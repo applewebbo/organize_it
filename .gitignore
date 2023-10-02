@@ -134,3 +134,5 @@ cython_debug/
 #  Boostrap Source Code
 bootstrap_source_scss/
 
+# RUFF
+.ruff_cache/
