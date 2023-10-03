@@ -1,7 +1,7 @@
 .PHONY: server
 
 local:
-	python manage.py runserver
+	python manage.py runserver --settings=core.settings.development
 
 requirements:
 	pip install --upgrade pip pip-tools

@@ -1,5 +1,3 @@
-target-version = "py311"
-
 [tool.bandit]
 skips = ["B101"]
 
@@ -17,4 +15,4 @@ addopts = "--nomigrations --disable-socket"
 
 [tool.ruff]
 select = ["E", "F"]
-ignore = ["E501", "E741"]
+ignore = ["E501", "E741", "F405"]
