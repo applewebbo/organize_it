@@ -12,6 +12,8 @@ cffi==1.16.0
     # via cryptography
 charset-normalizer==3.3.0
     # via requests
+crispy-bootstrap5==0.7
+    # via -r requirements.in
 cryptography==41.0.4
     # via pyjwt
 defusedxml==0.7.1
@@ -19,9 +21,15 @@ defusedxml==0.7.1
 django==4.2.5
     # via
     #   -r requirements.in
+    #   crispy-bootstrap5
     #   django-allauth
+    #   django-crispy-forms
 django-allauth==0.57.0
     # via -r requirements.in
+django-crispy-forms==2.0
+    # via
+    #   -r requirements.in
+    #   crispy-bootstrap5
 django-environ==0.11.2
     # via -r requirements.in
 idna==3.4

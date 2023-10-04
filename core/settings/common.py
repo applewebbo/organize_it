@@ -30,6 +30,8 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "crispy_bootstrap5",
+    "crispy_forms",
     # CONTRIB
     "django.contrib.admin",
     "django.contrib.auth",
@@ -130,6 +132,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "accounts.CustomUser"
 
+LOGIN_REDIRECT_URL = "/"
+
 # SITES
 
 SITE_ID = 1
@@ -185,3 +189,10 @@ ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_USERNAME_REQUIRED = False
 # ACCOUNT_USERNAME_VALIDATORS => default
 # SOCIALACCOUNT_* => default
+
+
+# DJANGO CRISPY FORMS
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+
+CRISPY_TEMPLATE_PACK = "bootstrap5"
