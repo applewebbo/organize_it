@@ -6,4 +6,12 @@
 
 {% block content %}
   <h1>Organize it!</h1>
+  <ul class="list-unstyled">
+    {% if user.is_authenticated %}
+      <p>You're logged in.</p>
+      <li><a href="{% url 'account_logout' %}">Logout</a></li>
+    {% else %}
+      <li><a href="{% url 'account_login' %}">Login</a></li>
+    {% endif %}
+  </ul>
 {% endblock content %}
