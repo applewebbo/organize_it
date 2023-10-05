@@ -19,8 +19,7 @@
       <!-- Messages -->
       {% if messages %}
         <div>
-          <strong>{% trans "Messages:" %}</strong>
-          <ul>
+          <ul class="list-unstyled ">
             {% for message in messages %}
               <li>{{message}}</li>
             {% endfor %}

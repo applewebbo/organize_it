@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 
-{% block page_title %}<title>Home Page</title>{% endblock page_title %}
+{% block page_title %}Home Page{% endblock page_title %}
 
 
 {% block content %}
@@ -9,9 +9,12 @@
   <ul class="list-unstyled">
     {% if user.is_authenticated %}
       <p>You're logged in.</p>
-      <li><a href="{% url 'account_logout' %}">Logout</a></li>
+      <form action="{% url 'account_logout' %}" method="POST">
+        {% csrf_token %}
+        <button class="btn btn-sm btn-primary" type="submit">Logout</button>
+      </form>
     {% else %}
-      <li><a href="{% url 'account_login' %}">Login</a></li>
+      <li><a class="btn btn-sm btn-primary" href="{% url 'account_login' %}">Login</a></li>
     {% endif %}
   </ul>
 {% endblock content %}
