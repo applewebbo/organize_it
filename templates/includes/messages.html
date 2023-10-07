@@ -1,6 +1,6 @@
 {% if messages %}
   {% for message in messages %}
-    <div class="position-absolute top-0 end-0 m-3">
+    <div class="position-fixed top-0 end-0 m-3">
       <div >
         <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert"
              x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)">
