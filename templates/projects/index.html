@@ -6,15 +6,4 @@
 
 {% block content %}
   <h1>Organize it!</h1>
-  <ul class="list-unstyled">
-    {% if user.is_authenticated %}
-      <p>You're logged in.</p>
-      <form action="{% url 'account_logout' %}" method="POST">
-        {% csrf_token %}
-        <button class="btn btn-sm btn-primary" type="submit">Logout</button>
-      </form>
-    {% else %}
-      <li><a class="btn btn-sm btn-primary" href="{% url 'account_login' %}">Login</a></li>
-    {% endif %}
-  </ul>
 {% endblock content %}
