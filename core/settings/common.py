@@ -33,7 +33,6 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "crispy_bootstrap5",
     "crispy_forms",
-    "django_browser_reload",
     "django_quill",
     # CONTRIB
     "django.contrib.admin",
@@ -48,7 +47,6 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django_browser_reload.middleware.BrowserReloadMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "allauth.account.middleware.AccountMiddleware",
