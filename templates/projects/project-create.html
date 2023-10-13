@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+
+{% block page_title %}Create a New Project{% endblock page_title %}
+
+{% block content %}
+  <h1>Create a New Project</h1>
+  <form action="" method="post">
+    {% csrf_token %}
+    {{ form }}
+  </form>
+
+
+{% endblock content %}

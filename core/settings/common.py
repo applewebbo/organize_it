@@ -212,3 +212,7 @@ MESSAGE_TAGS = {
 # MAPBOX
 
 MAPBOX_ACCESS_TOKEN = env("MAPBOX_ACCESS_TOKEN")
+
+# FORMS
+
+FORM_RENDERER = "django.forms.renderers.DjangoDivFormRenderer"
