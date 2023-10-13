@@ -12,10 +12,14 @@ cffi==1.16.0
     # via cryptography
 charset-normalizer==3.3.0
     # via requests
+click==8.1.7
+    # via geocoder
 crispy-bootstrap5==0.7
     # via -r requirements.in
 cryptography==41.0.4
     # via pyjwt
+decorator==5.1.1
+    # via ratelim
 defusedxml==0.7.1
     # via python3-openid
 django==4.2.6
@@ -35,6 +39,10 @@ django-environ==0.11.2
     # via -r requirements.in
 django-quill-editor==0.1.40
     # via -r requirements.in
+future==0.18.3
+    # via geocoder
+geocoder==1.38.1
+    # via -r requirements.in
 idna==3.4
     # via requests
 oauthlib==3.2.2
@@ -45,12 +53,17 @@ pyjwt==2.8.0
     # via django-allauth
 python3-openid==3.2.0
     # via django-allauth
+ratelim==0.1.6
+    # via geocoder
 requests==2.31.0
     # via
     #   django-allauth
+    #   geocoder
     #   requests-oauthlib
 requests-oauthlib==1.3.1
     # via django-allauth
+six==1.16.0
+    # via geocoder
 sqlparse==0.4.4
     # via django
 urllib3==2.0.6

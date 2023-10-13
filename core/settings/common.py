@@ -208,3 +208,7 @@ MESSAGE_TAGS = {
     messages.WARNING: "alert-warning",
     messages.ERROR: "alert-danger",
 }
+
+# MAPBOX
+
+MAPBOX_ACCESS_TOKEN = env("MAPBOX_ACCESS_TOKEN")

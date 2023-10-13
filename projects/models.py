@@ -1,3 +1,4 @@
+import geocoder
 from django.conf import settings
 from django.db import models
 from django_quill.fields import QuillField
@@ -29,3 +30,21 @@ class Link(models.Model):
 
     def __str__(self) -> str:
         return self.url
+
+
+class Place(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    url = models.URLField(null=True, blank=True)
+    address = models.CharField(max_length=200)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        g = geocoder.mapbox(self.address, access_token=settings.MAPBOX_ACCESS_TOKEN)
+        self.latitude = g.latlng[0]
+        self.longitude = g.latlng[1]
+        return super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return self.name
