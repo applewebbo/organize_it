@@ -42,8 +42,7 @@ class Place(models.Model):
 
     def save(self, *args, **kwargs):
         g = geocoder.mapbox(self.address, access_token=settings.MAPBOX_ACCESS_TOKEN)
-        self.latitude = g.latlng[0]
-        self.longitude = g.latlng[1]
+        self.latitude, self.longitude = g.latlng
         return super().save(*args, **kwargs)
 
     def __str__(self) -> str:
