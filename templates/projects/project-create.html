@@ -1,14 +1,20 @@
 {% extends "base.html" %}
+{% load crispy_forms_tags %}
 
 
 {% block page_title %}Create a New Project{% endblock page_title %}
+{% block extra_head %}
+  {{ form.media }}
+{% endblock extra_head %}
+
 
 {% block content %}
   <h1>Create a New Project</h1>
   <form action="" method="post">
     {% csrf_token %}
-    {{ form }}
+    {{ form|crispy }}
+    <div class="d-grid">
+      <button class="btn btn-primary my-3" type="submit">Save</button>
+    </div>
   </form>
-
-
 {% endblock content %}
