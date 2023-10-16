@@ -17,6 +17,13 @@ def home(request):
 
 
 @login_required
+def project_list(request):
+    projects = Project.objects.filter(author=request.user)
+    context = {"projects": projects}
+    return render(request, "projects/index.html#project-list", context)
+
+
+@login_required
 def project_detail(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
     context = {"project": project}
@@ -36,3 +43,10 @@ def project_create(request):
         form = ProjectForm()
     context = {"form": form}
     return render(request, "projects/project-create.html", context)
+
+
+@login_required
+def project_delete(request, project_id):
+    project = get_object_or_404(Project, pk=project_id)
+    project.delete()
+    return HttpResponse(status=204, headers={"HX-Trigger": "projectSaved"})

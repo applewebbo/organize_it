@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "crispy_bootstrap5",
     "crispy_forms",
+    "template_partials",
     # CONTRIB
     "django.contrib.admin",
     "django.contrib.auth",

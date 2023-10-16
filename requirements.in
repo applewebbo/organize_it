@@ -3,4 +3,5 @@ django==4.2.6
 django-allauth==0.57.0
 django-crispy-forms==2.0
 django-environ==0.11.2
+django-template-partials==23.3.post1
 geocoder==1.38.1

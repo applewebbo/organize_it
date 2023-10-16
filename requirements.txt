@@ -28,6 +28,7 @@ django==4.2.6
     #   crispy-bootstrap5
     #   django-allauth
     #   django-crispy-forms
+    #   django-template-partials
 django-allauth==0.57.0
     # via -r requirements.in
 django-crispy-forms==2.0
@@ -35,6 +36,8 @@ django-crispy-forms==2.0
     #   -r requirements.in
     #   crispy-bootstrap5
 django-environ==0.11.2
+    # via -r requirements.in
+django-template-partials==23.3.post1
     # via -r requirements.in
 future==0.18.3
     # via geocoder
@@ -47,7 +50,9 @@ oauthlib==3.2.2
 pycparser==2.21
     # via cffi
 pyjwt==2.8.0
-    # via django-allauth
+    # via
+    #   django-allauth
+    #   pyjwt
 python3-openid==3.2.0
     # via django-allauth
 ratelim==0.1.6

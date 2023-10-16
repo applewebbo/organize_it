@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load partials %}
 
 {% block page_title %}Home Page{% endblock page_title %}
 
@@ -7,13 +7,21 @@
 {% block content %}
   <h1 class="mb-3">Organize it!</h1>
   {% if user.is_authenticated %}
-    <ul class="list-unstyled">
-      {% for project in projects %}
-        <li><a href="{% url 'projects:project_detail' project.id %}">{{ project.title }}</a></li>
-      {% endfor %}
-    </ul>
+    {% partialdef project-list inline=true %}
+      <ul class="list-unstyled vstack gap-2" ù
+          hx-swap="outerHTML"
+          hx-get="{% url 'projects:project-list' %}"
+          hx-trigger="projectSaved from:body">
+        {% for project in projects %}
+          <li><a href="{% url 'projects:project-detail' project.id %}">{{ project.title }}</a>
+            <button class="btn btn-sm btn-danger ms-3" type="button"
+                    hx-get="{% url 'projects:project-delete' project.id %}"
+                    hx-confirm="Are you sure you want to delete {{ project.title }}?">Delete</button></li>
+        {% endfor %}
+      </ul>
+    {% endpartialdef %}
     <button class="btn btn-primary"
-            hx-get="{% url 'projects:project_create' %}"
+            hx-get="{% url 'projects:project-create' %}"
             hx-target="#dialog">Create a new project</button>
   {% else %}
     <a class="btn btn-primary" href="{% url 'account_login' %}">Login</a>
