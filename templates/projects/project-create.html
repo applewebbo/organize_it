@@ -1,20 +1,16 @@
-{% extends "base.html" %}
 {% load crispy_forms_tags %}
 
-
-{% block page_title %}Create a New Project{% endblock page_title %}
-{% block extra_head %}
-  {{ form.media }}
-{% endblock extra_head %}
-
-
-{% block content %}
-  <h1>Create a New Project</h1>
-  <form action="" method="post">
+<form hx-post="{{ request.path }}" class="modal-content" method="post">
+  <div class="modal-header">
+    <h5>Create a New Project</h5>
+  </div>
+  <div class="modal-body">
     {% csrf_token %}
-    {{ form|crispy }}
-    <div class="d-grid">
-      <button class="btn btn-primary my-3" type="submit">Save</button>
-    </div>
-  </form>
-{% endblock content %}
+    {{ form.media }}
+    {% crispy form %}
+  </div>
+  <div class="modal-footer">
+    <button type="button" data-bs-dismiss="modal" class="btn btn-danger">Cancel</button>
+    <button class="btn btn-primary" type="submit">Save</button>
+  </div>
+</form>

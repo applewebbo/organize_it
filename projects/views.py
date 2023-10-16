@@ -1,20 +1,29 @@
-from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, render
 
 from .forms import ProjectForm
 from .models import Project
 
 
 def home(request):
-    context = {}
+    user = request.user
+    if user.is_authenticated:
+        projects = Project.objects.filter(author=request.user)
+    else:
+        projects = None
+    context = {"projects": projects}
     return render(request, "projects/index.html", context)
 
 
+@login_required
 def project_detail(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
     context = {"project": project}
     return render(request, "projects/project-detail.html", context)
 
 
+@login_required
 def project_create(request):
     if request.method == "POST":
         form = ProjectForm(request.POST)
@@ -22,7 +31,7 @@ def project_create(request):
             project = form.save(commit=False)
             project.author = request.user
             project.save()
-            return redirect("projects:home")
+            return HttpResponse(status=204)
     else:
         form = ProjectForm()
     context = {"form": form}

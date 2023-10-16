@@ -5,5 +5,18 @@
 
 
 {% block content %}
-  <h1>Organize it!</h1>
+  <h1 class="mb-3">Organize it!</h1>
+  {% if user.is_authenticated %}
+    <ul class="list-unstyled">
+      {% for project in projects %}
+        <li><a href="{% url 'projects:project_detail' project.id %}">{{ project.title }}</a></li>
+      {% endfor %}
+    </ul>
+    <button class="btn btn-primary"
+            hx-get="{% url 'projects:project_create' %}"
+            hx-target="#dialog">Create a new project</button>
+  {% else %}
+    <a class="btn btn-primary" href="{% url 'account_login' %}">Login</a>
+  {% endif %}
+
 {% endblock content %}

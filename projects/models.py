@@ -1,7 +1,6 @@
 import geocoder
 from django.conf import settings
 from django.db import models
-from django_quill.fields import QuillField
 
 
 class Project(models.Model):
@@ -12,11 +11,10 @@ class Project(models.Model):
         COMPLETED = 4
 
     title = models.CharField(max_length=100)
-    description = QuillField()
+    description = models.CharField(max_length=500)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
-    due_date = models.CharField(max_length=100, null=True, blank=True)
     status = models.IntegerField(choices=Status.choices, default=Status.NOT_STARTED)
 
     def __str__(self) -> str:
