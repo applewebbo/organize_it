@@ -24,7 +24,9 @@
             hx-get="{% url 'projects:project-create' %}"
             hx-target="#dialog">Create a new project</button>
   {% else %}
-    <a class="btn btn-primary" href="{% url 'account_login' %}">Login</a>
+    <button class="btn btn-primary"
+            hx-get="{% url 'account_login' %}"
+            hx-target="#dialog">Login</button>
   {% endif %}
 
 {% endblock content %}
