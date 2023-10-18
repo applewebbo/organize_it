@@ -23,7 +23,6 @@ class ProjectForm(forms.ModelForm):
             "description",
             "start_date",
             "end_date",
-            "status",
         )
 
     def __init__(self, *args, **kwargs):

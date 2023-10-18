@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
@@ -38,7 +39,12 @@ def project_create(request):
             project = form.save(commit=False)
             project.author = request.user
             project.save()
-            return HttpResponse(status=204)
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                f"<strong>{project.title}</strong> added successfully",
+            )
+            return HttpResponse(status=204, headers={"HX-Trigger": "projectSaved"})
     else:
         form = ProjectForm()
     context = {"form": form}
@@ -49,4 +55,12 @@ def project_create(request):
 def project_delete(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
     project.delete()
-    return HttpResponse(status=204, headers={"HX-Trigger": "projectSaved"})
+    messages.add_message(
+        request,
+        messages.SUCCESS,
+        f"<strong>{project.title}</strong> deleted successfully",
+    )
+    return HttpResponse(
+        status=204,
+        headers={"HX-Trigger": "projectSaved"},
+    )

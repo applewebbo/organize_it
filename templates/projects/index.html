@@ -19,6 +19,12 @@
                     hx-confirm="Are you sure you want to delete {{ project.title }}?">Delete</button></li>
         {% endfor %}
       </ul>
+      {% if request.htmx %}
+        <div hx-swap-oob=innerHTML:#messages>
+          {% include 'includes/messages.html' %}
+        </div>
+      {% else %}
+      {% endif %}
     {% endpartialdef %}
     <button class="btn btn-primary"
             hx-get="{% url 'projects:project-create' %}"

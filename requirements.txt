@@ -28,6 +28,7 @@ django==4.2.6
     #   crispy-bootstrap5
     #   django-allauth
     #   django-crispy-forms
+    #   django-htmx
     #   django-template-partials
 django-allauth==0.57.0
     # via -r requirements.in
@@ -36,6 +37,8 @@ django-crispy-forms==2.0
     #   -r requirements.in
     #   crispy-bootstrap5
 django-environ==0.11.2
+    # via -r requirements.in
+django-htmx==1.17.0
     # via -r requirements.in
 django-template-partials==23.3.post1
     # via -r requirements.in
