@@ -6,7 +6,7 @@
     <h2 class="me-3">{{ project.title}}</h2>
     <span class="badge bg-info py-2 px-4">{{ project.get_status_display}}</span>
   </div>
-  <div id="project-date" class="mb-2 d-flex">
+  <div id="project-details" class="mb-2">
     {% if project.start_date and project.end_date %}
       <span class="pe-3">Start Date: <strong>{{ project.start_date}}</strong> / End date: <strong>{{ project.end_date}}</strong></span>
     {% else %}
