@@ -25,8 +25,8 @@ def project_list(request):
 
 
 @login_required
-def project_detail(request, project_id):
-    project = get_object_or_404(Project, pk=project_id)
+def project_detail(request, pk):
+    project = get_object_or_404(Project, pk=pk)
     context = {"project": project}
     return render(request, "projects/project-detail.html", context)
 
@@ -45,15 +45,15 @@ def project_create(request):
                 f"<strong>{project.title}</strong> added successfully",
             )
             return HttpResponse(status=204, headers={"HX-Trigger": "projectSaved"})
-    else:
-        form = ProjectForm()
+
+    form = ProjectForm()
     context = {"form": form}
     return render(request, "projects/project-create.html", context)
 
 
 @login_required
-def project_delete(request, project_id):
-    project = get_object_or_404(Project, pk=project_id)
+def project_delete(request, pk):
+    project = get_object_or_404(Project, pk=pk)
     project.delete()
     messages.add_message(
         request,
@@ -64,3 +64,22 @@ def project_delete(request, project_id):
         status=204,
         headers={"HX-Trigger": "projectSaved"},
     )
+
+
+@login_required
+def project_update(request, pk):
+    project = get_object_or_404(Project, pk=pk)
+    if request.method == "POST":
+        form = ProjectForm(request.POST, instance=project)
+        if form.is_valid():
+            project = form.save()
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                f"<strong>{project.title}</strong> added successfully",
+            )
+            return HttpResponse(status=204, headers={"HX-Trigger": "projectSaved"})
+
+    form = ProjectForm(instance=project)
+    context = {"form": form}
+    return render(request, "projects/project-create.html", context)

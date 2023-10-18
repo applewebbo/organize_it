@@ -19,7 +19,7 @@
     <!-- Custom.js -->
     <script defer src="{% static 'js/custom.js' %}"></script>
   </head>
-  <body>
+  <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
     <section>
       {% include 'includes/navbar.html' %}
     </section>
