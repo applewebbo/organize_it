@@ -16,6 +16,7 @@ class Project(models.Model):
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
     status = models.IntegerField(choices=Status.choices, default=Status.NOT_STARTED)
+    links = models.ManyToManyField("Link", related_name="projects")
 
     def __str__(self) -> str:
         return self.title
@@ -24,7 +25,9 @@ class Project(models.Model):
 class Link(models.Model):
     title = models.CharField(max_length=100, null=True, blank=True)
     url = models.URLField()
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="links"
+    )
 
     def __str__(self) -> str:
         return self.url

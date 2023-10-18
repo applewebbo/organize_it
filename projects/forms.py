@@ -3,7 +3,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Layout
 from django import forms
 
-from .models import Project
+from .models import Link, Project
 
 
 class ProjectForm(forms.ModelForm):
@@ -43,4 +43,27 @@ class ProjectForm(forms.ModelForm):
                 ),
                 css_class="row",
             ),
+        )
+
+
+class LinkForm(forms.ModelForm):
+    class Meta:
+        model = Link
+        fields = ("title", "url")
+        widgets = {
+            "title": forms.TextInput(attrs={"placeholder": "Titolo"}),
+            "url": forms.URLInput(attrs={"placeholder": "URL"}),
+        }
+        labels = {
+            "title": "Titolo",
+            "url": "URL",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            FloatingField("title"),
+            FloatingField("url"),
         )

@@ -2,6 +2,8 @@
 
 {% block page_title %}{{project.title}}{% endblock page_title %}
 {% block content %}
+
+  <!-- Details Section -->
   <div class="d-flex align-items-center">
     <h2 class="me-3">{{ project.title}}</h2>
     <span class="badge bg-info py-2 px-4">{{ project.get_status_display}}</span>
@@ -15,6 +17,23 @@
   </div>
   <p><em>{{ project.description }}</em></p>
   <hr>
+
+  <!-- Links Section -->
+  <section id="links" class="my-5">
+    <h3>Links</h3>
+    <ul class="list-unstyled">
+      {% for link in project.links.all %}
+        <li>
+          <a href="{{ link.url }}">{% if link.title %}{{ link.title }}{%else%}{{ link.url}}{% endif %}</a>
+        </li>
+      {% endfor %}
+    </ul>
+    <button class="btn btn-primary"
+            hx-get="{% url 'projects:project-add-link' project.id %}"
+            hx-target="#dialog"
+            hx-swap="innerHTML">Add a link</button>
+  </section>
+
 
 
 {% endblock content %}

@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 
-from .forms import ProjectForm
+from .forms import LinkForm, ProjectForm
 from .models import Project
 
 
@@ -26,7 +26,8 @@ def project_list(request):
 
 @login_required
 def project_detail(request, pk):
-    project = get_object_or_404(Project, pk=pk)
+    qs = Project.objects.prefetch_related("links")
+    project = get_object_or_404(qs, pk=pk)
     context = {"project": project}
     return render(request, "projects/project-detail.html", context)
 
@@ -83,3 +84,26 @@ def project_update(request, pk):
     form = ProjectForm(instance=project)
     context = {"form": form}
     return render(request, "projects/project-create.html", context)
+
+
+@login_required
+def project_add_link(request, pk):
+    project = get_object_or_404(Project, pk=pk)
+    if request.method == "POST":
+        form = LinkForm(request.POST)
+        if form.is_valid():
+            link = form.save(commit=False)
+            link.author = request.user
+            link.save()
+            project.links.add(link)
+            project.save()
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                "Link added successfully",
+            )
+            return HttpResponse(status=204, headers={"HX-Trigger": "projectSaved"})
+
+    form = LinkForm()
+    context = {"form": form}
+    return render(request, "projects/link-create.html", context)
