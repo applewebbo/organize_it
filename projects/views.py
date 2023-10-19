@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 
 from .forms import LinkForm, PlaceForm, ProjectForm
-from .models import Link, Project
+from .models import Link, Place, Project
 
 
 def home(request):
@@ -26,7 +26,7 @@ def project_list(request):
 
 @login_required
 def project_detail(request, pk):
-    qs = Project.objects.prefetch_related("links")
+    qs = Project.objects.prefetch_related("links", "places")
     project = get_object_or_404(qs, pk=pk)
     context = {"project": project}
     return render(request, "projects/project-detail.html", context)
@@ -168,5 +168,48 @@ def place_create(request, project_id):
             )
             return HttpResponse(status=204, headers={"HX-Trigger": "placeSaved"})
     form = PlaceForm()
+    context = {"form": form}
+    return render(request, "projects/place-create.html", context)
+
+
+@login_required
+def place_list(request, project_id):
+    places = Place.objects.filter(project=project_id)
+    project = get_object_or_404(Project, pk=project_id)
+    context = {"places": places, "project": project}
+    return render(request, "projects/project-detail.html#place-list", context)
+
+
+@login_required
+def place_delete(request, pk):
+    place = get_object_or_404(Place, pk=pk)
+    place.delete()
+    messages.add_message(
+        request,
+        messages.SUCCESS,
+        "Place deleted successfully",
+    )
+    return HttpResponse(
+        status=204,
+        headers={"HX-Trigger": "placeSaved"},
+    )
+
+
+@login_required
+def place_update(request, pk):
+    place = get_object_or_404(Place, pk=pk)
+
+    if request.method == "POST":
+        form = PlaceForm(request.POST, instance=place)
+        if form.is_valid():
+            place = form.save()
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                "Place updated successfully",
+            )
+            return HttpResponse(status=204, headers={"HX-Trigger": "placeSaved"})
+
+    form = PlaceForm(instance=place)
     context = {"form": form}
     return render(request, "projects/place-create.html", context)
