@@ -51,11 +51,11 @@ class LinkForm(forms.ModelForm):
         model = Link
         fields = ("title", "url")
         widgets = {
-            "title": forms.TextInput(attrs={"placeholder": "Titolo"}),
+            "title": forms.TextInput(attrs={"placeholder": "Title"}),
             "url": forms.URLInput(attrs={"placeholder": "URL"}),
         }
         labels = {
-            "title": "Titolo",
+            "title": "Title",
             "url": "URL",
         }
 

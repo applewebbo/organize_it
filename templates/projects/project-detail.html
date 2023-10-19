@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load partials %}
 
 {% block page_title %}{{project.title}}{% endblock page_title %}
 {% block content %}
@@ -21,13 +22,32 @@
   <!-- Links Section -->
   <section id="links" class="my-5">
     <h3>Links</h3>
-    <ul class="list-unstyled">
-      {% for link in project.links.all %}
-        <li>
-          <a href="{{ link.url }}">{% if link.title %}{{ link.title }}{%else%}{{ link.url}}{% endif %}</a>
-        </li>
-      {% endfor %}
-    </ul>
+    {% partialdef link-list inline=true %}
+      <ul class="list-unstyled vstack gap-2 mb-3"
+          hx-swap="outerHTML"
+          hx-get="{% url 'projects:link-list' project.id %}"
+          hx-trigger="linkSaved from:body">
+        {% for link in project.links.all %}
+          <li class="d-flex">
+            <a href="{{ link.url }}"
+               class="flex-grow-1 ">{% if link.title %}{{ link.title }}{%else%}{{ link.url}}{% endif %}</a>
+            <button class="btn btn-sm btn-primary ms-3"
+                    hx-get="{% url 'projects:link-update' link.id %}"
+                    hx-target="#dialog"
+                    hx-swap="innerHTML">Update</button>
+            <button class="btn btn-sm btn-danger ms-3"
+                    hx-get="{% url 'projects:link-delete' link.pk %}"
+                    hx-confirm="Are you sure you want to delete {{ link.url }}">Delete</button>
+          </li>
+        {% endfor %}
+      </ul>
+      {% if request.htmx %}
+        <div hx-swap-oob=innerHTML:#messages>
+          {% include 'includes/messages.html' %}
+        </div>
+      {% else %}
+      {% endif %}
+    {% endpartialdef %}
     <button class="btn btn-primary"
             hx-get="{% url 'projects:project-add-link' project.id %}"
             hx-target="#dialog"

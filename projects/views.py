@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 
 from .forms import LinkForm, ProjectForm
-from .models import Project
+from .models import Link, Project
 
 
 def home(request):
@@ -77,7 +77,7 @@ def project_update(request, pk):
             messages.add_message(
                 request,
                 messages.SUCCESS,
-                f"<strong>{project.title}</strong> added successfully",
+                f"<strong>{project.title}</strong> updated successfully",
             )
             return HttpResponse(status=204, headers={"HX-Trigger": "projectSaved"})
 
@@ -102,8 +102,51 @@ def project_add_link(request, pk):
                 messages.SUCCESS,
                 "Link added successfully",
             )
-            return HttpResponse(status=204, headers={"HX-Trigger": "projectSaved"})
+            return HttpResponse(status=204, headers={"HX-Trigger": "linkSaved"})
 
     form = LinkForm()
     context = {"form": form}
     return render(request, "projects/link-create.html", context)
+
+
+@login_required
+def link_delete(request, pk):
+    link = get_object_or_404(Link, pk=pk)
+    link.delete()
+    messages.add_message(
+        request,
+        messages.SUCCESS,
+        "Link deleted successfully",
+    )
+    return HttpResponse(
+        status=204,
+        headers={"HX-Trigger": "linkSaved"},
+    )
+
+
+@login_required
+def link_update(request, pk):
+    link = get_object_or_404(Link, pk=pk)
+
+    if request.method == "POST":
+        form = LinkForm(request.POST, instance=link)
+        if form.is_valid():
+            link = form.save()
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                "Link updated successfully",
+            )
+            return HttpResponse(status=204, headers={"HX-Trigger": "linkSaved"})
+
+    form = LinkForm(instance=link)
+    context = {"form": form}
+    return render(request, "projects/link-create.html", context)
+
+
+@login_required
+def link_list(request, project_id):
+    links = Link.objects.filter(projects=project_id)
+    project = get_object_or_404(Project, pk=project_id)
+    context = {"links": links, "project": project}
+    return render(request, "projects/project-detail.html#link-list", context)

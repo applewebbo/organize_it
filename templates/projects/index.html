@@ -17,7 +17,7 @@
             <a href="{% url 'projects:project-detail' project.id %}"
                class="flex-grow-1 ">{{ project.title }}</a>
             <button class="btn btn-sm btn-primary ms-3"
-                    hx-post="{% url 'projects:project-update' project.id %}"
+                    hx-get="{% url 'projects:project-update' project.id %}"
                     hx-target="#dialog"
                     hx-swap="innerHTML">Update</button>
             <button class="btn btn-sm btn-danger ms-3" type="button"
