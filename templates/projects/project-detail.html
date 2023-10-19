@@ -20,8 +20,14 @@
   <hr>
 
   <!-- Links Section -->
-  <section id="links" class="my-5">
-    <h3>Links</h3>
+  <section id="links" class="mt-3 mb-5">
+    <div class="d-flex align-items-center mb-3">
+      <h3 class="me-4">Links</h3>
+      <button class="btn btn-sm btn-outline-primary"
+              hx-get="{% url 'projects:project-add-link' project.id %}"
+              hx-target="#dialog"
+              hx-swap="innerHTML">Add a link</button>
+    </div>
     {% partialdef link-list inline=true %}
       <ul class="list-unstyled vstack gap-2 mb-3"
           hx-swap="outerHTML"
@@ -48,12 +54,18 @@
       {% else %}
       {% endif %}
     {% endpartialdef %}
-    <button class="btn btn-primary"
-            hx-get="{% url 'projects:project-add-link' project.id %}"
-            hx-target="#dialog"
-            hx-swap="innerHTML">Add a link</button>
-  </section>
 
+  </section>
+  <hr>
+  <!-- Places Section -->
+  <section id="places" class="my-5"></section>
+  <div class="d-flex align-items-center mb-3">
+    <h3 class="me-4">Places</h3>
+    <button class="btn btn-sm btn-outline-primary"
+            hx-get="{% url 'projects:project-add-place' project.id %}"
+            hx-target="#dialog"
+            hx-swap="innerHTML">Add a place</button>
+  </div>
 
 
 {% endblock content %}

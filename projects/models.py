@@ -34,7 +34,9 @@ class Link(models.Model):
 
 
 class Place(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    project = models.ForeignKey(
+        Project, on_delete=models.CASCADE, related_name="places"
+    )
     name = models.CharField(max_length=100)
     url = models.URLField(null=True, blank=True)
     address = models.CharField(max_length=200)

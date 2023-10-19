@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 
-from .forms import LinkForm, ProjectForm
+from .forms import LinkForm, PlaceForm, ProjectForm
 from .models import Link, Project
 
 
@@ -150,3 +150,23 @@ def link_list(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
     context = {"links": links, "project": project}
     return render(request, "projects/project-detail.html#link-list", context)
+
+
+@login_required
+def place_create(request, project_id):
+    project = get_object_or_404(Project, pk=project_id)
+    if request.method == "POST":
+        form = PlaceForm(request.POST)
+        if form.is_valid():
+            place = form.save(commit=False)
+            place.project = project
+            place.save()
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                f"<strong>{place.name}</strong> added successfully",
+            )
+            return HttpResponse(status=204, headers={"HX-Trigger": "placeSaved"})
+    form = PlaceForm()
+    context = {"form": form}
+    return render(request, "projects/place-create.html", context)

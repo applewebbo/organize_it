@@ -1,0 +1,18 @@
+{% load crispy_forms_tags %}
+
+<form hx-post="{{ request.path }}" class="modal-content" method="post">
+  <div class="modal-header">
+    <h5>Create a New Location</h5>
+  </div>
+  <div class="modal-body">
+    <div class="mb-3">
+      <a class="" href="https://www.google.com/maps" target="_blank">Find a place on GoogleMaps</a>
+    </div>
+    {% csrf_token %}
+    {% crispy form %}
+  </div>
+  <div class="modal-footer">
+    <button type="button" data-bs-dismiss="modal" class="btn btn-danger">Cancel</button>
+    <button class="btn btn-primary" type="submit">Save</button>
+  </div>
+</form>
