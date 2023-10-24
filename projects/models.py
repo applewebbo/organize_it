@@ -18,6 +18,9 @@ class Project(models.Model):
     status = models.IntegerField(choices=Status.choices, default=Status.NOT_STARTED)
     links = models.ManyToManyField("Link", related_name="projects")
 
+    class Meta:
+        ordering = ("-status",)
+
     def __str__(self) -> str:
         return self.title
 

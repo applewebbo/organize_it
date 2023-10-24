@@ -11,7 +11,7 @@
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav ms-auto">
         <a class="nav-link active" aria-current="page" href="{% url 'projects:home' %}">Home</a>
-        <a class="nav-link" href="#">Projects</a>
+        <a class="nav-link" href="{% url 'projects:project-list' %}">Projects</a>
         <a class="nav-link" href="#">Info</a>
         <a class="nav-link" href="#">Contacts</a>
         {% if user.is_authenticated %}

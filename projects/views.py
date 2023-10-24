@@ -30,9 +30,13 @@ def home(request):
 
 @login_required
 def project_list(request):
+    if request.htmx:
+        template = "projects/index.html#project-list"
+    else:
+        template = "projects/project-list.html"
     projects = Project.objects.filter(author=request.user)
     context = {"projects": projects}
-    return render(request, "projects/index.html#project-list", context)
+    return render(request, template, context)
 
 
 @login_required
