@@ -67,24 +67,34 @@
             hx-swap="innerHTML">Add a place</button>
   </div>
   {% partialdef place-list inline=true %}
-    <ul class="list-unstyled vstack gap-2 mb-3"
-        hx-swap="outerHTML"
-        hx-get="{% url 'projects:place-list' project.id %}"
-        hx-trigger="placeSaved from:body">
-      {% for place in project.places.all %}
-        <li class="d-flex">
-          <a href="#"
-             class="flex-grow-1 ">{{ place.name }}</a>
-          <button class="btn btn-sm btn-primary ms-3"
-                  hx-get="{% url 'projects:place-update' place.id %}"
-                  hx-target="#dialog"
-                  hx-swap="innerHTML">Update</button>
-          <button class="btn btn-sm btn-danger ms-3"
-                  hx-get="{% url 'projects:place-delete' place.id %}"
-                  hx-confirm="Are you sure you want to delete {{ place.name }}">Delete</button>
-        </li>
-      {% endfor %}
-    </ul>
+    <div id ="place-list" class="row mb-5"
+         hx-swap="outerHTML"
+         hx-get="{% url 'projects:place-list' project.id %}"
+         hx-trigger="placeSaved from:body"
+         hx-target="#place-list">
+      <div class="col-12">
+        <ul class="list-unstyled vstack gap-2 mb-5">
+          {% for place in project.places.all %}
+            <li class="d-flex">
+              <a href="#"
+                 class="flex-grow-1 ">{{ place.name }}</a>
+              <button class="btn btn-sm btn-primary ms-3"
+                      hx-get="{% url 'projects:place-update' place.id %}"
+                      hx-target="#dialog"
+                      hx-swap="innerHTML">Update</button>
+              <button class="btn btn-sm btn-danger ms-3"
+                      hx-get="{% url 'projects:place-delete' place.id %}"
+                      hx-confirm="Are you sure you want to delete {{ place.name }}">Delete</button>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="col-12">
+        <div id="map" class="z-n1">
+        </div>
+        {{ locations|json_script:"location_json" }}
+      </div>
+    </div>
     {% if request.htmx %}
       <div hx-swap-oob=innerHTML:#messages>
         {% include 'includes/messages.html' %}
@@ -92,7 +102,33 @@
     {% else %}
     {% endif %}
   {% endpartialdef %}
-
-
-
 {% endblock content %}
+{% block script %}
+  <script>
+
+    document.addEventListener('DOMContentLoaded', () => {
+      let map = createMap({{ map_bounds }});
+      let locations = JSON.parse(document.getElementById('location_json').textContent);
+
+      let markerFeatureGroup = L.featureGroup().addTo(map);
+
+      for (let location of locations) {
+        L.marker([ location.latitude, location.longitude]).addTo(markerFeatureGroup);
+      }
+    });
+
+    document.addEventListener('htmx:load', (e) => {
+      if (e.detail.elt.id == "place-list") {
+        let map = createMap({{ map_bounds }});
+        let locations = JSON.parse(document.getElementById('location_json').textContent);
+
+        let markerFeatureGroup = L.featureGroup().addTo(map);
+
+        for (let location of locations) {
+          L.marker([ location.latitude, location.longitude]).addTo(markerFeatureGroup);
+        }
+      }
+    });
+
+  </script>
+{% endblock script %}

@@ -5,4 +5,5 @@ django-crispy-forms==2.0
 django-environ==0.11.2
 django-htmx==1.17.0
 django-template-partials==23.3.post1
+folium==0.14.0
 geocoder==1.38.1

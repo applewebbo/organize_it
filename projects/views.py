@@ -7,6 +7,17 @@ from .forms import LinkForm, PlaceForm, ProjectForm
 from .models import Link, Place, Project
 
 
+def calculate_bounds(locations):
+    # Check if the list is not empty
+    if not locations:
+        return None
+
+    sw = list(min((point["latitude"], point["longitude"]) for point in locations))
+    ne = list(max((point["latitude"], point["longitude"]) for point in locations))
+
+    return [sw, ne]
+
+
 def home(request):
     user = request.user
     if user.is_authenticated:
@@ -28,7 +39,15 @@ def project_list(request):
 def project_detail(request, pk):
     qs = Project.objects.prefetch_related("links", "places")
     project = get_object_or_404(qs, pk=pk)
-    context = {"project": project}
+
+    locations = list(Place.objects.filter(project=pk).values("latitude", "longitude"))
+    map_bounds = calculate_bounds(locations)
+
+    context = {
+        "project": project,
+        "locations": locations,
+        "map_bounds": map_bounds,
+    }
     return render(request, "projects/project-detail.html", context)
 
 
@@ -176,7 +195,14 @@ def place_create(request, project_id):
 def place_list(request, project_id):
     places = Place.objects.filter(project=project_id)
     project = get_object_or_404(Project, pk=project_id)
-    context = {"places": places, "project": project}
+    locations = list(places.values("latitude", "longitude"))
+    map_bounds = calculate_bounds(locations)
+    context = {
+        "places": places,
+        "project": project,
+        "locations": locations,
+        "map_bounds": map_bounds,
+    }
     return render(request, "projects/project-detail.html#place-list", context)
 
 

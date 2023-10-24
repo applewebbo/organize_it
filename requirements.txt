@@ -6,6 +6,8 @@
 #
 asgiref==3.7.2
     # via django
+branca==0.6.0
+    # via folium
 certifi==2023.7.22
     # via requests
 cffi==1.16.0
@@ -42,12 +44,22 @@ django-htmx==1.17.0
     # via -r requirements.in
 django-template-partials==23.3.post1
     # via -r requirements.in
+folium==0.14.0
+    # via -r requirements.in
 future==0.18.3
     # via geocoder
 geocoder==1.38.1
     # via -r requirements.in
 idna==3.4
     # via requests
+jinja2==3.1.2
+    # via
+    #   branca
+    #   folium
+markupsafe==2.1.3
+    # via jinja2
+numpy==1.26.1
+    # via folium
 oauthlib==3.2.2
     # via requests-oauthlib
 pycparser==2.21
@@ -63,6 +75,7 @@ ratelim==0.1.6
 requests==2.31.0
     # via
     #   django-allauth
+    #   folium
     #   geocoder
     #   requests-oauthlib
 requests-oauthlib==1.3.1
