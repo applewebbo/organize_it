@@ -6,7 +6,7 @@
   <h1>My Projects</h1>
   <section id="projects" class="my-5">
     <div class="row g-4">
-      {% for project in projects %}
+      {% for project in active_projects %}
         <div class="col-lg-6 col-xxl-4">
           <div class="card h-100">
             <div class="card-header text-center">
@@ -26,13 +26,24 @@
             <div class="card-body">
               <h5 class="card-title">{{ project.title }}</h5>
               <p class="card-text">{{ project.description }}</p>
-              <a href="{% url 'projects:project-detail' project.id %}" class="btn btn-primary">View</a>
+              <div class="text-end">
+                <a href="#" class="btn btn-danger me-2">Archive</a>
+                <a href="{% url 'projects:project-detail' project.id %}" class="btn btn-primary">View</a>
+              </div>
 
             </div>
           </div>
         </div>
       {% endfor %}
     </div>
+  </section>
+  <h2>Archived Projects</h2>
+  <section id="archived-projects" class="my-4">
+    <ul class="list-unstyled">
+      {% for project in archived_projects %}
+        <li><a href="{% url 'projects:project-detail' project.id %}">{{ project.title }}</a></li>
+      {% endfor %}
+    </ul>
   </section>
 {% endblock content %}
 

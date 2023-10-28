@@ -9,6 +9,7 @@ class Project(models.Model):
         IMPENDING = 2
         IN_PROGRESS = 3
         COMPLETED = 4
+        ARCHIVED = 5
 
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=500)
@@ -19,7 +20,7 @@ class Project(models.Model):
     links = models.ManyToManyField("Link", related_name="projects")
 
     class Meta:
-        ordering = ("-status",)
+        ordering = ("status",)
 
     def __str__(self) -> str:
         return self.title

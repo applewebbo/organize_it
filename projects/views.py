@@ -34,8 +34,12 @@ def project_list(request):
         template = "projects/index.html#project-list"
     else:
         template = "projects/project-list.html"
-    projects = Project.objects.filter(author=request.user)
-    context = {"projects": projects}
+    active_projects = Project.objects.filter(author=request.user).exclude(status=5)
+    archived_projects = Project.objects.filter(author=request.user, status=5)
+    context = {
+        "active_projects": active_projects,
+        "archived_projects": archived_projects,
+    }
     return render(request, template, context)
 
 
