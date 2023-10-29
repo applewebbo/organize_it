@@ -31,7 +31,7 @@ def home(request):
 @login_required
 def project_list(request):
     if request.htmx:
-        template = "projects/index.html#project-list"
+        template = "projects/project-list.html#project-list"
     else:
         template = "projects/project-list.html"
     active_projects = Project.objects.filter(author=request.user).exclude(status=5)
@@ -111,6 +111,21 @@ def project_update(request, pk):
     form = ProjectForm(instance=project)
     context = {"form": form}
     return render(request, "projects/project-create.html", context)
+
+
+def project_archive(request, pk):
+    project = get_object_or_404(Project, pk=pk)
+    project.status = 5
+    project.save()
+    messages.add_message(
+        request,
+        messages.SUCCESS,
+        f"<strong>{project.title}</strong> archived successfully",
+    )
+    return HttpResponse(
+        status=204,
+        headers={"HX-Trigger": "projectSaved"},
+    )
 
 
 @login_required

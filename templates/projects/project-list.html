@@ -1,50 +1,67 @@
 {% extends "base.html" %}
+{% load partials %}
 
 {% block page_title %}Projects List{% endblock page_title %}
 
 {% block content %}
-  <h1>My Projects</h1>
-  <section id="projects" class="my-5">
-    <div class="row g-4">
-      {% for project in active_projects %}
-        <div class="col-lg-6 col-xxl-4">
-          <div class="card h-100">
-            <div class="card-header text-center">
-              <div class="d-flex justify-content-between">
-                <div>
-                  {% if project.start_date and project.end_date %}
-                    {{ project.start_date }} / {{ project.end_date }}
-                  {% else  %}
-                    - / -
-                  {% endif %}
+  {% partialdef project-list inline=true %}
+    <div id="projects">
+      <!-- Active Projects Section -->
+      <section class="my-5"
+               hx-swap="outerHTML"
+               hx-trigger="projectSaved from:body"
+               hx-get="{% url 'projects:project-list' %}"
+               hx-target="#projects">
+        <h1>My Projects</h1>
+        <div class="row g-4">
+          {% for project in active_projects %}
+            <div class="col-lg-6 col-xxl-4">
+              <div class="card h-100">
+                <div class="card-header text-center">
+                  <div class="d-flex justify-content-between">
+                    <div>
+                      {% if project.start_date and project.end_date %}
+                        {{ project.start_date }} / {{ project.end_date }}
+                      {% else  %}
+                        - / -
+                      {% endif %}
+                    </div>
+                    <span class="badge px-3 py-2 text-bg-secondary">
+                      {{ project.get_status_display }}
+                    </span>
+                  </div>
                 </div>
-                <span class="badge px-3 py-2 text-bg-secondary">
-                  {{ project.get_status_display }}
-                </span>
-              </div>
-            </div>
-            <div class="card-body">
-              <h5 class="card-title">{{ project.title }}</h5>
-              <p class="card-text">{{ project.description }}</p>
-              <div class="text-end">
-                <a href="#" class="btn btn-danger me-2">Archive</a>
-                <a href="{% url 'projects:project-detail' project.id %}" class="btn btn-primary">View</a>
-              </div>
+                <div class="card-body">
+                  <h5 class="card-title">{{ project.title }}</h5>
+                  <p class="card-text">{{ project.description }}</p>
+                  <div class="text-end">
+                    <button class="btn btn-danger me-2"
+                            hx-get="{% url 'projects:project-archive' project.id %}"
+                            hx-target="">Archive</button>
+                    <a href="{% url 'projects:project-detail' project.id %}" class="btn btn-primary">View</a>
+                  </div>
 
+                </div>
+              </div>
             </div>
-          </div>
+          {% endfor %}
         </div>
-      {% endfor %}
+      </section>
+    <!-- Archived Projects Section -->
+      {% if archived_projects %}
+        <section class="my-4">
+          <h2>Archived Projects</h2>
+          <ul class="list-unstyled">
+            {% for project in archived_projects %}
+              <li><a href="{% url 'projects:project-detail' project.id %}">{{ project.title }}</a></li>
+            {% endfor %}
+          </ul>
+        </section>
+      {% endif %}
     </div>
-  </section>
-  <h2>Archived Projects</h2>
-  <section id="archived-projects" class="my-4">
-    <ul class="list-unstyled">
-      {% for project in archived_projects %}
-        <li><a href="{% url 'projects:project-detail' project.id %}">{{ project.title }}</a></li>
-      {% endfor %}
-    </ul>
-  </section>
+
+
+  {% endpartialdef %}
 {% endblock content %}
 
 

@@ -14,6 +14,7 @@ htmx_urlpatterns = [
     path("projects/create", views.project_create, name="project-create"),
     path("projects/<int:pk>/delete", views.project_delete, name="project-delete"),
     path("projects/<int:pk>/update", views.project_update, name="project-update"),
+    path("projects/<int:pk>/archive", views.project_archive, name="project-archive"),
     path("projects/<int:pk>/add-link", views.project_add_link, name="project-add-link"),
     path("links/<int:pk>/delete", views.link_delete, name="link-delete"),
     path("links/<int:pk>/update", views.link_update, name="link-update"),
