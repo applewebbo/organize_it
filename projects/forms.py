@@ -2,6 +2,7 @@ from crispy_bootstrap5.bootstrap5 import FloatingField
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Layout
 from django import forms
+from django.core.exceptions import ValidationError
 
 from .models import Link, Place, Project
 
@@ -45,6 +46,13 @@ class ProjectForm(forms.ModelForm):
             ),
         )
 
+    def clean(self):
+        cleaned_data = super().clean()
+        if cleaned_data.get("start_date") and cleaned_data.get("end_date"):
+            if cleaned_data.get("start_date") > cleaned_data.get("end_date"):
+                raise ValidationError("End date must be after start date")
+        return cleaned_data
+
 
 class ProjectDateUpdateForm(forms.ModelForm):
     start_date = forms.DateField(
@@ -78,6 +86,13 @@ class ProjectDateUpdateForm(forms.ModelForm):
                 css_class="row",
             ),
         )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if cleaned_data.get("start_date") and cleaned_data.get("end_date"):
+            if cleaned_data.get("start_date") > cleaned_data.get("end_date"):
+                raise ValidationError("End date must be after start date")
+        return cleaned_data
 
 
 class LinkForm(forms.ModelForm):

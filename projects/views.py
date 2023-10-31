@@ -107,6 +107,9 @@ def project_update(request, pk):
                 f"<strong>{project.title}</strong> updated successfully",
             )
             return HttpResponse(status=204, headers={"HX-Trigger": "projectSaved"})
+        form = ProjectForm(request.POST, instance=project)
+        context = {"form": form}
+        return render(request, "projects/project-create.html", context)
 
     form = ProjectForm(instance=project)
     context = {"form": form}
@@ -140,6 +143,9 @@ def project_dates_update(request, pk):
                 "Dates updated successfully",
             )
             return HttpResponse(status=204, headers={"HX-Trigger": "projectSaved"})
+        form = ProjectDateUpdateForm(request.POST, instance=project)
+        context = {"form": form}
+        return render(request, "projects/project-dates-update.html", context)
 
     form = ProjectDateUpdateForm(instance=project)
     context = {"form": form}
