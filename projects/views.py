@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 
-from .forms import LinkForm, PlaceForm, ProjectForm
+from .forms import LinkForm, PlaceForm, ProjectDateUpdateForm, ProjectForm
 from .models import Link, Place, Project
 
 
@@ -126,6 +126,24 @@ def project_archive(request, pk):
         status=204,
         headers={"HX-Trigger": "projectSaved"},
     )
+
+
+def project_dates_update(request, pk):
+    project = get_object_or_404(Project, pk=pk)
+    if request.method == "POST":
+        form = ProjectDateUpdateForm(request.POST, instance=project)
+        if form.is_valid():
+            project = form.save()
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                "Dates updated successfully",
+            )
+            return HttpResponse(status=204, headers={"HX-Trigger": "projectSaved"})
+
+    form = ProjectDateUpdateForm(instance=project)
+    context = {"form": form}
+    return render(request, "projects/project-dates-update.html", context)
 
 
 @login_required

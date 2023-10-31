@@ -1,0 +1,15 @@
+{% load crispy_forms_tags %}
+
+<form hx-post="{{ request.path }}" class="modal-content" method="post">
+  <div class="modal-header">
+    <h5>Change dates</h5>
+  </div>
+  <div class="modal-body">
+    {% csrf_token %}
+    {% crispy form %}
+  </div>
+  <div class="modal-footer">
+    <button type="button" data-bs-dismiss="modal" class="btn btn-danger">Cancel</button>
+    <button class="btn btn-primary" type="submit">Save</button>
+  </div>
+</form>

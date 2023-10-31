@@ -16,29 +16,34 @@
         <div class="row g-4">
           {% for project in active_projects %}
             <div class="col-lg-6 col-xxl-4">
-              <div class="card h-100">
+              <div class="card h-100" id="{{project.id}}">
                 <div class="card-header text-center">
                   <div class="d-flex justify-content-between">
                     <div>
+                      <span class="badge rounded-pill px-3 py-2 text-bg-secondary me-3">
+                        {{ project.get_status_display }}
+                      </span>
                       {% if project.start_date and project.end_date %}
                         {{ project.start_date }} / {{ project.end_date }}
                       {% else  %}
                         - / -
                       {% endif %}
                     </div>
-                    <span class="badge px-3 py-2 text-bg-secondary">
-                      {{ project.get_status_display }}
-                    </span>
+                    <button class="btn btn-sm btn-outline-secondary"
+                            hx-get="{% url 'projects:project-dates' project.id %}"
+                            hx-target="#dialog"
+                            hx-swap="innerHTML"
+                    >Edit</button>
                   </div>
                 </div>
                 <div class="card-body">
                   <h5 class="card-title">{{ project.title }}</h5>
                   <p class="card-text">{{ project.description }}</p>
                   <div class="text-end">
-                    <button class="btn btn-danger me-2"
+                    <button class="btn btn-outline-danger me-2"
                             hx-get="{% url 'projects:project-archive' project.id %}"
                             hx-target="">Archive</button>
-                    <a href="{% url 'projects:project-detail' project.id %}" class="btn btn-primary">View</a>
+                    <a href="{% url 'projects:project-detail' project.id %}" class="btn btn-outline-primary">View</a>
                   </div>
 
                 </div>

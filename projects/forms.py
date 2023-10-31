@@ -46,6 +46,40 @@ class ProjectForm(forms.ModelForm):
         )
 
 
+class ProjectDateUpdateForm(forms.ModelForm):
+    start_date = forms.DateField(
+        label="Inizio", required=False, widget=forms.DateInput(attrs={"type": "date"})
+    )
+    end_date = forms.DateField(
+        label="Fine", required=False, widget=forms.DateInput(attrs={"type": "date"})
+    )
+
+    class Meta:
+        model = Project
+        fields = (
+            "start_date",
+            "end_date",
+        )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Div(
+                Div(
+                    FloatingField("start_date", autocomplete="Inizio"),
+                    css_class="col",
+                ),
+                Div(
+                    FloatingField("end_date", autocomplete="Fine"),
+                    css_class="col",
+                ),
+                css_class="row",
+            ),
+        )
+
+
 class LinkForm(forms.ModelForm):
     class Meta:
         model = Link
