@@ -1,3 +1,5 @@
+import datetime
+
 import geocoder
 from django.conf import settings
 from django.db import models
@@ -24,6 +26,26 @@ class Project(models.Model):
 
     def __str__(self) -> str:
         return self.title
+
+    def save(self, *args, **kwargs):
+        today = datetime.date.today()
+        delta = today - datetime.timedelta(days=7)
+        # more than 7 days from start date
+        if self.start_date <= delta:
+            self.status = 1
+        # less than 7 days from start date
+        elif self.start_date > delta and self.start_date < today:
+            self.status = 2
+        # between start date and end date
+        elif self.start_date >= today and self.end_date >= today:
+            self.status = 3
+        # after end date
+        elif self.end_date > today:
+            self.status = 4
+        else:
+            self.status = 1
+
+        super().save(*args, **kwargs)
 
 
 class Link(models.Model):
