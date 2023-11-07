@@ -58,50 +58,91 @@
   </section>
   <hr>
   <!-- Places Section -->
-  <section id="places" class="my-5"></section>
-  <div class="d-flex align-items-center mb-3">
-    <h3 class="me-4">Places</h3>
-    <button class="btn btn-sm btn-outline-primary"
-            hx-get="{% url 'projects:project-add-place' project.id %}"
-            hx-target="#dialog"
-            hx-swap="innerHTML">Add a place</button>
-  </div>
-  {% partialdef place-list inline=true %}
-    <div id ="place-list" class="row mb-5"
-         hx-swap="outerHTML"
-         hx-get="{% url 'projects:place-list' project.id %}"
-         hx-trigger="placeSaved from:body"
-         hx-target="#place-list">
-      <div class="col-12">
-        <ul class="list-unstyled vstack gap-2 mb-5">
-          {% for place in project.places.all %}
-            <li class="d-flex">
-              <a href="#"
-                 class="flex-grow-1 ">{{ place.name }}</a>
-              <button class="btn btn-sm btn-primary ms-3"
-                      hx-get="{% url 'projects:place-update' place.id %}"
-                      hx-target="#dialog"
-                      hx-swap="innerHTML">Update</button>
-              <button class="btn btn-sm btn-danger ms-3"
-                      hx-get="{% url 'projects:place-delete' place.id %}"
-                      hx-confirm="Are you sure you want to delete {{ place.name }}">Delete</button>
-            </li>
-          {% endfor %}
-        </ul>
-      </div>
-      <div class="col-12">
-        <div id="map" class="z-0">
-        </div>
-        {{ locations|json_script:"location_json" }}
-      </div>
+  <section id="places" class="my-5">
+    <div class="d-flex align-items-center mb-3">
+      <h3 class="me-4">Places</h3>
+      <button class="btn btn-sm btn-outline-primary"
+              hx-get="{% url 'projects:project-add-place' project.id %}"
+              hx-target="#dialog"
+              hx-swap="innerHTML">Add a place</button>
     </div>
-    {% if request.htmx %}
-      <div hx-swap-oob=innerHTML:#messages>
-        {% include 'includes/messages.html' %}
+    {% partialdef place-list inline=true %}
+      <div id ="place-list" class="row mb-5"
+           hx-swap="outerHTML"
+           hx-get="{% url 'projects:place-list' project.id %}"
+           hx-trigger="placeSaved from:body"
+           hx-target="#place-list">
+        <div class="col-12">
+          <ul class="list-unstyled vstack gap-2 mb-5">
+            {% for place in project.places.all %}
+              <li class="d-flex">
+                <a href="#"
+                   class="flex-grow-1 ">{{ place.name }}</a>
+                <button class="btn btn-sm btn-primary ms-3"
+                        hx-get="{% url 'projects:place-update' place.id %}"
+                        hx-target="#dialog"
+                        hx-swap="innerHTML">Update</button>
+                <button class="btn btn-sm btn-danger ms-3"
+                        hx-get="{% url 'projects:place-delete' place.id %}"
+                        hx-confirm="Are you sure you want to delete {{ place.name }}">Delete</button>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% if project.places.all %}
+          <div class="col-12">
+            <div id="map" class="z-0">
+            </div>
+            {{ locations|json_script:"location_json" }}
+          </div>
+        {% endif %}
       </div>
-    {% else %}
-    {% endif %}
-  {% endpartialdef %}
+      {% if request.htmx %}
+        <div hx-swap-oob=innerHTML:#messages>
+          {% include 'includes/messages.html' %}
+        </div>
+      {% else %}
+      {% endif %}
+    {% endpartialdef %}
+  </section>
+
+  <!-- Notes Section -->
+  <section id="notes" class="mt-3 mb-5">
+    <div class="d-flex align-items-center mb-3">
+      <h3 class="me-4">Notes</h3>
+      <button class="btn btn-sm btn-outline-primary"
+              hx-get="{% url 'projects:project-add-note' project.id %}"
+              hx-target="#dialog"
+              hx-swap="innerHTML">Add a note</button>
+    </div>
+    {% partialdef note-list inline=true %}
+      <ul class="list-unstyled vstack gap-2 mb-3"
+          hx-swap="outerHTML"
+          hx-get="{% url 'projects:note-list' project.id %}"
+          hx-trigger="noteSaved from:body">
+        {% for note in project.notes.all %}
+          <li class="d-flex">
+            <span
+              class="flex-grow-1 ">{{ note.content|truncatewords:15}}</span>
+            <button class="btn btn-sm btn-primary ms-3"
+                    hx-get="{% url 'projects:note-update' note.id %}"
+                    hx-target="#dialog"
+                    hx-swap="innerHTML">Update</button>
+            <button class="btn btn-sm btn-danger ms-3"
+                    hx-get="{% url 'projects:note-delete' note.id %}"
+                    hx-confirm="Are you sure you want to delete {{ link.url }}">Delete</button>
+          </li>
+        {% endfor %}
+      </ul>
+      {% if request.htmx %}
+        <div hx-swap-oob=innerHTML:#messages>
+          {% include 'includes/messages.html' %}
+        </div>
+      {% else %}
+      {% endif %}
+    {% endpartialdef %}
+
+  </section>
 {% endblock content %}
 {% block script %}
   <script>

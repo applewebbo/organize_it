@@ -136,3 +136,6 @@ bootstrap_source_scss/
 
 # RUFF
 .ruff_cache/
+
+# VSCODE
+.vscode/

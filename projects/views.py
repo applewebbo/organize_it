@@ -3,8 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 
-from .forms import LinkForm, PlaceForm, ProjectDateUpdateForm, ProjectForm
-from .models import Link, Place, Project
+from .forms import LinkForm, NoteForm, PlaceForm, ProjectDateUpdateForm, ProjectForm
+from .models import Link, Note, Place, Project
 
 
 def calculate_bounds(locations):
@@ -45,7 +45,7 @@ def project_list(request):
 
 @login_required
 def project_detail(request, pk):
-    qs = Project.objects.prefetch_related("links", "places")
+    qs = Project.objects.prefetch_related("links", "places", "notes")
     project = get_object_or_404(qs, pk=pk)
 
     locations = list(Place.objects.filter(project=pk).values("latitude", "longitude"))
@@ -211,16 +211,16 @@ def link_update(request, pk):
 
 
 @login_required
-def link_list(request, project_id):
-    links = Link.objects.filter(projects=project_id)
-    project = get_object_or_404(Project, pk=project_id)
+def link_list(request, pk):
+    links = Link.objects.filter(projects=pk)
+    project = get_object_or_404(Project, pk=pk)
     context = {"links": links, "project": project}
     return render(request, "projects/project-detail.html#link-list", context)
 
 
 @login_required
-def place_create(request, project_id):
-    project = get_object_or_404(Project, pk=project_id)
+def project_add_place(request, pk):
+    project = get_object_or_404(Project, pk=pk)
     if request.method == "POST":
         form = PlaceForm(request.POST)
         if form.is_valid():
@@ -239,9 +239,9 @@ def place_create(request, project_id):
 
 
 @login_required
-def place_list(request, project_id):
-    places = Place.objects.filter(project=project_id)
-    project = get_object_or_404(Project, pk=project_id)
+def place_list(request, pk):
+    places = Place.objects.filter(project=pk)
+    project = get_object_or_404(Project, pk=pk)
     locations = list(places.values("latitude", "longitude"))
     map_bounds = calculate_bounds(locations)
     context = {
@@ -286,3 +286,75 @@ def place_update(request, pk):
     form = PlaceForm(instance=place)
     context = {"form": form}
     return render(request, "projects/place-create.html", context)
+
+
+@login_required
+def project_add_note(request, pk):
+    project = get_object_or_404(Project, pk=pk)
+
+    if request.method == "POST":
+        form = NoteForm(project, request.POST)
+        if form.is_valid():
+            note = form.save(commit=False)
+            note.project = project
+            note.save()
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                "Note added successfully",
+            )
+            return HttpResponse(status=204, headers={"HX-Trigger": "noteSaved"})
+
+        form = NoteForm(project, request.POST)
+        context = {"form": form}
+        return render(request, "projects/note-create.html", context)
+
+    form = NoteForm(project)
+    context = {"form": form}
+    return render(request, "projects/note-create.html", context)
+
+
+@login_required
+def note_update(request, pk):
+    note = get_object_or_404(Note, pk=pk)
+    if request.method == "POST":
+        form = NoteForm(note.project, request.POST, instance=note)
+        if form.is_valid():
+            note = form.save()
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                "Note updated successfully",
+            )
+            return HttpResponse(status=204, headers={"HX-Trigger": "noteSaved"})
+
+        form = NoteForm(note.project, instance=note)
+        context = {"form": form}
+        return render(request, "projects/note-create.html", context)
+
+    form = NoteForm(note.project, instance=note)
+    context = {"form": form}
+    return render(request, "projects/note-create.html", context)
+
+
+@login_required
+def note_list(request, pk):
+    notes = Note.objects.filter(project=pk)
+    project = get_object_or_404(Project, pk=pk)
+    context = {"notes": notes, "project": project}
+    return render(request, "projects/project-detail.html#note-list", context)
+
+
+@login_required
+def note_delete(request, pk):
+    note = get_object_or_404(Note, pk=pk)
+    note.delete()
+    messages.add_message(
+        request,
+        messages.SUCCESS,
+        "Note deleted successfully",
+    )
+    return HttpResponse(
+        status=204,
+        headers={"HX-Trigger": "noteSaved"},
+    )

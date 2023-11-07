@@ -4,7 +4,7 @@ from crispy_forms.layout import Div, Layout
 from django import forms
 from django.core.exceptions import ValidationError
 
-from .models import Link, Place, Project
+from .models import Link, Note, Place, Project
 
 
 class ProjectForm(forms.ModelForm):
@@ -141,4 +141,28 @@ class PlaceForm(forms.ModelForm):
             FloatingField("name"),
             FloatingField("url"),
             FloatingField("address"),
+        )
+
+
+class NoteForm(forms.ModelForm):
+    class Meta:
+        model = Note
+        fields = ("content", "place", "link")
+        widgets = {
+            "content": forms.Textarea(attrs={"placeholder": "content"}),
+        }
+        labels = {
+            "content": "Content",
+        }
+
+    def __init__(self, project, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["place"].queryset = Place.objects.filter(project=project)
+        self.fields["link"].queryset = Link.objects.filter(projects=project)
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            FloatingField("content", css_class="fl-textarea"),
+            "place",
+            "link",
         )

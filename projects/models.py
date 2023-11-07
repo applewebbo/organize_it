@@ -76,3 +76,13 @@ class Place(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+
+class Note(models.Model):
+    content = models.CharField(max_length=500)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="notes")
+    place = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True, blank=True)
+    link = models.ForeignKey(Link, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self) -> str:
+        return f"{self.content[:35]} ..."

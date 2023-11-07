@@ -19,13 +19,15 @@ htmx_urlpatterns = [
     path("projects/<int:pk>/dates", views.project_dates_update, name="project-dates"),
     path("links/<int:pk>/delete", views.link_delete, name="link-delete"),
     path("links/<int:pk>/update", views.link_update, name="link-update"),
-    path("links/<int:project_id>/list", views.link_list, name="link-list"),
-    path(
-        "places/<int:project_id>/create", views.place_create, name="project-add-place"
-    ),
-    path("places/<int:project_id>/list", views.place_list, name="place-list"),
+    path("links/<int:pk>/list", views.link_list, name="link-list"),
+    path("places/<int:pk>/add", views.project_add_place, name="project-add-place"),
+    path("places/<int:pk>/list", views.place_list, name="place-list"),
     path("places/<int:pk>/delete", views.place_delete, name="place-delete"),
     path("places/<int:pk>/update", views.place_update, name="place-update"),
+    path("notes/<int:pk>/add", views.project_add_note, name="project-add-note"),
+    path("notes/<int:pk>/list", views.note_list, name="note-list"),
+    path("notes/<int:pk>/update", views.note_update, name="note-update"),
+    path("notes/<int:pk>/delete", views.note_delete, name="note-delete"),
 ]
 
 urlpatterns += htmx_urlpatterns
