@@ -83,6 +83,7 @@ class Note(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="notes")
     place = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True, blank=True)
     link = models.ForeignKey(Link, on_delete=models.SET_NULL, null=True, blank=True)
+    checked = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return f"{self.content[:35]} ..."

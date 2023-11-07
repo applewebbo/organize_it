@@ -358,3 +358,14 @@ def note_delete(request, pk):
         status=204,
         headers={"HX-Trigger": "noteSaved"},
     )
+
+
+@login_required
+def note_check_or_uncheck(request, pk):
+    note = get_object_or_404(Note, pk=pk)
+    note.checked = not note.checked
+    note.save()
+    return HttpResponse(
+        status=204,
+        headers={"HX-Trigger": "noteSaved"},
+    )
