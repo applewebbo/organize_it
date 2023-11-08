@@ -1,6 +1,6 @@
 from crispy_bootstrap5.bootstrap5 import FloatingField
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Div, Layout
+from crispy_forms.layout import HTML, Div, Layout
 from django import forms
 from django.core.exceptions import ValidationError
 
@@ -144,6 +144,35 @@ class PlaceForm(forms.ModelForm):
         )
 
 
+FIELDSET_CONTENT = """
+            <fieldset class="row mb-3">
+            <legend class="col-form-label col-sm-4 pt-0">Connect to</legend>
+            <div class="col-sm-8">
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios1" value="option1" checked
+                x-on:click="open = 0">
+                <label class="form-check-label" for="gridRadios1">
+                  None
+                </label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="option2"
+                    x-on:click="open = 1" x-transition>
+                <label class="form-check-label" for="gridRadios2">
+                  Place
+                </label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios3" value="option3"
+                x-on:click="open = 2" x-transition>
+                <label class="form-check-label" for="gridRadios3">
+                  Link
+                </label>
+              </div>
+            </div>
+            </fieldset>"""
+
+
 class NoteForm(forms.ModelForm):
     class Meta:
         model = Note
@@ -163,6 +192,9 @@ class NoteForm(forms.ModelForm):
         self.helper.form_tag = False
         self.helper.layout = Layout(
             FloatingField("content", css_class="fl-textarea"),
-            "place",
-            "link",
+            HTML('<div x-data="{ open: 0}">'),
+            HTML(FIELDSET_CONTENT),
+            Div("place", x_show="open == 1"),
+            Div("link", x_show="open == 2"),
+            HTML("</div>"),
         )
