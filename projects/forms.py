@@ -172,6 +172,13 @@ FIELDSET_CONTENT = """
             </div>
             </fieldset>"""
 
+SCRIPT = """<script>
+      function resetInput() {
+        let inputs = document.getElementsByClassName('select')
+        Array.from(inputs).forEach((el) => el.selectedIndex = 0);
+      }
+    </script>"""
+
 
 class NoteForm(forms.ModelForm):
     class Meta:
@@ -192,9 +199,12 @@ class NoteForm(forms.ModelForm):
         self.helper.form_tag = False
         self.helper.layout = Layout(
             FloatingField("content", css_class="fl-textarea"),
-            HTML('<div x-data="{ open: 0}">'),
+            HTML(
+                '<div x-data="{ open: 0}" x-init="$watch(\'open\', () => resetInput())">'
+            ),
             HTML(FIELDSET_CONTENT),
             Div("place", x_show="open == 1"),
             Div("link", x_show="open == 2"),
             HTML("</div>"),
+            HTML(SCRIPT),
         )
