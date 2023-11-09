@@ -157,20 +157,8 @@
 {% endblock content %}
 {% block script %}
   <script>
-
-    document.addEventListener('DOMContentLoaded', () => {
-      let map = createMap({{ map_bounds }});
-      let locations = JSON.parse(document.getElementById('location_json').textContent);
-
-      let markerFeatureGroup = L.featureGroup().addTo(map);
-
-      for (let location of locations) {
-        L.marker([ location.latitude, location.longitude]).addTo(markerFeatureGroup);
-      }
-    });
-
-    document.addEventListener('htmx:load', (e) => {
-      if (e.detail.elt.id == "place-list") {
+    {% if project.places.all %}
+      document.addEventListener('DOMContentLoaded', () => {
         let map = createMap({{ map_bounds }});
         let locations = JSON.parse(document.getElementById('location_json').textContent);
 
@@ -179,8 +167,21 @@
         for (let location of locations) {
           L.marker([ location.latitude, location.longitude]).addTo(markerFeatureGroup);
         }
-      }
-    });
+      });
+
+      document.addEventListener('htmx:load', (e) => {
+        if (e.detail.elt.id == "place-list") {
+          let map = createMap({{ map_bounds }});
+          let locations = JSON.parse(document.getElementById('location_json').textContent);
+
+          let markerFeatureGroup = L.featureGroup().addTo(map);
+
+          for (let location of locations) {
+            L.marker([ location.latitude, location.longitude]).addTo(markerFeatureGroup);
+          }
+        }
+      });
+    {% endif %}
 
     function resetInput() {
       let inputs = document.getElementsByClassName('select')
