@@ -1,6 +1,6 @@
 from crispy_bootstrap5.bootstrap5 import FloatingField
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import HTML, Div, Layout
+from crispy_forms.layout import HTML, Button, Div, Layout, Submit
 from django import forms
 from django.core.exceptions import ValidationError
 
@@ -172,13 +172,6 @@ FIELDSET_CONTENT = """
             </div>
             </fieldset>"""
 
-SCRIPT = """<script>
-      function resetInput() {
-        let inputs = document.getElementsByClassName('select')
-        Array.from(inputs).forEach((el) => el.selectedIndex = 0);
-      }
-    </script>"""
-
 
 class NoteForm(forms.ModelForm):
     class Meta:
@@ -199,12 +192,21 @@ class NoteForm(forms.ModelForm):
         self.helper.form_tag = False
         self.helper.layout = Layout(
             FloatingField("content", css_class="fl-textarea"),
-            HTML(
-                '<div x-data="{ open: 0}" x-init="$watch(\'open\', () => resetInput())">'
+            Div(
+                HTML(FIELDSET_CONTENT),
+                Div("place", x_show="open == 1"),
+                Div("link", x_show="open == 2"),
+                x_data="{ open: 0}",
+                x_init="$watch('open', () => resetInput())",
             ),
-            HTML(FIELDSET_CONTENT),
-            Div("place", x_show="open == 1"),
-            Div("link", x_show="open == 2"),
-            HTML("</div>"),
-            HTML(SCRIPT),
+            Div(
+                Button(
+                    "button",
+                    "Cancel",
+                    data_bs_dismiss="modal",
+                    css_class="btn btn-danger",
+                ),
+                Submit("submit", "Save", css_class="btn btn-primary"),
+                css_class="text-end mt-3",
+            ),
         )

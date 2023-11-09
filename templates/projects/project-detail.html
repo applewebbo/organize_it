@@ -182,5 +182,10 @@
       }
     });
 
+    function resetInput() {
+      let inputs = document.getElementsByClassName('select')
+      Array.from(inputs).forEach((el) => el.selectedIndex = 0);
+    }
+
   </script>
 {% endblock script %}
