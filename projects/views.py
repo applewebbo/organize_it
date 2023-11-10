@@ -1,7 +1,8 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
+from django.template.response import TemplateResponse
 
 from .forms import LinkForm, NoteForm, PlaceForm, ProjectDateUpdateForm, ProjectForm
 from .models import Link, Note, Place, Project
@@ -25,7 +26,7 @@ def home(request):
     else:
         projects = None
     context = {"projects": projects}
-    return render(request, "projects/index.html", context)
+    return TemplateResponse(request, "projects/index.html", context)
 
 
 @login_required
@@ -40,7 +41,7 @@ def project_list(request):
         "active_projects": active_projects,
         "archived_projects": archived_projects,
     }
-    return render(request, template, context)
+    return TemplateResponse(request, template, context)
 
 
 @login_required
@@ -56,7 +57,7 @@ def project_detail(request, pk):
         "locations": locations,
         "map_bounds": map_bounds,
     }
-    return render(request, "projects/project-detail.html", context)
+    return TemplateResponse(request, "projects/project-detail.html", context)
 
 
 @login_required
@@ -76,7 +77,7 @@ def project_create(request):
 
     form = ProjectForm()
     context = {"form": form}
-    return render(request, "projects/project-create.html", context)
+    return TemplateResponse(request, "projects/project-create.html", context)
 
 
 @login_required
@@ -109,11 +110,11 @@ def project_update(request, pk):
             return HttpResponse(status=204, headers={"HX-Trigger": "projectSaved"})
         form = ProjectForm(request.POST, instance=project)
         context = {"form": form}
-        return render(request, "projects/project-create.html", context)
+        return TemplateResponse(request, "projects/project-create.html", context)
 
     form = ProjectForm(instance=project)
     context = {"form": form}
-    return render(request, "projects/project-create.html", context)
+    return TemplateResponse(request, "projects/project-create.html", context)
 
 
 def project_archive(request, pk):
@@ -145,11 +146,11 @@ def project_dates_update(request, pk):
             return HttpResponse(status=204, headers={"HX-Trigger": "projectSaved"})
         form = ProjectDateUpdateForm(request.POST, instance=project)
         context = {"form": form}
-        return render(request, "projects/project-dates-update.html", context)
+        return TemplateResponse(request, "projects/project-dates-update.html", context)
 
     form = ProjectDateUpdateForm(instance=project)
     context = {"form": form}
-    return render(request, "projects/project-dates-update.html", context)
+    return TemplateResponse(request, "projects/project-dates-update.html", context)
 
 
 @login_required
@@ -172,7 +173,7 @@ def project_add_link(request, pk):
 
     form = LinkForm()
     context = {"form": form}
-    return render(request, "projects/link-create.html", context)
+    return TemplateResponse(request, "projects/link-create.html", context)
 
 
 @login_required
@@ -207,7 +208,7 @@ def link_update(request, pk):
 
     form = LinkForm(instance=link)
     context = {"form": form}
-    return render(request, "projects/link-create.html", context)
+    return TemplateResponse(request, "projects/link-create.html", context)
 
 
 @login_required
@@ -215,7 +216,7 @@ def link_list(request, pk):
     links = Link.objects.filter(projects=pk)
     project = get_object_or_404(Project, pk=pk)
     context = {"links": links, "project": project}
-    return render(request, "projects/project-detail.html#link-list", context)
+    return TemplateResponse(request, "projects/project-detail.html#link-list", context)
 
 
 @login_required
@@ -235,7 +236,7 @@ def project_add_place(request, pk):
             return HttpResponse(status=204, headers={"HX-Trigger": "placeSaved"})
     form = PlaceForm()
     context = {"form": form}
-    return render(request, "projects/place-create.html", context)
+    return TemplateResponse(request, "projects/place-create.html", context)
 
 
 @login_required
@@ -250,7 +251,7 @@ def place_list(request, pk):
         "locations": locations,
         "map_bounds": map_bounds,
     }
-    return render(request, "projects/project-detail.html#place-list", context)
+    return TemplateResponse(request, "projects/project-detail.html#place-list", context)
 
 
 @login_required
@@ -285,7 +286,7 @@ def place_update(request, pk):
 
     form = PlaceForm(instance=place)
     context = {"form": form}
-    return render(request, "projects/place-create.html", context)
+    return TemplateResponse(request, "projects/place-create.html", context)
 
 
 @login_required
@@ -307,11 +308,11 @@ def project_add_note(request, pk):
 
         form = NoteForm(project, request.POST)
         context = {"form": form}
-        return render(request, "projects/note-create.html", context)
+        return TemplateResponse(request, "projects/note-create.html", context)
 
     form = NoteForm(project)
     context = {"form": form}
-    return render(request, "projects/note-create.html", context)
+    return TemplateResponse(request, "projects/note-create.html", context)
 
 
 @login_required
@@ -330,11 +331,11 @@ def note_update(request, pk):
 
         form = NoteForm(note.project, instance=note)
         context = {"form": form}
-        return render(request, "projects/note-create.html", context)
+        return TemplateResponse(request, "projects/note-create.html", context)
 
     form = NoteForm(note.project, instance=note)
     context = {"form": form}
-    return render(request, "projects/note-create.html", context)
+    return TemplateResponse(request, "projects/note-create.html", context)
 
 
 @login_required
@@ -342,7 +343,7 @@ def note_list(request, pk):
     notes = Note.objects.filter(project=pk)
     project = get_object_or_404(Project, pk=pk)
     context = {"notes": notes, "project": project}
-    return render(request, "projects/project-detail.html#note-list", context)
+    return TemplateResponse(request, "projects/project-detail.html#note-list", context)
 
 
 @login_required
