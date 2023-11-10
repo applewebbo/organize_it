@@ -1,12 +1,12 @@
 [tool.bandit]
 skips = ["B101"]
 
-[tool.black]
-target-version = ["py311"]
+# [tool.black]
+# target-version = ["py311"]
 
-[tool.isort]
-profile = "black"
-src_paths = ["core"]
+# [tool.isort]
+# profile = "black"
+# src_paths = ["core"]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "core.testing_settings"
@@ -14,5 +14,8 @@ python_files = "test_*.py"
 addopts = "--nomigrations --disable-socket"
 
 [tool.ruff]
-select = ["E", "F"]
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "I"]
 ignore = ["E501", "E741", "F405"]
