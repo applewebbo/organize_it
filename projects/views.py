@@ -20,8 +20,7 @@ def calculate_bounds(locations):
 
 
 def home(request):
-    user = request.user
-    if user.is_authenticated:
+    if request.user.is_authenticated:
         projects = Project.objects.filter(author=request.user)
     else:
         projects = None
