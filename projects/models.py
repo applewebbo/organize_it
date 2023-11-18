@@ -28,6 +28,10 @@ class Project(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
+        # add the case for when status is 5 to bypass date checks
+        if self.status == 5:
+            super().save(*args, **kwargs)
+            return
         today = datetime.date.today()
         delta = today - datetime.timedelta(days=7)
         # more than 7 days from start date
