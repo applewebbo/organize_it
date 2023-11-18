@@ -56,7 +56,13 @@ def project_detail(request, pk):
         "locations": locations,
         "map_bounds": map_bounds,
     }
-    return TemplateResponse(request, "projects/project-detail.html", context)
+    if request.htmx:
+        # redraw the map section only
+        template = "projects/project-detail.html#project-detail"
+    else:
+        template = "projects/project-detail.html"
+
+    return TemplateResponse(request, template, context)
 
 
 @login_required
@@ -81,7 +87,7 @@ def project_create(request):
 
 @login_required
 def project_delete(request, pk):
-    project = get_object_or_404(Project, pk=pk)
+    project = get_object_or_404(Project, pk=pk, author=request.user)
     project.delete()
     messages.add_message(
         request,
@@ -96,7 +102,7 @@ def project_delete(request, pk):
 
 @login_required
 def project_update(request, pk):
-    project = get_object_or_404(Project, pk=pk)
+    project = get_object_or_404(Project, pk=pk, author=request.user)
     if request.method == "POST":
         form = ProjectForm(request.POST, instance=project)
         if form.is_valid():
@@ -117,7 +123,7 @@ def project_update(request, pk):
 
 
 def project_archive(request, pk):
-    project = get_object_or_404(Project, pk=pk)
+    project = get_object_or_404(Project, pk=pk, author=request.user)
     project.status = 5
     project.save()
     messages.add_message(
@@ -132,7 +138,7 @@ def project_archive(request, pk):
 
 
 def project_dates_update(request, pk):
-    project = get_object_or_404(Project, pk=pk)
+    project = get_object_or_404(Project, pk=pk, author=request.user)
     if request.method == "POST":
         form = ProjectDateUpdateForm(request.POST, instance=project)
         if form.is_valid():
@@ -154,7 +160,7 @@ def project_dates_update(request, pk):
 
 @login_required
 def project_add_link(request, pk):
-    project = get_object_or_404(Project, pk=pk)
+    project = get_object_or_404(Project, pk=pk, author=request.user)
     if request.method == "POST":
         form = LinkForm(request.POST)
         if form.is_valid():
@@ -177,7 +183,7 @@ def project_add_link(request, pk):
 
 @login_required
 def link_delete(request, pk):
-    link = get_object_or_404(Link, pk=pk)
+    link = get_object_or_404(Link, pk=pk, author=request.user)
     link.delete()
     messages.add_message(
         request,
@@ -192,7 +198,7 @@ def link_delete(request, pk):
 
 @login_required
 def link_update(request, pk):
-    link = get_object_or_404(Link, pk=pk)
+    link = get_object_or_404(Link, pk=pk, author=request.user)
 
     if request.method == "POST":
         form = LinkForm(request.POST, instance=link)
@@ -220,7 +226,7 @@ def link_list(request, pk):
 
 @login_required
 def project_add_place(request, pk):
-    project = get_object_or_404(Project, pk=pk)
+    project = get_object_or_404(Project, pk=pk, author=request.user)
     if request.method == "POST":
         form = PlaceForm(request.POST)
         if form.is_valid():
@@ -255,7 +261,7 @@ def place_list(request, pk):
 
 @login_required
 def place_delete(request, pk):
-    place = get_object_or_404(Place, pk=pk)
+    place = get_object_or_404(Place, pk=pk, project__author=request.user)
     place.delete()
     messages.add_message(
         request,
@@ -270,7 +276,7 @@ def place_delete(request, pk):
 
 @login_required
 def place_update(request, pk):
-    place = get_object_or_404(Place, pk=pk)
+    place = get_object_or_404(Place, pk=pk, project__author=request.user)
 
     if request.method == "POST":
         form = PlaceForm(request.POST, instance=place)
@@ -290,7 +296,7 @@ def place_update(request, pk):
 
 @login_required
 def project_add_note(request, pk):
-    project = get_object_or_404(Project, pk=pk)
+    project = get_object_or_404(Project, pk=pk, author=request.user)
 
     if request.method == "POST":
         form = NoteForm(project, request.POST)
@@ -316,7 +322,7 @@ def project_add_note(request, pk):
 
 @login_required
 def note_update(request, pk):
-    note = get_object_or_404(Note, pk=pk)
+    note = get_object_or_404(Note, pk=pk, project__author=request.user)
     if request.method == "POST":
         form = NoteForm(note.project, request.POST, instance=note)
         if form.is_valid():
@@ -347,7 +353,7 @@ def note_list(request, pk):
 
 @login_required
 def note_delete(request, pk):
-    note = get_object_or_404(Note, pk=pk)
+    note = get_object_or_404(Note, pk=pk, project__author=request.user)
     note.delete()
     messages.add_message(
         request,
@@ -362,7 +368,7 @@ def note_delete(request, pk):
 
 @login_required
 def note_check_or_uncheck(request, pk):
-    note = get_object_or_404(Note, pk=pk)
+    note = get_object_or_404(Note, pk=pk, project__author=request.user)
     note.checked = not note.checked
     note.save()
     return HttpResponse(
