@@ -17,16 +17,26 @@
     {% endif %}
   </div>
   <p><em>{{ project.description }}</em></p>
+  <div id="buttons">
+    <button class="btn btn-sm btn-outline-primary me-3"
+            hx-get="{% url 'projects:project-add-link' project.id %}"
+            hx-target="#dialog"
+            hx-swap="innerHTML">Add a link</button>
+    <button class="btn btn-sm btn-outline-primary me-3"
+            hx-get="{% url 'projects:project-add-place' project.id %}"
+            hx-target="#dialog"
+            hx-swap="innerHTML">Add a place</button>
+    <button class="btn btn-sm btn-outline-primary me-3"
+            hx-get="{% url 'projects:project-add-note' project.id %}"
+            hx-target="#dialog"
+            hx-swap="innerHTML">Add a note</button>
+  </div>
   <hr>
 
   <!-- Links Section -->
   <section id="links" class="mt-3 mb-5">
     <div class="d-flex align-items-center mb-3">
       <h3 class="me-4">Links</h3>
-      <button class="btn btn-sm btn-outline-primary"
-              hx-get="{% url 'projects:project-add-link' project.id %}"
-              hx-target="#dialog"
-              hx-swap="innerHTML">Add a link</button>
     </div>
     {% partialdef link-list inline=true %}
       <ul class="list-unstyled vstack gap-2 mb-3"
@@ -42,7 +52,7 @@
                     hx-target="#dialog"
                     hx-swap="innerHTML">Update</button>
             <button class="btn btn-sm btn-danger ms-3"
-                    hx-get="{% url 'projects:link-delete' link.pk %}"
+                    hx-delete="{% url 'projects:link-delete' link.pk %}"
                     hx-confirm="Are you sure you want to delete {{ link.url }}">Delete</button>
           </li>
         {% endfor %}
@@ -58,13 +68,19 @@
   </section>
   <hr>
   <!-- Places Section -->
-  <section id="places" class="my-5">
+  <section id="places" class="mt-3 mb-5" x-data="{ showMap: false }">
     <div class="d-flex align-items-center mb-3">
-      <h3 class="me-4">Places</h3>
-      <button class="btn btn-sm btn-outline-primary"
-              hx-get="{% url 'projects:project-add-place' project.id %}"
-              hx-target="#dialog"
-              hx-swap="innerHTML">Add a place</button>
+      <div class="flex-grow-1 ">
+        <h3 class="me-4">Places</h3>
+      </div>
+      {% if project.places.all %}
+        <div>
+          <button class="btn btn-sm btn-outline-secondary" @click="showMap = ! showMap">Show Map</button>
+          <button class="btn btn-sm btn-outline-secondary ms-3">Regenerate Map</button>
+
+        </div>
+      {% endif %}
+
     </div>
     {% partialdef place-list inline=true %}
       <div id ="place-list" class="row mb-5"
@@ -72,7 +88,7 @@
            hx-get="{% url 'projects:place-list' project.id %}"
            hx-trigger="placeSaved from:body"
            hx-target="#place-list">
-        <div class="col-12">
+        <div class="col-12 col-lg-6">
           <ul class="list-unstyled vstack gap-2 mb-5">
             {% for place in project.places.all %}
               <li class="d-flex">
@@ -83,14 +99,14 @@
                         hx-target="#dialog"
                         hx-swap="innerHTML">Update</button>
                 <button class="btn btn-sm btn-danger ms-3"
-                        hx-get="{% url 'projects:place-delete' place.id %}"
+                        hx-delete="{% url 'projects:place-delete' place.id %}"
                         hx-confirm="Are you sure you want to delete {{ place.name }}">Delete</button>
               </li>
             {% endfor %}
           </ul>
         </div>
         {% if project.places.all %}
-          <div class="col-12">
+          <div class="col-12 col-lg-6  mb-4" x-cloak x-show="showMap" x-transition.opacity >
             <div id="map" class="z-0">
             </div>
             {{ locations|json_script:"location_json" }}
@@ -105,15 +121,11 @@
       {% endif %}
     {% endpartialdef %}
   </section>
-
+  <hr>
   <!-- Notes Section -->
   <section id="notes" class="mt-3 mb-5">
     <div class="d-flex align-items-center mb-3">
       <h3 class="me-4">Notes</h3>
-      <button class="btn btn-sm btn-outline-primary"
-              hx-get="{% url 'projects:project-add-note' project.id %}"
-              hx-target="#dialog"
-              hx-swap="innerHTML">Add a note</button>
     </div>
     {% partialdef note-list inline=true %}
       <ul class="list-unstyled vstack gap-2 mb-3"
@@ -123,7 +135,7 @@
         {% for note in project.notes.all %}
           <li class="d-flex">
             <span
-              class="flex-grow-1 ">{{ note.content|truncatewords:15}}</span>
+              class="flex-grow-1 truncate">{{ note.content}}</span>
             {% if note.checked == True %}
               <button class="btn btn-sm btn-warning ms-3"
                       hx-get="{% url 'projects:note-check' note.id %}"
@@ -140,7 +152,7 @@
                     hx-target="#dialog"
                     hx-swap="innerHTML">Update</button>
             <button class="btn btn-sm btn-danger ms-3"
-                    hx-get="{% url 'projects:note-delete' note.id %}"
+                    hx-delete="{% url 'projects:note-delete' note.id %}"
                     hx-confirm="Are you sure you want to delete {{ link.url }}">Delete</button>
           </li>
         {% endfor %}
@@ -159,10 +171,10 @@
   <script>
     {% if project.places.all %}
       document.addEventListener('DOMContentLoaded', () => {
-        let map = createMap({{ map_bounds }});
+        let placesMap = createMap({{ map_bounds }});
         let locations = JSON.parse(document.getElementById('location_json').textContent);
 
-        let markerFeatureGroup = L.featureGroup().addTo(map);
+        let markerFeatureGroup = L.featureGroup().addTo(placesMap);
 
         for (let location of locations) {
           L.marker([ location.latitude, location.longitude]).addTo(markerFeatureGroup);
@@ -171,10 +183,10 @@
 
       document.addEventListener('htmx:load', (e) => {
         if (e.detail.elt.id == "place-list") {
-          let map = createMap({{ map_bounds }});
+          let placesMap = createMap({{ map_bounds }});
           let locations = JSON.parse(document.getElementById('location_json').textContent);
 
-          let markerFeatureGroup = L.featureGroup().addTo(map);
+          let markerFeatureGroup = L.featureGroup().addTo(placesMap);
 
           for (let location of locations) {
             L.marker([ location.latitude, location.longitude]).addTo(markerFeatureGroup);
@@ -187,6 +199,7 @@
       let inputs = document.getElementsByClassName('select')
       Array.from(inputs).forEach((el) => el.selectedIndex = 0);
     }
+
 
   </script>
 {% endblock script %}

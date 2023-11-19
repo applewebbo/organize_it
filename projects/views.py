@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
+from django.views.decorators.http import require_http_methods, require_POST
 
 from .forms import LinkForm, NoteForm, PlaceForm, ProjectDateUpdateForm, ProjectForm
 from .models import Link, Note, Place, Project
@@ -86,6 +87,7 @@ def project_create(request):
 
 
 @login_required
+@require_http_methods(["DELETE"])
 def project_delete(request, pk):
     project = get_object_or_404(Project, pk=pk, author=request.user)
     project.delete()
@@ -182,6 +184,7 @@ def project_add_link(request, pk):
 
 
 @login_required
+@require_http_methods(["DELETE"])
 def link_delete(request, pk):
     link = get_object_or_404(Link, pk=pk, author=request.user)
     link.delete()
@@ -260,6 +263,7 @@ def place_list(request, pk):
 
 
 @login_required
+@require_http_methods(["DELETE"])
 def place_delete(request, pk):
     place = get_object_or_404(Place, pk=pk, project__author=request.user)
     place.delete()
@@ -352,6 +356,7 @@ def note_list(request, pk):
 
 
 @login_required
+@require_http_methods(["DELETE"])
 def note_delete(request, pk):
     note = get_object_or_404(Note, pk=pk, project__author=request.user)
     note.delete()
@@ -367,6 +372,7 @@ def note_delete(request, pk):
 
 
 @login_required
+@require_POST
 def note_check_or_uncheck(request, pk):
     note = get_object_or_404(Note, pk=pk, project__author=request.user)
     note.checked = not note.checked

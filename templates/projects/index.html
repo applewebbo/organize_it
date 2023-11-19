@@ -21,7 +21,7 @@
                     hx-target="#dialog"
                     hx-swap="innerHTML">Update</button>
             <button class="btn btn-sm btn-danger ms-3" type="button"
-                    hx-get="{% url 'projects:project-delete' project.id %}"
+                    hx-delete="{% url 'projects:project-delete' project.id %}"
                     hx-confirm="Are you sure you want to delete {{ project.title }}?">Delete</button>
           </li>
         {% endfor %}
@@ -30,7 +30,6 @@
         <div hx-swap-oob=innerHTML:#messages>
           {% include 'includes/messages.html' %}
         </div>
-      {% else %}
       {% endif %}
     {% endpartialdef %}
     <button class="btn btn-primary"
