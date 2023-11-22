@@ -19,7 +19,7 @@ class Project(models.Model):
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
     status = models.IntegerField(choices=Status.choices, default=Status.NOT_STARTED)
-    links = models.ManyToManyField("Link", related_name="projects")
+    links = models.ManyToManyField("Link", related_name="projects", blank=True)
 
     class Meta:
         ordering = ("status",)
@@ -28,26 +28,27 @@ class Project(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
-        # add the case for when status is 5 to bypass date checks
-        if self.status == 5:
-            super().save(*args, **kwargs)
-            return
-        today = datetime.date.today()
-        delta = today - datetime.timedelta(days=7)
-        # more than 7 days from start date
-        if self.start_date <= delta:
-            self.status = 1
-        # less than 7 days from start date
-        elif self.start_date > delta and self.start_date < today:
-            self.status = 2
-        # between start date and end date
-        elif self.start_date >= today and self.end_date >= today:
-            self.status = 3
-        # after end date
-        elif self.end_date > today:
-            self.status = 4
-        else:
-            self.status = 1
+        if self.start_date and self.end_date:
+            # add the case for when status is 5 to bypass date checks
+            if self.status == 5:
+                super().save(*args, **kwargs)
+                return
+            today = datetime.date.today()
+            delta = today - datetime.timedelta(days=7)
+            # more than 7 days from start date
+            if self.start_date <= delta:
+                self.status = 1
+            # less than 7 days from start date
+            elif self.start_date > delta and self.start_date < today:
+                self.status = 2
+            # between start date and end date
+            elif self.start_date >= today and self.end_date >= today:
+                self.status = 3
+            # after end date
+            elif self.end_date > today:
+                self.status = 4
+            else:
+                self.status = 1
 
         super().save(*args, **kwargs)
 
