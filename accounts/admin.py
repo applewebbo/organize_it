@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .forms import CustomUserChangeForm, CustomUserCreationForm
-from .models import CustomUser
+from .forms import CustomUserChangeForm, CustomUserCreationForm, ProfileUpdateForm
+from .models import CustomUser, Profile
 
 
 @admin.register(CustomUser)
@@ -46,3 +46,9 @@ class CustomUserAdmin(UserAdmin):
     )
     search_fields = ("email",)
     ordering = ("email",)
+
+
+@admin.register(Profile)
+class ProfileAdmin(admin.ModelAdmin):
+    model = Profile
+    form = ProfileUpdateForm

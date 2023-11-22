@@ -5,7 +5,7 @@ from .models import Link, Note, Place, Project
 
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
-    pass
+    list_display = ["title", "author"]
 
 
 admin.site.register(Link)

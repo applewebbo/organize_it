@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+
+{% block page_title %}Personal Profile{% endblock page_title %}
+
+
+{% block content %}
+  <h1>Profile Page</h1>
+  <p>This is the profile page of {{ user.email }}. Here you can modify your preferences</p>
+  {% crispy profile_form %}
+{% endblock content %}
