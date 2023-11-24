@@ -5,37 +5,51 @@
 
 
 {% block content %}
-  <h1 class="mb-3">Organize it!</h1>
+  <div class="d-flex align-items-center">
+    <h1 class="mb-3 flex-grow-1 ">Organize it!</h1>
+    <button class="btn btn-outline-primary"
+            hx-post="{% url 'projects:project-create' %}"
+            hx-target="#dialog"
+            hx-swap="innerHTML">Add a Project</button>
+  </div>
+  <!-- Content for Autenthicated Users -->
   {% if user.is_authenticated %}
-    {% partialdef project-list inline=true %}
-      <ul class="list-group list-group-flush vstack gap-2 mb-3"
-          hx-swap="outerHTML"
-          hx-get="{% url 'projects:project-list' %}"
-          hx-trigger="projectSaved from:body">
-        {% for project in projects %}
-          <li class="list-group-item d-flex">
-            <a href="{% url 'projects:project-detail' project.id %}"
-               class="flex-grow-1 ">{{ project.title }}</a>
-            <button class="btn btn-sm btn-primary ms-3"
-                    hx-get="{% url 'projects:project-update' project.id %}"
-                    hx-target="#dialog"
-                    hx-swap="innerHTML">Update</button>
-            <button class="btn btn-sm btn-danger ms-3" type="button"
-                    hx-delete="{% url 'projects:project-delete' project.id %}"
-                    hx-confirm="Are you sure you want to delete {{ project.title }}?">Delete</button>
-          </li>
+    <p class="lead">Welcome back, {{ user.email }}!</p>
+    {% if fav_project %}
+      <div class="card">
+        <h5 class="card-header">My Favourite Project</h5>
+        <div class="card-body">
+          <h5 class="card-title">{{ fav_project.title }}</h5>
+          <p class="card-text">{{ fav_project.description }}</p>
+        </div>
+      </div>
+    {% else %}
+      {% for project in other_projects %}
+        {% if forloop.first %}
+          <div class="card mb-5">
+            <h5 class="card-header">My Latest Project</h5>
+            <div class="card-body">
+              <h5 class="card-title">{{ project.title }}</h5>
+              <p class="card-text">{{ project.description }}</p>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+      <h5>Other Projects</h5>
+      <ul class="list-unstyled ">
+        {% for project in other_projects %}
+          {% if forloop.first %}
+          {% else %}
+            <li><a href="#">{{ project.title}}</a></li>
+          {% endif %}
         {% endfor %}
       </ul>
-      {% if request.htmx %}
-        <div hx-swap-oob=innerHTML:#messages>
-          {% include 'includes/messages.html' %}
-        </div>
-      {% endif %}
-    {% endpartialdef %}
-    <button class="btn btn-primary"
-            hx-get="{% url 'projects:project-create' %}"
-            hx-target="#dialog"
-            hx-swap="innerHTML">Create a new project</button>
+
+
+
+    {% endif %}
+
+  <!-- Content for Anonymous Users -->
   {% else %}
     <section id="welcome">
       {% lorem 2 p random %}
@@ -44,10 +58,7 @@
         <button id="cta" class="btn btn-lg btn-secondary position-absolute top-50 start-50 translate-middle ">Create your first project now
         </button>
       </div>
-
     </section>
-
-
   {% endif %}
 
 {% endblock content %}

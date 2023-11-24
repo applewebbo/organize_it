@@ -5,6 +5,8 @@ from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.views.decorators.http import require_http_methods, require_POST
 
+from accounts.models import Profile
+
 from .forms import LinkForm, NoteForm, PlaceForm, ProjectDateUpdateForm, ProjectForm
 from .models import Link, Note, Place, Project
 
@@ -21,11 +23,23 @@ def calculate_bounds(locations):
 
 
 def home(request):
+    context = {}
     if request.user.is_authenticated:
-        projects = Project.objects.filter(author=request.user)
-    else:
-        projects = None
-    context = {"projects": projects}
+        fav_project = Profile.objects.get(user=request.user).fav_project or None
+        if fav_project:
+            other_projects = (
+                Project.objects.filter(author=request.user)
+                .exclude(pk=fav_project.pk)
+                .order_by("status")
+            )
+        else:
+            other_projects = Project.objects.filter(author=request.user).order_by(
+                "status"
+            )
+        context = {
+            "other_projects": other_projects,
+            "fav_project": fav_project,
+        }
     return TemplateResponse(request, "projects/index.html", context)
 
 

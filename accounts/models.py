@@ -24,7 +24,7 @@ class Profile(models.Model):
     """Profile holds user informations not related to auth"""
 
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    fav_project = models.ForeignKey(
+    fav_project = models.OneToOneField(
         "projects.Project",
         on_delete=models.SET_NULL,
         null=True,

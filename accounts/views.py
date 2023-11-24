@@ -21,6 +21,7 @@ def profile(request):
                 messages.SUCCESS,
                 "Profile modified succesfully",
             )
+            context["profile_form"] = ProfileUpdateForm(instance=request.user.profile)
             return TemplateResponse(request, "account/profile.html", context)
         form = ProfileUpdateForm(request.POST, instance=request.user.profile)
         return TemplateResponse(request, "account/profile.html", context)
