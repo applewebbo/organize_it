@@ -5,7 +5,7 @@ from django.conf import settings
 from django.db import models
 
 
-class Project(models.Model):
+class Trip(models.Model):
     class Status(models.IntegerChoices):
         NOT_STARTED = 1
         IMPENDING = 2
@@ -19,7 +19,7 @@ class Project(models.Model):
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
     status = models.IntegerField(choices=Status.choices, default=Status.NOT_STARTED)
-    links = models.ManyToManyField("Link", related_name="projects", blank=True)
+    links = models.ManyToManyField("Link", related_name="trips", blank=True)
 
     class Meta:
         ordering = ("status",)
@@ -65,9 +65,7 @@ class Link(models.Model):
 
 
 class Place(models.Model):
-    project = models.ForeignKey(
-        Project, on_delete=models.CASCADE, related_name="places"
-    )
+    trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="places")
     name = models.CharField(max_length=100)
     url = models.URLField(null=True, blank=True)
     address = models.CharField(max_length=200)
@@ -85,7 +83,7 @@ class Place(models.Model):
 
 class Note(models.Model):
     content = models.CharField(max_length=500)
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="notes")
+    trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="notes")
     place = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True, blank=True)
     link = models.ForeignKey(Link, on_delete=models.SET_NULL, null=True, blank=True)
     checked = models.BooleanField(default=False)

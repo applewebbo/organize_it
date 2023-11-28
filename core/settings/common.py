@@ -25,7 +25,7 @@ ALLOWED_HOSTS: list[str] = env("ALLOWED_HOSTS")
 
 INSTALLED_APPS = [
     # INTERNAL_APP
-    "projects",
+    "trips",
     "accounts",
     # THIRD_PARTY
     "allauth",

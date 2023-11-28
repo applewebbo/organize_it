@@ -1,7 +1,7 @@
 {% load static %}
 <nav class="navbar navbar-expand-lg bg-body-tertiary py-3">
   <div class="container">
-    <a class="navbar-brand" href="{% url 'projects:home' %}">
+    <a class="navbar-brand" href="{% url 'trips:home' %}">
       <img src="{% static 'img/logo.png' %}" alt="Logo" width="32" height="32" class="d-inline-block align-text-top me-2">
       Organize it!
     </a>
@@ -10,8 +10,8 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav ms-auto">
-        <a class="nav-link active" aria-current="page" href="{% url 'projects:home' %}">Home</a>
-        <a class="nav-link" href="{% url 'projects:project-list' %}">Projects</a>
+        <a class="nav-link active" aria-current="page" href="{% url 'trips:home' %}">Home</a>
+        <a class="nav-link" href="{% url 'trips:trip-list' %}">Trips</a>
         <a class="nav-link" href="#">Contacts</a>
         {% if user.is_authenticated %}
           <a class="nav-link" href="{% url 'accounts:profile' %}">Profile</a>

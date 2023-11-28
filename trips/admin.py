@@ -1,9 +1,9 @@
 from django.contrib import admin
 
-from .models import Link, Note, Place, Project
+from .models import Link, Note, Place, Trip
 
 
-@admin.register(Project)
+@admin.register(Trip)
 class ProjectAdmin(admin.ModelAdmin):
     list_display = ["title", "author"]
 

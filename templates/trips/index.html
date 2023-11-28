@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static partials %}
+
+{% block page_title %}Home Page{% endblock page_title %}
+
+
+{% block content %}
+  <div class="d-flex align-items-center mb-4">
+    <h1 class="mb-3 flex-grow-1 ">Organize it!</h1>
+    <button class="btn btn-outline-primary"
+            hx-post="{% url 'trips:trip-create' %}"
+            hx-target="#dialog"
+            hx-swap="innerHTML">Add a Trip</button>
+  </div>
+  <!-- Content for Autenthicated Users -->
+  {% if user.is_authenticated %}
+    <p class="lead">Welcome back, {{ user.email }}!</p>
+    <div id="trip-list">
+      {% if fav_trip %}
+        <div class="card mb-5">
+          <h5 class="card-header">My Favourite Trip</h5>
+          <div class="card-body">
+            <h5 class="card-title">{{ fav_trip.title }}</h5>
+            <p class="card-text">{{ fav_trip.description }}</p>
+          </div>
+        </div>
+        {% if other_trips %}
+          <h5>Other Trips</h5>
+          <ul class="list-unstyled ">
+            {% for trip in other_trips %}
+              <li><a href="#">{{ trip.title}}</a></li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% else %}
+        {% if other_trips %}
+          {% for trip in other_trips %}
+            {% if forloop.first %}
+              <div class="card mb-5">
+                <h5 class="card-header">My Latest Trip</h5>
+                <div class="card-body">
+                  <h5 class="card-title">{{ trip.title }}</h5>
+                  <p class="card-text">{{ trip.description }}</p>
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+          <h5>Other Trips</h5>
+          <ul class="list-unstyled ">
+            {% for trip in other_trips %}
+              {% if forloop.first %}
+              {% else %}
+                <li><a href="#">{{ trip.title}}</a></li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>You have no trips yet!</p>
+        {% endif %}
+
+      {% endif %}
+    </div>
+
+  <!-- Content for Anonymous Users -->
+  {% else %}
+    <section id="welcome">
+      {% lorem 2 p random %}
+      <div id="hero" class="my-5 position-relative">
+        <img src="{% static 'img/hero.jpg' %}" alt="Organized Desktop" class="img-fluid rounded-3">
+        <button id="cta" class="btn btn-lg btn-secondary position-absolute top-50 start-50 translate-middle ">Create your first trip now
+        </button>
+      </div>
+    </section>
+  {% endif %}
+
+{% endblock content %}

@@ -4,10 +4,10 @@ from crispy_forms.layout import HTML, Button, Div, Layout, Submit
 from django import forms
 from django.core.exceptions import ValidationError
 
-from .models import Link, Note, Place, Project
+from .models import Link, Note, Place, Trip
 
 
-class ProjectForm(forms.ModelForm):
+class TripForm(forms.ModelForm):
     title = forms.CharField(label="Titolo")
     description = forms.CharField(widget=forms.Textarea(), label="Descrizione")
     start_date = forms.DateField(
@@ -18,7 +18,7 @@ class ProjectForm(forms.ModelForm):
     )
 
     class Meta:
-        model = Project
+        model = Trip
         fields = (
             "title",
             "description",
@@ -54,7 +54,7 @@ class ProjectForm(forms.ModelForm):
         return cleaned_data
 
 
-class ProjectDateUpdateForm(forms.ModelForm):
+class TripDateUpdateForm(forms.ModelForm):
     start_date = forms.DateField(
         label="Inizio", required=False, widget=forms.DateInput(attrs={"type": "date"})
     )
@@ -63,7 +63,7 @@ class ProjectDateUpdateForm(forms.ModelForm):
     )
 
     class Meta:
-        model = Project
+        model = Trip
         fields = (
             "start_date",
             "end_date",
@@ -184,10 +184,10 @@ class NoteForm(forms.ModelForm):
             "content": "Content",
         }
 
-    def __init__(self, project, *args, **kwargs):
+    def __init__(self, trip, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["place"].queryset = Place.objects.filter(project=project)
-        self.fields["link"].queryset = Link.objects.filter(projects=project)
+        self.fields["place"].queryset = Place.objects.filter(trip=trip)
+        self.fields["link"].queryset = Link.objects.filter(trips=trip)
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.layout = Layout(
