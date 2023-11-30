@@ -9,9 +9,8 @@ skips = ["B101"]
 # src_paths = ["core"]
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "core.testing_settings"
+DJANGO_SETTINGS_MODULE = "core.settings.testing"
 python_files = "test_*.py"
-addopts = "--nomigrations --disable-socket"
 
 [tool.ruff]
 target-version = "py311"
