@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Link, Note, Place, Trip
+from .models import Day, Link, Note, Place, Trip
 
 
 @admin.register(Trip)
@@ -15,3 +15,8 @@ admin.site.register(Place)
 @admin.register(Note)
 class NoteAdmin(admin.ModelAdmin):
     pass
+
+
+@admin.register(Day)
+class DayAdmin(admin.ModelAdmin):
+    list_display = ["__str__", "trip", "date"]

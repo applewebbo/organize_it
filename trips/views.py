@@ -98,6 +98,9 @@ def trip_create(request):
                 f"<strong>{trip.title}</strong> added successfully",
             )
             return HttpResponse(status=204, headers={"HX-Trigger": "tripSaved"})
+        form = TripForm(request.POST)
+        context = {"form": form}
+        return TemplateResponse(request, "trips/trip-create.html", context)
 
     form = TripForm()
     context = {"form": form}

@@ -3,6 +3,14 @@ import datetime
 import geocoder
 from django.conf import settings
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.utils.translation import gettext as _
+
+
+def days_between(start_date, end_date):
+    delta = end_date - start_date
+    return delta.days
 
 
 class Trip(models.Model):
@@ -51,6 +59,27 @@ class Trip(models.Model):
                 self.status = 1
 
         super().save(*args, **kwargs)
+
+
+@receiver(post_save, sender=Trip)
+def update_trip_days(sender, instance, **kwargs):
+    days = days_between(instance.start_date, instance.end_date)
+    for day in range(days + 1):
+        Day.objects.update_or_create(
+            trip=instance,
+            number=day + 1,
+            date=instance.start_date + datetime.timedelta(days=day),
+        )
+
+
+class Day(models.Model):
+    trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="days")
+    number = models.PositiveSmallIntegerField()
+    date = models.DateField()
+
+    def __str__(self) -> str:
+        day = _("Day")
+        return f"{day} {self.number}"
 
 
 class Link(models.Model):
