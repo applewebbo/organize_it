@@ -250,6 +250,7 @@ def link_list(request, pk):
 
 @login_required
 def trip_add_place(request, pk):
+    # TODO we need to pass the trip obj to the form when creating place for getting the right choices
     trip = get_object_or_404(Trip, pk=pk, author=request.user)
     if request.method == "POST":
         form = PlaceForm(request.POST)
@@ -263,6 +264,9 @@ def trip_add_place(request, pk):
                 f"<strong>{place.name}</strong> added successfully",
             )
             return HttpResponse(status=204, headers={"HX-Trigger": "placeSaved"})
+        form = PlaceForm(request.POST)
+        context = {"form": form}
+        return TemplateResponse(request, "trips/place-create.html", context)
     form = PlaceForm()
     context = {"form": form}
     return TemplateResponse(request, "trips/place-create.html", context)

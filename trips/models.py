@@ -95,6 +95,9 @@ class Link(models.Model):
 
 class Place(models.Model):
     trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="places")
+    day = models.ForeignKey(
+        Day, on_delete=models.SET_NULL, null=True, related_name="places"
+    )
     name = models.CharField(max_length=100)
     url = models.URLField(null=True, blank=True)
     address = models.CharField(max_length=200)

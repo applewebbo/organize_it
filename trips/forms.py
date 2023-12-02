@@ -4,7 +4,7 @@ from crispy_forms.layout import HTML, Button, Div, Layout, Submit
 from django import forms
 from django.core.exceptions import ValidationError
 
-from .models import Link, Note, Place, Trip
+from .models import Day, Link, Note, Place, Trip
 
 
 class TripForm(forms.ModelForm):
@@ -85,6 +85,7 @@ class TripDateUpdateForm(forms.ModelForm):
                 ),
                 css_class="row",
             ),
+            FloatingField("days"),
         )
 
     def clean(self):
@@ -121,26 +122,32 @@ class LinkForm(forms.ModelForm):
 class PlaceForm(forms.ModelForm):
     class Meta:
         model = Place
-        fields = ("name", "url", "address")
+        fields = ("name", "url", "address", "day")
         widgets = {
             "name": forms.TextInput(attrs={"placeholder": "name"}),
             "url": forms.URLInput(attrs={"placeholder": "URL"}),
             "address": forms.TextInput(attrs={"placeholder": "address"}),
+            "day": forms.Select(attrs={"class": "form-select"}),
         }
         labels = {
             "title": "Title",
             "url": "URL",
             "address": "Address",
+            "day": "Day",
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["day"].choices = Day.objects.filter(
+            trip=self.instance.trip
+        ).values_list("id", "number")
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.layout = Layout(
             FloatingField("name"),
             FloatingField("url"),
             FloatingField("address"),
+            "day",
         )
 
 
