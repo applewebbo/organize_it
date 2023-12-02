@@ -7,6 +7,12 @@
   <div class="modal-body">
     {% csrf_token %}
     {% crispy form %}
+    <div class="card text-bg-light">
+      <div class="card-body">
+        <h5 class="card-title text-danger">Warning</h5>
+        <p class="card-text">Changing the dates will reset all links between places and days for the days deleted. This action cannot be undone</p>
+      </div>
+    </div>
   </div>
   <div class="modal-footer">
     <button type="button" data-bs-dismiss="modal" class="btn btn-danger">Cancel</button>
