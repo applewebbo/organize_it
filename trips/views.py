@@ -251,9 +251,9 @@ def link_list(request, pk):
 @login_required
 def trip_add_place(request, pk):
     # TODO we need to pass the trip obj to the form when creating place for getting the right choices
-    trip = get_object_or_404(Trip, pk=pk, author=request.user)
+    trip = get_object_or_404(Trip, pk=pk)
     if request.method == "POST":
-        form = PlaceForm(request.POST)
+        form = PlaceForm(request.POST, parent=trip)
         if form.is_valid():
             place = form.save(commit=False)
             place.trip = trip
@@ -264,10 +264,10 @@ def trip_add_place(request, pk):
                 f"<strong>{place.name}</strong> added successfully",
             )
             return HttpResponse(status=204, headers={"HX-Trigger": "placeSaved"})
-        form = PlaceForm(request.POST)
+        form = PlaceForm(request.POST, parent=trip)
         context = {"form": form}
         return TemplateResponse(request, "trips/place-create.html", context)
-    form = PlaceForm()
+    form = PlaceForm(parent=trip)
     context = {"form": form}
     return TemplateResponse(request, "trips/place-create.html", context)
 
@@ -317,6 +317,9 @@ def place_update(request, pk):
                 "Place updated successfully",
             )
             return HttpResponse(status=204, headers={"HX-Trigger": "placeSaved"})
+        form = PlaceForm(request.POST, instance=place)
+        context = {"form": form}
+        return TemplateResponse(request, "trips/place-create.html", context)
 
     form = PlaceForm(instance=place)
     context = {"form": form}

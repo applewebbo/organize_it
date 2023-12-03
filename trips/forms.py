@@ -3,6 +3,8 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import HTML, Button, Div, Layout, Submit
 from django import forms
 from django.core.exceptions import ValidationError
+from django.db.models import CharField, Value
+from django.db.models.functions import Concat
 
 from .models import Day, Link, Note, Place, Trip
 
@@ -136,11 +138,26 @@ class PlaceForm(forms.ModelForm):
             "day": "Day",
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, parent=False, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["day"].choices = Day.objects.filter(
-            trip=self.instance.trip
-        ).values_list("id", "number")
+        print(parent)
+        if parent:
+            trip = parent
+        else:
+            trip = self.instance.trip
+        self.fields["day"].choices = (
+            Day.objects.filter(trip=trip)
+            .annotate(
+                formatted_choice=Concat(
+                    "date",
+                    Value(" (Day "),
+                    "number",
+                    Value(")"),
+                    output_field=CharField(),
+                )
+            )
+            .values_list("id", "formatted_choice")
+        )
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.layout = Layout(
