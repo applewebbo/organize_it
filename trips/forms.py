@@ -140,7 +140,6 @@ class PlaceForm(forms.ModelForm):
 
     def __init__(self, *args, parent=False, **kwargs):
         super().__init__(*args, **kwargs)
-        print(parent)
         if parent:
             trip = parent
         else:
