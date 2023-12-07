@@ -1,0 +1,42 @@
+<li>
+  <div x-data="{
+               id:{{ day.number}},
+               get expanded() {
+               return this.active === this.id
+               },
+               set expanded(value) {
+               this.active = value ? this.id : null
+               }
+               }" role="region" class="border border-secondary-subtle rounded-1 p-3">
+
+    <h3 role="button" class="d-flex h5"
+        @click="expanded = !expanded"
+        :aria-expanded="expanded">
+      <span class="flex-grow-1 ">Day {{ day.number}}</span>
+      <span x-show="expanded" aria-hidden="true" class="me-3">&minus;</span>
+      <span x-show="!expanded" aria-hidden="true" class="me-3">&plus;</span>
+    </h3>
+    <div x-show="expanded">
+      {% if day.places.all %}
+        <ul class="list-group list-group-flush mt-2">
+          {% for place in day.places.all %}
+            <li class="list-group-item d-flex align-items-center">
+              <div class="flex-grow-1 ">{{ place.name }}</div>
+              <button class="btn btn-sm btn-primary ms-3"
+                      hx-get="{% url 'trips:place-update' place.id %}"
+                      hx-target="#dialog"
+                      hx-swap="innerHTML">Update</button>
+              <button class="btn btn-sm btn-danger ms-3"
+                      hx-delete="{% url 'trips:place-delete' place.id %}"
+                      hx-confirm="Are you sure you want to delete {{ place.name }}">Delete</button>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <ul class="list-unstyled ">
+          <li>-</li>
+        </ul>
+      {% endif %}
+    </div>
+  </div>
+</li>

@@ -64,7 +64,7 @@ def trip_list(request):
 
 @login_required
 def trip_detail(request, pk):
-    qs = Trip.objects.prefetch_related("links", "places", "notes")
+    qs = Trip.objects.prefetch_related("links", "places", "notes", "days")
     trip = get_object_or_404(qs, pk=pk)
 
     locations = list(Place.objects.filter(trip=pk).values("latitude", "longitude"))

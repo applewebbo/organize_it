@@ -39,12 +39,12 @@
       <h3 class="me-4">Links</h3>
     </div>
     {% partialdef link-list inline=true %}
-      <ul class="list-unstyled vstack gap-2 mb-3"
+      <ul class="list-group list-group-flush mb-3"
           hx-swap="outerHTML"
           hx-get="{% url 'trips:link-list' trip.id %}"
           hx-trigger="linkSaved from:body">
         {% for link in trip.links.all %}
-          <li class="d-flex">
+          <li class="list-group-item d-flex">
             <a href="{{ link.url }}"
                class="flex-grow-1 ">{% if link.title %}{{ link.title }}{%else%}{{ link.url}}{% endif %}</a>
             <button class="btn btn-sm btn-primary ms-3"
@@ -66,7 +66,6 @@
     {% endpartialdef %}
 
   </section>
-  <hr>
   <!-- Places Section -->
   <section id="places" class="mt-3 mb-5" x-data="{ showMap: false }">
     <div class="d-flex align-items-center mb-3">
@@ -74,11 +73,10 @@
         <h3 class="me-4">Places</h3>
       </div>
       {% if trip.places.all %}
-        <div>
+        {% comment %} <div>
           <button class="btn btn-sm btn-outline-secondary" @click="showMap = ! showMap">Show Map</button>
           <button class="btn btn-sm btn-outline-secondary ms-3">Regenerate Map</button>
-
-        </div>
+        </div> {% endcomment %}
       {% endif %}
 
     </div>
@@ -88,25 +86,18 @@
            hx-get="{% url 'trips:place-list' trip.id %}"
            hx-trigger="placeSaved from:body"
            hx-target="#place-list">
-        <div class="col-12 col-lg-6">
-          <ul class="list-unstyled vstack gap-2 mb-5">
-            {% for place in trip.places.all %}
-              <li class="d-flex">
-                <a href="#"
-                   class="flex-grow-1 ">{{ place.name }}</a>
-                <button class="btn btn-sm btn-primary ms-3"
-                        hx-get="{% url 'trips:place-update' place.id %}"
-                        hx-target="#dialog"
-                        hx-swap="innerHTML">Update</button>
-                <button class="btn btn-sm btn-danger ms-3"
-                        hx-delete="{% url 'trips:place-delete' place.id %}"
-                        hx-confirm="Are you sure you want to delete {{ place.name }}">Delete</button>
-              </li>
-            {% endfor %}
-          </ul>
+        <div class="col-12 col-xl-6">
+          <div x-data="{ active: 1 }">
+            <ul class="list-unstyled vstack gap-2 mb-5">
+              {% for day in trip.days.all %}
+                {% include 'trips/includes/places-single-day.html' %}
+              {% endfor %}
+            </ul>
+          </div>
         </div>
         {% if trip.places.all %}
-          <div class="col-12 col-lg-6  mb-4" x-cloak x-show="showMap" x-transition.opacity >
+          {% comment %} <div class="col-12 col-lg-6 mb-4" x-cloak x-show="showMap" x-transition.opacity> {% endcomment %}
+          <div class="col-12 col-xl-6 mb-4">
             <div id="map" class="z-0">
             </div>
             {{ locations|json_script:"location_json" }}
@@ -121,19 +112,18 @@
       {% endif %}
     {% endpartialdef %}
   </section>
-  <hr>
   <!-- Notes Section -->
   <section id="notes" class="mt-3 mb-5">
     <div class="d-flex align-items-center mb-3">
       <h3 class="me-4">Notes</h3>
     </div>
     {% partialdef note-list inline=true %}
-      <ul class="list-unstyled vstack gap-2 mb-3"
+      <ul class="list-group list-group-flush mb-3"
           hx-swap="outerHTML"
           hx-get="{% url 'trips:note-list' trip.id %}"
           hx-trigger="noteSaved from:body">
         {% for note in trip.notes.all %}
-          <li class="d-flex">
+          <li class="list-group-item d-flex">
             <span
               class="flex-grow-1 truncate">{{ note.content}}</span>
             {% if note.checked == True %}
