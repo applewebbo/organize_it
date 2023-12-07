@@ -24,7 +24,7 @@ decorator==5.1.1
     # via ratelim
 defusedxml==0.7.1
     # via python3-openid
-django==4.2.7
+django==4.2.8
     # via
     #   -r requirements.in
     #   crispy-bootstrap5
