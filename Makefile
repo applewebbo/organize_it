@@ -10,3 +10,6 @@ requirements:
 
 checkmigrations:
 	python manage.py makemigrations --check --no-input --dry-run
+
+watch:
+	npm run dev
