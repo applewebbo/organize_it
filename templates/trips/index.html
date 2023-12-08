@@ -5,12 +5,8 @@
 
 
 {% block content %}
-  <div class="d-flex align-items-center mb-4">
-    <h1 class="mb-3 flex-grow-1 ">Organize it!</h1>
-    <button class="btn btn-outline-primary"
-            hx-post="{% url 'trips:trip-create' %}"
-            hx-target="#dialog"
-            hx-swap="innerHTML">Add a Trip</button>
+  <div class="flex items-start mb-4">
+    <h1 class="text-3xl font-semibold grow">Organize it!</h1>
   </div>
   <!-- Content for Autenthicated Users -->
   {% if user.is_authenticated %}
@@ -64,10 +60,10 @@
   <!-- Content for Anonymous Users -->
   {% else %}
     <section id="welcome">
-      {% lorem 2 p random %}
-      <div id="hero" class="my-5 position-relative">
-        <img src="{% static 'img/hero.jpg' %}" alt="Organized Desktop" class="img-fluid rounded-3">
-        <button id="cta" class="btn btn-lg btn-secondary position-absolute top-50 start-50 translate-middle ">Create your first trip now
+      <p class="mb-4 text-gray-600">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sunt obcaecati, quibusdam excepturi beatae, nesciunt modi eos eius explicabo odit fugiat hic? Sapiente pariatur perspiciatis praesentium explicabo, adipisci aspernatur. Animi, aliquid?</p>
+      <p class="mb-4 text-gray-600">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Modi sunt dicta voluptatibus labore illum vero nemo cupiditate eveniet, numquam itaque at deleniti assumenda eaque aspernatur cumque nesciunt vitae officiis et?</p>
+      <div id="hero" class="my-8 flex justify-center items-center bg-local h-64" style="background-image: url({% static 'img/hero.jpg' %})">
+        <button id="cta" class="px-6 py-3.5 text-base font-medium text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Create your first trip now
         </button>
       </div>
     </section>

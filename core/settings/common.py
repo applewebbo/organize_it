@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
-    "crispy_bootstrap5",
+    "crispy_tailwind",
     "crispy_forms",
     "django_htmx",
     "template_partials",
@@ -197,9 +197,9 @@ ACCOUNT_USERNAME_REQUIRED = False
 
 # DJANGO CRISPY FORMS
 
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 
-CRISPY_TEMPLATE_PACK = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "tailwind"
 
 # ALERT STYLES
 
@@ -217,4 +217,9 @@ MAPBOX_ACCESS_TOKEN = env("MAPBOX_ACCESS_TOKEN")
 
 # FORMS
 
-FORM_RENDERER = "django.forms.renderers.DjangoDivFormRenderer"
+
+# class FormRenderer(TemplatesSetting):
+#     form_template_name = "form_snippet.html"
+
+
+# FORM_RENDERER = "config.settings.base.FormRenderer"
