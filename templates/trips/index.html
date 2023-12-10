@@ -5,9 +5,6 @@
 
 
 {% block content %}
-  <div class="flex items-start mb-4">
-    <h1 class="text-3xl font-semibold grow">Organize it!</h1>
-  </div>
   <!-- Content for Autenthicated Users -->
   {% if user.is_authenticated %}
     <p class="lead">Welcome back, {{ user.email }}!</p>
@@ -59,14 +56,15 @@
 
   <!-- Content for Anonymous Users -->
   {% else %}
-    <section id="welcome">
-      <p class="mb-4 text-gray-600">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sunt obcaecati, quibusdam excepturi beatae, nesciunt modi eos eius explicabo odit fugiat hic? Sapiente pariatur perspiciatis praesentium explicabo, adipisci aspernatur. Animi, aliquid?</p>
-      <p class="mb-4 text-gray-600">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Modi sunt dicta voluptatibus labore illum vero nemo cupiditate eveniet, numquam itaque at deleniti assumenda eaque aspernatur cumque nesciunt vitae officiis et?</p>
-      <div id="hero" class="my-8 flex justify-center items-center bg-local h-64" style="background-image: url({% static 'img/hero.jpg' %})">
-        <button id="cta" class="px-6 py-3.5 text-base font-medium text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Create your first trip now
-        </button>
+    <div class="hero min-h-fit py-12 rounded-lg mt-12" style="background-image: url({% static 'img/hero.jpg' %});">
+      <div class="hero-content text-center text-slate-800">
+        <div class="max-w-md">
+          <h1 class="text-5xl font-bold">Welcome to Organize it!</h1>
+          <p class="py-8 mb-8">Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem quasi. In deleniti eaque aut repudiandae et a id nisi.</p>
+          <button class="btn btn-primary">Create your first trip</button>
+        </div>
       </div>
-    </section>
+    </div>
   {% endif %}
 
 {% endblock content %}
