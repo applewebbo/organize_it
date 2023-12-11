@@ -139,3 +139,6 @@ bootstrap_source_scss/
 
 # VSCODE
 .vscode/
+
+# NODE
+node_modules/
