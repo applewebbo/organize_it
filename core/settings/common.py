@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import environ
-from django.contrib import messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -201,15 +200,15 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 
 CRISPY_TEMPLATE_PACK = "tailwind"
 
-# ALERT STYLES
+# # ALERT STYLES
 
-MESSAGE_TAGS = {
-    messages.DEBUG: "alert-secondary",
-    messages.INFO: "alert-info",
-    messages.SUCCESS: "alert-success",
-    messages.WARNING: "alert-warning",
-    messages.ERROR: "alert-danger",
-}
+# MESSAGE_TAGS = {
+#     messages.DEBUG: "text-gray-800 rounded-lg bg-gray-50 dark:bg-gray-800 dark:text-gray-300",
+#     messages.INFO: " text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400",
+#     messages.SUCCESS: "text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400",
+#     messages.WARNING: "text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300",
+#     messages.ERROR: "text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400",
+# }
 
 # MAPBOX
 
