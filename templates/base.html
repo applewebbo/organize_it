@@ -24,24 +24,27 @@
     <section>
       {% include 'includes/navbar.html' %}
     </section>
-    <div class="container mt-8 mx-auto">
-      {% block content %}
-      {% endblock content %}
-    </div>
-    <section>
-      {% include 'includes/footer.html' %}
-    </section>
+    <div x-data="{ openModal: false }">
+      <div class="container mt-8 mx-auto">
+        {% block content %}
+        {% endblock content %}
+      </div>
+      <section>
+        {% include 'includes/footer.html' %}
+      </section>
 
-    <!-- Modal -->
-    {% include 'includes/modal.html' %}
-    <!-- Messages -->
-    <div id="messages" class="z-3">
-      {% include 'includes/messages.html' %}
+      <!-- Modal -->
+      {% include 'includes/modal.html' %}
+      <!-- Messages -->
+      <div id="messages" class="z-3">
+        {% include 'includes/messages.html' %}
+      </div>
     </div>
     <!-- Htmx -->
     <script src="https://unpkg.com/htmx.org@1.9.9"></script>
     <!-- Alpine.js -->
     <script src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <!-- Custom.js -->
     <script src="{% static 'js/custom.js' %}"></script>

@@ -1,6 +1,5 @@
-from crispy_bootstrap5.bootstrap5 import FloatingField
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import HTML, Button, Div, Layout, Submit
+from crispy_forms.layout import HTML, Div, Field, Layout
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db.models import CharField, Value
@@ -33,18 +32,21 @@ class TripForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.layout = Layout(
-            FloatingField("title", autocomplete="Titolo"),
-            FloatingField("description", css_class="fl-textarea"),
             Div(
-                Div(
-                    FloatingField("start_date", autocomplete="Inizio"),
-                    css_class="col",
-                ),
-                Div(
-                    FloatingField("end_date", autocomplete="Fine"),
-                    css_class="col",
-                ),
-                css_class="row",
+                "title",
+                css_class="sm:col-span-2",
+            ),
+            Div(
+                Field("description", css_class="fl-textarea"),
+                css_class="sm:col-span-2",
+            ),
+            Div(
+                "start_date",
+                css_class="w-full",
+            ),
+            Div(
+                "end_date",
+                css_class="w-full",
             ),
         )
 
@@ -77,17 +79,13 @@ class TripDateUpdateForm(forms.ModelForm):
         self.helper.form_tag = False
         self.helper.layout = Layout(
             Div(
-                Div(
-                    FloatingField("start_date", autocomplete="Inizio"),
-                    css_class="col",
-                ),
-                Div(
-                    FloatingField("end_date", autocomplete="Fine"),
-                    css_class="col",
-                ),
-                css_class="row",
+                Field("start_date", autocomplete="Inizio"),
+                css_class="w-full",
             ),
-            FloatingField("days"),
+            Div(
+                Field("end_date", autocomplete="Fine"),
+                css_class="w-full",
+            ),
         )
 
     def clean(self):
@@ -110,14 +108,17 @@ class LinkForm(forms.ModelForm):
             "title": "Title",
             "url": "URL",
         }
+        help_texts = {
+            "title": "Please provide a name otherwise the Url will be used as a name"
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.layout = Layout(
-            FloatingField("title"),
-            FloatingField("url"),
+            "title",
+            "url",
         )
 
 
@@ -160,35 +161,35 @@ class PlaceForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.layout = Layout(
-            FloatingField("name"),
-            FloatingField("url"),
-            FloatingField("address"),
+            Field("name"),
+            Field("url"),
+            Field("address"),
             "day",
         )
 
 
 FIELDSET_CONTENT = """
-            <fieldset class="row mb-3">
-            <legend class="col-form-label col-sm-4 pt-0">Connect to</legend>
-            <div class="col-sm-8">
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios1" value="option1" checked
+            <fieldset>
+            <legend class="block text-gray-700 text-sm font-bold mb-2">Connect to</legend>
+            <div class="flex">
+              <div class="flex items-center me-4">
+                <input class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" type="radio" name="gridRadios" id="gridRadios1" value="option1" checked
                 x-on:click="open = 0">
-                <label class="form-check-label" for="gridRadios1">
+                <label class="ms-2 text-sm font-medium text-gray-600 dark:text-gray-300" for="gridRadios1">
                   None
                 </label>
               </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="option2"
+              <div class="flex items-center me-4">
+                <input class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" type="radio" name="gridRadios" id="gridRadios2" value="option2"
                     x-on:click="open = 1" x-transition>
-                <label class="form-check-label" for="gridRadios2">
+                <label class="ms-2 text-sm font-medium text-gray-600 dark:text-gray-300" for="gridRadios2">
                   Place
                 </label>
               </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios3" value="option3"
+              <div class="flex items-center me-4">
+                <input class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" type="radio" name="gridRadios" id="gridRadios3" value="option3"
                 x-on:click="open = 2" x-transition>
-                <label class="form-check-label" for="gridRadios3">
+                <label class="ms-2 text-sm font-medium text-gray-600 dark:text-gray-300" for="gridRadios3">
                   Link
                 </label>
               </div>
@@ -214,22 +215,12 @@ class NoteForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.layout = Layout(
-            FloatingField("content", css_class="fl-textarea"),
+            Field("content", css_class="fl-textarea"),
             Div(
                 HTML(FIELDSET_CONTENT),
                 Div("place", x_show="open == 1"),
                 Div("link", x_show="open == 2"),
                 x_data="{ open: 0}",
                 x_init="$watch('open', () => resetInput())",
-            ),
-            Div(
-                Button(
-                    "button",
-                    "Cancel",
-                    data_bs_dismiss="modal",
-                    css_class="btn btn-danger",
-                ),
-                Submit("submit", "Save", css_class="btn btn-primary"),
-                css_class="text-end mt-3",
             ),
         )
