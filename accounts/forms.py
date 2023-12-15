@@ -1,5 +1,5 @@
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Div, Layout, Submit
+from crispy_forms.layout import Layout, Submit
 from django import forms
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 
@@ -36,5 +36,6 @@ class ProfileUpdateForm(forms.ModelForm):
             )
         self.helper = FormHelper()
         self.helper.layout = Layout(
-            "fav_trip", Div(Submit("submit", "Salva"), css_class="mt-4 text-end")
+            "fav_trip",
+            Submit("submit", "Salva", css_class="mt-8 w-full"),
         )

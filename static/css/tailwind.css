@@ -2510,6 +2510,13 @@ html {
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
+p {
+  margin-bottom: 0.75rem;
+  font-weight: 400;
+  --tw-text-opacity: 1;
+  color: rgb(55 65 81 / var(--tw-text-opacity));
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -3195,6 +3202,10 @@ html {
 
 li:last-child {
   border-bottom: none;
+}
+
+select ~ .pointer-events-none {
+  display: none !important;
 }
 
 .hover\:bg-gray-100:hover {

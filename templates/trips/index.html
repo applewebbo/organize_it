@@ -14,7 +14,7 @@
           <span class="bg-accent text-accent-content font-medium me-2 px-3.5 py-1.5 rounded absolute top-0 right-0 -mt-4 mr-6">My Favourite Trip</span>
           <div class="card-body">
             <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">{{ fav_trip.title }}</h5>
-            <p class="mb-3 font-normal text-gray-700">{{ fav_trip.description }}</p>
+            <p>{{ fav_trip.description }}</p>
             <div class="card-actions justify-end">
               <a href="{% url 'trips:trip-detail' fav_trip.id %}" class="btn btn-sm btn-primary">View Trip</a>
             </div>

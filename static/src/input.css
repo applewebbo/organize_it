@@ -12,8 +12,15 @@
   .t-card{
     @apply p-4 bg-white border border-gray-200 rounded-lg shadow mb-5 relative;
   }
+  p{
+    @apply mb-3 font-normal text-gray-700;
+  }
 }
 
 li:last-child {
   border-bottom: none;
+}
+
+select ~ .pointer-events-none {
+  display: none !important;
 }
