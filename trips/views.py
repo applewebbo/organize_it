@@ -44,7 +44,6 @@ def home(request):
     if request.user.is_authenticated:
         if Profile.objects.filter(user=request.user).exists():
             context = get_trips(request.user)
-            context["has_profile"] = True
     return TemplateResponse(request, "trips/index.html", context)
 
 
