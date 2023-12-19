@@ -1,15 +1,12 @@
-
+// Close the modal after successfully submitting the form
 htmx.on("htmx:beforeSwap", (e) => {
   // Empty response targeting #dialog => hide the modal
   if (e.detail.target.id == "dialog" && !e.detail.xhr.response) {
+    window.dispatchEvent(new Event('hide-modal'))
     e.detail.shouldSwap = false
   }
 })
 
-htmx.on("hidden.bs.modal", () => {
-  // Closing the modal => remove the content from the modal
-  document.getElementById("dialog").innerHTML = ""
-})
 
 // LeafletJs Map
 function createMap(bounds) {

@@ -197,7 +197,7 @@ def trip_add_link(request, pk):
                 messages.SUCCESS,
                 "Link added successfully",
             )
-            return HttpResponse(status=204, headers={"HX-Refresh": "true"})
+            return HttpResponse(status=204, headers={"HX-Trigger": "linkSaved"})
 
     form = LinkForm()
     context = {"form": form}
