@@ -1,13 +1,19 @@
 {% extends "base-simplified.html" %}
-{% load i18n crispy_forms_tags %}
+{% load static i18n crispy_forms_tags %}
 {% load account socialaccount %}
 
 
 {% block content %}
-  <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
-    <div class="card shadow rounded-4">
-      <div class="card-body">
-        <h1 class="m-4 text-center text-primary">{% trans "Sign In" %}</h1>
+  <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+    <a href="#" class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
+      <img class="w-8 h-8 mr-2" src="{% static 'img/logo.png' %}" alt="logo">
+      Organize it!
+    </a>
+    <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+      <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+        <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+          {% trans "Sign In" %}
+        </h1>
 
         {% get_providers as socialaccount_providers %}
 
@@ -29,22 +35,24 @@
           {% include "socialaccount/snippets/login_extra.html" %}
 
         {% else %}
-          <p class="text-muted">{% blocktrans %}If you have not created an account yet, then please
-            <a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
+
         {% endif %}
 
-        <form class="login my-4" method="POST" action="{% url 'account_login' %}">
+        <form class="space-y-4 md:space-y-6" method="POST" action="{% url 'account_login' %}">
           {% csrf_token %}
           {{ form|crispy }}
           {% if redirect_field_value %}
             <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
           {% endif %}
-          <div class="d-grid gap-2 mt-4">
-            <a class="btn btn-secondary" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
-            <button class="btn btn-primary" type="submit">{% trans "Sign In" %}</button>
+          <div class="mb-3 text-sm text-right">
+            <a class="text-primary hover:underline" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
           </div>
-        </form>
-      </div>
+          <button type="submit" class="btn btn-primary w-full" >{% trans "Sign In" %}</button>
+          <p class="text-sm font-light text-gray-500 dark:text-gray-400">
+            {% blocktrans %}If you have not created an account yet, then please <a href="{{ signup_url }}" class="text-primary hover:underline">Sign up</a> first.{% endblocktrans %}</p>
+        </p>
+      </form>
     </div>
+  </div>
   </div>
 {% endblock content %}

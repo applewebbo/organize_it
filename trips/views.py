@@ -114,7 +114,7 @@ def trip_delete(request, pk):
     trip.delete()
     messages.add_message(
         request,
-        messages.SUCCESS,
+        messages.ERROR,
         f"<strong>{trip.title}</strong> deleted successfully",
     )
     return HttpResponse(

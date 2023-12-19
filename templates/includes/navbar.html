@@ -1,29 +1,51 @@
 {% load static %}
-<nav class="navbar navbar-expand-lg bg-body-tertiary py-3">
-  <div class="container">
-    <a class="navbar-brand" href="{% url 'trips:home' %}">
-      <img src="{% static 'img/logo.png' %}" alt="Logo" width="32" height="32" class="d-inline-block align-text-top me-2">
-      Organize it!
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-      <div class="navbar-nav ms-auto">
-        <a class="nav-link active" aria-current="page" href="{% url 'trips:home' %}">Home</a>
-        <a class="nav-link" href="{% url 'trips:trip-list' %}">Trips</a>
-        <a class="nav-link" href="#">Contacts</a>
-        {% if user.is_authenticated %}
-          <a class="nav-link" href="{% url 'accounts:profile' %}">Profile</a>
-          <form action="{% url 'account_logout' %}" method="POST">
-            {% csrf_token %}
-            <button class="btn btn-link nav-link" type="submit">Logout</button>
-          </form>
-        {% else %}
-          <a class="nav-link"
-             href="{% url 'account_login' %}">Login</a>
-        {% endif %}
+<div x-data="{ open: false}">
+  <nav class="navbar bg-base-100">
+    <div class="container mx-auto">
+      <div class="navbar-start">
+        <a href="{% url 'trips:home' %}" class="flex items-center space-x-3">
+          <img src="{% static 'img/logo.png' %}" class="h-8" alt=Logo">
+          <span class="text-2xl font-medium whitespace-nowrap">Organize it!</span>
+        </a>
       </div>
+      <div class="navbar-end flex justify-end items-center">
+        <ul class="menu menu-horizontal hidden md:flex">
+          <li><a href="{% url 'trips:home' %}">Home</a></li>
+          <li><a href="{% url 'trips:trip-list' %}">Trips</a></li>
+          {% if user.is_authenticated %}
+          <li><a href="{% url 'accounts:profile' %}">Profile</a></li>
+          {% endif %}
+        </ul>
+        {% if user.is_authenticated %}
+      <form action="{% url 'account_logout' %}" method="POST">
+        {% csrf_token %}
+        <button class="btn btn-primary btn-sm" type="submit">Log out</button>
+      </form>
+      {% else %}
+      <a href="{% url 'account_login' %}" class="btn btn-primary btn-sm mr-6">Log in</a>
+      {% endif %}
+      <button class="btn btn-square btn-ghost md:hidden" aria-expanded="false" x-on:click="open = ! open">
+        <span class="sr-only">Open main menu</span>
+        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
+        </svg>
+      </button>
     </div>
   </div>
 </nav>
+  <div class="items-center justify-between w-full md:hidden" x-show="open" x-collapse.duration.600>
+    <ul class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg bg-gray-50">
+      <li>
+        <a href="{% url 'trips:home' %}" class="block py-2 px-3 text-gray-900 hover:bg-gray-100" aria-current="page">Home</a>
+      </li>
+      <li>
+        <a href="{% url 'trips:trip-list' %}" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100">Trips</a>
+      </li>
+      {% if user.is_authenticated %}
+      <li>
+        <a href="{% url 'accounts:profile' %}" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100">Profile</a>
+      </li>
+      {% endif %}
+    </ul>
+  </div>
+</div>

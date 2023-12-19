@@ -1,4 +1,4 @@
-crispy-bootstrap5==0.7
+crispy-tailwind==0.5
 django==5.0
 django-allauth==0.57.0
 django-crispy-forms==2.0

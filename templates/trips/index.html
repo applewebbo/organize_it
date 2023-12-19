@@ -5,55 +5,62 @@
 
 
 {% block content %}
-  <div class="d-flex align-items-center mb-4">
-    <h1 class="mb-3 flex-grow-1 ">Organize it!</h1>
-    <button class="btn btn-outline-primary"
-            hx-post="{% url 'trips:trip-create' %}"
-            hx-target="#dialog"
-            hx-swap="innerHTML">Add a Trip</button>
-  </div>
-  <!-- Content for Autenthicated Users -->
   {% if user.is_authenticated %}
-    <p class="lead">Welcome back, {{ user.email }}!</p>
-    <div id="trip-list">
+<!-- Content for Autenthicated Users -->
+    <p class="text-xl mb-8">Welcome back, {{ user.email }}!</p>
+    <div id="trip-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
       {% if fav_trip %}
-        <div class="card mb-5">
-          <h5 class="card-header">My Favourite Trip</h5>
+        <div class="p-4 bg-white border border-gray-200 rounded-lg shadow mb-5 relative h-full">
+          <span class="bg-accent text-accent-content font-medium me-2 px-3.5 py-1.5 rounded absolute top-0 right-0 -mt-4 mr-6">My Favourite Trip</span>
           <div class="card-body">
-            <h5 class="card-title">{{ fav_trip.title }}</h5>
-            <p class="card-text">{{ fav_trip.description }}</p>
+            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">{{ fav_trip.title }}</h5>
+            <p>{{ fav_trip.description }}</p>
+            <div class="card-actions justify-end">
+              <a href="{% url 'trips:trip-detail' fav_trip.id %}" class="btn btn-sm btn-primary">View Trip</a>
+            </div>
           </div>
         </div>
         {% if other_trips %}
-          <h5>Other Trips</h5>
-          <ul class="list-unstyled ">
-            {% for trip in other_trips %}
-              <li><a href="#">{{ trip.title}}</a></li>
-            {% endfor %}
-          </ul>
+          <div class="p-4 bg-white border border-gray-200 rounded-lg shadow mb-5 relative h-full">
+            <span class="bg-gray-100 border border-gray-200 text-gray-800 font-medium me-2 px-3.5 py-1.5 rounded absolute top-0 right-0 -mt-4 mr-6">Other Trips</span>
+            <div class="card-body">
+              <ul class="list-unstyled ">
+                {% for trip in other_trips %}
+                  <li><a class="link" href="#">{{ trip.title}}</a></li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
         {% endif %}
       {% else %}
         {% if other_trips %}
           {% for trip in other_trips %}
             {% if forloop.first %}
-              <div class="card mb-5">
-                <h5 class="card-header">My Latest Trip</h5>
+              <div class="p-4 bg-white border border-gray-200 rounded-lg shadow mb-5 relative">
+                <span class="bg-accent text-accent-content font-medium me-2 px-3.5 py-1.5 rounded absolute top-0 right-0 -mt-4 mr-6">My Latest Trip</span>
                 <div class="card-body">
-                  <h5 class="card-title">{{ trip.title }}</h5>
-                  <p class="card-text">{{ trip.description }}</p>
+                  <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">{{ trip.title }}</h5>
+                  <p class="mb-3 font-normal text-gray-700">{{ trip.description }}</p>
+                  <div class="card-actions justify-end">
+                    <a href="{% url 'trips:trip-detail' trip.id %}" class="btn btn-sm btn-primary">View Trip</a>
+                  </div>
                 </div>
               </div>
             {% endif %}
           {% endfor %}
-          <h5>Other Trips</h5>
-          <ul class="list-unstyled ">
-            {% for trip in other_trips %}
-              {% if forloop.first %}
-              {% else %}
-                <li><a href="#">{{ trip.title}}</a></li>
-              {% endif %}
-            {% endfor %}
-          </ul>
+          <div class="p-4 bg-white border border-gray-200 rounded-lg shadow mb-5 relative">
+            <span class="bg-gray-100 border border-gray-200 text-gray-800 font-medium me-2 px-3.5 py-1.5 rounded absolute top-0 right-0 -mt-4 mr-6">Other Trips</span>
+            <div class="card-body">
+              <ul class="list-unstyled ">
+                {% for trip in other_trips %}
+                  {% if forloop.first %}
+                  {% else %}
+                    <li><a class="link" href="#">{{ trip.title}}</a></li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
         {% else %}
           <p>You have no trips yet!</p>
         {% endif %}
@@ -61,16 +68,17 @@
       {% endif %}
     </div>
 
-  <!-- Content for Anonymous Users -->
   {% else %}
-    <section id="welcome">
-      {% lorem 2 p random %}
-      <div id="hero" class="my-5 position-relative">
-        <img src="{% static 'img/hero.jpg' %}" alt="Organized Desktop" class="img-fluid rounded-3">
-        <button id="cta" class="btn btn-lg btn-secondary position-absolute top-50 start-50 translate-middle ">Create your first trip now
-        </button>
+    <!-- Content for Anonymous Users -->
+    <div class="hero min-h-fit py-12 rounded-lg mt-12" style="background-image: url({% static 'img/hero.jpg' %});">
+      <div class="hero-content text-center text-slate-800">
+        <div class="max-w-md">
+          <h1 class="text-5xl font-bold">Welcome to Organize it!</h1>
+          <p class="py-8 mb-8">Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem quasi. In deleniti eaque aut repudiandae et a id nisi.</p>
+          <button class="btn btn-primary">Create your first trip</button>
+        </div>
       </div>
-    </section>
+    </div>
   {% endif %}
 
 {% endblock content %}

@@ -12,51 +12,48 @@
                hx-get="{% url 'trips:trip-list' %}"
                hx-target="#trips">
 
-        <div class="d-md-flex align-items-center  mb-4 text-center text-md-start">
-          <h1 class="flex-grow-1">My Trips</h1>
-          <button class="btn btn-outline-primary"
+        <div class="md:flex items-center mb-12 text-center md:text-start">
+          <h1 class="grow text-2xl font-semibold">My Trips</h1>
+          <button class="btn btn-sm btn-outline btn-primary"
                   hx-get="{% url 'trips:trip-create' %}"
                   hx-target="#dialog"
-                  hx-swap="innerHTML">Create a new trip</button>
+                  hx-swap="innerHTML"
+                  x-on:click="openModal = true">Create a new trip</button>
         </div>
 
-        <div class="row g-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-y-8 gap-x-4">
           {% for trip in active_trips %}
-            <div class="col-lg-6 col-xxl-4">
-              <div class="card h-100" id="{{trip.id}}">
-                <div class="card-header text-center">
-                  <div class="d-flex justify-content-between">
-                    <div>
-                      <span class="badge rounded-pill px-3 py-2 text-bg-secondary me-3">
-                        {{ trip.get_status_display }}
-                      </span>
-                      {% if trip.start_date and trip.end_date %}
-                        {{ trip.start_date }} / {{ trip.end_date }}
-                      {% else  %}
-                        - / -
-                      {% endif %}
-                    </div>
-                    <button class="btn btn-sm btn-outline-secondary"
-                            hx-get="{% url 'trips:trip-dates' trip.id %}"
-                            hx-target="#dialog"
-                            hx-swap="innerHTML"
-                    >Edit</button>
-                  </div>
+            <div class="t-card h-full" id="{{trip.id}}">
+              <span class="card-badge-sm bg-base-200 text-gray-800 border border-gray-200">
+                {{ trip.get_status_display }}
+              </span>
+              <div class="card-body">
+                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">{{ trip.title }}</h5>
+                <div class="flex items-center">
+                  <span >{% if trip.start_date and trip.end_date %}
+                    {{ trip.start_date }} / {{ trip.end_date }}
+                  {% else  %}
+                    - / -
+                  {% endif %}
+                  </span>
+                  <a class="link link-secondary link-hover ml-4"
+                     hx-get="{% url 'trips:trip-dates' trip.id %}"
+                     hx-target="#dialog"
+                     hx-swap="innerHTML"
+                     x-on:click="openModal = true"
+                  >Change</a>
                 </div>
-                <div class="card-body">
-                  <h5 class="card-title">{{ trip.title }}</h5>
-                  <p class="card-text">{{ trip.description }}</p>
-                  <div class="text-end">
-                    <button class="btn btn-sm btn-outline-warning me-2"
-                            hx-get="{% url 'trips:trip-archive' trip.id %}"
-                            hx-target="">Archive</button>
-                    <button class="btn btn-sm btn-outline-danger me-2"
-                            hx-delete="{% url 'trips:trip-delete' trip.id %}"
-                            hx-confirm="Are you sure you want to delete {{ trip.title }}?">Delete</button>
-                    <a href="{% url 'trips:trip-detail' trip.id %}" class="btn btn-sm btn-outline-primary">View</a>
-                  </div>
+                <p class="mb-3 font-normal text-gray-700">{{ trip.description }}</p>
+                <div class="card-actions justify-end">
+                  <button class="btn btn-sm btn-outline btn-warning me-2"
+                          hx-get="{% url 'trips:trip-archive' trip.id %}"
+                          hx-target="">Archive</button>
+                  <button class="btn btn-sm btn-outline btn-error me-2"
+                          hx-delete="{% url 'trips:trip-delete' trip.id %}"
+                          hx-confirm="Are you sure you want to delete {{ trip.title }}?">Delete</button>
+                  <a href="{% url 'trips:trip-detail' trip.id %}" class="btn btn-sm btn-outline btn-primary">View</a>
+                </div>
 
-                </div>
               </div>
             </div>
           {% endfor %}
