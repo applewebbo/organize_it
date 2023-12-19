@@ -42,7 +42,9 @@ def home(request):
     """Home page"""
     context = {}
     if request.user.is_authenticated:
-        context = get_trips(request.user)
+        if Profile.objects.filter(user=request.user).exists():
+            context = get_trips(request.user)
+            context["has_profile"] = True
     return TemplateResponse(request, "trips/index.html", context)
 
 

@@ -12,7 +12,7 @@
         <ul class="menu menu-horizontal hidden md:flex">
           <li><a href="{% url 'trips:home' %}">Home</a></li>
           <li><a href="{% url 'trips:trip-list' %}">Trips</a></li>
-          {% if user.is_authenticated %}
+          {% if has_profile %}
           <li><a href="{% url 'accounts:profile' %}">Profile</a></li>
           {% endif %}
         </ul>
