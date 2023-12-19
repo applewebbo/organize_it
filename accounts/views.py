@@ -1,6 +1,8 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
 from django.template.response import TemplateResponse
+from django.urls import reverse
 
 from .forms import ProfileUpdateForm
 
@@ -21,8 +23,7 @@ def profile(request):
                 messages.SUCCESS,
                 "Profile modified succesfully",
             )
-            context["profile_form"] = ProfileUpdateForm(instance=request.user.profile)
-            return TemplateResponse(request, "account/profile.html", context)
+            return redirect(reverse("trips:home"))
         form = ProfileUpdateForm(request.POST, instance=request.user.profile)
         return TemplateResponse(request, "account/profile.html", context)
 

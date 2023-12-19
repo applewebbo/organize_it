@@ -127,7 +127,7 @@
             hx-get="{% url 'trips:note-list' trip.id %}"
             hx-trigger="noteSaved from:body">
           {% for note in trip.notes.all %}
-            <li class="flex border-b border-gray-200 px-4 mb-3 pb-2">
+            <li x-data class="flex border-b border-gray-200 px-4 mb-3 pb-2">
               <span
                 class="grow truncate">{{ note.content}}</span>
               {% if note.checked == True %}
@@ -144,7 +144,8 @@
               <button class="btn btn-sm btn-outline btn-primary ms-3"
                       hx-get="{% url 'trips:note-update' note.id %}"
                       hx-target="#dialog"
-                      hx-swap="innerHTML">Update</button>
+                      hx-swap="innerHTML"
+                      @click="$dispatch('open-modal')">Update</button>
               <button class="btn btn-sm btn-outline btn-error ms-3"
                       hx-delete="{% url 'trips:note-delete' note.id %}"
                       hx-confirm="Are you sure you want to delete {{ link.url }}">Delete</button>
