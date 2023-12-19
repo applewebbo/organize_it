@@ -1,3 +1,5 @@
+from datetime import date
+
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import HTML, Div, Field, Layout
 from django import forms
@@ -56,6 +58,13 @@ class TripForm(forms.ModelForm):
             if cleaned_data.get("start_date") > cleaned_data.get("end_date"):
                 raise ValidationError("End date must be after start date")
         return cleaned_data
+
+    def clean_start_date(self):
+        start_date = self.cleaned_data.get("start_date")
+        if start_date:
+            if start_date < date.today():
+                raise ValidationError("Start date must be after today")
+        return start_date
 
 
 class TripDateUpdateForm(forms.ModelForm):

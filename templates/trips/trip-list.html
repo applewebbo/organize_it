@@ -12,13 +12,13 @@
                hx-get="{% url 'trips:trip-list' %}"
                hx-target="#trips">
 
-        <div class="md:flex items-center mb-12 text-center md:text-start">
-          <h1 class="grow text-2xl font-semibold">My Trips</h1>
+        <div x-data class="md:flex items-center mb-12 text-center md:text-start">
+          <h1 class="grow text-2xl font-semibold mb-2">My Trips</h1>
           <button class="btn btn-sm btn-outline btn-primary"
                   hx-get="{% url 'trips:trip-create' %}"
                   hx-target="#dialog"
                   hx-swap="innerHTML"
-                  x-on:click="openModal = true">Create a new trip</button>
+                  @click="$dispatch('open-modal')">Create a new trip</button>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-y-8 gap-x-4">
@@ -29,7 +29,7 @@
               </span>
               <div class="card-body">
                 <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">{{ trip.title }}</h5>
-                <div class="flex items-center">
+                <div x-data class="flex items-center">
                   <span >{% if trip.start_date and trip.end_date %}
                     {{ trip.start_date }} / {{ trip.end_date }}
                   {% else  %}
@@ -40,7 +40,7 @@
                      hx-get="{% url 'trips:trip-dates' trip.id %}"
                      hx-target="#dialog"
                      hx-swap="innerHTML"
-                     x-on:click="openModal = true"
+                     @click="$dispatch('open-modal')"
                   >Change</a>
                 </div>
                 <p class="mb-3 font-normal text-gray-700">{{ trip.description }}</p>
