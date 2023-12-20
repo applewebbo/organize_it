@@ -64,6 +64,10 @@ class Trip(models.Model):
 @receiver(post_save, sender=Trip)
 def update_trip_days(sender, instance, **kwargs):
     days = days_between(instance.start_date, instance.end_date)
+    # check if days already created are inside the range and delete them accordingly
+    for day in instance.days.all():
+        if day.date < instance.start_date or day.date > instance.end_date:
+            day.delete()
     for day in range(days + 1):
         Day.objects.update_or_create(
             trip=instance,

@@ -21,7 +21,10 @@
         <span x-show="!expanded" aria-hidden="true" class="me-3"><svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M201.4 342.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 274.7 86.6 137.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg></span>
       </h3>
     {% else %}
-      <h3 class="px-3 py-1.5 mx-2 border-b border-secondary-subtle text-gray-400">Day {{ day.number}}</h3>
+      <div class="relative grow flex items-center my-3">
+        <span class="mr-3">Day {{ day.number}}</span>
+        <span class="bg-gray-200 text-gray-600 text-xs font-medium me-2 px-2.5 py-0.5 rounded border border-gray-300">0 Places</span>
+      </div>
     {% endif %}
     <div x-show="expanded">
       {% if day.places.all %}
@@ -39,10 +42,6 @@
                       hx-confirm="Are you sure you want to delete {{ place.name }}">Delete</button>
             </li>
           {% endfor %}
-        </ul>
-      {% else %}
-        <ul class="list-unstyled ">
-          <li>-</li>
         </ul>
       {% endif %}
     </div>
