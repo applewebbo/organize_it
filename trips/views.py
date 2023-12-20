@@ -251,7 +251,6 @@ def link_list(request, pk):
 
 @login_required
 def trip_add_place(request, pk):
-    # TODO we need to pass the trip obj to the form when creating place for getting the right choices
     trip = get_object_or_404(Trip, pk=pk)
     if request.method == "POST":
         form = PlaceForm(request.POST, parent=trip)
