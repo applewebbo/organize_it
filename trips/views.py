@@ -69,11 +69,13 @@ def trip_detail(request, pk):
     trip = get_object_or_404(qs, pk=pk)
 
     locations = list(Place.objects.filter(trip=pk).values("latitude", "longitude"))
+    not_assigned_locations = Place.na_objects.filter(trip=pk)
     map_bounds = calculate_bounds(locations)
 
     context = {
         "trip": trip,
         "locations": locations,
+        "not_assigned_locations": not_assigned_locations,
         "map_bounds": map_bounds,
     }
     if request.htmx:

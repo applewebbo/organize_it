@@ -97,6 +97,11 @@ class Link(models.Model):
         return self.url
 
 
+class NotAssignedManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(day__isnull=True)
+
+
 class Place(models.Model):
     trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="places")
     day = models.ForeignKey(
@@ -107,6 +112,9 @@ class Place(models.Model):
     address = models.CharField(max_length=200)
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
+
+    objects = models.Manager()
+    na_objects = NotAssignedManager()
 
     def save(self, *args, **kwargs):
         g = geocoder.mapbox(self.address, access_token=settings.MAPBOX_ACCESS_TOKEN)

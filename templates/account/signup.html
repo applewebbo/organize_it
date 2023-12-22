@@ -1,24 +1,28 @@
 {% extends "base-simplified.html" %}
 
-{% load i18n crispy_forms_tags %}
+{% load static i18n crispy_forms_tags %}
 
 {% block page_title %}{% trans "Signup" %}{% endblock page_title %}
 
 {% block content %}
-  <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
-    <div class="card shadow rounded-4">
-      <div class="card-body">
-        <h1 class="m-4 text-center text-primary">{% trans "Sign Up" %}</h1>
-        <p class="text-muted">{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>{% endblocktrans %}</p>
-        <form class="signup my-4" id="signup_form" method="post" action="{% url 'account_signup' %}">
+  <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+    <a href="#" class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
+      <img class="w-8 h-8 mr-2" src="{% static 'img/logo.png' %}" alt="logo">
+      Organize it!
+    </a>
+    <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+      <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+        <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+          {% trans "Sign Up" %}
+        </h1>
+        <p class="text-sm font-light text-gray-500 dark:text-gray-400">{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>{% endblocktrans %}</p>
+        <form class="space-y-4 md:space-y-6" id="signup_form" method="post" action="{% url 'account_signup' %}">
           {% csrf_token %}
           {{ form|crispy }}
           {% if redirect_field_value %}
             <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
           {% endif %}
-          <div class="d-grid">
-            <button class="btn btn-primary mt-3" type="submit">{% trans "Sign Up" %}</button>
-          </div>
+          <button class="btn btn-primary w-full" type="submit">{% trans "Sign Up" %}</button>
         </form>
       </div>
     </div>

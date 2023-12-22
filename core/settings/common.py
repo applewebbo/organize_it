@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "crispy_tailwind",
     "crispy_forms",
     "django_htmx",
+    "django_extensions",
     "template_partials",
     # CONTRIB
     "django.contrib.admin",

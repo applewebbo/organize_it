@@ -1,6 +1,6 @@
 {% if messages %}
   {% for message in messages %}
-    <div class="fixed top-14 right-5 flex items-center p-4 mb-4
+    <div class="fixed z-50 top-5 right-5 flex items-center p-4 mb-4
                 {% if message.tags == 'info' %}
                   text-blue-800 border border-blue-300 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400 dark:border-blue-800
                 {%elif message.tags == 'success' %}

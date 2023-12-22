@@ -45,11 +45,11 @@
             <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
           {% endif %}
           <div class="mb-3 text-sm text-right">
-            <a class="text-primary hover:underline" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
+            <a class="text-blue-600 hover:underline" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
           </div>
           <button type="submit" class="btn btn-primary w-full" >{% trans "Sign In" %}</button>
           <p class="text-sm font-light text-gray-500 dark:text-gray-400">
-            {% blocktrans %}If you have not created an account yet, then please <a href="{{ signup_url }}" class="text-primary hover:underline">Sign up</a> first.{% endblocktrans %}</p>
+            {% blocktrans %}If you have not created an account yet, then please <a href="{{ signup_url }}" class="text-blue-600 hover:underline">Sign up</a> first.{% endblocktrans %}</p>
         </p>
       </form>
     </div>
