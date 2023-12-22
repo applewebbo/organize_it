@@ -21,6 +21,9 @@
   .btn-sm{
     @apply px-3 py-2 text-sm
   }
+  .btn-xs{
+    @apply px-2.5 py-1.5 text-xs
+  }
   .btn-primary{
     @apply bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800
   }

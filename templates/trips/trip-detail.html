@@ -41,7 +41,7 @@
   <hr>
   <!-- Links Section -->
   <section id="links" class="mt-6 mb-4 px-4">
-    <div class="flex items-center mb-8">
+    <div x-data class="flex items-center mb-8">
       <h3 class="text-2xl font-bold mr-4 grow">Links</h3>
       <button class="btn btn-sm btn-primary mr-3"
               hx-get="{% url 'trips:trip-add-link' trip.id %}"
@@ -58,14 +58,16 @@
           <li x-data class="flex mb-3 pb-2">
             <a href="{{ link.url }}"
                class="grow">{% if link.title %}{{ link.title }}{%else%}{{ link.url}}{% endif %}</a>
-            <button class="btn btn-sm btn-outline btn-primary ms-3"
+            <button class="btn btn-sm btn-primary-outline ms-2"
                     hx-get="{% url 'trips:link-update' link.id %}"
                     hx-target="#dialog"
                     hx-swap="innerHTML"
-                    @click="$dispatch('open-modal')">Update</button>
-            <button class="btn btn-sm btn-outline btn-error ms-3"
+                    @click="$dispatch('open-modal')">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" /><path d="M13.5 6.5l4 4" /></svg></button>
+            <button class="btn btn-sm btn-danger-outline ms-2"
                     hx-delete="{% url 'trips:link-delete' link.pk %}"
-                    hx-confirm="Are you sure you want to delete {{ link.url }}">Delete</button>
+                    hx-confirm="Are you sure you want to delete {{ link.url }}">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg></button>
           </li>
         {% endfor %}
       </ul>
@@ -152,28 +154,31 @@
           hx-get="{% url 'trips:note-list' trip.id %}"
           hx-trigger="noteSaved from:body">
         {% for note in trip.notes.all %}
-          <li x-data class="flex border-b border-gray-200 mb-3 pb-2">
-            <span
-              class="grow truncate">{{ note.content}}</span>
+          <li x-data class="flex border-b border-gray-200 mb-3 pb-2 items-center">
+            <span class="grow truncate">{{ note.content}}</span>
             {% if note.checked == True %}
-              <button class="btn btn-sm btn-outline btn-warning ms-3"
+              <button class="btn btn-xs btn-danger-outline ms-2"
                       hx-post="{% url 'trips:note-check' note.id %}"
                       hx-target="#dialog"
-                      hx-swap="innerHTML">Uncheck</button>
+                      hx-swap="innerHTML">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /></svg></button>
             {% else %}
-              <button class="btn btn-sm btn-outline btn-success ms-3"
+              <button class="btn btn-xs btn-dark-outline btn-success ms-2"
                       hx-post="{% url 'trips:note-check' note.id %}"
                       hx-target="#dialog"
-                      hx-swap="innerHTML">Check</button>
+                      hx-swap="innerHTML">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M9 12l2 2l4 -4" /></svg></button>
             {% endif %}
-            <button class="btn btn-sm btn-outline btn-primary ms-3"
+            <button class="btn btn-xs btn-primary-outline ms-2"
                     hx-get="{% url 'trips:note-update' note.id %}"
                     hx-target="#dialog"
                     hx-swap="innerHTML"
-                    @click="$dispatch('open-modal')">Update</button>
-            <button class="btn btn-sm btn-outline btn-error ms-3"
+                    @click="$dispatch('open-modal')">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" /><path d="M13.5 6.5l4 4" /></svg></button>
+            <button class="btn btn-xs btn-danger-outline ms-2"
                     hx-delete="{% url 'trips:note-delete' note.id %}"
-                    hx-confirm="Are you sure you want to delete {{ link.url }}">Delete</button>
+                    hx-confirm="Are you sure you want to delete {{ link.url }}">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg></button>
           </li>
         {% endfor %}
       </ul>

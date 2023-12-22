@@ -901,6 +901,15 @@ p {
   line-height: 1.25rem;
 }
 
+.btn-xs {
+  padding-left: 0.625rem;
+  padding-right: 0.625rem;
+  padding-top: 0.375rem;
+  padding-bottom: 0.375rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
 .btn-primary {
   --tw-bg-opacity: 1;
   background-color: rgb(29 78 216 / var(--tw-bg-opacity));
@@ -1244,8 +1253,8 @@ p {
   margin-top: 0.5rem;
 }
 
-.mt-24 {
-  margin-top: 6rem;
+.mt-20 {
+  margin-top: 5rem;
 }
 
 .mt-3 {
@@ -1731,6 +1740,10 @@ p {
 
 .pb-2 {
   padding-bottom: 0.5rem;
+}
+
+.ps-4 {
+  padding-inline-start: 1rem;
 }
 
 .text-center {
@@ -2238,8 +2251,8 @@ select ~ .pointer-events-none {
     margin-top: 0px;
   }
 
-  .md\:mt-32 {
-    margin-top: 8rem;
+  .md\:mt-28 {
+    margin-top: 7rem;
   }
 
   .md\:flex {

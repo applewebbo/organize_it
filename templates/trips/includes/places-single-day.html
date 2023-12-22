@@ -31,16 +31,18 @@
       {% if day.places.all %}
         <ul class="mt-2">
           {% for place in day.places.all %}
-            <li class="flex items-center p-4">
-              <div class="grow">{{ place.name }}</div>
-              <button class="btn btn-sm btn-outline btn-primary ms-3"
+            <li class="flex items-center ps-4 py-2">
+              <div class="grow text-sm truncate">{{ place.name }}</div>
+              <button class="btn btn-xs btn-primary-outline me-2"
                       hx-get="{% url 'trips:place-update' place.id %}"
                       hx-target="#dialog"
                       hx-swap="innerHTML"
-                      @click="$dispatch('open-modal')">Update</button>
-              <button class="btn btn-sm btn-outline btn-error ms-3"
+                      @click="$dispatch('open-modal')">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" /><path d="M13.5 6.5l4 4" /></svg></button>
+              <button class="btn btn-xs btn-danger-outline"
                       hx-delete="{% url 'trips:place-delete' place.id %}"
-                      hx-confirm="Are you sure you want to delete {{ place.name }}">Delete</button>
+                      hx-confirm="Are you sure you want to delete {{ place.name }}">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg></button>
             </li>
           {% endfor %}
         </ul>
