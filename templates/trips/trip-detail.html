@@ -63,11 +63,12 @@
                     hx-target="#dialog"
                     hx-swap="innerHTML"
                     @click="$dispatch('open-modal')">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" /><path d="M13.5 6.5l4 4" /></svg></button>
+              {% heroicon_outline "pencil" stroke_width=2 class="size-4" %}
+            </button>
             <button class="btn btn-sm btn-danger-outline ms-2"
                     hx-delete="{% url 'trips:link-delete' link.pk %}"
                     hx-confirm="Are you sure you want to delete {{ link.url }}">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg></button>
+              {% heroicon_outline "x-mark"  stroke_width=2 class="size-4" %}</button>
           </li>
         {% endfor %}
       </ul>
@@ -161,24 +162,26 @@
                       hx-post="{% url 'trips:note-check' note.id %}"
                       hx-target="#dialog"
                       hx-swap="innerHTML">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /></svg></button>
+                {% heroicon_outline "document" stroke_width=2 class="size-4" %}</button>
             {% else %}
               <button class="btn btn-xs btn-dark-outline btn-success ms-2"
                       hx-post="{% url 'trips:note-check' note.id %}"
                       hx-target="#dialog"
                       hx-swap="innerHTML">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M9 12l2 2l4 -4" /></svg></button>
+                {% heroicon_outline "document-check" stroke_width=2 class="size-4" %}</button>
             {% endif %}
             <button class="btn btn-xs btn-primary-outline ms-2"
                     hx-get="{% url 'trips:note-update' note.id %}"
                     hx-target="#dialog"
                     hx-swap="innerHTML"
                     @click="$dispatch('open-modal')">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" /><path d="M13.5 6.5l4 4" /></svg></button>
+              {% heroicon_outline "pencil" stroke_width=2 class="size-4" %}
+            </button>
             <button class="btn btn-xs btn-danger-outline ms-2"
                     hx-delete="{% url 'trips:note-delete' note.id %}"
                     hx-confirm="Are you sure you want to delete {{ link.url }}">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg></button>
+              {% heroicon_outline "x-mark" stroke_width=2 class="size-4" %}
+            </button>
           </li>
         {% endfor %}
       </ul>

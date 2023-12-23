@@ -31,6 +31,7 @@ django==5.0
     #   django-crispy-forms
     #   django-htmx
     #   django-template-partials
+    #   heroicons
 django-allauth==0.57.0
     # via -r requirements.in
 django-crispy-forms==2.0
@@ -48,6 +49,8 @@ folium==0.14.0
 future==0.18.3
     # via geocoder
 geocoder==1.38.1
+    # via -r requirements.in
+heroicons==2.6.0
     # via -r requirements.in
 idna==3.4
     # via requests

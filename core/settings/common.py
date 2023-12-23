@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "crispy_forms",
     "django_htmx",
     "django_extensions",
+    "heroicons",
     "template_partials",
     # CONTRIB
     "django.contrib.admin",
@@ -69,6 +70,9 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+            ],
+            "builtins": [
+                "heroicons.templatetags.heroicons",
             ],
         },
     },
