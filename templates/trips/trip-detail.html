@@ -50,7 +50,7 @@
               @click="$dispatch('open-modal')">Add a link</button>
     </div>
     {% partialdef link-list inline=true %}
-      <ul class="my-3"
+      <ul class="my-3 columns-2"
           hx-swap="outerHTML"
           hx-get="{% url 'trips:link-list' trip.id %}"
           hx-trigger="linkSaved from:body">

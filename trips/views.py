@@ -23,8 +23,17 @@ def calculate_bounds(locations):
     if not locations:
         return None
 
-    sw = list(min((point["latitude"], point["longitude"]) for point in locations))
-    ne = list(max((point["latitude"], point["longitude"]) for point in locations))
+    # sw = list(min((point["latitude"], point["longitude"]) for point in locations))
+    # ne = list(max((point["latitude"], point["longitude"]) for point in locations))
+
+    # calculate min and max latitude and longitude
+    min_lat = min(point["latitude"] for point in locations)
+    min_lon = min(point["longitude"] for point in locations)
+    max_lat = max(point["latitude"] for point in locations)
+    max_lon = max(point["longitude"] for point in locations)
+
+    sw = [min_lat, min_lon]
+    ne = [max_lat, max_lon]
 
     return [sw, ne]
 
