@@ -1,6 +1,6 @@
 {% load crispy_forms_tags %}
 
-<form hx-post="{{ request.path }}" hx-target="#dialog" class="modal-content" method="post">
+<form hx-post="{{ request.path }}" hx-target="#dialog" hx-disabled-elt="#form-submit" class="modal-content" method="post">
   <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
     <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
       Create a new Link
@@ -18,6 +18,6 @@
   </div>
   <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600 justify-end">
     <button type="button" x-on:click="openModal = false" class="btn btn-outline btn-error mr-2">Cancel</button>
-    <button class="btn btn-outline btn-primary" type="submit">Save</button>
+    <button id="form-submit" class="btn btn-outline btn-primary" type="submit">Save</button>
   </div>
 </form>

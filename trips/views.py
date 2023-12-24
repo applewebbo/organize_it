@@ -77,7 +77,6 @@ def trip_detail(request, pk):
 
     locations = list(Place.objects.filter(trip=pk).values("latitude", "longitude"))
     not_assigned_locations = Place.na_objects.filter(trip=pk)
-    print(not_assigned_locations)
     map_bounds = calculate_bounds(locations)
 
     context = {
