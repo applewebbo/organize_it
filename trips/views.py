@@ -7,7 +7,14 @@ from django.views.decorators.http import require_http_methods, require_POST
 
 from accounts.models import Profile
 
-from .forms import LinkForm, NoteForm, PlaceForm, TripDateUpdateForm, TripForm
+from .forms import (
+    LinkForm,
+    NoteForm,
+    PlaceAssignForm,
+    PlaceForm,
+    TripDateUpdateForm,
+    TripForm,
+)
 from .models import Link, Note, Place, Trip
 
 
@@ -70,6 +77,7 @@ def trip_detail(request, pk):
 
     locations = list(Place.objects.filter(trip=pk).values("latitude", "longitude"))
     not_assigned_locations = Place.na_objects.filter(trip=pk)
+    print(not_assigned_locations)
     map_bounds = calculate_bounds(locations)
 
     context = {
@@ -279,11 +287,13 @@ def place_list(request, pk):
     places = Place.objects.filter(trip=pk)
     trip = get_object_or_404(Trip, pk=pk)
     locations = list(places.values("latitude", "longitude"))
+    not_assigned_locations = Place.na_objects.filter(trip=pk)
     map_bounds = calculate_bounds(locations)
     context = {
         "places": places,
         "trip": trip,
         "locations": locations,
+        "not_assigned_locations": not_assigned_locations,
         "map_bounds": map_bounds,
     }
     return TemplateResponse(request, "trips/trip-detail.html#place-list", context)
@@ -326,6 +336,28 @@ def place_update(request, pk):
     form = PlaceForm(instance=place)
     context = {"form": form}
     return TemplateResponse(request, "trips/place-create.html", context)
+
+
+@login_required
+def place_assign(request, pk):
+    place = get_object_or_404(Place, pk=pk, trip__author=request.user)
+    if request.method == "POST":
+        form = PlaceAssignForm(request.POST, instance=place)
+        if form.is_valid():
+            place = form.save()
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                "Place assigned successfully",
+            )
+            return HttpResponse(status=204, headers={"HX-Trigger": "placeSaved"})
+        form = PlaceAssignForm(request.POST, instance=place)
+        context = {"form": form, "place": place}
+        return TemplateResponse(request, "trips/place-create.html", context)
+
+    form = PlaceAssignForm(instance=place)
+    context = {"form": form, "place": place}
+    return TemplateResponse(request, "trips/place-assign.html", context)
 
 
 @login_required

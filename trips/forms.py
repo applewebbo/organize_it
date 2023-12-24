@@ -177,6 +177,40 @@ class PlaceForm(forms.ModelForm):
         )
 
 
+class PlaceAssignForm(forms.ModelForm):
+    class Meta:
+        model = Place
+        fields = ("day",)
+        widgets = {
+            "day": forms.Select(attrs={"class": "form-select"}),
+        }
+        labels = {
+            "day": "Day",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        trip = self.instance.trip
+        self.fields["day"].choices = (
+            Day.objects.filter(trip=trip)
+            .annotate(
+                formatted_choice=Concat(
+                    "date",
+                    Value(" (Day "),
+                    "number",
+                    Value(")"),
+                    output_field=CharField(),
+                )
+            )
+            .values_list("id", "formatted_choice")
+        )
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            "day",
+        )
+
+
 FIELDSET_CONTENT = """
             <fieldset>
             <legend class="block text-gray-700 text-sm font-bold mb-2">Connect to</legend>

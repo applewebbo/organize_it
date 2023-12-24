@@ -2,7 +2,7 @@ from django.urls import path
 
 from . import views
 
-app_name = "projects"
+app_name = "trips"
 
 urlpatterns = [
     path("", views.home, name="home"),
@@ -24,6 +24,7 @@ htmx_urlpatterns = [
     path("places/<int:pk>/list", views.place_list, name="place-list"),
     path("places/<int:pk>/delete", views.place_delete, name="place-delete"),
     path("places/<int:pk>/update", views.place_update, name="place-update"),
+    path("places/<int:pk>/assign", views.place_assign, name="place-assign"),
     path("notes/<int:pk>/add", views.trip_add_note, name="trip-add-note"),
     path("notes/<int:pk>/list", views.note_list, name="note-list"),
     path("notes/<int:pk>/update", views.note_update, name="note-update"),
