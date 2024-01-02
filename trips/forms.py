@@ -4,10 +4,21 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import HTML, Div, Field, Layout
 from django import forms
 from django.core.exceptions import ValidationError
+from django.db import models
 from django.db.models import CharField, Value
 from django.db.models.functions import Concat
 
 from .models import Day, Link, Note, Place, Trip
+
+
+def urlfields_assume_https(db_field, **kwargs):
+    """
+    ModelForm.Meta.formfield_callback function to assume HTTPS for scheme-less
+    domains in URLFields.
+    """
+    if isinstance(db_field, models.URLField):
+        kwargs["assume_scheme"] = "https"
+    return db_field.formfield(**kwargs)
 
 
 class TripForm(forms.ModelForm):
@@ -22,12 +33,7 @@ class TripForm(forms.ModelForm):
 
     class Meta:
         model = Trip
-        fields = (
-            "title",
-            "description",
-            "start_date",
-            "end_date",
-        )
+        fields = ["title", "description", "start_date", "end_date"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -108,7 +114,8 @@ class TripDateUpdateForm(forms.ModelForm):
 class LinkForm(forms.ModelForm):
     class Meta:
         model = Link
-        fields = ("title", "url")
+        fields = ["title", "url"]
+        formfield_callback = urlfields_assume_https
         widgets = {
             "title": forms.TextInput(attrs={"placeholder": "Title"}),
             "url": forms.URLInput(attrs={"placeholder": "URL"}),
@@ -134,7 +141,8 @@ class LinkForm(forms.ModelForm):
 class PlaceForm(forms.ModelForm):
     class Meta:
         model = Place
-        fields = ("name", "url", "address", "day")
+        fields = ["name", "url", "address", "day"]
+        formfield_callback = urlfields_assume_https
         widgets = {
             "name": forms.TextInput(attrs={"placeholder": "name"}),
             "url": forms.URLInput(attrs={"placeholder": "URL"}),
