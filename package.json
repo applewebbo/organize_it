@@ -3,10 +3,13 @@
     "dev": "tailwindcss -i static/src/input.css -o static/css/tailwind.css --watch"
   },
   "devDependencies": {
+    "@tailwindcss/forms": "^0.5.7",
     "@tailwindcss/typography": "^0.5.10",
+    "prettier": "^3.1.1",
+    "prettier-plugin-tailwindcss": "^0.5.10",
     "tailwindcss": "^3.4.0"
   },
-  "dependencies": {
-    "@tailwindcss/forms": "^0.5.7"
+  "prettier": {
+    "plugins": ["prettier-plugin-tailwindcss"]
   }
 }
