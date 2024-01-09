@@ -218,12 +218,3 @@ CRISPY_TEMPLATE_PACK = "tailwind"
 # MAPBOX
 
 MAPBOX_ACCESS_TOKEN = env("MAPBOX_ACCESS_TOKEN")
-
-# FORMS
-
-
-# class FormRenderer(TemplatesSetting):
-#     form_template_name = "form_snippet.html"
-
-
-# FORM_RENDERER = "config.settings.base.FormRenderer"
