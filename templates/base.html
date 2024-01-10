@@ -2,36 +2,39 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block page_title %}Organize it!{% endblock page_title %}</title>
-    {% block extra_head %}
-    {% endblock extra_head %}
-    <link rel="shortcut icon" type="image/png" href="{% static 'img/favicon.png' %}" >
+    {% block extra_head %} {% endblock extra_head %}
+    <link
+      rel="shortcut icon"
+      type="image/png"
+      href="{% static 'img/favicon.png' %}"
+    />
     <!-- Tailwind CSS -->
-    <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+    <link rel="stylesheet" href="{% static 'css/tailwind.css' %}" />
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}" />
     <!-- LeafletJS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-          crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-            crossorigin=""></script>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
   </head>
   <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-    <section>
-      {% include 'includes/navbar.html' %}
-    </section>
+    <section>{% include 'includes/navbar.html' %}</section>
     <div>
       <div class="container min-h-screen mt-20 md:mt-28 mx-auto">
-        {% block content %}
-        {% endblock content %}
+        {% block content %} {% endblock content %}
       </div>
-      <section>
-        {% include 'includes/footer.html' %}
-      </section>
+      <section>{% include 'includes/footer.html' %}</section>
 
       <!-- Modal -->
       {% include 'includes/modal.html' %}
@@ -50,8 +53,6 @@
     <!-- Custom.js -->
     <script src="{% static 'js/custom.js' %}"></script>
     <!-- LeafletJS -->
-    {% django_htmx_script %}
-    {% block script %}
-    {% endblock script %}
+    {% django_htmx_script %} {% block script %} {% endblock script %}
   </body>
 </html>

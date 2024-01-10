@@ -84,7 +84,9 @@ def trip_detail(request, pk):
     qs = Trip.objects.prefetch_related("links", "places", "notes", "days")
     trip = get_object_or_404(qs, pk=pk)
 
-    locations = list(Place.objects.filter(trip=pk).values("latitude", "longitude"))
+    locations = list(
+        Place.objects.filter(trip=pk).values("name", "latitude", "longitude")
+    )
     not_assigned_locations = Place.na_objects.filter(trip=pk)
     map_bounds = calculate_bounds(locations)
 

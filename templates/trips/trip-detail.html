@@ -223,7 +223,7 @@
           let markerFeatureGroup = L.featureGroup().addTo(placesMap);
 
           for (let location of locations) {
-            L.marker([ location.latitude, location.longitude]).addTo(markerFeatureGroup);
+            L.marker([ location.latitude, location.longitude]).addTo(markerFeatureGroup).bindPopup(location.name);
           }
         }
       });
