@@ -16,13 +16,14 @@ repos:
   rev: 1.15.0
   hooks:
   - id: django-upgrade
-    args: [--target-version, "4.2"]
+    args: [--target-version, "5.0"]
 - repo: https://github.com/rtts/djhtml
-  rev: 3.0.6
+  rev: '3.0.6'
   hooks:
-  - id: djhtml
-    args: [--tabwidth=2]
-    exclude: "templates/includes/navbar.html"
+    - id: djhtml
+      entry: djhtml --tabwidth 2
+    - id: djcss
+    - id: djjs
 - repo: https://github.com/astral-sh/ruff-pre-commit
   rev: v0.1.11
   hooks:
