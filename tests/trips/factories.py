@@ -10,3 +10,5 @@ class TripFactory(factory.django.DjangoModelFactory):
         model = Trip
 
     author = factory.SubFactory(UserFactory)
+    # start_date = factory.Faker("date_between", start_date='+8d', end_date='+10d')
+    # end_date = factory.Faker("date_between", start_date='+11d', end_date='+14d')

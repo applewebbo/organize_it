@@ -1,4 +1,4 @@
-import datetime
+from datetime import date, timedelta
 
 import geocoder
 from django.conf import settings
@@ -26,7 +26,7 @@ class Trip(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
-    status = models.IntegerField(choices=Status.choices, default=Status.NOT_STARTED)
+    status = models.IntegerField(choices=Status, default=Status.NOT_STARTED)
     links = models.ManyToManyField("Link", related_name="trips", blank=True)
 
     class Meta:
@@ -41,28 +41,30 @@ class Trip(models.Model):
             if self.status == 5:
                 super().save(*args, **kwargs)
                 return
-            today = datetime.date.today()
-            delta = today - datetime.timedelta(days=7)
-            # more than 7 days from start date
-            if self.start_date <= delta:
-                self.status = 1
-            # less than 7 days from start date
-            elif self.start_date > delta and self.start_date < today:
-                self.status = 2
-            # between start date and end date
-            elif self.start_date >= today and self.end_date >= today:
-                self.status = 3
+            today = date.today()
+            seven_days_after = today + timedelta(days=7)
             # after end date
-            elif self.end_date > today:
+            if self.end_date < today:
                 self.status = 4
-            else:
+            # between start date and end date
+            elif self.start_date <= today and self.end_date >= today:
+                self.status = 3
+            # less than 7 days from start date
+            elif self.start_date < seven_days_after and self.start_date > today:
+                self.status = 2
+            # more than 7 days from start date
+            elif self.start_date <= seven_days_after:
                 self.status = 1
+            # else:
+            #     self.status = 1
 
         super().save(*args, **kwargs)
 
 
 @receiver(post_save, sender=Trip)
 def update_trip_days(sender, instance, **kwargs):
+    if not instance.start_date or not instance.end_date:
+        return
     days = days_between(instance.start_date, instance.end_date)
     # check if days already created are inside the range and delete them accordingly
     for day in instance.days.all():
@@ -72,7 +74,7 @@ def update_trip_days(sender, instance, **kwargs):
         Day.objects.update_or_create(
             trip=instance,
             number=day + 1,
-            date=instance.start_date + datetime.timedelta(days=day),
+            date=instance.start_date + timedelta(days=day),
         )
 
 
