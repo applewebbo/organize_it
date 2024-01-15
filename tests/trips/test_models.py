@@ -4,11 +4,13 @@ from datetime import date, timedelta
 import factory
 import pytest
 
+from trips.models import Place
+
 pytestmark = pytest.mark.django_db
 
 
 class TestTripModel:
-    def test_trip_model_factory(self, user_factory, trip_factory):
+    def test_factory(self, user_factory, trip_factory):
         """Test trip model factory"""
         user = user_factory()
         trip = trip_factory(author=user, title="Test Trip")
@@ -25,22 +27,37 @@ class TestTripModel:
             (date.today() - timedelta(days=10), date.today() - timedelta(days=8), 4),
         ],
     )
-    def test_trip_status(
-        self, user_factory, trip_factory, start_date, end_date, status
-    ):
+    def test_status(self, user_factory, trip_factory, start_date, end_date, status):
         user = user_factory()
-
         trip = trip_factory(
             author=user, title="Test Trip", start_date=start_date, end_date=end_date
         )
 
-        print(start_date, end_date, status)
-
         assert trip.status == status
+
+    def test_status_without_dates_given(self, user_factory, trip_factory):
+        user = user_factory()
+        trip = trip_factory(
+            author=user, title="Test Trip", start_date=None, end_date=None
+        )
+
+        assert trip.status == 1
+
+    def test_archived_trip_bypass_dates_checks(self, user_factory, trip_factory):
+        user = user_factory()
+        trip = trip_factory(
+            author=user,
+            title="Test Trip",
+            start_date=date.today() - timedelta(days=10),
+            end_date=date.today() - timedelta(days=8),
+            status=5,
+        )
+
+        assert trip.status == 5
 
 
 class TestDayModel:
-    def test_day_model_factory(self, user_factory, trip_factory):
+    def test_factory(self, user_factory, trip_factory):
         """Test day automatically created matches requirements"""
         user = user_factory()
         trip = trip_factory(
@@ -54,10 +71,27 @@ class TestDayModel:
         assert trip.days.all().first().date == trip.start_date
         assert trip.days.all().count() == 3
 
+    def test_days_deleted_when_trip_dates_updated(self, user_factory, trip_factory):
+        """Test correct days are deleted when trip dates updated"""
+        user = user_factory()
+        trip = trip_factory(
+            author=user,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=5),
+        )
+
+        assert trip.days.all().first().date == date.today()
+
+        trip.start_date = date.today() + timedelta(days=1)
+        trip.save()
+
+        assert trip.days.all().first().date == date.today() + timedelta(days=1)
+
 
 class TestPlaceModel:
+    @pytest.mark.mapbox
     @factory.Faker.override_default_locale("it_IT")
-    def test_place_model_factory(self, user_factory, trip_factory, place_factory):
+    def test_factory(self, user_factory, trip_factory, place_factory):
         """Test place model factory"""
         user = user_factory()
         trip = trip_factory(author=user, title="Test Trip")
@@ -68,8 +102,9 @@ class TestPlaceModel:
         assert place.latitude is not None
         assert place.longitude is not None
 
+    @pytest.mark.mapbox
     @factory.Faker.override_default_locale("it_IT")
-    def test_place_assign_to_day(self, user_factory, trip_factory, place_factory):
+    def test_assign_to_day(self, user_factory, trip_factory, place_factory):
         """Test place assign to day"""
         user = user_factory()
         trip = trip_factory(author=user, title="Test Trip")
@@ -80,6 +115,7 @@ class TestPlaceModel:
 
         assert place.day == trip.days.all().first()
 
+    @pytest.mark.mapbox
     @factory.Faker.override_default_locale("it_IT")
     def test_place_unassign_on_trip_dates_update(
         self, user_factory, trip_factory, place_factory
@@ -102,3 +138,54 @@ class TestPlaceModel:
         trip.save()
 
         assert trip.places.first().day is None
+
+    @pytest.mark.mapbox
+    def test_unassigned_manager(self, user_factory, trip_factory, place_factory):
+        """Test place unassigned manager"""
+        user = user_factory()
+        trip = trip_factory(author=user, title="Test Trip")
+        place = place_factory(name="Test Place", trip=trip)
+
+        place.day = trip.days.first()
+        place.save()
+
+        assert trip.places.count() == 1
+        assert trip.places.first().day is not None
+        assert trip.places.first().day == trip.days.first()
+
+        assert Place.na_objects.filter(trip=trip).count() == 0
+
+        trip.start_date = date.today() + timedelta(days=7)
+        trip.end_date = date.today() + timedelta(days=11)
+        trip.save()
+
+        assert Place.na_objects.filter(trip=trip).count() == 1
+
+
+class TestLinkModel:
+    def test_factory(self, user_factory, trip_factory, link_factory):
+        """Test link model factory"""
+        user = user_factory()
+        trip = trip_factory(author=user, title="Test Trip")
+        link = link_factory()
+
+        trip.links.add(link)
+        trip.save()
+
+        assert link.__str__() == link.url
+        assert trip.links.first() == link
+
+
+class TestNoteModel:
+    def test_factory(self, user_factory, trip_factory, note_factory):
+        """Test note model factory"""
+        user = user_factory()
+        trip = trip_factory(author=user, title="Test Trip")
+        note = note_factory()
+
+        trip.notes.add(note)
+        trip.save()
+
+        assert note.__str__() == f"{note.content[:35]} ..."
+        assert trip.notes.first() == note
+        assert note.checked is False

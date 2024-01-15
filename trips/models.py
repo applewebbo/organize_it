@@ -55,8 +55,6 @@ class Trip(models.Model):
             # more than 7 days from start date
             elif self.start_date <= seven_days_after:
                 self.status = 1
-            # else:
-            #     self.status = 1
 
         super().save(*args, **kwargs)
 

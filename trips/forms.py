@@ -60,16 +60,18 @@ class TripForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        if cleaned_data.get("start_date") and cleaned_data.get("end_date"):
-            if cleaned_data.get("start_date") > cleaned_data.get("end_date"):
-                raise ValidationError("End date must be after start date")
+        if (
+            cleaned_data.get("start_date")
+            and cleaned_data.get("end_date")
+            and cleaned_data.get("start_date") > cleaned_data.get("end_date")
+        ):
+            raise ValidationError("End date must be after start date")
         return cleaned_data
 
     def clean_start_date(self):
         start_date = self.cleaned_data.get("start_date")
-        if start_date:
-            if start_date < date.today():
-                raise ValidationError("Start date must be after today")
+        if start_date and start_date < date.today():
+            raise ValidationError("Start date must be after today")
         return start_date
 
 
@@ -105,9 +107,12 @@ class TripDateUpdateForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        if cleaned_data.get("start_date") and cleaned_data.get("end_date"):
-            if cleaned_data.get("start_date") > cleaned_data.get("end_date"):
-                raise ValidationError("End date must be after start date")
+        if (
+            cleaned_data.get("start_date")
+            and cleaned_data.get("end_date")
+            and cleaned_data.get("start_date") > cleaned_data.get("end_date")
+        ):
+            raise ValidationError("End date must be after start date")
         return cleaned_data
 
 
@@ -182,7 +187,7 @@ class PlaceForm(forms.ModelForm):
             Field("url"),
             Field("address"),
             "day",
-        )
+        )  # pragma: no cover
 
 
 class PlaceAssignForm(forms.ModelForm):

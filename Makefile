@@ -13,3 +13,9 @@ checkmigrations:
 
 watch:
 	npm run dev
+
+test:
+	pytest --cov-report html:htmlcov --cov-report term:skip-covered
+
+mptest:
+	pytest -m "not mapbox" --cov-report html:htmlcov --cov-report term:skip-covered

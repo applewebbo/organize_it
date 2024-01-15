@@ -2,12 +2,11 @@
 import factory
 
 from tests.accounts.factories import UserFactory
-from trips.models import Trip
 
 
 class TripFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = Trip
+        model = "trips.Trip"
 
     author = factory.SubFactory(UserFactory)
     start_date = factory.Faker("date_between", start_date="today", end_date="+3d")
@@ -19,4 +18,21 @@ class PlaceFactory(factory.django.DjangoModelFactory):
         model = "trips.Place"
 
     address = factory.Faker("street_address")
+    trip = factory.SubFactory(TripFactory)
+
+
+class LinkFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "trips.Link"
+
+    author = factory.SubFactory(UserFactory)
+    url = factory.Faker("url")
+    title = factory.Faker("sentence")
+
+
+class NoteFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "trips.Note"
+
+    content = factory.Faker("paragraph", nb_sentences=4)
     trip = factory.SubFactory(TripFactory)
