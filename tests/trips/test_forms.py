@@ -134,8 +134,6 @@ class TestPlaceAssignForm:
         place = place_factory(trip=trip)
         form = PlaceAssignForm(instance=place)
 
-        print(form.fields["day"].choices)
-
         assert len(form.fields["day"].choices) == trip.days.count()
 
 
@@ -150,3 +148,17 @@ class TestNoteForm:
         form = NoteForm(trip=trip, data=data)
 
         assert form.is_valid()
+
+    def test_queryset(self, user_factory, trip_factory, place_factory, link_factory):
+        """Test that the form display the correct places and links to be assigned to the newly created note"""
+        user = user_factory()
+        trip = trip_factory(author=user)
+        place = place_factory(trip=trip)
+        link = link_factory(author=user)
+        trip.links.add(link)
+        trip.save()
+
+        form = NoteForm(trip=trip)
+
+        assert place in form.fields["place"].queryset
+        assert link in form.fields["link"].queryset
