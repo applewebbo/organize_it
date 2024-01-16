@@ -9,6 +9,7 @@ class TripFactory(factory.django.DjangoModelFactory):
         model = "trips.Trip"
 
     author = factory.SubFactory(UserFactory)
+    title = factory.Faker("sentence")
     start_date = factory.Faker("date_between", start_date="today", end_date="+3d")
     end_date = factory.Faker("date_between", start_date="+4d", end_date="+7d")
 

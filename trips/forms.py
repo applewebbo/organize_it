@@ -187,7 +187,7 @@ class PlaceForm(forms.ModelForm):
             Field("url"),
             Field("address"),
             "day",
-        )  # pragma: no cover
+        )
 
 
 class PlaceAssignForm(forms.ModelForm):
