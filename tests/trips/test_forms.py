@@ -5,6 +5,7 @@ import pytest
 
 from trips.forms import (
     LinkForm,
+    NoteForm,
     PlaceAssignForm,
     PlaceForm,
     TripDateUpdateForm,
@@ -136,3 +137,16 @@ class TestPlaceAssignForm:
         print(form.fields["day"].choices)
 
         assert len(form.fields["day"].choices) == trip.days.count()
+
+
+class TestNoteForm:
+    def test_form(self, user_factory, trip_factory):
+        """Test that the form saves a note"""
+        user = user_factory()
+        trip = trip_factory(author=user, title="Test Trip")
+        data = {
+            "content": "Test content",
+        }
+        form = NoteForm(trip=trip, data=data)
+
+        assert form.is_valid()
