@@ -1,32 +1,47 @@
 # FILEPATH: /tests/test_views.py
 import pytest
-from django.test import Client
-from django.urls import reverse
 
-from .factories import UserFactory
+from accounts.models import Profile
+from tests.test import TestCase
+from tests.trips.factories import TripFactory
 
 pytestmark = pytest.mark.django_db
 
 
-class TestAccountViews:
-    def setup_method(self):
-        self.client = Client()
-        self.user = UserFactory()
+class TestProfileView(TestCase):
+    def test_get(self):
+        user = self.make_user("user")
 
-    def test_profile_view(self):
-        # Login the user
-        self.client.force_login(self.user)
-
-        # Get the profile view
-        response = self.client.get(reverse("accounts:profile"))
-
+        with self.login(user):
+            response = self.get("accounts:profile")
         # Check the status code and template used
-        assert response.status_code == 200
+        self.response_200()
         assert "account/profile.html" in [t.name for t in response.templates]
 
-    def test_profile_view_unauthenticated(self):
+    def test_unauthenticated_get(self):
         # Get the profile view
-        response = self.client.get(reverse("accounts:profile"))
-
+        self.get("accounts:profile")
         # Check the status code and redirect location
-        assert response.status_code == 302
+        self.response_302()
+
+    def test_post(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        data = {"fav_trip": trip.pk}
+
+        with self.login(user):
+            response = self.post("accounts:profile", data=data)
+
+        self.response_302(response)
+        assert Profile.objects.get(user=user).fav_trip == trip
+
+    def test_post_form_invalid(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        data = {"fav_trip": trip}
+
+        with self.login(user):
+            response = self.post("accounts:profile", data=data)
+
+        self.response_200(response)
+        assert response.context_data["profile_form"]
