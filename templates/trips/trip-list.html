@@ -23,7 +23,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-y-8 gap-x-4">
           {% for trip in active_trips %}
-            <div class="t-card h-full" id="{{trip.id}}">
+            <div class="t-card h-full" id="{{ trip.id }}">
               <span class="card-badge-sm bg-cyan-400 text-gray-900 border border-cyan-500">
                 {{ trip.get_status_display }}
               </span>
@@ -32,7 +32,7 @@
                 <div x-data class="flex items-center">
                   <span >{% if trip.start_date and trip.end_date %}
                     {{ trip.start_date }} / {{ trip.end_date }}
-                  {% else  %}
+                  {% else %}
                     - / -
                   {% endif %}
                   </span>
@@ -73,14 +73,12 @@
     </div>
     {% if request.htmx %}
       <div hx-swap-oob=innerHTML:#messages>
-        {% include 'includes/messages.html' %}
+        {% include "includes/messages.html" %}
       </div>
     {% endif %}
 
-
   {% endpartialdef %}
 {% endblock content %}
-
 
 {% block script %}
 
