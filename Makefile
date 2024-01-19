@@ -15,7 +15,10 @@ watch:
 	npm run dev
 
 test:
-	pytest --cov-report html:htmlcov --cov-report term:skip-covered
+	pytest
+
+ftest:
+	pytest -n 8
 
 mptest:
-	pytest -m "not mapbox" --cov-report html:htmlcov --cov-report term:skip-covered
+	pytest -m "not mapbox" --cov-report html:htmlcov --cov-report term:skip-covered --cov-fail-under 100

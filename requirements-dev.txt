@@ -12,3 +12,4 @@ pre-commit
 pytest-cov==4.1.0
 pytest-factoryboy==2.6.0
 pytest-django==4.7.0
+pytest-xdist==3.5.0
