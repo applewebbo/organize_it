@@ -18,7 +18,7 @@ test:
 	pytest
 
 ftest:
-	pytest -n 8
+	pytest -n 8 --reuse-db
 
 mptest:
 	pytest -m "not mapbox" --cov-report html:htmlcov --cov-report term:skip-covered --cov-fail-under 100

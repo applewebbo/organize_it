@@ -11,6 +11,7 @@ skips = ["B101"]
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "core.settings.testing"
 python_files = "test_*.py"
+testpaths = ["tests"]
 markers = [
     "mapbox: requires Mapbox API key",
 ]

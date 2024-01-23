@@ -1,3 +1,5 @@
+import logging
+
 from .common import *  # noqa
 
 DATABASES = {
@@ -7,5 +9,10 @@ DATABASES = {
     }
 }
 
+PASSWORD_HASHERS = ("django.contrib.auth.hashers.MD5PasswordHasher",)
+
 
 EMAIL_BACKEND = "django.core.mail.backends.locmemp.EmailBackend"
+
+
+logging.disable()
