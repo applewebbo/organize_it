@@ -81,6 +81,7 @@ def trip_list(request):
 
 @login_required
 def trip_detail(request, pk):
+    """Detail Page for the selected trip"""
     qs = Trip.objects.prefetch_related("links", "places", "notes", "days")
     trip = get_object_or_404(qs, pk=pk)
 
@@ -96,12 +97,12 @@ def trip_detail(request, pk):
         "not_assigned_locations": not_assigned_locations,
         "map_bounds": map_bounds,
     }
-    if request.htmx:
-        # redraw the map section only
-        template = "trips/trip-detail.html#trip-detail"
-    else:
-        template = "trips/trip-detail.html"
-
+    # TODO: redraw of the map section to be added in future versions
+    # if request.htmx:
+    #     # redraw the map section only
+    #     template = "trips/trip-detail.html#trip-detail"
+    # else:
+    template = "trips/trip-detail.html"
     return TemplateResponse(request, template, context)
 
 
@@ -119,7 +120,6 @@ def trip_create(request):
                 f"<strong>{trip.title}</strong> added successfully",
             )
             return HttpResponse(status=204, headers={"HX-Trigger": "tripSaved"})
-        form = TripForm(request.POST)
         context = {"form": form}
         return TemplateResponse(request, "trips/trip-create.html", context)
 
@@ -183,21 +183,17 @@ def trip_archive(request, pk):
 
 def trip_dates_update(request, pk):
     trip = get_object_or_404(Trip, pk=pk, author=request.user)
-    if request.method == "POST":
-        form = TripDateUpdateForm(request.POST, instance=trip)
-        if form.is_valid():
-            trip = form.save()
-            messages.add_message(
-                request,
-                messages.SUCCESS,
-                "Dates updated successfully",
-            )
-            return HttpResponse(status=204, headers={"HX-Trigger": "tripSaved"})
-        form = TripDateUpdateForm(request.POST, instance=trip)
-        context = {"form": form}
-        return TemplateResponse(request, "trips/trip-dates-update.html", context)
 
-    form = TripDateUpdateForm(instance=trip)
+    form = TripDateUpdateForm(request.POST or None, instance=trip)
+    if form.is_valid():
+        trip = form.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            "Dates updated successfully",
+        )
+        return HttpResponse(status=204, headers={"HX-Trigger": "tripSaved"})
+
     context = {"form": form}
     return TemplateResponse(request, "trips/trip-dates-update.html", context)
 
@@ -205,22 +201,21 @@ def trip_dates_update(request, pk):
 @login_required
 def trip_add_link(request, pk):
     trip = get_object_or_404(Trip, pk=pk, author=request.user)
-    if request.method == "POST":
-        form = LinkForm(request.POST)
-        if form.is_valid():
-            link = form.save(commit=False)
-            link.author = request.user
-            link.save()
-            trip.links.add(link)
-            trip.save()
-            messages.add_message(
-                request,
-                messages.SUCCESS,
-                "Link added successfully",
-            )
-            return HttpResponse(status=204, headers={"HX-Trigger": "linkSaved"})
 
-    form = LinkForm()
+    form = LinkForm(request.POST or None)
+    if form.is_valid():
+        link = form.save(commit=False)
+        link.author = request.user
+        link.save()
+        trip.links.add(link)
+        trip.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            "Link added successfully",
+        )
+        return HttpResponse(status=204, headers={"HX-Trigger": "linkSaved"})
+
     context = {"form": form}
     return TemplateResponse(request, "trips/link-create.html", context)
 
@@ -245,18 +240,16 @@ def link_delete(request, pk):
 def link_update(request, pk):
     link = get_object_or_404(Link, pk=pk, author=request.user)
 
-    if request.method == "POST":
-        form = LinkForm(request.POST, instance=link)
-        if form.is_valid():
-            link = form.save()
-            messages.add_message(
-                request,
-                messages.SUCCESS,
-                "Link updated successfully",
-            )
-            return HttpResponse(status=204, headers={"HX-Trigger": "linkSaved"})
+    form = LinkForm(request.POST, instance=link)
+    if form.is_valid():
+        link = form.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            "Link updated successfully",
+        )
+        return HttpResponse(status=204, headers={"HX-Trigger": "linkSaved"})
 
-    form = LinkForm(instance=link)
     context = {"form": form}
     return TemplateResponse(request, "trips/link-create.html", context)
 
@@ -272,22 +265,19 @@ def link_list(request, pk):
 @login_required
 def trip_add_place(request, pk):
     trip = get_object_or_404(Trip, pk=pk)
-    if request.method == "POST":
-        form = PlaceForm(request.POST, parent=trip)
-        if form.is_valid():
-            place = form.save(commit=False)
-            place.trip = trip
-            place.save()
-            messages.add_message(
-                request,
-                messages.SUCCESS,
-                f"<strong>{place.name}</strong> added successfully",
-            )
-            return HttpResponse(status=204, headers={"HX-Trigger": "placeSaved"})
-        form = PlaceForm(request.POST, parent=trip)
-        context = {"form": form}
-        return TemplateResponse(request, "trips/place-create.html", context)
-    form = PlaceForm(parent=trip)
+
+    form = PlaceForm(request.POST or None, parent=trip)
+    if form.is_valid():
+        place = form.save(commit=False)
+        place.trip = trip
+        place.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            f"<strong>{place.name}</strong> added successfully",
+        )
+        return HttpResponse(status=204, headers={"HX-Trigger": "placeSaved"})
+
     context = {"form": form}
     return TemplateResponse(request, "trips/place-create.html", context)
 
@@ -329,21 +319,16 @@ def place_delete(request, pk):
 def place_update(request, pk):
     place = get_object_or_404(Place, pk=pk, trip__author=request.user)
 
-    if request.method == "POST":
-        form = PlaceForm(request.POST, instance=place)
-        if form.is_valid():
-            place = form.save()
-            messages.add_message(
-                request,
-                messages.SUCCESS,
-                "Place updated successfully",
-            )
-            return HttpResponse(status=204, headers={"HX-Trigger": "placeSaved"})
-        form = PlaceForm(request.POST, instance=place)
-        context = {"form": form}
-        return TemplateResponse(request, "trips/place-create.html", context)
+    form = PlaceForm(request.POST or None, instance=place)
+    if form.is_valid():
+        place = form.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            "Place updated successfully",
+        )
+        return HttpResponse(status=204, headers={"HX-Trigger": "placeSaved"})
 
-    form = PlaceForm(instance=place)
     context = {"form": form}
     return TemplateResponse(request, "trips/place-create.html", context)
 
@@ -399,22 +384,17 @@ def trip_add_note(request, pk):
 @login_required
 def note_update(request, pk):
     note = get_object_or_404(Note, pk=pk, trip__author=request.user)
-    if request.method == "POST":
-        form = NoteForm(note.trip, request.POST, instance=note)
-        if form.is_valid():
-            note = form.save()
-            messages.add_message(
-                request,
-                messages.SUCCESS,
-                "Note updated successfully",
-            )
-            return HttpResponse(status=204, headers={"HX-Trigger": "noteSaved"})
 
-        form = NoteForm(note.trip, instance=note)
-        context = {"form": form}
-        return TemplateResponse(request, "trips/note-create.html", context)
+    form = NoteForm(note.trip, request.POST or None, instance=note)
+    if form.is_valid():
+        note = form.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            "Note updated successfully",
+        )
+        return HttpResponse(status=204, headers={"HX-Trigger": "noteSaved"})
 
-    form = NoteForm(note.trip, instance=note)
     context = {"form": form}
     return TemplateResponse(request, "trips/note-create.html", context)
 

@@ -155,7 +155,7 @@ class PlaceForm(forms.ModelForm):
             "day": forms.Select(attrs={"class": "form-select"}),
         }
         labels = {
-            "title": "Title",
+            "name": "Name",
             "url": "URL",
             "address": "Address",
             "day": "Day",

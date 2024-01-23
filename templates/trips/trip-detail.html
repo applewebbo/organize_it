@@ -107,7 +107,7 @@
         <div x-data="{ active: 1 }">
           <ul class="mb-4">
             {% for day in trip.days.all %}
-              {% include 'trips/includes/places-single-day.html' %}
+              {% include "trips/includes/places-single-day.html" %}
             {% endfor %}
           </ul>
           {% if not_assigned_locations.all %}
@@ -138,7 +138,7 @@
       </div>
       {% if request.htmx %}
         <div hx-swap-oob=innerHTML:#messages>
-          {% include 'includes/messages.html' %}
+          {% include "includes/messages.html" %}
         </div>
       {% else %}
       {% endif %}
@@ -162,7 +162,7 @@
           hx-trigger="noteSaved from:body">
         {% for note in trip.notes.all %}
           <li x-data class="flex border-b border-gray-200 mb-3 pb-2 items-center">
-            <span class="grow truncate">{{ note.content}}</span>
+            <span class="grow truncate">{{ note.content }}</span>
             {% if note.checked == True %}
               <button class="btn btn-xs btn-danger-outline ms-2"
                       hx-post="{% url 'trips:note-check' note.id %}"
@@ -193,7 +193,7 @@
       </ul>
       {% if request.htmx %}
         <div hx-swap-oob=innerHTML:#messages>
-          {% include 'includes/messages.html' %}
+          {% include "includes/messages.html" %}
         </div>
       {% else %}
       {% endif %}
