@@ -117,12 +117,24 @@ class Place(models.Model):
     na_objects = NotAssignedManager()
 
     def save(self, *args, **kwargs):
+        old = type(self).objects.get(pk=self.pk) if self.pk else None
+        # if address is not changed, don't update coordinates
+        if old and old.address == self.address:
+            return super().save(*args, **kwargs)
         g = geocoder.mapbox(self.address, access_token=settings.MAPBOX_ACCESS_TOKEN)
         self.latitude, self.longitude = g.latlng
         return super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return self.name
+
+
+# @receiver(post_save, sender=Place)
+# def update_place_coordinates(sender, instance, created **kwargs):
+#     if created:
+#         g = geocoder.mapbox(instance.address, access_token=settings.MAPBOX_ACCESS_TOKEN)
+#         instance.latitude, instance.longitude = g.latlng
+#         instance.save()
 
 
 class Note(models.Model):
