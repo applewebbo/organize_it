@@ -23,15 +23,6 @@ class PlaceFactory(factory.django.DjangoModelFactory):
     trip = factory.SubFactory(TripFactory)
 
 
-class AlternatePlaceFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = "trips.Place"
-
-    name = factory.Faker("street_name")
-    address = factory.Faker("street_address")
-    trip = factory.SubFactory(TripFactory)
-
-
 class LinkFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "trips.Link"

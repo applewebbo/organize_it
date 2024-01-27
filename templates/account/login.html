@@ -2,7 +2,6 @@
 {% load static i18n crispy_forms_tags %}
 {% load account socialaccount %}
 
-
 {% block content %}
   <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
     <a href="#" class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
@@ -28,7 +27,9 @@
               {% include "socialaccount/snippets/provider_list.html" with process="login" %}
             </ul>
 
-            <div class="login-or">{% trans 'or' %}</div>
+            <div class="login-or">
+              {% trans 'or' %}
+            </div>
 
           </div>
 
@@ -38,7 +39,7 @@
 
         {% endif %}
 
-        <form class="space-y-4 md:space-y-6" method="POST" action="{% url 'account_login' %}">
+        <form class="space-y-4 md:space-y-6" method="post" action="{% url 'account_login' %}">
           {% csrf_token %}
           {{ form|crispy }}
           {% if redirect_field_value %}
@@ -49,10 +50,10 @@
           </div>
           <button type="submit" class="btn btn-primary w-full" >{% trans "Sign In" %}</button>
           <p class="text-sm font-light text-gray-500 dark:text-gray-400">
-            {% blocktrans %}If you have not created an account yet, then please <a href="{{ signup_url }}" class="text-blue-600 hover:underline">Sign up</a> first.{% endblocktrans %}</p>
-        </p>
-      </form>
+            {% blocktrans %}If you have not created an account yet, then please <a href="{{ signup_url }}" class="text-blue-600 hover:underline">Sign up</a> first.{% endblocktrans %}
+          </p>
+        </form>
+      </div>
     </div>
-  </div>
   </div>
 {% endblock content %}
