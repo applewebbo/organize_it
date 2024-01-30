@@ -1,66 +1,66 @@
 <p class="mb-8 text-2xl">Welcome back, {{ user.email }}!</p>
 <div id="trip-list"
      class="grid grid-cols-1 gap-x-4 gap-y-8 md:grid-cols-2">
-  {% if fav_trip %}
-    <div class="relative mb-6 h-full rounded-lg border border-gray-200 bg-white p-4 shadow">
-      <span class="absolute right-0 top-0 -mt-4 me-2 mr-6 rounded border border-sky-600 bg-sky-500 px-3.5 py-1.5 font-medium text-white">My Favourite Trip</span>
-      <div class="card-body">
-        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">{{ fav_trip.title }}</h5>
-        <p>{{ fav_trip.description }}</p>
-        <div class="card-actions justify-end">
-          <a href="{% url 'trips:trip-detail' fav_trip.id %}"
-             class="btn btn-sm btn-primary">View Trip</a>
-        </div>
-      </div>
-    </div>
-    {% if other_trips %}
-      <div class="relative mb-5 h-full rounded-lg border border-gray-200 bg-white p-4 shadow">
-        <span class="absolute right-0 top-0 -mt-4 me-2 mr-6 rounded border border-gray-200 bg-gray-100 px-3.5 py-1.5 font-medium text-gray-800">Other Trips</span>
-        <div class="card-body">
-          <ul class="list-unstyled">
-            {% for trip in other_trips %}
-              <li>
-                <a class="link" href="#">{{ trip.title }}</a>
-              </li>
-            {% endfor %}
-          </ul>
-        </div>
-      </div>
-    {% endif %}
-  {% else %}
-    {% if other_trips %}
-      {% for trip in other_trips %}
-        {% if forloop.first %}
-          <div class="relative mb-5 rounded-lg border border-gray-200 bg-white p-4 shadow">
-            <span class="absolute right-0 top-0 -mt-4 me-2 mr-6 rounded border border-sky-600 bg-sky-500 px-3.5 py-1.5 font-medium text-white">My Latest Trip</span>
+    {% if fav_trip %}
+        <div class="relative mb-6 h-full rounded-lg border border-gray-200 bg-white p-4 shadow">
+            <span class="absolute right-0 top-0 -mt-4 me-2 mr-6 rounded border border-sky-600 bg-sky-500 px-3.5 py-1.5 font-medium text-white">My Favourite Trip</span>
             <div class="card-body">
-              <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">{{ trip.title }}</h5>
-              <p class="mb-3 font-normal text-gray-700">{{ trip.description }}</p>
-              <div class="card-actions justify-end">
-                <a href="{% url 'trips:trip-detail' trip.id %}"
-                   class="btn btn-sm btn-primary">View Trip</a>
-              </div>
+                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">{{ fav_trip.title }}</h5>
+                <p>{{ fav_trip.description }}</p>
+                <div class="card-actions justify-end">
+                    <a href="{% url 'trips:trip-detail' fav_trip.id %}"
+                       class="btn btn-sm btn-primary">View Trip</a>
+                </div>
             </div>
-          </div>
-        {% endif %}
-      {% endfor %}
-      <div class="relative mb-5 rounded-lg border border-gray-200 bg-white p-4 shadow">
-        <span class="absolute right-0 top-0 -mt-4 me-2 mr-6 rounded border border-gray-200 bg-gray-100 px-3.5 py-1.5 font-medium text-gray-800">Other Trips</span>
-        <div class="card-body">
-          <ul class="list-unstyled">
-            {% for trip in other_trips %}
-              {% if forloop.first %}
-              {% else %}
-                <li>
-                  <a class="link" href="#">{{ trip.title }}</a>
-                </li>
-              {% endif %}
-            {% endfor %}
-          </ul>
         </div>
-      </div>
+        {% if other_trips %}
+            <div class="relative mb-5 h-full rounded-lg border border-gray-200 bg-white p-4 shadow">
+                <span class="absolute right-0 top-0 -mt-4 me-2 mr-6 rounded border border-gray-200 bg-gray-100 px-3.5 py-1.5 font-medium text-gray-800">Other Trips</span>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        {% for trip in other_trips %}
+                            <li>
+                                <a class="link" href="#">{{ trip.title }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
     {% else %}
-      <p>You have no trips yet!</p>
+        {% if other_trips %}
+            {% for trip in other_trips %}
+                {% if forloop.first %}
+                    <div class="relative mb-5 rounded-lg border border-gray-200 bg-white p-4 shadow">
+                        <span class="absolute right-0 top-0 -mt-4 me-2 mr-6 rounded border border-sky-600 bg-sky-500 px-3.5 py-1.5 font-medium text-white">My Latest Trip</span>
+                        <div class="card-body">
+                            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">{{ trip.title }}</h5>
+                            <p class="mb-3 font-normal text-gray-700">{{ trip.description }}</p>
+                            <div class="card-actions justify-end">
+                                <a href="{% url 'trips:trip-detail' trip.id %}"
+                                   class="btn btn-sm btn-primary">View Trip</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            <div class="relative mb-5 rounded-lg border border-gray-200 bg-white p-4 shadow">
+                <span class="absolute right-0 top-0 -mt-4 me-2 mr-6 rounded border border-gray-200 bg-gray-100 px-3.5 py-1.5 font-medium text-gray-800">Other Trips</span>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        {% for trip in other_trips %}
+                            {% if forloop.first %}
+                            {% else %}
+                                <li>
+                                    <a class="link" href="#">{{ trip.title }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% else %}
+            <p>You have no trips yet!</p>
+        {% endif %}
     {% endif %}
-  {% endif %}
 </div>

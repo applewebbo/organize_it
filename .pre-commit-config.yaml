@@ -17,15 +17,20 @@ repos:
   hooks:
   - id: django-upgrade
     args: [--target-version, "5.0"]
-- repo: https://github.com/rtts/djhtml
-  rev: '3.0.6'
+# - repo: https://github.com/rtts/djhtml
+#   rev: '3.0.6'
+#   hooks:
+#     - id: djhtml
+#       entry: djhtml --tabwidth 2
+#     - id: djcss
+#     - id: djjs
+- repo: https://github.com/djlint/djLint
+  rev: v1.34.1
   hooks:
-    - id: djhtml
-      entry: djhtml --tabwidth 2
-    - id: djcss
-    - id: djjs
+    - id: djlint-reformat-django
+    - id: djlint-django
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.1.14
+  rev: v0.1.15
   hooks:
     - id: ruff
       args: [--fix, --exit-non-zero-on-fix]

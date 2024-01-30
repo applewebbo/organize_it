@@ -31,3 +31,6 @@ omit = ['*/node_modules/*', '*/venv/*', '*/migrations/*', '*/tests/*', '*/test_*
 [tool.coverage.report]
 exclude_also = [
 ]
+
+[tool.djlint]
+ignore="T002,H006"

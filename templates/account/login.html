@@ -1,59 +1,54 @@
 {% extends "base-simplified.html" %}
 {% load static i18n crispy_forms_tags %}
 {% load account socialaccount %}
-
 {% block content %}
-  <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-    <a href="#" class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-      <img class="w-8 h-8 mr-2" src="{% static 'img/logo.png' %}" alt="logo">
-      Organize it!
-    </a>
-    <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-      <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-        <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-          {% trans "Sign In" %}
-        </h1>
-
-        {% get_providers as socialaccount_providers %}
-
-        {% if socialaccount_providers %}
-          <p>{% blocktrans with site.name as site_name %}Please sign in with one
+    <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+        <a href="#"
+           class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
+            <img class="w-8 h-8 mr-2" src="{% static 'img/logo.png' %}" alt="logo">
+            Organize it!
+        </a>
+        <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+            <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+                <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+                    {% trans "Sign In" %}
+                </h1>
+                {% get_providers as socialaccount_providers %}
+                {% if socialaccount_providers %}
+                    <p>
+                        {% blocktrans with site.name as site_name %}Please sign in with one
             of your existing third party accounts. Or, <a href="{{ signup_url }}">sign up</a>
-            for a {{ site_name }} account and sign in below:{% endblocktrans %}</p>
-
-          <div class="socialaccount_ballot">
-
-            <ul class="socialaccount_providers">
-              {% include "socialaccount/snippets/provider_list.html" with process="login" %}
-            </ul>
-
-            <div class="login-or">
-              {% trans 'or' %}
+            for a {{ site_name }} account and sign in below:{% endblocktrans %}
+                    </p>
+                    <div class="socialaccount_ballot">
+                        <ul class="socialaccount_providers">
+                            {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+                        </ul>
+                        <div class="login-or">{% trans 'or' %}</div>
+                    </div>
+                    {% include "socialaccount/snippets/login_extra.html" %}
+                {% else %}
+                {% endif %}
+                <form class="space-y-4 md:space-y-6"
+                      method="post"
+                      action="{% url 'account_login' %}">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    {% if redirect_field_value %}
+                        <input type="hidden"
+                               name="{{ redirect_field_name }}"
+                               value="{{ redirect_field_value }}" />
+                    {% endif %}
+                    <div class="mb-3 text-sm text-right">
+                        <a class="text-blue-600 hover:underline"
+                           href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full">{% trans "Sign In" %}</button>
+                    <p class="text-sm font-light text-gray-500 dark:text-gray-400">
+                        {% blocktrans %}If you have not created an account yet, then please <a href="{{ signup_url }}" class="text-blue-600 hover:underline">Sign up</a> first.{% endblocktrans %}
+                    </p>
+                </form>
             </div>
-
-          </div>
-
-          {% include "socialaccount/snippets/login_extra.html" %}
-
-        {% else %}
-
-        {% endif %}
-
-        <form class="space-y-4 md:space-y-6" method="post" action="{% url 'account_login' %}">
-          {% csrf_token %}
-          {{ form|crispy }}
-          {% if redirect_field_value %}
-            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-          {% endif %}
-          <div class="mb-3 text-sm text-right">
-            <a class="text-blue-600 hover:underline" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
-          </div>
-          <button type="submit" class="btn btn-primary w-full" >{% trans "Sign In" %}</button>
-          <p class="text-sm font-light text-gray-500 dark:text-gray-400">
-            {% blocktrans %}If you have not created an account yet, then please <a href="{{ signup_url }}" class="text-blue-600 hover:underline">Sign up</a> first.{% endblocktrans %}
-          </p>
-        </form>
-      </div>
+        </div>
     </div>
-  </div>
 {% endblock content %}

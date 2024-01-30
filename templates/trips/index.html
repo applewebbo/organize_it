@@ -1,16 +1,14 @@
 {% extends "base.html" %}
 {% load static partials %}
-
-{% block page_title %}Home Page{% endblock page_title %}
-
-
+{% block page_title %}
+    Home Page
+{% endblock page_title %}
 {% block content %}
-  {% if user.is_authenticated %}
-<!-- Content for Autenthicated Users -->
-    {% include 'includes/auth-index.html' %}
-  {% else %}
-    <!-- Content for Anonymous Users -->
-    {% include 'includes/anonymous-index.html' %}
-  {% endif %}
-
+    {% if user.is_authenticated %}
+        <!-- Content for Autenthicated Users -->
+        {% include 'includes/auth-index.html' %}
+    {% else %}
+        <!-- Content for Anonymous Users -->
+        {% include 'includes/anonymous-index.html' %}
+    {% endif %}
 {% endblock content %}

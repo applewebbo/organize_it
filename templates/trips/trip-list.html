@@ -1,85 +1,79 @@
 {% extends "base.html" %}
 {% load partials %}
-{% block page_title %}Trips List{% endblock page_title %}
-
+{% block page_title %}
+    Trips List
+{% endblock page_title %}
 {% block content %}
-  {% partialdef trip-list inline=true %}
+    {% partialdef trip-list inline=true %}
     <div id="trips">
-      <!-- Active Trips Section -->
-      <section class="my-5"
-               hx-swap="outerHTML"
-               hx-trigger="tripSaved from:body"
-               hx-get="{% url 'trips:trip-list' %}"
-               hx-target="#trips">
-
-        <div x-data class="md:flex items-center mb-12 text-center md:text-start">
-          <h1 class="grow text-2xl font-semibold mb-2">My Trips</h1>
-          <button class="btn btn-sm btn-primary-outline"
-                  hx-get="{% url 'trips:trip-create' %}"
-                  hx-target="#dialog"
-                  hx-swap="innerHTML"
-                  @click="$dispatch('open-modal')">Create a new trip</button>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-y-8 gap-x-4">
-          {% for trip in active_trips %}
-            <div class="t-card h-full" id="{{ trip.id }}">
-              <span class="card-badge-sm bg-cyan-400 text-gray-900 border border-cyan-500">
-                {{ trip.get_status_display }}
-              </span>
-              <div class="card-body">
-                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">{{ trip.title }}</h5>
-                <div x-data class="flex items-center">
-                  <span >{% if trip.start_date and trip.end_date %}
-                    {{ trip.start_date }} / {{ trip.end_date }}
-                  {% else %}
-                    - / -
-                  {% endif %}
-                  </span>
-                  <a class="font-medium text-blue-600 dark:text-blue-500 hover:underline ms-3"
-                     hx-get="{% url 'trips:trip-dates' trip.id %}"
-                     hx-target="#dialog"
-                     hx-swap="innerHTML"
-                     @click="$dispatch('open-modal')"
-                  >Change</a>
-                </div>
-                <p class="mb-3 font-normal text-gray-700">{{ trip.description }}</p>
-                <div class="text-right justify-end">
-                  <button class="btn btn-sm btn-dark-outline me-2"
-                          hx-get="{% url 'trips:trip-archive' trip.id %}"
-                          hx-target="">Archive</button>
-                  <button class="btn btn-sm btn-danger-outline me-2"
-                          hx-delete="{% url 'trips:trip-delete' trip.id %}"
-                          hx-confirm="Are you sure you want to delete {{ trip.title }}?">Delete</button>
-                  <a href="{% url 'trips:trip-detail' trip.id %}" class="btn btn-sm btn-primary-outline">View</a>
-                </div>
-
-              </div>
+        <!-- Active Trips Section -->
+        <section class="my-5"
+                 hx-swap="outerHTML"
+                 hx-trigger="tripSaved from:body"
+                 hx-get="{% url 'trips:trip-list' %}"
+                 hx-target="#trips">
+            <div x-data class="md:flex items-center mb-12 text-center md:text-start">
+                <h1 class="grow text-2xl font-semibold mb-2">My Trips</h1>
+                <button class="btn btn-sm btn-primary-outline"
+                        hx-get="{% url 'trips:trip-create' %}"
+                        hx-target="#dialog"
+                        hx-swap="innerHTML"
+                        @click="$dispatch('open-modal')">Create a new trip</button>
             </div>
-          {% endfor %}
-        </div>
-      </section>
-    <!-- Archived Trips Section -->
-      {% if archived_trips %}
-        <section class="my-4">
-          <h2>Archived Trips</h2>
-          <ul class="list-unstyled">
-            {% for trip in archived_trips %}
-              <li><a href="{% url 'trips:trip-detail' trip.id %}">{{ trip.title }}</a></li>
-            {% endfor %}
-          </ul>
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-y-8 gap-x-4">
+                {% for trip in active_trips %}
+                    <div class="t-card h-full" id="{{ trip.id }}">
+                        <span class="card-badge-sm bg-cyan-400 text-gray-900 border border-cyan-500">{{ trip.get_status_display }}</span>
+                        <div class="card-body">
+                            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">{{ trip.title }}</h5>
+                            <div x-data class="flex items-center">
+                                <span>
+                                    {% if trip.start_date and trip.end_date %}
+                                        {{ trip.start_date }} / {{ trip.end_date }}
+                                    {% else %}
+                                        - / -
+                                    {% endif %}
+                                </span>
+                                <a class="font-medium text-blue-600 dark:text-blue-500 hover:underline ms-3"
+                                   hx-get="{% url 'trips:trip-dates' trip.id %}"
+                                   hx-target="#dialog"
+                                   hx-swap="innerHTML"
+                                   @click="$dispatch('open-modal')">Change</a>
+                            </div>
+                            <p class="mb-3 font-normal text-gray-700">{{ trip.description }}</p>
+                            <div class="text-right justify-end">
+                                <button class="btn btn-sm btn-dark-outline me-2"
+                                        hx-get="{% url 'trips:trip-archive' trip.id %}"
+                                        hx-target="">Archive</button>
+                                <button class="btn btn-sm btn-danger-outline me-2"
+                                        hx-delete="{% url 'trips:trip-delete' trip.id %}"
+                                        hx-confirm="Are you sure you want to delete {{ trip.title }}?">Delete</button>
+                                <a href="{% url 'trips:trip-detail' trip.id %}"
+                                   class="btn btn-sm btn-primary-outline">View</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         </section>
-      {% endif %}
+        <!-- Archived Trips Section -->
+        {% if archived_trips %}
+            <section class="my-4">
+                <h2>Archived Trips</h2>
+                <ul class="list-unstyled">
+                    {% for trip in archived_trips %}
+                        <li>
+                            <a href="{% url 'trips:trip-detail' trip.id %}">{{ trip.title }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endif %}
     </div>
     {% if request.htmx %}
-      <div hx-swap-oob=innerHTML:#messages>
-        {% include "includes/messages.html" %}
-      </div>
+        <div hx-swap-oob="innerHTML:#messages">{% include "includes/messages.html" %}</div>
     {% endif %}
-
-  {% endpartialdef %}
+{% endpartialdef %}
 {% endblock content %}
-
 {% block script %}
-
 {% endblock script %}
