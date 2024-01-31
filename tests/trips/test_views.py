@@ -657,3 +657,16 @@ class NoteCheckOrUncheckView(TestCase):
 
         self.response_204(response)
         assert Note.objects.first().checked is False
+
+
+class MapView(TestCase):
+    def test_get(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        PlaceFactory.create_batch(2, trip=trip)
+
+        with self.login(user):
+            response = self.get("trips:map", pk=trip.pk)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/includes/map.html")
