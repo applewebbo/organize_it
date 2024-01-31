@@ -97,13 +97,29 @@ def trip_detail(request, pk):
         "not_assigned_locations": not_assigned_locations,
         "map_bounds": map_bounds,
     }
-    # TODO: redraw of the map section to be added in future versions
-    # if request.htmx:
-    #     # redraw the map section only
-    #     template = "trips/trip-detail.html#trip-detail"
-    # else:
-    template = "trips/trip-detail.html"
-    return TemplateResponse(request, template, context)
+    return TemplateResponse(request, "trips/trip-detail.html", context)
+
+
+@login_required
+def map(request, pk):
+    """Get map details as a separate view to serve with htmx"""
+    qs = Trip.objects.prefetch_related("places", "days")
+    trip = get_object_or_404(qs, pk=pk)
+
+    locations = list(
+        Place.objects.filter(trip=pk).values("name", "latitude", "longitude")
+    )
+    not_assigned_locations = Place.na_objects.filter(trip=pk)
+    map_bounds = calculate_bounds(locations)
+
+    context = {
+        "trip": trip,
+        "locations": locations,
+        "not_assigned_locations": not_assigned_locations,
+        "map_bounds": map_bounds,
+    }
+
+    return TemplateResponse(request, "trips/includes/map.html", context)
 
 
 @login_required

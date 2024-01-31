@@ -1,0 +1,18 @@
+<div id="map" class="mb-4 z-0"></div>
+{{ locations|json_script:"location_json" }}
+<div id="place-control" class="flex items-center mb-8" hx-swap-oob="true">
+    <h3 class="text-2xl font-bold mr-4 grow">Places</h3>
+    {% if trip.places.all %}
+        <button class="btn btn-sm btn-primary-outline text-center inline-flex items-center"
+                hx-get="{% url 'trips:place-list' trip.id %}"
+                hx-target="#place-list"
+                hx-swap="innerHTML">
+            {% heroicon_outline "list-bullet" stroke_width=2 class="size-4 me-2" %}List view
+        </button>
+    {% endif %}
+    <button class="btn btn-sm btn-primary"
+            hx-get="{% url 'trips:trip-add-place' trip.id %}"
+            hx-target="#dialog"
+            hx-swap="innerHTML"
+            @click="$dispatch('open-modal')">Add a Place</button>
+</div>

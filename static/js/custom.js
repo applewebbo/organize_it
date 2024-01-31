@@ -17,8 +17,3 @@ function createMap(bounds) {
   }).addTo(map);
   return map
 }
-
-// function resetInput() {
-//   let inputs = document.getElementsByClassName('select')
-//   Array.from(inputs).forEach((el) => el.selectedIndex = 0);
-// }

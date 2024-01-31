@@ -88,64 +88,62 @@
 </section>
 <hr>
 <!-- Places Section -->
-<section id="places" class="mt-6 mb-4 px-4" x-data="{ showMap: false }">
-    <div class="flex items-center mb-8">
+<section id="places" class="mt-6 mb-4 px-4">
+    {% partialdef place-list inline=true %}
+    <div id="place-control" class="flex items-center mb-8" hx-swap-oob=true>
         <h3 class="text-2xl font-bold mr-4 grow">Places</h3>
+        {% if trip.places.all %}
+            <button class="btn btn-sm btn-primary-outline text-center inline-flex items-center"
+                    hx-get="{% url 'trips:map' trip.id %}"
+                    hx-target="#place-list"
+                    hx-swap="innerHTML">
+                {% heroicon_outline "map" stroke_width=2 class="size-4 me-2" %}Map view
+            </button>
+        {% endif %}
         <button class="btn btn-sm btn-primary"
                 hx-get="{% url 'trips:trip-add-place' trip.id %}"
                 hx-target="#dialog"
                 hx-swap="innerHTML"
                 @click="$dispatch('open-modal')">Add a Place</button>
-        {% if trip.places.all %}
-            {% comment %} <div>
-          <button class="btn btn-sm btn-outline-secondary" @click="showMap = ! showMap">Show Map</button>
-          <button class="btn btn-sm btn-outline-secondary ms-3">Regenerate Map</button>
-            </div> {% endcomment %}
-        {% endif %}
     </div>
-    {% partialdef place-list inline=true %}
-    <div id="place-list"
-         class="grid grid-col-1 xl:grid-cols-2 gap-4"
-         hx-swap="outerHTML"
-         hx-get="{% url 'trips:place-list' trip.id %}"
-         hx-trigger="placeSaved from:body"
-         hx-target="#place-list">
-        <div x-data="{ active: 1 }">
-            <ul class="mb-4">
-                {% for day in trip.days.all %}
-                    {% include "trips/includes/places-single-day.html" %}
-                {% endfor %}
-            </ul>
-            {% if not_assigned_locations.all %}
-                <div x-data class="px-4 mb-2">
-                    <h4 class="text-xl font-semibold mb-3">Places not assigned</h4>
-                    <ul class="flex flex-wrap items-center justify-start">
-                        {% for place in not_assigned_locations %}
-                            <li class="me-4 mb-2 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300 border border-green-400 cursor-pointer">
-                                <a href="#"
-                                   hx-get="{% url 'trips:place-assign' place.id %}"
-                                   hx-target="#dialog"
-                                   hx-swap="innerHTML"
-                                   @click="$dispatch('open-modal')">{{ place.name }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            {% endif %}
-        </div>
-        {% if trip.places.all %}
-            {% comment %} <div class="col-12 col-lg-6 mb-4" x-cloak x-show="showMap" x-transition.opacity> {% endcomment %}
-            <div class="mb-4">
-                <div id="map" class="z-0"></div>
-                {{ locations|json_script:"location_json" }}
+    {% if trip.places.all %}
+        <div id="place-list"
+             class="grid grid-col-1 gap-4"
+             hx-swap="outerHTML"
+             hx-get="{% url 'trips:place-list' trip.id %}"
+             hx-trigger="placeSaved from:body"
+             hx-target="#place-list">
+            <div x-data="{ active: 1 }">
+                <ul class="mb-4">
+                    {% for day in trip.days.all %}
+                        {% include "trips/includes/places-single-day.html" %}
+                    {% endfor %}
+                </ul>
+                {% if not_assigned_locations.all %}
+                    <div x-data class="px-4 mb-2">
+                        <h4 class="text-xl font-semibold mb-3">Places not assigned</h4>
+                        <ul class="flex flex-wrap items-center justify-start">
+                            {% for place in not_assigned_locations %}
+                                <li class="me-4 mb-2 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300 border border-green-400 cursor-pointer">
+                                    <a href="#"
+                                       hx-get="{% url 'trips:place-assign' place.id %}"
+                                       hx-target="#dialog"
+                                       hx-swap="innerHTML"
+                                       @click="$dispatch('open-modal')">{{ place.name }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
             </div>
+            {% if request.htmx %}
+                <div hx-swap-oob=innerHTML:#messages>{% include "includes/messages.html" %}</div>
+            {% else %}
+            {% endif %}
+        {% else %}
+            <p class="mb-5 text-gray-500">No places here. Add your first place where you want to go...</p>
         {% endif %}
-    </div>
-    {% if request.htmx %}
-        <div hx-swap-oob=innerHTML:#messages>{% include "includes/messages.html" %}</div>
-    {% else %}
-    {% endif %}
-{% endpartialdef %}
+    {% endpartialdef %}
 </section>
 <hr>
 <!-- Notes Section -->
@@ -207,26 +205,15 @@
 {% block script %}
     <script>
     {% if trip.places.all %}
-      document.addEventListener('DOMContentLoaded', () => {
-        let placesMap = createMap({{ map_bounds }});
-        let locations = JSON.parse(document.getElementById('location_json').textContent);
-
-        let markerFeatureGroup = L.featureGroup().addTo(placesMap);
-
-        for (let location of locations) {
-          L.marker([ location.latitude, location.longitude]).addTo(markerFeatureGroup);
-        }
-      });
-
-      document.addEventListener('htmx:load', (e) => {
-        if (e.detail.elt.id == "place-list") {
+        htmx.on("htmx:load", function(evt){
+        if (evt.detail.elt.id == "map") {
           let placesMap = createMap({{ map_bounds }});
           let locations = JSON.parse(document.getElementById('location_json').textContent);
 
           let markerFeatureGroup = L.featureGroup().addTo(placesMap);
 
           for (let location of locations) {
-            L.marker([ location.latitude, location.longitude]).addTo(markerFeatureGroup).bindPopup(location.name);
+            L.marker([ location.latitude, location.longitude]).addTo(markerFeatureGroup);
           }
         }
       });
