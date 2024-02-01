@@ -18,7 +18,7 @@ NUMBER_OF_USERS = 2
 MAX_ACTIVE_TRIPS_PER_USER = 4
 MAX_COMPLETED_TRIPS_PER_USER = 3
 MAX_ARCHIVED_TRIPS_PER_USER = 3
-MAX_LINKS_PER_USER = 10
+MAX_LINKS_PER_USER = 15
 MAX_NOTES_PER_TRIP = 5
 MAX_PLACES_PER_TRIP = 8
 
@@ -58,14 +58,14 @@ class Command(BaseCommand):
         # creating links
         for user in User.objects.all():
             links = LinkFactory.create_batch(
-                random.randint(1, MAX_LINKS_PER_USER),
+                random.randint(5, MAX_LINKS_PER_USER),
                 author=user,
             )
             for link in links:
                 link.trips.add(
                     *random.choices(
                         Trip.objects.filter(author=user),
-                        k=random.randint(1, MAX_ACTIVE_TRIPS_PER_USER),
+                        k=random.randint(2, MAX_ACTIVE_TRIPS_PER_USER),
                     )
                 )
 

@@ -164,7 +164,7 @@ def trip_delete(request, pk):
 def trip_update(request, pk):
     trip = get_object_or_404(Trip, pk=pk, author=request.user)
     if request.method == "POST":
-        form = TripForm(request.POST, instance=trip)
+        form = TripForm(request.POST or None, instance=trip)
         if form.is_valid():
             trip = form.save()
             messages.add_message(
@@ -256,7 +256,7 @@ def link_delete(request, pk):
 def link_update(request, pk):
     link = get_object_or_404(Link, pk=pk, author=request.user)
 
-    form = LinkForm(request.POST, instance=link)
+    form = LinkForm(request.POST or None, instance=link)
     if form.is_valid():
         link = form.save()
         messages.add_message(
