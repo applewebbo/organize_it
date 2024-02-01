@@ -23,6 +23,22 @@ class PlaceFactory(factory.django.DjangoModelFactory):
     trip = factory.SubFactory(TripFactory)
 
 
+class PlaceItFactory(factory.django.DjangoModelFactory):
+    """Factory for populate the database with places located in Italy"""
+
+    class Meta:
+        model = "trips.Place"
+
+    class Params:
+        location = factory.Faker("local_latlng", country_code="IT")
+
+    name = factory.LazyAttribute(lambda obj: obj.location[2])
+    address = factory.LazyAttribute(lambda obj: obj.location[2])
+    latitude = factory.LazyAttribute(lambda obj: obj.location[0])
+    longitude = factory.LazyAttribute(lambda obj: obj.location[1])
+    trip = factory.SubFactory(TripFactory)
+
+
 class LinkFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "trips.Link"

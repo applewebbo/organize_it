@@ -6,7 +6,12 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from tests.accounts.factories import UserFactory
-from tests.trips.factories import LinkFactory, NoteFactory, PlaceFactory, TripFactory
+from tests.trips.factories import (
+    LinkFactory,
+    NoteFactory,
+    PlaceItFactory,
+    TripFactory,
+)
 from trips.models import Link, Note, Place, Trip
 
 NUMBER_OF_USERS = 2
@@ -70,7 +75,7 @@ class Command(BaseCommand):
         # creating places
         # TODO: create address, lat and long without using mapbox to speed up command and avoid needing internet connection
         for trip in Trip.objects.all():
-            places = PlaceFactory.create_batch(
+            places = PlaceItFactory.create_batch(
                 random.randint(3, MAX_PLACES_PER_TRIP), trip=trip
             )
             # assign places ro random days
