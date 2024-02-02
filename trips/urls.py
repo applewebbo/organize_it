@@ -31,6 +31,7 @@ htmx_urlpatterns = [
     path("notes/<int:pk>/delete", views.note_delete, name="note-delete"),
     path("notes/<int:pk>/check", views.note_check_or_uncheck, name="note-check"),
     path("trips/<int:pk>/map", views.map, name="map"),
+    path("trips/<int:pk>/<int:day>/map", views.map, name="map"),
 ]
 
 urlpatterns += htmx_urlpatterns

@@ -108,7 +108,6 @@
     </div>
     {% if trip.places.all %}
         <div id="place-list"
-             class="grid grid-col-1 gap-4"
              hx-swap="outerHTML"
              hx-get="{% url 'trips:place-list' trip.id %}"
              hx-trigger="placeSaved from:body"
@@ -213,7 +212,7 @@
           let markerFeatureGroup = L.featureGroup().addTo(placesMap);
 
           for (let location of locations) {
-            L.marker([ location.latitude, location.longitude]).addTo(markerFeatureGroup);
+            L.marker([ location.latitude, location.longitude]).addTo(markerFeatureGroup).bindPopup(location.name);
           }
         }
       });

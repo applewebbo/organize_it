@@ -19,21 +19,22 @@ from .models import Link, Note, Place, Trip
 
 
 def calculate_bounds(locations):
+    # TODO: add check for a single location and for some edge cases like a place distant from the others
     # Check if the list is not empty
     if not locations:
         return None
 
-    # sw = list(min((point["latitude"], point["longitude"]) for point in locations))
-    # ne = list(max((point["latitude"], point["longitude"]) for point in locations))
+    sw = list(min((point["latitude"], point["longitude"]) for point in locations))
+    ne = list(max((point["latitude"], point["longitude"]) for point in locations))
 
     # calculate min and max latitude and longitude
-    min_lat = min(point["latitude"] for point in locations)
-    min_lon = min(point["longitude"] for point in locations)
-    max_lat = max(point["latitude"] for point in locations)
-    max_lon = max(point["longitude"] for point in locations)
+    # min_lat = min(point["latitude"] for point in locations)
+    # min_lon = min(point["longitude"] for point in locations)
+    # max_lat = max(point["latitude"] for point in locations)
+    # max_lon = max(point["longitude"] for point in locations)
 
-    sw = [min_lat, min_lon]
-    ne = [max_lat, max_lon]
+    # sw = [min_lat, min_lon]
+    # ne = [max_lat, max_lon]
 
     return [sw, ne]
 
@@ -101,22 +102,28 @@ def trip_detail(request, pk):
 
 
 @login_required
-def map(request, pk):
+def map(request, pk, day=None):
     """Get map details as a separate view to serve with htmx"""
     qs = Trip.objects.prefetch_related("places", "days")
     trip = get_object_or_404(qs, pk=pk)
-
-    locations = list(
-        Place.objects.filter(trip=pk).values("name", "latitude", "longitude")
-    )
-    not_assigned_locations = Place.na_objects.filter(trip=pk)
+    # TODO: check if days have places and if not set the related button to disabled
+    if day:
+        locations = list(
+            Place.objects.filter(trip=pk, day=day).values(
+                "name", "latitude", "longitude"
+            )
+        )
+    else:
+        locations = list(
+            Place.objects.filter(trip=pk).values("name", "latitude", "longitude")
+        )
     map_bounds = calculate_bounds(locations)
 
     context = {
         "trip": trip,
         "locations": locations,
-        "not_assigned_locations": not_assigned_locations,
         "map_bounds": map_bounds,
+        "selected_day": day,
     }
 
     return TemplateResponse(request, "trips/includes/map.html", context)
