@@ -129,14 +129,6 @@ class Place(models.Model):
         return self.name
 
 
-# @receiver(post_save, sender=Place)
-# def update_place_coordinates(sender, instance, created **kwargs):
-#     if created:
-#         g = geocoder.mapbox(instance.address, access_token=settings.MAPBOX_ACCESS_TOKEN)
-#         instance.latitude, instance.longitude = g.latlng
-#         instance.save()
-
-
 class Note(models.Model):
     content = models.CharField(max_length=500)
     trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="notes")

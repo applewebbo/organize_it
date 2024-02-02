@@ -206,7 +206,8 @@
     {% if trip.places.all %}
         htmx.on("htmx:load", function(evt){
         if (evt.detail.elt.id == "map") {
-          let placesMap = createMap({{ map_bounds }});
+          let map_bounds = JSON.parse(document.getElementById('map_bounds').textContent);
+          let placesMap = createMap([map_bounds[0], map_bounds[1]]);
           let locations = JSON.parse(document.getElementById('location_json').textContent);
 
           let markerFeatureGroup = L.featureGroup().addTo(placesMap);
