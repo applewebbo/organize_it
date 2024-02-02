@@ -670,3 +670,15 @@ class MapView(TestCase):
 
         self.response_200(response)
         assertTemplateUsed(response, "trips/includes/map.html")
+
+    def test_get_with_day(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = Day.objects.filter(trip=trip).first()
+        PlaceFactory.create_batch(2, trip=trip, day=day)
+
+        with self.login(user):
+            response = self.get("trips:map", pk=trip.pk, day=day.pk)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/includes/map.html")
