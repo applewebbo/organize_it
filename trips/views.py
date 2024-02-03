@@ -96,9 +96,7 @@ def map(request, pk, day=None):
     """Get map details as a separate view to serve with htmx"""
     qs = Trip.objects.prefetch_related("places", "days")
     trip = get_object_or_404(qs, pk=pk)
-    days = Day.objects.filter(trip=pk, places__isnull=False)
-    print(days)
-    # TODO: check if days have places and if not set the related button to disabled
+    days = Day.objects.filter(trip=pk, places__isnull=False).distinct()
     if day:
         locations = list(
             Place.objects.filter(trip=pk, day=day).values(
