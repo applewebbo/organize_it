@@ -1540,10 +1540,6 @@ p {
   border-bottom-width: 1px;
 }
 
-.border-s-0 {
-  border-inline-start-width: 0px;
-}
-
 .border-t {
   border-top-width: 1px;
 }
