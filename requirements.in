@@ -1,10 +1,10 @@
-crispy-tailwind==1.0
-django==5.0.1
-django-allauth==0.57.0
-django-crispy-forms==2.0
-django-environ==0.11.2
-django-htmx==1.17.0
-django-template-partials==23.3.post1
+crispy-tailwind
+django>=5
+django-allauth
+django-crispy-forms
+django-environ
+django-htmx
+django-template-partials
 folium==0.14.0
 geocoder==1.38.1
 heroicons[django]
