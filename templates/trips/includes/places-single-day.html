@@ -1,48 +1,22 @@
-<li>
-    <div x-data="{ id:{{ day.number }}, get expanded() { return this.active === this.id }, set expanded(value) { this.active = value ? this.id : null } }"
-         role="region"
-         x-cloak>
-        {% if day.places.all %}
-            <h3 role="button"
-                class="flex border-b border-secondary-subtle px-4 py-3 mx-2 cursor-pointer"
-                :class="expanded ? 'bg-base-200' : ''"
-                @click="expanded = !expanded"
-                :aria-expanded="expanded">
-                <div class="relative grow flex items-center">
-                    <span class="mr-3">Day {{ day.number }}</span>
-                    <span class="bg-primary-content text-primary text-xs font-medium me-2 px-2.5 py-0.5 rounded border border-primary">{{ day.places.all.count }} Places</span>
-                </div>
-                <span x-show="expanded" aria-hidden="true" class="me-3">{% heroicon_outline "chevron-up" stroke_width=2 class="size-4" %}</span>
-                <span x-show="!expanded" aria-hidden="true" class="me-3">{% heroicon_outline "chevron-down" stroke_width=2 class="size-4" %}</span>
-            </h3>
-        {% else %}
-            <h3 class="relative grow flex items-center px-4 py-3 mx-2">
-                <span class="mr-3">Day {{ day.number }}</span>
-                <span class="bg-gray-200 text-gray-600 text-xs font-medium me-2 px-2.5 py-0.5 rounded border border-gray-300">0 Places</span>
-            </h3>
-        {% endif %}
-        <div x-show="expanded">
-            {% if day.places.all %}
-                <ul class="mt-2">
-                    {% for place in day.places.all %}
-                        <li class="flex items-center ps-4 py-2">
-                            <div class="grow text-sm truncate">{{ place.name }}</div>
-                            <button class="btn btn-xs btn-primary-outline me-2"
-                                    hx-get="{% url 'trips:place-update' place.id %}"
-                                    hx-target="#dialog"
-                                    hx-swap="innerHTML"
-                                    @click="$dispatch('open-modal')">
-                                {% heroicon_outline "pencil" stroke_width=2 class="size-3" %}
-                            </button>
-                            <button class="btn btn-xs btn-danger-outline"
-                                    hx-delete="{% url 'trips:place-delete' place.id %}"
-                                    hx-confirm="Are you sure you want to delete {{ place.name }}">
-                                {% heroicon_outline "x-mark" stroke_width=2 class="size-3" %}
-                            </button>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        </div>
-    </div>
-</li>
+<div>
+    <h3 class="flex px-4 py-3 mx-2">Day {{ day.number }}</h3>
+    <ul class="mt-2">
+        {% for place in day.places.all %}
+            <li class="flex items-center ps-4 py-2">
+                <div class="grow text-sm truncate">{{ place.name }}</div>
+                <button class="btn btn-xs btn-primary-outline me-2"
+                        hx-get="{% url 'trips:place-update' place.id %}"
+                        hx-target="#dialog"
+                        hx-swap="innerHTML"
+                        @click="$dispatch('open-modal')">
+                    {% heroicon_outline "pencil" stroke_width=2 class="size-3" %}
+                </button>
+                <button class="btn btn-xs btn-danger-outline"
+                        hx-delete="{% url 'trips:place-delete' place.id %}"
+                        hx-confirm="Are you sure you want to delete {{ place.name }}">
+                    {% heroicon_outline "x-mark" stroke_width=2 class="size-3" %}
+                </button>
+            </li>
+        {% endfor %}
+    </ul>
+</div>

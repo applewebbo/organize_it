@@ -74,8 +74,9 @@ def trip_list(request):
 @login_required
 def trip_detail(request, pk):
     """Detail Page for the selected trip"""
-    qs = Trip.objects.prefetch_related("links", "places", "notes", "days")
+    qs = Trip.objects.prefetch_related("links", "places", "notes")
     trip = get_object_or_404(qs, pk=pk)
+    days = Day.objects.filter(trip=pk).prefetch_related("places")
     locations = list(
         Place.objects.filter(trip=pk).values("name", "latitude", "longitude")
     )
@@ -84,6 +85,7 @@ def trip_detail(request, pk):
 
     context = {
         "trip": trip,
+        "days": days,
         "locations": locations,
         "not_assigned_locations": not_assigned_locations,
         "map_bounds": map_bounds,
