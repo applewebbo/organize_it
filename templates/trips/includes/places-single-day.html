@@ -1,8 +1,8 @@
-<div>
-    <h3 class="flex px-4 py-3 mx-2">Day {{ day.number }}</h3>
-    <ul class="mt-2">
+<div class="px-6 py-4 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+    <h3 class="flex py-3 mx-2 font-lg font-bold tracking-tight">Day {{ day.number }}</h3>
+    <ul class="my-2">
         {% for place in day.places.all %}
-            <li class="flex items-center ps-4 py-2">
+            <li class="flex items-center py-2">
                 <div class="grow text-sm truncate">{{ place.name }}</div>
                 <button class="btn btn-xs btn-primary-outline me-2"
                         hx-get="{% url 'trips:place-update' place.id %}"

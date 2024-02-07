@@ -8,7 +8,7 @@
                     hx-get="{% url 'trips:map' trip.id day.pk %}"
                     hx-target="#place-list"
                     hx-swap="innerHTML"
-                    class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border {% if forloop.first %}rounded-s-lg{% endif %} border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white">
+                    class="px-4 py-2 text-sm font-medium {% if selected_day == day.pk %} text-white bg-blue-700 hover:text-white hover:bg-blue-700 {% else %} text-gray-900 bg-white hover:bg-gray-200 hover:text-gray-900 {% endif %} {% if forloop.first %}rounded-s-lg{% endif %} border border-gray-200  focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white">
                 Day {{ day.number }}
             </button>
         {% endfor %}
@@ -16,9 +16,8 @@
                 hx-get="{% url 'trips:map' trip.id %}"
                 hx-target="#place-list"
                 hx-swap="innerHTML"
-                class="px-4 py-2 text-sm font-medium {% if selected_day %} text-gray-900 {% else %}  text-blue-700 {% endif %} bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white">
-            All Days
-        </button>
+                class="px-4 py-2 text-sm font-medium {% if selected_day %} text-gray-900 bg-white hover:bg-gray-200 hover:text-gray-900 focus:text-blue-700 {% else %} text-white bg-blue-500 hover:bg-blue-700 hover:text-white focus:text-white {% endif %}  border border-gray-200 rounded-e-lg  focus:z-10 focus:ring-2 focus:ring-blue-700  dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
+                {% if not selected_day %}disabled{% endif %}>All Days</button>
     </div>
 </div>
 <div id="place-control" class="flex items-center mb-8" hx-swap-oob="true">

@@ -6,10 +6,10 @@
 {% block content %}
     <!-- Details Section -->
     <section id="details" class="text-center md:text-start">
-        <div class="w-full px-6 py-4 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+        <div class="relative w-full px-6 py-4 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
             <div class="md:flex items-center mb-3">
                 <h2 class="text-4xl font-semibold tracking-tight md:mr-6 mb-2">{{ trip.title }}</h2>
-                <span class="badge badge-ghost">{{ trip.get_status_display }}</span>
+                <span class="card-badge bg-cyan-400 text-gray-900 border border-cyan-500">{{ trip.get_status_display }}</span>
             </div>
             <div id="trip-details" class="mb-4">
                 {% if trip.start_date and trip.end_date %}
@@ -115,9 +115,11 @@
              hx-get="{% url 'trips:place-list' trip.id %}"
              hx-trigger="placeSaved from:body"
              hx-target="#place-list">
-            <div class="mb-4 grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <div class="mb-8 grid md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {% for day in days %}
-                    {% include "trips/includes/places-single-day.html" %}
+                    {% if day.places.all %}
+                        {% include "trips/includes/places-single-day.html" %}
+                    {% endif %}
                 {% endfor %}
             </div>
             {% if not_assigned_locations.all %}
