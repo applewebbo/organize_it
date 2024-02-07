@@ -301,14 +301,18 @@ def trip_add_place(request, pk):
 
 @login_required
 def place_list(request, pk):
-    places = Place.objects.filter(trip=pk)
-    trip = get_object_or_404(Trip, pk=pk)
-    locations = list(places.values("latitude", "longitude"))
+    qs = Trip.objects.prefetch_related("links", "places", "notes")
+    trip = get_object_or_404(qs, pk=pk)
+    days = Day.objects.filter(trip=pk).prefetch_related("places")
+    locations = list(
+        Place.objects.filter(trip=pk).values("name", "latitude", "longitude")
+    )
     not_assigned_locations = Place.na_objects.filter(trip=pk)
     map_bounds = calculate_bounds(locations)
+
     context = {
-        "places": places,
         "trip": trip,
+        "days": days,
         "locations": locations,
         "not_assigned_locations": not_assigned_locations,
         "map_bounds": map_bounds,

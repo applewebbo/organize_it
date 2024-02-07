@@ -2,7 +2,7 @@
 {{ locations|json_script:"location_json" }}
 {{ map_bounds|json_script:"map_bounds" }}
 <div class="flex justify-center">
-    <div class="inline-flex rounded-md shadow-sm mb-4" role="group">
+    <div class="inline-flex rounded-md shadow-sm mt-2 mb-4" role="group">
         {% for day in days %}
             <button type="button"
                     hx-get="{% url 'trips:map' trip.id day.pk %}"
@@ -16,7 +16,7 @@
                 hx-get="{% url 'trips:map' trip.id %}"
                 hx-target="#place-list"
                 hx-swap="innerHTML"
-                class="px-4 py-2 text-sm font-medium {% if selected_day %} text-gray-900 bg-white hover:bg-gray-200 hover:text-gray-900 focus:text-blue-700 {% else %} text-white bg-blue-500 hover:bg-blue-700 hover:text-white focus:text-white {% endif %}  border border-gray-200 rounded-e-lg  focus:z-10 focus:ring-2 focus:ring-blue-700  dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
+                class="px-4 py-2 text-sm font-medium {% if selected_day %} text-gray-900 bg-white hover:bg-gray-200 hover:text-gray-900 focus:text-blue-700 {% else %} text-white bg-blue-700 hover:text-white hover:bg-blue-700{% endif %}  border border-gray-200 rounded-e-lg  focus:z-10 focus:ring-2 focus:ring-blue-700  dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
                 {% if not selected_day %}disabled{% endif %}>All Days</button>
     </div>
 </div>
