@@ -30,6 +30,19 @@ def calculate_bounds(locations):
     return [sw, ne]
 
 
+def calculate_days_and_locations(trip):
+    days = (
+        Day.objects.filter(trip=trip)
+        .exclude(places__isnull=True)
+        .prefetch_related("places")
+    )
+    locations = list(
+        Place.objects.filter(trip=trip).values("name", "latitude", "longitude")
+    )
+
+    return days, locations
+
+
 def get_trips(user):
     """Get the trips for the home page with favourite trip (if present) and others"""
     fav_trip = Profile.objects.get(user=user).fav_trip or None
@@ -76,10 +89,7 @@ def trip_detail(request, pk):
     """Detail Page for the selected trip"""
     qs = Trip.objects.prefetch_related("links", "places", "notes")
     trip = get_object_or_404(qs, pk=pk)
-    days = Day.objects.filter(trip=pk).prefetch_related("places")
-    locations = list(
-        Place.objects.filter(trip=pk).values("name", "latitude", "longitude")
-    )
+    days, locations = calculate_days_and_locations(pk)
     not_assigned_locations = Place.na_objects.filter(trip=pk)
     map_bounds = calculate_bounds(locations)
 
@@ -303,10 +313,7 @@ def trip_add_place(request, pk):
 def place_list(request, pk):
     qs = Trip.objects.prefetch_related("links", "places", "notes")
     trip = get_object_or_404(qs, pk=pk)
-    days = Day.objects.filter(trip=pk).prefetch_related("places")
-    locations = list(
-        Place.objects.filter(trip=pk).values("name", "latitude", "longitude")
-    )
+    days, locations = calculate_days_and_locations(pk)
     not_assigned_locations = Place.na_objects.filter(trip=pk)
     map_bounds = calculate_bounds(locations)
 
