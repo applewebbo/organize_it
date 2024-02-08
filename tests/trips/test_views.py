@@ -410,14 +410,17 @@ class PlaceListView(TestCase):
     def test_get(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)
-        places = PlaceFactory.create_batch(3, trip=trip)
+        PlaceFactory.create_batch(3, trip=trip)
 
         with self.login(user):
             response = self.get("trips:place-list", pk=trip.pk)
 
         self.response_200(response)
         assert trip == response.context_data["trip"]
-        assert places[0] in response.context_data["places"]
+        assert any(
+            value["latitude"] == Place.objects.filter(trip=trip).first().latitude
+            for value in response.context_data["locations"]
+        )
 
 
 class PlaceDeleteView(TestCase):
