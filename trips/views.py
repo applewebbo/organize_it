@@ -423,8 +423,8 @@ def note_update(request, pk):
         )
         return HttpResponse(status=204, headers={"HX-Trigger": "noteSaved"})
 
-    context = {"form": form}
-    return TemplateResponse(request, "trips/note-create.html", context)
+    context = {"form": form, "note": note}
+    return TemplateResponse(request, "trips/note-update.html", context)
 
 
 @login_required
