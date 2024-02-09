@@ -4,10 +4,10 @@
 
 @layer components {
   .card-badge {
-    @apply font-medium me-2 px-3.5 py-1.5 rounded absolute top-0 right-0 -mt-4 mr-6;
+    @apply font-medium me-2 px-3.5 py-1.5 rounded;
   }
   .card-badge-sm{
-    @apply font-medium me-2 text-sm px-2 py-0.5 rounded absolute top-0 right-0 -mt-3 mr-6;
+    @apply font-medium me-2 text-sm px-2 py-0.5 rounded;
   }
   .t-card{
     @apply p-4 bg-white border border-gray-200 rounded-lg shadow mb-5 relative;
@@ -44,4 +44,12 @@
 
 select ~ .pointer-events-none {
   display: none !important;
+}
+
+li.edit button {
+  visibility: hidden;
+}
+
+li.edit:hover button {
+  visibility: visible;
 }
