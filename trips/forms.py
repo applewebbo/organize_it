@@ -276,7 +276,7 @@ class NoteForm(forms.ModelForm):
                 HTML(FIELDSET_CONTENT),
                 Div("place", x_show="open == 1"),
                 Div("link", x_show="open == 2"),
-                x_data="{ open: 0}",
+                x_data="{ open: 0 }",
                 x_init="$watch('open', () => resetInput())",
             ),
         )

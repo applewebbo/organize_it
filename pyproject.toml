@@ -1,13 +1,6 @@
 [tool.bandit]
 skips = ["B101","B311"]
 
-# [tool.black]
-# target-version = ["py311"]
-
-# [tool.isort]
-# profile = "black"
-# src_paths = ["core"]
-
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "core.settings.testing"
 python_files = "test_*.py"
