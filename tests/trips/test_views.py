@@ -578,7 +578,7 @@ class NoteUpdateView(TestCase):
             response = self.get("trips:note-update", pk=note.pk)
 
         self.response_200(response)
-        assertTemplateUsed(response, "trips/note-create.html")
+        assertTemplateUsed(response, "trips/note-update.html")
 
     def test_post(self):
         user = self.make_user("user")
