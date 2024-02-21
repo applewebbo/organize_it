@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "dev": "tailwindcss -i static/src/input.css -o static/css/tailwind.css --watch"
+    "dev": "tailwindcss -i static/src/input.css -o static/css/tailwind.css --watch",
+    "build": "tailwindcss -i static/src/input.css -o static/css/tailwind.min.css --minify"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.7",

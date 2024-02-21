@@ -14,6 +14,9 @@ checkmigrations:
 watch:
 	npm run dev
 
+build:
+	npm run build
+
 test:
 	pytest
 
