@@ -1,4 +1,6 @@
-from core.settings.common import *  # noqa
+from .common import *  # noqa
+
+DEBUG = True
 
 # DJANGO-BROWSER-RELOAD
 

@@ -8,14 +8,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 env = environ.Env(
     ACCOUNT_DEFAULT_HTTP_PROTOCOL=(str, "https"),
     ALLOWED_HOSTS=(list, []),
+    CSRF_COOKIE_SECURE=(bool, True),
     DEBUG=(bool, False),
+    SESSION_COOKIE_SECURE=(bool, True),
+    SECURE_HSTS_SECONDS=(int, 60 * 60 * 24 * 365),
+    SECURE_SSL_REDIRECT=(bool, True),
 )
 
 environ.Env.read_env(BASE_DIR / ".env")
 
 SECRET_KEY = env("SECRET_KEY")
 
-DEBUG = env("DEBUG")
+DEBUG = env.bool("DEBUG")
 
 ALLOWED_HOSTS: list[str] = env("ALLOWED_HOSTS")
 
@@ -146,6 +150,15 @@ LOGIN_REDIRECT_URL = "/"
 # SITES
 
 SITE_ID = 1
+
+# SECURITY
+if not DEBUG:
+    CSRF_COOKIE_SECURE = env("CSRF_COOKIE_SECURE")
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_SECONDS = env("SECURE_HSTS_SECONDS")
+    SECURE_HSTS_PRELOAD = True
+    SECURE_SSL_REDIRECT = env("SECURE_SSL_REDIRECT")
+    SESSION_COOKIE_SECURE = env("SESSION_COOKIE_SECURE")
 
 # DJANGO-ALLAUTH
 
