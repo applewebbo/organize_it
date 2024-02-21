@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import dj_database_url
 import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -9,7 +10,10 @@ env = environ.Env(
     ACCOUNT_DEFAULT_HTTP_PROTOCOL=(str, "https"),
     ALLOWED_HOSTS=(list, []),
     CSRF_COOKIE_SECURE=(bool, True),
+    DATABASE_CONN_MAX_AGE=(int, 600),
+    DATABASE_SSL_REQUIRE=(bool, True),
     DEBUG=(bool, False),
+    POSTGRES_LOCALLY=(bool, False),
     SESSION_COOKIE_SECURE=(bool, True),
     SECURE_HSTS_SECONDS=(int, 60 * 60 * 24 * 365),
     SECURE_SSL_REDIRECT=(bool, True),
@@ -95,6 +99,16 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+
+POSTGRES_LOCALLY = env("POSTGRES_LOCALLY")
+
+if POSTGRES_LOCALLY:
+    DATABASES["default"] = dj_database_url.config(
+        default=env("DATABASE_URL"),
+        conn_max_age=600,
+        conn_health_checks=True,
+        ssl_require=True,
+    )
 
 
 # Password validation

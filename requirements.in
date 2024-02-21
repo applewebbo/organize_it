@@ -5,6 +5,8 @@ django-crispy-forms
 django-environ
 django-htmx
 django-template-partials
+dj-database-url==2.1.0
 folium==0.14.0
 geocoder==1.38.1
 heroicons[django]
+psycopg[binary]==3.1.18
