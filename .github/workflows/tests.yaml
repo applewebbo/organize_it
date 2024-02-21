@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       ALLOWED_HOSTS: '*'
+      DEBUG: 'on'
       SECRET_KEY: 'a secret to everybody'
       MAPBOX_ACCESS_TOKEN: "pk.eyJ1Ijoid2ViYm9ncmFmaWNvIiwiYSI6ImNsbm9ja3plNDBoYzMybXBmcnVqZ3hlbzcifQ.kSMXyPpY9YTAAXixqkFk1g"
 
