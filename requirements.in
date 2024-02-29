@@ -1,6 +1,6 @@
 crispy-tailwind
 django>=5
-django-allauth
+django-allauth==0.61.1
 django-crispy-forms
 django-environ
 django-htmx
