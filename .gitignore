@@ -145,3 +145,7 @@ node_modules/
 
 # NODE
 node_modules/
+
+# ENVIRONMENT
+.env
+.env.prod
