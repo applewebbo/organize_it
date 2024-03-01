@@ -5,19 +5,21 @@ FROM python:3.11.8-slim-bookworm
 WORKDIR /usr/src/app
 
 # set environment variables
+ENV VIRTUAL_ENV=/usr/local
+ENV PIP_DISABLE_PIP_VERSION_CHECK 1
 ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONPATH /srv
 ENV PYTHONUNBUFFERED 1
 
 #install uv
-ENV VIRTUAL_ENV=/usr/local
-RUN apt update && apt install -y curl
-ADD --chmod=755 https://astral.sh/uv/install.sh /install.sh
-RUN /install.sh && rm /install.sh
+RUN apt-get update
+RUN pip install --upgrade pip uv
+RUN python -m uv venv /venv
 
 # install dependencies
 COPY ./requirements.txt .
 COPY ./requirements-dev.txt .
-RUN /root/.cargo/bin/uv pip install --no-cache -r requirements.txt -r requirements-dev.txt
+RUN uv pip install -r requirements.txt -r requirements-dev.txt
 
 # copy entrypoint.sh
 COPY ./entrypoint.sh .
