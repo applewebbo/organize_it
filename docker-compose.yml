@@ -1,0 +1,12 @@
+version: '3.9'
+
+services:
+  web:
+    build: ./
+    command: python manage.py runserver_plus --settings=core.settings.development 0.0.0.0:8000
+    volumes:
+      - ./app/:/usr/src/organize_it/
+    ports:
+      - 8000:8000
+    env_file:
+      - ./.env.dev
