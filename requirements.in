@@ -4,6 +4,7 @@ django-allauth==0.61.1
 django-crispy-forms
 django-environ
 django-htmx
+django-q2==1.6.1
 django-template-partials
 dj-database-url==2.1.0
 folium==0.14.0

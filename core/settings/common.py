@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "heroicons",
     "template_partials",
+    "django_q",
     # CONTRIB
     "django.contrib.admin",
     "django.contrib.auth",
@@ -246,3 +247,15 @@ CRISPY_TEMPLATE_PACK = "tailwind"
 # MAPBOX
 
 MAPBOX_ACCESS_TOKEN = env("MAPBOX_ACCESS_TOKEN")
+
+# DJANGO-Q
+
+Q_CLUSTER = {
+    "name": "organize_it",
+    "workers": 4,
+    "timeout": 90,
+    "retry": 120,
+    "queue_limit": 50,
+    "bulk": 10,
+    "orm": "default",
+}
