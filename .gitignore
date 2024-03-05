@@ -146,6 +146,6 @@ node_modules/
 # NODE
 node_modules/
 
-# environment files
+# ENVIRONMENT
 .env
 .env.prod
