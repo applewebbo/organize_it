@@ -12,3 +12,5 @@ DATABASES = {
         "PORT": env("SQL_PORT"),
     }
 }
+
+CSRF_TRUSTED_ORIGINS = ["http://localhost"]

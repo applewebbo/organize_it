@@ -25,3 +25,8 @@ ftest:
 
 mptest:
 	pytest -m "not mapbox" --cov-report html:htmlcov --cov-report term:skip-covered --cov-fail-under 100
+
+dockerdb:
+	docker-compose exec web python manage.py flush --no-input --settings=core.settings.production
+	docker-compose exec web python manage.py migrate --settings=core.settings.production
+	docker-compose exec web python manage.py populate_trips --settings=core.settings.production
