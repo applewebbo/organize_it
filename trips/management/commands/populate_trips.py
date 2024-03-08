@@ -6,12 +6,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from tests.accounts.factories import UserFactory
-from tests.trips.factories import (
-    LinkFactory,
-    NoteFactory,
-    PlaceItFactory,
-    TripFactory,
-)
+from tests.trips.factories import LinkFactory, NoteFactory, PlaceItFactory, TripFactory
 from trips.models import Link, Note, Place, Trip
 
 NUMBER_OF_USERS = 2

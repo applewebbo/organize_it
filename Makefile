@@ -30,3 +30,6 @@ dockerdb:
 	docker compose exec web python manage.py flush --no-input --settings=core.settings.production
 	docker compose exec web python manage.py migrate --settings=core.settings.production
 	docker compose exec web python manage.py populate_trips --settings=core.settings.production
+
+cluster:
+	python manage.py qcluster --settings=core.settings.development

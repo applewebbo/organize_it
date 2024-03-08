@@ -52,7 +52,7 @@ django-htmx==1.17.2
     # via -r requirements.in
 django-picklefield==3.1
     # via django-q2
-django-q2==1.6.1
+django-q2==1.6.2
     # via -r requirements.in
 django-template-partials==23.4
     # via -r requirements.in
