@@ -36,13 +36,13 @@ class Trip(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
+        today = date.today()
+        seven_days_after = today + timedelta(days=7)
         if self.start_date and self.end_date:
             # add the case for when status is 5 to bypass date checks
             if self.status == 5:
                 super().save(*args, **kwargs)
                 return
-            today = date.today()
-            seven_days_after = today + timedelta(days=7)
             # after end date
             if self.end_date < today:
                 self.status = 4
