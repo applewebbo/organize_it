@@ -150,4 +150,3 @@ node_modules/
 
 # TAILWINDCSS
 static/css/tailwind.css
-static/css/tailwind.min.css
