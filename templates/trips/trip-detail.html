@@ -60,7 +60,7 @@
             </button>
         </div>
         {% partialdef link-list inline=true %}
-        <ul class="my-3 columns-2"
+        <ul class="my-3 columns-1 lg:columns-2"
             hx-swap="outerHTML"
             hx-get="{% url 'trips:link-list' trip.id %}"
             hx-trigger="linkSaved from:body">
@@ -107,9 +107,13 @@
             <button class="btn btn-sm btn-primary-outline text-center inline-flex items-center"
                     hx-get="{% url 'trips:map' trip.id %}"
                     hx-target="#place-list"
-                    hx-swap="innerHTML">{% heroicon_outline "map" stroke_width=2 class="size-4 me-2" %}Map</button>
+                    hx-swap="innerHTML">
+                {% heroicon_outline "map" stroke_width=2 class="size-4 me-0 sm:me-2" %}
+                <span class="hidden sm:block">Map</span>
+            </button>
             <button class="btn btn-sm btn-primary-outline text-center inline-flex items-center">
-                {% heroicon_outline "arrows-up-down" stroke_width=2 class="size-4 me-2" %}Reorder
+                {% heroicon_outline "arrows-up-down" stroke_width=2 class="size-4 me-0 sm:me-2" %}
+                <span class="hidden sm:block">Reorder</span>
             </button>
         {% endif %}
         <button class="btn btn-sm btn-primary text-center inline-flex items-center"
@@ -171,7 +175,7 @@
     </div>
     {% partialdef note-list inline=true %}
     <ul id="notes-list"
-        class="my-3"
+        class="my-3 columns-1 lg:columns-2"
         hx-swap="outerHTML"
         hx-get="{% url 'trips:note-list' trip.id %}"
         hx-trigger="noteSaved from:body">

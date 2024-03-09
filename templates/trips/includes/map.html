@@ -27,10 +27,12 @@
                 hx-get="{% url 'trips:place-list' trip.id %}"
                 hx-target="#place-list"
                 hx-swap="innerHTML">
-            {% heroicon_outline "list-bullet" stroke_width=2 class="size-4 me-2" %}List view
+            {% heroicon_outline "list-bullet" stroke_width=2 class="size-4 me-0 sm:me-2" %}
+            <span class="hidden sm:block">List view</span>
         </button>
         <button class="btn btn-sm btn-primary-outline text-center inline-flex items-center">
-            {% heroicon_outline "arrows-up-down" stroke_width=2 class="size-4 me-2" %}Reorder
+            {% heroicon_outline "arrows-up-down" stroke_width=2 class="size-4 me-0 sm:me-2" %}
+            <span class="hidden sm:block">Reorder</span>
         </button>
     {% endif %}
     <button class="btn btn-sm btn-primary text-center inline-flex items-center"

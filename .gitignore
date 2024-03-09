@@ -131,8 +131,6 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-#  Boostrap Source Code
-bootstrap_source_scss/
 
 # NODEJS
 node_modules/
@@ -149,3 +147,6 @@ node_modules/
 # ENVIRONMENT
 .env
 .env.prod
+
+# TAILWINDCSS
+static/css/tailwind.css

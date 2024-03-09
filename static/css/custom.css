@@ -14,3 +14,20 @@ textarea.fl-textarea {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+#notes-list > li:last-child {
+    border-bottom: none;
+  }
+
+  select ~ .pointer-events-none {
+    display: none !important;
+  }
+
+@media (pointer: fine) {
+    li.edit button {
+      visibility: hidden;
+    }
+
+    li.edit:hover button {
+      visibility: visible;
+    }
