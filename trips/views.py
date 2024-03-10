@@ -387,24 +387,18 @@ def place_assign(request, pk):
 def trip_add_note(request, pk):
     trip = get_object_or_404(Trip, pk=pk, author=request.user)
 
-    if request.method == "POST":
-        form = NoteForm(trip, request.POST)
-        if form.is_valid():
-            note = form.save(commit=False)
-            note.trip = trip
-            note.save()
-            messages.add_message(
-                request,
-                messages.SUCCESS,
-                "Note added successfully",
-            )
-            return HttpResponse(status=204, headers={"HX-Trigger": "noteSaved"})
+    form = NoteForm(trip, request.POST or None)
+    if form.is_valid():
+        note = form.save(commit=False)
+        note.trip = trip
+        note.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            "Note added successfully",
+        )
+        return HttpResponse(status=204, headers={"HX-Trigger": "noteSaved"})
 
-        form = NoteForm(trip, request.POST)
-        context = {"form": form}
-        return TemplateResponse(request, "trips/note-create.html", context)
-
-    form = NoteForm(trip)
     context = {"form": form}
     return TemplateResponse(request, "trips/note-create.html", context)
 

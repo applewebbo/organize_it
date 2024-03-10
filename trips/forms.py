@@ -267,15 +267,20 @@ class NoteForm(forms.ModelForm):
     def __init__(self, trip, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["place"].queryset = Place.objects.filter(trip=trip)
+        # self.fields["place"].empty_label = "None"
         self.fields["link"].queryset = Link.objects.filter(trips=trip)
+        # self.fields["link"].empty_label = "None"
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.layout = Layout(
             Field("content", css_class="fl-textarea"),
             Div(
                 HTML(FIELDSET_CONTENT),
-                Div("place", x_show="open == 1"),
-                Div("link", x_show="open == 2"),
+                # adding an extra div here to overcome django-crispy-forms issue with two subsequent Divs getting nested
+                Div(Div("place", x_show="open == 1")),
+                Div(
+                    Div("link", x_show="open == 2"),
+                ),
                 x_data="{ open: 0 }",
                 x_init="$watch('open', () => resetInput())",
             ),
