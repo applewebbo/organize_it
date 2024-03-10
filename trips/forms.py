@@ -1,8 +1,10 @@
 from datetime import date
 
+import geocoder
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import HTML, Div, Field, Layout
 from django import forms
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import CharField, Value
@@ -188,6 +190,13 @@ class PlaceForm(forms.ModelForm):
             Field("address"),
             "day",
         )
+
+    # TODO: raise a validation error if MAPBOX not accessible
+    def clean_address(self):
+        address = self.cleaned_data["address"]
+        if not geocoder.mapbox(address, access_token=settings.MAPBOX_ACCESS_TOKEN):
+            raise ValidationError("Cannot validate your address, please retry later")
+        return address
 
 
 class PlaceAssignForm(forms.ModelForm):
