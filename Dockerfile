@@ -21,13 +21,11 @@ COPY ./requirements.txt .
 COPY ./requirements-dev.txt .
 RUN uv pip install -r requirements.txt -r requirements-dev.txt
 
-# copy entrypoint.sh
-COPY ./entrypoint.sh .
-RUN sed -i 's/\r$//g' /usr/src/app/entrypoint.sh
-RUN chmod +x /usr/src/app/entrypoint.sh
-
 # copy project
 COPY . .
 
-# run entrypoint.sh
-ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
+# expose port for gunicorn
+EXPOSE 80
+
+# run migrate and gunicorn on port 80
+CMD ["sh", "./runserver.sh"]
