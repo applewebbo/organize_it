@@ -123,6 +123,28 @@ class TestPlaceForm:
         assert form.is_valid()
         assert place == trip.places.first()
 
+    def test_no_mapbox_access_raise_validation_error(
+        self, mocker, user_factory, trip_factory, place_factory
+    ):
+        """Test the form degrade gracefully when mapbox is not available"""
+        user = user_factory()
+        trip = trip_factory(author=user, title="Test Trip")
+        day = trip.days.first()
+        data = {
+            "name": "Test Place",
+            "address": factory.Faker("street_address"),
+            "day": day,
+        }
+        form = PlaceForm(parent=trip, data=data)
+
+        if form.is_valid():
+            place = form.save(commit=False)
+            place.trip = trip
+            place.save()
+
+        assert not form.is_valid()
+        assert "Cannot validate your address, please retry later" in form.errors
+
 
 class TestPlaceAssignForm:
     def test_form(self, user_factory, trip_factory, place_factory):

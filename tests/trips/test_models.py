@@ -1,5 +1,6 @@
 # test_models.py
 from datetime import date, timedelta
+from unittest.mock import Mock, patch
 
 import factory
 import pytest
@@ -88,10 +89,21 @@ class TestDayModel:
         assert trip.days.all().first().date == date.today() + timedelta(days=1)
 
 
+mock_geocoder_response = Mock(latlng=(10.0, 20.0))
+
+
+@pytest.fixture
+def mocked_geocoder():
+    with patch(
+        "trips.models.geocoder.mapbox", return_value=mock_geocoder_response
+    ) as mocked_geocoder:
+        yield mocked_geocoder
+
+
 class TestPlaceModel:
     @pytest.mark.mapbox
     @factory.Faker.override_default_locale("it_IT")
-    def test_factory(self, user_factory, trip_factory, place_factory):
+    def test_factory(self, user_factory, trip_factory, place_factory, mocked_geocoder):
         """Test place model factory"""
         user = user_factory()
         trip = trip_factory(author=user, title="Test Trip")
@@ -104,7 +116,9 @@ class TestPlaceModel:
 
     @pytest.mark.mapbox
     @factory.Faker.override_default_locale("it_IT")
-    def test_assign_to_day(self, user_factory, trip_factory, place_factory):
+    def test_assign_to_day(
+        self, user_factory, trip_factory, place_factory, mocked_geocoder
+    ):
         """Test place assign to day"""
         user = user_factory()
         trip = trip_factory(author=user, title="Test Trip")
@@ -118,7 +132,7 @@ class TestPlaceModel:
     @pytest.mark.mapbox
     @factory.Faker.override_default_locale("it_IT")
     def test_place_unassign_on_trip_dates_update(
-        self, user_factory, trip_factory, place_factory
+        self, user_factory, trip_factory, place_factory, mocked_geocoder
     ):
         """Test place unassign on trip dates update"""
         user = user_factory()
@@ -140,7 +154,9 @@ class TestPlaceModel:
         assert trip.places.first().day is None
 
     @pytest.mark.mapbox
-    def test_unassigned_manager(self, user_factory, trip_factory, place_factory):
+    def test_unassigned_manager(
+        self, user_factory, trip_factory, place_factory, mocked_geocoder
+    ):
         """Test place unassigned manager"""
         user = user_factory()
         trip = trip_factory(author=user, title="Test Trip")
