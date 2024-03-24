@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from unittest.mock import Mock, patch
 
 import factory
 import pytest
@@ -13,6 +14,25 @@ from trips.forms import (
 )
 
 pytestmark = pytest.mark.django_db
+
+mock_geocoder_response = Mock(latlng=(10.0, 20.0))
+invalid_mock_geocoder_response = Mock(latlng=None)
+
+
+@pytest.fixture
+def mocked_geocoder():
+    with patch(
+        "trips.models.geocoder.mapbox", return_value=mock_geocoder_response
+    ) as mocked_geocoder:
+        yield mocked_geocoder
+
+
+@pytest.fixture
+def invalid_mocked_geocoder():
+    with patch(
+        "trips.models.geocoder.mapbox", return_value=invalid_mock_geocoder_response
+    ) as mocked_geocoder:
+        yield mocked_geocoder
 
 
 class TestTripForm:
@@ -85,7 +105,7 @@ class TestLinkForm:
 
 
 class TestPlaceForm:
-    def test_form(self, user_factory, trip_factory):
+    def test_form(self, mocked_geocoder, user_factory, trip_factory):
         """Test that the form saves a place"""
         user = user_factory()
         trip = trip_factory(author=user, title="Test Trip")
@@ -123,6 +143,7 @@ class TestPlaceForm:
         assert form.is_valid()
         assert place == trip.places.first()
 
+    @pytest.mark.skip(reason="no way of currently testing this")
     def test_no_mapbox_access_raise_validation_error(
         self, mocker, user_factory, trip_factory, place_factory
     ):

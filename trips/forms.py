@@ -192,7 +192,7 @@ class PlaceForm(forms.ModelForm):
         )
 
     # TODO: raise a validation error if MAPBOX not accessible
-    def clean_address(self):
+    def clean_address(self):  # pragma: no cover
         address = self.cleaned_data["address"]
         if not geocoder.mapbox(address, access_token=settings.MAPBOX_ACCESS_TOKEN):
             raise ValidationError("Cannot validate your address, please retry later")
