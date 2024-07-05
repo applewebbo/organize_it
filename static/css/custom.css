@@ -19,7 +19,7 @@ textarea.fl-textarea {
     border-bottom: none;
   }
 
-  select ~ .pointer-events-none {
+select ~ .pointer-events-none {
     display: none !important;
   }
 

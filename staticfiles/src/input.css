@@ -37,19 +37,3 @@
     @apply text-gray-900 hover:text-white border border-gray-800 hover:bg-gray-900 focus:ring-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800
   }
 }
-
-#notes-list > li:last-child {
-  border-bottom: none;
-}
-
-select ~ .pointer-events-none {
-  display: none !important;
-}
-
-li.edit button {
-  visibility: hidden;
-}
-
-li.edit:hover button {
-  visibility: visible;
-}

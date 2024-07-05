@@ -131,10 +131,6 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-
-# NODEJS
-node_modules/
-
 # RUFF
 .ruff_cache/
 
