@@ -1,6 +1,5 @@
 from .common import *  # noqa
 
-
 DATABASES = {
     "default": {
         "ENGINE": env("SQL_ENGINE"),
@@ -12,4 +11,4 @@ DATABASES = {
     }
 }
 
-CSRF_TRUSTED_ORIGINS = env.list("DJANGO_CSRF_TRUSTED_ORIGINS", default=[])
+CSRF_TRUSTED_ORIGINS: list[str] = env("DJANGO_CSRF_TRUSTED_ORIGINS")
