@@ -12,18 +12,18 @@
                  hx-trigger="tripSaved from:body"
                  hx-get="{% url 'trips:trip-list' %}"
                  hx-target="#trips">
-            <div x-data class="md:flex items-center mb-12 text-center md:text-start">
-                <h1 class="grow text-2xl font-semibold mb-2">My Trips</h1>
+            <div x-data class="items-center mb-12 text-center md:flex md:text-start">
+                <h1 class="mb-2 text-2xl font-semibold grow">My Trips</h1>
                 <button class="btn btn-sm btn-primary-outline"
                         hx-get="{% url 'trips:trip-create' %}"
                         hx-target="#dialog"
                         hx-swap="innerHTML"
                         @click="$dispatch('open-modal')">Create a new trip</button>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-y-8 gap-x-4">
+            <div class="grid grid-cols-1 gap-x-4 gap-y-8 md:grid-cols-2 xl:grid-cols-3">
                 {% for trip in active_trips %}
-                    <div class="t-card h-full" id="{{ trip.id }}">
-                        <span class="card-badge-sm bg-cyan-400 text-gray-900 border border-cyan-500">{{ trip.get_status_display }}</span>
+                    <div class="h-full t-card" id="{{ trip.id }}">
+                        <span class="text-gray-900 bg-cyan-400 border border-cyan-500 card-badge-sm">{{ trip.get_status_display }}</span>
                         <div class="card-body">
                             <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">{{ trip.title }}</h5>
                             <div x-data class="flex items-center">
@@ -41,7 +41,7 @@
                                    @click="$dispatch('open-modal')">Change</a>
                             </div>
                             <p class="mb-3 font-normal text-gray-700">{{ trip.description }}</p>
-                            <div class="text-right justify-end">
+                            <div class="justify-end text-right">
                                 <button class="btn btn-sm btn-dark-outline me-2"
                                         hx-get="{% url 'trips:trip-archive' trip.id %}"
                                         hx-target="">Archive</button>

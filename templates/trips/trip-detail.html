@@ -6,10 +6,10 @@
 {% block content %}
     <!-- Details Section -->
     <section id="details" class="text-center md:text-start">
-        <div class="w-full px-6 py-4 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-            <div class="md:flex items-center mb-3">
-                <span class="card-badge bg-cyan-400 text-gray-900 border border-cyan-500 md:order-last">{{ trip.get_status_display }}</span>
-                <h2 class="text-4xl font-semibold tracking-tight md:mr-6 mb-2 md:grow mt-4 md:mt-0">{{ trip.title }}</h2>
+        <div class="py-4 px-6 w-full bg-white rounded-lg border border-gray-200 shadow dark:bg-gray-800 dark:border-gray-700">
+            <div class="items-center mb-3 md:flex">
+                <span class="text-gray-900 bg-cyan-400 border border-cyan-500 md:order-last card-badge">{{ trip.get_status_display }}</span>
+                <h2 class="mt-4 mb-2 text-4xl font-semibold tracking-tight md:mt-0 md:mr-6 md:grow">{{ trip.title }}</h2>
             </div>
             <div id="trip-details" class="mb-4">
                 {% if trip.start_date and trip.end_date %}
@@ -22,21 +22,21 @@
                 <em>{{ trip.description }}</em>
             </p>
             <div x-data id="buttons" class="my-6">
-                <button class="btn btn-sm btn-primary mr-3 text-center inline-flex items-center"
+                <button class="inline-flex items-center mr-3 text-center btn btn-sm btn-primary"
                         hx-get="{% url 'trips:trip-add-link' trip.id %}"
                         hx-target="#dialog"
                         hx-swap="innerHTML"
                         @click="$dispatch('open-modal')">
                     {% heroicon_outline "plus" stroke_width=2 class="size-4 me-2" %}Link
                 </button>
-                <button class="btn btn-sm btn-primary mr-3 text-center inline-flex items-center"
+                <button class="inline-flex items-center mr-3 text-center btn btn-sm btn-primary"
                         hx-get="{% url 'trips:trip-add-place' trip.id %}"
                         hx-target="#dialog"
                         hx-swap="innerHTML"
                         @click="$dispatch('open-modal')">
                     {% heroicon_outline "plus" stroke_width=2 class="size-4 me-2" %}Place
                 </button>
-                <button class="btn btn-sm btn-primary mr-3 text-center inline-flex items-center"
+                <button class="inline-flex items-center mr-3 text-center btn btn-sm btn-primary"
                         hx-get="{% url 'trips:trip-add-note' trip.id %}"
                         hx-target="#dialog"
                         hx-swap="innerHTML"
@@ -48,10 +48,10 @@
     </section>
     <hr>
     <!-- Links Section -->
-    <section id="links" class="mt-6 mb-4 px-4">
+    <section id="links" class="px-4 mt-6 mb-4">
         <div x-data class="flex items-center mb-8">
-            <h3 class="text-2xl font-bold mr-4 grow">Links</h3>
-            <button class="btn btn-sm btn-primary text-center inline-flex items-center"
+            <h3 class="mr-4 text-2xl font-bold grow">Links</h3>
+            <button class="inline-flex items-center text-center btn btn-sm btn-primary"
                     hx-get="{% url 'trips:trip-add-link' trip.id %}"
                     hx-target="#dialog"
                     hx-swap="innerHTML"
@@ -65,7 +65,7 @@
             hx-get="{% url 'trips:link-list' trip.id %}"
             hx-trigger="linkSaved from:body">
             {% for link in trip.links.all %}
-                <li x-data class="edit flex mb-3 pb-2">
+                <li x-data class="flex pb-2 mb-3 edit">
                     <a href="{{ link.url }}" class="grow truncate">
                         {% if link.title %}
                             {{ link.title }}
@@ -96,27 +96,27 @@
 </section>
 <hr>
 <!-- Places Section -->
-<section id="places" class="mt-6 mb-4 px-4">
+<section id="places" class="px-4 mt-6 mb-4">
     {% partialdef place-list inline=true %}
     <div x-data
          id="place-control"
          class="flex items-center mb-8"
          hx-swap-oob="true">
-        <h3 class="text-2xl font-bold mr-4 grow">Places</h3>
+        <h3 class="mr-4 text-2xl font-bold grow">Places</h3>
         {% if trip.places.all %}
-            <button class="btn btn-sm btn-primary-outline text-center inline-flex items-center"
+            <button class="inline-flex items-center text-center btn btn-sm btn-primary-outline"
                     hx-get="{% url 'trips:map' trip.id %}"
                     hx-target="#place-list"
                     hx-swap="innerHTML">
                 {% heroicon_outline "map" stroke_width=2 class="size-4 me-0 sm:me-2" %}
                 <span class="hidden sm:block">Map</span>
             </button>
-            <button class="btn btn-sm btn-primary-outline text-center inline-flex items-center">
+            <button class="inline-flex items-center text-center btn btn-sm btn-primary-outline">
                 {% heroicon_outline "arrows-up-down" stroke_width=2 class="size-4 me-0 sm:me-2" %}
                 <span class="hidden sm:block">Reorder</span>
             </button>
         {% endif %}
-        <button class="btn btn-sm btn-primary text-center inline-flex items-center"
+        <button class="inline-flex items-center text-center btn btn-sm btn-primary"
                 hx-get="{% url 'trips:trip-add-place' trip.id %}"
                 hx-target="#dialog"
                 hx-swap="innerHTML"
@@ -130,17 +130,17 @@
              hx-get="{% url 'trips:place-list' trip.id %}"
              hx-trigger="placeSaved from:body"
              hx-target="#place-list">
-            <div class="mb-8 grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <div class="grid gap-4 mb-8 md:grid-cols-2 xl:grid-cols-3">
                 {% for day in days %}
                     {% include "trips/includes/places-single-day.html" %}
                 {% endfor %}
             </div>
             {% if not_assigned_locations.all %}
                 <div x-data class="px-4 mb-2">
-                    <h4 class="text-xl font-semibold mb-3">Places not assigned</h4>
-                    <ul class="flex flex-wrap items-center justify-start">
+                    <h4 class="mb-3 text-xl font-semibold">Places not assigned</h4>
+                    <ul class="flex flex-wrap justify-start items-center">
                         {% for place in not_assigned_locations %}
-                            <li class="me-4 mb-2 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300 border border-green-400 cursor-pointer">
+                            <li class="py-0.5 px-2.5 mb-2 text-xs font-medium text-green-800 bg-green-100 rounded border border-green-400 cursor-pointer dark:text-green-300 dark:bg-green-900 me-4">
                                 <a href="#"
                                    hx-get="{% url 'trips:place-assign' place.id %}"
                                    hx-target="#dialog"
@@ -162,10 +162,10 @@
 </section>
 <hr>
 <!-- Notes Section -->
-<section id="notes" class="mt-6 mb-4 px-4">
+<section id="notes" class="px-4 mt-6 mb-4">
     <div x-data class="flex items-center mb-8">
-        <h3 class="text-2xl font-bold mr-4 grow">Notes</h3>
-        <button class="btn btn-sm btn-primary text-center inline-flex items-center"
+        <h3 class="mr-4 text-2xl font-bold grow">Notes</h3>
+        <button class="inline-flex items-center text-center btn btn-sm btn-primary"
                 hx-get="{% url 'trips:trip-add-note' trip.id %}"
                 hx-target="#dialog"
                 hx-swap="innerHTML"
@@ -181,7 +181,7 @@
         hx-trigger="noteSaved from:body">
         {% for note in trip.notes.all %}
             <li x-data
-                class="edit flex border-b border-gray-200 mb-3 pb-2 items-center">
+                class="flex items-center pb-2 mb-3 border-b border-gray-200 edit">
                 <span class="grow truncate me-3">{{ note.content }}</span>
                 {% if note.checked == True %}
                     <button class="btn btn-xs btn-danger-outline me-2"

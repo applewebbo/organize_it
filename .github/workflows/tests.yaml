@@ -1,7 +1,7 @@
 name: Tests Runner
 on:
-  - push
-  - pull_request
+- push
+- pull_request
 
 jobs:
   test:
@@ -9,27 +9,27 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       ALLOWED_HOSTS: '*'
-      DEBUG: 'on'
-      SECRET_KEY: 'a secret to everybody'
-      MAPBOX_ACCESS_TOKEN: "pk.eyJ1Ijoid2ViYm9ncmFmaWNvIiwiYSI6ImNsbm9ja3plNDBoYzMybXBmcnVqZ3hlbzcifQ.kSMXyPpY9YTAAXixqkFk1g"
+      DEBUG: on
+      SECRET_KEY: a secret to everybody
+      MAPBOX_ACCESS_TOKEN: pk.eyJ1Ijoid2ViYm9ncmFmaWNvIiwiYSI6ImNsbm9ja3plNDBoYzMybXBmcnVqZ3hlbzcifQ.kSMXyPpY9YTAAXixqkFk1g
 
     steps:
-      - name: Get the code
-        uses: actions/checkout@v3
+    - name: Get the code
+      uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-          cache-dependency-path: 'requirements*.txt'
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: pip
+        cache-dependency-path: requirements*.txt
 
 
-      - name: Install Python packages
-        run: pip install -r requirements.txt -r requirements-dev.txt
+    - name: Install Python packages
+      run: pip install -r requirements.txt -r requirements-dev.txt
 
-      - name: Test it
-        run: make ftest
+    - name: Test it
+      run: make ftest
 
       # - name: Check deploy configuration
       #   run: ./manage.py check --deploy --fail-level WARNING

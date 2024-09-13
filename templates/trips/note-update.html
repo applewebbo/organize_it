@@ -4,10 +4,10 @@
       hx-disabled-elt="#form-submit"
       class="modal-content"
       method="post">
-    <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+    <div class="flex justify-between items-center p-4 rounded-t border-b md:p-5 dark:border-gray-600">
         <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Update Note</h3>
         <button type="button"
-                class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                class="inline-flex justify-center items-center w-8 h-8 text-sm text-gray-400 bg-transparent rounded-lg hover:text-gray-900 hover:bg-gray-200 ms-auto dark:hover:bg-gray-600 dark:hover:text-white"
                 x-on:click="openModal = false">
             <svg class="w-3 h-3"
                  aria-hidden="true"
@@ -19,14 +19,14 @@
             <span class="sr-only">Close modal</span>
         </button>
     </div>
-    <div class="p-4 md:p-5 space-y-4">
+    <div class="p-4 space-y-4 md:p-5">
         {% csrf_token %}
         {% crispy form %}
     </div>
-    <div class="font flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600 justify-end">
+    <div class="flex justify-end items-center p-4 rounded-b border-t border-gray-200 md:p-5 dark:border-gray-600 font">
         <button type="button"
                 x-on:click="openModal = false"
-                class="btn btn-outline btn-error mr-2">Cancel</button>
+                class="mr-2 btn btn-outline btn-error">Cancel</button>
         <button id="form-submit" class="btn btn-outline btn-primary" type="submit">Save</button>
     </div>
 </form>

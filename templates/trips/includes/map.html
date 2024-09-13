@@ -1,8 +1,8 @@
-<div id="map" class="mb-4 z-0"></div>
+<div id="map" class="z-0 mb-4"></div>
 {{ locations|json_script:"location_json" }}
 {{ map_bounds|json_script:"map_bounds" }}
 <div class="flex justify-center">
-    <div class="inline-flex rounded-md shadow-sm mt-2 mb-4" role="group">
+    <div class="inline-flex mt-2 mb-4 rounded-md shadow-sm" role="group">
         {% for day in days %}
             <button type="button"
                     hx-get="{% url 'trips:map' trip.id day.pk %}"
@@ -21,21 +21,21 @@
     </div>
 </div>
 <div id="place-control" class="flex items-center mb-8" hx-swap-oob="true">
-    <h3 class="text-2xl font-bold mr-4 grow">Places</h3>
+    <h3 class="mr-4 text-2xl font-bold grow">Places</h3>
     {% if trip.places.all %}
-        <button class="btn btn-sm btn-primary-outline text-center inline-flex items-center"
+        <button class="inline-flex items-center text-center btn btn-sm btn-primary-outline"
                 hx-get="{% url 'trips:place-list' trip.id %}"
                 hx-target="#place-list"
                 hx-swap="innerHTML">
             {% heroicon_outline "list-bullet" stroke_width=2 class="size-4 me-0 sm:me-2" %}
             <span class="hidden sm:block">List view</span>
         </button>
-        <button class="btn btn-sm btn-primary-outline text-center inline-flex items-center">
+        <button class="inline-flex items-center text-center btn btn-sm btn-primary-outline">
             {% heroicon_outline "arrows-up-down" stroke_width=2 class="size-4 me-0 sm:me-2" %}
             <span class="hidden sm:block">Reorder</span>
         </button>
     {% endif %}
-    <button class="btn btn-sm btn-primary text-center inline-flex items-center"
+    <button class="inline-flex items-center text-center btn btn-sm btn-primary"
             hx-get="{% url 'trips:trip-add-place' trip.id %}"
             hx-target="#dialog"
             hx-swap="innerHTML"
