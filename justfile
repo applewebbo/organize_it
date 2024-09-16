@@ -5,7 +5,7 @@ default:
 
 # Run the local development server
 local:
-    python manage.py runserver --settings=core.settings.development
+    python manage.py tailwind --settings=core.settings.development runserver
 
 # Install requirements
 requirements:
@@ -23,17 +23,9 @@ update package:
 migrate:
     python manage.py migrate --settings=core.settings.development
 
-# Watch for changes and rebuild
-watch:
-    npm run dev
-
-# Build the project
-build:
-    npm run build
-
 # Run tests
 test:
-    pytest
+    COVERAGE_CORE=sysmon python -m pytest --reuse-db -s
 
 # Run fast tests
 ftest:
@@ -41,7 +33,7 @@ ftest:
 
 # Run tests excluding mapbox and generate coverage report
 mptest:
-    pytest -m "not mapbox" --cov-report html:htmlcov --cov-report term:skip-covered --cov-fail-under 100
+    COVERAGE_CORE=sysmon python -m pytest -m "not mapbox" --cov-report html:htmlcov --cov-report term:skip-covered --cov-fail-under 100
 
 # Set up Docker database
 dockerdb:
