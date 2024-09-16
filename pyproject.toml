@@ -7,14 +7,14 @@ dependencies = [
   "django-environ>=0.11.2",
   "django-htmx>=1.19.0",
   "django-q2>=1.7.2",
+  "django-tailwind-cli>=2.15.0",
   "django-template-partials>=24.4",
   "django>=5.1.1",
   "folium>=0.17.0",
   "geocoder>=1.38.1",
   "gunicorn>=23.0.0",
-  "heroicons>=2.8.0",
-  "psycopg>=3.2.1",
-  "psycopg-binary>=3.2.1",
+  "heroicons[django]>=2.8.0",
+  "psycopg[binary]>=3.2.1",
   "whitenoise>=6.7.0"
 ]
 description = "Add your description here"

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "crispy_forms",
     "django_htmx",
     "django_extensions",
+    "django_tailwind_cli",
     "heroicons",
     "template_partials",
     "django_q",
