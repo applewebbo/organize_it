@@ -7,13 +7,13 @@ repos:
   - id: check-yaml
   - id: check-added-large-files
 - repo: https://github.com/asottile/pyupgrade
-  rev: v3.16.0
+  rev: v3.17.0
   hooks:
   - id: pyupgrade
     args:
       - "--py311-plus"
 - repo: https://github.com/adamchainz/django-upgrade
-  rev: 1.20.0
+  rev: 1.21.0
   hooks:
   - id: django-upgrade
     args: [--target-version, "5.0"]
@@ -25,12 +25,12 @@ repos:
 #     - id: djcss
 #     - id: djjs
 - repo: https://github.com/djlint/djLint
-  rev: v1.34.1
+  rev: v1.35.2
   hooks:
     - id: djlint-reformat-django
     - id: djlint-django
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.5.4
+  rev: v0.6.5
   hooks:
     - id: ruff
       args: [--fix, --exit-non-zero-on-fix]
