@@ -1,4 +1,4 @@
-{% load i18n static django_htmx %}
+{% load i18n static django_htmx tailwind_cli %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -17,7 +17,7 @@
               type="image/png"
               href="{% static 'img/favicon.png' %}">
         <!-- Tailwind CSS -->
-        <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+        {% tailwind_css %}
         <!-- Custom CSS -->
         <link rel="stylesheet" href="{% static 'css/custom.css' %}">
     </head>
