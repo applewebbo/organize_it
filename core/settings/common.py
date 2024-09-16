@@ -262,3 +262,6 @@ Q_CLUSTER = {
     "orm": "default",
     "catch_up": False,
 }
+
+# DJANGO_TAILWIND_CLI
+TAILWIND_CLI_SRC_CSS = "static/src/input.css"
