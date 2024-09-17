@@ -3,6 +3,13 @@
 default:
     @just --list
 
+# Bootstrap the project (UV and BUN needed)
+bootstrap:
+    uv venv
+    source .venv/bin/activate
+    uv sync
+    bun add -D daisyui@latest
+
 # Run the local development server
 local:
     python manage.py tailwind --settings=core.settings.development runserver

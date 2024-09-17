@@ -10,7 +10,7 @@
             <div class="flex items-end space-x-3 md:order-2 md:space-x-0 rtl:space-x-reverse">
                 {% if user.is_authenticated %}
                 {% else %}
-                    <a href="{% url 'account_login' %}" class="btn btn-primary">Log in</a>
+                    <a href="{% url 'account_login' %}" class="btn btn-sm btn-primary">Log in</a>
                 {% endif %}
                 <button type="button"
                         class="inline-flex justify-center items-center p-2 w-10 h-10 text-sm text-gray-500 rounded-lg md:hidden dark:text-gray-400 hover:bg-gray-100 focus:ring-2 focus:ring-gray-200 focus:outline-none dark:hover:bg-gray-700 dark:focus:ring-gray-600"

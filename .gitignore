@@ -137,8 +137,10 @@ cython_debug/
 # VSCODE
 .vscode/
 
-# NODE
+# BUN
 node_modules/
+package.json
+bun.lockb
 
 # ENVIRONMENT
 .env
