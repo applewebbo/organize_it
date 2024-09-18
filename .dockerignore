@@ -1,9 +1,0 @@
-.venv
-.git
-.gitignore
-tests
-.coverage
-nginx
-node_modules
-htmlcov
-.coverage
