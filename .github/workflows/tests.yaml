@@ -17,20 +17,17 @@ jobs:
     - name: Get the code
       uses: actions/checkout@v3
 
-    - name: Install uv
+    - name: Install uv with cache enabled
       uses: astral-sh/setup-uv@v2
-
-    - uses: extractions/setup-just@v2
       with:
-        github-token: ${{ secrets.MY_GITHUB_TOKEN }}
+        enable-cache: true
+        cache-dependency-glob: uv.lock
 
     - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version-file: .python-version
+      run: uv python install
 
     - name: Install Python packages
-      run: uv sync --all-extras --no-dev
+      run: uv sync --all-extras --dev
 
     - name: Test it
-      run: make ftest
+      run: uv run COVERAGE_CORE=sysmon python -m pytest --reuse-db -s
