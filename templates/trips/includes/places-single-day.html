@@ -1,12 +1,12 @@
 <div id="day-{{ day.number }}"
-     class="px-5 py-4 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+     class="py-4 px-5 bg-white rounded-lg border border-gray-200 shadow dark:bg-gray-800 dark:border-gray-700">
     <div class="flex items-center">
-        <h3 class="grow py-3 font-lg font-bold tracking-tight">Day {{ day.number }}</h3>
+        <h3 class="py-3 font-bold tracking-tight grow font-lg">Day {{ day.number }}</h3>
     </div>
     <ul class="my-2">
         {% for place in day.places.all %}
-            <li class="edit flex items-center py-2">
-                <div class="grow text-sm truncate">{{ place.name }}</div>
+            <li class="flex items-center py-2 edit">
+                <div class="text-sm grow truncate">{{ place.name }}</div>
                 <button class="btn btn-xs btn-primary-outline me-2"
                         hx-get="{% url 'trips:place-update' place.id %}"
                         hx-target="#dialog"

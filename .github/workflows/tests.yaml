@@ -1,7 +1,7 @@
 name: Tests Runner
 on:
-  - push
-  - pull_request
+  push:
+    branches: [main]
 
 jobs:
   test:
@@ -9,31 +9,28 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       ALLOWED_HOSTS: '*'
-      DEBUG: 'on'
-      SECRET_KEY: 'a secret to everybody'
-      MAPBOX_ACCESS_TOKEN: "pk.eyJ1Ijoid2ViYm9ncmFmaWNvIiwiYSI6ImNsbm9ja3plNDBoYzMybXBmcnVqZ3hlbzcifQ.kSMXyPpY9YTAAXixqkFk1g"
+      DEBUG: on
+      SECRET_KEY: a secret to everybody
+      MAPBOX_ACCESS_TOKEN: ${{ secrets.MAPBOX_ACCESS_TOKEN }}
 
     steps:
-      - name: Get the code
-        uses: actions/checkout@v3
+    - name: Get the code
+      uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-          cache-dependency-path: 'requirements*.txt'
+    - name: Install uv
+      uses: astral-sh/setup-uv@v2
 
+    - uses: extractions/setup-just@v2
+      with:
+        github-token: ${{ secrets.MY_GITHUB_TOKEN }}
 
-      - name: Install Python packages
-        run: pip install -r requirements.txt -r requirements-dev.txt
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version-file: .python-version
 
-      - name: Test it
-        run: make ftest
+    - name: Install Python packages
+      run: uv sync --all-extras --no-dev
 
-      # - name: Check deploy configuration
-      #   run: ./manage.py check --deploy --fail-level WARNING
-      #   env:
-      #     DATABASE_URL: 'sqlite://:memory:'
-      #     SECRET_KEY: 'zt(6jlr#oquxm2t%ryh#n+-72p^(3knbf&q$5x16#o%1im-s7!'
-      #     SECURE_SSL_REDIRECT: 'on'
+    - name: Test it
+      run: make ftest

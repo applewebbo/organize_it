@@ -3,37 +3,16 @@
 @tailwind utilities;
 
 @layer components {
-  .card-badge {
-    @apply font-medium me-2 px-3.5 py-1.5 rounded;
-  }
-  .card-badge-sm{
-    @apply font-medium me-2 text-sm px-2 py-0.5 rounded;
-  }
-  .t-card{
-    @apply p-4 bg-white border border-gray-200 rounded-lg shadow mb-5 relative;
-  }
   p{
     @apply mb-3 font-normal text-gray-700;
   }
-  .btn{
-    @apply text-white  focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 focus:outline-none
+
+  .card-badge{
+    @apply text-info-content absolute px-2.5 py-1.5 right-0 top-0 -mt-4 me-6 bg-info rounded-md;
   }
-  .btn-sm{
-    @apply px-3 py-2 text-sm
+
+  .card-badge-neutral{
+    @apply text-base-content bg-base-200 border border-base-300 ;
   }
-  .btn-xs{
-    @apply px-2.5 py-1.5 text-xs
-  }
-  .btn-primary{
-    @apply bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800
-  }
-  .btn-primary-outline{
-    @apply text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-500 dark:focus:ring-blue-800
-  }
-  .btn-danger-outline{
-    @apply text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-red-300 dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900
-  }
-  .btn-dark-outline{
-    @apply text-gray-900 hover:text-white border border-gray-800 hover:bg-gray-900 focus:ring-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800
-  }
+
 }

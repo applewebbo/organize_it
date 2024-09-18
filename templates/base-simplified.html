@@ -1,4 +1,4 @@
-{% load i18n static django_htmx %}
+{% load i18n static django_htmx tailwind_cli %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -17,13 +17,13 @@
               type="image/png"
               href="{% static 'img/favicon.png' %}">
         <!-- Tailwind CSS -->
-        <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+        {% tailwind_css %}
         <!-- Custom CSS -->
         <link rel="stylesheet" href="{% static 'css/custom.css' %}">
     </head>
     <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
           class="bg-secondary-subtle">
-        <section class="bg-gray-50 dark:bg-gray-900 h-screen">
+        <section class="h-screen bg-gray-50 dark:bg-gray-900">
             {% block content %}
             {% endblock content %}
         </section>

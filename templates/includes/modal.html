@@ -8,7 +8,7 @@
          aria-modal="true"
          x-id="['modal-title']"
          :aria-labelledby="$id('modal-title')"
-         class="fixed inset-0 z-50 overflow-y-auto">
+         class="overflow-y-auto fixed inset-0 z-50">
         <!-- Overlay -->
         <div x-show="openModal"
              x-transition.opacity
@@ -17,11 +17,11 @@
         <div x-show="openModal"
              x-transition
              x-on:click="openModal = false"
-             class="relative flex min-h-screen items-center justify-center p-4">
+             class="flex relative justify-center items-center p-4 min-h-screen">
             <div x-on:click.stop
                  x-trap.noscroll.inert="openModal"
                  id="dialog"
-                 class="relative w-full max-w-2xl overflow-y-auto rounded-lg bg-white shadow"></div>
+                 class="overflow-y-auto relative w-full max-w-2xl bg-white rounded-lg shadow"></div>
         </div>
     </div>
 </div>
