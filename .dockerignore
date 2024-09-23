@@ -1,0 +1,7 @@
+.venv
+.git
+.gitignore
+node_modules
+ruff_cache
+pytest_cache
+html_cov
