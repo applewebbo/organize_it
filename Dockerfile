@@ -30,8 +30,6 @@ COPY pyproject.toml ./
 COPY uv.lock ./
 RUN uv sync --frozen --no-dev --no-install-project
 
-
-
 # copy project
 WORKDIR /app
 COPY . /app
