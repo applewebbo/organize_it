@@ -36,9 +36,6 @@ RUN uv sync --frozen --no-dev --no-install-project
 WORKDIR /app
 COPY . /app
 
-# Build Static Files
-RUN python manage.py collectstatic --no-input
-
 # expose port for granian
 EXPOSE 80
 
