@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import dj_database_url
@@ -19,7 +20,8 @@ env = environ.Env(
     SECURE_SSL_REDIRECT=(bool, True),
 )
 
-environ.Env.read_env(BASE_DIR / ".env")
+# # Take environment variables from .env file
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 SECRET_KEY = env("SECRET_KEY")
 
