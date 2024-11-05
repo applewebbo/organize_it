@@ -1,3 +1,6 @@
+.env
+.env.prod
+.env.dev
 .venv
 .git
 .gitignore
