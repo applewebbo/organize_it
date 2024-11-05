@@ -710,6 +710,7 @@ dependencies = [
     { name = "django-q2" },
     { name = "django-tailwind-cli" },
     { name = "django-template-partials" },
+    { name = "factory-boy" },
     { name = "folium" },
     { name = "geocoder" },
     { name = "gunicorn" },
@@ -718,7 +719,7 @@ dependencies = [
     { name = "whitenoise" },
 ]
 
-[package.dev-dependencies]
+[package.dependency-groups]
 dev = [
     { name = "coverage" },
     { name = "django-browser-reload" },
@@ -727,7 +728,6 @@ dev = [
     { name = "django-extensions" },
     { name = "django-test-plus" },
     { name = "djlint" },
-    { name = "factory-boy" },
     { name = "pre-commit" },
     { name = "pytest-cov" },
     { name = "pytest-django" },
@@ -750,6 +750,7 @@ requires-dist = [
     { name = "django-q2", specifier = ">=1.7.2" },
     { name = "django-tailwind-cli", specifier = ">=2.15.0" },
     { name = "django-template-partials", specifier = ">=24.4" },
+    { name = "factory-boy", specifier = ">=3.3.1" },
     { name = "folium", specifier = ">=0.17.0" },
     { name = "geocoder", specifier = ">=1.38.1" },
     { name = "gunicorn", specifier = ">=23.0.0" },
@@ -758,7 +759,7 @@ requires-dist = [
     { name = "whitenoise", specifier = ">=6.7.0" },
 ]
 
-[package.metadata.requires-dev]
+[package.metadata.dependency-groups]
 dev = [
     { name = "coverage", specifier = ">=7.6.1" },
     { name = "django-browser-reload", specifier = ">=1.15.0" },
@@ -767,7 +768,6 @@ dev = [
     { name = "django-extensions", specifier = ">=3.2.3" },
     { name = "django-test-plus", specifier = ">=2.2.4" },
     { name = "djlint", specifier = ">=1.35.2" },
-    { name = "factory-boy", specifier = ">=3.3.1" },
     { name = "pre-commit", specifier = ">=3.8.0" },
     { name = "pytest-cov", specifier = ">=5.0.0" },
     { name = "pytest-django", specifier = ">=4.9.0" },
