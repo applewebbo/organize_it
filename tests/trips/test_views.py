@@ -131,7 +131,7 @@ class TripCreateView(TestCase):
         self.response_204(response)
         trip = Trip.objects.filter(author=user).first()
         message = list(get_messages(response.wsgi_request))[0].message
-        assert message == f"<strong>{ trip.title }</strong> added successfully"
+        assert message == f"<strong>{trip.title}</strong> added successfully"
         assert Trip.objects.filter(author=user).count() == 1
 
     def test_post_with_invalid_start_date(self):
@@ -160,7 +160,7 @@ class TripDeleteView(TestCase):
 
         self.response_204(response)
         message = list(get_messages(response.wsgi_request))[0].message
-        assert message == f"<strong>{ trip.title }</strong> deleted successfully"
+        assert message == f"<strong>{trip.title}</strong> deleted successfully"
         assert Trip.objects.filter(author=user).count() == 0
 
 
@@ -217,7 +217,7 @@ class TripArchiveView(TestCase):
 
         self.response_204(response)
         message = list(get_messages(response.wsgi_request))[0].message
-        assert message == f"<strong>{ trip.title }</strong> archived successfully"
+        assert message == f"<strong>{trip.title}</strong> archived successfully"
         assert Trip.objects.filter(author=user).count() == 1
         assert Trip.objects.filter(author=user, status=5).count() == 1
 
@@ -389,7 +389,7 @@ class TripAddPlace(TestCase):
 
         self.response_204(response)
         message = list(get_messages(response.wsgi_request))[0].message
-        assert message == f"<strong>{ data['name'] }</strong> added successfully"
+        assert message == f"<strong>{data['name']}</strong> added successfully"
         assert trip.places.count() == 1
 
     def test_post_with_invalid_data(self):
