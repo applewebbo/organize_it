@@ -16,7 +16,7 @@ repos:
   rev: 1.23.1
   hooks:
   - id: django-upgrade
-    args: [--target-version, '5.0']
+    args: [--target-version, '5.1']
 - repo: https://github.com/djlint/djLint
   rev: v1.36.4
   hooks:

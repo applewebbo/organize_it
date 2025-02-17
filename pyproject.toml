@@ -70,5 +70,6 @@ dev-dependencies = [
   "pytest-mock>=3.14.0",
   "pytest-xdist>=3.6.1",
   "pywatchman>=2.0.0",
+  "ruff>=0.9.6",
   "werkzeug>=3.0.4"
 ]

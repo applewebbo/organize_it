@@ -8,7 +8,7 @@ bootstrap:
     uv venv
     source .venv/bin/activate
     uv sync
-    bun add -D daisyui@latest
+    bun add -D daisyui@beta
 
 # Run the local development server
 local:
@@ -24,7 +24,7 @@ update_all:
 
 # Update a specific package
 update package:
-    uv sync --upgrade-package
+    uv sync --upgrade-package package
 
 # Run database migrations
 migrate:
@@ -51,3 +51,14 @@ dockerdb:
 # Run the cluster
 cluster:
     python manage.py qcluster --settings=core.settings.development
+
+lint:
+    uv run ruff check --fix --unsafe-fixes .
+    uv run ruff format .
+    just _pre-commit run --all-files
+
+_pre-commit *args:
+    uvx --with pre-commit-uv pre-commit {{ args }}
+
+secure:
+    uv-secure
