@@ -26,6 +26,7 @@ def urlfields_assume_https(db_field, **kwargs):
 class TripForm(forms.ModelForm):
     title = forms.CharField(label="Titolo")
     description = forms.CharField(widget=forms.Textarea(), label="Descrizione")
+    destination = forms.CharField(label="Destinazione")
     start_date = forms.DateField(
         label="Inizio", required=False, widget=forms.DateInput(attrs={"type": "date"})
     )
@@ -35,7 +36,7 @@ class TripForm(forms.ModelForm):
 
     class Meta:
         model = Trip
-        fields = ["title", "description", "start_date", "end_date"]
+        fields = ["title", "destination", "description", "start_date", "end_date"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -44,7 +45,11 @@ class TripForm(forms.ModelForm):
         self.helper.layout = Layout(
             Div(
                 "title",
-                css_class="sm:col-span-2",
+                css_class="w-full",
+            ),
+            Div(
+                "destination",
+                css_class="w-full",
             ),
             Div(
                 Field("description", css_class="fl-textarea"),
@@ -75,6 +80,13 @@ class TripForm(forms.ModelForm):
         if start_date and start_date < date.today():
             raise ValidationError("Start date must be after today")
         return start_date
+
+    def clean_destination(self):
+        destination = self.cleaned_data.get("destination")
+        g = geocoder.mapbox(destination)
+        if not g.latlng:
+            raise ValidationError("Destination not found")
+        return destination
 
 
 class TripDateUpdateForm(forms.ModelForm):

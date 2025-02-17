@@ -23,6 +23,7 @@ class Trip(models.Model):
 
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=500)
+    destination = models.CharField(max_length=100)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
@@ -73,6 +74,7 @@ def update_trip_days(sender, instance, **kwargs):
             trip=instance,
             number=day + 1,
             date=instance.start_date + timedelta(days=day),
+            location=instance.destination,
         )
 
 
@@ -80,10 +82,29 @@ class Day(models.Model):
     trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="days")
     number = models.PositiveSmallIntegerField()
     date = models.DateField()
+    location = models.CharField(max_length=100)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            old = type(self).objects.get(pk=self.pk)
+            # if address is not changed, don't update coordinates
+            if old.location == self.location:
+                return super().save(*args, **kwargs)
+
+        # Only try to geocode if we have a location
+        if self.location:
+            g = geocoder.mapbox(
+                self.location, access_token=settings.MAPBOX_ACCESS_TOKEN
+            )
+            self.latitude, self.longitude = g.latlng
+
+        return super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         day = _("Day")
-        return f"{day} {self.number}"
+        return f"{day} {self.number} [{self.location}]"
 
 
 class Link(models.Model):

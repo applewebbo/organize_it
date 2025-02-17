@@ -136,6 +136,7 @@ cython_debug/
 
 # VSCODE
 .vscode/
+.qodo/
 
 # BUN
 node_modules/

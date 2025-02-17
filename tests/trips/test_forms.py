@@ -27,14 +27,6 @@ def mocked_geocoder():
         yield mocked_geocoder
 
 
-@pytest.fixture
-def invalid_mocked_geocoder():
-    with patch(
-        "trips.models.geocoder.mapbox", return_value=invalid_mock_geocoder_response
-    ) as mocked_geocoder:
-        yield mocked_geocoder
-
-
 class TestTripForm:
     def test_form(self):
         data = {
@@ -42,6 +34,7 @@ class TestTripForm:
             "description": "Test Description",
             "start_date": date.today() + timedelta(days=10),
             "end_date": date.today() + timedelta(days=12),
+            "destination": "Milano",
         }
         form = TripForm(data=data)
 
@@ -53,6 +46,7 @@ class TestTripForm:
             "description": "Test Description",
             "start_date": date.today() + timedelta(days=12),
             "end_date": date.today() + timedelta(days=10),
+            "destination": "Milano",
         }
         form = TripForm(data=data)
 
@@ -65,11 +59,46 @@ class TestTripForm:
             "description": "Test Description",
             "start_date": date.today() - timedelta(days=7),
             "end_date": date.today() + timedelta(days=10),
+            "destination": "Milano",
         }
         form = TripForm(data=data)
 
         assert not form.is_valid()
         assert "Start date must be after today" in form.errors["start_date"]
+
+    def test_clean_destination_valid(self, mocker):
+        """Test destination validation with valid location"""
+        mock_geocoder = mocker.patch("geocoder.mapbox")
+        mock_geocoder.return_value.ok = True
+
+        data = {
+            "title": "Test Trip",
+            "description": "Test Description",
+            "destination": "Paris",
+            "start_date": date.today() + timedelta(days=1),
+            "end_date": date.today() + timedelta(days=3),
+        }
+        form = TripForm(data=data)
+
+        assert form.is_valid()
+        assert form.cleaned_data["destination"] == "Paris"
+
+    def test_clean_destination_invalid(self, mocker):
+        """Test destination validation with invalid location"""
+        mock_geocoder = mocker.patch("geocoder.mapbox")
+        mock_geocoder.return_value.ok = False
+
+        data = {
+            "title": "Test Trip",
+            "description": "Test Description",
+            "destination": "NonExistentPlace",
+            "start_date": date.today() + timedelta(days=1),
+            "end_date": date.today() + timedelta(days=3),
+        }
+        form = TripForm(data=data)
+
+        assert not form.is_valid()
+        assert "Destination not found" in form.errors["destination"]
 
 
 class TestTripDateUpdateForm:
