@@ -6,10 +6,10 @@
 {% block content %}
     <!-- Details Section -->
     <section id="details" class="text-center md:text-start">
-        <div class="py-4 px-6 w-full bg-white rounded-lg border border-gray-200 shadow dark:bg-gray-800 dark:border-gray-700">
+        <div class="py-4 px-6 w-full bg-white rounded-lg border border-gray-200 shadow">
             <div class="items-center mb-3 md:flex">
-                <h2 class="mt-4 mb-2 text-4xl font-semibold tracking-tight md:mt-0 md:mr-6 md:grow">
-                    {{ trip.title }} <span class="mb-2 badge badge-md badge-secondary badge-outline ms-2">{{ trip.get_status_display }}</span>
+                <h2 class="mt-4 mb-2 text-3xl font-semibold tracking-tight md:mt-0 md:mr-6 lg:text-4xl md:grow">
+                    {{ trip.title }} <span class="mb-2 badge badge-sm badge-secondary badge-outline ms-2 lg:badge-md">{{ trip.get_status_display }}</span>
                 </h2>
                 <div x-data>
                     <button class="hidden items-center mx-auto md:flex md:mx-0 btn btn-lg btn-primary btn-outline">
