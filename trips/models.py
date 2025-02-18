@@ -159,3 +159,22 @@ class Note(models.Model):
 
     def __str__(self) -> str:
         return f"{self.content[:35]} ..."
+
+
+class Transport(models.Model):
+    class Type(models.IntegerChoices):
+        PLANE = 1, _("Plane")
+        TRAIN = 2, _("Train")
+        BOAT = 3, _("Boat")
+        BUS = 4, _("Bus")
+        TAXI = 5, _("Taxi")
+        OTHER = 6, _("Other")
+
+    day = models.ForeignKey(Day, on_delete=models.CASCADE, related_name="transports")
+    name = models.CharField(max_length=100)
+    start = models.CharField(max_length=100)
+    destination = models.CharField(max_length=100)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    order = models.PositiveSmallIntegerField()
+    type = models.IntegerField(choices=Type.choices, default=Type.PLANE)
