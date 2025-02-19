@@ -11,11 +11,31 @@
                 <h2 class="mt-4 mb-2 text-3xl font-semibold tracking-tight md:mt-0 md:mr-6 lg:text-4xl md:grow">
                     {{ trip.title }} <span class="mb-2 badge badge-sm badge-secondary badge-outline ms-2 lg:badge-md">{{ trip.get_status_display }}</span>
                 </h2>
-                <div x-data>
-                    <button class="hidden items-center mx-auto md:flex md:mx-0 btn btn-lg btn-primary btn-outline">
-                        {% heroicon_solid "plus" class="w-6 h-6 md:me-2" %}
+                <div class="dropdown dropdown-bottom dropdown-end" x-data>
+                    <div tabindex="0"
+                         role="button"
+                         class="hidden items-center m-1 mx-auto md:flex md:mx-0 btn">
                         Add
-                    </button>
+                        {% heroicon_mini "chevron-down" class="size-4" %}
+                    </div>
+                    <ul tabindex="0"
+                        class="z-20 p-2 w-52 shadow dropdown-content menu bg-base-100 rounded-box border-1 border-base-300">
+                        <li>
+                            <a hx-get="{% url 'trips:trip-add-link' trip.id %}"
+                               hx-target="#dialog"
+                               hx-swap="innerHTML"
+                               @click="$dispatch('open-modal'); document.activeElement.blur()">Transport</a>
+                        </li>
+                        <li>
+                            <a>Experience</a>
+                        </li>
+                        <li>
+                            <a>Meal</a>
+                        </li>
+                        <li>
+                            <a>Stay</a>
+                        </li>
+                    </ul>
                 </div>
             </div>
             <div id="trip-details"
@@ -42,11 +62,31 @@
             <p class="hidden md:block">
                 <em>{{ trip.description }}</em>
             </p>
-            <div x-data>
-                <button class="items-center mx-auto w-full md:hidden md:mx-0 btn btn-lg btn-primary btn-outline">
-                    {% heroicon_solid "plus" class="w-6 h-6 md:me-2" %}
+            <div class="dropdown dropdown-bottom dropdown-end" x-data>
+                <div tabindex="0"
+                     role="button"
+                     class="items-center m-1 mx-auto w-full md:hidden md:mx-0 btn">
                     Add
-                </button>
+                    {% heroicon_mini "chevron-down" class="size-4" %}
+                </div>
+                <ul tabindex="0"
+                    class="z-20 p-2 w-52 shadow dropdown-content menu bg-base-100 rounded-box">
+                    <li>
+                        <a hx-get="{% url 'trips:trip-add-link' trip.id %}"
+                           hx-target="#dialog"
+                           hx-swap="innerHTML"
+                           @click="$dispatch('open-modal'); document.activeElement.blur()">Transport</a>
+                    </li>
+                    <li>
+                        <a>Experience</a>
+                    </li>
+                    <li>
+                        <a>Meal</a>
+                    </li>
+                    <li>
+                        <a>Stay</a>
+                    </li>
+                </ul>
             </div>
         </div>
     </section>
