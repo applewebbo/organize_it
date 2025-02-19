@@ -12,6 +12,7 @@ from .forms import (
     NoteForm,
     PlaceAssignForm,
     PlaceForm,
+    TransportForm,
     TripDateUpdateForm,
     TripForm,
 )
@@ -455,3 +456,10 @@ def note_check_or_uncheck(request, pk):
         status=204,
         headers={"HX-Trigger": "noteSaved"},
     )
+
+
+def trip_add_transport(request, pk):
+    trip = get_object_or_404(Trip, pk=pk, author=request.user)
+    form = TransportForm(trip, request.POST or None)
+    context = {"form": form}
+    return TemplateResponse(request, "trips/transport-create.html", context)

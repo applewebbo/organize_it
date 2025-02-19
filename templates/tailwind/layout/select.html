@@ -1,0 +1,14 @@
+{% load crispy_forms_filters l10n tailwind_filters %}
+{% comment %} <div class="relative"> {% endcomment %}
+<select class="select {% if field.errors %}select-error{% endif %}"
+        name="{{ field.html_name }}"
+        {{ field|build_attrs }}>
+    {% for group, options, index in field|optgroups %}
+        {% if group %}<optgroup label="{{ group }}">{% endif %}
+            {% for option in options %}
+                {% include "tailwind/layout/select_option.html" %}
+            {% endfor %}
+            {% if group %}</optgroup>{% endif %}
+    {% endfor %}
+</select>
+{% comment %} </div> {% endcomment %}

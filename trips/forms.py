@@ -8,9 +8,10 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import CharField, Value
-from django.db.models.functions import Concat
+from django.db.models.functions import Concat, ExtractDay, ExtractMonth
+from django.utils.translation import gettext_lazy as _
 
-from .models import Day, Link, Note, Place, Trip
+from .models import Day, Link, Note, Place, Transport, Trip
 
 
 def urlfields_assume_https(db_field, **kwargs):
@@ -230,7 +231,7 @@ class PlaceAssignForm(forms.ModelForm):
             .annotate(
                 formatted_choice=Concat(
                     "date",
-                    Value(" (Day "),
+                    Value(_("Day")),
                     "number",
                     Value(")"),
                     output_field=CharField(),
@@ -305,4 +306,64 @@ class NoteForm(forms.ModelForm):
                 x_data="{ open: 0 }",
                 x_init="$watch('open', () => resetInput())",
             ),
+        )
+
+
+class TransportForm(forms.ModelForm):
+    class Meta:
+        model = Transport
+        fields = [
+            "name",
+            "type",
+            "day",
+            "departure",
+            "destination",
+            "start_time",
+            "end_time",
+        ]
+        formfield_callback = urlfields_assume_https
+        widgets = {
+            "name": forms.TextInput(attrs={"placeholder": "Name"}),
+            "type": forms.Select(
+                attrs={"class": "select select-bordered w-full max-w-xs"}
+            ),
+            "day": forms.Select(attrs={"class": "form-select"}),
+            "departure": forms.TextInput(attrs={"placeholder": "Departure"}),
+            "destination": forms.TextInput(attrs={"placeholder": "Destination"}),
+            "start_time": forms.TimeInput(attrs={"type": "time"}),
+            "end_time": forms.TimeInput(attrs={"type": "time"}),
+        }
+
+    def __init__(self, trip, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.fields["type"].choices = Transport.Type.choices
+        self.fields["day"].choices = (
+            Day.objects.filter(trip=trip)
+            .annotate(
+                formatted_choice=Concat(
+                    Value("Day "),
+                    "number",
+                    Value(" ("),
+                    ExtractDay("date"),
+                    Value("/"),
+                    ExtractMonth("date"),
+                    Value(")"),
+                    output_field=CharField(),
+                )
+            )
+            .values_list("id", "formatted_choice")
+        )
+        self.helper.layout = Layout(
+            Div(
+                "name",
+                css_class="sm:col-span-2",
+            ),
+            Field("type", css_class="select select-primary"),
+            "day",
+            "departure",
+            "destination",
+            "start_time",
+            "end_time",
         )

@@ -172,9 +172,12 @@ class Transport(models.Model):
 
     day = models.ForeignKey(Day, on_delete=models.CASCADE, related_name="transports")
     name = models.CharField(max_length=100)
-    start = models.CharField(max_length=100)
+    departure = models.CharField(max_length=100)
     destination = models.CharField(max_length=100)
     start_time = models.TimeField()
     end_time = models.TimeField()
     order = models.PositiveSmallIntegerField()
     type = models.IntegerField(choices=Type.choices, default=Type.PLANE)
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.day - self.day.trip.title})"
