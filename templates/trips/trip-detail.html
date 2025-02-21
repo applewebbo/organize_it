@@ -21,7 +21,7 @@
                     <ul tabindex="0"
                         class="z-20 p-2 w-52 shadow dropdown-content menu bg-base-100 rounded-box border-1 border-base-300">
                         <li>
-                            <a hx-get="{% url 'trips:trip-add-transport' trip.id %}"
+                            <a hx-get="{% url 'trips:add-transport' trip.id %}"
                                hx-target="#dialog"
                                hx-swap="innerHTML"
                                @click="$dispatch('open-modal'); document.activeElement.blur()">Transport</a>
@@ -72,7 +72,7 @@
                 <ul tabindex="0"
                     class="z-20 p-2 w-52 shadow dropdown-content menu bg-base-100 rounded-box">
                     <li>
-                        <a hx-get="{% url 'trips:trip-add-transport' trip.id %}"
+                        <a hx-get="{% url 'trips:add-transport' trip.id %}"
                            hx-target="#dialog"
                            hx-swap="innerHTML"
                            @click="$dispatch('open-modal'); document.activeElement.blur()">Transport</a>

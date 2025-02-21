@@ -7,11 +7,11 @@ from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import CharField, Value
+from django.db.models import CharField, Max, Value
 from django.db.models.functions import Concat, ExtractDay, ExtractMonth
 from django.utils.translation import gettext_lazy as _
 
-from .models import Day, Link, Note, Place, Transport, Trip
+from .models import Day, Event, Link, Note, Place, Transport, Trip
 
 
 def urlfields_assume_https(db_field, **kwargs):
@@ -313,25 +313,28 @@ class TransportForm(forms.ModelForm):
     class Meta:
         model = Transport
         fields = [
-            "name",
             "type",
             "day",
-            "departure",
+            "address",
             "destination",
             "start_time",
             "end_time",
+            "url",
+            "order",
         ]
         formfield_callback = urlfields_assume_https
+        labels = {"address": _("Departure")}
         widgets = {
-            "name": forms.TextInput(attrs={"placeholder": "Name"}),
             "type": forms.Select(
                 attrs={"class": "select select-bordered w-full max-w-xs"}
             ),
             "day": forms.Select(attrs={"class": "form-select"}),
-            "departure": forms.TextInput(attrs={"placeholder": "Departure"}),
+            "address": forms.TextInput(attrs={"placeholder": "Departure"}),
             "destination": forms.TextInput(attrs={"placeholder": "Destination"}),
             "start_time": forms.TimeInput(attrs={"type": "time"}),
             "end_time": forms.TimeInput(attrs={"type": "time"}),
+            "url": forms.TextInput(attrs={"placeholder": "Url"}),
+            "order": forms.HiddenInput(),
         }
 
     def __init__(self, trip, *args, **kwargs):
@@ -356,14 +359,34 @@ class TransportForm(forms.ModelForm):
             .values_list("id", "formatted_choice")
         )
         self.helper.layout = Layout(
-            Div(
-                "name",
-                css_class="sm:col-span-2",
-            ),
             Field("type", css_class="select select-primary"),
             "day",
-            "departure",
+            "address",
             "destination",
             "start_time",
             "end_time",
+            "order",
+            Div(
+                "url",
+                css_class="sm:col-span-2",
+            ),
         )
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.name = (
+            f"{self.cleaned_data['address']} - {self.cleaned_data['destination']}"
+        )
+        if commit:
+            instance.save()
+        return instance
+
+    def clean(self):
+        cleaned_data = super().clean()
+        day = cleaned_data.get("day")
+
+        # Set default order to 1 if no transports exist for this day
+        max_order = Event.objects.filter(day=day).aggregate(Max("order"))["order__max"]
+        cleaned_data["order"] = 1 if max_order is None else max_order + 1
+
+        return cleaned_data

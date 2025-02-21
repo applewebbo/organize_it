@@ -164,6 +164,7 @@ AUTH_USER_MODEL = "accounts.CustomUser"
 
 LOGIN_REDIRECT_URL = "/"
 
+
 # SITES
 
 SITE_ID = 1

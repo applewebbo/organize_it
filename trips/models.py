@@ -161,23 +161,52 @@ class Note(models.Model):
         return f"{self.content[:35]} ..."
 
 
-class Transport(models.Model):
-    class Type(models.IntegerChoices):
-        PLANE = 1, _("Plane")
-        TRAIN = 2, _("Train")
-        BOAT = 3, _("Boat")
-        BUS = 4, _("Bus")
-        TAXI = 5, _("Taxi")
-        OTHER = 6, _("Other")
-
+class Event(models.Model):
     day = models.ForeignKey(Day, on_delete=models.CASCADE, related_name="transports")
     name = models.CharField(max_length=100)
-    departure = models.CharField(max_length=100)
-    destination = models.CharField(max_length=100)
+    order = models.PositiveSmallIntegerField(blank=True, null=True)
     start_time = models.TimeField()
     end_time = models.TimeField()
-    order = models.PositiveSmallIntegerField()
-    type = models.IntegerField(choices=Type.choices, default=Type.PLANE)
+    url = models.URLField(null=True, blank=True)
+    address = models.CharField(max_length=200)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        """convert address to coordinates for displaying on the map"""
+        old = type(self).objects.get(pk=self.pk) if self.pk else None
+        # if address is not changed, don't update coordinates
+        if old and old.address == self.address:
+            return super().save(*args, **kwargs)
+        g = geocoder.mapbox(self.address, access_token=settings.MAPBOX_ACCESS_TOKEN)
+        self.latitude, self.longitude = g.latlng
+        return super().save(*args, **kwargs)
+
+
+class Transport(Event):
+    class Type(models.IntegerChoices):
+        CAR = 1, _("Car")
+        PLANE = 2, _("Plane")
+        TRAIN = 3, _("Train")
+        BOAT = 4, _("Boat")
+        BUS = 5, _("Bus")
+        TAXI = 6, _("Taxi")
+        OTHER = 7, _("Other")
+
+    type = models.IntegerField(choices=Type.choices, default=Type.CAR)
+    destination = models.CharField(max_length=100)
+    dest_latitude = models.FloatField(null=True, blank=True)
+    dest_longitude = models.FloatField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        """convert destination to coordinates for displaying on the map"""
+        old = type(self).objects.get(pk=self.pk) if self.pk else None
+        # if address is not changed, don't update coordinates
+        if old and old.destination == self.destination:
+            return super().save(*args, **kwargs)
+        g = geocoder.mapbox(self.destination, access_token=settings.MAPBOX_ACCESS_TOKEN)
+        self.dest_latitude, self.dest_longitude = g.latlng
+        return super().save(*args, **kwargs)
 
     def __str__(self) -> str:
-        return f"{self.name} ({self.day - self.day.trip.title})"
+        return f"{self.name} ({self.day.trip.title} - Day {self.day.number})"

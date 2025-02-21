@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods, require_POST
 
 from accounts.models import Profile
@@ -458,8 +459,17 @@ def note_check_or_uncheck(request, pk):
     )
 
 
-def trip_add_transport(request, pk):
+def add_transport(request, pk):
     trip = get_object_or_404(Trip, pk=pk, author=request.user)
     form = TransportForm(trip, request.POST or None)
+    print(form.errors)
+    if form.is_valid():
+        form.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            _("Transport added successfully"),
+        )
+        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
     context = {"form": form}
     return TemplateResponse(request, "trips/transport-create.html", context)

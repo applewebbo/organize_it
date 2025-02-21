@@ -23,8 +23,8 @@ update_all:
     uv sync --upgrade
 
 # Update a specific package
-update package:
-    uv sync --upgrade-package package
+update *args:
+    uv sync --upgrade-package {{ args }}
 
 # Run database migrations
 migrate:
