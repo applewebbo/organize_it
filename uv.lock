@@ -260,6 +260,18 @@ wheels = [
 ]
 
 [[package]]
+name = "django-cotton"
+version = "1.5.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/de/26/e0de6358048b7a9142d9d14ca28de83c7a94a2c3897675b5c5eaeb7cf90e/django_cotton-1.5.3.tar.gz", hash = "sha256:9913870ecae56ddba8f185a4fd1c6d9c31a0acd5c3abddc525cf7eebddd1a7cc", size = 21217 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7a/cc/debb7fa25650556d491a567c5be3ef7908f158b6894e463516f5578fdf69/django_cotton-1.5.3-py3-none-any.whl", hash = "sha256:f1956122b97c154d6aaba7252cd50285f6abb13be19938260c27f445d581ae29", size = 20804 },
+]
+
+[[package]]
 name = "django-coverage-plugin"
 version = "3.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -740,6 +752,7 @@ dependencies = [
     { name = "dj-database-url" },
     { name = "django" },
     { name = "django-allauth" },
+    { name = "django-cotton" },
     { name = "django-crispy-forms" },
     { name = "django-environ" },
     { name = "django-htmx" },
@@ -772,7 +785,6 @@ dev = [
     { name = "pytest-xdist" },
     { name = "pywatchman" },
     { name = "ruff" },
-    { name = "werkzeug" },
 ]
 
 [package.metadata]
@@ -781,6 +793,7 @@ requires-dist = [
     { name = "dj-database-url", specifier = ">=2.2.0" },
     { name = "django", specifier = ">=5.1.1" },
     { name = "django-allauth", specifier = ">=64.2.1" },
+    { name = "django-cotton", specifier = ">=1.5.3" },
     { name = "django-crispy-forms", specifier = ">=2.3" },
     { name = "django-environ", specifier = ">=0.11.2" },
     { name = "django-htmx", specifier = ">=1.19.0" },
@@ -813,7 +826,6 @@ dev = [
     { name = "pytest-xdist", specifier = ">=3.6.1" },
     { name = "pywatchman", specifier = ">=2.0.0" },
     { name = "ruff", specifier = ">=0.9.6" },
-    { name = "werkzeug", specifier = ">=3.0.4" },
 ]
 
 [[package]]
@@ -1296,18 +1308,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/f1/88/dacc875dd54a8acadb4bcbfd4e3e86df8be75527116c91d8f9784f5e9cab/virtualenv-20.29.2.tar.gz", hash = "sha256:fdaabebf6d03b5ba83ae0a02cfe96f48a716f4fae556461d180825866f75b728", size = 4320272 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/93/fa/849483d56773ae29740ae70043ad88e068f98a6401aa819b5d6bee604683/virtualenv-20.29.2-py3-none-any.whl", hash = "sha256:febddfc3d1ea571bdb1dc0f98d7b45d24def7428214d4fb73cc486c9568cce6a", size = 4301478 },
-]
-
-[[package]]
-name = "werkzeug"
-version = "3.1.3"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "markupsafe" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/9f/69/83029f1f6300c5fb2471d621ab06f6ec6b3324685a2ce0f9777fd4a8b71e/werkzeug-3.1.3.tar.gz", hash = "sha256:60723ce945c19328679790e3282cc758aa4a6040e4bb330f53d30fa546d44746", size = 806925 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/52/24/ab44c871b0f07f491e5d2ad12c9bd7358e527510618cb1b803a88e986db1/werkzeug-3.1.3-py3-none-any.whl", hash = "sha256:54b78bf3716d19a65be4fceccc0d1d7b89e608834989dfae50ea87564639213e", size = 224498 },
 ]
 
 [[package]]

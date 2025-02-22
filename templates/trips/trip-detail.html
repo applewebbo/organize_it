@@ -5,38 +5,12 @@
 {% endblock page_title %}
 {% block content %}
     <!-- Details Section -->
-    <section id="details" class="text-center md:text-start">
-        <div class="py-4 px-6 w-full bg-white rounded-lg border border-gray-200 shadow">
+    <section id="details" class="mb-8 text-center md:text-start">
+        <div class="py-2 px-4 w-full bg-white rounded-lg border border-gray-200 shadow md:py-4 md:px-6">
             <div class="items-center mb-3 md:flex">
-                <h2 class="mt-4 mb-2 text-3xl font-semibold tracking-tight md:mt-0 md:mr-6 lg:text-4xl md:grow">
-                    {{ trip.title }} <span class="mb-2 badge badge-sm badge-secondary badge-outline ms-2 lg:badge-md">{{ trip.get_status_display }}</span>
+                <h2 class="mt-2 mb-2 text-2xl font-semibold tracking-tight md:mt-0 md:text-3xl md:grow">
+                    {{ trip.title }} <span class="mb-2 badge badge-xs badge-secondary badge-outline ms-2 md:badge-sm lg:badge-md">{{ trip.get_status_display }}</span>
                 </h2>
-                <div class="dropdown dropdown-bottom dropdown-end" x-data>
-                    <div tabindex="0"
-                         role="button"
-                         class="hidden items-center m-1 mx-auto md:flex md:mx-0 btn">
-                        Add
-                        {% heroicon_mini "chevron-down" class="size-4" %}
-                    </div>
-                    <ul tabindex="0"
-                        class="z-20 p-2 w-52 shadow dropdown-content menu bg-base-100 rounded-box border-1 border-base-300">
-                        <li>
-                            <a hx-get="{% url 'trips:add-transport' trip.id %}"
-                               hx-target="#dialog"
-                               hx-swap="innerHTML"
-                               @click="$dispatch('open-modal'); document.activeElement.blur()">Transport</a>
-                        </li>
-                        <li>
-                            <a>Experience</a>
-                        </li>
-                        <li>
-                            <a>Meal</a>
-                        </li>
-                        <li>
-                            <a>Stay</a>
-                        </li>
-                    </ul>
-                </div>
             </div>
             <div id="trip-details"
                  class="flex flex-col gap-x-3 mb-4 md:flex-row lg:gap-x-6 lg:justify-start">
@@ -62,38 +36,21 @@
             <p class="hidden md:block">
                 <em>{{ trip.description }}</em>
             </p>
-            <div class="dropdown dropdown-bottom dropdown-end" x-data>
-                <div tabindex="0"
-                     role="button"
-                     class="items-center m-1 mx-auto w-full md:hidden md:mx-0 btn">
-                    Add
-                    {% heroicon_mini "chevron-down" class="size-4" %}
-                </div>
-                <ul tabindex="0"
-                    class="z-20 p-2 w-52 shadow dropdown-content menu bg-base-100 rounded-box">
-                    <li>
-                        <a hx-get="{% url 'trips:add-transport' trip.id %}"
-                           hx-target="#dialog"
-                           hx-swap="innerHTML"
-                           @click="$dispatch('open-modal'); document.activeElement.blur()">Transport</a>
-                    </li>
-                    <li>
-                        <a>Experience</a>
-                    </li>
-                    <li>
-                        <a>Meal</a>
-                    </li>
-                    <li>
-                        <a>Stay</a>
-                    </li>
-                </ul>
-            </div>
         </div>
     </section>
     <!-- END Details Section -->
+    <!-- Days Section   -->
+    <section id="days" class="flex flex-col gap-y-4 text-center md:text-start">
+
+        {% for day in trip.days.all %}
+            {% include 'trips/includes/day.html' with day=day %}
+        {% endfor %}
+
+    </section>
+    <!-- END Days Section -->
 {% endblock content %}
 {% block script %}
-    <script src="{% static 'js/sortable.js' %}"></script>
+    <!--<script src="{% static 'js/sortable.js' %}"></script>-->
     <script>
     {% if trip.places.all %}
         htmx.on("htmx:load", function(evt){
@@ -115,7 +72,5 @@
       let inputs = document.getElementsByClassName('select')
       Array.from(inputs).forEach((el) => el.selectedIndex = 0);
     }
-
-
     </script>
 {% endblock script %}

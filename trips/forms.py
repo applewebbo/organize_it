@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import CharField, Max, Value
-from django.db.models.functions import Concat, ExtractDay, ExtractMonth
+from django.db.models.functions import Concat
 from django.utils.translation import gettext_lazy as _
 
 from .models import Day, Event, Link, Note, Place, Transport, Trip
@@ -325,10 +325,8 @@ class TransportForm(forms.ModelForm):
         formfield_callback = urlfields_assume_https
         labels = {"address": _("Departure")}
         widgets = {
-            "type": forms.Select(
-                attrs={"class": "select select-bordered w-full max-w-xs"}
-            ),
-            "day": forms.Select(attrs={"class": "form-select"}),
+            "type": forms.Select(),
+            "day": forms.Select(),
             "address": forms.TextInput(attrs={"placeholder": "Departure"}),
             "destination": forms.TextInput(attrs={"placeholder": "Destination"}),
             "start_time": forms.TimeInput(attrs={"type": "time"}),
@@ -348,11 +346,6 @@ class TransportForm(forms.ModelForm):
                 formatted_choice=Concat(
                     Value("Day "),
                     "number",
-                    Value(" ("),
-                    ExtractDay("date"),
-                    Value("/"),
-                    ExtractMonth("date"),
-                    Value(")"),
                     output_field=CharField(),
                 )
             )
