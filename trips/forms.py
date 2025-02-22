@@ -314,7 +314,6 @@ class TransportForm(forms.ModelForm):
         model = Transport
         fields = [
             "type",
-            "day",
             "address",
             "destination",
             "start_time",
@@ -326,7 +325,6 @@ class TransportForm(forms.ModelForm):
         labels = {"address": _("Departure")}
         widgets = {
             "type": forms.Select(),
-            "day": forms.Select(),
             "address": forms.TextInput(attrs={"placeholder": "Departure"}),
             "destination": forms.TextInput(attrs={"placeholder": "Destination"}),
             "start_time": forms.TimeInput(attrs={"type": "time"}),
@@ -335,33 +333,34 @@ class TransportForm(forms.ModelForm):
             "order": forms.HiddenInput(),
         }
 
-    def __init__(self, trip, *args, **kwargs):
+    def __init__(self, day, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.day = kwargs.pop("day", None)
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.fields["type"].choices = Transport.Type.choices
-        self.fields["day"].choices = (
-            Day.objects.filter(trip=trip)
-            .annotate(
-                formatted_choice=Concat(
-                    Value("Day "),
-                    "number",
-                    output_field=CharField(),
-                )
-            )
-            .values_list("id", "formatted_choice")
-        )
         self.helper.layout = Layout(
-            Field("type", css_class="select select-primary"),
-            "day",
-            "address",
-            "destination",
-            "start_time",
-            "end_time",
             "order",
             Div(
-                "url",
+                "address",
                 css_class="sm:col-span-2",
+            ),
+            Div(
+                "destination",
+                css_class="sm:col-span-2",
+            ),
+            Div(
+                "start_time",
+                css_class="sm:col-span-2",
+            ),
+            Div(
+                "end_time",
+                css_class="sm:col-span-2",
+            ),
+            Field("type", css_class="select select-primary w-full"),
+            Div(
+                "url",
+                css_class="sm:col-span-3",
             ),
         )
 
@@ -376,8 +375,7 @@ class TransportForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        day = cleaned_data.get("day")
-
+        day = self.day
         # Set default order to 1 if no transports exist for this day
         max_order = Event.objects.filter(day=day).aggregate(Max("order"))["order__max"]
         cleaned_data["order"] = 1 if max_order is None else max_order + 1
