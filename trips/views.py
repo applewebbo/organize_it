@@ -89,7 +89,7 @@ def trip_list(request):
 @login_required
 def trip_detail(request, pk):
     """Detail Page for the selected trip"""
-    qs = Trip.objects.prefetch_related("days")
+    qs = Trip.objects.prefetch_related("days", "days__events")
     trip = get_object_or_404(qs, pk=pk)
     # days, locations = calculate_days_and_locations(pk)
     # not_assigned_locations = Place.na_objects.filter(trip=pk)

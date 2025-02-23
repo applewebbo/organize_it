@@ -162,7 +162,13 @@ class Note(models.Model):
 
 
 class Event(models.Model):
-    day = models.ForeignKey(Day, on_delete=models.CASCADE, related_name="transports")
+    class Category(models.IntegerChoices):
+        TRANSPORT = 1, _("Transport")
+        EXPERIENCE = 2, _("Experience")
+        MEAL = 3, _("Meal")
+        STAY = 4, _("Stay")
+
+    day = models.ForeignKey(Day, on_delete=models.CASCADE, related_name="events")
     name = models.CharField(max_length=100)
     order = models.PositiveSmallIntegerField(blank=True, null=True)
     start_time = models.TimeField()
@@ -171,6 +177,12 @@ class Event(models.Model):
     address = models.CharField(max_length=200)
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
+    category = models.PositiveSmallIntegerField(
+        choices=Category.choices, default=Category.EXPERIENCE
+    )
+
+    class Meta:
+        ordering = ["order"]
 
     def save(self, *args, **kwargs):
         """convert address to coordinates for displaying on the map"""
@@ -206,6 +218,9 @@ class Transport(Event):
             return super().save(*args, **kwargs)
         g = geocoder.mapbox(self.destination, access_token=settings.MAPBOX_ACCESS_TOKEN)
         self.dest_latitude, self.dest_longitude = g.latlng
+        # autosave category for transport
+        self.category = self.Category.TRANSPORT
+
         return super().save(*args, **kwargs)
 
     def __str__(self) -> str:

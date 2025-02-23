@@ -1,7 +1,17 @@
-<div class="flex items-center py-4 px-6 w-full bg-white rounded-lg border border-gray-200 shadow">
-    <h2 class="text-lg font-medium sm:text-xl grow">Day {{ day.number }}</h2>
-    <button class="btn btn-sm me-2 sm:btn-md" disabled="disabled">
-        {% heroicon_mini "map" class="size-5" %}
-    </button>
-    <c-dropdown />
+<div class="py-4 px-6 w-full bg-white rounded-lg border border-gray-200 shadow">
+    <div class="flex items-center">
+        <h2 class="text-lg font-medium sm:text-xl grow">Day {{ day.number }}</h2>
+        <button class="btn btn-sm me-2 sm:btn-md" disabled="disabled">
+            {% heroicon_mini "map" class="size-5" %}
+        </button>
+        <c-dropdown />
+    </div>
+    <div class="divider"></div>
+    <ul>
+
+        {% for event in day.events.all %}
+            {{ event.name }} ({{ event.get_category_display }})
+        {% endfor %}
+
+    </ul>
 </div>
