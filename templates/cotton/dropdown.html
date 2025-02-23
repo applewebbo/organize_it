@@ -13,7 +13,10 @@
                @click="$dispatch('open-modal'); document.activeElement.blur()">Transport</a>
         </li>
         <li>
-            <a>Experience</a>
+            <a hx-get="{% url 'trips:add-experience' day.pk %}"
+               hx-target="#dialog"
+               hx-swap="innerHTML"
+               @click="$dispatch('open-modal'); document.activeElement.blur()">Experience</a>
         </li>
         <li>
             <a>Meal</a>

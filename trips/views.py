@@ -9,6 +9,7 @@ from django.views.decorators.http import require_http_methods, require_POST
 from accounts.models import Profile
 
 from .forms import (
+    ExperienceForm,
     LinkForm,
     NoteForm,
     PlaceAssignForm,
@@ -473,3 +474,20 @@ def add_transport(request, day_id):
         return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
     context = {"form": form}
     return TemplateResponse(request, "trips/transport-create.html", context)
+
+
+def add_experience(request, day_id):
+    day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
+    form = ExperienceForm(day, request.POST or None)
+    if form.is_valid():
+        transport = form.save(commit=False)
+        transport.day = day
+        transport.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            _("Experience added successfully"),
+        )
+        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+    context = {"form": form}
+    return TemplateResponse(request, "trips/experience-create.html", context)

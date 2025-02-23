@@ -10,7 +10,7 @@
     <ul>
 
         {% for event in day.events.all %}
-            {{ event.name }} ({{ event.get_category_display }})
+            <li>{{ event.name }} ({{ event.get_category_display }})</li>
         {% endfor %}
 
     </ul>
