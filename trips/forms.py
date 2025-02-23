@@ -11,7 +11,7 @@ from django.db.models import CharField, Max, Value
 from django.db.models.functions import Concat
 from django.utils.translation import gettext_lazy as _
 
-from .models import Day, Event, Experience, Link, Note, Place, Transport, Trip
+from .models import Day, Event, Experience, Link, Meal, Note, Place, Transport, Trip
 
 
 def urlfields_assume_https(db_field, **kwargs):
@@ -390,7 +390,7 @@ class ExperienceForm(forms.ModelForm):
                 i * 30,
                 (datetime.min + timedelta(minutes=i * 30)).strftime("%H:%M"),
             )
-            for i in range(48)
+            for i in range(16)
         ],
         label=_("Duration"),
         required=False,
@@ -423,6 +423,99 @@ class ExperienceForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.fields["type"].choices = Experience.Type.choices
+        if self.instance.pk and self.instance.end_time and self.instance.start_time:
+            start_time = datetime.combine(date.today(), self.instance.start_time)
+            end_time = datetime.combine(date.today(), self.instance.end_time)
+            duration = (end_time - start_time).total_seconds() // 60
+            self.initial["duration"] = int(duration)
+        self.helper.layout = Layout(
+            "order",
+            Div(
+                "name",
+                css_class="sm:col-span-3",
+            ),
+            Field("type", css_class="select select-primary w-full"),
+            Div(
+                "address",
+                css_class="sm:col-span-4",
+            ),
+            Div(
+                "start_time",
+                css_class="sm:col-span-3",
+            ),
+            Div(
+                "duration",
+                css_class="sm:col-span-1",
+            ),
+            Div(
+                "url",
+                css_class="sm:col-span-4",
+            ),
+        )
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        # convert duration to end_time
+        duration = self.cleaned_data.get("duration")
+        if duration:
+            start_time = datetime.combine(date.today(), self.cleaned_data["start_time"])
+            end_time = start_time + timedelta(minutes=int(duration))
+            instance.end_time = end_time.time()
+
+        if commit:
+            instance.save()
+        return instance
+
+    def clean(self):
+        cleaned_data = super().clean()
+        day = self.day
+        # Set default order to 1 if no events exist for this day
+        max_order = Event.objects.filter(day=day).aggregate(Max("order"))["order__max"]
+        cleaned_data["order"] = 1 if max_order is None else max_order + 1
+
+        return cleaned_data
+
+
+class MealForm(forms.ModelForm):
+    duration = forms.ChoiceField(
+        choices=[
+            (
+                i * 30,
+                (datetime.min + timedelta(minutes=i * 15)).strftime("%H:%M"),
+            )
+            for i in range(8)
+        ],
+        label=_("Duration"),
+        required=False,
+    )
+
+    class Meta:
+        model = Meal
+        fields = [
+            "name",
+            "type",
+            "address",
+            "start_time",
+            "duration",
+            "url",
+            "order",
+        ]
+        formfield_callback = urlfields_assume_https
+        widgets = {
+            "name": forms.TextInput(attrs={"placeholder": "Name"}),
+            "type": forms.Select(),
+            "url": forms.TextInput(attrs={"placeholder": "Url"}),
+            "address": forms.TextInput(attrs={"placeholder": "Address"}),
+            "start_time": forms.TimeInput(attrs={"type": "time"}),
+            "order": forms.HiddenInput(),
+        }
+
+    def __init__(self, day, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.day = kwargs.pop("day", None)
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.fields["type"].choices = Meal.Type.choices
         if self.instance.pk and self.instance.end_time and self.instance.start_time:
             start_time = datetime.combine(date.today(), self.instance.start_time)
             end_time = datetime.combine(date.today(), self.instance.end_time)

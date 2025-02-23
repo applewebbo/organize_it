@@ -244,3 +244,21 @@ class Experience(Event):
         """autosave category for experience"""
         self.category = self.Category.EXPERIENCE
         return super().save(*args, **kwargs)
+
+
+class Meal(Event):
+    class Type(models.IntegerChoices):
+        BREAKFAST = 1, _("Breakfast")
+        LUNCH = 2, _("Lunch")
+        DINNER = 3, _("Dinner")
+        SNACK = 4, _("Snack")
+
+    type = models.IntegerField(choices=Type.choices, default=Type.LUNCH)
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.day.trip.title} - Day {self.day.number})"
+
+    def save(self, *args, **kwargs):
+        """autosave category for meal"""
+        self.category = self.Category.MEAL
+        return super().save(*args, **kwargs)

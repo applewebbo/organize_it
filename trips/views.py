@@ -11,6 +11,7 @@ from accounts.models import Profile
 from .forms import (
     ExperienceForm,
     LinkForm,
+    MealForm,
     NoteForm,
     PlaceAssignForm,
     PlaceForm,
@@ -491,3 +492,20 @@ def add_experience(request, day_id):
         return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
     context = {"form": form}
     return TemplateResponse(request, "trips/experience-create.html", context)
+
+
+def add_meal(request, day_id):
+    day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
+    form = MealForm(day, request.POST or None)
+    if form.is_valid():
+        transport = form.save(commit=False)
+        transport.day = day
+        transport.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            _("Meal added successfully"),
+        )
+        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+    context = {"form": form}
+    return TemplateResponse(request, "trips/meal-create.html", context)
