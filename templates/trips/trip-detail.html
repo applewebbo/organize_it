@@ -40,7 +40,7 @@
     </section>
     <!-- END Details Section -->
     <!-- Days Section   -->
-    <section id="days" class="flex flex-col gap-y-4 text-center md:text-start">
+    <section id="days" class="flex flex-col gap-y-4">
 
         {% for day in trip.days.all %}
             {% include 'trips/includes/day.html' with day=day %}
@@ -50,27 +50,4 @@
     <!-- END Days Section -->
 {% endblock content %}
 {% block script %}
-    <!--<script src="{% static 'js/sortable.js' %}"></script>-->
-    <script>
-    {% if trip.places.all %}
-        htmx.on("htmx:load", function(evt){
-        if (evt.detail.elt.id == "map") {
-          let map_bounds = JSON.parse(document.getElementById('map_bounds').textContent);
-          let placesMap = createMap([map_bounds[0], map_bounds[1]]);
-          let locations = JSON.parse(document.getElementById('location_json').textContent);
-
-          let markerFeatureGroup = L.featureGroup().addTo(placesMap);
-
-          for (let location of locations) {
-            L.marker([ location.latitude, location.longitude]).addTo(markerFeatureGroup).bindPopup(location.name);
-          }
-        }
-      });
-    {% endif %}
-
-    function resetInput() {
-      let inputs = document.getElementsByClassName('select')
-      Array.from(inputs).forEach((el) => el.selectedIndex = 0);
-    }
-    </script>
 {% endblock script %}
