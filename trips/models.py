@@ -225,3 +225,22 @@ class Transport(Event):
 
     def __str__(self) -> str:
         return f"{self.name} ({self.day.trip.title} - Day {self.day.number})"
+
+
+class Experience(Event):
+    class Type(models.IntegerChoices):
+        MUSEUM = 1, _("Museum")
+        PARK = 2, _("Park")
+        WALK = 3, _("Walk")
+        SPORT = 4, _("Sport")
+        OTHER = 6, _("Other")
+
+    type = models.IntegerField(choices=Type.choices, default=Type.MUSEUM)
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.day.trip.title} - Day {self.day.number})"
+
+    def save(self, *args, **kwargs):
+        """autosave category for experience"""
+        self.category = self.Category.EXPERIENCE
+        return super().save(*args, **kwargs)
