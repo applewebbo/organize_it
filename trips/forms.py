@@ -11,7 +11,18 @@ from django.db.models import CharField, Max, Value
 from django.db.models.functions import Concat
 from django.utils.translation import gettext_lazy as _
 
-from .models import Day, Event, Experience, Link, Meal, Note, Place, Transport, Trip
+from .models import (
+    Day,
+    Event,
+    Experience,
+    Link,
+    Meal,
+    Note,
+    Place,
+    Stay,
+    Transport,
+    Trip,
+)
 
 
 def urlfields_assume_https(db_field, **kwargs):
@@ -567,3 +578,90 @@ class MealForm(forms.ModelForm):
         cleaned_data["order"] = 1 if max_order is None else max_order + 1
 
         return cleaned_data
+
+
+class StayForm(forms.ModelForm):
+    apply_to_days = (
+        forms.ModelMultipleChoiceField(  # New field for multiple day selection
+            queryset=None,
+            widget=forms.CheckboxSelectMultiple,
+            required=True,
+            label=_("Period of stay"),  # Customize the label as needed
+        )
+    )
+
+    class Meta:
+        model = Stay
+        fields = [
+            "name",
+            "check_in",
+            "check_out",
+            "cancellation_date",
+            "phone_number",
+            "url",
+            "address",
+            "apply_to_days",
+        ]
+        formfield_callback = urlfields_assume_https
+        widgets = {
+            "name": forms.TextInput(attrs={"placeholder": "Name"}),
+            "url": forms.TextInput(attrs={"placeholder": "Url"}),
+            "address": forms.TextInput(attrs={"placeholder": "Address"}),
+            "check_in": forms.TimeInput(attrs={"type": "time"}),
+            "check_out": forms.TimeInput(attrs={"type": "time"}),
+            "cancellation_date": forms.DateInput(attrs={"type": "date"}),
+            "phone_number": forms.TextInput(attrs={"placeholder": "Phone Number"}),
+        }
+
+    def __init__(self, trip, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["apply_to_days"].queryset = Day.objects.filter(trip=trip)
+        self.fields["apply_to_days"].label_from_instance = (
+            lambda obj: f"Day {obj.number}"
+        )
+        self.fields["apply_to_days"].initial = Day.objects.filter(
+            trip=trip
+        ).values_list("pk", flat=True)
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Div(
+                "name",
+                css_class="sm:col-span-4",
+            ),
+            Div(
+                "address",
+                css_class="sm:col-span-4",
+            ),
+            Div(
+                "check_in",
+                css_class="sm:col-span-2",
+            ),
+            Div(
+                "check_out",
+                css_class="sm:col-span-2",
+            ),
+            Div(
+                "cancellation_date",
+                css_class="sm:col-span-2",
+            ),
+            Div(
+                "phone_number",
+                css_class="sm:col-span-2",
+            ),
+            Div(
+                "url",
+                css_class="sm:col-span-4",
+            ),
+            "apply_to_days",
+        )
+
+    def save(self, commit=True):
+        stay = super().save(commit=False)
+        if commit:
+            stay.save()
+        days = self.cleaned_data["apply_to_days"]
+        for day in days:
+            day.stay = stay
+            day.save()
+        return stay

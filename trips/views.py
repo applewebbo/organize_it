@@ -15,6 +15,7 @@ from .forms import (
     NoteForm,
     PlaceAssignForm,
     PlaceForm,
+    StayForm,
     TransportForm,
     TripDateUpdateForm,
     TripForm,
@@ -509,3 +510,19 @@ def add_meal(request, day_id):
         return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
     context = {"form": form}
     return TemplateResponse(request, "trips/meal-create.html", context)
+
+
+def add_stay(request, day_id):
+    day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
+    trip = day.trip
+    form = StayForm(trip, request.POST or None)
+    if form.is_valid():
+        form.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            _("Stay added successfully"),
+        )
+        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+    context = {"form": form}
+    return TemplateResponse(request, "trips/stay-create.html", context)

@@ -8,10 +8,9 @@
     </div>
     <div class="divider"></div>
     <ul>
-
+            <li class="italic">{{ day.stay.name }} (Stay)</li>
         {% for event in day.events.all %}
             <li>{{ event.name }} ({{ event.get_category_display }})</li>
         {% endfor %}
-
     </ul>
 </div>

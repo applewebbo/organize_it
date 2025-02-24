@@ -2,6 +2,7 @@ from datetime import date, timedelta
 
 import geocoder
 from django.conf import settings
+from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -78,8 +79,47 @@ def update_trip_days(sender, instance, **kwargs):
         )
 
 
+class Stay(models.Model):
+    name = models.CharField(max_length=100)
+    check_in = models.TimeField(null=True, blank=True)
+    check_out = models.TimeField(null=True, blank=True)
+    cancellation_date = models.DateField(null=True, blank=True)
+    phone_number = models.CharField(
+        max_length=30,
+        blank=True,
+        validators=[
+            RegexValidator(
+                regex=r"^(?:\+?[1-9]\d{1,14}|\d{2,15})$",
+                message=_(
+                    "Enter a valid phone number (with or without international prefix)."
+                ),
+            ),
+        ],
+    )
+    url = models.URLField(null=True, blank=True)
+    address = models.CharField(max_length=200)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        """convert address to coordinates for displaying on the map"""
+        old = type(self).objects.get(pk=self.pk) if self.pk else None
+        # if address is not changed, don't update coordinates
+        if old and old.address == self.address:
+            return super().save(*args, **kwargs)
+        g = geocoder.mapbox(self.address, access_token=settings.MAPBOX_ACCESS_TOKEN)
+        self.latitude, self.longitude = g.latlng
+        return super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return f"{self.name} - {self.days.first().trip.title}"
+
+
 class Day(models.Model):
     trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="days")
+    stay = models.ForeignKey(
+        Stay, on_delete=models.CASCADE, null=True, blank=True, related_name="days"
+    )
     number = models.PositiveSmallIntegerField()
     date = models.DateField()
     location = models.CharField(max_length=100)

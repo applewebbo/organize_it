@@ -41,11 +41,9 @@
     <!-- END Details Section -->
     <!-- Days Section   -->
     <section id="days" class="flex flex-col gap-y-4">
-
         {% for day in trip.days.all %}
             {% include 'trips/includes/day.html' with day=day %}
         {% endfor %}
-
     </section>
     <!-- END Days Section -->
 {% endblock content %}

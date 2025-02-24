@@ -37,6 +37,7 @@ htmx_urlpatterns = [
         "experiences/<int:day_id>/create", views.add_experience, name="add-experience"
     ),
     path("meals/<int:day_id>/create", views.add_meal, name="add-meal"),
+    path("stays/<int:day_id>/create", views.add_stay, name="add-stay"),
 ]
 
 urlpatterns += htmx_urlpatterns
