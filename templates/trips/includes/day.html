@@ -2,6 +2,9 @@
     <div class="flex items-center">
         <h2 class="text-lg font-medium sm:text-xl grow">Day {{ day.number }}</h2>
         <button class="btn btn-sm me-2 sm:btn-md" disabled="disabled">
+            {% heroicon_mini "pencil-square" class="size-5" %}
+        </button>
+        <button class="btn btn-sm me-2 sm:btn-md" disabled="disabled">
             {% heroicon_mini "map" class="size-5" %}
         </button>
         <c-dropdown />

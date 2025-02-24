@@ -7,13 +7,12 @@ from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import CharField, Max, Value
+from django.db.models import CharField, Value
 from django.db.models.functions import Concat
 from django.utils.translation import gettext_lazy as _
 
 from .models import (
     Day,
-    Event,
     Experience,
     Link,
     Meal,
@@ -330,7 +329,6 @@ class TransportForm(forms.ModelForm):
             "start_time",
             "end_time",
             "url",
-            "order",
         ]
         formfield_callback = urlfields_assume_https
         labels = {"address": _("Departure")}
@@ -341,17 +339,14 @@ class TransportForm(forms.ModelForm):
             "start_time": forms.TimeInput(attrs={"type": "time"}),
             "end_time": forms.TimeInput(attrs={"type": "time"}),
             "url": forms.TextInput(attrs={"placeholder": "Url"}),
-            "order": forms.HiddenInput(),
         }
 
-    def __init__(self, day, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.day = kwargs.pop("day", None)
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.fields["type"].choices = Transport.Type.choices
         self.helper.layout = Layout(
-            "order",
             Div(
                 "address",
                 css_class="sm:col-span-2",
@@ -384,15 +379,6 @@ class TransportForm(forms.ModelForm):
             instance.save()
         return instance
 
-    def clean(self):
-        cleaned_data = super().clean()
-        day = self.day
-        # Set default order to 1 if no event exist for this day
-        max_order = Event.objects.filter(day=day).aggregate(Max("order"))["order__max"]
-        cleaned_data["order"] = 1 if max_order is None else max_order + 1
-
-        return cleaned_data
-
 
 class ExperienceForm(forms.ModelForm):
     duration = forms.ChoiceField(
@@ -416,7 +402,6 @@ class ExperienceForm(forms.ModelForm):
             "start_time",
             "duration",
             "url",
-            "order",
         ]
         formfield_callback = urlfields_assume_https
         widgets = {
@@ -425,12 +410,10 @@ class ExperienceForm(forms.ModelForm):
             "url": forms.TextInput(attrs={"placeholder": "Url"}),
             "address": forms.TextInput(attrs={"placeholder": "Address"}),
             "start_time": forms.TimeInput(attrs={"type": "time"}),
-            "order": forms.HiddenInput(),
         }
 
-    def __init__(self, day, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.day = kwargs.pop("day", None)
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.fields["type"].choices = Experience.Type.choices
@@ -440,7 +423,6 @@ class ExperienceForm(forms.ModelForm):
             duration = (end_time - start_time).total_seconds() // 60
             self.initial["duration"] = int(duration)
         self.helper.layout = Layout(
-            "order",
             Div(
                 "name",
                 css_class="sm:col-span-3",
@@ -476,15 +458,6 @@ class ExperienceForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
-
-    def clean(self):
-        cleaned_data = super().clean()
-        day = self.day
-        # Set default order to 1 if no events exist for this day
-        max_order = Event.objects.filter(day=day).aggregate(Max("order"))["order__max"]
-        cleaned_data["order"] = 1 if max_order is None else max_order + 1
-
-        return cleaned_data
 
 
 class MealForm(forms.ModelForm):
@@ -509,7 +482,6 @@ class MealForm(forms.ModelForm):
             "start_time",
             "duration",
             "url",
-            "order",
         ]
         formfield_callback = urlfields_assume_https
         widgets = {
@@ -518,12 +490,10 @@ class MealForm(forms.ModelForm):
             "url": forms.TextInput(attrs={"placeholder": "Url"}),
             "address": forms.TextInput(attrs={"placeholder": "Address"}),
             "start_time": forms.TimeInput(attrs={"type": "time"}),
-            "order": forms.HiddenInput(),
         }
 
-    def __init__(self, day, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.day = kwargs.pop("day", None)
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.fields["type"].choices = Meal.Type.choices
@@ -533,7 +503,6 @@ class MealForm(forms.ModelForm):
             duration = (end_time - start_time).total_seconds() // 60
             self.initial["duration"] = int(duration)
         self.helper.layout = Layout(
-            "order",
             Div(
                 "name",
                 css_class="sm:col-span-3",
@@ -569,15 +538,6 @@ class MealForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
-
-    def clean(self):
-        cleaned_data = super().clean()
-        day = self.day
-        # Set default order to 1 if no events exist for this day
-        max_order = Event.objects.filter(day=day).aggregate(Max("order"))["order__max"]
-        cleaned_data["order"] = 1 if max_order is None else max_order + 1
-
-        return cleaned_data
 
 
 class StayForm(forms.ModelForm):

@@ -210,7 +210,6 @@ class Event(models.Model):
 
     day = models.ForeignKey(Day, on_delete=models.CASCADE, related_name="events")
     name = models.CharField(max_length=100)
-    order = models.PositiveSmallIntegerField(blank=True, null=True)
     start_time = models.TimeField()
     end_time = models.TimeField()
     url = models.URLField(null=True, blank=True)
@@ -222,7 +221,7 @@ class Event(models.Model):
     )
 
     class Meta:
-        ordering = ["order"]
+        ordering = ["start_time"]
 
     def save(self, *args, **kwargs):
         """convert address to coordinates for displaying on the map"""

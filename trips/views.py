@@ -463,7 +463,7 @@ def note_check_or_uncheck(request, pk):
 
 def add_transport(request, day_id):
     day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
-    form = TransportForm(day, request.POST or None)
+    form = TransportForm(request.POST or None)
     if form.is_valid():
         transport = form.save(commit=False)
         transport.day = day
@@ -480,11 +480,11 @@ def add_transport(request, day_id):
 
 def add_experience(request, day_id):
     day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
-    form = ExperienceForm(day, request.POST or None)
+    form = ExperienceForm(request.POST or None)
     if form.is_valid():
-        transport = form.save(commit=False)
-        transport.day = day
-        transport.save()
+        experience = form.save(commit=False)
+        experience.day = day
+        experience.save()
         messages.add_message(
             request,
             messages.SUCCESS,
@@ -497,11 +497,11 @@ def add_experience(request, day_id):
 
 def add_meal(request, day_id):
     day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
-    form = MealForm(day, request.POST or None)
+    form = MealForm(request.POST or None)
     if form.is_valid():
-        transport = form.save(commit=False)
-        transport.day = day
-        transport.save()
+        meal = form.save(commit=False)
+        meal.day = day
+        meal.save()
         messages.add_message(
             request,
             messages.SUCCESS,
