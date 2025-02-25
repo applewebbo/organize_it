@@ -31,12 +31,12 @@ migrate:
     python manage.py migrate --settings=core.settings.development
 
 # Run tests
-test:
-    COVERAGE_CORE=sysmon python -m pytest --reuse-db -s
+test *args:
+    COVERAGE_CORE=sysmon python -m pytest --reuse-db -s {{ args }}
 
 # Run fast tests
-ftest:
-    pytest -n 8 --reuse-db
+ftest *args:
+    pytest -n 8 --reuse-db {{ args }}
 
 # Run tests excluding mapbox and generate coverage report
 mptest:

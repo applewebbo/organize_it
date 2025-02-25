@@ -56,3 +56,72 @@ class NoteFactory(factory.django.DjangoModelFactory):
 
     content = factory.Faker("paragraph", nb_sentences=4)
     trip = factory.SubFactory(TripFactory)
+
+
+class TransportFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "trips.Transport"
+
+    class Params:
+        location = factory.Faker("local_latlng", country_code="IT")
+        dest_location = factory.Faker("local_latlng", country_code="IT")
+
+    trip = factory.SubFactory(TripFactory)
+    day = factory.LazyAttribute(lambda obj: obj.trip.days.order_by("?").first())
+    name = factory.Faker("company", locale="it_IT")
+    start_time = factory.Faker("time")
+    end_time = factory.Faker("time")
+    address = factory.LazyAttribute(lambda obj: obj.location[2])
+    destination = factory.LazyAttribute(lambda obj: obj.dest_location[2])
+    type = factory.Faker("random_element", elements=[1, 2, 3, 4, 5, 6, 7])
+    category = 1
+
+
+class ExperienceFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "trips.Experience"
+
+    class Params:
+        location = factory.Faker("local_latlng", country_code="IT")
+
+    trip = factory.SubFactory(TripFactory)
+    day = factory.LazyAttribute(lambda obj: obj.trip.days.order_by("?").first())
+    name = factory.Faker("company", locale="it_IT")
+    start_time = factory.Faker("time")
+    end_time = factory.Faker("time")
+    address = factory.LazyAttribute(lambda obj: obj.location[2])
+    type = factory.Faker("random_element", elements=[1, 2, 3, 4, 5, 6])
+    category = 2
+
+
+class MealFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "trips.Meal"
+
+    class Params:
+        location = factory.Faker("local_latlng", country_code="IT")
+
+    trip = factory.SubFactory(TripFactory)
+    day = factory.LazyAttribute(lambda obj: obj.trip.days.order_by("?").first())
+    name = factory.Faker("company", locale="it_IT")
+    start_time = factory.Faker("time")
+    end_time = factory.Faker("time")
+    address = factory.LazyAttribute(lambda obj: obj.location[2])
+    type = factory.Faker("random_element", elements=[1, 2, 3, 4])
+    category = 3
+
+
+class StayFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "trips.Stay"
+
+    class Params:
+        location = factory.Faker("local_latlng", country_code="IT")
+
+    name = factory.Faker("company", locale="it_IT")
+    check_in = factory.Faker("time")
+    check_out = factory.Faker("time")
+    cancellation_date = factory.Faker("future_date")
+    phone_number = factory.Faker("phone_number", locale="it_IT")
+    url = factory.Faker("url")
+    address = factory.LazyAttribute(lambda obj: obj.location[2])

@@ -11,17 +11,7 @@ from django.db.models import CharField, Value
 from django.db.models.functions import Concat
 from django.utils.translation import gettext_lazy as _
 
-from .models import (
-    Day,
-    Experience,
-    Link,
-    Meal,
-    Note,
-    Place,
-    Stay,
-    Transport,
-    Trip,
-)
+from .models import Day, Experience, Link, Meal, Note, Place, Stay, Transport, Trip
 
 
 def urlfields_assume_https(db_field, **kwargs):
@@ -95,7 +85,7 @@ class TripForm(forms.ModelForm):
     def clean_destination(self):
         destination = self.cleaned_data.get("destination")
         g = geocoder.mapbox(destination)
-        if not g.latlng:
+        if not g.ok:
             raise ValidationError("Destination not found")
         return destination
 
@@ -241,7 +231,7 @@ class PlaceAssignForm(forms.ModelForm):
             .annotate(
                 formatted_choice=Concat(
                     "date",
-                    Value(_("Day")),
+                    Value("Day"),
                     "number",
                     Value(")"),
                     output_field=CharField(),

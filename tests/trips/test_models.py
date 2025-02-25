@@ -65,9 +65,10 @@ class TestDayModel:
             author=user,
             start_date=date.today(),
             end_date=date.today() + timedelta(days=2),
+            title="Test Trip",
         )
 
-        assert trip.days.all().first().__str__() == "Day 1"
+        assert trip.days.all().first().__str__() == "Day 1 [Test Trip]"
         assert trip.days.all().first().number == 1
         assert trip.days.all().first().date == trip.start_date
         assert trip.days.all().count() == 3
