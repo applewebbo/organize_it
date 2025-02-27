@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Day, Experience, Link, Meal, Note, Place, Stay, Transport, Trip
+from .models import Day, Experience, Link, Meal, Note, Stay, Transport, Trip
 
 
 @admin.register(Trip)
@@ -10,7 +10,6 @@ class ProjectAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Link)
-admin.site.register(Place)
 
 
 @admin.register(Note)

@@ -2,10 +2,11 @@
 from datetime import date, timedelta
 from unittest.mock import Mock, patch
 
-import factory
 import pytest
+from django.conf import settings
+from django.core.exceptions import ValidationError
 
-from trips.models import Place
+from trips.models import Event, Experience, Meal, Stay, Transport
 
 pytestmark = pytest.mark.django_db
 
@@ -22,7 +23,8 @@ class TestTripModel:
     @pytest.mark.parametrize(
         "start_date, end_date, status",
         [
-            (date.today() + timedelta(days=10), date.today() + timedelta(days=12), 1),
+            (date.today() + timedelta(days=14), date.today() + timedelta(days=17), 1),
+            (date.today() + timedelta(days=7), date.today() + timedelta(days=10), 1),
             (date.today() + timedelta(days=4), date.today() + timedelta(days=6), 2),
             (date.today() - timedelta(days=1), date.today() + timedelta(days=1), 3),
             (date.today() - timedelta(days=10), date.today() - timedelta(days=8), 4),
@@ -101,84 +103,6 @@ def mocked_geocoder():
         yield mocked_geocoder
 
 
-class TestPlaceModel:
-    @pytest.mark.mapbox
-    @factory.Faker.override_default_locale("it_IT")
-    def test_factory(self, user_factory, trip_factory, place_factory, mocked_geocoder):
-        """Test place model factory"""
-        user = user_factory()
-        trip = trip_factory(author=user, title="Test Trip")
-        place = place_factory(name="Test Place", trip=trip)
-
-        assert place.__str__() == "Test Place"
-        assert place.trip == trip
-        assert place.latitude is not None
-        assert place.longitude is not None
-
-    @pytest.mark.mapbox
-    @factory.Faker.override_default_locale("it_IT")
-    def test_assign_to_day(
-        self, user_factory, trip_factory, place_factory, mocked_geocoder
-    ):
-        """Test place assign to day"""
-        user = user_factory()
-        trip = trip_factory(author=user, title="Test Trip")
-        place = place_factory(name="Test Place", trip=trip)
-
-        place.day = trip.days.all().first()
-        place.save()
-
-        assert place.day == trip.days.all().first()
-
-    @pytest.mark.mapbox
-    @factory.Faker.override_default_locale("it_IT")
-    def test_place_unassign_on_trip_dates_update(
-        self, user_factory, trip_factory, place_factory, mocked_geocoder
-    ):
-        """Test place unassign on trip dates update"""
-        user = user_factory()
-        trip = trip_factory(
-            author=user,
-            title="Test Trip",
-            start_date=date.today(),
-            end_date=date.today() + timedelta(days=1),
-        )
-        place = place_factory(name="Test Place", trip=trip)
-
-        place.day = trip.days.first()
-        place.save()
-
-        trip.start_date = date.today() + timedelta(days=7)
-        trip.end_date = date.today() + timedelta(days=11)
-        trip.save()
-
-        assert trip.places.first().day is None
-
-    @pytest.mark.mapbox
-    def test_unassigned_manager(
-        self, user_factory, trip_factory, place_factory, mocked_geocoder
-    ):
-        """Test place unassigned manager"""
-        user = user_factory()
-        trip = trip_factory(author=user, title="Test Trip")
-        place = place_factory(name="Test Place", trip=trip)
-
-        place.day = trip.days.first()
-        place.save()
-
-        assert trip.places.count() == 1
-        assert trip.places.first().day is not None
-        assert trip.places.first().day == trip.days.first()
-
-        assert Place.na_objects.filter(trip=trip).count() == 0
-
-        trip.start_date = date.today() + timedelta(days=7)
-        trip.end_date = date.today() + timedelta(days=11)
-        trip.save()
-
-        assert Place.na_objects.filter(trip=trip).count() == 1
-
-
 class TestLinkModel:
     def test_factory(self, user_factory, trip_factory, link_factory):
         """Test link model factory"""
@@ -206,3 +130,237 @@ class TestNoteModel:
         assert note.__str__() == f"{note.content[:35]} ..."
         assert trip.notes.first() == note
         assert note.checked is False
+
+
+class TestEventModel:
+    def test_factory(self, user_factory, trip_factory, event_factory):
+        """Test event model factory"""
+        user = user_factory()
+        trip = trip_factory(author=user, title="Test Trip")
+        event = event_factory(day=trip.days.first())
+
+        assert event.__str__() == f"{event.name} ({event.start_time})"
+        assert event.day.trip == trip
+
+    @patch("geocoder.mapbox")
+    def test_save_updates_coordinates(self, mock_geocoder, user_factory, trip_factory):
+        # Setup mock response
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
+
+        user = user_factory()
+        trip = trip_factory(author=user)
+        day = trip.days.first()
+
+        mock_geocoder.reset_mock()
+
+        event = Event.objects.create(
+            day=day,
+            name="Test Event",
+            start_time="10:00",
+            end_time="11:00",
+            address="Milan, Italy",
+        )
+
+        # Verify the coordinates were set from the mock response
+        assert event.latitude == 45.4773
+        assert event.longitude == 9.1815
+        mock_geocoder.assert_called_once_with(
+            "Milan, Italy", access_token=settings.MAPBOX_ACCESS_TOKEN
+        )
+
+    @patch("geocoder.mapbox")
+    def test_save_does_not_update_coordinates_if_address_unchanged(
+        self, mock_geocoder, user_factory, trip_factory
+    ):
+        # Setup mock response
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
+
+        user = user_factory()
+        trip = trip_factory(author=user)
+        day = trip.days.first()
+
+        event = Event.objects.create(
+            day=day,
+            name="Test Event",
+            start_time="10:00",
+            end_time="11:00",
+            address="Milan, Italy",
+        )
+
+        # Reset mock before saving again
+        mock_geocoder.reset_mock()
+
+        # Save again without changing the address
+        event.name = "Updated Event Name"
+        event.save()
+
+        # Verify geocoder was not called again
+        mock_geocoder.assert_not_called()
+
+
+class TestTransportModel:
+    def test_factory(self, user_factory, trip_factory, transport_factory):
+        """Test transport model factory"""
+        user = user_factory()
+        trip = trip_factory(author=user, title="Test Trip")
+        transport = transport_factory(day=trip.days.first(), type=Transport.Type.CAR)
+
+        assert transport.__str__() == f"{transport.name} ({trip.title} - Day 1)"
+        assert transport.day.trip == trip
+        assert transport.category == Event.Category.TRANSPORT
+        assert transport.type == Transport.Type.CAR
+
+    @patch("geocoder.mapbox")
+    def test_save_updates_coordinates(self, mock_geocoder, user_factory, trip_factory):
+        # Setup mock response
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
+
+        user = user_factory()
+        trip = trip_factory(author=user)
+        day = trip.days.first()
+
+        mock_geocoder.reset_mock()
+
+        transport = Transport.objects.create(
+            day=day,
+            name="Train to Milan",
+            start_time="10:00",
+            end_time="11:00",
+            type=Transport.Type.TRAIN,
+            destination="Milan, Italy",
+        )
+
+        # Verify the coordinates were set from the mock response
+        assert transport.dest_latitude == 45.4773
+        assert transport.dest_longitude == 9.1815
+        assert mock_geocoder.call_count == 2
+
+    @patch("geocoder.mapbox")
+    def test_save_does_not_update_coordinates_if_destination_unchanged(
+        self, mock_geocoder, user_factory, trip_factory
+    ):
+        # Setup mock response
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
+
+        user = user_factory()
+        trip = trip_factory(author=user)
+        day = trip.days.first()
+
+        transport = Transport.objects.create(
+            day=day,
+            name="Train to Milan",
+            start_time="10:00",
+            end_time="11:00",
+            type=Transport.Type.TRAIN,
+            destination="Milan, Italy",
+        )
+
+        # Reset mock before saving again
+        mock_geocoder.reset_mock()
+
+        # Save again without changing the destination
+        transport.name = "Updated Transport Name"
+        transport.save()
+
+        # Verify geocoder was not called again
+        mock_geocoder.assert_not_called()
+
+
+class TestExperienceModel:
+    def test_factory(self, user_factory, trip_factory, experience_factory):
+        """Test experience model factory"""
+        user = user_factory()
+        trip = trip_factory(author=user, title="Test Trip")
+        experience = experience_factory(
+            day=trip.days.first(), type=Experience.Type.MUSEUM
+        )
+
+        assert experience.__str__() == f"{experience.name} ({trip.title} - Day 1)"
+        assert experience.day.trip == trip
+        assert experience.category == Event.Category.EXPERIENCE
+        assert experience.type == Experience.Type.MUSEUM
+
+
+class TestMealModel:
+    def test_factory(self, user_factory, trip_factory, meal_factory):
+        """Test experience model factory"""
+        user = user_factory()
+        trip = trip_factory(author=user, title="Test Trip")
+        experience = meal_factory(day=trip.days.first(), type=Meal.Type.LUNCH)
+
+        assert experience.__str__() == f"{experience.name} ({trip.title} - Day 1)"
+        assert experience.day.trip == trip
+        assert experience.category == Event.Category.MEAL
+        assert experience.type == Meal.Type.LUNCH
+
+
+class TestStayModel:
+    def test_factory(self, user_factory, trip_factory, stay_factory):
+        """Test stay model factory"""
+        user = user_factory()
+        trip = trip_factory(author=user, title="Test Trip")
+        day = trip.days.first()
+        stay = stay_factory(name="Grand Hotel")
+
+        # Associate stay with trip's first day
+        day.stay = stay
+        day.save()
+
+        assert stay.__str__() == "Grand Hotel - Test Trip"
+        assert stay.days.first() == day
+        assert stay.days.first().trip == trip
+
+    @patch("geocoder.mapbox")
+    def test_save_updates_coordinates(self, mock_geocoder, user_factory, trip_factory):
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
+
+        stay = Stay.objects.create(
+            name="Grand Hotel Milano",
+            check_in="14:00",
+            check_out="11:00",
+            phone_number="+393334445566",
+            address="Via Example 123, Milan, Italy",
+        )
+
+        assert stay.latitude == 45.4773
+        assert stay.longitude == 9.1815
+        mock_geocoder.assert_called_once_with(
+            "Via Example 123, Milan, Italy", access_token=settings.MAPBOX_ACCESS_TOKEN
+        )
+
+    @patch("geocoder.mapbox")
+    def test_save_does_not_update_coordinates_if_address_unchanged(
+        self, mock_geocoder, user_factory, trip_factory
+    ):
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
+
+        stay = Stay.objects.create(
+            name="Grand Hotel Milano",
+            check_in="14:00",
+            check_out="11:00",
+            phone_number="+393334445566",
+            address="Via Example 123, Milan, Italy",
+        )
+
+        mock_geocoder.reset_mock()
+
+        stay.name = "Updated Hotel Name"
+        stay.save()
+
+        mock_geocoder.assert_not_called()
+
+    def test_phone_number_validation(self, stay_factory):
+        """Test phone number validation"""
+        # Valid phone numbers
+        stay = stay_factory(phone_number="+393334445566")
+        stay.full_clean()
+        assert stay.phone_number == "+393334445566"
+
+        stay = stay_factory(phone_number="0233445566")
+        stay.full_clean()
+        assert stay.phone_number == "0233445566"
+
+        # Invalid phone number should raise ValidationError
+        with pytest.raises(ValidationError):
+            stay = stay_factory(phone_number="invalid")
+            stay.full_clean()

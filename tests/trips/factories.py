@@ -16,31 +16,6 @@ class TripFactory(factory.django.DjangoModelFactory):
     end_date = factory.Faker("date_between", start_date="+4d", end_date="+7d")
 
 
-class PlaceFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = "trips.Place"
-
-    name = factory.Faker("street_name")
-    address = factory.Faker("street_address")
-    trip = factory.SubFactory(TripFactory)
-
-
-class PlaceItFactory(factory.django.DjangoModelFactory):
-    """Factory for populate the database with places located in Italy"""
-
-    class Meta:
-        model = "trips.Place"
-
-    class Params:
-        location = factory.Faker("local_latlng", country_code="IT")
-
-    name = factory.LazyAttribute(lambda obj: obj.location[2])
-    address = factory.LazyAttribute(lambda obj: obj.location[2])
-    latitude = factory.LazyAttribute(lambda obj: obj.location[0])
-    longitude = factory.LazyAttribute(lambda obj: obj.location[1])
-    trip = factory.SubFactory(TripFactory)
-
-
 class LinkFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "trips.Link"
@@ -58,6 +33,22 @@ class NoteFactory(factory.django.DjangoModelFactory):
     trip = factory.SubFactory(TripFactory)
 
 
+class EventFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "trips.Event"
+
+    class Params:
+        location = factory.Faker("local_latlng", country_code="IT")
+        trip = factory.SubFactory(TripFactory)
+
+    day = factory.LazyAttribute(lambda obj: obj.trip.days.order_by("?").first())
+    name = factory.Faker("company", locale="it_IT")
+    start_time = factory.Faker("time")
+    end_time = factory.Faker("time")
+    address = factory.LazyAttribute(lambda obj: obj.location[2])
+    category = factory.Faker("random_element", elements=[1, 2, 3])
+
+
 class TransportFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "trips.Transport"
@@ -65,8 +56,8 @@ class TransportFactory(factory.django.DjangoModelFactory):
     class Params:
         location = factory.Faker("local_latlng", country_code="IT")
         dest_location = factory.Faker("local_latlng", country_code="IT")
+        trip = factory.SubFactory(TripFactory)
 
-    trip = factory.SubFactory(TripFactory)
     day = factory.LazyAttribute(lambda obj: obj.trip.days.order_by("?").first())
     name = factory.Faker("company", locale="it_IT")
     start_time = factory.Faker("time")
@@ -83,8 +74,8 @@ class ExperienceFactory(factory.django.DjangoModelFactory):
 
     class Params:
         location = factory.Faker("local_latlng", country_code="IT")
+        trip = factory.SubFactory(TripFactory)
 
-    trip = factory.SubFactory(TripFactory)
     day = factory.LazyAttribute(lambda obj: obj.trip.days.order_by("?").first())
     name = factory.Faker("company", locale="it_IT")
     start_time = factory.Faker("time")
@@ -100,8 +91,8 @@ class MealFactory(factory.django.DjangoModelFactory):
 
     class Params:
         location = factory.Faker("local_latlng", country_code="IT")
+        trip = factory.SubFactory(TripFactory)
 
-    trip = factory.SubFactory(TripFactory)
     day = factory.LazyAttribute(lambda obj: obj.trip.days.order_by("?").first())
     name = factory.Faker("company", locale="it_IT")
     start_time = factory.Faker("time")

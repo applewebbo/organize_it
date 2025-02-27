@@ -16,7 +16,7 @@ from .forms import (
     TripDateUpdateForm,
     TripForm,
 )
-from .models import Day, Place, Trip
+from .models import Day, Trip
 
 # def calculate_bounds(locations):
 #     # TODO: add check for a single location
@@ -30,17 +30,17 @@ from .models import Day, Place, Trip
 #     return [sw, ne]
 
 
-def calculate_days_and_locations(trip):
-    days = (
-        Day.objects.filter(trip=trip)
-        .exclude(places__isnull=True)
-        .prefetch_related("places")
-    )
-    locations = list(
-        Place.objects.filter(trip=trip).values("name", "latitude", "longitude")
-    )
+# def calculate_days_and_locations(trip):
+#     days = (
+#         Day.objects.filter(trip=trip)
+#         .exclude(places__isnull=True)
+#         .prefetch_related("places")
+#     )
+#     locations = list(
+#         Place.objects.filter(trip=trip).values("name", "latitude", "longitude")
+#     )
 
-    return days, locations
+#     return days, locations
 
 
 def get_trips(user):
