@@ -1,4 +1,5 @@
 import datetime
+from unittest.mock import Mock, patch
 
 import factory
 import pytest
@@ -11,6 +12,17 @@ from tests.trips.factories import TripFactory
 from trips.models import Trip
 
 pytestmark = pytest.mark.django_db
+
+mock_geocoder_response = Mock(latlng=(10.0, 20.0))
+invalid_mock_geocoder_response = Mock(latlng=None)
+
+
+@pytest.fixture
+def mocked_geocoder():
+    with patch(
+        "trips.models.geocoder.mapbox", return_value=mock_geocoder_response
+    ) as mocked_geocoder:
+        yield mocked_geocoder
 
 
 class HomeView(TestCase):
@@ -252,3 +264,210 @@ class TripDatesUpdateView(TestCase):
         assert message == "Dates updated successfully"
         assert trip.start_date == data["start_date"]
         assert trip.end_date == data["end_date"]
+
+
+class AddTransportView(TestCase):
+    @patch("geocoder.mapbox")
+    def test_post(self, mock_geocoder):
+        mock_geocoder.return_value.ok = True
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        data = {
+            "type": 1,
+            "address": "Milan",
+            "destination": "Rome",
+            "start_time": "10:00",
+            "end_time": "12:00",
+            "url": "https://example.com",
+        }
+
+        with self.login(user):
+            response = self.post("trips:add-transport", day_id=day.pk, data=data)
+
+        self.response_204(response)
+        message = list(get_messages(response.wsgi_request))[0].message
+        assert message == "Transport added successfully"
+        assert day.events.count() == 1
+
+    def test_post_with_invalid_data(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        data = {
+            "type": 1,
+        }
+
+        with self.login(user):
+            response = self.post("trips:add-transport", day_id=day.pk, data=data)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/transport-create.html")
+        assert day.events.count() == 0
+
+
+class AddExperienceView(TestCase):
+    @patch("geocoder.mapbox")
+    def test_post(self, mock_geocoder):
+        mock_geocoder.return_value.ok = True
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        data = {
+            "name": "Walking Tour",
+            "type": 1,
+            "address": "Starting Point",
+            "start_time": "14:00",
+            "duration": "120",
+            "url": "https://example.com",
+        }
+
+        with self.login(user):
+            response = self.post("trips:add-experience", day_id=day.pk, data=data)
+
+        self.response_204(response)
+        message = list(get_messages(response.wsgi_request))[0].message
+        assert message == "Experience added successfully"
+        assert day.events.count() == 1
+
+    def test_post_with_invalid_data(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        data = {
+            "name": "Visit Museum",
+        }
+
+        with self.login(user):
+            response = self.post("trips:add-experience", day_id=day.pk, data=data)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/experience-create.html")
+        assert day.events.count() == 0
+
+
+class AddMealView(TestCase):
+    @patch("geocoder.mapbox")
+    def test_post(self, mock_geocoder):
+        mock_geocoder.return_value.ok = True
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        data = {
+            "name": "La Pergola",
+            "type": 1,  # LUNCH
+            "address": "Via Alberto Cadlolo, 101, Rome",
+            "start_time": "13:00",
+            "duration": "60",  # 1 hour
+            "url": "https://example.com",
+        }
+
+        with self.login(user):
+            response = self.post("trips:add-meal", day_id=day.pk, data=data)
+
+        self.response_204(response)
+        message = list(get_messages(response.wsgi_request))[0].message
+        assert message == "Meal added successfully"
+        assert day.events.count() == 1
+
+    def test_post_with_invalid_data(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        data = {
+            "name": "Lunch",
+        }
+
+        with self.login(user):
+            response = self.post("trips:add-meal", day_id=day.pk, data=data)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/meal-create.html")
+        assert day.events.count() == 0
+
+
+class AddStayView(TestCase):
+    @patch("geocoder.mapbox")
+    def test_post(self, mock_geocoder):
+        mock_geocoder.return_value.ok = True
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        days = trip.days.all()
+        day = days.first()
+        data = {
+            "name": "Grand Hotel",
+            "check_in": "14:00",
+            "check_out": "11:00",
+            "cancellation_date": "2024-12-31",
+            "phone_number": "+1234567890",
+            "url": "https://example.com",
+            "address": "Via Roma 1, Rome",
+            "apply_to_days": [day.pk for day in days],
+        }
+
+        with self.login(user):
+            response = self.post("trips:add-stay", day_id=day.pk, data=data)
+
+        self.response_204(response)
+        message = list(get_messages(response.wsgi_request))[0].message
+        assert message == "Stay added successfully"
+        day.refresh_from_db()
+        assert day.stay is not None
+
+    def test_post_with_invalid_data(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        data = {
+            "name": "Hotel",
+        }
+
+        with self.login(user):
+            response = self.post("trips:add-stay", day_id=day.pk, data=data)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/stay-create.html")
+        assert day.stay is None
+
+    @patch("geocoder.mapbox")
+    def test_post_single_day(self, mock_geocoder):
+        mock_geocoder.return_value.ok = True
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        days = trip.days.all()
+        first_day = days.first()
+        data = {
+            "name": "Grand Hotel",
+            "check_in": "14:00",
+            "check_out": "11:00",
+            "cancellation_date": "2024-12-31",
+            "phone_number": "+1234567890",
+            "url": "https://example.com",
+            "address": "Via Roma 1, Rome",
+            "apply_to_days": [first_day.pk],  # Only apply to first day
+        }
+
+        with self.login(user):
+            response = self.post("trips:add-stay", day_id=first_day.pk, data=data)
+
+        self.response_204(response)
+        message = list(get_messages(response.wsgi_request))[0].message
+        assert message == "Stay added successfully"
+
+        # Refresh days from db and verify
+        first_day.refresh_from_db()
+        assert first_day.stay is not None
+
+        # Other days should not have the stay
+        other_days = days.exclude(pk=first_day.pk)
+        for day in other_days:
+            day.refresh_from_db()
+            assert day.stay is None
