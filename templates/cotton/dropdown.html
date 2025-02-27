@@ -1,0 +1,34 @@
+<div class="dropdown dropdown-bottom dropdown-end" x-data>
+    <div tabindex="0"
+         role="button"
+         class="btn btn-sm sm:btn-md">
+        {% heroicon_mini "plus" class="size-5" %}
+    </div>
+    <ul tabindex="0"
+        class="z-20 p-2 w-52 shadow dropdown-content menu bg-base-100 rounded-box border-1 border-base-300">
+        <li>
+            <a hx-get="{% url 'trips:add-transport' day.pk %}"
+               hx-target="#dialog"
+               hx-swap="innerHTML"
+               @click="$dispatch('open-modal'); document.activeElement.blur()">Transport</a>
+        </li>
+        <li>
+            <a hx-get="{% url 'trips:add-experience' day.pk %}"
+               hx-target="#dialog"
+               hx-swap="innerHTML"
+               @click="$dispatch('open-modal'); document.activeElement.blur()">Experience</a>
+        </li>
+        <li>
+            <a hx-get="{% url 'trips:add-meal' day.pk %}"
+               hx-target="#dialog"
+               hx-swap="innerHTML"
+               @click="$dispatch('open-modal'); document.activeElement.blur()">Meal</a>
+        </li>
+        <li>
+            <a hx-get="{% url 'trips:add-stay' day.pk %}"
+               hx-target="#dialog"
+               hx-swap="innerHTML"
+               @click="$dispatch('open-modal'); document.activeElement.blur()">Stay</a>
+        </li>
+    </ul>
+</div>

@@ -2,6 +2,7 @@ from datetime import date, timedelta
 
 import geocoder
 from django.conf import settings
+from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -23,6 +24,7 @@ class Trip(models.Model):
 
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=500)
+    destination = models.CharField(max_length=100)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
@@ -76,14 +78,53 @@ def update_trip_days(sender, instance, **kwargs):
         )
 
 
+class Stay(models.Model):
+    name = models.CharField(max_length=100)
+    check_in = models.TimeField(null=True, blank=True)
+    check_out = models.TimeField(null=True, blank=True)
+    cancellation_date = models.DateField(null=True, blank=True)
+    phone_number = models.CharField(
+        max_length=30,
+        blank=True,
+        validators=[
+            RegexValidator(
+                regex=r"^(?:\+?[1-9]\d{1,14}|\d{2,15})$",
+                message=_(
+                    "Enter a valid phone number (with or without international prefix)."
+                ),
+            ),
+        ],
+    )
+    url = models.URLField(null=True, blank=True)
+    address = models.CharField(max_length=200)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        """convert address to coordinates for displaying on the map"""
+        old = type(self).objects.get(pk=self.pk) if self.pk else None
+        # if address is not changed, don't update coordinates
+        if old and old.address == self.address:
+            return super().save(*args, **kwargs)
+        g = geocoder.mapbox(self.address, access_token=settings.MAPBOX_ACCESS_TOKEN)
+        self.latitude, self.longitude = g.latlng
+        return super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return f"{self.name} - {self.days.first().trip.title}"
+
+
 class Day(models.Model):
     trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="days")
+    stay = models.ForeignKey(
+        Stay, on_delete=models.CASCADE, null=True, blank=True, related_name="days"
+    )
     number = models.PositiveSmallIntegerField()
     date = models.DateField()
 
     def __str__(self) -> str:
         day = _("Day")
-        return f"{day} {self.number}"
+        return f"{day} {self.number} [{self.trip.title}]"
 
 
 class Link(models.Model):
@@ -97,26 +138,40 @@ class Link(models.Model):
         return self.url
 
 
-class NotAssignedManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().filter(day__isnull=True)
+class Note(models.Model):
+    content = models.CharField(max_length=500)
+    trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="notes")
+    link = models.ForeignKey(Link, on_delete=models.SET_NULL, null=True, blank=True)
+    checked = models.BooleanField(default=False)
+
+    def __str__(self) -> str:
+        return f"{self.content[:35]} ..."
 
 
-class Place(models.Model):
-    trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="places")
-    day = models.ForeignKey(
-        Day, on_delete=models.SET_NULL, null=True, related_name="places"
-    )
+class Event(models.Model):
+    class Category(models.IntegerChoices):
+        TRANSPORT = 1, _("Transport")
+        EXPERIENCE = 2, _("Experience")
+        MEAL = 3, _("Meal")
+        STAY = 4, _("Stay")
+
+    day = models.ForeignKey(Day, on_delete=models.CASCADE, related_name="events")
     name = models.CharField(max_length=100)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
     url = models.URLField(null=True, blank=True)
     address = models.CharField(max_length=200)
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
+    category = models.PositiveSmallIntegerField(
+        choices=Category.choices, default=Category.EXPERIENCE
+    )
 
-    objects = models.Manager()
-    na_objects = NotAssignedManager()
+    class Meta:
+        ordering = ["start_time"]
 
     def save(self, *args, **kwargs):
+        """convert address to coordinates for displaying on the map"""
         old = type(self).objects.get(pk=self.pk) if self.pk else None
         # if address is not changed, don't update coordinates
         if old and old.address == self.address:
@@ -126,15 +181,73 @@ class Place(models.Model):
         return super().save(*args, **kwargs)
 
     def __str__(self) -> str:
-        return self.name
+        return f"{self.name} ({self.start_time})"
 
 
-class Note(models.Model):
-    content = models.CharField(max_length=500)
-    trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="notes")
-    place = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True, blank=True)
-    link = models.ForeignKey(Link, on_delete=models.SET_NULL, null=True, blank=True)
-    checked = models.BooleanField(default=False)
+class Transport(Event):
+    class Type(models.IntegerChoices):
+        CAR = 1, _("Car")
+        PLANE = 2, _("Plane")
+        TRAIN = 3, _("Train")
+        BOAT = 4, _("Boat")
+        BUS = 5, _("Bus")
+        TAXI = 6, _("Taxi")
+        OTHER = 7, _("Other")
+
+    type = models.IntegerField(choices=Type.choices, default=Type.CAR)
+    destination = models.CharField(max_length=100)
+    dest_latitude = models.FloatField(null=True, blank=True)
+    dest_longitude = models.FloatField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        """convert destination to coordinates for displaying on the map"""
+        old = type(self).objects.get(pk=self.pk) if self.pk else None
+        # if address is not changed, don't update coordinates
+        if old and old.destination == self.destination:
+            return super().save(*args, **kwargs)
+        g = geocoder.mapbox(self.destination, access_token=settings.MAPBOX_ACCESS_TOKEN)
+        self.dest_latitude, self.dest_longitude = g.latlng
+        # autosave category for transport
+        self.category = self.Category.TRANSPORT
+
+        return super().save(*args, **kwargs)
 
     def __str__(self) -> str:
-        return f"{self.content[:35]} ..."
+        return f"{self.name} ({self.day.trip.title} - Day {self.day.number})"
+
+
+class Experience(Event):
+    class Type(models.IntegerChoices):
+        MUSEUM = 1, _("Museum")
+        PARK = 2, _("Park")
+        WALK = 3, _("Walk")
+        SPORT = 4, _("Sport")
+        OTHER = 6, _("Other")
+
+    type = models.IntegerField(choices=Type.choices, default=Type.MUSEUM)
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.day.trip.title} - Day {self.day.number})"
+
+    def save(self, *args, **kwargs):
+        """autosave category for experience"""
+        self.category = self.Category.EXPERIENCE
+        return super().save(*args, **kwargs)
+
+
+class Meal(Event):
+    class Type(models.IntegerChoices):
+        BREAKFAST = 1, _("Breakfast")
+        LUNCH = 2, _("Lunch")
+        DINNER = 3, _("Dinner")
+        SNACK = 4, _("Snack")
+
+    type = models.IntegerField(choices=Type.choices, default=Type.LUNCH)
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.day.trip.title} - Day {self.day.number})"
+
+    def save(self, *args, **kwargs):
+        """autosave category for meal"""
+        self.category = self.Category.MEAL
+        return super().save(*args, **kwargs)

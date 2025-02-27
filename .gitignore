@@ -136,6 +136,7 @@ cython_debug/
 
 # VSCODE
 .vscode/
+.qodo/
 
 # BUN
 node_modules/
@@ -145,6 +146,7 @@ bun.lockb
 # ENVIRONMENT
 .env
 .env.prod
+.env.dev
 
 # TAILWINDCSS
 static/css/tailwind.css

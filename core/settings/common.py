@@ -31,28 +31,28 @@ ALLOWED_HOSTS: list[str] = env("ALLOWED_HOSTS")
 # Application definition
 
 INSTALLED_APPS = [
-    # INTERNAL_APP
-    "trips",
-    "accounts",
-    # THIRD_PARTY
-    "allauth",
-    "allauth.account",
-    "allauth.socialaccount",
-    "crispy_tailwind",
-    "crispy_forms",
-    "django_htmx",
-    "django_extensions",
-    "django_tailwind_cli",
-    "heroicons",
-    "template_partials",
-    "django_q",
-    # CONTRIB
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # THIRD_PARTY
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "crispy_tailwind",
+    "crispy_forms",
+    "django_cotton.apps.SimpleAppConfig",
+    "django_extensions",
+    "django_htmx",
+    "django_tailwind_cli",
+    "heroicons",
+    "template_partials.apps.SimpleAppConfig",
+    "django_q",
+    # INTERNAL_APP
+    "trips",
+    "accounts",
 ]
 
 MIDDLEWARE = [
@@ -74,8 +74,23 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [BASE_DIR / "templates"],
-        "APP_DIRS": True,
+        "APP_DIRS": False,
         "OPTIONS": {
+            "loaders": [
+                (
+                    "template_partials.loader.Loader",
+                    [
+                        (
+                            "django.template.loaders.cached.Loader",
+                            [
+                                "django_cotton.cotton_loader.Loader",
+                                "django.template.loaders.filesystem.Loader",
+                                "django.template.loaders.app_directories.Loader",
+                            ],
+                        )
+                    ],
+                )
+            ],
             "context_processors": [
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
@@ -84,6 +99,8 @@ TEMPLATES = [
             ],
             "builtins": [
                 "heroicons.templatetags.heroicons",
+                "django_cotton.templatetags.cotton",
+                "template_partials.templatetags.partials",
             ],
             "debug": True,
         },
@@ -164,6 +181,7 @@ AUTH_USER_MODEL = "accounts.CustomUser"
 
 LOGIN_REDIRECT_URL = "/"
 
+
 # SITES
 
 SITE_ID = 1
@@ -188,7 +206,7 @@ AUTHENTICATION_BACKENDS = [
 
 # ACCOUNT_ADAPTER => default
 # ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS => default
-ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 # ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL => default
 # ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL => default
@@ -262,6 +280,3 @@ Q_CLUSTER = {
     "orm": "default",
     "catch_up": False,
 }
-
-# DJANGO_TAILWIND_CLI
-TAILWIND_CLI_SRC_CSS = "static/src/input.css"

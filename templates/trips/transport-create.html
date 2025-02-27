@@ -1,7 +1,11 @@
 {% load crispy_forms_tags %}
-<form hx-post="{{ request.path }}" hx-target="#dialog" method="post">
-    <div class="flex justify-between items-center py-2 px-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
-        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Create a New Trip</h3>
+<form hx-post="{{ request.path }}"
+      hx-target="#dialog"
+      hx-disabled-elt="#form-submit"
+      class="modal-content"
+      method="post">
+    <div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Create a new Transport</h3>
         <button type="button"
                 class="inline-flex justify-center items-center w-8 h-8 text-sm text-gray-400 bg-transparent rounded-lg hover:text-gray-900 hover:bg-gray-200 ms-auto dark:hover:bg-gray-600 dark:hover:text-white"
                 x-on:click="openModal = false">
@@ -15,7 +19,7 @@
             <span class="sr-only">Close modal</span>
         </button>
     </div>
-    <div class="grid gap-x-1 p-4 sm:grid-cols-2 sm:gap-x-2 md:p-5">
+    <div class="grid gap-x-1 p-4 sm:grid-cols-4 sm:gap-x-2 md:p-5">
         {% csrf_token %}
         {% crispy form %}
     </div>
@@ -23,6 +27,6 @@
         <button type="button"
                 x-on:click="openModal = false"
                 class="mr-2 btn btn-outline btn-error">Cancel</button>
-        <button class="btn btn-outline btn-primary" type="submit">Save</button>
+        <button id="form-submit" class="btn btn-outline btn-primary" type="submit">Save</button>
     </div>
 </form>

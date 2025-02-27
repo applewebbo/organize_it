@@ -11,17 +11,18 @@ repos:
   hooks:
   - id: pyupgrade
     args:
-    - --py311-plus
+    - --py313-plus
 - repo: https://github.com/adamchainz/django-upgrade
   rev: 1.23.1
   hooks:
   - id: django-upgrade
-    args: [--target-version, '5.0']
-- repo: https://github.com/djlint/djLint
-  rev: v1.36.4
-  hooks:
-  - id: djlint-reformat-django
-  - id: djlint-django
+    args: [--target-version, '5.1']
+# - repo: https://github.com/djlint/djLint
+#   rev: v1.36.4
+#   hooks:
+#   - id: djlint-reformat-django
+#   - id: djlint-django
+#     exclude: templates/tailwind/field.html
 - repo: https://github.com/astral-sh/ruff-pre-commit
   rev: v0.9.7
   hooks:

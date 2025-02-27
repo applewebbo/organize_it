@@ -8,7 +8,7 @@ bootstrap:
     uv venv
     source .venv/bin/activate
     uv sync
-    bun add -D daisyui@latest
+    bun add -D daisyui@beta
 
 # Run the local development server
 local:
@@ -23,20 +23,20 @@ update_all:
     uv sync --upgrade
 
 # Update a specific package
-update package:
-    uv sync --upgrade-package
+update *args:
+    uv sync --upgrade-package {{ args }}
 
 # Run database migrations
 migrate:
     python manage.py migrate --settings=core.settings.development
 
 # Run tests
-test:
-    COVERAGE_CORE=sysmon python -m pytest --reuse-db -s
+test *args:
+    COVERAGE_CORE=sysmon python -m pytest --reuse-db -s {{ args }}
 
 # Run fast tests
-ftest:
-    pytest -n 8 --reuse-db
+ftest *args:
+    pytest -n 8 --reuse-db {{ args }}
 
 # Run tests excluding mapbox and generate coverage report
 mptest:
@@ -51,3 +51,14 @@ dockerdb:
 # Run the cluster
 cluster:
     python manage.py qcluster --settings=core.settings.development
+
+lint:
+    uv run ruff check --fix --unsafe-fixes .
+    uv run ruff format .
+    just _pre-commit run --all-files
+
+_pre-commit *args:
+    uvx --with pre-commit-uv pre-commit {{ args }}
+
+secure:
+    uv-secure

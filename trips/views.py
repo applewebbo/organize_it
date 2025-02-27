@@ -3,44 +3,44 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
-from django.views.decorators.http import require_http_methods, require_POST
+from django.utils.translation import gettext_lazy as _
+from django.views.decorators.http import require_http_methods
 
 from accounts.models import Profile
 
 from .forms import (
-    LinkForm,
-    NoteForm,
-    PlaceAssignForm,
-    PlaceForm,
+    ExperienceForm,
+    MealForm,
+    StayForm,
+    TransportForm,
     TripDateUpdateForm,
     TripForm,
 )
-from .models import Day, Link, Note, Place, Trip
+from .models import Day, Trip
+
+# def calculate_bounds(locations):
+#     # TODO: add check for a single location
+#     # Check if the list is not empty
+#     if not locations:
+#         return None
+
+#     sw = list(min((point["latitude"], point["longitude"]) for point in locations))
+#     ne = list(max((point["latitude"], point["longitude"]) for point in locations))
+
+#     return [sw, ne]
 
 
-def calculate_bounds(locations):
-    # TODO: add check for a single location
-    # Check if the list is not empty
-    if not locations:
-        return None
+# def calculate_days_and_locations(trip):
+#     days = (
+#         Day.objects.filter(trip=trip)
+#         .exclude(places__isnull=True)
+#         .prefetch_related("places")
+#     )
+#     locations = list(
+#         Place.objects.filter(trip=trip).values("name", "latitude", "longitude")
+#     )
 
-    sw = list(min((point["latitude"], point["longitude"]) for point in locations))
-    ne = list(max((point["latitude"], point["longitude"]) for point in locations))
-
-    return [sw, ne]
-
-
-def calculate_days_and_locations(trip):
-    days = (
-        Day.objects.filter(trip=trip)
-        .exclude(places__isnull=True)
-        .prefetch_related("places")
-    )
-    locations = list(
-        Place.objects.filter(trip=trip).values("name", "latitude", "longitude")
-    )
-
-    return days, locations
+#     return days, locations
 
 
 def get_trips(user):
@@ -87,50 +87,49 @@ def trip_list(request):
 @login_required
 def trip_detail(request, pk):
     """Detail Page for the selected trip"""
-    qs = Trip.objects.prefetch_related("links", "places", "notes")
+    qs = Trip.objects.prefetch_related("days", "days__events")
     trip = get_object_or_404(qs, pk=pk)
-    days, locations = calculate_days_and_locations(pk)
-    not_assigned_locations = Place.na_objects.filter(trip=pk)
-    map_bounds = calculate_bounds(locations)
+    # days, locations = calculate_days_and_locations(pk)
+    # not_assigned_locations = Place.na_objects.filter(trip=pk)
+    # map_bounds = calculate_bounds(locations)
 
     context = {
         "trip": trip,
-        "days": days,
-        "locations": locations,
-        "not_assigned_locations": not_assigned_locations,
-        "map_bounds": map_bounds,
+        # "locations": locations,
+        # "not_assigned_locations": not_assigned_locations,
+        # "map_bounds": map_bounds,
     }
     return TemplateResponse(request, "trips/trip-detail.html", context)
 
 
-@login_required
-def map(request, pk, day=None):
-    """Get map details as a separate view to serve with htmx"""
-    qs = Trip.objects.prefetch_related("places", "days")
-    trip = get_object_or_404(qs, pk=pk)
-    days = Day.objects.filter(trip=pk, places__isnull=False).distinct()
-    if day:
-        locations = list(
-            Place.objects.filter(trip=pk, day=day).values(
-                "name", "latitude", "longitude"
-            )
-        )
+# @login_required
+# def map(request, pk, day=None):
+#     """Get map details as a separate view to serve with htmx"""
+#     qs = Trip.objects.prefetch_related("places", "days")
+#     trip = get_object_or_404(qs, pk=pk)
+#     days = Day.objects.filter(trip=pk, places__isnull=False).distinct()
+#     if day:
+#         locations = list(
+#             Place.objects.filter(trip=pk, day=day).values(
+#                 "name", "latitude", "longitude"
+#             )
+#         )
 
-    else:
-        locations = list(
-            Place.objects.filter(trip=pk).values("name", "latitude", "longitude")
-        )
-    map_bounds = calculate_bounds(locations)
+#     else:
+#         locations = list(
+#             Place.objects.filter(trip=pk).values("name", "latitude", "longitude")
+#         )
+#     map_bounds = calculate_bounds(locations)
 
-    context = {
-        "trip": trip,
-        "locations": locations,
-        "map_bounds": map_bounds,
-        "selected_day": day,
-        "days": days,
-    }
+#     context = {
+#         "trip": trip,
+#         "locations": locations,
+#         "map_bounds": map_bounds,
+#         "selected_day": day,
+#         "days": days,
+#     }
 
-    return TemplateResponse(request, "trips/includes/map.html", context)
+#     return TemplateResponse(request, "trips/includes/map.html", context)
 
 
 @login_required
@@ -225,233 +224,68 @@ def trip_dates_update(request, pk):
     return TemplateResponse(request, "trips/trip-dates-update.html", context)
 
 
-@login_required
-def trip_add_link(request, pk):
-    trip = get_object_or_404(Trip, pk=pk, author=request.user)
-
-    form = LinkForm(request.POST or None)
+def add_transport(request, day_id):
+    day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
+    form = TransportForm(request.POST or None)
     if form.is_valid():
-        link = form.save(commit=False)
-        link.author = request.user
-        link.save()
-        trip.links.add(link)
-        trip.save()
+        transport = form.save(commit=False)
+        transport.day = day
+        transport.save()
         messages.add_message(
             request,
             messages.SUCCESS,
-            "Link added successfully",
+            _("Transport added successfully"),
         )
-        return HttpResponse(status=204, headers={"HX-Trigger": "linkSaved"})
-
+        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
     context = {"form": form}
-    return TemplateResponse(request, "trips/link-create.html", context)
+    return TemplateResponse(request, "trips/transport-create.html", context)
 
 
-@login_required
-@require_http_methods(["DELETE"])
-def link_delete(request, pk):
-    link = get_object_or_404(Link, pk=pk, author=request.user)
-    link.delete()
-    messages.add_message(
-        request,
-        messages.SUCCESS,
-        "Link deleted successfully",
-    )
-    return HttpResponse(
-        status=204,
-        headers={"HX-Trigger": "linkSaved"},
-    )
-
-
-@login_required
-def link_update(request, pk):
-    link = get_object_or_404(Link, pk=pk, author=request.user)
-
-    form = LinkForm(request.POST or None, instance=link)
+def add_experience(request, day_id):
+    day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
+    form = ExperienceForm(request.POST or None)
     if form.is_valid():
-        link = form.save()
+        experience = form.save(commit=False)
+        experience.day = day
+        experience.save()
         messages.add_message(
             request,
             messages.SUCCESS,
-            "Link updated successfully",
+            _("Experience added successfully"),
         )
-        return HttpResponse(status=204, headers={"HX-Trigger": "linkSaved"})
-
+        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
     context = {"form": form}
-    return TemplateResponse(request, "trips/link-create.html", context)
+    return TemplateResponse(request, "trips/experience-create.html", context)
 
 
-@login_required
-def link_list(request, pk):
-    links = Link.objects.filter(trips=pk)
-    trip = get_object_or_404(Trip, pk=pk)
-    context = {"links": links, "trip": trip}
-    return TemplateResponse(request, "trips/trip-detail.html#link-list", context)
-
-
-@login_required
-def trip_add_place(request, pk):
-    trip = get_object_or_404(Trip, pk=pk)
-
-    form = PlaceForm(request.POST or None, parent=trip)
+def add_meal(request, day_id):
+    day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
+    form = MealForm(request.POST or None)
     if form.is_valid():
-        place = form.save(commit=False)
-        place.trip = trip
-        place.save()
+        meal = form.save(commit=False)
+        meal.day = day
+        meal.save()
         messages.add_message(
             request,
             messages.SUCCESS,
-            f"<strong>{place.name}</strong> added successfully",
+            _("Meal added successfully"),
         )
-        return HttpResponse(status=204, headers={"HX-Trigger": "placeSaved"})
-
+        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
     context = {"form": form}
-    return TemplateResponse(request, "trips/place-create.html", context)
+    return TemplateResponse(request, "trips/meal-create.html", context)
 
 
-@login_required
-def place_list(request, pk):
-    qs = Trip.objects.prefetch_related("links", "places", "notes")
-    trip = get_object_or_404(qs, pk=pk)
-    days, locations = calculate_days_and_locations(pk)
-    not_assigned_locations = Place.na_objects.filter(trip=pk)
-    map_bounds = calculate_bounds(locations)
-
-    context = {
-        "trip": trip,
-        "days": days,
-        "locations": locations,
-        "not_assigned_locations": not_assigned_locations,
-        "map_bounds": map_bounds,
-    }
-    return TemplateResponse(request, "trips/trip-detail.html#place-list", context)
-
-
-@login_required
-@require_http_methods(["DELETE"])
-def place_delete(request, pk):
-    place = get_object_or_404(Place, pk=pk, trip__author=request.user)
-    place.delete()
-    messages.add_message(
-        request,
-        messages.SUCCESS,
-        "Place deleted successfully",
-    )
-    return HttpResponse(
-        status=204,
-        headers={"HX-Trigger": "placeSaved"},
-    )
-
-
-@login_required
-def place_update(request, pk):
-    place = get_object_or_404(Place, pk=pk, trip__author=request.user)
-
-    form = PlaceForm(request.POST or None, instance=place)
+def add_stay(request, day_id):
+    day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
+    trip = day.trip
+    form = StayForm(trip, request.POST or None)
     if form.is_valid():
-        place = form.save()
+        form.save()
         messages.add_message(
             request,
             messages.SUCCESS,
-            "Place updated successfully",
+            _("Stay added successfully"),
         )
-        return HttpResponse(status=204, headers={"HX-Trigger": "placeSaved"})
-
+        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
     context = {"form": form}
-    return TemplateResponse(request, "trips/place-create.html", context)
-
-
-@login_required
-def place_assign(request, pk):
-    place = get_object_or_404(Place, pk=pk, trip__author=request.user)
-    if request.method == "POST":
-        form = PlaceAssignForm(request.POST, instance=place)
-        if form.is_valid():
-            place = form.save()
-            messages.add_message(
-                request,
-                messages.SUCCESS,
-                "Place assigned successfully",
-            )
-            return HttpResponse(status=204, headers={"HX-Trigger": "placeSaved"})
-        form = PlaceAssignForm(request.POST, instance=place)
-        context = {"form": form, "place": place}
-        return TemplateResponse(request, "trips/place-create.html", context)
-
-    form = PlaceAssignForm(instance=place)
-    context = {"form": form, "place": place}
-    return TemplateResponse(request, "trips/place-assign.html", context)
-
-
-@login_required
-def trip_add_note(request, pk):
-    trip = get_object_or_404(Trip, pk=pk, author=request.user)
-
-    form = NoteForm(trip, request.POST or None)
-    if form.is_valid():
-        note = form.save(commit=False)
-        note.trip = trip
-        note.save()
-        messages.add_message(
-            request,
-            messages.SUCCESS,
-            "Note added successfully",
-        )
-        return HttpResponse(status=204, headers={"HX-Trigger": "noteSaved"})
-
-    context = {"form": form}
-    return TemplateResponse(request, "trips/note-create.html", context)
-
-
-@login_required
-def note_update(request, pk):
-    note = get_object_or_404(Note, pk=pk, trip__author=request.user)
-
-    form = NoteForm(note.trip, request.POST or None, instance=note)
-    if form.is_valid():
-        note = form.save()
-        messages.add_message(
-            request,
-            messages.SUCCESS,
-            "Note updated successfully",
-        )
-        return HttpResponse(status=204, headers={"HX-Trigger": "noteSaved"})
-
-    context = {"form": form, "note": note}
-    return TemplateResponse(request, "trips/note-update.html", context)
-
-
-@login_required
-def note_list(request, pk):
-    notes = Note.objects.filter(trip=pk)
-    trip = get_object_or_404(Trip, pk=pk)
-    context = {"notes": notes, "trip": trip}
-    return TemplateResponse(request, "trips/trip-detail.html#note-list", context)
-
-
-@login_required
-@require_http_methods(["DELETE"])
-def note_delete(request, pk):
-    note = get_object_or_404(Note, pk=pk, trip__author=request.user)
-    note.delete()
-    messages.add_message(
-        request,
-        messages.SUCCESS,
-        "Note deleted successfully",
-    )
-    return HttpResponse(
-        status=204,
-        headers={"HX-Trigger": "noteSaved"},
-    )
-
-
-@login_required
-@require_POST
-def note_check_or_uncheck(request, pk):
-    note = get_object_or_404(Note, pk=pk, trip__author=request.user)
-    note.checked = not note.checked
-    note.save()
-    return HttpResponse(
-        status=204,
-        headers={"HX-Trigger": "noteSaved"},
-    )
+    return TemplateResponse(request, "trips/stay-create.html", context)

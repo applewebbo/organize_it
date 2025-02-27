@@ -5,245 +5,47 @@
 {% endblock page_title %}
 {% block content %}
     <!-- Details Section -->
-    <section id="details" class="text-center md:text-start">
-        <div class="py-4 px-6 w-full bg-white rounded-lg border border-gray-200 shadow dark:bg-gray-800 dark:border-gray-700">
+    <section id="details" class="mb-8 text-center md:text-start">
+        <div class="py-2 px-4 w-full bg-white rounded-lg border border-gray-200 shadow md:py-4 md:px-6">
             <div class="items-center mb-3 md:flex">
-                <span class="text-gray-900 bg-cyan-400 border border-cyan-500 md:order-last card-badge">{{ trip.get_status_display }}</span>
-                <h2 class="mt-4 mb-2 text-4xl font-semibold tracking-tight md:mt-0 md:mr-6 md:grow">{{ trip.title }}</h2>
+                <h2 class="mt-2 mb-2 text-2xl font-semibold tracking-tight md:mt-0 md:text-3xl md:grow">
+                    {{ trip.title }} <span class="mb-2 badge badge-xs badge-secondary badge-outline ms-2 md:badge-sm lg:badge-md">{{ trip.get_status_display }}</span>
+                </h2>
             </div>
-            <div id="trip-details" class="mb-4">
+            <div id="trip-details"
+                 class="flex flex-col gap-x-3 mb-4 md:flex-row lg:gap-x-6 lg:justify-start">
                 {% if trip.start_date and trip.end_date %}
-                    <span>Start Date: <strong>{{ trip.start_date }}</strong> / End date: <strong>{{ trip.end_date }}</strong></span>
+                    <div>
+                        Start Date: <strong>{{ trip.start_date }}</strong>
+                    </div>
+                    <div>
+                        End date: <strong>{{ trip.end_date }}</strong>
+                    </div>
                 {% else %}
-                    <span>Start Date: <strong>-</strong>  /  End date: <strong>-</strong></span>
+                    <div>
+                        Start Date: <strong>-</strong>
+                    </div>
+                    <div>
+                        End date: <strong>-</strong>
+                    </div>
                 {% endif %}
+                <div>
+                    Destination: <strong>{{ trip.destination }}</strong>
+                </div>
             </div>
-            <p>
+            <p class="hidden md:block">
                 <em>{{ trip.description }}</em>
             </p>
-            <div x-data id="buttons" class="my-6">
-                <button class="inline-flex items-center mr-3 text-center btn btn-sm btn-primary"
-                        hx-get="{% url 'trips:trip-add-link' trip.id %}"
-                        hx-target="#dialog"
-                        hx-swap="innerHTML"
-                        @click="$dispatch('open-modal')">
-                    {% heroicon_outline "plus" stroke_width=2 class="size-4 me-2" %}Link
-                </button>
-                <button class="inline-flex items-center mr-3 text-center btn btn-sm btn-primary"
-                        hx-get="{% url 'trips:trip-add-place' trip.id %}"
-                        hx-target="#dialog"
-                        hx-swap="innerHTML"
-                        @click="$dispatch('open-modal')">
-                    {% heroicon_outline "plus" stroke_width=2 class="size-4 me-2" %}Place
-                </button>
-                <button class="inline-flex items-center mr-3 text-center btn btn-sm btn-primary"
-                        hx-get="{% url 'trips:trip-add-note' trip.id %}"
-                        hx-target="#dialog"
-                        hx-swap="innerHTML"
-                        @click="$dispatch('open-modal')">
-                    {% heroicon_outline "plus" stroke_width=2 class="size-4 me-2" %}Note
-                </button>
-            </div>
         </div>
     </section>
-    <hr>
-    <!-- Links Section -->
-    <section id="links" class="px-4 mt-6 mb-4">
-        <div x-data class="flex items-center mb-8">
-            <h3 class="mr-4 text-2xl font-bold grow">Links</h3>
-            <button class="inline-flex items-center text-center btn btn-sm btn-primary"
-                    hx-get="{% url 'trips:trip-add-link' trip.id %}"
-                    hx-target="#dialog"
-                    hx-swap="innerHTML"
-                    @click="$dispatch('open-modal')">
-                {% heroicon_outline "plus" stroke_width=2 class="size-4 me-2" %}Link
-            </button>
-        </div>
-        {% partialdef link-list inline=true %}
-        <ul class="my-3 columns-1 lg:columns-2"
-            hx-swap="outerHTML"
-            hx-get="{% url 'trips:link-list' trip.id %}"
-            hx-trigger="linkSaved from:body">
-            {% for link in trip.links.all %}
-                <li x-data class="flex pb-2 mb-3 edit">
-                    <a href="{{ link.url }}" class="grow truncate">
-                        {% if link.title %}
-                            {{ link.title }}
-                        {% else %}
-                            {{ link.url }}
-                        {% endif %}
-                    </a>
-                    <button class="btn btn-xs btn-primary-outline me-2"
-                            hx-get="{% url 'trips:link-update' link.id %}"
-                            hx-target="#dialog"
-                            hx-swap="innerHTML"
-                            @click="$dispatch('open-modal')">
-                        {% heroicon_outline "pencil" stroke_width=2 class="size-3" %}
-                    </button>
-                    <button class="btn btn-xs btn-danger-outline"
-                            hx-delete="{% url 'trips:link-delete' link.pk %}"
-                            hx-confirm="Are you sure you want to delete {{ link.url }}">
-                        {% heroicon_outline "x-mark" stroke_width=2 class="size-3" %}
-                    </button>
-                </li>
-            {% endfor %}
-        </ul>
-        {% if request.htmx %}
-            <div hx-swap-oob="innerHTML:#messages">{% include 'includes/messages.html' %}</div>
-        {% else %}
-        {% endif %}
-    {% endpartialdef %}
-</section>
-<hr>
-<!-- Places Section -->
-<section id="places" class="px-4 mt-6 mb-4">
-    {% partialdef place-list inline=true %}
-    <div x-data
-         id="place-control"
-         class="flex items-center mb-8"
-         hx-swap-oob="true">
-        <h3 class="mr-4 text-2xl font-bold grow">Places</h3>
-        {% if trip.places.all %}
-            <button class="inline-flex items-center text-center btn btn-sm btn-primary-outline"
-                    hx-get="{% url 'trips:map' trip.id %}"
-                    hx-target="#place-list"
-                    hx-swap="innerHTML">
-                {% heroicon_outline "map" stroke_width=2 class="size-4 me-0 sm:me-2" %}
-                <span class="hidden sm:block">Map</span>
-            </button>
-            <button class="inline-flex items-center text-center btn btn-sm btn-primary-outline">
-                {% heroicon_outline "arrows-up-down" stroke_width=2 class="size-4 me-0 sm:me-2" %}
-                <span class="hidden sm:block">Reorder</span>
-            </button>
-        {% endif %}
-        <button class="inline-flex items-center text-center btn btn-sm btn-primary"
-                hx-get="{% url 'trips:trip-add-place' trip.id %}"
-                hx-target="#dialog"
-                hx-swap="innerHTML"
-                @click="$dispatch('open-modal')">
-            {% heroicon_outline "plus" stroke_width=2 class="size-4 me-2" %}Place
-        </button>
-    </div>
-    {% if trip.places.all %}
-        <div id="place-list"
-             hx-swap="outerHTML"
-             hx-get="{% url 'trips:place-list' trip.id %}"
-             hx-trigger="placeSaved from:body"
-             hx-target="#place-list">
-            <div class="grid gap-4 mb-8 md:grid-cols-2 xl:grid-cols-3">
-                {% for day in days %}
-                    {% include "trips/includes/places-single-day.html" %}
-                {% endfor %}
-            </div>
-            {% if not_assigned_locations.all %}
-                <div x-data class="px-4 mb-2">
-                    <h4 class="mb-3 text-xl font-semibold">Places not assigned</h4>
-                    <ul class="flex flex-wrap justify-start items-center">
-                        {% for place in not_assigned_locations %}
-                            <li class="py-0.5 px-2.5 mb-2 text-xs font-medium text-green-800 bg-green-100 rounded border border-green-400 cursor-pointer dark:text-green-300 dark:bg-green-900 me-4">
-                                <a href="#"
-                                   hx-get="{% url 'trips:place-assign' place.id %}"
-                                   hx-target="#dialog"
-                                   hx-swap="innerHTML"
-                                   @click="$dispatch('open-modal')">{{ place.name }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            {% endif %}
-            {% if request.htmx %}
-                <div hx-swap-oob=innerHTML:#messages>{% include "includes/messages.html" %}</div>
-            {% else %}
-            {% endif %}
-        {% else %}
-            <p class="mb-5 text-gray-500">No places here. Add your first place where you want to go...</p>
-        {% endif %}
-    {% endpartialdef %}
-</section>
-<hr>
-<!-- Notes Section -->
-<section id="notes" class="px-4 mt-6 mb-4">
-    <div x-data class="flex items-center mb-8">
-        <h3 class="mr-4 text-2xl font-bold grow">Notes</h3>
-        <button class="inline-flex items-center text-center btn btn-sm btn-primary"
-                hx-get="{% url 'trips:trip-add-note' trip.id %}"
-                hx-target="#dialog"
-                hx-swap="innerHTML"
-                @click="$dispatch('open-modal')">
-            {% heroicon_outline "plus" stroke_width=2 class="size-4 me-2" %}Note
-        </button>
-    </div>
-    {% partialdef note-list inline=true %}
-    <ul id="notes-list"
-        class="my-3 columns-1 lg:columns-2"
-        hx-swap="outerHTML"
-        hx-get="{% url 'trips:note-list' trip.id %}"
-        hx-trigger="noteSaved from:body">
-        {% for note in trip.notes.all %}
-            <li x-data
-                class="flex items-center pb-2 mb-3 border-b border-gray-200 edit">
-                <span class="grow truncate me-3">{{ note.content }}</span>
-                {% if note.checked == True %}
-                    <button class="btn btn-xs btn-danger-outline me-2"
-                            hx-post="{% url 'trips:note-check' note.id %}"
-                            hx-target="#dialog"
-                            hx-swap="innerHTML">
-                        {% heroicon_outline "document" stroke_width=2 class="size-3" %}
-                    </button>
-                {% else %}
-                    <button class="btn btn-xs btn-dark-outline btn-success me-2"
-                            hx-post="{% url 'trips:note-check' note.id %}"
-                            hx-target="#dialog"
-                            hx-swap="innerHTML">
-                        {% heroicon_outline "document-check" stroke_width=2 class="size-3" %}
-                    </button>
-                {% endif %}
-                <button class="btn btn-xs btn-primary-outline me-2"
-                        hx-get="{% url 'trips:note-update' note.id %}"
-                        hx-target="#dialog"
-                        hx-swap="innerHTML"
-                        @click="$dispatch('open-modal')">
-                    {% heroicon_outline "pencil" stroke_width=2 class="size-3" %}
-                </button>
-                <button class="btn btn-xs btn-danger-outline me-2"
-                        hx-delete="{% url 'trips:note-delete' note.id %}"
-                        hx-confirm="Are you sure you want to delete {{ link.url }}">
-                    {% heroicon_outline "x-mark" stroke_width=2 class="size-3" %}
-                </button>
-            </li>
+    <!-- END Details Section -->
+    <!-- Days Section   -->
+    <section id="days" class="flex flex-col gap-y-4">
+        {% for day in trip.days.all %}
+            {% include 'trips/includes/day.html' with day=day %}
         {% endfor %}
-    </ul>
-    {% if request.htmx %}
-        <div hx-swap-oob="innerHTML:#messages">{% include "includes/messages.html" %}</div>
-    {% else %}
-    {% endif %}
-{% endpartialdef %}
-</section>
+    </section>
+    <!-- END Days Section -->
 {% endblock content %}
 {% block script %}
-    <script src="{% static 'js/sortable.js' %}"></script>
-    <script>
-    {% if trip.places.all %}
-        htmx.on("htmx:load", function(evt){
-        if (evt.detail.elt.id == "map") {
-          let map_bounds = JSON.parse(document.getElementById('map_bounds').textContent);
-          let placesMap = createMap([map_bounds[0], map_bounds[1]]);
-          let locations = JSON.parse(document.getElementById('location_json').textContent);
-
-          let markerFeatureGroup = L.featureGroup().addTo(placesMap);
-
-          for (let location of locations) {
-            L.marker([ location.latitude, location.longitude]).addTo(markerFeatureGroup).bindPopup(location.name);
-          }
-        }
-      });
-    {% endif %}
-
-    function resetInput() {
-      let inputs = document.getElementsByClassName('select')
-      Array.from(inputs).forEach((el) => el.selectedIndex = 0);
-    }
-
-
-    </script>
 {% endblock script %}
