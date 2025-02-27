@@ -128,7 +128,10 @@ class TripCreateView(TestCase):
         self.response_200(response)
         assertTemplateUsed(response, "trips/trip-create.html")
 
-    def test_post(self):
+    @patch("geocoder.mapbox")
+    def test_post(self, mock_geocoder):
+        mock_geocoder.return_value.ok = True
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
         user = self.make_user("user")
         data = {
             "title": "Trip to Paris",
@@ -188,7 +191,10 @@ class TripUpdateView(TestCase):
         self.response_200(response)
         assertTemplateUsed(response, "trips/trip-create.html")
 
-    def test_post(self):
+    @patch("geocoder.mapbox")
+    def test_post(self, mock_geocoder):
+        mock_geocoder.return_value.ok = True
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
         user = self.make_user("user")
         trip = TripFactory(author=user)
         data = {

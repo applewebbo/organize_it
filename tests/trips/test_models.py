@@ -10,6 +10,16 @@ from trips.models import Event, Experience, Meal, Stay, Transport
 
 pytestmark = pytest.mark.django_db
 
+mock_geocoder_response = Mock(latlng=(10.0, 20.0))
+
+
+@pytest.fixture
+def mocked_geocoder():
+    with patch(
+        "trips.models.geocoder.mapbox", return_value=mock_geocoder_response
+    ) as mocked_geocoder:
+        yield mocked_geocoder
+
 
 class TestTripModel:
     def test_factory(self, user_factory, trip_factory):
@@ -90,17 +100,6 @@ class TestDayModel:
         trip.save()
 
         assert trip.days.all().first().date == date.today() + timedelta(days=1)
-
-
-mock_geocoder_response = Mock(latlng=(10.0, 20.0))
-
-
-@pytest.fixture
-def mocked_geocoder():
-    with patch(
-        "trips.models.geocoder.mapbox", return_value=mock_geocoder_response
-    ) as mocked_geocoder:
-        yield mocked_geocoder
 
 
 class TestLinkModel:

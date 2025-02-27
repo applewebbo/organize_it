@@ -29,7 +29,10 @@ def mocked_geocoder():
 
 
 class TestTripForm:
-    def test_form(self):
+    @patch("geocoder.mapbox")
+    def test_form(self, mock_geocoder):
+        mock_geocoder.return_value.ok = True
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
         data = {
             "title": "Test Trip",
             "destination": "Milano",
@@ -41,7 +44,10 @@ class TestTripForm:
 
         assert form.is_valid()
 
-    def test_end_date_before_start_date(self):
+    @patch("geocoder.mapbox")
+    def test_end_date_before_start_date(self, mock_geocoder):
+        mock_geocoder.return_value.ok = True
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
         data = {
             "title": "Test Trip",
             "description": "Test Description",
@@ -54,7 +60,10 @@ class TestTripForm:
         assert not form.is_valid()
         assert "End date must be after start date" in form.non_field_errors()
 
-    def test_start_date_before_today(self):
+    @patch("geocoder.mapbox")
+    def test_start_date_before_today(self, mock_geocoder):
+        mock_geocoder.return_value.ok = True
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
         data = {
             "title": "Test Trip",
             "description": "Test Description",
