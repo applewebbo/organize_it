@@ -87,17 +87,14 @@ def trip_list(request):
 @login_required
 def trip_detail(request, pk):
     """Detail Page for the selected trip"""
-    qs = Trip.objects.prefetch_related("days", "days__events")
+    qs = Trip.objects.prefetch_related(
+        "days__events",
+        "days__stay",
+    ).select_related("author")
     trip = get_object_or_404(qs, pk=pk)
-    # days, locations = calculate_days_and_locations(pk)
-    # not_assigned_locations = Place.na_objects.filter(trip=pk)
-    # map_bounds = calculate_bounds(locations)
 
     context = {
         "trip": trip,
-        # "locations": locations,
-        # "not_assigned_locations": not_assigned_locations,
-        # "map_bounds": map_bounds,
     }
     return TemplateResponse(request, "trips/trip-detail.html", context)
 

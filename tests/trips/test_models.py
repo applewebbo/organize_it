@@ -101,6 +101,70 @@ class TestDayModel:
 
         assert trip.days.all().first().date == date.today() + timedelta(days=1)
 
+    def test_next_day_property(self, user_factory, trip_factory):
+        """Test next_day property returns correct day"""
+        user = user_factory()
+        trip = trip_factory(
+            author=user,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=2),
+        )
+        days = list(trip.days.all())
+
+        # Test first day returns second day
+        assert days[0].next_day == days[1]
+
+        # Test middle day returns last day
+        assert days[1].next_day == days[2]
+
+        # Test last day returns None
+        assert days[2].next_day is None
+
+        # Test day not in trip returns None
+        other_trip = trip_factory()
+        other_day = other_trip.days.first()
+        other_day.trip = trip  # Change trip reference without adding to trip's days
+        assert other_day.next_day is None
+
+        # Test with empty trip
+        empty_trip = trip_factory()
+        empty_trip.days.all().delete()
+        test_day = days[0]
+        test_day.trip = empty_trip
+        assert test_day.next_day is None
+
+    def test_prev_day_property(self, user_factory, trip_factory):
+        """Test prev_day property returns correct day"""
+        user = user_factory()
+        trip = trip_factory(
+            author=user,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=2),
+        )
+        days = list(trip.days.all())
+
+        # Test first day returns None
+        assert days[0].prev_day is None
+
+        # Test middle day returns first day
+        assert days[1].prev_day == days[0]
+
+        # Test last day returns middle day
+        assert days[2].prev_day == days[1]
+
+        # Test day not in trip returns None
+        other_trip = trip_factory()
+        other_day = other_trip.days.first()
+        other_day.trip = trip  # Change trip reference without adding to trip's days
+        assert other_day.prev_day is None
+
+        # Test with empty trip
+        empty_trip = trip_factory()
+        empty_trip.days.all().delete()
+        test_day = days[0]
+        test_day.trip = empty_trip
+        assert test_day.prev_day is None
+
 
 class TestLinkModel:
     def test_factory(self, user_factory, trip_factory, link_factory):
@@ -362,4 +426,5 @@ class TestStayModel:
         # Invalid phone number should raise ValidationError
         with pytest.raises(ValidationError):
             stay = stay_factory(phone_number="invalid")
+            stay.full_clean()
             stay.full_clean()
