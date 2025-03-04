@@ -122,6 +122,26 @@ class Day(models.Model):
     number = models.PositiveSmallIntegerField()
     date = models.DateField()
 
+    @property
+    def next_day(self):
+        """Get next day using prefetched data"""
+        days = [d for d in self.trip.days.all()]
+        try:
+            current_index = days.index(self)
+            return days[current_index + 1] if current_index + 1 < len(days) else None
+        except (ValueError, IndexError):
+            return None
+
+    @property
+    def prev_day(self):
+        """Get previous day using prefetched data"""
+        days = [d for d in self.trip.days.all()]
+        try:
+            current_index = days.index(self)
+            return days[current_index - 1] if current_index > 0 else None
+        except (ValueError, IndexError):
+            return None
+
     def __str__(self) -> str:
         day = _("Day")
         return f"{day} {self.number} [{self.trip.title}]"
