@@ -28,3 +28,11 @@ def has_different_stay(day1, day2):
     if not day2:
         return True
     return day1.stay != day2.stay
+
+
+@register.filter
+def is_first_day_of_stay(day):
+    if not day.stay:
+        return False
+    prev_day = day.prev_day
+    return not prev_day or prev_day.stay != day.stay

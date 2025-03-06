@@ -30,7 +30,7 @@
 @plugin"@tailwindcss/container-queries";
 @plugin"@tailwindcss/forms";
 @plugin "daisyui" {
-  themes: winter --default;
+  themes: silk --default;
 }
 
 p{
