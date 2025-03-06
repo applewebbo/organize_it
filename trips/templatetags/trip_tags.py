@@ -36,3 +36,19 @@ def is_first_day_of_stay(day):
         return False
     prev_day = day.prev_day
     return not prev_day or prev_day.stay != day.stay
+
+
+@register.filter
+def is_first_day_of_trip(day):
+    return day.number == 1
+
+
+@register.filter
+def event_icon(event):
+    icons = {
+        1: "truck",  # Transport
+        2: "photo",  # Experience
+        3: "cake",  # Meal
+        4: "home-modern",  # Stay
+    }
+    return icons.get(event.category, "question-mark-circle")

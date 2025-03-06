@@ -1,7 +1,14 @@
 import pytest
 
-from tests.trips.factories import StayFactory, TripFactory
-from trips.templatetags.trip_tags import has_different_stay, is_last_day, next_day
+from tests.trips.factories import EventFactory, StayFactory, TripFactory
+from trips.templatetags.trip_tags import (
+    event_icon,
+    has_different_stay,
+    is_first_day_of_stay,
+    is_first_day_of_trip,
+    is_last_day,
+    next_day,
+)
 
 pytestmark = pytest.mark.django_db
 
@@ -29,6 +36,35 @@ def trip_with_stays():
         days[3].save()
 
     return trip
+
+
+def test_trip_with_stays_fixture(trip_with_stays):
+    """Test that trip_with_stays fixture creates correct setup"""
+    days = list(trip_with_stays.days.all())
+
+    # Verify we have at least 3 days
+    assert len(days) >= 3
+
+    # First two days should have same stay
+    assert days[0].stay == days[1].stay
+
+    # Last days should have different stay from first days
+    assert days[0].stay != days[2].stay
+    assert days[1].stay != days[2].stay
+
+    # If there's a fourth day, it should have same stay as third day
+    if len(days) > 3:
+        assert days[2].stay == days[3].stay
+
+
+def test_trip_with_stays_stays_exist(trip_with_stays):
+    """Test that stays in trip_with_stays are properly created"""
+    days = list(trip_with_stays.days.all())
+
+    # Verify stays are not None
+    assert days[0].stay is not None
+    assert days[1].stay is not None
+    assert days[2].stay is not None
 
 
 def test_next_day(trip_with_stays):
@@ -137,3 +173,53 @@ def test_has_different_stay(trip_with_stays):
 
     # Test with None returns True
     assert has_different_stay(days[-1], None)
+
+
+def test_is_first_day_of_stay(trip_with_stays):
+    """Test is_first_day_of_stay template filter"""
+    days = list(trip_with_stays.days.all())
+
+    # First day of first stay should return True
+    assert is_first_day_of_stay(days[0])
+
+    # Second day of first stay should return False
+    assert not is_first_day_of_stay(days[1])
+
+    # First day of second stay should return True
+    assert is_first_day_of_stay(days[2])
+
+    # Test with day without stay
+    days[0].stay = None
+    assert not is_first_day_of_stay(days[0])
+
+
+def test_is_first_day_of_trip(trip_with_stays):
+    """Test is_first_day_of_trip template filter"""
+    days = list(trip_with_stays.days.all())
+
+    # First day should return True
+    assert is_first_day_of_trip(days[0])
+
+    # Other days should return False
+    assert not is_first_day_of_trip(days[1])
+    assert not is_first_day_of_trip(days[2])
+
+
+def test_event_icon():
+    """Test event_icon template filter"""
+    # Test all event categories
+    transport = EventFactory(category=1)
+    assert event_icon(transport) == "truck"
+
+    experience = EventFactory(category=2)
+    assert event_icon(experience) == "photo"
+
+    meal = EventFactory(category=3)
+    assert event_icon(meal) == "cake"
+
+    stay = EventFactory(category=4)
+    assert event_icon(stay) == "home-modern"
+
+    # Test unknown category
+    unknown = EventFactory(category=99)
+    assert event_icon(unknown) == "question-mark-circle"
