@@ -114,10 +114,26 @@ class Stay(models.Model):
         return f"{self.name} - {self.days.first().trip.title}"
 
 
+@receiver(post_save, sender=Stay)
+def update_stay_days(sender, instance, **kwargs):
+    """
+    When days are assigned to a stay, remove those days from any previous stays
+    """
+    # Get all days that are now assigned to this stay
+    related_days = instance.days.all()
+
+    # For each day, remove any other stay relationships
+    for day in related_days:
+        # Find other stays linked to this day (excluding the current stay)
+        Day.objects.filter(stay__isnull=False, pk=day.pk).exclude(stay=instance).update(
+            stay=None
+        )
+
+
 class Day(models.Model):
     trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="days")
     stay = models.ForeignKey(
-        Stay, on_delete=models.CASCADE, null=True, blank=True, related_name="days"
+        Stay, on_delete=models.SET_NULL, null=True, blank=True, related_name="days"
     )
     number = models.PositiveSmallIntegerField()
     date = models.DateField()
