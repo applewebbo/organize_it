@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
@@ -16,7 +18,7 @@ from .forms import (
     TripDateUpdateForm,
     TripForm,
 )
-from .models import Day, Trip
+from .models import Day, Stay, Trip
 
 # def calculate_bounds(locations):
 #     # TODO: add check for a single location
@@ -286,3 +288,25 @@ def add_stay(request, day_id):
         return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
     context = {"form": form}
     return TemplateResponse(request, "trips/stay-create.html", context)
+
+
+def stay_detail(request, pk):
+    stay = get_object_or_404(Stay, pk=pk)
+    days = stay.days.order_by("date")
+    last_day = days.last()
+    first_stay_day = days.first()
+
+    # Find the day before the first stay day in the trip's days
+    first_day = (
+        Day.objects.filter(
+            trip=first_stay_day.trip, date=first_stay_day.date - timedelta(days=1)
+        ).first()
+        or first_stay_day
+    )
+
+    context = {
+        "stay": stay,
+        "first_day": first_day,
+        "last_day": last_day,
+    }
+    return TemplateResponse(request, "trips/stay-detail.html", context)

@@ -8,12 +8,16 @@
         <button class="btn btn-sm me-2 sm:btn-md" disabled="disabled">{% heroicon_mini "map" class="size-5" %}</button>
         <c-dropdown />
     </div>
-    <div id="stay-info" class="mt-4">
+    <div id="stay-info" class="mt-4" x-data>
         <ul class="flex flex-col gap-y-2 gap-x-4 md:flex-row">
             {% if day.stay %}
                 <li class="flex items-center italic">
                     {% heroicon_outline 'home-modern' class="size-5 me-2" %}
-                    {{ day.stay.name }}
+                    <a hx-get="{% url 'trips:stay-detail' day.stay.pk %}"
+                       hx-target="#dialog"
+                       hx-swap="innerHTML"
+                       @click="$dispatch('open-modal'); document.activeElement.blur()"
+                       class="link">{{ day.stay.name }}</a>
                     {% if day|is_first_day_of_trip and day.stay.check_in %}
                         <div class="flex items-center py-0.5 px-2 text-green-700 bg-green-100 rounded-lg border-2 border-green-300 ms-2">
                             {{ day.stay.check_in|time:"H:i" }}
@@ -33,24 +37,28 @@
                     {% if next_day and next_day.stay and day|has_different_stay:next_day and next_day.stay.check_in %}
                         <li class="flex items-center italic">
                             {% heroicon_outline 'home-modern' class="size-5 me-2" %}
-                            {{ next_day.stay.name }}
-                            <div class="flex items-center py-0.5 px-2 text-green-700 bg-green-100 rounded-lg border-2 border-green-300 ms-2">
-                                {{ next_day.stay.check_in|time:"H:i" }}
-                                {% heroicon_mini 'arrow-right-end-on-rectangle' class="size-4 ms-1" %}
-                            </div>
-                        </li>
-                    {% endif %}
-                {% endwith %}
-            {% endif %}
+                            <a hx-get="{% url 'trips:stay-detail' next_day.stay.pk %}"
+                               hx-target="#dialog"
+                               hx-swap="innerHTML"
+                               @click="$dispatch('open-modal'); document.activeElement.blur()"
+                               class="link">{{ next_day.stay.name }}</a>
+                                <div class="flex items-center py-0.5 px-2 text-green-700 bg-green-100 rounded-lg border-2 border-green-300 ms-2">
+                                    {{ next_day.stay.check_in|time:"H:i" }}
+                                    {% heroicon_mini 'arrow-right-end-on-rectangle' class="size-4 ms-1" %}
+                                </div>
+                            </li>
+                        {% endif %}
+                    {% endwith %}
+                {% endif %}
+            </ul>
+        </div>
+        {% if day.events.all %}<div class="divider"></div>{% endif %}
+        <ul>
+            {% for event in day.events.all %}
+                <li class="flex items-center">
+                    {% heroicon_outline event|event_icon class="size-4 me-2" %}
+                    {{ event.name }} ({{ event.start_time|time:"H:i" }})
+                </li>
+            {% endfor %}
         </ul>
     </div>
-    {% if day.events.all %}<div class="divider"></div>{% endif %}
-    <ul>
-        {% for event in day.events.all %}
-            <li class="flex items-center">
-                {% heroicon_outline event|event_icon class="size-4 me-2" %}
-                {{ event.name }} ({{ event.start_time|time:"H:i" }})
-            </li>
-        {% endfor %}
-    </ul>
-</div>
