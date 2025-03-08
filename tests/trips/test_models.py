@@ -428,3 +428,40 @@ class TestStayModel:
             stay = stay_factory(phone_number="invalid")
             stay.full_clean()
             stay.full_clean()
+
+    def test_update_stay_days_removes_previous_stays(self, trip_factory, stay_factory):
+        """Test that assigning multiple days to a new stay removes them from previous stays"""
+        # Create a trip with 3 days
+        trip = trip_factory(
+            start_date=date.today(), end_date=date.today() + timedelta(days=2)
+        )
+        days = list(trip.days.all())
+
+        # Create two stays and assign days to first stay
+        stay1 = stay_factory()
+        stay2 = stay_factory()
+
+        # Associate days with stay1 using Day objects
+        for day in days:
+            day.stay = stay1
+            day.save()
+
+        # Verify initial assignment
+        assert stay1.days.count() == 3
+
+        # Now update stay2 to include these days
+        # This will trigger the post_save signal on Stay
+        for day in days:
+            day.stay = stay2
+            day.save()
+
+        # Save stay2 to ensure signal is triggered
+        stay2.save()
+
+        # Refresh stays from database
+        stay1.refresh_from_db()
+        stay2.refresh_from_db()
+
+        # Verify days were properly transferred
+        assert stay2.days.count() == 3
+        assert stay1.days.count() == 0

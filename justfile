@@ -1,4 +1,3 @@
-
 # Define the default recipe
 default:
     @just --list
@@ -28,19 +27,19 @@ update *args:
 
 # Run database migrations
 migrate:
-    python manage.py migrate --settings=core.settings.development
+    uv run python manage.py migrate --settings=core.settings.development
 
 # Run tests
 test *args:
-    COVERAGE_CORE=sysmon python -m pytest --reuse-db -s {{ args }}
+    COVERAGE_CORE=sysmon uv run python -m pytest --reuse-db -s {{ args }}
 
 # Run fast tests
 ftest *args:
-    pytest -n 8 --reuse-db {{ args }}
+    uv run pytest -n 8 --reuse-db {{ args }}
 
 # Run tests excluding mapbox and generate coverage report
 mptest:
-    COVERAGE_CORE=sysmon python -m pytest -m "not mapbox" --cov-report html:htmlcov --cov-report term:skip-covered --cov-fail-under 100
+    COVERAGE_CORE=sysmon uv run python -m pytest -m "not mapbox" --cov-report html:htmlcov --cov-report term:skip-covered --cov-fail-under 100
 
 # Set up Docker database
 dockerdb:

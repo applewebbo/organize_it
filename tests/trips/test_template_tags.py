@@ -1,6 +1,7 @@
 import pytest
 
 from tests.trips.factories import EventFactory, StayFactory, TripFactory
+from trips.templatetags.trip_filters import phone_format
 from trips.templatetags.trip_tags import (
     event_icon,
     has_different_stay,
@@ -223,3 +224,19 @@ def test_event_icon():
     # Test unknown category
     unknown = EventFactory(category=99)
     assert event_icon(unknown) == "question-mark-circle"
+
+
+@pytest.mark.parametrize(
+    "phone_number,expected",
+    [
+        ("+1234567890", "+12 345 67890"),  # Adjusted spacing
+        ("1234567890", "+39 1234567890"),  # Italian prefix is added
+        ("+39 123 456 7890", "+39 1234567890"),  # Spaces are removed
+        ("", ""),  # Empty string remains empty
+        (None, None),  # None remains None
+        ("123", "+39 123"),  # Short numbers get prefix
+        ("1234567890123456", "+39 1234567890123456"),  # Long numbers get prefix
+    ],
+)
+def test_phone_format(phone_number, expected):
+    assert phone_format(phone_number) == expected

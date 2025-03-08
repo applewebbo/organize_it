@@ -8,7 +8,7 @@ from django.db.models import signals
 from pytest_django.asserts import assertTemplateUsed
 
 from tests.test import TestCase
-from tests.trips.factories import TripFactory
+from tests.trips.factories import StayFactory, TripFactory
 from trips.models import Trip
 
 pytestmark = pytest.mark.django_db
@@ -477,3 +477,39 @@ class AddStayView(TestCase):
         for day in other_days:
             day.refresh_from_db()
             assert day.stay is None
+
+
+class StayDetailView(TestCase):
+    def test_get(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        days = trip.days.all()
+        # Create stay and set days after creation
+        stay = StayFactory()
+        stay.days.set(days)
+
+        with self.login(user):
+            response = self.get("trips:stay-detail", pk=stay.pk)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/stay-detail.html")
+        assert response.context["stay"] == stay
+        assert response.context["first_day"] == days.first()
+        assert response.context["last_day"] == days.last()
+
+    def test_get_with_previous_day(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        days = list(trip.days.all())
+        # Create stay and set only second day onwards
+        stay = StayFactory()
+        stay.days.set(days[1:])
+
+        with self.login(user):
+            response = self.get("trips:stay-detail", pk=stay.pk)
+
+        self.response_200(response)
+        assert (
+            response.context["first_day"] == days[0]
+        )  # Should be the day before first stay day
+        assert response.context["last_day"] == days[-1]
