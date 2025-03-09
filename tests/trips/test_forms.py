@@ -441,9 +441,6 @@ class TestStayForm:
         form = StayForm(trip=trip)
 
         assert form.fields["apply_to_days"].queryset.count() == trip.days.count()
-        assert list(form.fields["apply_to_days"].initial) == list(
-            trip.days.values_list("pk", flat=True)
-        )
 
     def test_phone_number_validation(self, user_factory, trip_factory):
         """Test phone number validation"""

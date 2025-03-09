@@ -513,3 +513,86 @@ class StayDetailView(TestCase):
             response.context["first_day"] == days[0]
         )  # Should be the day before first stay day
         assert response.context["last_day"] == days[-1]
+
+
+class StayModifyView(TestCase):
+    @patch("geocoder.mapbox")
+    def test_post(self, mock_geocoder):
+        mock_geocoder.return_value.ok = True
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        days = trip.days.all()
+        stay = StayFactory()
+        stay.days.set(days)
+
+        data = {
+            "name": "Updated Hotel",
+            "check_in": "15:00",
+            "check_out": "10:00",
+            "cancellation_date": "2024-12-31",
+            "phone_number": "+1234567890",
+            "url": "https://example.com",
+            "address": "Via Roma 1, Rome",
+            "apply_to_days": [day.pk for day in days],
+        }
+
+        with self.login(user):
+            response = self.post("trips:stay-modify", pk=stay.pk, data=data)
+
+        self.response_204(response)
+        message = list(get_messages(response.wsgi_request))[0].message
+        assert message == "Stay updated successfully"
+        stay.refresh_from_db()
+        assert stay.name == "Updated Hotel"
+        assert stay.check_in == datetime.time(15, 0)
+        assert stay.check_out == datetime.time(10, 0)
+
+    def test_post_with_invalid_data(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        days = trip.days.all()
+        stay = StayFactory()
+        stay.days.set(days)
+
+        data = {
+            "name": "",  # Invalid: name is required
+        }
+
+        with self.login(user):
+            response = self.post("trips:stay-modify", pk=stay.pk, data=data)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/stay-modify.html")
+
+
+class StayDeleteView(TestCase):
+    def test_get(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        days = trip.days.all()
+        stay = StayFactory()
+        stay.days.set(days)
+
+        with self.login(user):
+            response = self.get("trips:stay-delete", pk=stay.pk)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/stay-delete.html")
+        assert response.context["stay"] == stay
+
+    def test_post(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        days = trip.days.all()
+        stay = StayFactory()
+        stay.days.set(days)
+
+        with self.login(user):
+            response = self.post("trips:stay-delete", pk=stay.pk)
+
+        self.response_204(response)
+        message = list(get_messages(response.wsgi_request))[0].message
+        assert message == "Stay deleted successfully"
+        assert not days.first().stay
