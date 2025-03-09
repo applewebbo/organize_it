@@ -478,9 +478,11 @@ class StayForm(forms.ModelForm):
         self.fields["apply_to_days"].label_from_instance = (
             lambda obj: f"Day {obj.number}"
         )
-        self.fields["apply_to_days"].initial = Day.objects.filter(
-            trip=trip
-        ).values_list("pk", flat=True)
+        # Only set initial values if we're editing an existing stay
+        if self.instance.pk:
+            self.fields["apply_to_days"].initial = Day.objects.filter(
+                trip=trip, stay=self.instance
+            ).values_list("pk", flat=True)
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.layout = Layout(

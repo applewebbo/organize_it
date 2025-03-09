@@ -277,7 +277,7 @@ def add_meal(request, day_id):
 def add_stay(request, day_id):
     day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
     trip = day.trip
-    form = StayForm(trip, request.POST or None)
+    form = StayForm(trip, request.POST or None, initial={"apply_to_days": [day_id]})
     if form.is_valid():
         form.save()
         messages.add_message(
@@ -285,7 +285,7 @@ def add_stay(request, day_id):
             messages.SUCCESS,
             _("Stay added successfully"),
         )
-        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+        return HttpResponse(status=204, headers={"HX-Refresh": "true"})
     context = {"form": form}
     return TemplateResponse(request, "trips/stay-create.html", context)
 
@@ -324,6 +324,21 @@ def stay_modify(request, pk):
             messages.SUCCESS,
             _("Stay updated successfully"),
         )
-        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+        return HttpResponse(status=204, headers={"HX-Refresh": "true"})
     context = {"form": form, "stay": stay}
     return TemplateResponse(request, "trips/stay-modify.html", context)
+
+
+def stay_delete(request, pk):
+    stay = get_object_or_404(Stay, pk=pk)
+
+    if request.method == "POST":
+        stay.delete()
+        messages.add_message(
+            request,
+            messages.ERROR,
+            _("Stay deleted successfully"),
+        )
+        return HttpResponse(status=204, headers={"HX-Refresh": "true"})
+
+    return TemplateResponse(request, "trips/stay-delete.html", {"stay": stay})

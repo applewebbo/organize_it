@@ -1,7 +1,7 @@
 {% load crispy_forms_tags %}
 <h3 id="stay-title"
     class="text-xl font-semibold text-gray-900 dark:text-white"
-    hx-swap-oob="true">Modify {{ stay.name }}</h3>
+    hx-swap-oob="true">Edit Stay:&nbsp;{{ stay.name }}</h3>
 <form hx-post="{{ request.path }}"
       hx-target="#dialog"
       hx-disabled-elt="#form-submit"
@@ -12,9 +12,9 @@
         {% crispy form %}
     </div>
     <div class="flex justify-end items-center p-4">
+        <button id="form-submit" class="ms-2 btn btn-sm btn-success" type="submit">Save</button>
         <button type="button"
                 x-on:click="openModal = false"
-                class="mr-2 btn btn-outline btn-error">Cancel</button>
-        <button id="form-submit" class="btn btn-outline btn-primary" type="submit">Save</button>
+                class="ms-2 btn btn-sm btn-outline btn-neutral">Cancel</button>
     </div>
 </form>

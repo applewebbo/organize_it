@@ -23,10 +23,10 @@
         {% csrf_token %}
         {% crispy form %}
     </div>
-    <div class="flex justify-end items-center p-4 rounded-b border-t border-gray-200 md:p-5 dark:border-gray-600">
+    <div class="flex justify-end items-center p-4 rounded-b md:p-5">
+        <button id="form-submit" class="mr-2 btn btn-sm btn-success" type="submit">Save</button>
         <button type="button"
                 x-on:click="openModal = false"
-                class="mr-2 btn btn-outline btn-error">Cancel</button>
-        <button id="form-submit" class="btn btn-outline btn-primary" type="submit">Save</button>
+                class="mr-2 btn btn-outline btn-neutral btn-sm">Cancel</button>
     </div>
 </form>

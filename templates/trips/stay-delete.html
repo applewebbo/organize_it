@@ -1,0 +1,16 @@
+{% load crispy_forms_tags %}
+<h3 id="stay-title"
+    class="text-xl font-semibold text-gray-900 dark:text-white"
+    hx-swap-oob="true">Delete Stay:&nbsp;{{ stay.name }}</h3>
+    <div class="p-4 md:p-5">
+        <p>You are deleting <strong>{{ stay.name }}</strong>. This is a permanent deletion, are you sure?</p>
+    </div>
+    <div class="flex justify-end items-center p-4">
+        <button class="ms-2 btn btn-sm btn-error"
+                type="button"
+                hx-post="{% url 'trips:stay-delete' stay.pk %}"
+                hx-target="#dialog">Confirm</button>
+        <button type="button"
+                x-on:click="openModal = false"
+                class="ms-2 btn btn-sm btn-outline btn-neutral">Cancel</button>
+    </div>

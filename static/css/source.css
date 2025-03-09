@@ -29,8 +29,11 @@
 @plugin"@tailwindcss/aspect-ratio";
 @plugin"@tailwindcss/container-queries";
 @plugin"@tailwindcss/forms";
-@plugin "daisyui" {
-  themes: silk --default;
+@plugin "daisyui";
+@plugin "daisyui/theme" {
+  name: "light";
+  default: true;
+  --radius-field: 0.35rem;
 }
 
 p{
