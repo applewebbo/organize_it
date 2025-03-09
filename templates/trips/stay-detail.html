@@ -1,34 +1,33 @@
 {% load trip_filters heroicons %}
 <div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
-    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Details for {{ stay.name }}</h3>
+    <h3 id="stay-title" class="text-xl font-semibold text-gray-900 dark:text-white">Details for {{ stay.name }}</h3>
     <button type="button"
-                class="btn btn-ghost btn-circle btn-sm"
-                x-on:click="openModal = false">
-            {% heroicon_mini 'x-mark' class="size-5" %}
-            <span class="sr-only">Close modal</span>
-        </button>
+            class="btn btn-ghost btn-circle btn-sm"
+            x-on:click="openModal = false">
+        {% heroicon_mini 'x-mark' class="size-5" %}
+        <span class="sr-only">Close modal</span>
+    </button>
 </div>
-
-<div class="grid gap-x-1 p-4">
-    <div>
+<div id="stay-details">
+    <div class="grid gap-x-1 p-4">
         <ul class="leading-10">
             <li>
-                <span class="font-bold">Name: </span>{{ stay.name }}
+                <span class="font-bold">Name:</span>{{ stay.name }}
             </li>
             <li>
-                <span class="font-bold">Phone Number: </span>{{ stay.phone_number|phone_format }}
+                <span class="font-bold">Phone Number:</span>{{ stay.phone_number|phone_format }}
             </li>
             <li>
-                <span class="font-bold">Address: </span>{{ stay.address }}
+                <span class="font-bold">Address:</span>{{ stay.address }}
             </li>
             <li>
-                <span class="font-bold">Check-in: </span>{{ first_day.date|date:"d/m/Y" }} at {{ stay.check_in|time:"H:i" }}
+                <span class="font-bold">Check-in:</span>{{ first_day.date|date:"d/m/Y" }} at {{ stay.check_in|time:"H:i" }}
             </li>
             <li>
-                <span class="font-bold">Check-out: </span>{{ last_day.date|date:"d/m/Y" }} at {{ stay.check_out|time:"H:i" }}
+                <span class="font-bold">Check-out:</span>{{ last_day.date|date:"d/m/Y" }} at {{ stay.check_out|time:"H:i" }}
             </li>
             <li>
-                <span class="font-bold">Cancellation Date: </span>
+                <span class="font-bold">Cancellation Date:</span>
                 {% if stay.cancellation_date %}
                     {{ stay.cancellation_date }}
                 {% else %}
@@ -36,15 +35,18 @@
                 {% endif %}
             </li>
             <li>
-                <span class="font-bold">Website: </span><a href="{{ stay.url }}" class="link">{{ stay.url }}</a>
+                <span class="font-bold">Website:</span><a href="{{ stay.url }}" class="link">{{ stay.url }}</a>
             </li>
         </ul>
     </div>
-</div>
-<div class="flex justify-end items-center p-4 rounded-bmd:p-5">
-    <button type="button"
-            class="btn btn-outline btn-success" disabled>Edit</button>
-    <button type="button"
-            x-on:click="openModal = false"
-            class="ms-2 btn btn-outline btn-error">Close</button>
+    <div class="flex justify-end items-center p-4 rounded-bmd:p-5">
+        <button type="button"
+                class="btn btn-outline btn-success"
+                hx-target="#stay-details"
+                hx-get="{% url 'trips:stay-modify' stay.pk %}"
+                hx-swap="innerHTML">Modify</button>
+        <button type="button"
+                x-on:click="openModal = false"
+                class="ms-2 btn btn-outline btn-error">Close</button>
+    </div>
 </div>

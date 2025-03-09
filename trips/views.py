@@ -310,3 +310,20 @@ def stay_detail(request, pk):
         "last_day": last_day,
     }
     return TemplateResponse(request, "trips/stay-detail.html", context)
+
+
+def stay_modify(request, pk):
+    qs = Stay.objects.prefetch_related("days")
+    stay = get_object_or_404(qs, pk=pk)
+    trip = stay.days.first().trip
+    form = StayForm(trip, request.POST or None, instance=stay)
+    if form.is_valid():
+        form.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            _("Stay updated successfully"),
+        )
+        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+    context = {"form": form, "stay": stay}
+    return TemplateResponse(request, "trips/stay-modify.html", context)

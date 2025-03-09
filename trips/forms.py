@@ -462,6 +462,15 @@ class StayForm(forms.ModelForm):
             "cancellation_date": forms.DateInput(attrs={"type": "date"}),
             "phone_number": forms.TextInput(attrs={"placeholder": "Phone Number"}),
         }
+        labels = {
+            "name": _("Name"),
+            "check_in": _("Check-in"),
+            "check_out": _("Check-out"),
+            "cancellation_date": _("Cancellation date"),
+            "phone_number": _("Phone number"),
+            "url": _("Website"),
+            "address": _("Address"),
+        }
 
     def __init__(self, trip, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -503,7 +512,10 @@ class StayForm(forms.ModelForm):
                 "url",
                 css_class="sm:col-span-4",
             ),
-            "apply_to_days",
+            Div(
+                "apply_to_days",
+                css_class="sm:col-span-4",
+            ),
         )
 
     def save(self, commit=True):

@@ -1,0 +1,20 @@
+{% load crispy_forms_filters %}
+{% load l10n %}
+{% for choice in field.field.choices %}
+    <div class="flex items-center mb-2 me-4 min-w-24">
+        <input type="checkbox"
+               class="checkbox me-2"
+               {% if choice.0 in field.value or choice.0|stringformat:"s" in field.value or choice.0|stringformat:"s" == field.value|default_if_none:""|stringformat:"s" %} checked="checked"{% endif %}
+               name="{{ field.html_name }}"
+               id="id_{{ field.html_name }}_{{ forloop.counter }}"
+               value="{{ choice.0|unlocalize }}"
+               {{ field.field.widget.attrs|flatatt }}>
+        {{ choice.1|unlocalize }}
+        <label class="{% if css_container.option_label %}{{ css_container.option_label }}{% else %}fieldset-label{% endif %}"
+               for="id_{{ field.html_name }}_{{ forloop.counter }}">
+        </label>
+        {% if field.errors and forloop.last and not inline_class %}
+            {# include 'tailwind/layout/field_errors_block.html' <-- bs4 template adds this here. Currently this pack adds it in field.html #}
+        {% endif %}
+    </div>
+{% endfor %}

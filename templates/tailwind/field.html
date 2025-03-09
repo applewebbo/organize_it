@@ -18,7 +18,7 @@
             {% include 'tailwind/layout/select.html' %}
         </div>
     {% elif field|is_checkboxselectmultiple %}
-        <div class="{% if field_class %}{{ field_class }}{% else %}mb-3{% endif %}"{% if flat_attrs %} {{ flat_attrs|safe }}{% endif %}>
+        <div class="{% if field_class %}{{ field_class }}{% else %}flex flex-wrap mb-3{% endif %}"{% if flat_attrs %} {{ flat_attrs|safe }}{% endif %}>
             {% include 'tailwind/layout/checkboxselectmultiple.html' %}
         </div>
     {% elif field|is_radioselect %}
