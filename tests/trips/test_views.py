@@ -596,3 +596,76 @@ class StayDeleteView(TestCase):
         message = list(get_messages(response.wsgi_request))[0].message
         assert message == "Stay deleted successfully"
         assert not days.first().stay
+
+    def test_get_with_single_other_stay(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        days = trip.days.all()
+        stay = StayFactory()
+        other_stay = StayFactory()
+        stay.days.set(days[:2])  # First two days
+        other_stay.days.set(days[2:])  # Remaining days
+
+        with self.login(user):
+            response = self.get("trips:stay-delete", pk=stay.pk)
+
+        self.response_200(response)
+        assert response.context["show_dropdown"] is False
+        assert response.context["other_stays"].count() == 1
+        assert response.context["other_stays"].first() == other_stay
+
+    def test_get_with_multiple_other_stays(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        days = trip.days.all()
+        stay = StayFactory()
+        other_stays = [StayFactory(), StayFactory()]
+        stay.days.set(days[:2])
+        other_stays[0].days.set(days[2:4])
+        other_stays[1].days.set(days[4:])
+
+        with self.login(user):
+            response = self.get("trips:stay-delete", pk=stay.pk)
+
+        self.response_200(response)
+        assert response.context["show_dropdown"] is True
+        assert response.context["other_stays"].count() == 2
+
+    def test_post_with_single_other_stay_auto_reassign(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        days = trip.days.all()
+        stay = StayFactory()
+        other_stay = StayFactory()
+        stay.days.set(days[:2])
+        other_stay.days.set(days[2:])
+
+        with self.login(user):
+            response = self.post("trips:stay-delete", pk=stay.pk)
+
+        self.response_204(response)
+        # Verify days were reassigned
+        for day in days[:2]:
+            day.refresh_from_db()
+            assert day.stay == other_stay
+
+    def test_post_with_multiple_stays_manual_selection(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        days = trip.days.all()
+        stay = StayFactory()
+        other_stays = [StayFactory(), StayFactory()]
+        stay.days.set(days[:2])
+        other_stays[0].days.set(days[2:4])
+        other_stays[1].days.set(days[4:])
+
+        with self.login(user):
+            response = self.post(
+                "trips:stay-delete", pk=stay.pk, data={"new_stay": other_stays[0].pk}
+            )
+
+        self.response_204(response)
+        # Verify days were reassigned to the selected stay
+        for day in days[:2]:
+            day.refresh_from_db()
+            assert day.stay == other_stays[0]
