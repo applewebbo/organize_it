@@ -1,11 +1,15 @@
-#!/usr/bin/env -S uv run
-"""Django's command-line utility for administrative tasks."""
-
+#!/usr/bin/env python
 import os
 import sys
+import warnings
 
 
 def main():
+    # Filter out specific deprecation warnings from Typer
+    warnings.filterwarnings(
+        "ignore", message="In Typer, only the parameter.*", category=DeprecationWarning
+    )
+
     """Run administrative tasks."""
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings.common")
     try:

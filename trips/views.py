@@ -331,8 +331,20 @@ def stay_modify(request, pk):
 
 def stay_delete(request, pk):
     stay = get_object_or_404(Stay, pk=pk)
+    trip = stay.days.first().trip
+    other_stays = Stay.objects.filter(days__trip=trip).exclude(pk=pk).distinct()
 
     if request.method == "POST":
+        if other_stays.count() == 1:
+            # Automatically reassign to the only remaining stay
+            new_stay = other_stays.first()
+            stay.days.update(stay=new_stay)
+        else:
+            new_stay_id = request.POST.get("new_stay")
+            if new_stay_id:
+                new_stay = Stay.objects.get(pk=new_stay_id)
+                stay.days.update(stay=new_stay)
+
         stay.delete()
         messages.add_message(
             request,
@@ -341,4 +353,9 @@ def stay_delete(request, pk):
         )
         return HttpResponse(status=204, headers={"HX-Refresh": "true"})
 
-    return TemplateResponse(request, "trips/stay-delete.html", {"stay": stay})
+    context = {
+        "stay": stay,
+        "other_stays": other_stays,
+        "show_dropdown": other_stays.count() > 1,
+    }
+    return TemplateResponse(request, "trips/stay-delete.html", context)

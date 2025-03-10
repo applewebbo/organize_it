@@ -1,16 +1,39 @@
-{% load crispy_forms_tags %}
+{% load crispy_forms_tags heroicons %}
 <h3 id="stay-title"
     class="text-xl font-semibold text-gray-900 dark:text-white"
     hx-swap-oob="true">Delete Stay:&nbsp;{{ stay.name }}</h3>
-    <div class="p-4 md:p-5">
-        <p>You are deleting <strong>{{ stay.name }}</strong>. This is a permanent deletion, are you sure?</p>
-    </div>
-    <div class="flex justify-end items-center p-4">
-        <button class="ms-2 btn btn-sm btn-error"
-                type="button"
-                hx-post="{% url 'trips:stay-delete' stay.pk %}"
-                hx-target="#dialog">Confirm</button>
-        <button type="button"
-                x-on:click="openModal = false"
-                class="ms-2 btn btn-sm btn-outline btn-neutral">Cancel</button>
-    </div>
+<div class="p-4 md:p-5">
+    <p>
+        You are deleting <strong>{{ stay.name }}</strong>. This is a permanent deletion, are you sure?
+    </p>
+    {% if other_stays %}
+        <div role="alert" class="flex py-4 alert alert-info alert-outline">
+            <div>{% heroicon_solid 'information-circle' class="size-5" %}</div>
+            {% if show_dropdown %}
+                <div class="flex items-center grow">
+                    <label for="new_stay" class="block text-sm font-medium grow">Select stay to reassign days to:</label>
+                    <select name="new_stay"
+                            id="new_stay"
+                            class="w-full select select-bordered text-base-content"
+                            required>
+                        {% for other_stay in other_stays %}<option value="{{ other_stay.pk }}">{{ other_stay.name }}</option>{% endfor %}
+                    </select>
+                </div>
+            {% else %}
+                <span class="text-sm">
+                    Days will be reassigned to: <strong>{{ other_stays.0.name }}</strong>
+                </span>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+<div class="flex justify-end items-center p-4">
+    <button class="ms-2 btn btn-sm btn-error"
+            type="button"
+            hx-post="{% url 'trips:stay-delete' stay.pk %}"
+            hx-include="#new_stay"
+            hx-target="#dialog">Confirm</button>
+    <button type="button"
+            x-on:click="openModal = false"
+            class="ms-2 btn btn-sm btn-outline btn-neutral">Cancel</button>
+</div>
