@@ -111,7 +111,8 @@ class Stay(models.Model):
         return super().save(*args, **kwargs)
 
     def __str__(self) -> str:
-        return f"{self.name} - {self.days.first().trip.title}"
+        first_day = self.days.first()
+        return f"{self.name} - {first_day.trip.title}" if first_day else self.name
 
 
 @receiver(post_save, sender=Stay)

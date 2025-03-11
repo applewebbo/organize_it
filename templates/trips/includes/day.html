@@ -53,11 +53,12 @@
             </ul>
         </div>
         {% if day.events.all %}<div class="divider"></div>{% endif %}
-        <ul>
+        <ul class="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-2 lg:grid-cols-3 grid-col">
             {% for event in day.events.all %}
-                <li class="flex items-center">
-                    {% heroicon_outline event|event_icon class="size-4 me-2" %}
-                    {{ event.name }} ({{ event.start_time|time:"H:i" }})
+                <li>
+                    <c-event />
+                    {% comment %} {% heroicon_outline event|event_icon class="size-4 me-2" %}
+                    {{ event.name }} ({{ event.start_time|time:"H:i" }} - {{ event.end_time|time:"H:i" }}) {% endcomment %}
                 </li>
             {% endfor %}
         </ul>
