@@ -1,7 +1,6 @@
 import pytest
 
 from tests.trips.factories import EventFactory, StayFactory, TripFactory
-from trips.templatetags.trip_filters import phone_format
 from trips.templatetags.trip_tags import (
     event_icon,
     has_different_stay,
@@ -9,6 +8,7 @@ from trips.templatetags.trip_tags import (
     is_first_day_of_trip,
     is_last_day,
     next_day,
+    phone_format,
 )
 
 pytestmark = pytest.mark.django_db

@@ -56,9 +56,9 @@
         <ul class="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-2 lg:grid-cols-3 grid-col">
             {% for event in day.events.all %}
                 <li>
-                    <c-event />
-                    {% comment %} {% heroicon_outline event|event_icon class="size-4 me-2" %}
-                    {{ event.name }} ({{ event.start_time|time:"H:i" }} - {{ event.end_time|time:"H:i" }}) {% endcomment %}
+                    <c-event icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}"">
+                        {{ event.start_time|time:"H:i" }} - {{ event.end_time|time:"H:i" }}
+                    </c-event>
                 </li>
             {% endfor %}
         </ul>

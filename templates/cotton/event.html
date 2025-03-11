@@ -1,11 +1,13 @@
-{% load trip_tags %}
-<div class="bg-gray-100 rounded-lg border border-gray-300">
+{% load heroicons %}
+<div class="rounded-lg border {{ border_color }} {{ bg_color }}">
     <div class="py-3 px-6">
-        <h2 class="flex card-title irtems-center">
-            {% heroicon_outline event|event_icon class="size-5 me-2" %}
+        <h2 class="flex items-center mb-2 card-title">
+            <span class="{{ icon_color }} bg-white p-2 rounded-full border-2 {{ border_color }} ">{% heroicon_outline icon class="stroke-2 size-6" %}</span>
             {{ event.name }}
-            {% if event.url %} <a href="{{ event.url }}">{% heroicon_mini 'link' class="ms-2" %}</a>{% endif %}
+            {% if event.url %}
+                <span class="{{ icon_color }}"><a href="{{ event.url }}">{% heroicon_mini 'link' class="ms-2" %}</a></span>
+            {% endif %}
         </h2>
-        <p>{{ event.start_time|time:"H:i" }} - {{ event.end_time|time:"H:i" }}</p>
+        <p class="pl-2.5 text-base-content/70">{{ slot }}</p>
     </div>
 </div>
