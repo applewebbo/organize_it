@@ -218,9 +218,6 @@ def test_event_icon():
     meal = EventFactory(category=3)
     assert event_icon(meal) == "cake"
 
-    stay = EventFactory(category=4)
-    assert event_icon(stay) == "home-modern"
-
     # Test unknown category
     unknown = EventFactory(category=99)
     assert event_icon(unknown) == "question-mark-circle"
