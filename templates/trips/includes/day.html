@@ -53,7 +53,7 @@
             </ul>
         </div>
         {% if day.events.all %}<div class="divider"></div>{% endif %}
-        <ul class="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-2 lg:grid-cols-3 grid-col">
+        <ul class="grid grid-cols-1 gap-4 mt-4 md:grid-cols-2 xl:grid-cols-3 grid-col">
             {% for event in day.events.all %}
                 <li>
                     <c-event icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}"">
