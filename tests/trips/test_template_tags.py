@@ -2,7 +2,10 @@ import pytest
 
 from tests.trips.factories import EventFactory, StayFactory, TripFactory
 from trips.templatetags.trip_tags import (
+    event_bg_color,  # Add these
+    event_border_color,  # new
     event_icon,
+    event_icon_color,  # imports
     has_different_stay,
     is_first_day_of_stay,
     is_first_day_of_trip,
@@ -221,6 +224,57 @@ def test_event_icon():
     # Test unknown category
     unknown = EventFactory(category=99)
     assert event_icon(unknown) == "question-mark-circle"
+
+
+def test_event_bg_color():
+    """Test event_bg_color template filter"""
+    # Test all event categories
+    transport = EventFactory(category=1)
+    assert event_bg_color(transport) == "bg-[#BAEAFF]"
+
+    experience = EventFactory(category=2)
+    assert event_bg_color(experience) == "bg-[#DDFFCF]"
+
+    meal = EventFactory(category=3)
+    assert event_bg_color(meal) == "bg-[#FFF4D4]"
+
+    # Test unknown category
+    unknown = EventFactory(category=99)
+    assert event_bg_color(unknown) == "bg-gray-300"
+
+
+def test_event_border_color():
+    """Test event_border_color template filter"""
+    # Test all event categories
+    transport = EventFactory(category=1)
+    assert event_border_color(transport) == "border-[#5ECEFF]"
+
+    experience = EventFactory(category=2)
+    assert event_border_color(experience) == "border-[#98F56F]"
+
+    meal = EventFactory(category=3)
+    assert event_border_color(meal) == "border-[#FFDB6D]"
+
+    # Test unknown category
+    unknown = EventFactory(category=99)
+    assert event_border_color(unknown) == "bg-gray-300"
+
+
+def test_event_icon_color():
+    """Test event_icon_color template filter"""
+    # Test all event categories
+    transport = EventFactory(category=1)
+    assert event_icon_color(transport) == "text-transport-blue"
+
+    experience = EventFactory(category=2)
+    assert event_icon_color(experience) == "text-experience-green"
+
+    meal = EventFactory(category=3)
+    assert event_icon_color(meal) == "text-meal-yellow"
+
+    # Test unknown category
+    unknown = EventFactory(category=99)
+    assert event_icon_color(unknown) == "text-base-content"
 
 
 @pytest.mark.parametrize(

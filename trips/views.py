@@ -356,6 +356,6 @@ def stay_delete(request, pk):
     context = {
         "stay": stay,
         "other_stays": other_stays,
-        "show_dropdown": other_stays.count() > 1,
+        "show_dropdown": len(other_stays) > 1,
     }
     return TemplateResponse(request, "trips/stay-delete.html", context)
