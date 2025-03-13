@@ -8,7 +8,15 @@ from django.db.models import signals
 from pytest_django.asserts import assertTemplateUsed
 
 from tests.test import TestCase
-from tests.trips.factories import StayFactory, TripFactory
+from tests.trips.factories import (
+    EventFactory,
+    ExperienceFactory,
+    MealFactory,
+    StayFactory,
+    TransportFactory,
+    TripFactory,
+)
+from trips.forms import ExperienceForm, MealForm, TransportForm
 from trips.models import Trip
 
 pytestmark = pytest.mark.django_db
@@ -669,3 +677,134 @@ class StayDeleteView(TestCase):
         for day in days[:2]:
             day.refresh_from_db()
             assert day.stay == other_stays[0]
+
+
+class EventDeleteView(TestCase):
+    def test_delete(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(day=day)
+
+        with self.login(user):
+            response = self.delete("trips:event-delete", pk=event.pk)
+
+        self.response_204(response)
+        message = list(get_messages(response.wsgi_request))[0].message
+        assert message == "Event deleted successfully"
+        assert event.day.events.count() == 0
+
+    def test_delete_unauthorized(self):
+        user = self.make_user("user")
+        other_user = self.make_user("other_user")
+        trip = TripFactory(author=other_user)
+        event = EventFactory(trip=trip)
+
+        with self.login(user):
+            response = self.delete("trips:event-delete", pk=event.pk)
+
+        self.response_404(response)
+        assert event.day.events.count() == 1
+
+
+class EventModifyView(TestCase):
+    def test_get_transport(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = TransportFactory(day=day)  # Transport
+
+        with self.login(user):
+            response = self.get("trips:event-modify", pk=event.pk)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/event-modify.html")
+        assert isinstance(response.context["form"], TransportForm)
+
+    def test_get_experience(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = ExperienceFactory(day=day)  # Experience
+
+        with self.login(user):
+            response = self.get("trips:event-modify", pk=event.pk)
+
+        self.response_200(response)
+        assert isinstance(response.context["form"], ExperienceForm)
+
+    def test_get_meal(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = MealFactory(day=day)  # Meal
+
+        with self.login(user):
+            response = self.get("trips:event-modify", pk=event.pk)
+
+        self.response_200(response)
+        assert isinstance(response.context["form"], MealForm)
+
+    def test_get_invalid_category(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        event = EventFactory(trip=trip, category=99)  # Invalid category
+
+        with self.login(user):
+            response = self.get("trips:event-modify", pk=event.pk)
+
+        self.response_404(response)
+
+    def test_get_unauthorized(self):
+        user = self.make_user("user")
+        other_user = self.make_user("other_user")
+        trip = TripFactory(author=other_user)
+        day = trip.days.first()
+        event = ExperienceFactory(day=day)
+
+        with self.login(user):
+            response = self.get("trips:event-modify", pk=event.pk)
+
+        self.response_404(response)
+
+    @patch("geocoder.mapbox")
+    def test_post_transport(self, mock_geocoder):
+        mock_geocoder.return_value.ok = True
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = TransportFactory(day=day)  # Transport
+        data = {
+            "address": "New Address",
+            "destination": "New Destination",
+            "start_time": "10:00",
+            "end_time": "12:00",
+            "url": "https://example.com",
+            "type": 1,
+        }
+
+        with self.login(user):
+            response = self.post("trips:event-modify", pk=event.pk, data=data)
+
+        self.response_204(response)
+        message = list(get_messages(response.wsgi_request))[0].message
+        assert message == "Event updated successfully"
+        event.refresh_from_db()
+        assert event.name == "New Address - New Destination"
+
+    def test_post_with_invalid_data(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = TransportFactory(day=day)  # Transport
+        data = {
+            "name": "",  # Invalid: name is required
+        }
+
+        with self.login(user):
+            response = self.post("trips:event-modify", pk=event.pk, data=data)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/event-modify.html")

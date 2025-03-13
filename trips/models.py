@@ -190,7 +190,6 @@ class Event(models.Model):
         TRANSPORT = 1, _("Transport")
         EXPERIENCE = 2, _("Experience")
         MEAL = 3, _("Meal")
-        STAY = 4, _("Stay")
 
     day = models.ForeignKey(Day, on_delete=models.CASCADE, related_name="events")
     name = models.CharField(max_length=100)

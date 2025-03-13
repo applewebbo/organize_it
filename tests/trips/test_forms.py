@@ -13,6 +13,7 @@ from trips.forms import (
     TripDateUpdateForm,
     TripForm,
 )
+from trips.models import Experience
 
 pytestmark = pytest.mark.django_db
 
@@ -295,6 +296,28 @@ class TestExperienceForm:
         assert form.is_valid()
         experience = form.save(commit=False)
         assert experience.end_time.strftime("%H:%M") == "16:00"
+
+    @patch("geocoder.mapbox")
+    def test_save_without_commit(self, mock_geocoder):
+        """Test save method with commit=False"""
+        mock_geocoder.return_value.ok = True
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
+
+        data = {
+            "name": "Walking Tour",
+            "type": 1,
+            "address": "Starting Point",
+            "start_time": "14:00",
+            "duration": "120",
+            "url": "https://example.com",
+        }
+        form = ExperienceForm(data=data)
+
+        assert form.is_valid()
+        experience = form.save(commit=False)
+        assert experience.end_time.strftime("%H:%M") == "16:00"
+        # Verify that the instance wasn't saved to the database
+        assert not Experience.objects.filter(name="Walking Tour").exists()
 
 
 class TestMealForm:

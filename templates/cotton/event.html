@@ -1,17 +1,25 @@
 {% load heroicons %}
 <div class="py-3 px-6 rounded-lg border {{ border_color }} {{ bg_color }}">
     <div class="flex items-start">
-        <div class="{{ icon_color }} bg-white mt-1 p-2 rounded-full border-2 {{ border_color }} ">{% heroicon_outline icon class="stroke-2 size-6" %}</div>
+        <div class="{{ icon_color }} bg-white mt-1 p-2 rounded-full border-2 {{ border_color }} ">
+            {% heroicon_outline icon class="stroke-2 size-6" %}
+        </div>
         <div class="ms-2">
-            <h2 class="card-title">
-                {{ event.name }}
-            </h2>
+            <h2 class="card-title">{{ event.name }}</h2>
             <p class="text-base-content/70">{{ slot }}</p>
         </div>
     </div>
-    <div class="mt-2 text-right">
-        <a href="#" class="btn btn-sm" disabled>{% heroicon_outline 'pencil' class="size-4" %}</a>
-        <a href="#" class="btn btn-sm" disabled>{% heroicon_outline 'trash' class="size-4" %}</a>
+    <div class="mt-2 text-right" x-data>
+        <a href="{% url 'trips:event-modify' event.pk %}"
+           class="btn btn-sm"
+           hx-get="{% url 'trips:event-modify' event.pk %}"
+           @click="$dispatch('open-modal'); document.activeElement.blur()"
+           hx-target="#dialog"
+           hx-swap="innerHTML">{% heroicon_outline 'pencil' class="size-4" %}</a>
+        <a href="{% url 'trips:event-delete' event.pk %}"
+           class="btn btn-sm"
+           hx-delete="{% url 'trips:event-delete' event.pk %}"
+           hx-confirm="You're permanently deleting {{ event.name }}. Are you sure?">{% heroicon_outline 'trash' class="size-4" %}</a>
         <a href="#" class="btn btn-sm" disabled>{% heroicon_outline 'map' class="size-4" %}</a>
     </div>
 </div>

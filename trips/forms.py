@@ -271,6 +271,8 @@ class TransportForm(forms.ModelForm):
         instance.name = (
             f"{self.cleaned_data['address']} - {self.cleaned_data['destination']}"
         )
+        if commit:
+            instance.save()
         return instance
 
 

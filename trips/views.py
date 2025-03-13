@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
@@ -18,7 +18,7 @@ from .forms import (
     TripDateUpdateForm,
     TripForm,
 )
-from .models import Day, Stay, Trip
+from .models import Day, Event, Stay, Trip
 
 # def calculate_bounds(locations):
 #     # TODO: add check for a single location
@@ -191,6 +191,7 @@ def trip_update(request, pk):
     return TemplateResponse(request, "trips/trip-create.html", context)
 
 
+@login_required
 def trip_archive(request, pk):
     trip = get_object_or_404(Trip, pk=pk, author=request.user)
     trip.status = 5
@@ -206,6 +207,7 @@ def trip_archive(request, pk):
     )
 
 
+@login_required
 def trip_dates_update(request, pk):
     trip = get_object_or_404(Trip, pk=pk, author=request.user)
 
@@ -223,6 +225,7 @@ def trip_dates_update(request, pk):
     return TemplateResponse(request, "trips/trip-dates-update.html", context)
 
 
+@login_required
 def add_transport(request, day_id):
     day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
     form = TransportForm(request.POST or None)
@@ -240,6 +243,7 @@ def add_transport(request, day_id):
     return TemplateResponse(request, "trips/transport-create.html", context)
 
 
+@login_required
 def add_experience(request, day_id):
     day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
     form = ExperienceForm(request.POST or None)
@@ -257,6 +261,7 @@ def add_experience(request, day_id):
     return TemplateResponse(request, "trips/experience-create.html", context)
 
 
+@login_required
 def add_meal(request, day_id):
     day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
     form = MealForm(request.POST or None)
@@ -274,6 +279,7 @@ def add_meal(request, day_id):
     return TemplateResponse(request, "trips/meal-create.html", context)
 
 
+@login_required
 def add_stay(request, day_id):
     day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
     trip = day.trip
@@ -290,6 +296,7 @@ def add_stay(request, day_id):
     return TemplateResponse(request, "trips/stay-create.html", context)
 
 
+@login_required
 def stay_detail(request, pk):
     stay = get_object_or_404(Stay, pk=pk)
     days = stay.days.order_by("date")
@@ -312,6 +319,7 @@ def stay_detail(request, pk):
     return TemplateResponse(request, "trips/stay-detail.html", context)
 
 
+@login_required
 def stay_modify(request, pk):
     qs = Stay.objects.prefetch_related("days")
     stay = get_object_or_404(qs, pk=pk)
@@ -329,6 +337,7 @@ def stay_modify(request, pk):
     return TemplateResponse(request, "trips/stay-modify.html", context)
 
 
+@login_required
 def stay_delete(request, pk):
     stay = get_object_or_404(Stay, pk=pk)
     trip = stay.days.first().trip
@@ -359,3 +368,45 @@ def stay_delete(request, pk):
         "show_dropdown": len(other_stays) > 1,
     }
     return TemplateResponse(request, "trips/stay-delete.html", context)
+
+
+@login_required
+@require_http_methods(["DELETE"])
+def event_delete(request, pk):
+    qs = Event.objects.select_related("day__trip__author")
+    event = get_object_or_404(qs, pk=pk, day__trip__author=request.user)
+    event.delete()
+    messages.add_message(
+        request,
+        messages.ERROR,
+        _("Event deleted successfully"),
+    )
+    return HttpResponse(status=204, headers={"HX-Refresh": "true"})
+
+
+@login_required
+def event_modify(request, pk):
+    qs = Event.objects.select_related("day__trip")
+    event = get_object_or_404(qs, pk=pk, day__trip__author=request.user)
+
+    # Select form class based on event category
+    event_form = {
+        1: TransportForm,  # Transport
+        2: ExperienceForm,  # Experience
+        3: MealForm,  # Meal
+    }.get(event.category)
+
+    if not event_form:
+        raise Http404("Invalid event category")
+
+    form = event_form(request.POST or None, instance=event)
+    if form.is_valid():
+        form.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            _("Event updated successfully"),
+        )
+        return HttpResponse(status=204, headers={"HX-Refresh": "true"})
+    context = {"form": form, "event": event}
+    return TemplateResponse(request, "trips/event-modify.html", context)
