@@ -1,6 +1,7 @@
 import pytest
 
 from tests.trips.factories import EventFactory, StayFactory, TripFactory
+from trips.data.phone_prefixes import ITALIAN_PREFIXES
 from trips.templatetags.trip_tags import (
     event_bg_color,  # Add these
     event_border_color,  # new
@@ -291,3 +292,13 @@ def test_event_icon_color():
 )
 def test_phone_format(phone_number, expected):
     assert phone_format(phone_number) == expected
+
+
+def test_phone_format_with_italian_prefix():
+    """
+    Test phone_format function to ensure it correctly formats numbers with Italian prefixes.
+    """
+    for prefix in ITALIAN_PREFIXES:
+        number = f"{prefix}1234567"
+        phone_format(number)
+        f"+39 {prefix} {number[len(prefix) :]}"

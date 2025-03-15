@@ -205,6 +205,9 @@ class Event(models.Model):
 
     class Meta:
         ordering = ["start_time"]
+        indexes = [
+            models.Index(fields=["day_id", "start_time"]),
+        ]
 
     def save(self, *args, **kwargs):
         """convert address to coordinates for displaying on the map"""
@@ -215,6 +218,23 @@ class Event(models.Model):
         g = geocoder.mapbox(self.address, access_token=settings.MAPBOX_ACCESS_TOKEN)
         self.latitude, self.longitude = g.latlng
         return super().save(*args, **kwargs)
+
+    @property
+    def has_overlap(self):
+        """Check if event overlaps with any other event in the same day"""
+        return (
+            Event.objects.filter(
+                day=self.day,
+                start_time__lt=self.end_time,
+                end_time__gt=self.start_time,
+            )
+            .exclude(pk=self.pk)
+            .exists()
+        )
+
+    @has_overlap.setter
+    def has_overlap(self, value):
+        self._has_overlap = value
 
     def __str__(self) -> str:
         return f"{self.name} ({self.start_time})"

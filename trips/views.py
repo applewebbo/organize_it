@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Exists, OuterRef, Prefetch
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
@@ -9,8 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
 from accounts.models import Profile
-
-from .forms import (
+from trips.forms import (
     ExperienceForm,
     MealForm,
     StayForm,
@@ -18,31 +18,7 @@ from .forms import (
     TripDateUpdateForm,
     TripForm,
 )
-from .models import Day, Event, Stay, Trip
-
-# def calculate_bounds(locations):
-#     # TODO: add check for a single location
-#     # Check if the list is not empty
-#     if not locations:
-#         return None
-
-#     sw = list(min((point["latitude"], point["longitude"]) for point in locations))
-#     ne = list(max((point["latitude"], point["longitude"]) for point in locations))
-
-#     return [sw, ne]
-
-
-# def calculate_days_and_locations(trip):
-#     days = (
-#         Day.objects.filter(trip=trip)
-#         .exclude(places__isnull=True)
-#         .prefetch_related("places")
-#     )
-#     locations = list(
-#         Place.objects.filter(trip=trip).values("name", "latitude", "longitude")
-#     )
-
-#     return days, locations
+from trips.models import Day, Event, Stay, Trip
 
 
 def get_trips(user):
@@ -88,47 +64,40 @@ def trip_list(request):
 
 @login_required
 def trip_detail(request, pk):
-    """Detail Page for the selected trip"""
+    """
+    Detail Page for the selected trip.
+    Annotates events with overlap information using database queries.
+    Events can overlap with previous or next events.
+    """
     qs = Trip.objects.prefetch_related(
-        "days__events",
+        Prefetch(
+            "days__events",
+            queryset=Event.objects.annotate(
+                has_overlap=Exists(
+                    Event.objects.filter(
+                        day_id=OuterRef("day_id"),
+                        id__lt=OuterRef("id"),
+                        end_time__gt=OuterRef("start_time"),
+                        start_time__lt=OuterRef("end_time"),
+                    )
+                    | Event.objects.filter(
+                        day_id=OuterRef("day_id"),
+                        id__gt=OuterRef("id"),
+                        start_time__lt=OuterRef("end_time"),
+                        end_time__gt=OuterRef("start_time"),
+                    )
+                )
+            ).order_by("start_time"),
+        ),
         "days__stay",
     ).select_related("author")
+
     trip = get_object_or_404(qs, pk=pk)
 
     context = {
         "trip": trip,
     }
     return TemplateResponse(request, "trips/trip-detail.html", context)
-
-
-# @login_required
-# def map(request, pk, day=None):
-#     """Get map details as a separate view to serve with htmx"""
-#     qs = Trip.objects.prefetch_related("places", "days")
-#     trip = get_object_or_404(qs, pk=pk)
-#     days = Day.objects.filter(trip=pk, places__isnull=False).distinct()
-#     if day:
-#         locations = list(
-#             Place.objects.filter(trip=pk, day=day).values(
-#                 "name", "latitude", "longitude"
-#             )
-#         )
-
-#     else:
-#         locations = list(
-#             Place.objects.filter(trip=pk).values("name", "latitude", "longitude")
-#         )
-#     map_bounds = calculate_bounds(locations)
-
-#     context = {
-#         "trip": trip,
-#         "locations": locations,
-#         "map_bounds": map_bounds,
-#         "selected_day": day,
-#         "days": days,
-#     }
-
-#     return TemplateResponse(request, "trips/includes/map.html", context)
 
 
 @login_required

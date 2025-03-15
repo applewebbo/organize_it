@@ -1,5 +1,12 @@
 {% load heroicons %}
-<div class="py-3 px-6 rounded-lg border {{ border_color }} {{ bg_color }}">
+<div class="py-3 px-6 rounded-lg border {{ border_color }} {{ bg_color }} relative">
+    {% if event.has_overlap_previous or event.has_overlap_next %}
+        <div class="absolute top-0 right-0 p-1.5 mt-2 mr-4 bg-white rounded-full border text-error border-error"
+             x-data
+             @mouseenter="$tooltip('Time conflict with another event')">
+            {% heroicon_mini 'exclamation-triangle' class="size-4" %}
+        </div>
+    {% endif %}
     <div class="flex items-start">
         <div class="{{ icon_color }} bg-white mt-1 p-2 rounded-full border-2 {{ border_color }} ">
             {% heroicon_outline icon class="stroke-2 size-6" %}

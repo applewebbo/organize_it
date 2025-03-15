@@ -106,6 +106,7 @@ class TripListView(TestCase):
 
 class TripDetailView(TestCase):
     def test_get(self):
+        """Test the trip detail view"""
         user = self.make_user("user")
         trip = TripFactory(author=user)
 
@@ -115,15 +116,45 @@ class TripDetailView(TestCase):
         self.response_200(response)
         assertTemplateUsed(response, "trips/trip-detail.html")
 
-    # def test_map_bounds(self):
-    #     user = self.make_user("user")
-    #     trip = TripFactory(author=user)
-    #     PlaceFactory.create_batch(2, trip=trip)
+    def test_no_overlaps(self):
+        """Test events with no overlaps"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
 
-    #     with self.login(user):
-    #         response = self.get("trips:trip-detail", pk=trip.pk)
+        # Create three events with non-overlapping times
+        EventFactory(day=day, start_time="09:00", end_time="10:00")
+        EventFactory(day=day, start_time="10:30", end_time="11:30")
+        EventFactory(day=day, start_time="12:00", end_time="13:00")
 
-    #     assert response.context["map_bounds"] is not None
+        with self.login(user):
+            response = self.get("trips:trip-detail", pk=trip.pk)
+
+        events = response.context["trip"].days.first().events.all()
+
+        # No events should have overlaps
+        for event in events:
+            assert not event.has_overlap
+
+    def test_with_overlaps(self):
+        """Test events with overlaps"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+
+        # Create three events with overlapping times
+        EventFactory(day=day, start_time="09:00", end_time="10:00")
+        EventFactory(day=day, start_time="09:30", end_time="10:30")
+        EventFactory(day=day, start_time="10:00", end_time="11:00")
+
+        with self.login(user):
+            response = self.get("trips:trip-detail", pk=trip.pk)
+
+        events = response.context["trip"].days.first().events.all()
+
+        # All events should have overlaps
+        for event in events:
+            assert event.has_overlap
 
 
 class TripCreateView(TestCase):

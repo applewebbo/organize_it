@@ -56,8 +56,10 @@
         <ul class="grid grid-cols-1 gap-4 mt-4 md:grid-cols-2 xl:grid-cols-3 grid-col">
             {% for event in day.events.all %}
                 <li>
-                    <c-event icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}"">
-                        {{ event.start_time|time:"H:i" }} - {{ event.end_time|time:"H:i" }}
+                    <c-event icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}">
+                        <span class="{% if event.has_overlap %}text-error{% endif %}">
+                            {{ event.start_time|time:"H:i" }}&nbsp;-&nbsp; {{ event.end_time|time:"H:i" }}
+                        </span>
                     </c-event>
                 </li>
             {% endfor %}
