@@ -17,7 +17,7 @@ from tests.trips.factories import (
     TripFactory,
 )
 from trips.forms import ExperienceForm, MealForm, TransportForm
-from trips.models import Trip
+from trips.models import Stay, Trip
 
 pytestmark = pytest.mark.django_db
 
@@ -654,21 +654,40 @@ class StayDeleteView(TestCase):
         assert response.context["other_stays"].first() == other_stay
 
     def test_get_with_multiple_other_stays(self):
+        """Test stay deletion view when there are multiple other stays available"""
         user = self.make_user("user")
         trip = TripFactory(author=user)
-        days = trip.days.all()
-        stay = StayFactory()
-        other_stays = [StayFactory(), StayFactory()]
-        stay.days.set(days[:2])
-        other_stays[0].days.set(days[2:4])
-        other_stays[1].days.set(days[4:])
+        # Force evaluation of days queryset
+        days = list(trip.days.all())
+
+        # Create stays
+        stay_to_delete = StayFactory()
+        other_stay1 = StayFactory()
+        other_stay2 = StayFactory()
+
+        # Explicitly set days to ensure proper distribution
+        stay_to_delete.days.set(days[:2])
+        other_stay1.days.set(days[2:4])
+        other_stay2.days.set(days[4:])
+
+        # Verify initial setup
+        assert Stay.objects.count() == 3
+        assert stay_to_delete.days.count() == 2
+        assert other_stay1.days.count() == 2
+        assert other_stay2.days.count() == len(days) - 4
 
         with self.login(user):
-            response = self.get("trips:stay-delete", pk=stay.pk)
+            response = self.get("trips:stay-delete", pk=stay_to_delete.pk)
 
         self.response_200(response)
+
+        # Get other stays from response context
+        other_stays = list(response.context["other_stays"])
+
+        # Verify response context
         assert response.context["show_dropdown"] is True
-        assert response.context["other_stays"].count() == 2
+        assert len(other_stays) == 2
+        assert set(other_stays) == {other_stay1, other_stay2}
 
     def test_post_with_single_other_stay_auto_reassign(self):
         user = self.make_user("user")
@@ -708,6 +727,44 @@ class StayDeleteView(TestCase):
         for day in days[:2]:
             day.refresh_from_db()
             assert day.stay == other_stays[0]
+
+    def test_post_with_manual_stay_selection(self):
+        """Test stay deletion when manually selecting a new stay from multiple options"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        days = trip.days.all()
+
+        # Create three stays
+        stay_to_delete = StayFactory()
+        new_stay = StayFactory()
+        other_stay = StayFactory()
+
+        # Assign days to stays
+        stay_to_delete.days.set(days[:2])  # First two days
+        new_stay.days.set(days[2:4])  # Next two days
+        other_stay.days.set(days[4:])  # Remaining days
+
+        # Verify initial setup
+        assert Stay.objects.count() == 3
+
+        with self.login(user):
+            response = self.post(
+                "trips:stay-delete",
+                pk=stay_to_delete.pk,
+                data={"new_stay": new_stay.pk},
+            )
+
+        self.response_204(response)
+        message = list(get_messages(response.wsgi_request))[0].message
+        assert message == "Stay deleted successfully"
+
+        # Verify stay was deleted
+        assert not Stay.objects.filter(pk=stay_to_delete.pk).exists()
+
+        # Verify days were reassigned to the selected stay
+        for day in days[:2]:
+            day.refresh_from_db()
+            assert day.stay == new_stay
 
 
 class EventDeleteView(TestCase):
