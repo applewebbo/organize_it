@@ -21,13 +21,8 @@
         <!-- Custom CSS -->
         <link rel="stylesheet" href="{% static 'css/custom.css' %}" />
         <!-- LeafletJS -->
-        <link rel="stylesheet"
-              href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-              integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-              crossorigin="" />
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-                integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-                crossorigin=""></script>
+        <link rel="stylesheet" href="{% static 'css/leaflet.css' %}" />
+        <script src="{% static 'js/leaflet.js' %}"></script>
     </head>
     <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
         <section>
@@ -47,11 +42,11 @@
             <div id="messages" class="z-3">{% include 'includes/messages.html' %}</div>
         </div>
         <!-- Htmx -->
-        <script src="https://unpkg.com/htmx.org@latest"></script>
+        <script src="{% static 'js/htmx.min.js' %}"></script>
         <!-- Alpine.js -->
-        <script src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        <script src="{% static 'js/alpine-collapse.min.js' %}"></script>
+        <script src="{% static 'js/alpine-focus.min.js' %}"></script>
+        <script src="{% static 'js/alpine.min.js' %}"></script>
         <!-- Custom.js -->
         <script src="{% static 'js/custom.js' %}"></script>
         {% django_htmx_script %}

@@ -17,12 +17,11 @@
         </div>
     </div>
     <div class="mt-2 text-right" x-data>
-        <a href="{% url 'trips:event-modify' event.pk %}"
-           class="btn btn-sm"
+        <button class="btn btn-sm"
            hx-get="{% url 'trips:event-modify' event.pk %}"
            @click="$dispatch('open-modal'); document.activeElement.blur()"
            hx-target="#dialog"
-           hx-swap="innerHTML">{% heroicon_outline 'pencil' class="size-4" %}</a>
+           hx-swap="innerHTML">{% heroicon_outline 'pencil' class="size-4" %}</button>
         <a href="{% url 'trips:event-delete' event.pk %}"
            class="btn btn-sm"
            hx-delete="{% url 'trips:event-delete' event.pk %}"
