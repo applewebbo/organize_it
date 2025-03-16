@@ -17,7 +17,7 @@ dependencies = [
   "heroicons[django]>=2.8.0",
   "psycopg[binary]>=3.2.1",
   "whitenoise>=6.7.0",
-  "django-cotton<=1.6.0"
+  "django-cotton>=2.0.0"
 ]
 description = "Add your description here"
 name = "organize-it"

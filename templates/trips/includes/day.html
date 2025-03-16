@@ -6,7 +6,7 @@
             {% heroicon_mini "pencil-square" class="size-5" %}
         </button>
         <button class="btn btn-sm me-2 sm:btn-md" disabled="disabled">{% heroicon_mini "map" class="size-5" %}</button>
-        <c-dropdown />
+        <c-dropdown :day="day" />
     </div>
     <div id="stay-info" class="mt-4" x-data>
         <ul class="flex flex-col gap-y-2 gap-x-4 md:flex-row">
@@ -56,7 +56,7 @@
         <ul class="grid grid-cols-1 gap-4 mt-4 md:grid-cols-2 xl:grid-cols-3 grid-col">
             {% for event in day.events.all %}
                 <li>
-                    <c-event icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}">
+                    <c-event :event="event" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}">
                         <span class="{% if event.has_overlap %}text-error{% endif %}">
                             {{ event.start_time|time:"H:i" }}&nbsp;-&nbsp; {{ event.end_time|time:"H:i" }}
                         </span>
