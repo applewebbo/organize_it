@@ -657,15 +657,14 @@ class StayDeleteView(TestCase):
         """Test stay deletion view when there are multiple other stays available"""
         user = self.make_user("user")
         trip = TripFactory(author=user)
-        # Force evaluation of days queryset
-        days = list(trip.days.all())
+        days = trip.days.all()
 
         # Create stays
         stay_to_delete = StayFactory()
         other_stay1 = StayFactory()
         other_stay2 = StayFactory()
 
-        # Explicitly set days to ensure proper distribution
+        # Set days for each stay
         stay_to_delete.days.set(days[:2])
         other_stay1.days.set(days[2:4])
         other_stay2.days.set(days[4:])
@@ -682,12 +681,12 @@ class StayDeleteView(TestCase):
         self.response_200(response)
 
         # Get other stays from response context
-        other_stays = list(response.context["other_stays"])
+        other_stays = set(response.context["other_stays"])
 
         # Verify response context
         assert response.context["show_dropdown"] is True
         assert len(other_stays) == 2
-        assert set(other_stays) == {other_stay1, other_stay2}
+        assert other_stays == {other_stay1, other_stay2}
 
     def test_post_with_single_other_stay_auto_reassign(self):
         user = self.make_user("user")
@@ -887,6 +886,7 @@ class EventModifyView(TestCase):
         trip = TripFactory(author=user)
         day = trip.days.first()
         event = TransportFactory(day=day)  # Transport
+        original_name = event.name
         data = {
             "name": "",  # Invalid: name is required
         }
@@ -896,3 +896,5 @@ class EventModifyView(TestCase):
 
         self.response_200(response)
         assertTemplateUsed(response, "trips/event-modify.html")
+        event.refresh_from_db()
+        assert event.name == original_name  # Check that name wasn't changed

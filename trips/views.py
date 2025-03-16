@@ -355,8 +355,20 @@ def event_delete(request, pk):
 
 @login_required
 def event_modify(request, pk):
-    qs = Event.objects.select_related("day__trip")
+    """
+    Modify an event based on its category.
+    For Transport/Experience/Meal events, loads the specific instance to access model-specific fields.
+    """
+    qs = Event.objects.select_related("day__trip", "transport", "experience", "meal")
     event = get_object_or_404(qs, pk=pk, day__trip__author=request.user)
+
+    # Get proper instance based on category
+    if event.category == 1:  # Transport
+        event = event.transport
+    elif event.category == 2:  # Experience
+        event = event.experience
+    elif event.category == 3:  # Meal
+        event = event.meal
 
     # Select form class based on event category
     event_form = {
