@@ -319,27 +319,29 @@ class ExperienceForm(forms.ModelForm):
             duration = (end_time - start_time).total_seconds() // 60
             self.initial["duration"] = int(duration)
         self.helper.layout = Layout(
-            Div(
+            Field(
                 "name",
-                css_class="sm:col-span-3",
+                wrapper_class="sm:col-span-3",
             ),
-            Field("type", css_class="select select-primary w-full"),
-            Div(
+            Field("type", css_class="select select-primary"),
+            Field(
                 "address",
-                css_class="sm:col-span-4",
+                wrapper_class="sm:col-span-4",
             ),
-            Div(
+            Field(
                 "start_time",
-                css_class="sm:col-span-3",
+                x_ref="startTime",
+                **{"x-on:change": "checkOverlap()"},
+                wrapper_class="sm:col-span-3",
             ),
-            Div(
+            Field(
                 "duration",
-                css_class="sm:col-span-1",
+                x_ref="duration",
+                **{"x-on:change": "checkOverlap()"},
+                wrapper_class="sm:col-span-1",
             ),
-            Div(
-                "url",
-                css_class="sm:col-span-4",
-            ),
+            Div(id="overlap-warning", css_class="sm:col-span-4"),
+            Field("url", wrapper_class="sm:col-span-4"),
         )
 
     def save(self, commit=True):

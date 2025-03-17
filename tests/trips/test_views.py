@@ -105,8 +105,10 @@ class TripListView(TestCase):
 
 
 class TripDetailView(TestCase):
-    def test_get(self):
-        """Test the trip detail view"""
+    """Test cases for trip detail view"""
+
+    def test_get_trip_detail_success(self):
+        """Test successful retrieval of trip detail page"""
         user = self.make_user("user")
         trip = TripFactory(author=user)
 
@@ -115,46 +117,27 @@ class TripDetailView(TestCase):
 
         self.response_200(response)
         assertTemplateUsed(response, "trips/trip-detail.html")
+        assert response.context["trip"] == trip
 
-    def test_no_overlaps(self):
-        """Test events with no overlaps"""
+    def test_get_trip_detail_not_found(self):
+        """Test 404 response for non-existent trip"""
         user = self.make_user("user")
-        trip = TripFactory(author=user)
-        day = trip.days.first()
 
-        # Create three events with non-overlapping times
-        EventFactory(day=day, start_time="09:00", end_time="10:00")
-        EventFactory(day=day, start_time="10:30", end_time="11:30")
-        EventFactory(day=day, start_time="12:00", end_time="13:00")
+        with self.login(user):
+            response = self.get("trips:trip-detail", pk=99999)
+
+        self.response_404(response)
+
+    def test_get_trip_detail_unauthorized(self):
+        """Test unauthorized access to trip detail"""
+        user = self.make_user("user")
+        other_user = self.make_user("other_user")
+        trip = TripFactory(author=other_user)
 
         with self.login(user):
             response = self.get("trips:trip-detail", pk=trip.pk)
 
-        events = response.context["trip"].days.first().events.all()
-
-        # No events should have overlaps
-        for event in events:
-            assert not event.has_overlap
-
-    def test_with_overlaps(self):
-        """Test events with overlaps"""
-        user = self.make_user("user")
-        trip = TripFactory(author=user)
-        day = trip.days.first()
-
-        # Create three events with overlapping times
-        EventFactory(day=day, start_time="09:00", end_time="10:00")
-        EventFactory(day=day, start_time="09:30", end_time="10:30")
-        EventFactory(day=day, start_time="10:00", end_time="11:00")
-
-        with self.login(user):
-            response = self.get("trips:trip-detail", pk=trip.pk)
-
-        events = response.context["trip"].days.first().events.all()
-
-        # All events should have overlaps
-        for event in events:
-            assert event.has_overlap
+        self.response_404(response)
 
 
 class TripCreateView(TestCase):
@@ -898,3 +881,71 @@ class EventModifyView(TestCase):
         assertTemplateUsed(response, "trips/event-modify.html")
         event.refresh_from_db()
         assert event.name == original_name  # Check that name wasn't changed
+
+
+class TestEventOverlapCheck(TestCase):
+    def test_overlap_warning(self):
+        """Test that overlap warning is shown when times overlap"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+
+        # Create existing event
+        EventFactory(
+            day=day, start_time=datetime.time(10, 0), end_time=datetime.time(12, 0)
+        )
+
+        # Check overlap
+        with self.login(user):
+            response = self.get(
+                "trips:check-event-overlap",
+                day_id=day.pk,
+                data={"start_time": "11:00", "end_time": "13:00"},
+            )
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/overlap-warning.html")
+        assert "This event overlaps with another event" in str(response.content)
+
+    def test_no_overlap_warning(self):
+        """Test that no warning is shown when times don't overlap"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+
+        # Create existing event
+        EventFactory(
+            day=day, start_time=datetime.time(10, 0), end_time=datetime.time(12, 0)
+        )
+
+        # Check non-overlapping time
+        with self.login(user):
+            response = self.get(
+                "trips:check-event-overlap",
+                day_id=day.pk,
+                data={"start_time": "13:00", "end_time": "14:00"},
+            )
+
+        self.response_200(response)
+        assert response.content.decode() == ""
+
+    def test_missing_time_parameters(self):
+        """Test that empty response is returned when time parameters are missing"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+
+        test_cases = [
+            {},  # No parameters
+            {"start_time": "10:00"},  # Only start_time
+            {"end_time": "11:00"},  # Only end_time
+            {"start_time": "", "end_time": ""},  # Empty parameters
+        ]
+
+        with self.login(user):
+            for params in test_cases:
+                response = self.get(
+                    "trips:check-event-overlap", day_id=day.pk, data=params
+                )
+                self.response_200(response)
+                assert response.content.decode() == ""

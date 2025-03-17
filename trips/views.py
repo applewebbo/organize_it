@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Exists, OuterRef, Prefetch
+from django.db.models import Prefetch
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
@@ -19,6 +19,7 @@ from trips.forms import (
     TripForm,
 )
 from trips.models import Day, Event, Stay, Trip
+from trips.utils import annotate_event_overlaps
 
 
 def get_trips(user):
@@ -66,33 +67,19 @@ def trip_list(request):
 def trip_detail(request, pk):
     """
     Detail Page for the selected trip.
-    Annotates events with overlap information using database queries.
-    Events can overlap with previous or next events.
+    Uses window functions to efficiently detect event overlaps within each day.
     """
     qs = Trip.objects.prefetch_related(
         Prefetch(
             "days__events",
-            queryset=Event.objects.annotate(
-                has_overlap=Exists(
-                    Event.objects.filter(
-                        day_id=OuterRef("day_id"),
-                        id__lt=OuterRef("id"),
-                        end_time__gt=OuterRef("start_time"),
-                        start_time__lt=OuterRef("end_time"),
-                    )
-                    | Event.objects.filter(
-                        day_id=OuterRef("day_id"),
-                        id__gt=OuterRef("id"),
-                        start_time__lt=OuterRef("end_time"),
-                        end_time__gt=OuterRef("start_time"),
-                    )
-                )
-            ).order_by("start_time"),
+            queryset=annotate_event_overlaps(Event.objects.all()).order_by(
+                "start_time"
+            ),
         ),
         "days__stay",
     ).select_related("author")
 
-    trip = get_object_or_404(qs, pk=pk)
+    trip = get_object_or_404(qs, pk=pk, author=request.user)
 
     context = {
         "trip": trip,
@@ -226,7 +213,7 @@ def add_experience(request, day_id):
             _("Experience added successfully"),
         )
         return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
-    context = {"form": form}
+    context = {"form": form, "day": day}
     return TemplateResponse(request, "trips/experience-create.html", context)
 
 
@@ -334,7 +321,7 @@ def stay_delete(request, pk):
     context = {
         "stay": stay,
         "other_stays": other_stays,
-        "show_dropdown": len(other_stays) > 1,
+        "show_dropdown": other_stays.count() > 1,  # Changed from len() to count()
     }
     return TemplateResponse(request, "trips/stay-delete.html", context)
 
@@ -391,3 +378,31 @@ def event_modify(request, pk):
         return HttpResponse(status=204, headers={"HX-Refresh": "true"})
     context = {"form": form, "event": event}
     return TemplateResponse(request, "trips/event-modify.html", context)
+
+
+@login_required
+def check_event_overlap(request, day_id):
+    """
+    Check if the proposed event time overlaps with existing events.
+    Returns a warning message if there's an overlap.
+    """
+    start_time = request.GET.get("start_time")
+    end_time = request.GET.get("end_time")
+
+    if not (start_time and end_time):
+        return HttpResponse("")
+
+    day = get_object_or_404(Day, pk=day_id)
+
+    overlapping_events = Event.objects.filter(
+        day=day, start_time__lt=end_time, end_time__gt=start_time
+    ).exists()
+
+    if overlapping_events:
+        return TemplateResponse(
+            request,
+            "trips/overlap-warning.html",
+            {"message": _("This event overlaps with another event")},
+        )
+
+    return HttpResponse("")

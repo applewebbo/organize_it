@@ -19,9 +19,27 @@
             <span class="sr-only">Close modal</span>
         </button>
     </div>
-    <div class="grid gap-x-1 p-4 sm:grid-cols-4 sm:gap-x-2 md:p-5">
+    <div class="grid gap-x-1 p-4 sm:grid-cols-4 sm:gap-x-2 md:p-5" x-data="{
+        checkOverlap() {
+            const startTime = $refs.startTime.value;
+            const duration = $refs.duration.value;
+            if (startTime && duration) {
+                const endTime = new Date(`2000-01-01T${startTime}`);
+                endTime.setMinutes(endTime.getMinutes() + parseInt(duration));
+                const endTimeStr = endTime.toTimeString().slice(0,5);
+                htmx.ajax('GET', '{% url 'trips:check-event-overlap' day.pk %}', {
+                    target: '#overlap-warning',
+                    values: {
+                        start_time: startTime,
+                        end_time: endTimeStr
+                    }
+                });
+            }
+        }
+    }">
         {% csrf_token %}
         {% crispy form %}
+
     </div>
     <div class="flex justify-end items-center p-4 rounded-b border-t border-gray-200 md:p-5 dark:border-gray-600">
         <button type="button"

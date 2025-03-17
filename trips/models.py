@@ -219,23 +219,6 @@ class Event(models.Model):
         self.latitude, self.longitude = g.latlng
         return super().save(*args, **kwargs)
 
-    @property
-    def has_overlap(self):
-        """Check if event overlaps with any other event in the same day"""
-        return (
-            Event.objects.filter(
-                day=self.day,
-                start_time__lt=self.end_time,
-                end_time__gt=self.start_time,
-            )
-            .exclude(pk=self.pk)
-            .exists()
-        )
-
-    @has_overlap.setter
-    def has_overlap(self, value):
-        self._has_overlap = value
-
     def __str__(self) -> str:
         return f"{self.name} ({self.start_time})"
 
