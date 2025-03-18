@@ -40,7 +40,8 @@
     </section>
     <!-- END Details Section -->
     <!-- Days Section   -->
-    <section id="days" class="flex flex-col gap-y-4">
+    <!-- TODO: add dayModified refresh with htmx-->
+    <section id="days" class="flex flex-col gap-y-4" >
         {% for day in trip.days.all %}
             {% include 'trips/includes/day.html' with day=day %}
         {% endfor %}

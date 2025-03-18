@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.db.models import Prefetch
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
@@ -406,3 +407,43 @@ def check_event_overlap(request, day_id):
         )
 
     return HttpResponse("")
+
+
+@login_required
+@require_http_methods(["POST"])
+def event_swap(request, pk1, pk2):
+    """
+    Swap the times of two events.
+    Requires both events to belong to the same day and the same trip author.
+    """
+    event1 = get_object_or_404(Event, pk=pk1, day__trip__author=request.user)
+    event2 = get_object_or_404(Event, pk=pk2, day__trip__author=request.user)
+
+    try:
+        with transaction.atomic():
+            event1.swap_times_with(event2)
+
+        messages.success(request, _("Events swapped successfully"))
+        return HttpResponse(status=204, headers={"HX-Trigger": "dayModified"})
+
+    except ValueError as e:
+        messages.error(request, str(e))
+        return HttpResponse(status=400)
+
+
+@login_required
+def event_swap_modal(request, pk):
+    """
+    Provide a list of events to swap with the selected event.
+    Only events from the same day and trip are shown.
+    """
+    selected_event = get_object_or_404(Event, pk=pk, day__trip__author=request.user)
+    day = selected_event.day
+    swappable_events = Event.objects.filter(day=day).exclude(pk=pk)
+
+    context = {
+        "selected_event": selected_event,
+        "swappable_events": swappable_events,
+    }
+
+    return TemplateResponse(request, "trips/event-swap.html", context)

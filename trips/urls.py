@@ -32,6 +32,10 @@ htmx_urlpatterns = [
         views.check_event_overlap,
         name="check-event-overlap",
     ),
+    path("events/<int:pk1>/swap/<int:pk2>/", views.event_swap, name="event-swap"),
+    path(
+        "events/<int:pk>/swap-choices", views.event_swap_modal, name="event-swap-modal"
+    ),
 ]
 
 urlpatterns += htmx_urlpatterns

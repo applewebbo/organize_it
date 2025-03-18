@@ -2,8 +2,7 @@
 <div class="py-3 px-6 rounded-lg border {{ border_color }} {{ bg_color }} relative">
     {% if event.has_overlap %}
         <div class="absolute top-0 right-0 p-1.5 mt-2 mr-4 bg-white rounded-full border text-error border-error"
-             x-data
-             @mouseenter="$tooltip('Time conflict with another event')">
+             x-data>
             {% heroicon_mini 'exclamation-triangle' class="size-4" %}
         </div>
     {% endif %}
@@ -17,6 +16,11 @@
         </div>
     </div>
     <div class="mt-2 text-right" x-data>
+        <button class="btn btn-sm"
+           hx-get="{% url 'trips:event-swap-modal' event.pk %}"
+           @click="$dispatch('open-modal'); document.activeElement.blur()"
+           hx-target="#dialog"
+           hx-swap="innerHTML">{% heroicon_outline 'arrows-up-down' class="size-4" %}</button>
         <button class="btn btn-sm"
            hx-get="{% url 'trips:event-modify' event.pk %}"
            @click="$dispatch('open-modal'); document.activeElement.blur()"

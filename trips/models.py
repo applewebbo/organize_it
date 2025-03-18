@@ -222,6 +222,24 @@ class Event(models.Model):
     def __str__(self) -> str:
         return f"{self.name} ({self.start_time})"
 
+    def swap_times_with(self, other_event):
+        """
+        Swap start and end times with another event.
+        Both events must belong to the same day.
+        """
+        if self.day_id != other_event.day_id:
+            raise ValueError("Can only swap events within the same day")
+
+        self.start_time, other_event.start_time = (
+            other_event.start_time,
+            self.start_time,
+        )
+        self.end_time, other_event.end_time = other_event.end_time, self.end_time
+
+        # Save both events
+        self.save()
+        other_event.save()
+
 
 class Transport(Event):
     class Type(models.IntegerChoices):
