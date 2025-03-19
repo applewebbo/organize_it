@@ -88,6 +88,29 @@ def trip_detail(request, pk):
     return TemplateResponse(request, "trips/trip-detail.html", context)
 
 
+def day_detail(request, pk):
+    """
+    Detail Page for the selected day.
+    Uses window functions to efficiently detect event overlaps within the day.
+    """
+    qs = Day.objects.prefetch_related(
+        Prefetch(
+            "events",
+            queryset=annotate_event_overlaps(Event.objects.all()).order_by(
+                "start_time"
+            ),
+        ),
+        "stay",
+    ).select_related("trip__author")
+
+    day = get_object_or_404(qs, pk=pk, trip__author=request.user)
+
+    context = {
+        "day": day,
+    }
+    return TemplateResponse(request, "trips/includes/day.html", context)
+
+
 @login_required
 def trip_create(request):
     if request.method == "POST":
@@ -418,13 +441,14 @@ def event_swap(request, pk1, pk2):
     """
     event1 = get_object_or_404(Event, pk=pk1, day__trip__author=request.user)
     event2 = get_object_or_404(Event, pk=pk2, day__trip__author=request.user)
+    day = event1.day
 
     try:
         with transaction.atomic():
             event1.swap_times_with(event2)
 
         messages.success(request, _("Events swapped successfully"))
-        return HttpResponse(status=204, headers={"HX-Trigger": "dayModified"})
+        return HttpResponse(status=204, headers={"HX-Trigger": f"dayModified{day.pk}"})
 
     except ValueError as e:
         messages.error(request, str(e))
