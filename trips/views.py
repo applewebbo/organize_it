@@ -88,6 +88,7 @@ def trip_detail(request, pk):
     return TemplateResponse(request, "trips/trip-detail.html", context)
 
 
+@login_required
 def day_detail(request, pk):
     """
     Detail Page for the selected day.

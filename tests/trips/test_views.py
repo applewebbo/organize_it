@@ -140,6 +140,38 @@ class TripDetailView(TestCase):
         self.response_404(response)
 
 
+class DayDetailView(TestCase):
+    """Test cases for day detail view"""
+
+    def test_get_day_detail_success(self):
+        """Test successful retrieval of day detail"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(day=day)
+
+        with self.login(user):
+            response = self.get("trips:day-detail", pk=day.pk)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/includes/day.html")
+        assert day.events.first() == event
+        assert "day" in response.context
+        assert response.context["day"] == day
+
+    def test_get_day_detail_unauthorized(self):
+        """Test unauthorized access to day detail"""
+        user = self.make_user("user")
+        other_user = self.make_user("other_user")
+        trip = TripFactory(author=other_user)
+        day = trip.days.first()
+
+        with self.login(user):
+            response = self.get("trips:day-detail", pk=day.pk)
+
+        self.response_404(response)
+
+
 class TripCreateView(TestCase):
     def test_get(self):
         user = self.make_user("user")
@@ -949,3 +981,109 @@ class TestEventOverlapCheck(TestCase):
                 )
                 self.response_200(response)
                 assert response.content.decode() == ""
+
+
+class TestEventSwap(TestCase):
+    """Test cases for event swapping functionality"""
+
+    def test_event_swap_success(self):
+        """Test successful swapping of two events times"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+
+        event1 = EventFactory(
+            day=day, start_time=datetime.time(10, 0), end_time=datetime.time(11, 0)
+        )
+        event2 = EventFactory(
+            day=day, start_time=datetime.time(14, 0), end_time=datetime.time(15, 0)
+        )
+
+        with self.login(user):
+            response = self.post("trips:event-swap", pk1=event1.pk, pk2=event2.pk)
+
+        self.response_204(response)
+        message = list(get_messages(response.wsgi_request))[0].message
+        assert message == "Events swapped successfully"
+
+        # Verify events were swapped
+        event1.refresh_from_db()
+        event2.refresh_from_db()
+        assert event1.start_time == datetime.time(14, 0)
+        assert event1.end_time == datetime.time(15, 0)
+        assert event2.start_time == datetime.time(10, 0)
+        assert event2.end_time == datetime.time(11, 0)
+
+    def test_event_swap_unauthorized(self):
+        """Test unauthorized access to event swap"""
+        user = self.make_user("user")
+        other_user = self.make_user("other_user")
+        trip = TripFactory(author=other_user)
+        day = trip.days.first()
+        event1 = EventFactory(day=day)
+        event2 = EventFactory(day=day)
+
+        with self.login(user):
+            response = self.post("trips:event-swap", pk1=event1.pk, pk2=event2.pk)
+
+        self.response_404(response)
+
+    def test_event_swap_different_days(self):
+        """Test swapping events from different days"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day1 = trip.days.first()
+        day2 = trip.days.last()
+        event1 = EventFactory(day=day1)
+        event2 = EventFactory(day=day2)
+
+        with self.login(user):
+            response = self.post("trips:event-swap", pk1=event1.pk, pk2=event2.pk)
+
+        self.response_400(response)
+
+
+class TestEventSwapModal(TestCase):
+    """Test cases for event swap modal view"""
+
+    def test_get_swap_modal(self):
+        """Test successful retrieval of swap modal"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        selected_event = EventFactory(day=day)
+        swappable_event = EventFactory(day=day)
+
+        with self.login(user):
+            response = self.get("trips:event-swap-modal", pk=selected_event.pk)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/event-swap.html")
+        assert response.context["selected_event"] == selected_event
+        assert swappable_event in response.context["swappable_events"]
+
+    def test_get_swap_modal_unauthorized(self):
+        """Test unauthorized access to swap modal"""
+        user = self.make_user("user")
+        other_user = self.make_user("other_user")
+        trip = TripFactory(author=other_user)
+        day = trip.days.first()
+        event = EventFactory(day=day)
+
+        with self.login(user):
+            response = self.get("trips:event-swap-modal", pk=event.pk)
+
+        self.response_404(response)
+
+    def test_get_swap_modal_no_other_events(self):
+        """Test swap modal when no other events exist"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(day=day)
+
+        with self.login(user):
+            response = self.get("trips:event-swap-modal", pk=event.pk)
+
+        self.response_200(response)
+        assert len(response.context["swappable_events"]) == 0
