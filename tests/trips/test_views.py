@@ -671,40 +671,48 @@ class StayDeleteView(TestCase):
     def test_get_with_multiple_other_stays(self):
         """Test stay deletion view when there are multiple other stays available"""
         user = self.make_user("user")
-        trip = TripFactory(author=user)
-        days = trip.days.all()
 
-        # Create stays and ensure proper linkage to trip
+        # Create a trip with exactly 6 days
+        start_date = datetime.date(2024, 1, 1)  # Use fixed date instead of today
+        end_date = start_date + datetime.timedelta(days=5)
+        trip = TripFactory(author=user, start_date=start_date, end_date=end_date)
+
+        # Get all days and ensure we have exactly 6
+        days = list(trip.days.all().order_by("date"))
+        assert len(days) == 6, f"Expected 6 days, got {len(days)}"
+
+        # Create stays
         stay_to_delete = StayFactory()
         other_stay1 = StayFactory()
         other_stay2 = StayFactory()
 
-        # Set days for each stay - ensuring each stay gets assigned to the same trip
-        stay_to_delete.days.set(days[:2])  # First 2 days
-        other_stay1.days.set(days[2:4])  # Days 3-4
-        other_stay2.days.set(days[4:])  # Remaining days
+        # Assign exactly 2 days to each stay
+        stay_to_delete.days.set(days[:2])
+        other_stay1.days.set(days[2:4])
+        other_stay2.days.set(days[4:6])
 
-        # Force refresh from database to ensure all relationships are saved
-        stay_to_delete.refresh_from_db()
-        other_stay1.refresh_from_db()
-        other_stay2.refresh_from_db()
+        # Force refresh and verify setup
+        for stay in [stay_to_delete, other_stay1, other_stay2]:
+            stay.refresh_from_db()
+            assert stay.days.count() == 2, f"Stay {stay.pk} should have exactly 2 days"
 
-        # Verify initial setup
-        assert stay_to_delete.days.count() == 2
-        assert other_stay1.days.count() >= 1
-        assert other_stay2.days.count() >= 1
-        assert Stay.objects.filter(days__trip=trip).distinct().count() == 3
+        # Verify trip has exactly 3 stays
+        trip_stays = Stay.objects.filter(days__trip=trip).distinct()
+        assert trip_stays.count() == 3, f"Expected 3 stays, got {trip_stays.count()}"
 
+        # Get stay deletion page
         with self.login(user):
             response = self.get("trips:stay-delete", pk=stay_to_delete.pk)
 
         self.response_200(response)
 
-        # Get other stays and verify they're from the same trip
+        # Verify response
         other_stays = response.context["other_stays"]
-        assert other_stays.count() > 1, "Should have at least 2 other stays"
-        assert set(other_stays) == {other_stay1, other_stay2}
-        assert response.context["show_dropdown"] is True
+        assert other_stays.count() == 2, (
+            f"Expected 2 other stays, got {other_stays.count()}"
+        )
+        assert set(other_stays) == {other_stay1, other_stay2}, "Wrong stays in context"
+        assert response.context["show_dropdown"] is True, "show_dropdown should be True"
 
     def test_post_with_single_other_stay_auto_reassign(self):
         user = self.make_user("user")

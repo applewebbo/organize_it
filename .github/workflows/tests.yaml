@@ -12,6 +12,23 @@ jobs:
       DEBUG: on
       SECRET_KEY: a secret to everybody
       MAPBOX_ACCESS_TOKEN: ${{ secrets.MAPBOX_ACCESS_TOKEN }}
+      TZ: UTC  # Set timezone to UTC
+      PYTHONUNBUFFERED: 1
+
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: test_db
+        ports:
+        - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
     - name: Get the code
@@ -30,4 +47,8 @@ jobs:
       run: uv sync --all-extras --dev
 
     - name: Test it
-      run: uv run pytest --reuse-db -s
+      run: |
+        # Run migrations before tests
+        python manage.py migrate --noinput
+        # Run tests with -v 2 for more verbosity
+        uv run pytest --reuse-db -v 2 -s
