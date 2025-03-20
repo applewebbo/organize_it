@@ -49,6 +49,6 @@ jobs:
     - name: Test it
       run: |
         # Run migrations before tests
-        python manage.py migrate --noinput
+        uv run python manage.py migrate --noinput
         # Run tests with -v 2 for more verbosity
         uv run pytest --reuse-db -v 2 -s
