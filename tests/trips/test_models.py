@@ -260,6 +260,51 @@ class TestEventModel:
         # Verify geocoder was not called again
         mock_geocoder.assert_not_called()
 
+    def test_swap_times_with_success(self, user_factory, trip_factory, event_factory):
+        """Test successful swapping of event times"""
+        user = user_factory()
+        trip = trip_factory(author=user)
+        day = trip.days.first()
+
+        event1 = event_factory(
+            day=day, name="First Event", start_time="09:00", end_time="10:00"
+        )
+        event2 = event_factory(
+            day=day, name="Second Event", start_time="14:00", end_time="15:00"
+        )
+
+        # Store original times
+        event1_original_start = event1.start_time
+        event1_original_end = event1.end_time
+        event2_original_start = event2.start_time
+        event2_original_end = event2.end_time
+
+        # Perform swap
+        event1.swap_times_with(event2)
+
+        # Verify times were swapped
+        assert event1.start_time == event2_original_start
+        assert event1.end_time == event2_original_end
+        assert event2.start_time == event1_original_start
+        assert event2.end_time == event1_original_end
+
+    def test_swap_times_with_different_days(
+        self, user_factory, trip_factory, event_factory
+    ):
+        """Test error when swapping events from different days"""
+        user = user_factory()
+        trip = trip_factory(author=user)
+        day1 = trip.days.first()
+        day2 = trip.days.last()
+
+        event1 = event_factory(day=day1, start_time="09:00", end_time="10:00")
+        event2 = event_factory(day=day2, start_time="14:00", end_time="15:00")
+
+        # Verify ValueError is raised when swapping events from different days
+        with pytest.raises(ValueError) as exc:
+            event1.swap_times_with(event2)
+        assert str(exc.value) == "Can only swap events within the same day"
+
 
 class TestTransportModel:
     def test_factory(self, user_factory, trip_factory, transport_factory):

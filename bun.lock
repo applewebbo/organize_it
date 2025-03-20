@@ -3,11 +3,11 @@
   "workspaces": {
     "": {
       "devDependencies": {
-        "daisyui": "^5.0.4",
+        "daisyui": "^5.0.6",
       },
     },
   },
   "packages": {
-    "daisyui": ["daisyui@5.0.4", "", {}, "sha512-9X3oX/k9hPBCslAECk8kYfvwgrz6Grs0lN7VI0/ZTM/hUfq1uFREHxCcBCCq0QROpN183N19B1hTNRWGipO2Eg=="],
+    "daisyui": ["daisyui@5.0.6", "", {}, "sha512-/e/9Gw/2y9oawBJlWkJMSEhRXdmfOLvcPl+6q/x2rPEdIVOtebs1t3ex2vwySl9vCRs1GGNBKCiL+P60Ps/wUw=="],
   }
 }

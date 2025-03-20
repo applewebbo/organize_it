@@ -219,25 +219,26 @@ class Event(models.Model):
         self.latitude, self.longitude = g.latlng
         return super().save(*args, **kwargs)
 
-    @property
-    def has_overlap(self):
-        """Check if event overlaps with any other event in the same day"""
-        return (
-            Event.objects.filter(
-                day=self.day,
-                start_time__lt=self.end_time,
-                end_time__gt=self.start_time,
-            )
-            .exclude(pk=self.pk)
-            .exists()
-        )
-
-    @has_overlap.setter
-    def has_overlap(self, value):
-        self._has_overlap = value
-
     def __str__(self) -> str:
         return f"{self.name} ({self.start_time})"
+
+    def swap_times_with(self, other_event):
+        """
+        Swap start and end times with another event.
+        Both events must belong to the same day.
+        """
+        if self.day_id != other_event.day_id:
+            raise ValueError("Can only swap events within the same day")
+
+        self.start_time, other_event.start_time = (
+            other_event.start_time,
+            self.start_time,
+        )
+        self.end_time, other_event.end_time = other_event.end_time, self.end_time
+
+        # Save both events
+        self.save()
+        other_event.save()
 
 
 class Transport(Event):

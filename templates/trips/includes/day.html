@@ -1,5 +1,7 @@
 {% load trip_tags %}
-<div class="py-4 px-6 w-full bg-white rounded-lg border border-gray-200 shadow">
+<div class="py-4 px-6 w-full bg-white rounded-lg border border-gray-200 shadow"
+     hx-get="{% url 'trips:day-detail' day.pk %}"
+     hx-trigger="dayModified{{ day.pk }} from:body">
     <div class="flex items-center">
         <h2 class="text-lg font-medium sm:text-xl grow">Day {{ day.number }}</h2>
         <button class="btn btn-sm me-2 sm:btn-md" disabled="disabled">
@@ -42,26 +44,27 @@
                                hx-swap="innerHTML"
                                @click="$dispatch('open-modal'); document.activeElement.blur()"
                                class="link">{{ next_day.stay.name }}</a>
-                                <div class="flex items-center py-0.5 px-2 text-green-700 bg-green-100 rounded-lg border-2 border-green-300 ms-2">
-                                    {{ next_day.stay.check_in|time:"H:i" }}
-                                    {% heroicon_mini 'arrow-right-end-on-rectangle' class="size-4 ms-1" %}
-                                </div>
-                            </li>
-                        {% endif %}
-                    {% endwith %}
-                {% endif %}
-            </ul>
-        </div>
-        {% if day.events.all %}<div class="divider"></div>{% endif %}
-        <ul class="grid grid-cols-1 gap-4 mt-4 md:grid-cols-2 xl:grid-cols-3 grid-col">
-            {% for event in day.events.all %}
-                <li>
-                    <c-event :event="event" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}">
-                        <span class="{% if event.has_overlap %}text-error{% endif %}">
-                            {{ event.start_time|time:"H:i" }}&nbsp;-&nbsp; {{ event.end_time|time:"H:i" }}
-                        </span>
-                    </c-event>
-                </li>
-            {% endfor %}
+                            <div class="flex items-center py-0.5 px-2 text-green-700 bg-green-100 rounded-lg border-2 border-green-300 ms-2">
+                                {{ next_day.stay.check_in|time:"H:i" }}
+                                {% heroicon_mini 'arrow-right-end-on-rectangle' class="size-4 ms-1" %}
+                            </div>
+                        </li>
+                    {% endif %}
+                {% endwith %}
+            {% endif %}
         </ul>
     </div>
+    {% if day.events.all %}<div class="divider"></div>{% endif %}
+    <ul class="grid grid-cols-1 gap-4 mt-4 md:grid-cols-2 xl:grid-cols-3 grid-col">
+        {% for event in day.events.all %}
+            <li>
+                <c-event :event="event" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}">
+                <span class="{% if event.has_overlap %}text-error{% endif %}">
+                    {{ event.start_time|time:"H:i" }}&nbsp;-&nbsp; {{ event.end_time|time:"H:i" }}
+                </span>
+                </c-event>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+<div id="messages" class="z-3" hx-swap-oob="true">{% include 'includes/messages.html' %}</div>

@@ -105,8 +105,10 @@ class TripListView(TestCase):
 
 
 class TripDetailView(TestCase):
-    def test_get(self):
-        """Test the trip detail view"""
+    """Test cases for trip detail view"""
+
+    def test_get_trip_detail_success(self):
+        """Test successful retrieval of trip detail page"""
         user = self.make_user("user")
         trip = TripFactory(author=user)
 
@@ -115,46 +117,59 @@ class TripDetailView(TestCase):
 
         self.response_200(response)
         assertTemplateUsed(response, "trips/trip-detail.html")
+        assert response.context["trip"] == trip
 
-    def test_no_overlaps(self):
-        """Test events with no overlaps"""
+    def test_get_trip_detail_not_found(self):
+        """Test 404 response for non-existent trip"""
         user = self.make_user("user")
-        trip = TripFactory(author=user)
-        day = trip.days.first()
 
-        # Create three events with non-overlapping times
-        EventFactory(day=day, start_time="09:00", end_time="10:00")
-        EventFactory(day=day, start_time="10:30", end_time="11:30")
-        EventFactory(day=day, start_time="12:00", end_time="13:00")
+        with self.login(user):
+            response = self.get("trips:trip-detail", pk=99999)
+
+        self.response_404(response)
+
+    def test_get_trip_detail_unauthorized(self):
+        """Test unauthorized access to trip detail"""
+        user = self.make_user("user")
+        other_user = self.make_user("other_user")
+        trip = TripFactory(author=other_user)
 
         with self.login(user):
             response = self.get("trips:trip-detail", pk=trip.pk)
 
-        events = response.context["trip"].days.first().events.all()
+        self.response_404(response)
 
-        # No events should have overlaps
-        for event in events:
-            assert not event.has_overlap
 
-    def test_with_overlaps(self):
-        """Test events with overlaps"""
+class DayDetailView(TestCase):
+    """Test cases for day detail view"""
+
+    def test_get_day_detail_success(self):
+        """Test successful retrieval of day detail"""
         user = self.make_user("user")
         trip = TripFactory(author=user)
         day = trip.days.first()
-
-        # Create three events with overlapping times
-        EventFactory(day=day, start_time="09:00", end_time="10:00")
-        EventFactory(day=day, start_time="09:30", end_time="10:30")
-        EventFactory(day=day, start_time="10:00", end_time="11:00")
+        event = EventFactory(day=day)
 
         with self.login(user):
-            response = self.get("trips:trip-detail", pk=trip.pk)
+            response = self.get("trips:day-detail", pk=day.pk)
 
-        events = response.context["trip"].days.first().events.all()
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/includes/day.html")
+        assert day.events.first() == event
+        assert "day" in response.context
+        assert response.context["day"] == day
 
-        # All events should have overlaps
-        for event in events:
-            assert event.has_overlap
+    def test_get_day_detail_unauthorized(self):
+        """Test unauthorized access to day detail"""
+        user = self.make_user("user")
+        other_user = self.make_user("other_user")
+        trip = TripFactory(author=other_user)
+        day = trip.days.first()
+
+        with self.login(user):
+            response = self.get("trips:day-detail", pk=day.pk)
+
+        self.response_404(response)
 
 
 class TripCreateView(TestCase):
@@ -898,3 +913,177 @@ class EventModifyView(TestCase):
         assertTemplateUsed(response, "trips/event-modify.html")
         event.refresh_from_db()
         assert event.name == original_name  # Check that name wasn't changed
+
+
+class TestEventOverlapCheck(TestCase):
+    def test_overlap_warning(self):
+        """Test that overlap warning is shown when times overlap"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+
+        # Create existing event
+        EventFactory(
+            day=day, start_time=datetime.time(10, 0), end_time=datetime.time(12, 0)
+        )
+
+        # Check overlap
+        with self.login(user):
+            response = self.get(
+                "trips:check-event-overlap",
+                day_id=day.pk,
+                data={"start_time": "11:00", "end_time": "13:00"},
+            )
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/overlap-warning.html")
+        assert "This event overlaps with another event" in str(response.content)
+
+    def test_no_overlap_warning(self):
+        """Test that no warning is shown when times don't overlap"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+
+        # Create existing event
+        EventFactory(
+            day=day, start_time=datetime.time(10, 0), end_time=datetime.time(12, 0)
+        )
+
+        # Check non-overlapping time
+        with self.login(user):
+            response = self.get(
+                "trips:check-event-overlap",
+                day_id=day.pk,
+                data={"start_time": "13:00", "end_time": "14:00"},
+            )
+
+        self.response_200(response)
+        assert response.content.decode() == ""
+
+    def test_missing_time_parameters(self):
+        """Test that empty response is returned when time parameters are missing"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+
+        test_cases = [
+            {},  # No parameters
+            {"start_time": "10:00"},  # Only start_time
+            {"end_time": "11:00"},  # Only end_time
+            {"start_time": "", "end_time": ""},  # Empty parameters
+        ]
+
+        with self.login(user):
+            for params in test_cases:
+                response = self.get(
+                    "trips:check-event-overlap", day_id=day.pk, data=params
+                )
+                self.response_200(response)
+                assert response.content.decode() == ""
+
+
+class TestEventSwap(TestCase):
+    """Test cases for event swapping functionality"""
+
+    def test_event_swap_success(self):
+        """Test successful swapping of two events times"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+
+        event1 = EventFactory(
+            day=day, start_time=datetime.time(10, 0), end_time=datetime.time(11, 0)
+        )
+        event2 = EventFactory(
+            day=day, start_time=datetime.time(14, 0), end_time=datetime.time(15, 0)
+        )
+
+        with self.login(user):
+            response = self.post("trips:event-swap", pk1=event1.pk, pk2=event2.pk)
+
+        self.response_204(response)
+        message = list(get_messages(response.wsgi_request))[0].message
+        assert message == "Events swapped successfully"
+
+        # Verify events were swapped
+        event1.refresh_from_db()
+        event2.refresh_from_db()
+        assert event1.start_time == datetime.time(14, 0)
+        assert event1.end_time == datetime.time(15, 0)
+        assert event2.start_time == datetime.time(10, 0)
+        assert event2.end_time == datetime.time(11, 0)
+
+    def test_event_swap_unauthorized(self):
+        """Test unauthorized access to event swap"""
+        user = self.make_user("user")
+        other_user = self.make_user("other_user")
+        trip = TripFactory(author=other_user)
+        day = trip.days.first()
+        event1 = EventFactory(day=day)
+        event2 = EventFactory(day=day)
+
+        with self.login(user):
+            response = self.post("trips:event-swap", pk1=event1.pk, pk2=event2.pk)
+
+        self.response_404(response)
+
+    def test_event_swap_different_days(self):
+        """Test swapping events from different days"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day1 = trip.days.first()
+        day2 = trip.days.last()
+        event1 = EventFactory(day=day1)
+        event2 = EventFactory(day=day2)
+
+        with self.login(user):
+            response = self.post("trips:event-swap", pk1=event1.pk, pk2=event2.pk)
+
+        self.response_400(response)
+
+
+class TestEventSwapModal(TestCase):
+    """Test cases for event swap modal view"""
+
+    def test_get_swap_modal(self):
+        """Test successful retrieval of swap modal"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        selected_event = EventFactory(day=day)
+        swappable_event = EventFactory(day=day)
+
+        with self.login(user):
+            response = self.get("trips:event-swap-modal", pk=selected_event.pk)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/event-swap.html")
+        assert response.context["selected_event"] == selected_event
+        assert swappable_event in response.context["swappable_events"]
+
+    def test_get_swap_modal_unauthorized(self):
+        """Test unauthorized access to swap modal"""
+        user = self.make_user("user")
+        other_user = self.make_user("other_user")
+        trip = TripFactory(author=other_user)
+        day = trip.days.first()
+        event = EventFactory(day=day)
+
+        with self.login(user):
+            response = self.get("trips:event-swap-modal", pk=event.pk)
+
+        self.response_404(response)
+
+    def test_get_swap_modal_no_other_events(self):
+        """Test swap modal when no other events exist"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(day=day)
+
+        with self.login(user):
+            response = self.get("trips:event-swap-modal", pk=event.pk)
+
+        self.response_200(response)
+        assert len(response.context["swappable_events"]) == 0

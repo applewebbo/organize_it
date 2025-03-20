@@ -27,6 +27,16 @@ htmx_urlpatterns = [
     path("stays/<int:pk>/delete", views.stay_delete, name="stay-delete"),
     path("events/<int:pk>/delete", views.event_delete, name="event-delete"),
     path("events/<int:pk>/modify", views.event_modify, name="event-modify"),
+    path(
+        "days/<int:day_id>/check-overlap/",
+        views.check_event_overlap,
+        name="check-event-overlap",
+    ),
+    path("events/<int:pk1>/swap/<int:pk2>/", views.event_swap, name="event-swap"),
+    path(
+        "events/<int:pk>/swap-choices", views.event_swap_modal, name="event-swap-modal"
+    ),
+    path("days/<int:pk>/detail", views.day_detail, name="day-detail"),
 ]
 
 urlpatterns += htmx_urlpatterns
