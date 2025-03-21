@@ -231,47 +231,47 @@ def test_event_bg_color():
     """Test event_bg_color template filter"""
     # Test all event categories
     transport = EventFactory(category=1)
-    assert event_bg_color(transport) == "bg-[#BAEAFF]"
+    assert event_bg_color(transport) == "bg-tr-blue-100"
 
     experience = EventFactory(category=2)
-    assert event_bg_color(experience) == "bg-[#DDFFCF]"
+    assert event_bg_color(experience) == "bg-exp-green-100"
 
     meal = EventFactory(category=3)
-    assert event_bg_color(meal) == "bg-[#FFF4D4]"
+    assert event_bg_color(meal) == "bg-meal-yellow-100"
 
     # Test unknown category
     unknown = EventFactory(category=99)
-    assert event_bg_color(unknown) == "bg-gray-300"
+    assert event_bg_color(unknown) == "bg-gray-100"
 
 
 def test_event_border_color():
     """Test event_border_color template filter"""
     # Test all event categories
     transport = EventFactory(category=1)
-    assert event_border_color(transport) == "border-[#5ECEFF]"
+    assert event_border_color(transport) == "border-tr-blue-300"
 
     experience = EventFactory(category=2)
-    assert event_border_color(experience) == "border-[#98F56F]"
+    assert event_border_color(experience) == "border-exp-green-300"
 
     meal = EventFactory(category=3)
-    assert event_border_color(meal) == "border-[#FFDB6D]"
+    assert event_border_color(meal) == "border-meal-yellow-300"
 
     # Test unknown category
     unknown = EventFactory(category=99)
-    assert event_border_color(unknown) == "bg-gray-300"
+    assert event_border_color(unknown) == "border-gray-300"
 
 
 def test_event_icon_color():
     """Test event_icon_color template filter"""
     # Test all event categories
     transport = EventFactory(category=1)
-    assert event_icon_color(transport) == "text-transport-blue"
+    assert event_icon_color(transport) == "text-tr-blue-700"
 
     experience = EventFactory(category=2)
-    assert event_icon_color(experience) == "text-experience-green"
+    assert event_icon_color(experience) == "text-exp-green-700"
 
     meal = EventFactory(category=3)
-    assert event_icon_color(meal) == "text-meal-yellow"
+    assert event_icon_color(meal) == "text-meal-yellow-700"
 
     # Test unknown category
     unknown = EventFactory(category=99)

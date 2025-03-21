@@ -60,29 +60,29 @@ def event_icon(event):
 @register.filter
 def event_bg_color(event):
     colors = {
-        1: "bg-[#BAEAFF]",  # Transport
-        2: "bg-[#DDFFCF]",  # Experience
-        3: "bg-[#FFF4D4]",  # Meal
+        1: "bg-tr-blue-100",  # Transport
+        2: "bg-exp-green-100",  # Experience
+        3: "bg-meal-yellow-100",  # Meal
     }
-    return colors.get(event.category, "bg-gray-300")
+    return colors.get(event.category, "bg-gray-100")
 
 
 @register.filter
 def event_border_color(event):
     colors = {
-        1: "border-[#5ECEFF]",  # Transport
-        2: "border-[#98F56F]",  # Experience
-        3: "border-[#FFDB6D]",  # Meal
+        1: "border-tr-blue-300",  # Transport
+        2: "border-exp-green-300",  # Experience
+        3: "border-meal-yellow-300",  # Meal
     }
-    return colors.get(event.category, "bg-gray-300")
+    return colors.get(event.category, "border-gray-300")
 
 
 @register.filter
 def event_icon_color(event):
     colors = {
-        1: "text-transport-blue",  # Transport
-        2: "text-experience-green",  # Experience
-        3: "text-meal-yellow",  # Meal
+        1: "text-tr-blue-700",  # Transport
+        2: "text-exp-green-700",  # Experience
+        3: "text-meal-yellow-700",  # Meal
     }
     return colors.get(event.category, "text-base-content")
 
