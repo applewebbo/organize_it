@@ -1,26 +1,25 @@
-<p class="mb-8 text-2xl">Welcome back, {{ user.email }}!</p>
 <div id="trip-list"
-     class="grid grid-cols-1 gap-x-4 gap-y-8 md:grid-cols-2">
+     class="grid grid-cols-1 gap-x-4 gap-y-8 mt-8 md:grid-cols-2">
     {% if fav_trip %}
-        <div class="relative p-4 mb-6 h-full bg-white rounded-lg border border-gray-200 shadow">
-            <div class="card-badge">My Favourite Trip</div>
+        <div class="relative shadow card card-border bg-base-100">
             <div class="card-body">
-                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">{{ fav_trip.title }}</h5>
+                <span class="text-sm text-slate-600 dark:text-slate-300">Favourite</span>
+                <h5 class="card-title">{{ fav_trip.title }}</h5>
                 <p>{{ fav_trip.description }}</p>
                 <div class="justify-end card-actions">
                     <a href="{% url 'trips:trip-detail' fav_trip.id %}"
-                       class="btn btn-sm btn-primary">View Trip</a>
+                       class="btn btn-sm btn-primary btn-outline">View Trip</a>
                 </div>
             </div>
         </div>
         {% if other_trips %}
-            <div class="relative p-4 mb-5 h-full bg-white rounded-lg border border-gray-200 shadow">
-                <div class="card-badge">Other Trips</div>
+            <div class="relative shadow card card-border bg-base-100">
                 <div class="card-body">
+                    <span class="text-sm text-slate-600 dark:text-slate-300">Others</span>
                     <ul class="list-unstyled">
                         {% for trip in other_trips %}
                             <li>
-                                <a class="link" href="#">{{ trip.title }}</a>
+                                <a class="link" href="{% url 'trips:trip-detail' trip.id %}">{{ trip.title }}</a>
                             </li>
                         {% endfor %}
                     </ul>
@@ -31,28 +30,28 @@
         {% if other_trips %}
             {% for trip in other_trips %}
                 {% if forloop.first %}
-                    <div class="relative p-4 mb-5 bg-white rounded-lg border border-gray-200 shadow">
-                        <div class="card-badge">My Latest Trip</div>
+                    <div class="relative shadow card card-border bg-base-100">
                         <div class="card-body">
-                            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">{{ trip.title }}</h5>
-                            <p class="mb-3 font-normal text-gray-700">{{ trip.description }}</p>
+                            <span class="text-sm text-slate-600 dark:text-slate-300">Latest</span>
+                            <h5 class="card-title">{{ trip.title }}</h5>
+                            <p>{{ trip.description }}</p>
                             <div class="justify-end card-actions">
                                 <a href="{% url 'trips:trip-detail' trip.id %}"
-                                   class="btn btn-sm btn-primary">View Trip</a>
+                                   class="btn btn-sm btn-primary btn-outline">View Trip</a>
                             </div>
                         </div>
                     </div>
                 {% endif %}
             {% endfor %}
-            <div class="relative p-4 mb-5 bg-white rounded-lg border border-gray-200 shadow">
-                <div class="card-badge card-badge-neutral">Other Trips</div>
+            <div class="relative shadow card card-border bg-base-100">
                 <div class="card-body">
+                    <span class="text-sm text-slate-600 dark:text-slate-300">Others</span>
                     <ul class="list-unstyled">
                         {% for trip in other_trips %}
                             {% if forloop.first %}
                             {% else %}
                                 <li>
-                                    <a class="link" href="#">{{ trip.title }}</a>
+                                    <a class="link" href="{% url 'trips:trip-detail' trip.id %}">{{ trip.title }}</a>
                                 </li>
                             {% endif %}
                         {% endfor %}

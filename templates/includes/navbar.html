@@ -1,6 +1,6 @@
 {% load static %}
 <div x-data="{ open: false}">
-    <nav class="fixed top-0 z-20 w-full bg-white border-b border-gray-200 dark:bg-gray-900 start-0">
+    <nav class="fixed top-0 z-20 w-full border-b shadow-md bg-slate-50 border-slate-200 start-0 dark:border-slate-500 dark:bg-slate-600">
         <div class="flex flex-wrap justify-between items-center p-4 mx-auto max-w-screen-xl">
             <a href="{% url 'trips:home' %}"
                class="flex items-center space-x-3 rtl:space-x-reverse grow">
@@ -57,26 +57,26 @@
             </div>
             <div class="hidden justify-between items-center w-full md:flex md:order-1 md:w-auto md:me-8"
                  id="navbar-cta">
-                <ul class="flex flex-col p-4 mt-4 font-medium bg-gray-50 rounded-lg border border-gray-100 md:flex-row md:p-0 md:mt-0 md:space-x-8 md:bg-white md:border-0 dark:bg-gray-800 dark:border-gray-700 rtl:space-x-reverse md:dark:bg-gray-900">
+                <ul class="flex flex-col p-4 mt-4 font-medium rounded-lg border md:flex-row md:p-0 md:mt-0 md:space-x-8 md:border-0 bg-slate-50 border-slate-100 rtl:space-x-reverse md:bg-slate-50 md:dark:bg-slate-600 dark:bg-slate-800 dark:border-slate-500">
                     <li>
                         <a href="{% url 'trips:home' %}"
-                           class="block py-2 px-3 text-white bg-blue-700 rounded md:p-0 md:text-blue-700 md:bg-transparent md:dark:text-blue-500"
+                           class="block py-2 px-3 text-white rounded md:p-0 md:bg-transparent bg-tr-blue-700 md:text-tr-blue-700 md:dark:text-tr-blue-500"
                            aria-current="page">Home</a>
                     </li>
                     <li>
                         <a href="{% url 'trips:trip-list' %}"
-                           class="block py-2 px-3 text-gray-900 rounded md:p-0 dark:text-white dark:border-gray-700 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:text-blue-500 md:dark:hover:bg-transparent dark:hover:bg-gray-700 dark:hover:text-white">Trips</a>
+                           class="block py-2 px-3 text-gray-900 rounded md:p-0 dark:text-white md:hover:bg-transparent md:hover:text-tr-blue-700 md:dark:hover:text-tr-blue-500 md:dark:hover:bg-transparent dark:border-slate-700 dark:hover:bg-gray-700 dark:hover:text-white hover:bg-slate-100">Trips</a>
                     </li>
                     {% if user.is_authenticated %}
                         <li>
                             <a href="{% url 'accounts:profile' %}"
-                               class="block py-2 px-3 text-gray-900 rounded md:p-0 dark:text-white dark:border-gray-700 hover:bg-gray-100 d:dark:hover:text-blue-500 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:bg-transparent dark:hover:bg-gray-700 dark:hover:text-white">Profile</a>
+                               class="block py-2 px-3 text-gray-900 rounded md:p-0 dark:text-white md:hover:bg-transparent md:hover:text-tr-blue-700 md:dark:hover:text-tr-blue-500 md:dark:hover:bg-transparent dark:border-slate-700 dark:hover:bg-gray-700 dark:hover:text-white hover:bg-slate-100">Profile</a>
                         </li>
                         <li>
                             <form action="{% url 'account_logout' %}" method="post">
                                 {% csrf_token %}
                                 <button type="submit"
-                                        class="block py-2 px-3 text-gray-900 rounded md:p-0 dark:text-white dark:border-gray-700 hover:bg-gray-100 d:dark:hover:text-blue-500 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:bg-transparent dark:hover:bg-gray-700 dark:hover:text-white">
+                                        class="block py-2 px-3 text-gray-900 rounded md:p-0 dark:text-white md:hover:bg-transparent md:hover:text-tr-blue-700 md:dark:hover:text-tr-blue-500 md:dark:hover:bg-transparent dark:border-slate-700 dark:hover:bg-gray-700 dark:hover:text-white hover:bg-slate-100">
                                     Logout
                                 </button>
                             </form>
@@ -92,7 +92,7 @@
             <ul class="flex flex-col gap-x-0 gap-y-4 py-4 px-5">
                 <li>
                     <a href="{% url 'trips:home' %}"
-                       class="font-medium text-blue-600 dark:text-blue-500"
+                       class="font-medium text-tr-blue-600 dark:text-tr-blue-500"
                        aria-current="page">Home</a>
                 </li>
                 <li>

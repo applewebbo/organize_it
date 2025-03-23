@@ -13,8 +13,8 @@
                  hx-get="{% url 'trips:trip-list' %}"
                  hx-target="#trips">
             <div x-data class="items-center mb-12 text-center md:flex md:text-start">
-                <h1 class="mb-2 text-2xl font-semibold grow">My Trips</h1>
-                <button class="btn btn-sm btn-primary btn-outline"
+                <h1 class="mb-2 text-3xl font-semibold grow">My Trips</h1>
+                <button class="btn btn-sm btn-primary"
                         hx-get="{% url 'trips:trip-create' %}"
                         hx-target="#dialog"
                         hx-swap="innerHTML"
@@ -22,10 +22,10 @@
             </div>
             <div class="grid grid-cols-1 gap-x-4 gap-y-8 md:grid-cols-2 xl:grid-cols-3">
                 {% for trip in active_trips %}
-                    <div class="relative border border-gray-200 shadow-lg card bg-base-100"
+                    <div class="shadow card card-border bg-base-100"
                          id="{{ trip.id }}">
-                        <div class="card-badge">{{ trip.get_status_display }}</div>
-                        <div class="card-body">
+                         <div class="card-body">
+                            <span class="badge badge-outline badge-secondary">{{ trip.get_status_display }}</span>
                             <h2 class="card-title">{{ trip.title }}</h2>
                             <div x-data class="flex items-center">
                                 <span>
@@ -41,16 +41,16 @@
                                    hx-swap="innerHTML"
                                    @click="$dispatch('open-modal')">Change</a>
                             </div>
-                            <p class="mb-3 font-normal text-gray-700">{{ trip.description }}</p>
+                            <p class="mb-3 italic text-base-content/80">{{ trip.description }}</p>
                             <div class="justify-end text-right">
-                                <button class="btn btn-sm btn-dark btn-outline me-2"
+                                <button class="btn btn-sm btn-warning btn-soft me-2"
                                         hx-get="{% url 'trips:trip-archive' trip.id %}"
                                         hx-target="">Archive</button>
-                                <button class="btn btn-sm btn-error btn-outline me-2"
+                                <button class="btn btn-sm btn-error btn-soft me-2"
                                         hx-delete="{% url 'trips:trip-delete' trip.id %}"
                                         hx-confirm="Are you sure you want to delete {{ trip.title }}?">Delete</button>
                                 <a href="{% url 'trips:trip-detail' trip.id %}"
-                                   class="btn btn-sm btn-primary btn-outline">View</a>
+                                   class="btn btn-sm btn-primary btn-soft">View</a>
                             </div>
                         </div>
                     </div>

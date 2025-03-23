@@ -60,9 +60,9 @@ def event_icon(event):
 @register.filter
 def event_bg_color(event):
     colors = {
-        1: "bg-tr-blue-100",  # Transport
-        2: "bg-exp-green-100",  # Experience
-        3: "bg-meal-yellow-100",  # Meal
+        1: "bg-tr-blue-100 dark:bg-tr-blue-100/30",  # Transport
+        2: "bg-exp-green-100 dark:bg-exp-green-100/30",  # Experience
+        3: "bg-meal-yellow-100 dark:bg-meal-yellow-100/30",  # Meal
     }
     return colors.get(event.category, "bg-gray-100")
 
@@ -70,9 +70,9 @@ def event_bg_color(event):
 @register.filter
 def event_border_color(event):
     colors = {
-        1: "border-tr-blue-300",  # Transport
-        2: "border-exp-green-300",  # Experience
-        3: "border-meal-yellow-300",  # Meal
+        1: "border-tr-blue-300 dark:border-tr-blue-700",  # Transport
+        2: "border-exp-green-300 dark:border-exp-green-700",  # Experience
+        3: "border-meal-yellow-300 dark:border-meal-yellow-700",  # Meal
     }
     return colors.get(event.category, "border-gray-300")
 
@@ -80,9 +80,9 @@ def event_border_color(event):
 @register.filter
 def event_icon_color(event):
     colors = {
-        1: "text-tr-blue-700",  # Transport
-        2: "text-exp-green-700",  # Experience
-        3: "text-meal-yellow-700",  # Meal
+        1: "text-tr-blue-700 dark:text-tr-blue-300",  # Transport
+        2: "text-exp-green-700 dark:text-exp-green-300",  # Experience
+        3: "text-meal-yellow-700 dark:text-meal-yellow-300",  # Meal
     }
     return colors.get(event.category, "text-base-content")
 

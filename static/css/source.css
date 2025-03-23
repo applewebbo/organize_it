@@ -74,14 +74,10 @@
   --radius-field: 0.35rem;
 }
 
-p{
-    @apply mb-3 font-normal text-gray-700;
+.stay-in {
+  @apply flex items-center py-0.5 px-2 text-green-700 bg-green-100 dark:bg-green-300/30 dark:text-green-200 rounded-lg border-2 border-green-300 dark:border-green-700 ms-2;
   }
 
-  .card-badge{
-    @apply text-info-content absolute px-2.5 py-1.5 right-0 top-0 -mt-4 me-6 bg-info rounded-md;
-  }
-
-  .card-badge-neutral{
-    @apply text-base-content bg-base-200 border border-base-300 ;
+.stay-out {
+  @apply flex items-center py-0.5 px-2 text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-300/30 rounded-lg border-2 border-red-300 dark:border-red-800 ms-2
   }
