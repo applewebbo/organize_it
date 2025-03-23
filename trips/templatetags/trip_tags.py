@@ -1,6 +1,7 @@
 import re
 
 from django import template
+from django.core.exceptions import ObjectDoesNotExist
 
 from trips.data.phone_prefixes import ITALIAN_PREFIXES
 
@@ -19,11 +20,11 @@ def next_day(day):
 
 @register.filter
 def is_last_day(day):
-    days = list(day.trip.days.all())
     try:
+        days = list(day.trip.days.all())
         current_index = days.index(day)
         return current_index == len(days) - 1
-    except (ValueError, IndexError):
+    except (ValueError, IndexError, ObjectDoesNotExist):
         return False
 
 
@@ -44,7 +45,12 @@ def is_first_day_of_stay(day):
 
 @register.filter
 def is_first_day_of_trip(day):
-    return day.number == 1
+    """Check if the given day is the first day of its trip"""
+    try:
+        first_day = day.trip.days.order_by("number").first()
+        return day == first_day
+    except AttributeError:
+        return False
 
 
 @register.filter
