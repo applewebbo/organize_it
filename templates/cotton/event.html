@@ -1,18 +1,12 @@
 {% load heroicons %}
-<div class="py-3 px-6 rounded-lg border {{ border_color }} {{ bg_color }} relative">
-    {% if event.has_overlap %}
-        <div class="absolute top-0 right-0 p-1 mt-2 mr-4 rounded-full border bg-slate-50 text-error border-error dark:bg-slate-700"
-             x-data>
-            {% heroicon_mini 'exclamation-triangle' class="size-3" %}
-        </div>
-    {% endif %}
+<div class="py-3 px-6 rounded-lg border {{ border_color }} {{ bg_color }}">
     <div class="flex items-start mb-3">
         <div class="{{ icon_color }} bg-slate-50 dark:bg-slate-700 mt-1 p-2 rounded-full border-2 {{ border_color }} ">
             {% heroicon_outline icon class="stroke-2 size-6" %}
         </div>
         <div class="ms-2">
             <h2 class="{{ icon_color }} font-semibold text-lg">{{ event.name }}</h2>
-            <p class="{{ icon_color }}">{{ slot }}</p>
+            <div class="{{ icon_color }} flex items-center gap-x-2">{{ slot }}</div>
         </div>
     </div>
     <div class="mt-2 text-right" x-data>

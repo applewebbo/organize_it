@@ -79,5 +79,5 @@
   }
 
 .stay-out {
-  @apply flex items-center py-0.5 px-2 text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-300/30 rounded-lg border-2 border-red-300 dark:border-red-800 ms-2
+  @apply flex items-center py-0.5 px-2 text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-500/30 rounded-lg border-2 border-red-300 dark:border-red-800 ms-2
   }
