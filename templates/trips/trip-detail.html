@@ -41,13 +41,29 @@
     </section>
     <!-- END Details Section -->
     <!-- Days Section   -->
-    <!-- TODO: add dayModified refresh with htmx-->
     <section id="days" class="flex flex-col gap-y-4">
         {% for day in trip.days.all %}
             {% include 'trips/includes/day.html' with day=day %}
         {% endfor %}
     </section>
     <!-- END Days Section -->
+    <section id="unpaired">
+        <div class="shadow card card-border bg-base-100">
+            <div class="card-body">
+                <h2 class="text-xl font-medium sm:text-2xl grow">Unpaired Events</h2>
+                <ul class="flex flex-wrap gap-3 justify-center my-4">
+                    {% for event in unpaired_events %}
+                    <a href="#">
+                        <li class="py-4 badge badge-soft badge-primary badge-lg">
+                            {% heroicon_solid 'plus-circle' class='size-5' %}
+                            {{ event.name }}
+                        </li>
+                    </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </section>
 {% endblock content %}
 {% block script %}
 {% endblock script %}
