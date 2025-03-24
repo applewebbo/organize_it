@@ -352,6 +352,19 @@ def stay_delete(request, pk):
 
 
 @login_required
+def event_modal(request, pk):
+    """
+    Modal for showing related event link for unpairing or deleting
+    """
+    qs = Event.objects.select_related("day__trip__author")
+    event = get_object_or_404(qs, pk=pk, day__trip__author=request.user)
+    context = {
+        "event": event,
+    }
+    return TemplateResponse(request, "trips/event-modal.html", context)
+
+
+@login_required
 @require_http_methods(["DELETE"])
 def event_delete(request, pk):
     qs = Event.objects.select_related("day__trip__author")

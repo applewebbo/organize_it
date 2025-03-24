@@ -11,17 +11,19 @@
     </div>
     <div class="mt-2 text-right" x-data>
         <button class="btn btn-sm btn-soft"
-           hx-get="{% url 'trips:event-swap-modal' event.pk %}"
-           @click="$dispatch('open-modal'); document.activeElement.blur()"
-           hx-target="#dialog"
-           hx-swap="innerHTML">{% heroicon_outline 'arrows-up-down' class="size-4" %}</button>
+                hx-get="{% url 'trips:event-swap-modal' event.pk %}"
+                @click="$dispatch('open-modal'); document.activeElement.blur()"
+                hx-target="#dialog"
+                hx-swap="innerHTML">{% heroicon_outline 'arrows-up-down' class="size-4" %}</button>
         <button class="btn btn-sm btn-soft"
-           hx-get="{% url 'trips:event-modify' event.pk %}"
-           @click="$dispatch('open-modal'); document.activeElement.blur()"
-           hx-target="#dialog"
-           hx-swap="innerHTML">{% heroicon_outline 'pencil' class="size-4" %}</button>
-        <a href="{% url 'trips:event-delete' event.pk %}"
-           class="btn btn-sm btn-soft"
-           hx-put="{% url 'trips:event-unpair' event.pk %}">{% heroicon_outline 'trash' class="size-4" %}</a>
+                hx-get="{% url 'trips:event-modify' event.pk %}"
+                @click="$dispatch('open-modal'); document.activeElement.blur()"
+                hx-target="#dialog"
+                hx-swap="innerHTML">{% heroicon_outline 'pencil' class="size-4" %}</button>
+        <button class="btn btn-sm btn-soft"
+                hx-get="{% url 'trips:event-modal' event.pk %}"
+                @click="$dispatch('open-modal'); document.activeElement.blur()"
+                hx-target="#dialog"
+                hx-swap="innerHTML">{% heroicon_outline 'trash' class="size-4" %}</button>
     </div>
 </div>

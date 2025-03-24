@@ -25,6 +25,7 @@ htmx_urlpatterns = [
     path("stays/<int:day_id>/create", views.add_stay, name="add-stay"),
     path("stays/<int:pk>/modify", views.stay_modify, name="stay-modify"),
     path("stays/<int:pk>/delete", views.stay_delete, name="stay-delete"),
+    path("events/<int:pk>/modal", views.event_modal, name="event-modal"),
     path("events/<int:pk>/delete", views.event_delete, name="event-delete"),
     path("events/<int:pk>/unpair", views.event_unpair, name="event-unpair"),
     path("events/<int:pk>/modify", views.event_modify, name="event-modify"),
