@@ -359,8 +359,27 @@ def event_delete(request, pk):
     event.delete()
     messages.add_message(
         request,
-        messages.ERROR,
+        messages.SUCCESS,
         _("Event deleted successfully"),
+    )
+    return HttpResponse(status=204, headers={"HX-Refresh": "true"})
+
+
+@login_required
+@require_http_methods(["PUT"])
+def event_unpair(request, pk):
+    """
+    Unpair an event from its day by setting the day relation to null.
+    Only the trip author can unpair events.
+    """
+    qs = Event.objects.select_related("day__trip__author")
+    event = get_object_or_404(qs, pk=pk, day__trip__author=request.user)
+    event.day = None
+    event.save()
+    messages.add_message(
+        request,
+        messages.SUCCESS,
+        _("Event unpaired successfully"),
     )
     return HttpResponse(status=204, headers={"HX-Refresh": "true"})
 

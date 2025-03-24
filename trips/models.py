@@ -191,7 +191,9 @@ class Event(models.Model):
         EXPERIENCE = 2, _("Experience")
         MEAL = 3, _("Meal")
 
-    day = models.ForeignKey(Day, on_delete=models.CASCADE, related_name="events")
+    day = models.ForeignKey(
+        Day, on_delete=models.CASCADE, related_name="events", null=True
+    )
     name = models.CharField(max_length=100)
     start_time = models.TimeField()
     end_time = models.TimeField()

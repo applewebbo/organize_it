@@ -22,7 +22,6 @@
            hx-swap="innerHTML">{% heroicon_outline 'pencil' class="size-4" %}</button>
         <a href="{% url 'trips:event-delete' event.pk %}"
            class="btn btn-sm btn-soft"
-           hx-delete="{% url 'trips:event-delete' event.pk %}"
-           hx-confirm="You're permanently deleting {{ event.name }}. Are you sure?">{% heroicon_outline 'trash' class="size-4" %}</a>
+           hx-put="{% url 'trips:event-unpair' event.pk %}">{% heroicon_outline 'trash' class="size-4" %}</a>
     </div>
 </div>
