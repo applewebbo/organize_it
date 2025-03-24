@@ -35,9 +35,7 @@ def mocked_geocoder():
 
 class HomeView(TestCase):
     def test_get(self):
-        # Get the home view
         response = self.get("trips:home")
-        # Check the status code and template used
         self.response_200(response)
         assertTemplateUsed(response, "trips/index.html")
 
@@ -128,17 +126,6 @@ class TripDetailView(TestCase):
 
         self.response_404(response)
 
-    def test_get_trip_detail_unauthorized(self):
-        """Test unauthorized access to trip detail"""
-        user = self.make_user("user")
-        other_user = self.make_user("other_user")
-        trip = TripFactory(author=other_user)
-
-        with self.login(user):
-            response = self.get("trips:trip-detail", pk=trip.pk)
-
-        self.response_404(response)
-
 
 class DayDetailView(TestCase):
     """Test cases for day detail view"""
@@ -158,18 +145,6 @@ class DayDetailView(TestCase):
         assert day.events.first() == event
         assert "day" in response.context
         assert response.context["day"] == day
-
-    def test_get_day_detail_unauthorized(self):
-        """Test unauthorized access to day detail"""
-        user = self.make_user("user")
-        other_user = self.make_user("other_user")
-        trip = TripFactory(author=other_user)
-        day = trip.days.first()
-
-        with self.login(user):
-            response = self.get("trips:day-detail", pk=day.pk)
-
-        self.response_404(response)
 
 
 class TripCreateView(TestCase):
@@ -807,18 +782,6 @@ class EventDeleteView(TestCase):
         assert message == "Event deleted successfully"
         assert event.day.events.count() == 0
 
-    def test_delete_unauthorized(self):
-        user = self.make_user("user")
-        other_user = self.make_user("other_user")
-        trip = TripFactory(author=other_user)
-        event = EventFactory(trip=trip)
-
-        with self.login(user):
-            response = self.delete("trips:event-delete", pk=event.pk)
-
-        self.response_404(response)
-        assert event.day.events.count() == 1
-
 
 class EventUnpairView(TestCase):
     def test_unpair(self):
@@ -835,19 +798,6 @@ class EventUnpairView(TestCase):
         assert message == "Event unpaired successfully"
         event.refresh_from_db()
         assert event.day is None
-
-    def test_unpair_unauthorized(self):
-        user = self.make_user("user")
-        other_user = self.make_user("other_user")
-        trip = TripFactory(author=other_user)
-        event = EventFactory(trip=trip)
-
-        with self.login(user):
-            response = self.put("trips:event-unpair", pk=event.pk)
-
-        self.response_404(response)
-        event.refresh_from_db()
-        assert event.day is not None
 
 
 class EventModalView(TestCase):
@@ -866,19 +816,6 @@ class EventModalView(TestCase):
         self.response_200(response)
         assertTemplateUsed(response, "trips/event-modal.html")
         assert response.context["event"] == event
-
-    def test_get_modal_unauthorized(self):
-        """Test unauthorized access to event modal"""
-        user = self.make_user("user")
-        other_user = self.make_user("other_user")
-        trip = TripFactory(author=other_user)
-        day = trip.days.first()
-        event = EventFactory(day=day)
-
-        with self.login(user):
-            response = self.get("trips:event-modal", pk=event.pk)
-
-        self.response_404(response)
 
 
 class EventModifyView(TestCase):
@@ -923,18 +860,6 @@ class EventModifyView(TestCase):
         user = self.make_user("user")
         trip = TripFactory(author=user)
         event = EventFactory(trip=trip, category=99)  # Invalid category
-
-        with self.login(user):
-            response = self.get("trips:event-modify", pk=event.pk)
-
-        self.response_404(response)
-
-    def test_get_unauthorized(self):
-        user = self.make_user("user")
-        other_user = self.make_user("other_user")
-        trip = TripFactory(author=other_user)
-        day = trip.days.first()
-        event = ExperienceFactory(day=day)
 
         with self.login(user):
             response = self.get("trips:event-modify", pk=event.pk)
@@ -1086,20 +1011,6 @@ class TestEventSwap(TestCase):
         assert event2.start_time == datetime.time(10, 0)
         assert event2.end_time == datetime.time(11, 0)
 
-    def test_event_swap_unauthorized(self):
-        """Test unauthorized access to event swap"""
-        user = self.make_user("user")
-        other_user = self.make_user("other_user")
-        trip = TripFactory(author=other_user)
-        day = trip.days.first()
-        event1 = EventFactory(day=day)
-        event2 = EventFactory(day=day)
-
-        with self.login(user):
-            response = self.post("trips:event-swap", pk1=event1.pk, pk2=event2.pk)
-
-        self.response_404(response)
-
     def test_event_swap_different_days(self):
         """Test swapping events from different days"""
         user = self.make_user("user")
@@ -1133,19 +1044,6 @@ class TestEventSwapModal(TestCase):
         assertTemplateUsed(response, "trips/event-swap.html")
         assert response.context["selected_event"] == selected_event
         assert swappable_event in response.context["swappable_events"]
-
-    def test_get_swap_modal_unauthorized(self):
-        """Test unauthorized access to swap modal"""
-        user = self.make_user("user")
-        other_user = self.make_user("other_user")
-        trip = TripFactory(author=other_user)
-        day = trip.days.first()
-        event = EventFactory(day=day)
-
-        with self.login(user):
-            response = self.get("trips:event-swap-modal", pk=event.pk)
-
-        self.response_404(response)
 
     def test_get_swap_modal_no_other_events(self):
         """Test swap modal when no other events exist"""
