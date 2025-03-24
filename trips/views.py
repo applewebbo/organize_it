@@ -81,10 +81,9 @@ def trip_detail(request, pk):
     ).select_related("author")
 
     trip = get_object_or_404(qs, pk=pk, author=request.user)
+    unpaired_events = trip.all_events.filter(day__isnull=True)
 
-    context = {
-        "trip": trip,
-    }
+    context = {"trip": trip, "unpaired_events": unpaired_events}
     return TemplateResponse(request, "trips/trip-detail.html", context)
 
 
@@ -227,6 +226,7 @@ def add_transport(request, day_id):
 @login_required
 def add_experience(request, day_id):
     day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
+    Event.objects.filter()
     form = ExperienceForm(request.POST or None)
     if form.is_valid():
         experience = form.save(commit=False)

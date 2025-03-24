@@ -820,6 +820,67 @@ class EventDeleteView(TestCase):
         assert event.day.events.count() == 1
 
 
+class EventUnpairView(TestCase):
+    def test_unpair(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(day=day)
+
+        with self.login(user):
+            response = self.put("trips:event-unpair", pk=event.pk)
+
+        self.response_204(response)
+        message = list(get_messages(response.wsgi_request))[0].message
+        assert message == "Event unpaired successfully"
+        event.refresh_from_db()
+        assert event.day is None
+
+    def test_unpair_unauthorized(self):
+        user = self.make_user("user")
+        other_user = self.make_user("other_user")
+        trip = TripFactory(author=other_user)
+        event = EventFactory(trip=trip)
+
+        with self.login(user):
+            response = self.put("trips:event-unpair", pk=event.pk)
+
+        self.response_404(response)
+        event.refresh_from_db()
+        assert event.day is not None
+
+
+class EventModalView(TestCase):
+    """Test cases for event modal view"""
+
+    def test_get_modal(self):
+        """Test successful retrieval of event modal"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(day=day)
+
+        with self.login(user):
+            response = self.get("trips:event-modal", pk=event.pk)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/event-modal.html")
+        assert response.context["event"] == event
+
+    def test_get_modal_unauthorized(self):
+        """Test unauthorized access to event modal"""
+        user = self.make_user("user")
+        other_user = self.make_user("other_user")
+        trip = TripFactory(author=other_user)
+        day = trip.days.first()
+        event = EventFactory(day=day)
+
+        with self.login(user):
+            response = self.get("trips:event-modal", pk=event.pk)
+
+        self.response_404(response)
+
+
 class EventModifyView(TestCase):
     def test_get_transport(self):
         user = self.make_user("user")
