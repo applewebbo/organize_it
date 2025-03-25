@@ -84,7 +84,11 @@ def trip_detail(request, pk):
     unpaired_events = trip.all_events.filter(day__isnull=True)
 
     context = {"trip": trip, "unpaired_events": unpaired_events}
-    return TemplateResponse(request, "trips/trip-detail.html", context)
+    if request.htmx:
+        template = "trips/trip-detail.html#days"
+    else:
+        template = "trips/trip-detail.html"
+    return TemplateResponse(request, template, context)
 
 
 @login_required
@@ -385,8 +389,8 @@ def event_unpair(request, pk):
     Unpair an event from its day by setting the day relation to null.
     Only the trip author can unpair events.
     """
-    qs = Event.objects.select_related("day__trip__author")
-    event = get_object_or_404(qs, pk=pk, day__trip__author=request.user)
+    qs = Event.objects.select_related("trip__author")
+    event = get_object_or_404(qs, pk=pk, trip__author=request.user)
     event.day = None
     event.save()
     messages.add_message(
@@ -395,6 +399,43 @@ def event_unpair(request, pk):
         _("Event unpaired successfully"),
     )
     return HttpResponse(status=204, headers={"HX-Refresh": "true"})
+
+
+@login_required
+def event_pair(request, pk, day_id):
+    """
+    Pair an event with a day.
+    Only the trip author can pair events.
+    """
+    qs = Event.objects.select_related("trip__author")
+    event = get_object_or_404(qs, pk=pk, trip__author=request.user)
+    day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
+
+    event.day = day
+    event.save()
+    messages.add_message(
+        request,
+        messages.SUCCESS,
+        _("Event paired successfully"),
+    )
+    return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+
+
+@login_required
+def event_pair_choice(request, pk):
+    """
+    Provide a list of days to pair with the selected event.
+    Only days from the same trip are shown.
+    """
+    event = get_object_or_404(Event, pk=pk, trip__author=request.user)
+    trip = event.trip
+    days = trip.days.all()
+
+    context = {
+        "event": event,
+        "days": days,
+    }
+    return TemplateResponse(request, "trips/event-pair-choice.html", context)
 
 
 @login_required

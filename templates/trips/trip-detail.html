@@ -40,30 +40,35 @@
         </div>
     </section>
     <!-- END Details Section -->
-    <!-- Days Section   -->
-    <section id="days" class="flex flex-col gap-y-4">
-        {% for day in trip.days.all %}
-            {% include 'trips/includes/day.html' with day=day %}
-        {% endfor %}
-    </section>
-    <!-- END Days Section -->
-    <section id="unpaired">
-        <div class="shadow card card-border bg-base-100">
-            <div class="card-body">
-                <h2 class="text-xl font-medium sm:text-2xl grow">Unpaired Events</h2>
-                <ul class="flex flex-wrap gap-3 justify-center my-4">
-                    {% for event in unpaired_events %}
-                    <a href="#">
-                        <li class="py-4 badge badge-soft badge-primary badge-lg">
-                            {% heroicon_solid 'plus-circle' class='size-5' %}
-                            {{ event.name }}
-                        </li>
-                    </a>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
-    </section>
+    {% partialdef days inline=true %}
+    <div id="days-events"
+         hx-get="{% url 'trips:trip-detail' trip.pk %}"
+         hx-target="#days-events"
+         hx-swap="innerHTML"
+         hx-trigger="tripModified from:body">
+        <!-- Days Section   -->
+        <section id="days" class="flex flex-col gap-y-4">
+            {% for day in trip.days.all %}
+                {% include 'trips/includes/day.html' with day=day %}
+            {% endfor %}
+        </section>
+        <!-- END Days Section -->
+        <!-- Unpaired Events Section -->
+        {% if unpaired_events %}
+            <section id="unpaired">
+                <div class="shadow card card-border bg-base-100" x-data>
+                    <div class="card-body">
+                        <h2 class="text-xl font-medium sm:text-2xl grow">Unpaired Events</h2>
+                        <ul class="flex flex-wrap gap-3 justify-center my-4">
+                            {% for event in unpaired_events %}<c-unpaired-event :event="event" :days="trip.days.all" />{% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        {% endif %}
+        <!-- END Unpaired Events Section -->
+    </div>
+{% endpartialdef %}
 {% endblock content %}
 {% block script %}
 {% endblock script %}

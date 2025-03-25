@@ -1,7 +1,10 @@
 {% load trip_tags %}
-<div class="shadow card card-border bg-base-100"
+<div id="day-{{ day.pk }}"
+     class="shadow card card-border bg-base-100"
      hx-get="{% url 'trips:day-detail' day.pk %}"
-     hx-trigger="dayModified{{ day.pk }} from:body">
+     hx-trigger="dayModified{{ day.pk }} from:body"
+     hx-target="#day-{{ day.pk }}"
+     hx-swap="innerHTML">
     <div class="card-body">
         <div class="flex items-center">
             <h2 class="text-xl font-medium sm:text-2xl grow">Day {{ day.number }}</h2>
