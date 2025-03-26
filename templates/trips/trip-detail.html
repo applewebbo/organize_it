@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load partials static %}
+{% load partials static trip_tags %}
 {% block page_title %}
     {{ trip.title }}
 {% endblock page_title %}
@@ -60,7 +60,9 @@
                     <div class="card-body">
                         <h2 class="text-xl font-medium sm:text-2xl grow">Unpaired Events</h2>
                         <ul class="flex flex-wrap gap-3 justify-center my-4">
-                            {% for event in unpaired_events %}<c-unpaired-event :event="event" :days="trip.days.all" />{% endfor %}
+                            {% for event in unpaired_events %}
+                                <c-unpaired-event :event="event" :days="trip.days.all" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}" />
+                            {% endfor %}
                         </ul>
                     </div>
                 </div>

@@ -1,10 +1,12 @@
 <li>
-    <button class="flex items-center btn btn-primary btn-soft"
+    <button class="flex items-center gap-2 {{ bg_color }} border-2 {{ border_color }} py-3 px-4 rounded-lg cursor-pointer"
             hx-get="{% url 'trips:event-pair-choice' event.pk %}"
             hx-target="#dialog"
             hx-swap="innerHTML"
             @click="$dispatch('open-modal'); document.activeElement.blur()">
-        {% heroicon_solid 'plus-circle' class='size-5' %}
-        {{ event.name }}
+        <div class="{{ icon_color }} bg-slate-50 dark:bg-slate-700 mt-1 p-2 rounded-full border-2 {{ border_color }} ">
+            {% heroicon_solid icon class='size-4' %}
+        </div>
+        <span class="font-semibold text-base {{ icon_color }}">{{ event.name }}</span>
     </button>
 </li>
