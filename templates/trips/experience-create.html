@@ -1,4 +1,4 @@
-{% load crispy_forms_tags %}
+{% load crispy_forms_tags heroicons %}
 <form hx-post="{{ request.path }}"
       hx-target="#dialog"
       hx-disabled-elt="#form-submit"
@@ -19,29 +19,28 @@
             <span class="sr-only">Close modal</span>
         </button>
     </div>
-    <div class="grid gap-x-1 p-4 sm:grid-cols-4 sm:gap-x-2 md:p-5" x-data="{
-        checkOverlap() {
-            const startTime = $refs.startTime.value;
-            const duration = $refs.duration.value;
-            if (startTime && duration) {
-                const endTime = new Date(`2000-01-01T${startTime}`);
-                endTime.setMinutes(endTime.getMinutes() + parseInt(duration));
-                const endTimeStr = endTime.toTimeString().slice(0,5);
-                htmx.ajax('GET', '{% url 'trips:check-event-overlap' day.pk %}', {
-                    target: '#overlap-warning',
-                    values: {
-                        start_time: startTime,
-                        end_time: endTimeStr
-                    }
-                });
-            }
-        }
-    }">
+    <div class="grid gap-x-1 p-4 sm:grid-cols-4 sm:gap-x-2 md:p-5"
+         x-data="{ checkOverlap() { const startTime = $refs.startTime.value; const duration = $refs.duration.value; if (startTime && duration) { const endTime = new Date(`2000-01-01T${startTime}`); endTime.setMinutes(endTime.getMinutes() + parseInt(duration)); const endTimeStr = endTime.toTimeString().slice(0,5); htmx.ajax('GET', '{% url 'trips:check-event-overlap' day.pk %}', { target: '#overlap-warning', values: { start_time: startTime, end_time: endTimeStr } }); } } }">
         {% csrf_token %}
         {% crispy form %}
-
     </div>
-    <div class="flex justify-end items-center p-4 rounded-b border-t border-gray-200 md:p-5 dark:border-gray-600">
+    <div class="px-4 md:px-5">
+        <h4 class="text-lg font-semibold">Unpaired Experiences</h4>
+        <ul class="flex flex-wrap gap-3 justify-start items-center mt-4">
+            {% for exp in unpaired_experiences %}
+                <li>
+                    <a href="{% url 'trips:event-pair' exp.pk day.pk %}"
+                       class="flex gap-2 items-center btn btn-primary btn-soft"
+                       hx-get="{% url 'trips:event-pair' exp.pk day.pk %}"
+                       hx-target="#dialog">
+                        {{ exp.name }}
+                        {% heroicon_mini 'plus-circle' class="size-4" %}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="flex justify-end items-center p-4 md:p-5">
         <button type="button"
                 x-on:click="openModal = false"
                 class="mr-2 btn btn-outline btn-error">Cancel</button>

@@ -212,6 +212,9 @@ def trip_dates_update(request, pk):
 @login_required
 def add_transport(request, day_id):
     day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
+    unpaired_experiences = Event.objects.filter(
+        day__isnull=True, trip=day.trip, category=1
+    )
     form = TransportForm(request.POST or None)
     if form.is_valid():
         transport = form.save(commit=False)
@@ -223,14 +226,16 @@ def add_transport(request, day_id):
             _("Transport added successfully"),
         )
         return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
-    context = {"form": form}
+    context = {"form": form, "day": day, "unpaired_experiences": unpaired_experiences}
     return TemplateResponse(request, "trips/transport-create.html", context)
 
 
 @login_required
 def add_experience(request, day_id):
     day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
-    Event.objects.filter()
+    unpaired_experiences = Event.objects.filter(
+        day__isnull=True, trip=day.trip, category=2
+    )
     form = ExperienceForm(request.POST or None)
     if form.is_valid():
         experience = form.save(commit=False)
@@ -242,13 +247,16 @@ def add_experience(request, day_id):
             _("Experience added successfully"),
         )
         return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
-    context = {"form": form, "day": day}
+    context = {"form": form, "day": day, "unpaired_experiences": unpaired_experiences}
     return TemplateResponse(request, "trips/experience-create.html", context)
 
 
 @login_required
 def add_meal(request, day_id):
     day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
+    unpaired_experiences = Event.objects.filter(
+        day__isnull=True, trip=day.trip, category=3
+    )
     form = MealForm(request.POST or None)
     if form.is_valid():
         meal = form.save(commit=False)
@@ -260,7 +268,7 @@ def add_meal(request, day_id):
             _("Meal added successfully"),
         )
         return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
-    context = {"form": form}
+    context = {"form": form, "day": day, "unpaired_experiences": unpaired_experiences}
     return TemplateResponse(request, "trips/meal-create.html", context)
 
 
