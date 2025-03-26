@@ -10,3 +10,4 @@
   * kebab case for naming template files
   * snake case for naming functions
   * pascal case for naming models
+* Don't test @login_required as it's a django function already tested

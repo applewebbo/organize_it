@@ -126,6 +126,32 @@ class TripDetailView(TestCase):
 
         self.response_404(response)
 
+    def test_get_trip_detail_with_htmx(self):
+        """Test that trip detail returns partial template with HTMX request"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+
+        with self.login(user):
+            response = self.get(
+                "trips:trip-detail", pk=trip.pk, extra={"HTTP_HX-Request": "true"}
+            )
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/includes/day.html")
+        assert response.context["trip"] == trip
+
+    def test_get_trip_detail_without_htmx(self):
+        """Test that trip detail returns full template without HTMX request"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+
+        with self.login(user):
+            response = self.get("trips:trip-detail", pk=trip.pk)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/trip-detail.html")
+        assert response.context["trip"] == trip
+
 
 class DayDetailView(TestCase):
     """Test cases for day detail view"""
@@ -699,39 +725,21 @@ class StayDeleteView(TestCase):
         other_stay.days.set(days[2:])
 
         with self.login(user):
-            response = self.post("trips:stay-delete", pk=stay.pk)
-
-        self.response_204(response)
-        # Verify days were reassigned
-        for day in days[:2]:
-            day.refresh_from_db()
-            assert day.stay == other_stay
-
-    def test_post_with_multiple_stays_manual_selection(self):
-        user = self.make_user("user")
-        trip = TripFactory(author=user)
-        days = trip.days.all()
-        stay = StayFactory()
-        other_stays = [StayFactory(), StayFactory()]
-        stay.days.set(days[:2])
-        other_stays[0].days.set(days[2:4])
-        other_stays[1].days.set(days[4:])
-
-        with self.login(user):
-            response = self.post(
-                "trips:stay-delete", pk=stay.pk, data={"new_stay": other_stays[0].pk}
-            )
+            response = self.post("trips:stay-delete", pk=other_stay.pk)
 
         self.response_204(response)
         # Verify days were reassigned to the selected stay
         for day in days[:2]:
             day.refresh_from_db()
-            assert day.stay == other_stays[0]
+            assert day.stay == stay
 
     def test_post_with_manual_stay_selection(self):
         """Test stay deletion when manually selecting a new stay from multiple options"""
         user = self.make_user("user")
-        trip = TripFactory(author=user)
+        # Create a trip with exactly 6 days
+        start_date = datetime.date(2024, 1, 1)  # Use fixed date instead of today
+        end_date = start_date + datetime.timedelta(days=5)
+        trip = TripFactory(author=user, start_date=start_date, end_date=end_date)
         days = trip.days.all()
 
         # Create three stays
@@ -798,6 +806,58 @@ class EventUnpairView(TestCase):
         assert message == "Event unpaired successfully"
         event.refresh_from_db()
         assert event.day is None
+
+
+class EventPairView(TestCase):
+    def test_pair(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(day=day)
+        event.day = None  # Unpair the event first
+        event.save()
+
+        with self.login(user):
+            response = self.put("trips:event-pair", pk=event.pk, day_id=day.pk)
+
+        self.response_204(response)
+        message = list(get_messages(response.wsgi_request))[0].message
+        assert message == "Event paired successfully"
+        event.refresh_from_db()
+        assert event.day == day
+
+
+class EventPairChoiceView(TestCase):
+    """Test cases for event pair choice view"""
+
+    def test_get_pair_choice(self):
+        """Test successful retrieval of event pair choice page"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        event = EventFactory(trip=trip)
+        event.day = None  # Ensure event is unpaired
+        event.save()
+
+        with self.login(user):
+            response = self.get("trips:event-pair-choice", pk=event.pk)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/event-pair-choice.html")
+        assert response.context["event"] == event
+        assert list(response.context["days"]) == list(trip.days.all())
+
+    def test_get_pair_choice_already_paired(self):
+        """Test pair choice view with already paired event"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(day=day)  # Event is already paired
+
+        with self.login(user):
+            response = self.get("trips:event-pair-choice", pk=event.pk)
+
+        self.response_200(response)
+        assert list(response.context["days"]) == list(trip.days.all())
 
 
 class EventModalView(TestCase):

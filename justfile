@@ -31,15 +31,15 @@ migrate:
 
 # Run tests
 test *args:
-    COVERAGE_CORE=sysmon uv run python -m pytest --reuse-db -s {{ args }}
+    uv run python -m pytest --reuse-db -s -x {{ args }}
 
 # Run fast tests
 ftest *args:
-    uv run pytest -n 8 --reuse-db {{ args }}
+    uv run pytest -n 8 --reuse-db --dist loadscope --exitfirst {{ args }}
 
 # Run tests excluding mapbox and generate coverage report
 mptest:
-    COVERAGE_CORE=sysmon uv run python -m pytest -m "not mapbox" --cov-report html:htmlcov --cov-report term:skip-covered --cov-fail-under 100
+    uv run python -m pytest -m "not mapbox" --cov-report html:htmlcov --cov-report term:skip-covered --cov-fail-under 100
 
 # Set up Docker database
 dockerdb:
@@ -61,3 +61,6 @@ _pre-commit *args:
 
 secure:
     uv-secure
+
+populate_trips:
+    uv run python manage.py populate_trips
