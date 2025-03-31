@@ -4,7 +4,7 @@ import geocoder
 from django.conf import settings
 from django.core.validators import RegexValidator
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils.translation import gettext as _
 
@@ -191,7 +191,10 @@ class Event(models.Model):
         EXPERIENCE = 2, _("Experience")
         MEAL = 3, _("Meal")
 
-    day = models.ForeignKey(Day, on_delete=models.CASCADE, related_name="events")
+    day = models.ForeignKey(
+        Day, on_delete=models.SET_NULL, related_name="events", null=True
+    )
+    trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="all_events")
     name = models.CharField(max_length=100)
     start_time = models.TimeField()
     end_time = models.TimeField()
@@ -217,6 +220,9 @@ class Event(models.Model):
             return super().save(*args, **kwargs)
         g = geocoder.mapbox(self.address, access_token=settings.MAPBOX_ACCESS_TOKEN)
         self.latitude, self.longitude = g.latlng
+        # Ensure trip is set from day if not already set
+        if self.day and not self.trip_id:
+            self.trip = self.day.trip
         return super().save(*args, **kwargs)
 
     def __str__(self) -> str:
@@ -239,6 +245,16 @@ class Event(models.Model):
         # Save both events
         self.save()
         other_event.save()
+
+
+@receiver(pre_save, sender=Event)
+def update_event_trip(sender, instance, **kwargs):
+    """
+    Ensure event's trip is always set correctly based on its day
+    """
+    if instance.day_id:
+        if not instance.trip_id or instance.trip_id != instance.day.trip_id:
+            instance.trip = instance.day.trip
 
 
 class Transport(Event):

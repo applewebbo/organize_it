@@ -1,19 +1,17 @@
 {% load static %}
-<section class="bg-white dark:bg-gray-900">
-    <div class="grid py-8 px-4 mx-auto max-w-screen-xl lg:gap-8 lg:py-16 xl:gap-0">
-        <div class="place-self-center mr-auto">
+<section class="max-w-screen-xl shadow card card-border bg-base-100">
             <img src="{% static 'img/hero.jpg' %}"
-                 class="hidden rounded-lg shadow-lg sm:block"
+                 class="hidden rounded-t-lg sm:block"
                  alt="Planner">
-            <div class="py-3 px-4 lg:py-6 lg:px-8">
-                <h1 class="mb-4 max-w-2xl text-3xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl dark:text-white">
+            <div class="py-5 px-6 lg:py-6 lg:px-8">
+                <h1 class="mb-4 max-w-2xl text-3xl font-extrabold tracking-tight leading-none md:text-4xl xl:text-5xl dark:text-white">
                     Organize your next trip!
                 </h1>
-                <p class="mb-6 max-w-2xl font-light text-gray-500 md:text-lg lg:mb-8 lg:text-xl dark:text-gray-400">
-                    Register links, locations and notes about your next trip. Organize them by day and look at a map to set up your next journey
+                <p class="mb-6 max-w-2xl font-light text-gray-500 lg:mb-8 dark:text-gray-400 text-base/6 md:text-lg/6 lg:text-xl/7">
+                    Register experiences, stays and transports. Keep links and notes about them. Organize them by day and look at a map to set up your next journey. Share the journey plan with your friends and family.
                 </p>
                 <a href="{% url 'account_signup' %}"
-                   class="inline-flex justify-center items-center btn btn-primary">
+                   class="inline-flex justify-center items-center btn btn-primary md:btn-lg">
                     Get started
                     <svg class="ml-2 -mr-1 w-5 h-5"
                          fill="currentColor"
@@ -24,6 +22,4 @@
                     </svg>
                 </a>
             </div>
-        </div>
-    </div>
 </section>

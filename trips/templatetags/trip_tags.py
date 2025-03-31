@@ -1,6 +1,7 @@
 import re
 
 from django import template
+from django.core.exceptions import ObjectDoesNotExist
 
 from trips.data.phone_prefixes import ITALIAN_PREFIXES
 
@@ -19,11 +20,11 @@ def next_day(day):
 
 @register.filter
 def is_last_day(day):
-    days = list(day.trip.days.all())
     try:
+        days = list(day.trip.days.all())
         current_index = days.index(day)
         return current_index == len(days) - 1
-    except (ValueError, IndexError):
+    except (ValueError, IndexError, ObjectDoesNotExist):
         return False
 
 
@@ -44,7 +45,13 @@ def is_first_day_of_stay(day):
 
 @register.filter
 def is_first_day_of_trip(day):
-    return day.number == 1
+    """Check if the given day is the first day of its trip using prefetched data"""
+    try:
+        days = [d for d in day.trip.days.all()]
+        first_day = min(days, key=lambda d: d.number) if days else None
+        return day == first_day
+    except AttributeError:
+        return False
 
 
 @register.filter
@@ -60,29 +67,29 @@ def event_icon(event):
 @register.filter
 def event_bg_color(event):
     colors = {
-        1: "bg-[#BAEAFF]",  # Transport
-        2: "bg-[#DDFFCF]",  # Experience
-        3: "bg-[#FFF4D4]",  # Meal
+        1: "bg-tr-blue-100 dark:bg-tr-blue-100/30",  # Transport
+        2: "bg-exp-green-100 dark:bg-exp-green-100/30",  # Experience
+        3: "bg-meal-yellow-100 dark:bg-meal-yellow-100/30",  # Meal
     }
-    return colors.get(event.category, "bg-gray-300")
+    return colors.get(event.category, "bg-gray-100")
 
 
 @register.filter
 def event_border_color(event):
     colors = {
-        1: "border-[#5ECEFF]",  # Transport
-        2: "border-[#98F56F]",  # Experience
-        3: "border-[#FFDB6D]",  # Meal
+        1: "border-tr-blue-300 dark:border-tr-blue-700",  # Transport
+        2: "border-exp-green-300 dark:border-exp-green-700",  # Experience
+        3: "border-meal-yellow-300 dark:border-meal-yellow-700",  # Meal
     }
-    return colors.get(event.category, "bg-gray-300")
+    return colors.get(event.category, "border-gray-300")
 
 
 @register.filter
 def event_icon_color(event):
     colors = {
-        1: "text-transport-blue",  # Transport
-        2: "text-experience-green",  # Experience
-        3: "text-meal-yellow",  # Meal
+        1: "text-tr-blue-700 dark:text-tr-blue-300",  # Transport
+        2: "text-exp-green-700 dark:text-exp-green-300",  # Experience
+        3: "text-meal-yellow-700 dark:text-meal-yellow-300",  # Meal
     }
     return colors.get(event.category, "text-base-content")
 

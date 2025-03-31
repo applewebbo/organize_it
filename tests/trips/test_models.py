@@ -305,6 +305,41 @@ class TestEventModel:
             event1.swap_times_with(event2)
         assert str(exc.value) == "Can only swap events within the same day"
 
+    def test_event_trip_relationship(self, trip_factory, event_factory):
+        """Test that event maintains trip relationship when unpaired from day"""
+        trip = trip_factory()
+        day = trip.days.first()
+
+        # Create event with day
+        event = event_factory(day=day)
+        assert event.trip == trip
+
+        # Unpair event from day
+        event.day = None
+        event.save()
+
+        # Verify trip relationship is maintained
+        event.refresh_from_db()
+        assert event.trip == trip
+        assert event in trip.all_events.all()
+
+    def test_event_trip_assignment_on_day_change(self, trip_factory, event_factory):
+        """Test that event's trip updates when day changes"""
+        trip1 = trip_factory()
+        trip2 = trip_factory()
+        day1 = trip1.days.first()
+        day2 = trip2.days.first()
+
+        event = event_factory(day=day1)
+        assert event.trip == trip1
+
+        # Change event's day
+        event.day = day2
+        event.save()
+
+        event.refresh_from_db()
+        assert event.trip == trip2
+
 
 class TestTransportModel:
     def test_factory(self, user_factory, trip_factory, transport_factory):

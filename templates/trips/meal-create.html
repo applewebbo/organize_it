@@ -23,7 +23,23 @@
         {% csrf_token %}
         {% crispy form %}
     </div>
-    <div class="flex justify-end items-center p-4 rounded-b border-t border-gray-200 md:p-5 dark:border-gray-600">
+    <div class="px-4 md:px-5">
+        <h4 class="text-lg font-semibold">Unpaired Experiences</h4>
+        <ul class="flex flex-wrap gap-3 justify-start items-center mt-4">
+            {% for exp in unpaired_experiences %}
+                <li>
+                    <a href="{% url 'trips:event-pair' exp.pk day.pk %}"
+                       class="flex gap-2 items-center btn btn-primary btn-soft"
+                       hx-get="{% url 'trips:event-pair' exp.pk day.pk %}"
+                       hx-target="#dialog">
+                        {{ exp.name }}
+                        {% heroicon_mini 'plus-circle' class="size-4" %}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="flex justify-end items-center p-4 md:p-5">
         <button type="button"
                 x-on:click="openModal = false"
                 class="mr-2 btn btn-outline btn-error">Cancel</button>

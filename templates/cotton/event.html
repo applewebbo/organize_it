@@ -1,35 +1,29 @@
 {% load heroicons %}
-<div class="py-3 px-6 rounded-lg border {{ border_color }} {{ bg_color }} relative">
-    {% if event.has_overlap %}
-        <div class="absolute top-0 right-0 p-1.5 mt-2 mr-4 bg-white rounded-full border text-error border-error"
-             x-data>
-            {% heroicon_mini 'exclamation-triangle' class="size-4" %}
-        </div>
-    {% endif %}
-    <div class="flex items-start">
-        <div class="{{ icon_color }} bg-white mt-1 p-2 rounded-full border-2 {{ border_color }} ">
+<div class="py-3 px-6 rounded-lg border {{ border_color }} {{ bg_color }}">
+    <div class="flex items-start mb-3">
+        <div class="{{ icon_color }} bg-slate-50 dark:bg-slate-700 mt-1 p-2 rounded-full border-2 {{ border_color }} ">
             {% heroicon_outline icon class="stroke-2 size-6" %}
         </div>
         <div class="ms-2">
-            <h2 class="card-title">{{ event.name }}</h2>
-            <p class="text-base-content/70">{{ slot }}</p>
+            <h2 class="{{ icon_color }} font-semibold text-lg">{{ event.name }}</h2>
+            <div class="{{ icon_color }} flex items-center gap-x-2">{{ slot }}</div>
         </div>
     </div>
     <div class="mt-2 text-right" x-data>
-        <button class="btn btn-sm"
-           hx-get="{% url 'trips:event-swap-modal' event.pk %}"
-           @click="$dispatch('open-modal'); document.activeElement.blur()"
-           hx-target="#dialog"
-           hx-swap="innerHTML">{% heroicon_outline 'arrows-up-down' class="size-4" %}</button>
-        <button class="btn btn-sm"
-           hx-get="{% url 'trips:event-modify' event.pk %}"
-           @click="$dispatch('open-modal'); document.activeElement.blur()"
-           hx-target="#dialog"
-           hx-swap="innerHTML">{% heroicon_outline 'pencil' class="size-4" %}</button>
-        <a href="{% url 'trips:event-delete' event.pk %}"
-           class="btn btn-sm"
-           hx-delete="{% url 'trips:event-delete' event.pk %}"
-           hx-confirm="You're permanently deleting {{ event.name }}. Are you sure?">{% heroicon_outline 'trash' class="size-4" %}</a>
-        <a href="#" class="btn btn-sm" disabled>{% heroicon_outline 'map' class="size-4" %}</a>
+        <button class="btn btn-sm btn-soft"
+                hx-get="{% url 'trips:event-swap-modal' event.pk %}"
+                @click="$dispatch('open-modal'); document.activeElement.blur()"
+                hx-target="#dialog"
+                hx-swap="innerHTML">{% heroicon_outline 'arrows-up-down' class="size-4" %}</button>
+        <button class="btn btn-sm btn-soft"
+                hx-get="{% url 'trips:event-modify' event.pk %}"
+                @click="$dispatch('open-modal'); document.activeElement.blur()"
+                hx-target="#dialog"
+                hx-swap="innerHTML">{% heroicon_outline 'pencil' class="size-4" %}</button>
+        <button class="btn btn-sm btn-soft"
+                hx-get="{% url 'trips:event-modal' event.pk %}"
+                @click="$dispatch('open-modal'); document.activeElement.blur()"
+                hx-target="#dialog"
+                hx-swap="innerHTML">{% heroicon_outline 'trash' class="size-4" %}</button>
     </div>
 </div>

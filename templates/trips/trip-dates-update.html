@@ -1,6 +1,6 @@
 {% load crispy_forms_tags %}
 <form hx-post="{{ request.path }}" hx-target="#dialog" method="post">
-    <div class="flex justify-between items-center p-4 rounded-t border-b md:p-5 dark:border-gray-600">
+    <div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
         <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Change Dates</h3>
         <button type="button"
                 class="inline-flex justify-center items-center w-8 h-8 text-sm text-gray-400 bg-transparent rounded-lg hover:text-gray-900 hover:bg-gray-200 ms-auto dark:hover:bg-gray-600 dark:hover:text-white"
@@ -15,15 +15,16 @@
             <span class="sr-only">Close modal</span>
         </button>
     </div>
-    <div class="grid gap-4 p-4 space-y-4 sm:grid-cols-2 sm:gap-6 md:p-5">
+    <div class="grid gap-2 p-4 space-y-1 sm:grid-cols-2 sm:gap-4 md:p-5">
         {% csrf_token %}
         {% crispy form %}
-        <div class="p-4 mb-4 text-sm text-red-800 bg-red-50 rounded-lg sm:col-span-2 dark:text-red-400 dark:bg-gray-800"
+        <div class="sm:col-span-2 alert alert-error alert-soft"
              role="alert">
-            <span class="font-medium">Warning!</span>Changing the dates will reset all links between places and days for the days deleted. This action cannot be undone
+            {% heroicon_mini 'exclamation-triangle' class="size-5" %}
+            <div><strong>Warning!&nbsp;</strong>Changing the dates will unpair all events from deleted days. This action cannot be undone.</div>
         </div>
     </div>
-    <div class="flex justify-end items-center p-4 rounded-b border-t border-gray-200 md:p-5 dark:border-gray-600">
+    <div class="flex justify-end items-center p-4 md:p-5">
         <button type="button"
                 x-on:click="openModal = false"
                 class="mr-2 btn btn-outline btn-error">Cancel</button>

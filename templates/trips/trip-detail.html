@@ -1,52 +1,76 @@
 {% extends "base.html" %}
-{% load partials static %}
+{% load partials static trip_tags %}
 {% block page_title %}
     {{ trip.title }}
 {% endblock page_title %}
 {% block content %}
     <!-- Details Section -->
     <section id="details" class="mb-8 text-center md:text-start">
-        <div class="py-2 px-4 w-full bg-white rounded-lg border border-gray-200 shadow md:py-4 md:px-6">
-            <div class="items-center mb-3 md:flex">
-                <h2 class="mt-2 mb-2 text-2xl font-semibold tracking-tight md:mt-0 md:text-3xl md:grow">
-                    {{ trip.title }} <span class="mb-2 badge badge-xs badge-secondary badge-outline ms-2 md:badge-sm lg:badge-md">{{ trip.get_status_display }}</span>
-                </h2>
-            </div>
-            <div id="trip-details"
-                 class="flex flex-col gap-x-3 mb-4 md:flex-row lg:gap-x-6 lg:justify-start">
-                {% if trip.start_date and trip.end_date %}
-                    <div>
-                        Start Date: <strong>{{ trip.start_date }}</strong>
-                    </div>
-                    <div>
-                        End date: <strong>{{ trip.end_date }}</strong>
-                    </div>
-                {% else %}
-                    <div>
-                        Start Date: <strong>-</strong>
-                    </div>
-                    <div>
-                        End date: <strong>-</strong>
-                    </div>
-                {% endif %}
-                <div>
-                    Destination: <strong>{{ trip.destination }}</strong>
+        <div class="shadow card card-border bg-base-100">
+            <div class="card-body">
+                <div class="flex flex-col-reverse items-center mb-3 md:flex-row">
+                    <h2 class="mt-0 mb-2 text-2xl font-semibold tracking-tight md:mt-0 md:text-3xl md:me-4">{{ trip.title }}</h2>
+                    <span class="mb-2 badge badge-secondary badge-outline badge-sm md:ms-2 lg:badge-md">{{ trip.get_status_display }}</span>
                 </div>
+                <div id="trip-details"
+                     class="flex flex-col gap-x-3 mb-4 md:flex-row lg:gap-x-6 lg:justify-start">
+                    {% if trip.start_date and trip.end_date %}
+                        <div>
+                            Start Date: <strong>{{ trip.start_date }}</strong>
+                        </div>
+                        <div>
+                            End date: <strong>{{ trip.end_date }}</strong>
+                        </div>
+                    {% else %}
+                        <div>
+                            Start Date: <strong>-</strong>
+                        </div>
+                        <div>
+                            End date: <strong>-</strong>
+                        </div>
+                    {% endif %}
+                    <div class="hidden md:block">
+                        Destination: <strong>{{ trip.destination }}</strong>
+                    </div>
+                </div>
+                <p class="hidden md:block">
+                    <em class="text-base-content/80">{{ trip.description }}</em>
+                </p>
             </div>
-            <p class="hidden md:block">
-                <em>{{ trip.description }}</em>
-            </p>
         </div>
     </section>
     <!-- END Details Section -->
-    <!-- Days Section   -->
-    <!-- TODO: add dayModified refresh with htmx-->
-    <section id="days" class="flex flex-col gap-y-4">
-        {% for day in trip.days.all %}
-            {% include 'trips/includes/day.html' with day=day %}
-        {% endfor %}
-    </section>
-<!-- END Days Section -->
+    {% partialdef days inline=true %}
+    <div id="days-events"
+         hx-get="{% url 'trips:trip-detail' trip.pk %}"
+         hx-target="#days-events"
+         hx-swap="innerHTML"
+         hx-trigger="tripModified from:body">
+        <!-- Days Section   -->
+        <section id="days" class="flex flex-col gap-y-4">
+            {% for day in trip.days.all %}
+                {% include 'trips/includes/day.html' with day=day %}
+            {% endfor %}
+        </section>
+        <!-- END Days Section -->
+        <!-- Unpaired Events Section -->
+        {% if unpaired_events %}
+            <section id="unpaired">
+                <div class="shadow card card-border bg-base-100" x-data>
+                    <div class="card-body">
+                        <h2 class="text-xl font-medium sm:text-2xl grow">Unpaired Events</h2>
+                        <ul class="flex flex-wrap gap-3 justify-center my-4">
+                            {% for event in unpaired_events %}
+                                <c-unpaired-event :event="event" :days="trip.days.all" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}" />
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        {% endif %}
+        <!-- END Unpaired Events Section -->
+    </div>
+{% endpartialdef %}
 {% endblock content %}
 {% block script %}
 {% endblock script %}

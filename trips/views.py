@@ -81,11 +81,14 @@ def trip_detail(request, pk):
     ).select_related("author")
 
     trip = get_object_or_404(qs, pk=pk, author=request.user)
+    unpaired_events = trip.all_events.filter(day__isnull=True)
 
-    context = {
-        "trip": trip,
-    }
-    return TemplateResponse(request, "trips/trip-detail.html", context)
+    context = {"trip": trip, "unpaired_events": unpaired_events}
+    if request.htmx:
+        template = "trips/trip-detail.html#days"
+    else:
+        template = "trips/trip-detail.html"
+    return TemplateResponse(request, template, context)
 
 
 @login_required
@@ -209,6 +212,9 @@ def trip_dates_update(request, pk):
 @login_required
 def add_transport(request, day_id):
     day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
+    unpaired_experiences = Event.objects.filter(
+        day__isnull=True, trip=day.trip, category=1
+    )
     form = TransportForm(request.POST or None)
     if form.is_valid():
         transport = form.save(commit=False)
@@ -220,13 +226,16 @@ def add_transport(request, day_id):
             _("Transport added successfully"),
         )
         return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
-    context = {"form": form}
+    context = {"form": form, "day": day, "unpaired_experiences": unpaired_experiences}
     return TemplateResponse(request, "trips/transport-create.html", context)
 
 
 @login_required
 def add_experience(request, day_id):
     day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
+    unpaired_experiences = Event.objects.filter(
+        day__isnull=True, trip=day.trip, category=2
+    )
     form = ExperienceForm(request.POST or None)
     if form.is_valid():
         experience = form.save(commit=False)
@@ -238,13 +247,16 @@ def add_experience(request, day_id):
             _("Experience added successfully"),
         )
         return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
-    context = {"form": form, "day": day}
+    context = {"form": form, "day": day, "unpaired_experiences": unpaired_experiences}
     return TemplateResponse(request, "trips/experience-create.html", context)
 
 
 @login_required
 def add_meal(request, day_id):
     day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
+    unpaired_experiences = Event.objects.filter(
+        day__isnull=True, trip=day.trip, category=3
+    )
     form = MealForm(request.POST or None)
     if form.is_valid():
         meal = form.save(commit=False)
@@ -256,7 +268,7 @@ def add_meal(request, day_id):
             _("Meal added successfully"),
         )
         return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
-    context = {"form": form}
+    context = {"form": form, "day": day, "unpaired_experiences": unpaired_experiences}
     return TemplateResponse(request, "trips/meal-create.html", context)
 
 
@@ -352,6 +364,19 @@ def stay_delete(request, pk):
 
 
 @login_required
+def event_modal(request, pk):
+    """
+    Modal for showing related event link for unpairing or deleting
+    """
+    qs = Event.objects.select_related("day__trip__author")
+    event = get_object_or_404(qs, pk=pk, day__trip__author=request.user)
+    context = {
+        "event": event,
+    }
+    return TemplateResponse(request, "trips/event-modal.html", context)
+
+
+@login_required
 @require_http_methods(["DELETE"])
 def event_delete(request, pk):
     qs = Event.objects.select_related("day__trip__author")
@@ -359,10 +384,66 @@ def event_delete(request, pk):
     event.delete()
     messages.add_message(
         request,
-        messages.ERROR,
+        messages.SUCCESS,
         _("Event deleted successfully"),
     )
     return HttpResponse(status=204, headers={"HX-Refresh": "true"})
+
+
+@login_required
+@require_http_methods(["PUT"])
+def event_unpair(request, pk):
+    """
+    Unpair an event from its day by setting the day relation to null.
+    Only the trip author can unpair events.
+    """
+    qs = Event.objects.select_related("trip__author")
+    event = get_object_or_404(qs, pk=pk, trip__author=request.user)
+    event.day = None
+    event.save()
+    messages.add_message(
+        request,
+        messages.SUCCESS,
+        _("Event unpaired successfully"),
+    )
+    return HttpResponse(status=204, headers={"HX-Refresh": "true"})
+
+
+@login_required
+def event_pair(request, pk, day_id):
+    """
+    Pair an event with a day.
+    Only the trip author can pair events.
+    """
+    qs = Event.objects.select_related("trip__author")
+    event = get_object_or_404(qs, pk=pk, trip__author=request.user)
+    day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
+
+    event.day = day
+    event.save()
+    messages.add_message(
+        request,
+        messages.SUCCESS,
+        _("Event paired successfully"),
+    )
+    return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+
+
+@login_required
+def event_pair_choice(request, pk):
+    """
+    Provide a list of days to pair with the selected event.
+    Only days from the same trip are shown.
+    """
+    event = get_object_or_404(Event, pk=pk, trip__author=request.user)
+    trip = event.trip
+    days = trip.days.all()
+
+    context = {
+        "event": event,
+        "days": days,
+    }
+    return TemplateResponse(request, "trips/event-pair-choice.html", context)
 
 
 @login_required

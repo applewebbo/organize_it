@@ -41,12 +41,13 @@ ignore = "T002,H006"
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "core.settings.testing"
-'addopts' = "--nomigrations --cov=. --cov-report html:htmlcov --cov-report term:skip-covered --cov-fail-under 100"
+'addopts' = "--reuse-db --nomigrations --cov=. --cov-report html:htmlcov --cov-report term:skip-covered --cov-fail-under 100"
 markers = [
   "mapbox: requires Mapbox API key"
 ]
 python_files = "test_*.py"
 testpaths = ["tests"]
+xfail_strict = true
 
 [tool.ruff]
 target-version = "py311"

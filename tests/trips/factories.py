@@ -153,6 +153,7 @@ class EventFactory(factory.django.DjangoModelFactory):
         trip = factory.SubFactory(TripFactory)
 
     day = factory.LazyAttribute(lambda obj: obj.trip.days.order_by("?").first())
+    trip = factory.LazyAttribute(lambda obj: obj.trip)
     name = factory.Faker("company", locale="it_IT")
     start_time = factory.Faker("time")
     end_time = factory.Faker("time")

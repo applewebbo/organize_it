@@ -1,9 +1,41 @@
 @import "tailwindcss";
 
 @theme {
-  --color-transport-blue: #009FE5;
-  --color-experience-green: #3ECC00;
-  --color-meal-yellow: #DFA800;
+  --color-tr-blue-50: oklch(96.72% 0.022 221.81);
+  --color-tr-blue-100: oklch(93.62% 0.043 222.71);
+  --color-tr-blue-200: oklch(87.48% 0.083 224.91);
+  --color-tr-blue-300: oklch(82.18% 0.117 226.54);
+  --color-tr-blue-400: oklch(77.41% 0.143 230.48);
+  --color-tr-blue-500: oklch(73.46% 0.159 236.36);
+  --color-tr-blue-600: oklch(62.37% 0.133 235.63);
+  --color-tr-blue-700: oklch(50.76% 0.107 234.44);
+  --color-tr-blue-800: oklch(38.16% 0.079 233.38);
+  --color-tr-blue-900: oklch(24.71% 0.048 228.26);
+  --color-tr-blue-950: oklch(16.9% 0.031 222.65);
+  --color-exp-green-50: oklch(97.31% 0.027 140.18);
+  --color-exp-green-100: oklch(94.73% 0.054 138.54);
+  --color-exp-green-200: oklch(88.99% 0.112 138.83);
+  --color-exp-green-300: oklch(84.45% 0.162 139.14);
+  --color-exp-green-400: oklch(79.91% 0.209 139.59);
+  --color-exp-green-500: oklch(74.5% 0.224 140.1);
+  --color-exp-green-600: oklch(62.84% 0.187 140.1);
+  --color-exp-green-700: oklch(51.81% 0.152 139.95);
+  --color-exp-green-800: oklch(38.57% 0.109 139.85);
+  --color-exp-green-900: oklch(25.85% 0.067 139.26);
+  --color-exp-green-950: oklch(17.78% 0.04 137.46);
+  --color-meal-yellow-50: oklch(97.92% 0.023 90.75);
+  --color-meal-yellow-100: oklch(95.68% 0.046 89.57);
+  --color-meal-yellow-200: oklch(91.77% 0.091 90.4);
+  --color-meal-yellow-300: oklch(88.29% 0.125 90.27);
+  --color-meal-yellow-400: oklch(84.68% 0.153 88.1);
+  --color-meal-yellow-500: oklch(81.75% 0.165 84.94);
+  --color-meal-yellow-600: oklch(69.98% 0.142 83.7);
+  --color-meal-yellow-700: oklch(57.12% 0.115 84.65);
+  --color-meal-yellow-800: oklch(42.09% 0.084 85.42);
+  --color-meal-yellow-900: oklch(26.85% 0.053 87.13);
+  --color-meal-yellow-950: oklch(18.46% 0.035 92.93);
+
+
 }
 
 @utility container {
@@ -42,14 +74,10 @@
   --radius-field: 0.35rem;
 }
 
-p{
-    @apply mb-3 font-normal text-gray-700;
+.stay-in {
+  @apply flex items-center py-0.5 px-2 text-green-700 bg-green-100 dark:bg-green-300/30 dark:text-green-200 rounded-lg border-2 border-green-300 dark:border-green-700 ms-2;
   }
 
-  .card-badge{
-    @apply text-info-content absolute px-2.5 py-1.5 right-0 top-0 -mt-4 me-6 bg-info rounded-md;
-  }
-
-  .card-badge-neutral{
-    @apply text-base-content bg-base-200 border border-base-300 ;
+.stay-out {
+  @apply flex items-center py-0.5 px-2 text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-500/30 rounded-lg border-2 border-red-300 dark:border-red-800 ms-2
   }
