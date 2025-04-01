@@ -10,22 +10,24 @@
     </button>
 </div>
 <div id="stay-details">
-    <div class="grid gap-x-1 py-4 px-8">
+    <div class="grid gap-1 p-4 sm:grid-cols-2 sm:gap-2 md:p-5">
         <ul class="leading-10">
             <li>
-                <span class="font-bold">Name:&nbsp;</span>{{ stay.name }}
+                <span class="font-bold">Address:&nbsp;</span>{{ stay.address }}
             </li>
             <li>
                 <span class="font-bold">Phone Number:&nbsp;</span>{{ stay.phone_number|phone_format }}
             </li>
             <li>
-                <span class="font-bold">Address:&nbsp;</span>{{ stay.address }}
+                <span class="font-bold">Website:&nbsp;</span><a href="{{ stay.url }}" class="link">{{ stay.url }}</a>
+            </li>
+        </ul>
+        <ul class="leading-10">
+            <li>
+                <span class="font-bold">Check-in:&nbsp;</span>{{ first_day.date|date:"d/m" }} at {{ stay.check_in|time:"H:i" }}
             </li>
             <li>
-                <span class="font-bold">Check-in:&nbsp;</span>{{ first_day.date|date:"d/m/Y" }} at {{ stay.check_in|time:"H:i" }}
-            </li>
-            <li>
-                <span class="font-bold">Check-out:&nbsp;</span>{{ last_day.date|date:"d/m/Y" }} at {{ stay.check_out|time:"H:i" }}
+                <span class="font-bold">Check-out:&nbsp;</span>{{ last_day.date|date:"d/m" }} at {{ stay.check_out|time:"H:i" }}
             </li>
             <li>
                 <span class="font-bold">Cancellation Date:&nbsp;</span>
@@ -35,24 +37,21 @@
                     Not provided
                 {% endif %}
             </li>
-            <li>
-                <span class="font-bold">Website:&nbsp;</span><a href="{{ stay.url }}" class="link">{{ stay.url }}</a>
-            </li>
         </ul>
     </div>
     <div class="flex justify-end items-center p-4 px-8 rounded-b md:p-5">
         <button type="button"
-                class="ms-2 btn btn-success btn-sm"
+                class="ms-2 btn btn-success btn-soft"
                 hx-get="{% url 'trips:stay-modify' stay.pk %}"
                 hx-target="#stay-details"
                 hx-swap="innerHTML">Edit</button>
         <button type="button"
-                class="ms-2 btn btn-error btn-sm"
+                class="ms-2 btn btn-error btn-soft"
                 hx-get="{% url 'trips:stay-delete' stay.pk %}"
                 hx-target="#stay-details"
                 hx-swap="innerHTML">Delete</button>
         <button type="button"
                 x-on:click="openModal = false"
-                class="ms-2 btn btn-outline btn-neutral btn-sm">Close</button>
+                class="ms-2 btn btn-soft btn-neutral">Close</button>
     </div>
 </div>

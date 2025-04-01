@@ -23,11 +23,11 @@
 <div class="flex justify-end items-center p-4 rounded-b">
     <button type="button"
             x-on:click="openModal = false"
-            class="mr-2 btn btn-outline">Cancel</button>
-    <button class="mr-2 btn btn-outline btn-primary"
+            class="mr-2 btn btn-soft">Cancel</button>
+    <button class="mr-2 btn btn-soft btn-primary"
             hx-put="{% url 'trips:event-unpair' event.pk %}"
             type="button">Unpair</button>
-    <button class="btn btn-outline btn-error"
+    <button class="btn btn-soft btn-error"
             hx-delete="{% url 'trips:event-delete' event.pk %}"
             type="button">Confirm</button>
 </div>

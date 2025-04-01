@@ -447,6 +447,30 @@ def event_pair_choice(request, pk):
 
 
 @login_required
+def event_detail(request, pk):
+    """
+    Detail Page for the selected event.
+    Uses window functions to efficiently detect event overlaps within the day.
+    """
+    qs = Event.objects.select_related("trip__author", "transport", "experience", "meal")
+    event = get_object_or_404(qs, pk=pk, trip__author=request.user)
+
+    # Get proper instance based on category
+    if event.category == 1:  # Transport
+        event = event.transport
+    elif event.category == 2:  # Experience
+        event = event.experience
+    elif event.category == 3:  # Meal
+        event = event.meal
+
+    context = {
+        "event": event,
+        "category": event.category,
+    }
+    return TemplateResponse(request, "trips/event-detail.html", context)
+
+
+@login_required
 def event_modify(request, pk):
     """
     Modify an event based on its category.

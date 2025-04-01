@@ -4,8 +4,15 @@
         <div class="{{ icon_color }} bg-slate-50 dark:bg-slate-700 mt-1 p-2 rounded-full border-2 {{ border_color }} ">
             {% heroicon_outline icon class="stroke-2 size-6" %}
         </div>
-        <div class="ms-2">
-            <h2 class="{{ icon_color }} font-semibold text-lg">{{ event.name }}</h2>
+        <div class="ms-2" x-data>
+            <h2 class="{{ icon_color }} font-semibold text-lg">
+                <a class="link"
+                   href="#"
+                   hx-get="{% url 'trips:event-detail' event.pk %}"
+                   @click="$dispatch('open-modal'); document.activeElement.blur()"
+                   hx-target="#dialog"
+                   hx-swap="innerHTML">{{ event.name }}</a>
+            </h2>
             <div class="{{ icon_color }} flex items-center gap-x-2">{{ slot }}</div>
         </div>
     </div>
@@ -15,7 +22,7 @@
                 @click="$dispatch('open-modal'); document.activeElement.blur()"
                 hx-target="#dialog"
                 hx-swap="innerHTML">{% heroicon_outline 'arrows-up-down' class="size-4" %}</button>
-        <button class="btn btn-sm btn-soft"
+        {% comment %} <button class="btn btn-sm btn-soft"
                 hx-get="{% url 'trips:event-modify' event.pk %}"
                 @click="$dispatch('open-modal'); document.activeElement.blur()"
                 hx-target="#dialog"
@@ -24,6 +31,6 @@
                 hx-get="{% url 'trips:event-modal' event.pk %}"
                 @click="$dispatch('open-modal'); document.activeElement.blur()"
                 hx-target="#dialog"
-                hx-swap="innerHTML">{% heroicon_outline 'trash' class="size-4" %}</button>
+                hx-swap="innerHTML">{% heroicon_outline 'trash' class="size-4" %}</button> {% endcomment %}
     </div>
 </div>

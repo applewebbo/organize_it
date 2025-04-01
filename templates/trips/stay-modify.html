@@ -12,9 +12,9 @@
         {% crispy form %}
     </div>
     <div class="flex justify-end items-center p-4">
-        <button id="form-submit" class="ms-2 btn btn-sm btn-success" type="submit">Save</button>
         <button type="button"
                 x-on:click="openModal = false"
-                class="ms-2 btn btn-sm btn-outline btn-neutral">Cancel</button>
+                class="ms-2 btn btn-error btn-soft">Cancel</button>
+        <button id="form-submit" class="ms-2 btn btn-primary btn-soft" type="submit">Save</button>
     </div>
 </form>
