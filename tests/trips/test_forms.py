@@ -4,6 +4,7 @@ from unittest.mock import Mock, patch
 import pytest
 
 from trips.forms import (
+    EventChangeTimesForm,
     ExperienceForm,
     LinkForm,
     MealForm,
@@ -481,3 +482,37 @@ class TestStayForm:
 
         assert not form.is_valid()
         assert "phone_number" in form.errors
+
+
+class TestEventChangeTimesForm:
+    """Test suite for EventChangeTimesForm"""
+
+    def test_form_valid(self, user_factory, trip_factory, experience_factory):
+        """Test that form accepts valid time inputs"""
+        user = user_factory()
+        trip = trip_factory(author=user)
+        day = trip.days.first()
+        experience = experience_factory(day=day)
+
+        data = {"start_time": "09:00", "end_time": "10:00"}
+        form = EventChangeTimesForm(data=data, instance=experience)
+
+        assert form.is_valid()
+        event = form.save()
+        assert event.start_time.strftime("%H:%M") == "09:00"
+        assert event.end_time.strftime("%H:%M") == "10:00"
+
+    def test_form_invalid_end_time_before_start_time(
+        self, user_factory, trip_factory, experience_factory
+    ):
+        """Test that form rejects end time before start time"""
+        user = user_factory()
+        trip = trip_factory(author=user)
+        day = trip.days.first()
+        experience = experience_factory(day=day)
+
+        data = {"start_time": "10:00", "end_time": "09:00"}
+        form = EventChangeTimesForm(data=data, instance=experience)
+
+        assert not form.is_valid()
+        assert "End time must be after start time" in form.non_field_errors()

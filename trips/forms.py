@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .models import Day, Experience, Link, Meal, Note, Stay, Transport, Trip
+from .models import Day, Event, Experience, Link, Meal, Note, Stay, Transport, Trip
 
 
 def urlfields_assume_https(db_field, **kwargs):
@@ -533,3 +533,43 @@ class StayForm(forms.ModelForm):
             day.stay = stay
             day.save()
         return stay
+
+
+class EventChangeTimesForm(forms.ModelForm):
+    start_time = forms.TimeField(
+        label="Start Time",
+        widget=forms.TimeInput(attrs={"type": "time"}),
+    )
+    end_time = forms.TimeField(
+        label="End Time",
+        widget=forms.TimeInput(attrs={"type": "time"}),
+    )
+
+    class Meta:
+        model = Event
+        fields = ["start_time", "end_time"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Div(
+                "start_time",
+                css_class="sm:col-span-2",
+            ),
+            Div(
+                "end_time",
+                css_class="sm:col-span-2",
+            ),
+        )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        start_time = cleaned_data.get("start_time")
+        end_time = cleaned_data.get("end_time")
+
+        if start_time and end_time and start_time >= end_time:
+            raise ValidationError("End time must be after start time")
+
+        return cleaned_data

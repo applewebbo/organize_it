@@ -1,0 +1,37 @@
+{% load trip_tags heroicons %}
+<div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
+    <h3 id="event-title"
+        class="text-xl font-semibold text-gray-900 dark:text-white">Details for {{ event.name }}</h3>
+    <button type="button"
+            class="btn btn-ghost btn-circle btn-sm"
+            x-on:click="openModal = false">
+        {% heroicon_mini 'x-mark' class="size-5" %}
+        <span class="sr-only">Close modal</span>
+    </button>
+</div>
+<div id="event-details">
+    <div class="grid gap-1 p-4 sm:grid-cols-2 sm:gap-2 md:p-5">
+        {% if category == 1 %}
+            {% include 'trips/includes/transport-detail.html' %}
+        {% elif category == 2 %}
+            {% include 'trips/includes/experience-detail.html' %}
+        {% elif category == 3 %}
+            {% include 'trips/includes/meal-detail.html' %}
+        {% endif %}
+    </div>
+    <div class="flex justify-end items-center p-4 px-8 rounded-b md:p-5">
+        <button type="button"
+                class="ms-2 btn btn-success btn-soft"
+                hx-get="{% url 'trips:event-modify' event.pk %}"
+                hx-target="#dialog"
+                hx-swap="innerHTML">Edit</button>
+        <button type="button"
+                class="ms-2 btn btn-error btn-soft"
+                hx-get="{% url 'trips:event-modal' event.pk %}"
+                hx-target="#dialog"
+                hx-swap="innerHTML">Delete</button>
+        <button type="button"
+                x-on:click="openModal = false"
+                class="ms-2 btn btn-soft btn-neutral">Close</button>
+    </div>
+</div>
