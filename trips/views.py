@@ -12,6 +12,7 @@ from django.views.decorators.http import require_http_methods
 
 from accounts.models import Profile
 from trips.forms import (
+    EventChangeTimesForm,
     ExperienceForm,
     MealForm,
     StayForm,
@@ -508,6 +509,31 @@ def event_modify(request, pk):
         return HttpResponse(status=204, headers={"HX-Refresh": "true"})
     context = {"form": form, "event": event}
     return TemplateResponse(request, "trips/event-modify.html", context)
+
+
+@login_required
+def event_change_times(request, pk):
+    """
+    Change the times of an event on the event detail card
+    """
+    qs = Event.objects.select_related("trip__author")
+    event = get_object_or_404(qs, pk=pk, trip__author=request.user)
+    form = EventChangeTimesForm(request.POST or None, instance=event)
+    if form.is_valid():
+        event = form.save(commit=False)
+        event.start_time = form.cleaned_data["start_time"]
+        event.end_time = form.cleaned_data["end_time"]
+        event.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            _("Event times updated successfully"),
+        )
+        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+
+    return TemplateResponse(
+        request, "trips/event-change-times.html", {"event": event, "form": form}
+    )
 
 
 @login_required

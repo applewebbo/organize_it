@@ -53,11 +53,11 @@
                                 </div>
                                 <div class="ms-3">
                                     <h2 class="text-lg font-semibold link text-slate-500 dark:text-slate-200">
-                                    <a hx-get="{% url 'trips:stay-detail' next_day.stay.pk %}"
-                                       hx-target="#dialog"
-                                       hx-swap="innerHTML"
-                                       @click="$dispatch('open-modal'); document.activeElement.blur()"
-                                       class="link">{{ next_day.stay.name }}</a>
+                                        <a hx-get="{% url 'trips:stay-detail' next_day.stay.pk %}"
+                                           hx-target="#dialog"
+                                           hx-swap="innerHTML"
+                                           @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                           class="link">{{ next_day.stay.name }}</a>
                                     </h2>
                                     <div class="stay-in">
                                         {% heroicon_mini 'information-circle' class="size-4 me-1.5" %}
@@ -75,10 +75,23 @@
             {% for event in day.events.all %}
                 <li>
                     <c-event :event="event" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}">
-                    <div>{{ event.start_time|time:"H:i" }}&nbsp;-&nbsp;{{ event.end_time|time:"H:i" }}</div>
-                    {% if event.has_overlap %}
-                        <div class="px-1 font-semibold rounded-sm text-error bg-slate-50 dark:bg-slate-700">!!</div>
-                    {% endif %}
+                    <div class="flex items-center" x-data>
+                        {% if event.has_overlap %}
+                            <div class="px-1 font-semibold rounded-sm me-1.5 text-error bg-slate-50 dark:bg-slate-700">!!</div>
+                        {% endif %}
+                        <a href="#"
+                           class="flex items-center"
+                           x-data="{ showIcon: false }"
+                           @mouseenter="showIcon = true"
+                           @mouseleave="showIcon = false"
+                           hx-get="{% url 'trips:event-change-times' event.pk %}"
+                           @click="$dispatch('open-modal'); document.activeElement.blur()"
+                           hx-target="#dialog"
+                           hx-swap="innerHTML">
+                            {{ event.start_time|time:"H:i" }}&nbsp;-&nbsp;{{ event.end_time|time:"H:i" }}
+                            <span x-show="showIcon">{% heroicon_mini "pencil-square" class="size-3 ms-2" %}</span>
+                        </a>
+                    </div>
                     </c-event>
                 </li>
             {% endfor %}
