@@ -463,6 +463,8 @@ def event_detail(request, pk):
         event = event.experience
     elif event.category == 3:  # Meal
         event = event.meal
+    else:
+        raise Http404("Invalid event category")
 
     context = {
         "event": event,

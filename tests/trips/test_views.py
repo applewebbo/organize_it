@@ -1117,3 +1117,159 @@ class TestEventSwapModal(TestCase):
 
         self.response_200(response)
         assert len(response.context["swappable_events"]) == 0
+
+
+class TestEventDetail(TestCase):
+    """Test cases for event detail view"""
+
+    def test_get_transport_detail(self):
+        """Test successful retrieval of transport event detail"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        transport = TransportFactory(day=day)
+
+        with self.login(user):
+            response = self.get("trips:event-detail", pk=transport.pk)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/event-detail.html")
+        assert response.context["event"] == transport
+        assert response.context["category"] == transport.category
+
+    def test_get_experience_detail(self):
+        """Test successful retrieval of experience event detail"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        experience = ExperienceFactory(day=day)
+
+        with self.login(user):
+            response = self.get("trips:event-detail", pk=experience.pk)
+
+        self.response_200(response)
+        assert response.context["event"] == experience
+        assert response.context["category"] == experience.category
+
+    def test_get_meal_detail(self):
+        """Test successful retrieval of meal event detail"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        meal = MealFactory(day=day)
+
+        with self.login(user):
+            response = self.get("trips:event-detail", pk=meal.pk)
+
+        self.response_200(response)
+        assert response.context["event"] == meal
+        assert response.context["category"] == meal.category
+
+    def test_get_detail_unauthorized(self):
+        """Test unauthorized access to event detail"""
+        other_user = self.make_user("other")
+        trip = TripFactory(author=other_user)
+        day = trip.days.first()
+        event = EventFactory(day=day)
+
+        user = self.make_user("user")
+        with self.login(user):
+            response = self.get("trips:event-detail", pk=event.pk)
+
+        self.response_404(response)
+
+    def test_get_detail_invalid_category(self):
+        """Test event detail with invalid category"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(day=day, category=99)  # Invalid category
+
+        with self.login(user):
+            response = self.get("trips:event-detail", pk=event.pk)
+
+        self.response_404(response)
+
+
+class TestEventChangeTimes(TestCase):
+    """Test cases for event time changes"""
+
+    def test_get_change_times(self):
+        """Test successful retrieval of change times form"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(
+            day=day, start_time=datetime.time(10, 0), end_time=datetime.time(11, 0)
+        )
+
+        with self.login(user):
+            response = self.get("trips:event-change-times", pk=event.pk)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/event-change-times.html")
+        assert "form" in response.context
+        assert response.context["event"] == event
+
+    def test_post_change_times_success(self):
+        """Test successful time update"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(
+            day=day, start_time=datetime.time(10, 0), end_time=datetime.time(11, 0)
+        )
+
+        data = {
+            "start_time": "14:00",
+            "end_time": "15:00",
+        }
+
+        with self.login(user):
+            response = self.post("trips:event-change-times", pk=event.pk, data=data)
+
+        self.response_204(response)
+        message = list(get_messages(response.wsgi_request))[0].message
+        assert message == "Event times updated successfully"
+
+        event.refresh_from_db()
+        assert event.start_time == datetime.time(14, 0)
+        assert event.end_time == datetime.time(15, 0)
+
+    def test_post_change_times_invalid(self):
+        """Test time update with invalid data"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(
+            day=day, start_time=datetime.time(10, 0), end_time=datetime.time(11, 0)
+        )
+
+        data = {
+            "start_time": "",  # Invalid: required field
+            "end_time": "15:00",
+        }
+
+        with self.login(user):
+            response = self.post("trips:event-change-times", pk=event.pk, data=data)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/event-change-times.html")
+        assert "form" in response.context
+        assert response.context["form"].errors
+
+        event.refresh_from_db()
+        assert event.start_time == datetime.time(10, 0)  # Time shouldn't change
+
+    def test_get_change_times_unauthorized(self):
+        """Test unauthorized access to change times"""
+        other_user = self.make_user("other")
+        trip = TripFactory(author=other_user)
+        day = trip.days.first()
+        event = EventFactory(day=day)
+
+        user = self.make_user("user")
+        with self.login(user):
+            response = self.get("trips:event-change-times", pk=event.pk)
+
+        self.response_404(response)
