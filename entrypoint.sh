@@ -8,6 +8,9 @@ python manage.py tailwind build
 echo "Collecting static files..."
 python manage.py collectstatic --no-input
 
+echo "Migrating Database..."
+python manage.py migrate
+
 echo "Starting granian..."
 exec granian "core.wsgi:application" \
     --host 0.0.0.0 \
