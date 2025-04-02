@@ -142,7 +142,6 @@ cython_debug/
 
 # BUN
 node_modules/
-package.json
 bun.lockb
 
 # ENVIRONMENT
