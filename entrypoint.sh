@@ -27,15 +27,5 @@ exec granian "core.wsgi:application" \
     --port 80 \
     --interface wsgi \
     --no-ws \
-    ${LOOP_ARG} \
-    --process-name "granian [core]" \
-    --workers 2 \
-    --runtime-threads 8 \
-    --blocking-threads 16 \
-    --backlog 1024 \
-    --backpressure 512 \
-    --thread-stack-size 131072 \
-    --max-requests 500 \
-    --max-requests-jitter 50 \
-    --keep-alive 65 \
-    --graceful-timeout 30
+    --loop uvloop \
+    --process-name "granian [core]"
