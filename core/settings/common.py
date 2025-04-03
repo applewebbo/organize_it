@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "crispy_tailwind",
     "crispy_forms",
+    "debug_toolbar",
+    "django_browser_reload",
     "django_cotton.apps.SimpleAppConfig",
     "django_extensions",
     "django_htmx",
@@ -66,6 +68,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
+    "django_browser_reload.middleware.BrowserReloadMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = "core.urls"
