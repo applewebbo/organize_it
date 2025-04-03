@@ -15,8 +15,11 @@ python manage.py collectstatic --no-input
 echo "Starting granian..."
 exec granian "core.wsgi:application" \
     --host 0.0.0.0 \
-    --port 80 \
+    --port 8000 \
     --interface wsgi \
     --no-ws \
     --loop uvloop \
-    --process-name "granian [core]"
+    --process-name "granian [core]" \
+    --workers 2 \
+    --backpressure 16 \
+    --memory-target 256
