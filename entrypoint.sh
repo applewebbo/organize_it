@@ -2,14 +2,14 @@
 
 set -eu
 
+echo "Migrating Database..."
+python manage.py migrate
+
 echo "Building production css files..."
 python manage.py tailwind build
 
 echo "Collecting static files..."
 python manage.py collectstatic --no-input
-
-echo "Migrating Database..."
-python manage.py migrate
 
 echo "Starting granian..."
 exec granian "core.wsgi:application" \
