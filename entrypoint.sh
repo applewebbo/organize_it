@@ -30,7 +30,8 @@ exec granian "core.wsgi:application" \
     ${LOOP_ARG} \
     --process-name "granian [core]" \
     --workers 2 \
-    --threads 16 \
+    --runtime-threads 8 \
+    --blocking-threads 16 \
     --backlog 1024 \
     --backpressure 512 \
     --thread-stack-size 131072 \
