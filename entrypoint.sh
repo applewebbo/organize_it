@@ -2,6 +2,16 @@
 
 set -eu
 
+# Check if uvloop is installed and set LOOP_ARG accordingly:
+# - If uvloop exists: LOOP_ARG = "--loop uvloop"
+# - If uvloop missing: LOOP_ARG = "" (empty string)
+if ! python -c "import uvloop" 2>/dev/null; then
+    echo "Warning: uvloop not found, falling back to default event loop"
+    LOOP_ARG=""
+else
+    LOOP_ARG="--loop uvloop"
+fi
+
 echo "Migrating Database..."
 python manage.py migrate
 
@@ -17,5 +27,8 @@ exec granian "core.wsgi:application" \
     --port 80 \
     --interface wsgi \
     --no-ws \
-    --loop uvloop \
-    --process-name "granian [core]"
+    --loop uvloop
+    --process-name "granian [core]" \
+    --workers 4 \
+    --threads 32 \
+    --backlog 2048
