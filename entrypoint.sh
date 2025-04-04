@@ -21,5 +21,4 @@ exec granian "core.wsgi:application" \
     --loop uvloop \
     --process-name "granian [core]" \
     --workers 2 \
-    --backpressure 16 \
-    --memory-target 256
+    --backpressure 16
