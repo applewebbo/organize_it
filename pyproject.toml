@@ -21,7 +21,8 @@ dependencies = [
   "django-extensions",
   "django-browser-reload>=1.18.0",
   "django-debug-toolbar>=5.1.0",
-  "uvloop>=0.21.0"
+  "uvloop>=0.21.0",
+  "django-anymail[mailgun]>=13.0"
 ]
 description = "Add your description here"
 name = "organize-it"
