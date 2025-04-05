@@ -283,4 +283,4 @@ Q_CLUSTER = {
     "catch_up": False,
 }
 
-TAILWIND_CLI_VERSION = "4.0.15"
+TAILWIND_CLI_VERSION = "4.1.2"
