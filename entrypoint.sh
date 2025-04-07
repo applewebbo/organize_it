@@ -15,7 +15,7 @@ python manage.py collectstatic --no-input
 echo "Starting granian..."
 exec granian "core.wsgi:application" \
     --host 0.0.0.0 \
-    --port 8000 \
+    --port 80 \
     --interface wsgi \
     --no-ws \
     --loop uvloop \
