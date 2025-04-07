@@ -22,7 +22,7 @@ RUN apt update \
     && rm -rf /var/lib/apt/lists/*
 # Install uv using the official script
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
-    mv /root/.cargo/bin/uv /usr/local/bin/uv
+    mv /root/.local/bin/uv /usr/local/bin/uv
 RUN python -m uv venv
 
 # copy project
