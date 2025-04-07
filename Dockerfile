@@ -23,7 +23,6 @@ RUN apt update \
 # Install uv using the official script
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
     mv /root/.local/bin/uv /usr/local/bin/uv
-RUN python -m uv venv
 
 # copy project
 WORKDIR /app
