@@ -246,7 +246,7 @@ Q_CLUSTER = {
 
 # DJANGO-TAILWIND-CLI
 
-TAILWIND_CLI_SRC_CSS = "static/css/source.css"
+TAILWIND_CLI_SRC_CSS = "src/source.css"
 TAILWIND_CLI_USE_DAISY_UI = True
 
 # I18N

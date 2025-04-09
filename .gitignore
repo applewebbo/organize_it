@@ -151,3 +151,5 @@ bun.lockb
 
 # TAILWINDCSS
 static/css/tailwind.css
+.django_tailwind_cli/
+src/intellisense.css
