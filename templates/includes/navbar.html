@@ -1,14 +1,23 @@
-{% load static %}
+{% load static i18n heroicons %}
 <div x-data="{ open: false}">
-    <nav class="fixed top-0 z-20 w-full border-b shadow-md bg-slate-50 border-slate-200 start-0 dark:border-slate-500 dark:bg-slate-600">
-        <div class="flex flex-wrap justify-between items-center p-4 mx-auto max-w-screen-xl">
+    <nav nav class="bg-white border-slate-200 dark:bg-slate-900">
+        <div class="flex flex-wrap items-center p-4 mx-auto max-w-screen-xl">
             <a href="{% url 'trips:home' %}"
                class="flex items-center space-x-3 rtl:space-x-reverse grow">
                 <img src="{% static 'img/logo.png' %}" class="h-8" alt="Logo">
                 <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Organize it!</span>
             </a>
-            <div class="flex items-end space-x-3 md:order-2 md:space-x-0 rtl:space-x-reverse">
+            <div class="flex items-center space-x-3 md:order-2 md:space-x-0 rtl:space-x-reverse">
+                <div class="flex me-4">{% include 'includes/language-chooser.html' %}</div>
                 {% if user.is_authenticated %}
+                <form action="{% url 'account_logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit"
+                            href="{% url 'account_logout' %}"
+                            class="btn btn-sm btn-primary">
+                        Log out
+                    </button>
+                </form>
                 {% else %}
                     <a href="{% url 'account_login' %}" class="btn btn-sm btn-primary">Log in</a>
                 {% endif %}
@@ -18,49 +27,16 @@
                         aria-expanded="false"
                         x-on:click="open = ! open">
                     <span class="sr-only">Open main menu</span>
-                    <svg x-show="! open"
-                         class="w-6 h-6"
-                         aria-hidden="true"
-                         xmlns="http://www.w3.org/2000/svg"
-                         class="icon icon-tabler icon-tabler-menu-2"
-                         width="24"
-                         height="24"
-                         viewBox="0 0 24 24"
-                         stroke-width="2"
-                         stroke="currentColor"
-                         fill="none"
-                         stroke-linecap="round"
-                         stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M4 6l16 0" />
-                        <path d="M4 12l16 0" />
-                        <path d="M4 18l16 0" />
-                    </svg>
-                    <svg x-show="open"
-                         class="w-6 h-6"
-                         aria-hidden="true"
-                         xmlns="http://www.w3.org/2000/svg"
-                         class="icon icon-tabler icon-tabler-x"
-                         width="24"
-                         height="24"
-                         viewBox="0 0 24 24"
-                         stroke-width="2"
-                         stroke="currentColor"
-                         fill="none"
-                         stroke-linecap="round"
-                         stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M18 6l-12 12" />
-                        <path d="M6 6l12 12" />
-                    </svg>
+                    {% heroicon_outline 'bars-3' class='size-6' x_show='!open' aria_hidden='true' %}
+                    {% heroicon_outline 'x-mark' class='size-6' x_show='open' aria_hidden='true' %}
                 </button>
             </div>
             <div class="hidden justify-between items-center w-full md:flex md:order-1 md:w-auto md:me-8"
                  id="navbar-cta">
-                <ul class="flex flex-col p-4 mt-4 font-medium rounded-lg border md:flex-row md:p-0 md:mt-0 md:space-x-8 md:border-0 bg-slate-50 border-slate-100 rtl:space-x-reverse md:bg-slate-50 md:dark:bg-slate-600 dark:bg-slate-800 dark:border-slate-500">
+                <ul class="flex flex-col p-4 mt-4 font-medium md:flex-row md:p-0 md:mt-0 md:space-x-8 md:border-0 border-slate-100 rtl:space-x-reverse">
                     <li>
                         <a href="{% url 'trips:home' %}"
-                           class="block py-2 px-3 text-white rounded md:p-0 md:bg-transparent bg-tr-blue-700 md:text-tr-blue-700 md:dark:text-tr-blue-500"
+                           class="block py-2 px-3 text-white rounded md:p-0 md:text-tr-blue-700 md:dark:text-tr-blue-500"
                            aria-current="page">Home</a>
                     </li>
                     <li>
@@ -71,15 +47,6 @@
                         <li>
                             <a href="{% url 'accounts:profile' %}"
                                class="block py-2 px-3 text-gray-900 rounded md:p-0 dark:text-white md:hover:bg-transparent md:hover:text-tr-blue-700 md:dark:hover:text-tr-blue-500 md:dark:hover:bg-transparent dark:border-slate-700 dark:hover:bg-gray-700 dark:hover:text-white hover:bg-slate-100">Profile</a>
-                        </li>
-                        <li>
-                            <form action="{% url 'account_logout' %}" method="post">
-                                {% csrf_token %}
-                                <button type="submit"
-                                        class="block py-2 px-3 text-gray-900 rounded md:p-0 dark:text-white md:hover:bg-transparent md:hover:text-tr-blue-700 md:dark:hover:text-tr-blue-500 md:dark:hover:bg-transparent dark:border-slate-700 dark:hover:bg-gray-700 dark:hover:text-white hover:bg-slate-100">
-                                    Logout
-                                </button>
-                            </form>
                         </li>
                     {% endif %}
                 </ul>
@@ -103,16 +70,6 @@
                     <li>
                         <a href="{% url 'accounts:profile' %}"
                            class="font-medium text-gray-500 sm:py-6 dark:text-gray-400 hover:text-gray-400 dark:hover:text-gray-500">Profile</a>
-                    </li>
-                    <li>
-                        <form action="{% url 'account_logout' %}" method="post">
-                            {% csrf_token %}
-                            <button type="submit"
-                                    href="{% url 'account_logout' %}"
-                                    class="font-medium text-gray-500 dark:text-gray-400 hover:text-gray-400 dark:hover:text-gray-500">
-                                Log out
-                            </button>
-                        </form>
                     </li>
                 {% endif %}
             </ul>

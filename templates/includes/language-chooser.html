@@ -1,0 +1,17 @@
+{% load i18n heroicons %}
+<div class="flex items-center">
+<label for="language-select" class="sr-only">Choose your language:</label>
+{% heroicon_mini 'language' class='size-6 me-1' %}
+{% get_current_language as current_language %}
+<select id="language-select"
+        name="language"
+        class="block p-1.5 w-full text-sm rounded-md border-r-8 border-transparent dark:placeholder-gray-400 bg-slate-200 text-slate-900 dark:bg-slate-700 dark:text-slate-50"
+        hx-post="{% url 'set_language' %}"
+        hx-trigger="change"
+        hx-swap="none"
+        hx-headers='{"HX-Request": "true"}'
+        hx-on="htmx:afterRequest: window.location.reload()">
+    <option value="en" {% if current_language == "en" %}selected{% endif %}>ENG</option>
+    <option value="it" {% if current_language == "it" %}selected{% endif %}>ITA</option>
+</select>
+</div>

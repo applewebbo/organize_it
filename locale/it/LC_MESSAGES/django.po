@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-06 12:52+0200\n"
-"PO-Revision-Date: 2025-04-09 15:29+0200\n"
+"POT-Creation-Date: 2025-04-09 15:47+0200\n"
+"PO-Revision-Date: 2025-04-09 15:48+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: it\n"
@@ -35,11 +35,11 @@ msgstr "Superuser deve avere is_superuser=True."
 msgid "email address"
 msgstr "indirizzo email"
 
-#: core/settings/common.py:251
+#: core/settings/common.py:254
 msgid "Italian"
 msgstr "Italiano"
 
-#: core/settings/common.py:252
+#: core/settings/common.py:255
 msgid "English"
 msgstr "Inglese"
 
@@ -208,6 +208,18 @@ msgstr ""
 "casella dei messaggi ricevuti verifica anche nella cartella spam. Non "
 "esitare a contattarci se non ricevi la email di verifica entro qualche "
 "minuto."
+
+#: templates/trips/trip-detail.html:19 templates/trips/trip-detail.html:26
+msgid "Start Date:"
+msgstr "Data di inizio:"
+
+#: templates/trips/trip-detail.html:22 templates/trips/trip-detail.html:29
+msgid "End Date:"
+msgstr "Data di fine:"
+
+#: templates/trips/trip-detail.html:33
+msgid "Destination:"
+msgstr "Destinazione:"
 
 #: trips/forms.py:230
 msgid "Departure"

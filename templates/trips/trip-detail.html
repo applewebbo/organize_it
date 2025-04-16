@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load partials static trip_tags %}
+{% load partials static trip_tags i18n %}
 {% block page_title %}
     {{ trip.title }}
 {% endblock page_title %}
@@ -16,21 +16,21 @@
                      class="flex flex-col gap-x-3 mb-4 md:flex-row lg:gap-x-6 lg:justify-start">
                     {% if trip.start_date and trip.end_date %}
                         <div>
-                            Start Date: <strong>{{ trip.start_date }}</strong>
+                            {% trans "Start Date:" %}&nbsp;<strong>{{ trip.start_date }}</strong>
                         </div>
                         <div>
-                            End date: <strong>{{ trip.end_date }}</strong>
+                            {% trans "End Date:" %}&nbsp;<strong>{{ trip.end_date }}</strong>
                         </div>
                     {% else %}
                         <div>
-                            Start Date: <strong>-</strong>
+                            {% trans "Start Date:" %}&nbsp;<strong>-</strong>
                         </div>
                         <div>
-                            End date: <strong>-</strong>
+                            {% trans "End Date:" %}&nbsp;<strong>-</strong>
                         </div>
                     {% endif %}
                     <div class="hidden md:block">
-                        Destination: <strong>{{ trip.destination }}</strong>
+                        {% trans "Destination:" %}&nbsp;<strong>{{ trip.destination }}</strong>
                     </div>
                 </div>
                 <p class="hidden md:block">
