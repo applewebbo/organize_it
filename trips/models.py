@@ -6,7 +6,7 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 
 
 def days_between(start_date, end_date):
@@ -16,11 +16,11 @@ def days_between(start_date, end_date):
 
 class Trip(models.Model):
     class Status(models.IntegerChoices):
-        NOT_STARTED = 1
-        IMPENDING = 2
-        IN_PROGRESS = 3
-        COMPLETED = 4
-        ARCHIVED = 5
+        NOT_STARTED = 1, _("Not started")
+        IMPENDING = 2, _("Impending")
+        IN_PROGRESS = 3, _("In progress")
+        COMPLETED = 4, _("Completed")
+        ARCHIVED = 5, _("Archived")
 
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=500)

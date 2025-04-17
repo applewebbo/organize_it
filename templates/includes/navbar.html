@@ -10,23 +10,21 @@
             <div class="flex items-center space-x-3 md:order-2 md:space-x-0 rtl:space-x-reverse">
                 <div class="flex me-4">{% include 'includes/language-chooser.html' %}</div>
                 {% if user.is_authenticated %}
-                <form action="{% url 'account_logout' %}" method="post">
-                    {% csrf_token %}
-                    <button type="submit"
-                            href="{% url 'account_logout' %}"
-                            class="btn btn-sm btn-primary">
-                        Log out
-                    </button>
-                </form>
+                    <form action="{% url 'account_logout' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit"
+                                href="{% url 'account_logout' %}"
+                                class="btn btn-sm btn-primary">{% trans 'Logout' %}</button>
+                    </form>
                 {% else %}
-                    <a href="{% url 'account_login' %}" class="btn btn-sm btn-primary">Log in</a>
+                    <a href="{% url 'account_login' %}" class="btn btn-sm btn-primary">{% trans 'Login' %}</a>
                 {% endif %}
                 <button type="button"
                         class="inline-flex justify-center items-center p-2 w-10 h-10 text-sm text-gray-500 rounded-lg md:hidden dark:text-gray-400 hover:bg-gray-100 focus:ring-2 focus:ring-gray-200 focus:outline-none dark:hover:bg-gray-700 dark:focus:ring-gray-600"
                         aria-controls="navbar-cta"
                         aria-expanded="false"
                         x-on:click="open = ! open">
-                    <span class="sr-only">Open main menu</span>
+                    <span class="sr-only">{% trans 'Open main menu' %}</span>
                     {% heroicon_outline 'bars-3' class='size-6' x_show='!open' aria_hidden='true' %}
                     {% heroicon_outline 'x-mark' class='size-6' x_show='open' aria_hidden='true' %}
                 </button>
@@ -41,12 +39,12 @@
                     </li>
                     <li>
                         <a href="{% url 'trips:trip-list' %}"
-                           class="block py-2 px-3 text-gray-900 rounded md:p-0 dark:text-white md:hover:bg-transparent md:hover:text-tr-blue-700 md:dark:hover:text-tr-blue-500 md:dark:hover:bg-transparent dark:border-slate-700 dark:hover:bg-gray-700 dark:hover:text-white hover:bg-slate-100">Trips</a>
+                           class="block py-2 px-3 text-gray-900 rounded md:p-0 dark:text-white md:hover:bg-transparent md:hover:text-tr-blue-700 md:dark:hover:text-tr-blue-500 md:dark:hover:bg-transparent dark:border-slate-700 dark:hover:bg-gray-700 dark:hover:text-white hover:bg-slate-100">{% trans 'Trips' %}</a>
                     </li>
                     {% if user.is_authenticated %}
                         <li>
                             <a href="{% url 'accounts:profile' %}"
-                               class="block py-2 px-3 text-gray-900 rounded md:p-0 dark:text-white md:hover:bg-transparent md:hover:text-tr-blue-700 md:dark:hover:text-tr-blue-500 md:dark:hover:bg-transparent dark:border-slate-700 dark:hover:bg-gray-700 dark:hover:text-white hover:bg-slate-100">Profile</a>
+                               class="block py-2 px-3 text-gray-900 rounded md:p-0 dark:text-white md:hover:bg-transparent md:hover:text-tr-blue-700 md:dark:hover:text-tr-blue-500 md:dark:hover:bg-transparent dark:border-slate-700 dark:hover:bg-gray-700 dark:hover:text-white hover:bg-slate-100">{% trans 'Profile' %}</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -64,12 +62,12 @@
                 </li>
                 <li>
                     <a href="{% url 'trips:trip-list' %}"
-                       class="font-medium text-gray-500 sm:py-6 dark:text-gray-400 hover:text-gray-400 dark:hover:text-gray-500">Trips</a>
+                       class="font-medium text-gray-500 sm:py-6 dark:text-gray-400 hover:text-gray-400 dark:hover:text-gray-500">{% trans 'Trips' %}</a>
                 </li>
                 {% if user.is_authenticated %}
                     <li>
                         <a href="{% url 'accounts:profile' %}"
-                           class="font-medium text-gray-500 sm:py-6 dark:text-gray-400 hover:text-gray-400 dark:hover:text-gray-500">Profile</a>
+                           class="font-medium text-gray-500 sm:py-6 dark:text-gray-400 hover:text-gray-400 dark:hover:text-gray-500">{% trans 'Profile' %}</a>
                     </li>
                 {% endif %}
             </ul>

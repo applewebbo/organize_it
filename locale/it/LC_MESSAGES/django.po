@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-09 15:47+0200\n"
-"PO-Revision-Date: 2025-04-09 15:48+0200\n"
+"POT-Creation-Date: 2025-04-17 12:14+0200\n"
+"PO-Revision-Date: 2025-04-17 12:14+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: it\n"
@@ -21,7 +21,7 @@ msgstr ""
 
 #: accounts/managers.py:16
 msgid "The Email must be set"
-msgstr ""
+msgstr "L’indirizzo mail deve essere impostato"
 
 #: accounts/managers.py:32
 msgid "Superuser must have is_staff=True."
@@ -209,6 +209,30 @@ msgstr ""
 "esitare a contattarci se non ricevi la email di verifica entro qualche "
 "minuto."
 
+#: templates/includes/footer.html:6
+msgid "© 2025 WEBBOgrafico - All right reserved"
+msgstr "© 2025 WEBBOgrafico - Tutti i diritti riservati"
+
+#: templates/includes/navbar.html:17
+msgid "Logout"
+msgstr "Esci"
+
+#: templates/includes/navbar.html:20
+msgid "Login"
+msgstr "Entra"
+
+#: templates/includes/navbar.html:27
+msgid "Open main menu"
+msgstr "Apri il menu principale"
+
+#: templates/includes/navbar.html:42 templates/includes/navbar.html:65
+msgid "Trips"
+msgstr "Viaggi"
+
+#: templates/includes/navbar.html:47 templates/includes/navbar.html:70
+msgid "Profile"
+msgstr "Profilo"
+
 #: templates/trips/trip-detail.html:19 templates/trips/trip-detail.html:26
 msgid "Start Date:"
 msgstr "Data di inizio:"
@@ -220,6 +244,34 @@ msgstr "Data di fine:"
 #: templates/trips/trip-detail.html:33
 msgid "Destination:"
 msgstr "Destinazione:"
+
+#: templates/trips/trip-list.html:4
+msgid "Trips List"
+msgstr "Lista dei Viaggi"
+
+#: templates/trips/trip-list.html:16
+msgid "My Trips"
+msgstr "Viaggi Personali"
+
+#: templates/trips/trip-list.html:21
+msgid "Create a new trip"
+msgstr "Crea un nuovo viaggio"
+
+#: templates/trips/trip-list.html:42
+msgid "Modify Dates"
+msgstr "Modifica date"
+
+#: templates/trips/trip-list.html:48
+msgid "Archive"
+msgstr "Archivia"
+
+#: templates/trips/trip-list.html:51
+msgid "Delete"
+msgstr "Elimina"
+
+#: templates/trips/trip-list.html:53
+msgid "View"
+msgstr "Vedi"
 
 #: trips/forms.py:230
 msgid "Departure"
@@ -260,6 +312,26 @@ msgstr "Sito Internet"
 #: trips/forms.py:476
 msgid "Address"
 msgstr "Indirizzo"
+
+#: trips/models.py:19
+msgid "Not started"
+msgstr "Non iniziato"
+
+#: trips/models.py:20
+msgid "Impending"
+msgstr "Imminente"
+
+#: trips/models.py:21
+msgid "In progress"
+msgstr "In corso"
+
+#: trips/models.py:22
+msgid "Completed"
+msgstr "Completata"
+
+#: trips/models.py:23
+msgid "Archived"
+msgstr "Archiviata"
 
 #: trips/models.py:93
 msgid "Enter a valid phone number (with or without international prefix)."
