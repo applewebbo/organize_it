@@ -1,5 +1,5 @@
 # pull official base image
-FROM python:3.12-slim-bookworm
+FROM python:3.13-slim-bookworm
 
 # set work directory
 WORKDIR /usr/src/app
@@ -20,18 +20,13 @@ RUN curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc| gpg --dearmor
 RUN apt update \
     && apt -y install postgresql-16 \
     && rm -rf /var/lib/apt/lists/*
-RUN pip install --upgrade pip uv
-RUN python -m uv venv
+# Install uv using the official script
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    mv /root/.local/bin/uv /usr/local/bin/uv
 
 # copy project
 WORKDIR /app
 COPY . /app
-
-# Install Bun
-RUN curl -fsSL https://bun.sh/install | bash
-
-# # Install DaisyUI using Bun
-RUN ~/.bun/bin/bun install
 
 # activate virtual env
 ARG VIRTUAL_ENV=/app/.venv
@@ -46,7 +41,7 @@ RUN uv sync --frozen --no-dev --no-install-project
 WORKDIR /app
 COPY . /app
 
-# expose port for gunicorn
+# expose port for granian
 EXPOSE 80
 
 # run migrate and gunicorn on port 80

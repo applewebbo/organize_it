@@ -140,9 +140,6 @@ cython_debug/
 .vscode/
 .qodo/
 
-# BUN
-node_modules/
-bun.lockb
 
 # ENVIRONMENT
 .env
@@ -153,3 +150,6 @@ bun.lockb
 static/css/tailwind.css
 .django_tailwind_cli/
 src/intellisense.css
+
+# DJANGO
+staticfiles/

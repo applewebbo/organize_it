@@ -1,0 +1,469 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-04-17 12:14+0200\n"
+"PO-Revision-Date: 2025-04-17 12:14+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.6\n"
+
+#: accounts/managers.py:16
+msgid "The Email must be set"
+msgstr "L’indirizzo mail deve essere impostato"
+
+#: accounts/managers.py:32
+msgid "Superuser must have is_staff=True."
+msgstr "Superuser deve avere is_staff=True."
+
+#: accounts/managers.py:34
+msgid "Superuser must have is_superuser=True."
+msgstr "Superuser deve avere is_superuser=True."
+
+#: accounts/models.py:12
+msgid "email address"
+msgstr "indirizzo email"
+
+#: core/settings/common.py:254
+msgid "Italian"
+msgstr "Italiano"
+
+#: core/settings/common.py:255
+msgid "English"
+msgstr "Inglese"
+
+#: templates/account/email_confirm.html:5
+#: templates/account/email_confirm.html:8
+msgid "Confirm Email Address"
+msgstr "Conferma il tuo indirizzo email"
+
+#: templates/account/email_confirm.html:13
+#, python-format
+msgid ""
+"Please confirm that <a href=\"mailto:%(email)s\">%(email)s</a> is an email "
+"address for user %(user_display)s."
+msgstr ""
+"Per favore conferma che <a href=\"mailto:%(email)s\">%(email)s</a> è "
+"l'indirizzo email per l'utente %(user_display)s."
+
+#: templates/account/email_confirm.html:18
+msgid "Confirm"
+msgstr "Conferma"
+
+#: templates/account/email_confirm.html:22
+#, python-format
+msgid ""
+"Unable to confirm %(email)s because it is already confirmed by a different "
+"account."
+msgstr ""
+"Impossibile confermare %(email)s perché l'indirizzo è già stato confermato "
+"per un altro account."
+
+#: templates/account/email_confirm.html:28
+#, python-format
+msgid ""
+"This email confirmation link expired or is invalid. Please <a "
+"href=\"%(email_url)s\">issue a new email confirmation request</a>."
+msgstr ""
+"Questo link per la conferma dell'indirizzo email è scaduto oppure non è "
+"valido. Per favore <a href=\"%(email_url)s\">richiedi un nuovo link</a>."
+
+#: templates/account/login.html:14 templates/account/login.html:46
+msgid "Sign In"
+msgstr "Entra"
+
+#: templates/account/login.html:19
+#, python-format
+msgid ""
+"Please sign in with one\n"
+"            of your existing third party accounts. Or, <a "
+"href=\"%(signup_url)s\">sign up</a>\n"
+"            for a %(site_name)s account and sign in below:"
+msgstr ""
+"Per favore esegui il login con uno dei\n"
+"            tuoi account di terze parti. Oppure, <a "
+"href=\"%(signup_url)s\">registrati</a>\n"
+"            per un account presso %(site_name)s ed esegui il login qui sotto:"
+
+#: templates/account/login.html:27
+msgid "or"
+msgstr "oppure"
+
+#: templates/account/login.html:44
+msgid "Forgot Password?"
+msgstr "Password dimenticata?"
+
+#: templates/account/login.html:48
+#, python-format
+msgid ""
+"If you have not created an account yet, then please <a "
+"href=\"%(signup_url)s\" class=\"text-blue-600 hover:underline\">Sign up</a> "
+"first."
+msgstr ""
+"Se non hai ancora creato un account, allora per favore <a "
+"href=\"%(signup_url)s\" class=\"text-blue-600 hover:underline\">Registrati</"
+"a>  prima."
+
+#: templates/account/password_reset.html:5
+#: templates/account/password_reset.html:17
+#: templates/account/password_reset_done.html:5
+#: templates/account/password_reset_done.html:8
+msgid "Password Reset"
+msgstr "Reset Password"
+
+#: templates/account/password_reset.html:23
+msgid ""
+"Forgotten your password? Enter your email address below, and we'll send you "
+"an email allowing you to reset it."
+msgstr ""
+"Password dimenticata? Inserisci il tuo indirizzo email qua sotto e riceverai "
+"una email con il link per resettare la tua password."
+
+#: templates/account/password_reset.html:32
+msgid "Reset My Password"
+msgstr "Resetta la mia password"
+
+#: templates/account/password_reset.html:35
+msgid "Please contact us if you have any trouble resetting your password."
+msgstr "Per favore contattaci se hai problemi a resecare la tua password."
+
+#: templates/account/password_reset_done.html:13
+msgid ""
+"We have sent you an email. If you have not received it please check your "
+"spam folder. Otherwise contact us if you do not receive it in a few minutes."
+msgstr ""
+"Ti abbiamo inviato una email. Se non l'hai ricevuta controlla nella cartella "
+"spam. Altrimenti contattaci se non la ricevi entro qualche minuto."
+
+#: templates/account/password_reset_from_key.html:4
+#: templates/account/password_reset_from_key.html:19
+#: templates/account/password_reset_from_key_done.html:4
+#: templates/account/password_reset_from_key_done.html:7
+msgid "Change Password"
+msgstr "Cambia Password"
+
+#: templates/account/password_reset_from_key.html:17
+msgid "Bad Token"
+msgstr "Token non valido"
+
+#: templates/account/password_reset_from_key.html:25
+#, python-format
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a <a href=\"%(passwd_reset_url)s\">new password reset</"
+"a>."
+msgstr ""
+"Il link per resettare la password risulta non valido, probabilmente perché è "
+"già stato utilizzato.  Per favore richiedi un<a "
+"href=\"%(passwd_reset_url)s\">nuovo link</a>."
+
+#: templates/account/password_reset_from_key.html:36
+msgid "change password"
+msgstr "cambia password"
+
+#: templates/account/password_reset_from_key_done.html:8
+msgid "Your password is now changed."
+msgstr "La tua password è stata cambiata."
+
+#: templates/account/signup.html:4
+msgid "Signup"
+msgstr "Registrati"
+
+#: templates/account/signup.html:16 templates/account/signup.html:32
+msgid "Sign Up"
+msgstr "Registrati"
+
+#: templates/account/signup.html:19
+#, python-format
+msgid ""
+"Already have an account? Then please <a href=\"%(login_url)s\">sign in</a>"
+msgstr ""
+"Hai già un account? Allora per favore <a href=\"%(login_url)s\">entra</a>"
+
+#: templates/account/verification_sent.html:4
+#: templates/account/verification_sent.html:7
+msgid "Verify Your Email Address"
+msgstr "Verifica il tuo indirizzo email"
+
+#: templates/account/verification_sent.html:9
+msgid ""
+"We have sent an email to you for verification. Follow the link provided to "
+"finalize the signup process. If you do not see the verification email in "
+"your main inbox, check your spam folder. Please contact us if you do not "
+"receive the verification email within a few minutes."
+msgstr ""
+"TI abbiamo inviato una email per la verifica. Segui il link presente nella "
+"email per completare questo processo. Se non vedi la email di verifica nella "
+"casella dei messaggi ricevuti verifica anche nella cartella spam. Non "
+"esitare a contattarci se non ricevi la email di verifica entro qualche "
+"minuto."
+
+#: templates/includes/footer.html:6
+msgid "© 2025 WEBBOgrafico - All right reserved"
+msgstr "© 2025 WEBBOgrafico - Tutti i diritti riservati"
+
+#: templates/includes/navbar.html:17
+msgid "Logout"
+msgstr "Esci"
+
+#: templates/includes/navbar.html:20
+msgid "Login"
+msgstr "Entra"
+
+#: templates/includes/navbar.html:27
+msgid "Open main menu"
+msgstr "Apri il menu principale"
+
+#: templates/includes/navbar.html:42 templates/includes/navbar.html:65
+msgid "Trips"
+msgstr "Viaggi"
+
+#: templates/includes/navbar.html:47 templates/includes/navbar.html:70
+msgid "Profile"
+msgstr "Profilo"
+
+#: templates/trips/trip-detail.html:19 templates/trips/trip-detail.html:26
+msgid "Start Date:"
+msgstr "Data di inizio:"
+
+#: templates/trips/trip-detail.html:22 templates/trips/trip-detail.html:29
+msgid "End Date:"
+msgstr "Data di fine:"
+
+#: templates/trips/trip-detail.html:33
+msgid "Destination:"
+msgstr "Destinazione:"
+
+#: templates/trips/trip-list.html:4
+msgid "Trips List"
+msgstr "Lista dei Viaggi"
+
+#: templates/trips/trip-list.html:16
+msgid "My Trips"
+msgstr "Viaggi Personali"
+
+#: templates/trips/trip-list.html:21
+msgid "Create a new trip"
+msgstr "Crea un nuovo viaggio"
+
+#: templates/trips/trip-list.html:42
+msgid "Modify Dates"
+msgstr "Modifica date"
+
+#: templates/trips/trip-list.html:48
+msgid "Archive"
+msgstr "Archivia"
+
+#: templates/trips/trip-list.html:51
+msgid "Delete"
+msgstr "Elimina"
+
+#: templates/trips/trip-list.html:53
+msgid "View"
+msgstr "Vedi"
+
+#: trips/forms.py:230
+msgid "Departure"
+msgstr "Partenza"
+
+#: trips/forms.py:288 trips/forms.py:368
+msgid "Duration"
+msgstr "Durata"
+
+#: trips/forms.py:443
+msgid "Period of stay"
+msgstr "Periodo di soggiorno"
+
+#: trips/forms.py:470
+msgid "Name"
+msgstr "Nome"
+
+#: trips/forms.py:471
+msgid "Check-in"
+msgstr "Check-in"
+
+#: trips/forms.py:472
+msgid "Check-out"
+msgstr "Check-out"
+
+#: trips/forms.py:473
+msgid "Cancellation date"
+msgstr "Data di cancellazione gratuita"
+
+#: trips/forms.py:474
+msgid "Phone number"
+msgstr "Numero di telefono"
+
+#: trips/forms.py:475
+msgid "Website"
+msgstr "Sito Internet"
+
+#: trips/forms.py:476
+msgid "Address"
+msgstr "Indirizzo"
+
+#: trips/models.py:19
+msgid "Not started"
+msgstr "Non iniziato"
+
+#: trips/models.py:20
+msgid "Impending"
+msgstr "Imminente"
+
+#: trips/models.py:21
+msgid "In progress"
+msgstr "In corso"
+
+#: trips/models.py:22
+msgid "Completed"
+msgstr "Completata"
+
+#: trips/models.py:23
+msgid "Archived"
+msgstr "Archiviata"
+
+#: trips/models.py:93
+msgid "Enter a valid phone number (with or without international prefix)."
+msgstr ""
+"Inserisci un numero di telefono valido (con o senza il prefisso "
+"internazionale)"
+
+#: trips/models.py:163
+msgid "Day"
+msgstr "Giorno"
+
+#: trips/models.py:190
+msgid "Transport"
+msgstr "Viaggio"
+
+#: trips/models.py:191
+msgid "Experience"
+msgstr "Esperienza"
+
+#: trips/models.py:192
+msgid "Meal"
+msgstr "Pasto"
+
+#: trips/models.py:262
+msgid "Car"
+msgstr "Automobile"
+
+#: trips/models.py:263
+msgid "Plane"
+msgstr "Aeroplano"
+
+#: trips/models.py:264
+msgid "Train"
+msgstr "Treno"
+
+#: trips/models.py:265
+msgid "Boat"
+msgstr "Nave"
+
+#: trips/models.py:266
+msgid "Bus"
+msgstr "Autobus"
+
+#: trips/models.py:267
+msgid "Taxi"
+msgstr "Taxi"
+
+#: trips/models.py:268 trips/models.py:298
+msgid "Other"
+msgstr "Altro"
+
+#: trips/models.py:294
+msgid "Museum"
+msgstr "Museo"
+
+#: trips/models.py:295
+msgid "Park"
+msgstr "Parco"
+
+#: trips/models.py:296
+msgid "Walk"
+msgstr "Passeggiata"
+
+#: trips/models.py:297
+msgid "Sport"
+msgstr "Attività sportiva"
+
+#: trips/models.py:313
+msgid "Breakfast"
+msgstr "Colazione"
+
+#: trips/models.py:314
+msgid "Lunch"
+msgstr "Pranzo"
+
+#: trips/models.py:315
+msgid "Dinner"
+msgstr "Cena"
+
+#: trips/models.py:316
+msgid "Snack"
+msgstr "Spuntino"
+
+#: trips/views.py:227
+msgid "Transport added successfully"
+msgstr "Viaggio aggiunto con successo"
+
+#: trips/views.py:248
+msgid "Experience added successfully"
+msgstr "Esperienza aggiunta con successo"
+
+#: trips/views.py:269
+msgid "Meal added successfully"
+msgstr "Pasto aggiunto con successo"
+
+#: trips/views.py:286
+msgid "Stay added successfully"
+msgstr "Soggiorno aggiunto con successo"
+
+#: trips/views.py:327
+msgid "Stay updated successfully"
+msgstr "Soggiorno modificato con successo"
+
+#: trips/views.py:355
+msgid "Stay deleted successfully"
+msgstr "Soggiorno eliminato con successo"
+
+#: trips/views.py:389
+msgid "Event deleted successfully"
+msgstr "Evento eliminato con successo"
+
+#: trips/views.py:408
+msgid "Event unpaired successfully"
+msgstr "Evento scollegato con successo"
+
+#: trips/views.py:428
+msgid "Event paired successfully"
+msgstr "Evento ricollegato con successo"
+
+#: trips/views.py:509
+msgid "Event updated successfully"
+msgstr "Evento modificato con successo"
+
+#: trips/views.py:532
+msgid "Event times updated successfully"
+msgstr "Orari dell'evento modificati con successo"
+
+#: trips/views.py:563
+msgid "This event overlaps with another event"
+msgstr ""
+"Gli orari di questo evento si sovrappongono con quelli di un altro evento"
+
+#: trips/views.py:584
+msgid "Events swapped successfully"
+msgstr "Eventi scambiati con successo"

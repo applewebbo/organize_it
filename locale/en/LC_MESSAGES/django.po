@@ -1,0 +1,354 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-04-06 12:52+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+#: accounts/managers.py:16
+msgid "The Email must be set"
+msgstr ""
+
+#: accounts/managers.py:32
+msgid "Superuser must have is_staff=True."
+msgstr ""
+
+#: accounts/managers.py:34
+msgid "Superuser must have is_superuser=True."
+msgstr ""
+
+#: accounts/models.py:12
+msgid "email address"
+msgstr ""
+
+#: core/settings/common.py:251
+msgid "Italian"
+msgstr ""
+
+#: core/settings/common.py:252
+msgid "English"
+msgstr ""
+
+#: templates/account/email_confirm.html:5
+#: templates/account/email_confirm.html:8
+msgid "Confirm Email Address"
+msgstr ""
+
+#: templates/account/email_confirm.html:13
+#, python-format
+msgid ""
+"Please confirm that <a href=\"mailto:%(email)s\">%(email)s</a> is an email "
+"address for user %(user_display)s."
+msgstr ""
+
+#: templates/account/email_confirm.html:18
+msgid "Confirm"
+msgstr ""
+
+#: templates/account/email_confirm.html:22
+#, python-format
+msgid ""
+"Unable to confirm %(email)s because it is already confirmed by a different "
+"account."
+msgstr ""
+
+#: templates/account/email_confirm.html:28
+#, python-format
+msgid ""
+"This email confirmation link expired or is invalid. Please <a "
+"href=\"%(email_url)s\">issue a new email confirmation request</a>."
+msgstr ""
+
+#: templates/account/login.html:14 templates/account/login.html:46
+msgid "Sign In"
+msgstr ""
+
+#: templates/account/login.html:19
+#, python-format
+msgid ""
+"Please sign in with one\n"
+"            of your existing third party accounts. Or, <a "
+"href=\"%(signup_url)s\">sign up</a>\n"
+"            for a %(site_name)s account and sign in below:"
+msgstr ""
+
+#: templates/account/login.html:27
+msgid "or"
+msgstr ""
+
+#: templates/account/login.html:44
+msgid "Forgot Password?"
+msgstr ""
+
+#: templates/account/login.html:48
+#, python-format
+msgid ""
+"If you have not created an account yet, then please <a "
+"href=\"%(signup_url)s\" class=\"text-blue-600 hover:underline\">Sign up</a> "
+"first."
+msgstr ""
+
+#: templates/account/password_reset.html:5
+#: templates/account/password_reset.html:17
+#: templates/account/password_reset_done.html:5
+#: templates/account/password_reset_done.html:8
+msgid "Password Reset"
+msgstr ""
+
+#: templates/account/password_reset.html:23
+msgid ""
+"Forgotten your password? Enter your email address below, and we'll send you "
+"an email allowing you to reset it."
+msgstr ""
+
+#: templates/account/password_reset.html:32
+msgid "Reset My Password"
+msgstr ""
+
+#: templates/account/password_reset.html:35
+msgid "Please contact us if you have any trouble resetting your password."
+msgstr ""
+
+#: templates/account/password_reset_done.html:13
+msgid ""
+"We have sent you an email. If you have not received it please check your "
+"spam folder. Otherwise contact us if you do not receive it in a few minutes."
+msgstr ""
+
+#: templates/account/password_reset_from_key.html:4
+#: templates/account/password_reset_from_key.html:19
+#: templates/account/password_reset_from_key_done.html:4
+#: templates/account/password_reset_from_key_done.html:7
+msgid "Change Password"
+msgstr ""
+
+#: templates/account/password_reset_from_key.html:17
+msgid "Bad Token"
+msgstr ""
+
+#: templates/account/password_reset_from_key.html:25
+#, python-format
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a <a href=\"%(passwd_reset_url)s\">new password reset</"
+"a>."
+msgstr ""
+
+#: templates/account/password_reset_from_key.html:36
+msgid "change password"
+msgstr ""
+
+#: templates/account/password_reset_from_key_done.html:8
+msgid "Your password is now changed."
+msgstr ""
+
+#: templates/account/signup.html:4
+msgid "Signup"
+msgstr ""
+
+#: templates/account/signup.html:16 templates/account/signup.html:32
+msgid "Sign Up"
+msgstr ""
+
+#: templates/account/signup.html:19
+#, python-format
+msgid ""
+"Already have an account? Then please <a href=\"%(login_url)s\">sign in</a>"
+msgstr ""
+
+#: templates/account/verification_sent.html:4
+#: templates/account/verification_sent.html:7
+msgid "Verify Your Email Address"
+msgstr ""
+
+#: templates/account/verification_sent.html:9
+msgid ""
+"We have sent an email to you for verification. Follow the link provided to "
+"finalize the signup process. If you do not see the verification email in "
+"your main inbox, check your spam folder. Please contact us if you do not "
+"receive the verification email within a few minutes."
+msgstr ""
+
+#: trips/forms.py:230
+msgid "Departure"
+msgstr ""
+
+#: trips/forms.py:288 trips/forms.py:368
+msgid "Duration"
+msgstr ""
+
+#: trips/forms.py:443
+msgid "Period of stay"
+msgstr ""
+
+#: trips/forms.py:470
+msgid "Name"
+msgstr ""
+
+#: trips/forms.py:471
+msgid "Check-in"
+msgstr ""
+
+#: trips/forms.py:472
+msgid "Check-out"
+msgstr ""
+
+#: trips/forms.py:473
+msgid "Cancellation date"
+msgstr ""
+
+#: trips/forms.py:474
+msgid "Phone number"
+msgstr ""
+
+#: trips/forms.py:475
+msgid "Website"
+msgstr ""
+
+#: trips/forms.py:476
+msgid "Address"
+msgstr ""
+
+#: trips/models.py:93
+msgid "Enter a valid phone number (with or without international prefix)."
+msgstr ""
+
+#: trips/models.py:163
+msgid "Day"
+msgstr ""
+
+#: trips/models.py:190
+msgid "Transport"
+msgstr ""
+
+#: trips/models.py:191
+msgid "Experience"
+msgstr ""
+
+#: trips/models.py:192
+msgid "Meal"
+msgstr ""
+
+#: trips/models.py:262
+msgid "Car"
+msgstr ""
+
+#: trips/models.py:263
+msgid "Plane"
+msgstr ""
+
+#: trips/models.py:264
+msgid "Train"
+msgstr ""
+
+#: trips/models.py:265
+msgid "Boat"
+msgstr ""
+
+#: trips/models.py:266
+msgid "Bus"
+msgstr ""
+
+#: trips/models.py:267
+msgid "Taxi"
+msgstr ""
+
+#: trips/models.py:268 trips/models.py:298
+msgid "Other"
+msgstr ""
+
+#: trips/models.py:294
+msgid "Museum"
+msgstr ""
+
+#: trips/models.py:295
+msgid "Park"
+msgstr ""
+
+#: trips/models.py:296
+msgid "Walk"
+msgstr ""
+
+#: trips/models.py:297
+msgid "Sport"
+msgstr ""
+
+#: trips/models.py:313
+msgid "Breakfast"
+msgstr ""
+
+#: trips/models.py:314
+msgid "Lunch"
+msgstr ""
+
+#: trips/models.py:315
+msgid "Dinner"
+msgstr ""
+
+#: trips/models.py:316
+msgid "Snack"
+msgstr ""
+
+#: trips/views.py:227
+msgid "Transport added successfully"
+msgstr ""
+
+#: trips/views.py:248
+msgid "Experience added successfully"
+msgstr ""
+
+#: trips/views.py:269
+msgid "Meal added successfully"
+msgstr ""
+
+#: trips/views.py:286
+msgid "Stay added successfully"
+msgstr ""
+
+#: trips/views.py:327
+msgid "Stay updated successfully"
+msgstr ""
+
+#: trips/views.py:355
+msgid "Stay deleted successfully"
+msgstr ""
+
+#: trips/views.py:389
+msgid "Event deleted successfully"
+msgstr ""
+
+#: trips/views.py:408
+msgid "Event unpaired successfully"
+msgstr ""
+
+#: trips/views.py:428
+msgid "Event paired successfully"
+msgstr ""
+
+#: trips/views.py:509
+msgid "Event updated successfully"
+msgstr ""
+
+#: trips/views.py:532
+msgid "Event times updated successfully"
+msgstr ""
+
+#: trips/views.py:563
+msgid "This event overlaps with another event"
+msgstr ""
+
+#: trips/views.py:584
+msgid "Events swapped successfully"
+msgstr ""
