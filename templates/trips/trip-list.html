@@ -14,7 +14,7 @@
                  hx-target="#trips">
             <div x-data class="items-center mb-12 text-center md:flex md:text-start">
                 <h1 class="mb-2 text-3xl font-semibold grow">{% trans 'My Trips' %}</h1>
-                <button class="btn btn-sm btn-primary"
+                <button class="btn btn-sm btn-primary md:btn-md"
                         hx-get="{% url 'trips:trip-create' %}"
                         hx-target="#dialog"
                         hx-swap="innerHTML"
