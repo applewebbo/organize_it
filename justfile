@@ -77,6 +77,11 @@ uv-install:
 migrate:
     uv run python manage.py migrate --settings=core.settings.development
 
+# Update Translation Files
+[group('development')]
+compilemessages:
+    uv run python manage.py compilemessages --settings=core.settings.development
+
 ##########################################################################
 # Utility
 ##########################################################################
