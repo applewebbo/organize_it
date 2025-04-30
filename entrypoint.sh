@@ -6,6 +6,9 @@ export PYTHONWARNINGS="ignore::SyntaxWarning"
 echo "Migrating Database..."
 python manage.py migrate
 
+echo "Translating..."
+python manage.py compilemessages
+
 echo "Building production css files..."
 python manage.py tailwind build
 
