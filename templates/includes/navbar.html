@@ -5,7 +5,7 @@
             <a href="{% url 'trips:home' %}"
                class="flex items-center space-x-3 rtl:space-x-reverse grow">
                 <img src="{% static 'img/logo.png' %}" class="size-8" alt="Logo">
-                <span class="self-center text-sm font-semibold whitespace-nowrap md:text-2xl dark:text-white">Organize it!</span>
+                <span class="self-center text-base font-semibold whitespace-nowrap sm:text-xl md:text-2xl dark:text-white">Organize it!</span>
             </a>
             <div class="flex items-center space-x-3 md:order-2 md:space-x-0 rtl:space-x-reverse">
                 <div class="flex me-4">{% include 'includes/language-chooser.html' %}</div>
@@ -17,7 +17,8 @@
                                 class="btn btn-xs btn-primary md:btn-sm">{% trans 'Logout' %}</button>
                     </form>
                 {% else %}
-                    <a href="{% url 'account_login' %}" class="btn btn-xs btn-primary md:btn-sm">{% trans 'Login' %}</a>
+                    <a href="{% url 'account_login' %}"
+                       class="btn btn-xs btn-primary md:btn-sm">{% trans 'Login' %}</a>
                 {% endif %}
                 <button type="button"
                         class="inline-flex justify-center items-center p-2 w-10 h-10 text-sm text-gray-500 rounded-lg md:hidden dark:text-gray-400 hover:bg-gray-100 focus:ring-2 focus:ring-gray-200 focus:outline-none dark:hover:bg-gray-700 dark:focus:ring-gray-600"
