@@ -258,3 +258,44 @@ LANGUAGES = (
 LOCALE_PATHS = [
     BASE_DIR / "locale/",
 ]
+
+# LOGGING
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "filters": {
+        "require_debug_false": {
+            "()": "django.utils.log.RequireDebugFalse",
+        },
+    },
+    "formatters": {
+        "simple": {
+            "format": "{levelname} {asctime:s} [{name}] {message}",
+            "style": "{",
+        },
+        "verbose": {
+            "format": "{levelname} {asctime:s} {name} {module}.py (line {lineno:d}) {funcName} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "task": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "formatter": "simple",
+            "filename": BASE_DIR / "tasks.log",
+        },
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+    },
+    "loggers": {
+        "task": {
+            "handlers": ["task"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}

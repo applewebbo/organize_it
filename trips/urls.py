@@ -9,6 +9,7 @@ urlpatterns = [
     path("trips/<int:pk>", views.trip_detail, name="trip-detail"),
     path("trips/list", views.trip_list, name="trip-list"),
     path("stays/<int:pk>", views.stay_detail, name="stay-detail"),
+    path("log/<str:filename>", views.view_log_file, name="log"),
 ]
 
 htmx_urlpatterns = [
