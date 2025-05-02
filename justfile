@@ -82,6 +82,11 @@ migrate:
 compilemessages:
     uv run python manage.py compilemessages --settings=core.settings.development
 
+# Run Tasks Worker
+[group('development')]
+@tasks:
+    uv run python manage.py db_worker --settings=core.settings.development
+
 ##########################################################################
 # Utility
 ##########################################################################
