@@ -15,10 +15,6 @@ python manage.py tailwind build
 echo "Collecting static files..."
 python manage.py collectstatic --no-input
 
-# Stream logs to stdout
-echo "Streaming logs..."
-tail -f /app/logs/*.log &
-
 # Start the web server and tasks worker
 echo "Starting supervisord.."
 exec supervisord -c /app/supervisord.conf
