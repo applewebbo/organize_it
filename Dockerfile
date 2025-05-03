@@ -45,6 +45,9 @@ COPY . /app
 # copy supervisord config
 COPY supervisord.conf /app/supervisord.conf
 
+# create logs directory
+RUN mkdir -p /app/logs
+
 # expose port for granian
 EXPOSE 80
 
