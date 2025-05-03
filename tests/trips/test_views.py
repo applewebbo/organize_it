@@ -1,10 +1,14 @@
 import datetime
+import tempfile
+from pathlib import Path
 from unittest.mock import Mock, patch
 
 import factory
 import pytest
 from django.contrib.messages import get_messages
 from django.db.models import signals
+from django.test import override_settings
+from django.urls import reverse
 from pytest_django.asserts import assertTemplateUsed
 
 from tests.test import TestCase
@@ -1273,3 +1277,61 @@ class TestEventChangeTimes(TestCase):
             response = self.get("trips:event-change-times", pk=event.pk)
 
         self.response_404(response)
+
+
+class TestViewLogFile(TestCase):
+    """
+    Tests for the view_log_file function-based view.
+    """
+
+    def test_view_log_file_success(self):
+        """
+        Should return the content of the log file if it exists and user is staff.
+        """
+        log_content = "test log content"
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            log_file_path = f"{tmpdirname}/test.log"
+            with open(log_file_path, "w") as f:
+                f.write(log_content)
+            url = reverse("trips:log", kwargs={"filename": "test.log"})
+            user = self.make_user()
+            user.is_staff = True
+            user.save()
+            with self.login(user), override_settings(BASE_DIR=Path(tmpdirname)):
+                response = self.get(url)
+
+        assert response.status_code == 200
+        assert response["Content-Type"] == "text/plain"
+        assert log_content in response.content.decode()
+
+    def test_view_log_file_not_found(self):
+        """
+        Should return 404 if the log file does not exist and user is staff.
+        """
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            url = reverse("trips:log", kwargs={"filename": "notfound.log"})
+            user = self.make_user()
+            user.is_staff = True
+            user.save()
+            with self.login(user), override_settings(BASE_DIR=Path(tmpdirname)):
+                response = self.get(url)
+
+        assert response.status_code == 404
+
+    def test_view_log_file_forbidden_for_non_staff(self):
+        """
+        Should return 302 redirect to login for non-staff users.
+        """
+        log_content = "test log content"
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            log_file_path = f"{tmpdirname}/test.log"
+            with open(log_file_path, "w") as f:
+                f.write(log_content)
+            url = reverse("trips:log", kwargs={"filename": "test.log"})
+            user = self.make_user()
+            user.is_staff = False
+            user.save()
+            with self.login(user), override_settings(BASE_DIR=Path(tmpdirname)):
+                response = self.get(url)
+
+        assert response.status_code == 302

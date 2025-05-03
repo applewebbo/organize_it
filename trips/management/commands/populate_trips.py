@@ -1,3 +1,4 @@
+import logging
 import random
 from datetime import date, datetime, time, timedelta
 
@@ -15,6 +16,8 @@ from tests.trips.factories import (
     TripFactory,
 )
 from trips.models import Event, Stay, Trip
+
+logger = logging.getLogger("task")
 
 NUMBER_OF_USERS = 1
 TRIPS_PER_USER = 2
@@ -130,5 +133,5 @@ class Command(BaseCommand):
                         ExperienceFactory(
                             day=day, start_time=start_time, end_time=end_time, url=url
                         )
-
+        logger.info("Trips populated correctly!")
         self.stdout.write(self.style.SUCCESS("Successfully populated database"))

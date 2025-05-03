@@ -1,7 +1,8 @@
 from datetime import timedelta
 
+from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import transaction
 from django.db.models import Prefetch
 from django.http import Http404, HttpResponse
@@ -605,3 +606,18 @@ def event_swap_modal(request, pk):
     }
 
     return TemplateResponse(request, "trips/event-swap.html", context)
+
+
+@user_passes_test(lambda u: u.is_staff)
+def view_log_file(request, filename):
+    """
+    View the log file for the application.
+    Only accessible to staff users.
+    """
+    file_path = settings.BASE_DIR / filename
+    if file_path.exists():
+        with open(file_path) as file:
+            response = HttpResponse(file.read(), content_type="text/plain")
+            return response
+    else:
+        raise Http404("Log file does not exist")

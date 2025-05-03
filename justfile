@@ -72,6 +72,11 @@ uv-install:
 @populate_trips:
     uv run python manage.py populate_trips
 
+# Create database migrations
+[group('development')]
+makemigrations:
+    uv run python manage.py makemigrations --settings=core.settings.development
+
 # Run database migrations
 [group('development')]
 migrate:
@@ -81,6 +86,11 @@ migrate:
 [group('development')]
 compilemessages:
     uv run python manage.py compilemessages --settings=core.settings.development
+
+# Run Tasks Worker
+[group('development')]
+@tasks:
+    uv run python manage.py qcluster --settings=core.settings.development
 
 ##########################################################################
 # Utility
