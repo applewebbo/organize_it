@@ -195,6 +195,10 @@ def trip_archive(request, pk):
 
 @login_required
 def trip_dates_update(request, pk):
+    """
+    Update the start and end dates of a trip.
+    This view handles the form submission for updating trip dates and uses htmx to trigger a client-side event upon success.
+    """
     trip = get_object_or_404(Trip, pk=pk, author=request.user)
 
     form = TripDateUpdateForm(request.POST or None, instance=trip)
