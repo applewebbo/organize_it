@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-17 12:14+0200\n"
-"PO-Revision-Date: 2025-04-17 12:14+0200\n"
+"POT-Creation-Date: 2025-05-03 15:42+0200\n"
+"PO-Revision-Date: 2025-05-03 15:45+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: it\n"
@@ -209,6 +209,21 @@ msgstr ""
 "esitare a contattarci se non ricevi la email di verifica entro qualche "
 "minuto."
 
+#: templates/includes/anonymous-index.html:8
+msgid "Organize your next trip!"
+msgstr "Organizza il tuo prossimo viaggio!"
+
+#: templates/includes/anonymous-index.html:11
+msgid ""
+"Register experiences, stays and transports. Keep links and notes about them. "
+"Organize them by day and look at a map to set up your next journey. Share "
+"the journey plan with your friends and family."
+msgstr ""
+"Aggiungi esperienze, soggiorni e trasporti. Tieni traccia di links utili e "
+"note. Organizzali per giorno e guardali su una mappa per creare il tuo "
+"prossimo viaggio. Condividi il piano di viaggio con la tua famiglia e i tuoi "
+"amici."
+
 #: templates/includes/footer.html:6
 msgid "© 2025 WEBBOgrafico - All right reserved"
 msgstr "© 2025 WEBBOgrafico - Tutti i diritti riservati"
@@ -217,19 +232,19 @@ msgstr "© 2025 WEBBOgrafico - Tutti i diritti riservati"
 msgid "Logout"
 msgstr "Esci"
 
-#: templates/includes/navbar.html:20
+#: templates/includes/navbar.html:21
 msgid "Login"
 msgstr "Entra"
 
-#: templates/includes/navbar.html:27
+#: templates/includes/navbar.html:28
 msgid "Open main menu"
 msgstr "Apri il menu principale"
 
-#: templates/includes/navbar.html:42 templates/includes/navbar.html:65
+#: templates/includes/navbar.html:43 templates/includes/navbar.html:66
 msgid "Trips"
 msgstr "Viaggi"
 
-#: templates/includes/navbar.html:47 templates/includes/navbar.html:70
+#: templates/includes/navbar.html:48 templates/includes/navbar.html:71
 msgid "Profile"
 msgstr "Profilo"
 
@@ -415,55 +430,55 @@ msgstr "Cena"
 msgid "Snack"
 msgstr "Spuntino"
 
-#: trips/views.py:227
+#: trips/views.py:228
 msgid "Transport added successfully"
 msgstr "Viaggio aggiunto con successo"
 
-#: trips/views.py:248
+#: trips/views.py:249
 msgid "Experience added successfully"
 msgstr "Esperienza aggiunta con successo"
 
-#: trips/views.py:269
+#: trips/views.py:270
 msgid "Meal added successfully"
 msgstr "Pasto aggiunto con successo"
 
-#: trips/views.py:286
+#: trips/views.py:287
 msgid "Stay added successfully"
 msgstr "Soggiorno aggiunto con successo"
 
-#: trips/views.py:327
+#: trips/views.py:328
 msgid "Stay updated successfully"
 msgstr "Soggiorno modificato con successo"
 
-#: trips/views.py:355
+#: trips/views.py:356
 msgid "Stay deleted successfully"
 msgstr "Soggiorno eliminato con successo"
 
-#: trips/views.py:389
+#: trips/views.py:390
 msgid "Event deleted successfully"
 msgstr "Evento eliminato con successo"
 
-#: trips/views.py:408
+#: trips/views.py:409
 msgid "Event unpaired successfully"
 msgstr "Evento scollegato con successo"
 
-#: trips/views.py:428
+#: trips/views.py:429
 msgid "Event paired successfully"
 msgstr "Evento ricollegato con successo"
 
-#: trips/views.py:509
+#: trips/views.py:510
 msgid "Event updated successfully"
 msgstr "Evento modificato con successo"
 
-#: trips/views.py:532
+#: trips/views.py:533
 msgid "Event times updated successfully"
 msgstr "Orari dell'evento modificati con successo"
 
-#: trips/views.py:563
+#: trips/views.py:564
 msgid "This event overlaps with another event"
 msgstr ""
 "Gli orari di questo evento si sovrappongono con quelli di un altro evento"
 
-#: trips/views.py:584
+#: trips/views.py:585
 msgid "Events swapped successfully"
 msgstr "Eventi scambiati con successo"
