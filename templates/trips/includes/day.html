@@ -1,4 +1,4 @@
-{% load trip_tags %}
+{% load trip_tags i18n %}
 <div id="day-{{ day.pk }}"
      class="shadow card card-border bg-base-100"
      hx-get="{% url 'trips:day-detail' day.pk %}"
@@ -7,7 +7,7 @@
      hx-swap="innerHTML">
     <div class="card-body">
         <div class="flex items-center">
-            <h2 class="text-xl font-medium sm:text-2xl grow">Day {{ day.number }}</h2>
+            <h2 class="text-xl font-medium sm:text-2xl grow">{% trans 'Day' %} {{ day.number }}</h2>
             <button class="btn btn-sm me-2 sm:btn-md" disabled="disabled">
                 {% heroicon_mini "pencil-square" class="size-5" %}
             </button>

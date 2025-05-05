@@ -82,10 +82,15 @@ makemigrations:
 migrate:
     uv run python manage.py migrate --settings=core.settings.development
 
-# Update Translation Files
+# Compile Translation Files
 [group('development')]
 compilemessages:
     uv run python manage.py compilemessages --settings=core.settings.development
+
+# Update Translation Files
+[group('development')]
+updatemessages:
+    uv run python manage.py makemessages -a --settings=core.settings.development
 
 # Run Tasks Worker
 [group('development')]
