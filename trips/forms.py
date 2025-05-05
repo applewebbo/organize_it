@@ -6,6 +6,7 @@ from crispy_forms.layout import HTML, Div, Field, Layout
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
 
 from .models import Day, Event, Experience, Link, Meal, Note, Stay, Transport, Trip
@@ -89,10 +90,12 @@ class TripForm(forms.ModelForm):
 
 class TripDateUpdateForm(forms.ModelForm):
     start_date = forms.DateField(
-        label="Inizio", required=False, widget=forms.DateInput(attrs={"type": "date"})
+        label="Inizio",
+        required=False,
     )
     end_date = forms.DateField(
-        label="Fine", required=False, widget=forms.DateInput(attrs={"type": "date"})
+        label="Fine",
+        required=False,
     )
 
     class Meta:
@@ -103,7 +106,29 @@ class TripDateUpdateForm(forms.ModelForm):
         )
 
     def __init__(self, *args, **kwargs):
+        """
+        Initialize the form and set initial values for start_date and end_date
+        from the instance if available.
+        """
         super().__init__(*args, **kwargs)
+
+        # Detect the current language
+        current_language = get_language()
+
+        # Set the date format dynamically
+        if current_language == "en":
+            date_format = "%m/%d/%Y"  # MM/DD/YYYY for English
+        elif current_language == "it":
+            date_format = "%d/%m/%Y"  # DD/MM/YYYY for Italian
+        else:
+            date_format = "%Y-%m-%d"  # Default to ISO format
+
+        # Update the widget and input_formats for both fields
+        self.fields["start_date"].widget = forms.DateInput(format=date_format)
+        self.fields["start_date"].input_formats = [date_format]
+        self.fields["end_date"].widget = forms.DateInput(format=date_format)
+        self.fields["end_date"].input_formats = [date_format]
+
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.layout = Layout(
@@ -118,6 +143,9 @@ class TripDateUpdateForm(forms.ModelForm):
         )
 
     def clean(self):
+        """
+        Validate that the end date is after the start date.
+        """
         cleaned_data = super().clean()
         if (
             cleaned_data.get("start_date")

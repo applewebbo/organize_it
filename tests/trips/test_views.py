@@ -315,9 +315,11 @@ class TripDatesUpdateView(TestCase):
     def test_post(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)
+        start_date = datetime.date.today()
+        end_date = start_date + datetime.timedelta(days=3)
         data = {
-            "start_date": datetime.date.today(),
-            "end_date": datetime.date.today() + datetime.timedelta(days=3),
+            "start_date": start_date.strftime("%m/%d/%Y"),  # Format as MM/DD/YYYY
+            "end_date": end_date.strftime("%m/%d/%Y"),  # Format as MM/DD/YYYY
         }
 
         with self.login(user):
@@ -327,8 +329,9 @@ class TripDatesUpdateView(TestCase):
         message = list(get_messages(response.wsgi_request))[0].message
         trip = Trip.objects.filter(author=user).first()
         assert message == "Dates updated successfully"
-        assert trip.start_date == data["start_date"]
-        assert trip.end_date == data["end_date"]
+        trip.refresh_from_db()
+        assert trip.start_date == start_date
+        assert trip.end_date == end_date
 
 
 class AddTransportView(TestCase):

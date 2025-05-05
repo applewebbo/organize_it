@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-06 12:52+0200\n"
+"POT-Creation-Date: 2025-05-05 11:21+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
 #: accounts/managers.py:16
 msgid "The Email must be set"
 msgstr ""
@@ -33,11 +34,11 @@ msgstr ""
 msgid "email address"
 msgstr ""
 
-#: core/settings/common.py:251
+#: core/settings/common.py:254
 msgid "Italian"
 msgstr ""
 
-#: core/settings/common.py:252
+#: core/settings/common.py:255
 msgid "English"
 msgstr ""
 
@@ -181,64 +182,201 @@ msgid ""
 "receive the verification email within a few minutes."
 msgstr ""
 
-#: trips/forms.py:230
+#: templates/cotton/dropdown.html:10 trips/models.py:190
+msgid "Transport"
+msgstr ""
+
+#: templates/cotton/dropdown.html:16 trips/models.py:191
+msgid "Experience"
+msgstr ""
+
+#: templates/cotton/dropdown.html:22 trips/models.py:192
+msgid "Meal"
+msgstr ""
+
+#: templates/cotton/dropdown.html:28
+msgid "Stay"
+msgstr ""
+
+#: templates/includes/anonymous-index.html:8
+msgid "Organize your next trip!"
+msgstr ""
+
+#: templates/includes/anonymous-index.html:11
+msgid ""
+"Register experiences, stays and transports. Keep links and notes about them. "
+"Organize them by day and look at a map to set up your next journey. Share "
+"the journey plan with your friends and family."
+msgstr ""
+
+#: templates/includes/footer.html:6
+msgid "© 2025 WEBBOgrafico - All right reserved"
+msgstr ""
+
+#: templates/includes/navbar.html:17
+msgid "Logout"
+msgstr ""
+
+#: templates/includes/navbar.html:21
+msgid "Login"
+msgstr ""
+
+#: templates/includes/navbar.html:28
+msgid "Open main menu"
+msgstr ""
+
+#: templates/includes/navbar.html:43 templates/includes/navbar.html:66
+msgid "Trips"
+msgstr ""
+
+#: templates/includes/navbar.html:48 templates/includes/navbar.html:71
+msgid "Profile"
+msgstr ""
+
+#: templates/trips/experience-create.html:8
+msgid "Create a new Experience"
+msgstr ""
+
+#: templates/trips/experience-create.html:29
+msgid "Unpaired Experiences"
+msgstr ""
+
+#: templates/trips/experience-create.html:48
+#: templates/trips/transport-create.html:47
+msgid "Cancel"
+msgstr ""
+
+#: templates/trips/experience-create.html:49
+#: templates/trips/transport-create.html:48
+msgid "Save"
+msgstr ""
+
+#: templates/trips/includes/day.html:10 trips/models.py:163
+msgid "Day"
+msgstr ""
+
+#: templates/trips/meal-create.html:8
+msgid "Create a new Meal"
+msgstr ""
+
+#: templates/trips/meal-create.html:28
+msgid "Unpaired Meals"
+msgstr ""
+
+#: templates/trips/transport-create.html:8
+msgid "Create a new Transport"
+msgstr ""
+
+#: templates/trips/transport-create.html:28
+msgid "Unpaired Transports"
+msgstr ""
+
+#: templates/trips/trip-detail.html:19 templates/trips/trip-detail.html:26
+msgid "Start Date:"
+msgstr ""
+
+#: templates/trips/trip-detail.html:22 templates/trips/trip-detail.html:29
+msgid "End Date:"
+msgstr ""
+
+#: templates/trips/trip-detail.html:33
+msgid "Destination:"
+msgstr ""
+
+#: templates/trips/trip-detail.html:61
+msgid "Unpaired Events"
+msgstr ""
+
+#: templates/trips/trip-list.html:4
+msgid "Trips List"
+msgstr ""
+
+#: templates/trips/trip-list.html:16
+msgid "My Trips"
+msgstr ""
+
+#: templates/trips/trip-list.html:21
+msgid "Create a new trip"
+msgstr ""
+
+#: templates/trips/trip-list.html:42
+msgid "Modify Dates"
+msgstr ""
+
+#: templates/trips/trip-list.html:48
+msgid "Archive"
+msgstr ""
+
+#: templates/trips/trip-list.html:51
+msgid "Delete"
+msgstr ""
+
+#: templates/trips/trip-list.html:53
+msgid "View"
+msgstr ""
+
+#: trips/forms.py:258
 msgid "Departure"
 msgstr ""
 
-#: trips/forms.py:288 trips/forms.py:368
+#: trips/forms.py:316 trips/forms.py:396
 msgid "Duration"
 msgstr ""
 
-#: trips/forms.py:443
+#: trips/forms.py:471
 msgid "Period of stay"
 msgstr ""
 
-#: trips/forms.py:470
+#: trips/forms.py:498
 msgid "Name"
 msgstr ""
 
-#: trips/forms.py:471
+#: trips/forms.py:499
 msgid "Check-in"
 msgstr ""
 
-#: trips/forms.py:472
+#: trips/forms.py:500
 msgid "Check-out"
 msgstr ""
 
-#: trips/forms.py:473
+#: trips/forms.py:501
 msgid "Cancellation date"
 msgstr ""
 
-#: trips/forms.py:474
+#: trips/forms.py:502
 msgid "Phone number"
 msgstr ""
 
-#: trips/forms.py:475
+#: trips/forms.py:503
 msgid "Website"
 msgstr ""
 
-#: trips/forms.py:476
+#: trips/forms.py:504
 msgid "Address"
+msgstr ""
+
+#: trips/models.py:19
+msgid "Not started"
+msgstr ""
+
+#: trips/models.py:20
+msgid "Impending"
+msgstr ""
+
+#: trips/models.py:21
+msgid "In progress"
+msgstr ""
+
+#: trips/models.py:22
+msgid "Completed"
+msgstr ""
+
+#: trips/models.py:23
+msgid "Archived"
 msgstr ""
 
 #: trips/models.py:93
 msgid "Enter a valid phone number (with or without international prefix)."
-msgstr ""
-
-#: trips/models.py:163
-msgid "Day"
-msgstr ""
-
-#: trips/models.py:190
-msgid "Transport"
-msgstr ""
-
-#: trips/models.py:191
-msgid "Experience"
-msgstr ""
-
-#: trips/models.py:192
-msgid "Meal"
 msgstr ""
 
 #: trips/models.py:262
@@ -301,54 +439,54 @@ msgstr ""
 msgid "Snack"
 msgstr ""
 
-#: trips/views.py:227
+#: trips/views.py:232
 msgid "Transport added successfully"
 msgstr ""
 
-#: trips/views.py:248
+#: trips/views.py:253
 msgid "Experience added successfully"
 msgstr ""
 
-#: trips/views.py:269
+#: trips/views.py:274
 msgid "Meal added successfully"
 msgstr ""
 
-#: trips/views.py:286
+#: trips/views.py:291
 msgid "Stay added successfully"
 msgstr ""
 
-#: trips/views.py:327
+#: trips/views.py:332
 msgid "Stay updated successfully"
 msgstr ""
 
-#: trips/views.py:355
+#: trips/views.py:360
 msgid "Stay deleted successfully"
 msgstr ""
 
-#: trips/views.py:389
+#: trips/views.py:394
 msgid "Event deleted successfully"
 msgstr ""
 
-#: trips/views.py:408
+#: trips/views.py:413
 msgid "Event unpaired successfully"
 msgstr ""
 
-#: trips/views.py:428
+#: trips/views.py:433
 msgid "Event paired successfully"
 msgstr ""
 
-#: trips/views.py:509
+#: trips/views.py:514
 msgid "Event updated successfully"
 msgstr ""
 
-#: trips/views.py:532
+#: trips/views.py:537
 msgid "Event times updated successfully"
 msgstr ""
 
-#: trips/views.py:563
+#: trips/views.py:568
 msgid "This event overlaps with another event"
 msgstr ""
 
-#: trips/views.py:584
+#: trips/views.py:589
 msgid "Events swapped successfully"
 msgstr ""

@@ -1,4 +1,4 @@
-{% load crispy_forms_tags %}
+{% load crispy_forms_tags l10n %}
 <form hx-post="{{ request.path }}" hx-target="#dialog" method="post">
     <div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
         <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Change Dates</h3>
@@ -18,10 +18,11 @@
     <div class="grid gap-2 p-4 space-y-1 sm:grid-cols-2 sm:gap-4 md:p-5">
         {% csrf_token %}
         {% crispy form %}
-        <div class="sm:col-span-2 alert alert-error alert-soft"
-             role="alert">
+        <div class="sm:col-span-2 alert alert-error alert-soft" role="alert">
             {% heroicon_mini 'exclamation-triangle' class="size-5" %}
-            <div><strong>Warning!&nbsp;</strong>Changing the dates will unpair all events from deleted days. This action cannot be undone.</div>
+            <div>
+                <strong>Warning!&nbsp;</strong>Changing the dates will unpair all events from deleted days. This action cannot be undone.
+            </div>
         </div>
     </div>
     <div class="flex justify-end items-center p-4 md:p-5">
