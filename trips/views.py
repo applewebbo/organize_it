@@ -679,3 +679,11 @@ def validate_dates(request):
         )
         return HttpResponse(html)
     return HttpResponse("")
+
+
+@login_required
+def add_note_to_event(request, pk):
+    """
+    Add a note to an event.
+    """
+    pass
