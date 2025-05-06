@@ -2,7 +2,7 @@ from datetime import date, datetime, timedelta
 
 import geocoder
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import HTML, Div, Field, Layout
+from crispy_forms.layout import Div, Field, Layout
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -231,7 +231,7 @@ FIELDSET_CONTENT = """
 class NoteForm(forms.ModelForm):
     class Meta:
         model = Note
-        fields = ("content", "link")
+        fields = ("content",)
         widgets = {
             "content": forms.Textarea(attrs={"placeholder": "content"}),
         }
@@ -239,23 +239,12 @@ class NoteForm(forms.ModelForm):
             "content": "Content",
         }
 
-    def __init__(self, trip, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["link"].queryset = Link.objects.filter(trips=trip)
-        # self.fields["link"].empty_label = "None"
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.layout = Layout(
             Field("content", css_class="fl-textarea"),
-            Div(
-                HTML(FIELDSET_CONTENT),
-                # adding an extra div here to overcome django-crispy-forms issue with two subsequent Divs getting nested
-                Div(
-                    Div("link", x_show="open == 2"),
-                ),
-                x_data="{ open: 0 }",
-                x_init="$watch('open', () => resetInput())",
-            ),
         )
 
 

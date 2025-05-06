@@ -200,16 +200,6 @@ class Link(models.Model):
         return self.url
 
 
-class Note(models.Model):
-    content = models.CharField(max_length=500)
-    trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="notes")
-    link = models.ForeignKey(Link, on_delete=models.SET_NULL, null=True, blank=True)
-    checked = models.BooleanField(default=False)
-
-    def __str__(self) -> str:
-        return f"{self.content[:35]} ..."
-
-
 class Event(models.Model):
     class Category(models.IntegerChoices):
         TRANSPORT = 1, _("Transport")
@@ -349,3 +339,17 @@ class Meal(Event):
         """autosave category for meal"""
         self.category = self.Category.MEAL
         return super().save(*args, **kwargs)
+
+
+class Note(models.Model):
+    content = models.CharField(max_length=500)
+    event = models.ForeignKey(
+        Event, on_delete=models.SET_NULL, null=True, blank=True, related_name="notes"
+    )
+    stay = models.ForeignKey(
+        Stay, on_delete=models.SET_NULL, null=True, blank=True, related_name="notes"
+    )
+    checked = models.BooleanField(default=False)
+
+    def __str__(self) -> str:
+        return f"{self.content[:35]} ..."
