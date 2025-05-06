@@ -51,6 +51,7 @@ htmx_urlpatterns = [
     ),
     path("days/<int:pk>/detail", views.day_detail, name="day-detail"),
     path("validate/dates/", views.validate_dates, name="validate-dates"),
+    path("notes/<int:pk>/create", views.add_note_to_event, name="add-note-to-event"),
 ]
 
 urlpatterns += htmx_urlpatterns
