@@ -25,7 +25,9 @@ def urlfields_assume_https(db_field, **kwargs):
 
 class TripForm(forms.ModelForm):
     title = forms.CharField(label="Titolo")
-    description = forms.CharField(widget=forms.Textarea(), label="Descrizione")
+    description = forms.CharField(
+        widget=forms.Textarea(), label="Descrizione", required=False
+    )
     destination = forms.CharField(label="Destinazione")
     start_date = forms.DateField(
         label="Inizio", required=False, widget=forms.DateInput(attrs={"type": "date"})

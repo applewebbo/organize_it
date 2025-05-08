@@ -23,7 +23,7 @@ class Trip(models.Model):
         ARCHIVED = 5, _("Archived")
 
     title = models.CharField(max_length=100)
-    description = models.CharField(max_length=500)
+    description = models.CharField(max_length=500, blank=True)
     destination = models.CharField(max_length=100)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     start_date = models.DateField(null=True, blank=True)
