@@ -1338,3 +1338,88 @@ class TestViewLogFile(TestCase):
                 response = self.get(url)
 
         assert response.status_code == 302
+
+
+class ValidateDatesViewTests(TestCase):
+    """
+    Tests for the validate_dates function-based view.
+    """
+
+    def test_valid_dates(self):
+        """Should return empty response if dates are valid."""
+        today = datetime.date.today()
+        data = {
+            "start_date": today.isoformat(),
+            "end_date": (today + datetime.timedelta(days=1)).isoformat(),
+        }
+        response = self.client.post(reverse("trips:validate-dates"), data)
+        assert response.status_code == 200
+        assert response.content == b""
+
+    def test_start_date_before_today(self):
+        """Should return error if start_date is before today."""
+        today = datetime.date.today()
+        data = {
+            "start_date": (today - datetime.timedelta(days=1)).isoformat(),
+            "end_date": today.isoformat(),
+        }
+        response = self.client.post(reverse("trips:validate-dates"), data)
+        assert b"Start date must be after today" in response.content
+
+    def test_start_date_after_end_date(self):
+        """Should return error if start_date is after end_date."""
+        today = datetime.date.today()
+        data = {
+            "start_date": (today + datetime.timedelta(days=2)).isoformat(),
+            "end_date": (today + datetime.timedelta(days=1)).isoformat(),
+        }
+        response = self.client.post(reverse("trips:validate-dates"), data)
+        assert b"Start date cannot be after end date" in response.content
+
+    def test_invalid_date_format(self):
+        """Should return empty response if date format is invalid."""
+        data = {
+            "start_date": "not-a-date",
+            "end_date": "also-not-a-date",
+        }
+        response = self.client.post(reverse("trips:validate-dates"), data)
+        assert response.status_code == 200
+        assert response.content == b""
+
+    def test_both_errors(self):
+        """Should return both errors if start_date is before today and after end_date."""
+        today = datetime.date.today()
+        data = {
+            "start_date": (today - datetime.timedelta(days=1)).isoformat(),
+            "end_date": (today - datetime.timedelta(days=2)).isoformat(),
+        }
+        response = self.client.post(reverse("trips:validate-dates"), data)
+        assert b"Start date must be after today" in response.content
+        assert b"Start date cannot be after end date" in response.content
+
+    def test_missing_start_date(self):
+        """Should return empty response if start_date is missing."""
+        today = datetime.date.today()
+        data = {
+            "end_date": (today + datetime.timedelta(days=1)).isoformat(),
+        }
+        response = self.client.post(reverse("trips:validate-dates"), data)
+        assert response.status_code == 200
+        assert response.content == b""
+
+    def test_missing_end_date(self):
+        """Should return empty response if end_date is missing."""
+        today = datetime.date.today()
+        data = {
+            "start_date": today.isoformat(),
+        }
+        response = self.client.post(reverse("trips:validate-dates"), data)
+        assert response.status_code == 200
+        assert response.content == b""
+
+    def test_missing_both_dates(self):
+        """Should return empty response if both start_date and end_date are missing."""
+        data = {}
+        response = self.client.post(reverse("trips:validate-dates"), data)
+        assert response.status_code == 200
+        assert response.content == b""
