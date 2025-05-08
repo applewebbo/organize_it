@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import date, timedelta
 
 from django.conf import settings
 from django.contrib import messages
@@ -8,6 +8,7 @@ from django.db.models import Prefetch
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
@@ -625,3 +626,56 @@ def view_log_file(request, filename):
             return response
     else:
         raise Http404("Log file does not exist")
+
+
+def validate_dates(request):
+    """
+    Validate the start and end dates of a trip.
+    If the start date is after the end date or before today, return an HTML snippet with an error message.
+    """
+    start_date = request.POST.get("start_date")
+    end_date = request.POST.get("end_date")
+    errors = []
+
+    # Parse dates if present
+    try:
+        if start_date:
+            start_date_obj = date.fromisoformat(start_date)
+        else:
+            start_date_obj = None
+        if end_date:
+            end_date_obj = date.fromisoformat(end_date)
+        else:
+            end_date_obj = None
+    except ValueError:
+        # If parsing fails, skip further checks
+        return HttpResponse("")
+
+    # Check if start_date is before today
+    if start_date_obj and start_date_obj < date.today():
+        errors.append(_("Start date must be after today."))
+
+    # Check if start_date is after end_date
+    if start_date_obj and end_date_obj and start_date_obj > end_date_obj:
+        errors.append(_("Start date cannot be after end date."))
+
+    if errors:
+        html = "".join(
+            [
+                format_html(
+                    """
+                <div class="alert alert-error alert-soft flex items-center gap-2 mt-2" x-data>
+                    <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4m0 4h.01M21 12A9 9 0 1 1 3 12a9 9 0 0 1 18 0Z" />
+                    </svg>
+                    <span>{}</span>
+                </div>
+                """,
+                    error,
+                )
+                for error in errors
+            ]
+        )
+        return HttpResponse(html)
+    return HttpResponse("")

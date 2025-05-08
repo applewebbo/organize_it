@@ -6,6 +6,7 @@ from crispy_forms.layout import HTML, Div, Field, Layout
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.urls import reverse
 from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
 
@@ -39,6 +40,15 @@ class TripForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        validate_url = reverse("trips:validate-dates")
+        htmx_attrs = {
+            "hx-post": validate_url,
+            "hx-trigger": "change",
+            "hx-target": "#validate_dates",
+            "hx-include": "#id_start_date,#id_end_date",
+        }
+        self.fields["start_date"].widget.attrs.update(htmx_attrs)
+        self.fields["end_date"].widget.attrs.update(htmx_attrs)
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.layout = Layout(
@@ -62,6 +72,10 @@ class TripForm(forms.ModelForm):
                 "end_date",
                 css_class="w-full",
             ),
+            Div(
+                HTML('<div id="validate_dates"></div>'),
+                css_class="sm:col-span-2",
+            ),
         )
 
     def clean(self):
@@ -71,20 +85,20 @@ class TripForm(forms.ModelForm):
             and cleaned_data.get("end_date")
             and cleaned_data.get("start_date") > cleaned_data.get("end_date")
         ):
-            raise ValidationError("End date must be after start date")
+            raise ValidationError(_("End date must be after start date"))
         return cleaned_data
 
     def clean_start_date(self):
         start_date = self.cleaned_data.get("start_date")
         if start_date and start_date < date.today():
-            raise ValidationError("Start date must be after today")
+            raise ValidationError(_("Start date must be after today"))
         return start_date
 
     def clean_destination(self):
         destination = self.cleaned_data.get("destination")
         g = geocoder.mapbox(destination)
         if not g.ok:
-            raise ValidationError("Destination not found")
+            raise ValidationError(_("Destination not found"))
         return destination
 
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-05 11:21+0200\n"
+"POT-Creation-Date: 2025-05-08 15:06+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -315,43 +315,55 @@ msgstr ""
 msgid "View"
 msgstr ""
 
-#: trips/forms.py:258
+#: trips/forms.py:89
+msgid "End date must be after start date"
+msgstr ""
+
+#: trips/forms.py:95
+msgid "Start date must be after today"
+msgstr ""
+
+#: trips/forms.py:102
+msgid "Destination not found"
+msgstr ""
+
+#: trips/forms.py:273
 msgid "Departure"
 msgstr ""
 
-#: trips/forms.py:316 trips/forms.py:396
+#: trips/forms.py:331 trips/forms.py:411
 msgid "Duration"
 msgstr ""
 
-#: trips/forms.py:471
+#: trips/forms.py:486
 msgid "Period of stay"
 msgstr ""
 
-#: trips/forms.py:498
+#: trips/forms.py:513
 msgid "Name"
 msgstr ""
 
-#: trips/forms.py:499
+#: trips/forms.py:514
 msgid "Check-in"
 msgstr ""
 
-#: trips/forms.py:500
+#: trips/forms.py:515
 msgid "Check-out"
 msgstr ""
 
-#: trips/forms.py:501
+#: trips/forms.py:516
 msgid "Cancellation date"
 msgstr ""
 
-#: trips/forms.py:502
+#: trips/forms.py:517
 msgid "Phone number"
 msgstr ""
 
-#: trips/forms.py:503
+#: trips/forms.py:518
 msgid "Website"
 msgstr ""
 
-#: trips/forms.py:504
+#: trips/forms.py:519
 msgid "Address"
 msgstr ""
 
@@ -439,54 +451,62 @@ msgstr ""
 msgid "Snack"
 msgstr ""
 
-#: trips/views.py:232
+#: trips/views.py:226
 msgid "Transport added successfully"
 msgstr ""
 
-#: trips/views.py:253
+#: trips/views.py:247
 msgid "Experience added successfully"
 msgstr ""
 
-#: trips/views.py:274
+#: trips/views.py:268
 msgid "Meal added successfully"
 msgstr ""
 
-#: trips/views.py:291
+#: trips/views.py:285
 msgid "Stay added successfully"
 msgstr ""
 
-#: trips/views.py:332
+#: trips/views.py:326
 msgid "Stay updated successfully"
 msgstr ""
 
-#: trips/views.py:360
+#: trips/views.py:354
 msgid "Stay deleted successfully"
 msgstr ""
 
-#: trips/views.py:394
+#: trips/views.py:388
 msgid "Event deleted successfully"
 msgstr ""
 
-#: trips/views.py:413
+#: trips/views.py:407
 msgid "Event unpaired successfully"
 msgstr ""
 
-#: trips/views.py:433
+#: trips/views.py:427
 msgid "Event paired successfully"
 msgstr ""
 
-#: trips/views.py:514
+#: trips/views.py:508
 msgid "Event updated successfully"
 msgstr ""
 
-#: trips/views.py:537
+#: trips/views.py:531
 msgid "Event times updated successfully"
 msgstr ""
 
-#: trips/views.py:568
+#: trips/views.py:562
 msgid "This event overlaps with another event"
 msgstr ""
 
-#: trips/views.py:589
+#: trips/views.py:583
 msgid "Events swapped successfully"
+msgstr ""
+
+#: trips/views.py:649
+msgid "Start date must be after today."
+msgstr ""
+
+#: trips/views.py:653
+msgid "Start date cannot be after end date."
 msgstr ""

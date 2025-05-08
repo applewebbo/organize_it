@@ -50,6 +50,7 @@ htmx_urlpatterns = [
         "events/<int:pk>/swap-choices", views.event_swap_modal, name="event-swap-modal"
     ),
     path("days/<int:pk>/detail", views.day_detail, name="day-detail"),
+    path("validate/dates/", views.validate_dates, name="validate-dates"),
 ]
 
 urlpatterns += htmx_urlpatterns

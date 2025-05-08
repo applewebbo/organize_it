@@ -89,7 +89,7 @@ compilemessages:
 
 # Update Translation Files
 [group('development')]
-updatemessages:
+makemessages:
     uv run python manage.py makemessages -a --settings=core.settings.development
 
 # Run Tasks Worker
