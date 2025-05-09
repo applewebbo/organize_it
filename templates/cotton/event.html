@@ -18,7 +18,7 @@
     </div>
     <div class="absolute top-0 right-2 mt-2 text-right" x-data>
         <button class="btn btn-xs btn-soft {{ border_color }} {{ bg_color }} dark:hover:bg-slate-900/10 hover:bg-white/50"
-                hx-get="{% url 'trips:add-note-to-event' event.pk %}"
+                hx-get="{% url 'trips:event-notes' event.pk %}"
                 @click="$dispatch('open-modal'); document.activeElement.blur()"
                 hx-target="#dialog"
                 hx-swap="innerHTML">{% heroicon_mini 'paper-clip' class="size-4" %}
