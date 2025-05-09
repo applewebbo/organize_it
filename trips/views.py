@@ -17,6 +17,7 @@ from trips.forms import (
     EventChangeTimesForm,
     ExperienceForm,
     MealForm,
+    NoteForm,
     StayForm,
     TransportForm,
     TripDateUpdateForm,
@@ -689,8 +690,10 @@ def event_notes(request, event_id):
     qs = Event.objects.prefetch_related("notes")
     event = get_object_or_404(qs, pk=event_id, trip__author=request.user)
     notes = event.notes.all()
+    form = NoteForm()
     context = {
         "notes": notes,
+        "form": form,
     }
     return TemplateResponse(request, "trips/event-notes.html", context)
 
