@@ -682,8 +682,34 @@ def validate_dates(request):
 
 
 @login_required
-def add_note_to_event(request, pk):
+def event_notes(request, event_id):
+    """
+    View the note for an event.
+    """
+    qs = Event.objects.prefetch_related("notes")
+    event = get_object_or_404(qs, pk=event_id, trip__author=request.user)
+    notes = event.notes.all()
+    context = {
+        "notes": notes,
+    }
+    return TemplateResponse(request, "trips/event-notes.html", context)
+
+
+@login_required
+def add_note_to_event(request, event_id):
     """
     Add a note to an event.
     """
-    pass
+    event = get_object_or_404(Event, pk=event_id, trip__author=request.user)
+    if request.method == "POST":
+        note = request.POST.get("note")
+        if note:
+            event.note = note
+            event.save()
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                _("Note added successfully"),
+            )
+            return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+    return HttpResponse(status=400)
