@@ -333,6 +333,35 @@ class TripDatesUpdateView(TestCase):
         assert trip.start_date == start_date
         assert trip.end_date == end_date
 
+    def test_day_numbers_are_correct_and_unique_after_date_change(self):
+        """
+        Ensure that after changing the trip's start_date, all days have correct and unique numbers.
+        """
+        user = self.make_user("user")
+        # Create a trip with 3 days
+        start_date = datetime.date(2024, 5, 2)
+        end_date = start_date + datetime.timedelta(days=2)
+        trip = TripFactory(author=user, start_date=start_date, end_date=end_date)
+        days = list(trip.days.order_by("date"))
+        assert [d.number for d in days] == [1, 2, 3]
+
+        # Change start_date to add a day before
+        trip.start_date = start_date - datetime.timedelta(days=1)
+        trip.save()
+        trip.refresh_from_db()
+        days = list(trip.days.order_by("date"))
+
+        # Check that numbers are 1, 2, 3, 4 and unique
+        numbers = [d.number for d in days]
+        assert numbers == [1, 2, 3, 4]
+        assert len(numbers) == len(set(numbers)), "Day numbers are not unique"
+
+        # Check that the dates are consecutive and ordered
+        expected_dates = [
+            trip.start_date + datetime.timedelta(days=i) for i in range(4)
+        ]
+        assert [d.date for d in days] == expected_dates
+
 
 class AddTransportView(TestCase):
     @patch("geocoder.mapbox")
@@ -657,7 +686,10 @@ class StayDeleteView(TestCase):
         self.response_204(response)
         message = list(get_messages(response.wsgi_request))[0].message
         assert message == "Stay deleted successfully"
-        assert not days.first().stay
+        # Refresh the day from the database to get the updated stay value
+        first_day = days.first()
+        first_day.refresh_from_db()
+        assert not first_day.stay
 
     def test_get_with_single_other_stay(self):
         user = self.make_user("user")

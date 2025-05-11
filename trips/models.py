@@ -63,19 +63,41 @@ class Trip(models.Model):
 
 @receiver(post_save, sender=Trip)
 def update_trip_days(sender, instance, **kwargs):
+    """
+    Update the days for a trip when start_date or end_date changes.
+    Retain the order of days and shift existing days and their related objects accordingly.
+    """
     if not instance.start_date or not instance.end_date:
         return
-    days = days_between(instance.start_date, instance.end_date)
-    # check if days already created are inside the range and delete them accordingly
+
+    days_total = days_between(instance.start_date, instance.end_date) + 1
+    desired_dates = [instance.start_date + timedelta(days=i) for i in range(days_total)]
+
+    # Build a mapping of current days by date
+    current_days_by_date = {day.date: day for day in instance.days.all()}
+    # Delete days outside the new range
     for day in instance.days.all():
-        if day.date < instance.start_date or day.date > instance.end_date:
+        if day.date not in desired_dates:
             day.delete()
-    for day in range(days + 1):
-        Day.objects.update_or_create(
-            trip=instance,
-            number=day + 1,
-            date=instance.start_date + timedelta(days=day),
-        )
+
+    # Get all days ordered by date (after deletion)
+    list(instance.days.order_by("date"))
+
+    # For each desired date, either update an existing day or create a new one
+    for idx, day_date in enumerate(desired_dates):
+        if day_date in current_days_by_date:
+            # Update number if needed
+            day = current_days_by_date[day_date]
+            if day.number != idx + 1:
+                day.number = idx + 1
+                day.save(update_fields=["number"])
+        else:
+            # Insert a new day at the correct position
+            Day.objects.create(
+                trip=instance,
+                number=idx + 1,
+                date=day_date,
+            )
 
 
 class Stay(models.Model):
@@ -138,6 +160,9 @@ class Day(models.Model):
     )
     number = models.PositiveSmallIntegerField()
     date = models.DateField()
+
+    class Meta:
+        ordering = ["number"]
 
     @property
     def next_day(self):
