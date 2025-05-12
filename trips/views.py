@@ -692,6 +692,7 @@ def event_notes(request, event_id):
     notes = event.notes.all()
     form = NoteForm()
     context = {
+        "event": event,
         "notes": notes,
         "form": form,
     }
@@ -705,10 +706,11 @@ def add_note_to_event(request, event_id):
     """
     event = get_object_or_404(Event, pk=event_id, trip__author=request.user)
     if request.method == "POST":
-        note = request.POST.get("note")
-        if note:
-            event.note = note
-            event.save()
+        form = NoteForm(request.POST)
+        if form.is_valid():
+            note = form.save(commit=False)
+            note.event = event
+            note.save()
             messages.add_message(
                 request,
                 messages.SUCCESS,
