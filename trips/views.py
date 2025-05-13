@@ -23,7 +23,7 @@ from trips.forms import (
     TripDateUpdateForm,
     TripForm,
 )
-from trips.models import Day, Event, Stay, Trip
+from trips.models import Day, Event, Note, Stay, Trip
 from trips.utils import annotate_event_overlaps
 
 
@@ -700,7 +700,7 @@ def event_notes(request, event_id):
 
 
 @login_required
-def add_note_to_event(request, event_id):
+def note_create(request, event_id):
     """
     Add a note to an event.
     """
@@ -718,3 +718,40 @@ def add_note_to_event(request, event_id):
             )
             return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
     return HttpResponse(status=400)
+
+
+@login_required
+def note_modify(request, note_id):
+    """
+    Modify a note for an event.
+    """
+    note = get_object_or_404(Note, pk=note_id, event__trip__author=request.user)
+    form = NoteForm(request.POST or None, instance=note)
+    if form.is_valid():
+        form.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            _("Note updated successfully"),
+        )
+        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+    context = {
+        "form": form,
+        "note": note,
+    }
+    return TemplateResponse(request, "trips/note-modify.html", context)
+
+
+@login_required
+def note_delete(request, note_id):
+    """
+    Delete a note from an event.
+    """
+    note = get_object_or_404(Note, pk=note_id, event__trip__author=request.user)
+    note.delete()
+    messages.add_message(
+        request,
+        messages.ERROR,
+        _("Note deleted successfully"),
+    )
+    return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})

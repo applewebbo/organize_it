@@ -233,7 +233,7 @@ class NoteForm(forms.ModelForm):
         model = Note
         fields = ("content",)
         widgets = {
-            "content": forms.TextInput(attrs={"placeholder": "Add notes..."}),
+            "content": forms.Textarea(attrs={"placeholder": "Add notes..."}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -242,7 +242,10 @@ class NoteForm(forms.ModelForm):
         self.helper.form_tag = False
         self.helper.form_show_labels = False
         self.helper.layout = Layout(
-            "content",
+            Div(
+                Field("content", css_class="fl-textarea"),
+                css_class="sm:col-span-2",
+            ),
         )
 
 
