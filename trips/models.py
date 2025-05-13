@@ -343,13 +343,12 @@ class Meal(Event):
 
 class Note(models.Model):
     content = models.CharField(max_length=500)
-    event = models.ForeignKey(
-        Event, on_delete=models.SET_NULL, null=True, blank=True, related_name="notes"
+    event = models.OneToOneField(
+        Event, on_delete=models.CASCADE, null=True, blank=True, related_name="note"
     )
-    stay = models.ForeignKey(
-        Stay, on_delete=models.SET_NULL, null=True, blank=True, related_name="notes"
+    stay = models.OneToOneField(
+        Stay, on_delete=models.CASCADE, null=True, blank=True, related_name="note"
     )
-    checked = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return f"{self.content[:35]} ..."

@@ -233,7 +233,7 @@ class NoteForm(forms.ModelForm):
         model = Note
         fields = ("content",)
         widgets = {
-            "content": forms.TextInput(attrs={"placeholder": "Add a note..."}),
+            "content": forms.TextInput(attrs={"placeholder": "Add notes..."}),
         }
 
     def __init__(self, *args, **kwargs):

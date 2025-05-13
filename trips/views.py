@@ -687,13 +687,13 @@ def event_notes(request, event_id):
     """
     View the note for an event.
     """
-    qs = Event.objects.prefetch_related("notes")
+    qs = Event.objects.select_related("note")
     event = get_object_or_404(qs, pk=event_id, trip__author=request.user)
-    notes = event.notes.all()
+    note = getattr(event, "note", None)
     form = NoteForm()
     context = {
         "event": event,
-        "notes": notes,
+        "note": note,
         "form": form,
     }
     return TemplateResponse(request, "trips/event-notes.html", context)

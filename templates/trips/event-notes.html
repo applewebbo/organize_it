@@ -1,6 +1,6 @@
 {% load i18n heroicons crispy_forms_tags %}
 <div class="flex justify-between items-center py-2 px-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
-    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% trans 'Event Notes' %}</h3>
+    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% if note %}{% trans 'Event Notes' %}{% else %}{% trans 'Add Notes' %} {% endif %}</h3>
     <button type="button"
             class="inline-flex justify-center items-center w-8 h-8 text-sm text-gray-400 bg-transparent rounded-lg hover:text-gray-900 hover:bg-gray-200 ms-auto dark:hover:bg-gray-600 dark:hover:text-white"
             x-on:click="openModal = false">
@@ -9,20 +9,27 @@
     </button>
 </div>
 <div class="grid gap-x-1 p-4 sm:grid-cols-2 sm:gap-x-2 md:p-5">
-    {% if notes %}
-        <ul>
-        {% for note in notes %}
-            <li>{{ note.content }}</li>
-        {% endfor %}
-        </ul>
-    {% endif %}
+    {% if note %}
+    <div id="note" class="py-2 sm:col-span-2">
+        {{ note.content }}
+        <div class="flex gap-2 justify-end mt-2">
+            <button class="btn btn-sm btn-soft btn-primary">
+                Edit
+            </button>
+            <button class="btn btn-sm btn-soft">
+                Close
+            </button>
+        </div>
+    </div>
+    {% else %}
     <div class="mt-3 sm:col-span-2">
         <form hx-post="{% url 'trips:add-note-to-event' event.pk %}" hx-target="#dialog" method="post" class="flex gap-2 items-end">
             {% csrf_token %}
             <div class="grow">{% crispy form %}</div>
-            <button class="self-center mb-3 btn btn-sm btn-primary btn-soft" type="submit">
-            Add
+            <button class="self-center mb-3 btn btn-primary btn-soft" type="submit">
+               {% heroicon_mini 'plus' class='size-6' %}
             </button>
         </form>
     </div>
+    {% endif %}
 </div>
