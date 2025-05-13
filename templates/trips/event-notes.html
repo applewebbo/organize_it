@@ -10,21 +10,7 @@
 </div>
 <div class="grid gap-x-1 p-4 sm:grid-cols-2 sm:gap-x-2 md:p-5">
     {% if note %}
-    <div id="note" class="py-2 sm:col-span-2">
-        {{ note.content }}
-        <div class="flex gap-2 justify-end mt-2">
-            <button class="btn btn-sm btn-soft btn-primary"
-                    hx-post="{% url 'trips:note-modify' note.pk %}"
-                    hx-target="#dialog"
-                    hx-swap="innerHTML">
-                {% trans 'Edit' %}
-            </button>
-            <button class="btn btn-sm btn-soft"
-                    x-on:click="openModal = false">
-                {% trans 'Close' %}
-            </button>
-        </div>
-    </div>
+    {% include 'trips/includes/note.html' %}
     {% else %}
     <div class="mt-3">
         <form hx-post="{% url 'trips:note-create' event.pk %}" hx-target="#dialog" method="post">

@@ -727,6 +727,10 @@ def note_modify(request, note_id):
     """
     note = get_object_or_404(Note, pk=note_id, event__trip__author=request.user)
     form = NoteForm(request.POST or None, instance=note)
+    context = {
+        "form": form,
+        "note": note,
+    }
     if form.is_valid():
         form.save()
         messages.add_message(
@@ -734,11 +738,7 @@ def note_modify(request, note_id):
             messages.SUCCESS,
             _("Note updated successfully"),
         )
-        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
-    context = {
-        "form": form,
-        "note": note,
-    }
+        return TemplateResponse(request, "trips/event-notes.html", context)
     return TemplateResponse(request, "trips/note-modify.html", context)
 
 
