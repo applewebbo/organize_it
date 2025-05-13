@@ -181,18 +181,12 @@ class TestLinkModel:
 
 
 class TestNoteModel:
-    def test_factory(self, user_factory, trip_factory, note_factory):
+    def test_factory(self, user_factory, event_factory, note_factory):
         """Test note model factory"""
-        user = user_factory()
-        trip = trip_factory(author=user, title="Test Trip")
+        user_factory()
         note = note_factory()
 
-        trip.notes.add(note)
-        trip.save()
-
         assert note.__str__() == f"{note.content[:35]} ..."
-        assert trip.notes.first() == note
-        assert note.checked is False
 
 
 class TestEventModel:

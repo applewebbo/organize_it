@@ -176,28 +176,16 @@ class TestLinkForm:
 
 
 class TestNoteForm:
-    def test_form(self, user_factory, trip_factory):
+    def test_form(self, user_factory):
         """Test that the form saves a note"""
-        user = user_factory()
-        trip = trip_factory(author=user, title="Test Trip")
+        user_factory()
+
         data = {
             "content": "Test content",
         }
-        form = NoteForm(trip=trip, data=data)
+        form = NoteForm(data=data)
 
         assert form.is_valid()
-
-    def test_queryset(self, user_factory, trip_factory, link_factory):
-        """Test that the form display the correct links to be assigned to the newly created note"""
-        user = user_factory()
-        trip = trip_factory(author=user)
-        link = link_factory(author=user)
-        trip.links.add(link)
-        trip.save()
-
-        form = NoteForm(trip=trip)
-
-        assert link in form.fields["link"].queryset
 
 
 class TestTransportForm:

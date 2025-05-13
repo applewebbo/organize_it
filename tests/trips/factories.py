@@ -141,7 +141,6 @@ class NoteFactory(factory.django.DjangoModelFactory):
         model = "trips.Note"
 
     content = factory.Faker("paragraph", nb_sentences=4)
-    trip = factory.SubFactory(TripFactory)
 
 
 class EventFactory(factory.django.DjangoModelFactory):

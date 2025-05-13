@@ -20,8 +20,8 @@ from tests.trips.factories import (
     TransportFactory,
     TripFactory,
 )
-from trips.forms import ExperienceForm, MealForm, TransportForm
-from trips.models import Stay, Trip
+from trips.forms import ExperienceForm, MealForm, NoteForm, TransportForm
+from trips.models import Note, Stay, Trip
 
 pytestmark = pytest.mark.django_db
 
@@ -1455,3 +1455,178 @@ class ValidateDatesViewTests(TestCase):
         response = self.client.post(reverse("trips:validate-dates"), data)
         assert response.status_code == 200
         assert response.content == b""
+
+
+class EventNotesView(TestCase):
+    def test_event_notes_with_note(self):
+        """
+        Test event_notes view when the event has a note.
+        """
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(day=day, trip=trip)
+        note = Note.objects.create(content="Test note", event=event)
+
+        with self.login(user):
+            response = self.get("trips:event-notes", event_id=event.pk)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/event-notes.html")
+        assert response.context["event"] == event
+        assert response.context["note"] == note
+        assert isinstance(response.context["form"], NoteForm)
+
+    def test_event_notes_without_note(self):
+        """
+        Test event_notes view when the event has no note.
+        """
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(day=day, trip=trip)
+
+        with self.login(user):
+            response = self.get("trips:event-notes", event_id=event.pk)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/event-notes.html")
+        assert response.context["event"] == event
+        assert response.context["note"] is None
+        assert isinstance(response.context["form"], NoteForm)
+
+
+class NoteCreateView(TestCase):
+    def test_note_create_success(self):
+        """
+        Test successful creation of a note for an event.
+        """
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(day=day, trip=trip)
+        data = {"content": "This is a test note."}
+
+        with self.login(user):
+            response = self.post("trips:note-create", event_id=event.pk, data=data)
+
+        self.response_204(response)
+        message = list(get_messages(response.wsgi_request))[0].message
+        assert message == "Note added successfully"
+        event.refresh_from_db()
+        assert hasattr(event, "note")
+        assert event.note.content == data["content"]
+
+    def test_note_create_already_exists(self):
+        """
+        Test that creating a note for an event that already has a note returns 400.
+        """
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(day=day, trip=trip)
+        Note.objects.create(content="Existing note", event=event)
+        data = {"content": "Another note"}
+
+        with self.login(user):
+            response = self.post("trips:note-create", event_id=event.pk, data=data)
+
+        assert response.status_code == 400
+        messages_list = list(get_messages(response.wsgi_request))
+        assert any("already has a note" in m.message for m in messages_list)
+
+    def test_note_create_invalid_data(self):
+        """
+        Test that creating a note with invalid data returns 400.
+        """
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(day=day, trip=trip)
+        data = {"content": ""}  # Invalid: content is required
+
+        with self.login(user):
+            response = self.post("trips:note-create", event_id=event.pk, data=data)
+
+        assert response.status_code == 400
+
+
+class NoteModifyView(TestCase):
+    def test_note_modify_success(self):
+        """
+        Test successful modification of a note for an event.
+        """
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(day=day, trip=trip)
+        note = Note.objects.create(content="Original note", event=event)
+        data = {"content": "Updated note content."}
+
+        with self.login(user):
+            response = self.post("trips:note-modify", note_id=note.pk, data=data)
+
+        self.response_200(response)
+        message = list(get_messages(response.wsgi_request))[0].message
+        assert message == "Note updated successfully"
+        note.refresh_from_db()
+        assert note.content == data["content"]
+
+    def test_note_modify_invalid_data(self):
+        """
+        Test modification of a note with invalid data returns 200 and shows form errors.
+        """
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(day=day, trip=trip)
+        note = Note.objects.create(content="Original note", event=event)
+        data = {"content": ""}  # Invalid: content is required
+
+        with self.login(user):
+            response = self.post("trips:note-modify", note_id=note.pk, data=data)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/note-modify.html")
+        note.refresh_from_db()
+        assert note.content == "Original note"
+
+    def test_note_modify_not_found(self):
+        """
+        Test modification of a non-existent note returns 404.
+        """
+        user = self.make_user("user")
+        with self.login(user):
+            response = self.post(
+                "trips:note-modify", note_id=99999, data={"content": "Anything"}
+            )
+        self.response_404(response)
+
+
+class NoteDeleteView(TestCase):
+    def test_note_delete_success(self):
+        """
+        Test successful deletion of a note for an event.
+        """
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(day=day, trip=trip)
+        note = Note.objects.create(content="Note to delete", event=event)
+
+        with self.login(user):
+            response = self.post("trips:note-delete", note_id=note.pk)
+
+        self.response_204(response)
+        message = list(get_messages(response.wsgi_request))[0].message
+        assert message == "Note deleted successfully"
+        assert not Note.objects.filter(pk=note.pk).exists()
+
+    def test_note_delete_not_found(self):
+        """
+        Test deletion of a non-existent note returns 404.
+        """
+        user = self.make_user("user")
+        with self.login(user):
+            response = self.post("trips:note-delete", note_id=99999)
+        self.response_404(response)

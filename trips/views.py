@@ -700,30 +700,33 @@ def event_notes(request, event_id):
 
 
 @login_required
+@require_http_methods(["POST"])
 def note_create(request, event_id):
     """
-    Add a note to an event.
+    Add a note to an event. If the event already has a note, do not create a new one.
     """
     event = get_object_or_404(Event, pk=event_id, trip__author=request.user)
-    if request.method == "POST":
-        form = NoteForm(request.POST)
-        if form.is_valid():
-            note = form.save(commit=False)
-            note.event = event
-            note.save()
-            messages.add_message(
-                request,
-                messages.SUCCESS,
-                _("Note added successfully"),
-            )
-            return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+    if hasattr(event, "note") and event.note is not None:
+        messages.error(request, _("This event already has a note."))
+        return HttpResponse(status=400)
+    form = NoteForm(request.POST)
+    if form.is_valid():
+        note = form.save(commit=False)
+        note.event = event
+        note.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            _("Note added successfully"),
+        )
+        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
     return HttpResponse(status=400)
 
 
 @login_required
 def note_modify(request, note_id):
     """
-    Modify a note for an event.
+    Modify a note for an event. If the note does not exist, return 404.
     """
     note = get_object_or_404(Note, pk=note_id, event__trip__author=request.user)
     form = NoteForm(request.POST or None, instance=note)
@@ -745,7 +748,7 @@ def note_modify(request, note_id):
 @login_required
 def note_delete(request, note_id):
     """
-    Delete a note from an event.
+    Delete a note from an event. If the note does not exist, return 404.
     """
     note = get_object_or_404(Note, pk=note_id, event__trip__author=request.user)
     note.delete()
