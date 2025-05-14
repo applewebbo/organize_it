@@ -514,7 +514,7 @@ class StayForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["apply_to_days"].queryset = Day.objects.filter(trip=trip)
         self.fields["apply_to_days"].label_from_instance = (
-            lambda obj: f"Day {obj.number}"
+            lambda obj: f"{_('Day')} {obj.number}"
         )
         # Only set initial values if we're editing an existing stay
         if self.instance.pk:
