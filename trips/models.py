@@ -121,6 +121,7 @@ class Stay(models.Model):
     address = models.CharField(max_length=200)
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
+    notes = models.CharField(max_length=500, blank=True)
 
     def save(self, *args, **kwargs):
         """convert address to coordinates for displaying on the map"""
