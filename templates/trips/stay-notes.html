@@ -1,6 +1,6 @@
 {% load i18n heroicons crispy_forms_tags %}
 <div class="flex justify-between items-center py-2 px-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
-    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% if note %}{% trans 'Stay Notes' %}{% else %}{% trans 'Add Notes' %} {% endif %}</h3>
+    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% if stay.notes %}{% trans 'Stay Notes' %}{% else %}{% trans 'Add Notes' %} {% endif %}</h3>
     <button type="button"
             class="inline-flex justify-center items-center w-8 h-8 text-sm text-gray-400 bg-transparent rounded-lg hover:text-gray-900 hover:bg-gray-200 ms-auto dark:hover:bg-gray-600 dark:hover:text-white"
             x-on:click="openModal = false">

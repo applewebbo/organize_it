@@ -64,9 +64,14 @@ htmx_urlpatterns = [
         name="stay-note-create",
     ),
     path(
-        "stay-notes/<int:stay_id>/delete",
+        "stay-notes/<int:stay_id>/modify",
         views.stay_note_modify,
         name="stay-note-modify",
+    ),
+    path(
+        "stay-notes/<int:stay_id>/delete",
+        views.stay_note_delete,
+        name="stay-note-delete",
     ),
 ]
 

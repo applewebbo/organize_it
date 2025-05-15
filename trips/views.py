@@ -720,7 +720,11 @@ def note_create(request, event_id):
             messages.SUCCESS,
             _("Note added successfully"),
         )
-        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+        context = {
+            "form": form,
+            "note": note,
+        }
+        return TemplateResponse(request, "trips/event-notes.html", context)
     return HttpResponse(status=400)
 
 
@@ -792,7 +796,11 @@ def stay_note_create(request, stay_id):
             messages.SUCCESS,
             _("Note added successfully"),
         )
-        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+        context = {
+            "stay": stay,
+            "form": form,
+        }
+        return TemplateResponse(request, "trips/stay-notes.html", context)
     return HttpResponse(status=400)
 
 
@@ -815,4 +823,20 @@ def stay_note_modify(request, stay_id):
             _("Note updated successfully"),
         )
         return TemplateResponse(request, "trips/stay-notes.html", context)
-    return TemplateResponse(request, "trips/note-modify.html", context)
+    return TemplateResponse(request, "trips/stay-note-modify.html", context)
+
+
+@login_required
+def stay_note_delete(request, stay_id):
+    """
+    Delete a note from a stay. If the note does not exist, return 404.
+    """
+    stay = get_object_or_404(Stay, pk=stay_id)
+    stay.notes = ""
+    stay.save()
+    messages.add_message(
+        request,
+        messages.ERROR,
+        _("Note deleted successfully"),
+    )
+    return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
