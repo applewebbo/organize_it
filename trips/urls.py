@@ -57,6 +57,17 @@ htmx_urlpatterns = [
     path("notes/<int:event_id>/create", views.note_create, name="note-create"),
     path("notes/<int:note_id>/delete", views.note_delete, name="note-delete"),
     path("notes/<int:note_id>/modify", views.note_modify, name="note-modify"),
+    path("stay-notes/<int:stay_id>/", views.stay_notes, name="stay-notes"),
+    path(
+        "stay-notes/<int:stay_id>/create",
+        views.stay_note_create,
+        name="stay-note-create",
+    ),
+    path(
+        "stay-notes/<int:stay_id>/delete",
+        views.stay_note_modify,
+        name="stay-note-modify",
+    ),
 ]
 
 urlpatterns += htmx_urlpatterns

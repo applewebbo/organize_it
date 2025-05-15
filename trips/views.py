@@ -14,6 +14,7 @@ from django.views.decorators.http import require_http_methods
 
 from accounts.models import Profile
 from trips.forms import (
+    AddNoteToStayForm,
     EventChangeTimesForm,
     ExperienceForm,
     MealForm,
@@ -758,3 +759,60 @@ def note_delete(request, note_id):
         _("Note deleted successfully"),
     )
     return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+
+
+@login_required
+def stay_notes(request, stay_id):
+    """
+    View the note for an event.
+    """
+    stay = get_object_or_404(Stay, pk=stay_id)
+    form = AddNoteToStayForm()
+    context = {
+        "stay": stay,
+        "form": form,
+    }
+    return TemplateResponse(request, "trips/stay-notes.html", context)
+
+
+@login_required
+@require_http_methods(["POST"])
+def stay_note_create(request, stay_id):
+    """
+    Add a note to a stay. If the stay already has a note, do not create a new one.
+    """
+    stay = get_object_or_404(Stay, pk=stay_id)
+    form = AddNoteToStayForm(request.POST)
+    if form.is_valid():
+        notes_content = form.cleaned_data["notes"]
+        stay.notes = notes_content
+        stay.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            _("Note added successfully"),
+        )
+        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+    return HttpResponse(status=400)
+
+
+@login_required
+def stay_note_modify(request, stay_id):
+    """
+    Modify a note for a stay. If the note does not exist, return 404.
+    """
+    stay = get_object_or_404(Stay, pk=stay_id)
+    form = AddNoteToStayForm(request.POST or None, instance=stay)
+    context = {
+        "form": form,
+        "stay": stay,
+    }
+    if form.is_valid():
+        form.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            _("Note updated successfully"),
+        )
+        return TemplateResponse(request, "trips/stay-notes.html", context)
+    return TemplateResponse(request, "trips/note-modify.html", context)

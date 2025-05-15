@@ -607,3 +607,34 @@ class EventChangeTimesForm(forms.ModelForm):
             raise ValidationError("End time must be after start time")
 
         return cleaned_data
+
+
+class AddNoteToStayForm(forms.ModelForm):
+    """
+    Form to add notes to a Stay instance.
+    """
+
+    notes = forms.CharField(
+        label="Notes",
+        widget=forms.Textarea(attrs={"placeholder": "Add notes..."}),
+        required=False,
+    )
+
+    class Meta:
+        model = Stay
+        fields = ["notes"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from crispy_forms.helper import FormHelper
+        from crispy_forms.layout import Div, Field, Layout
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.form_show_labels = False
+        self.helper.layout = Layout(
+            Div(
+                Field("notes", css_class="fl-textarea"),
+                css_class="sm:col-span-2",
+            ),
+        )
