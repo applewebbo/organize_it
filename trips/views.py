@@ -24,7 +24,7 @@ from trips.forms import (
     TripDateUpdateForm,
     TripForm,
 )
-from trips.models import Day, Event, Note, Stay, Trip
+from trips.models import Day, Event, Stay, Trip
 from trips.utils import annotate_event_overlaps
 
 
@@ -686,15 +686,23 @@ def validate_dates(request):
 @login_required
 def event_notes(request, event_id):
     """
-    View the note for an event.
+    View or edit the notes for an event (now a field on Event).
     """
-    qs = Event.objects.select_related("note")
-    event = get_object_or_404(qs, pk=event_id, trip__author=request.user)
-    note = getattr(event, "note", None)
-    form = NoteForm()
+    event = get_object_or_404(Event, pk=event_id, trip__author=request.user)
+    if request.method == "POST":
+        form = NoteForm(request.POST, instance=event)
+        if form.is_valid():
+            form.save()
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                _("Note updated successfully"),
+            )
+            return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+    else:
+        form = NoteForm(instance=event)
     context = {
         "event": event,
-        "note": note,
         "form": form,
     }
     return TemplateResponse(request, "trips/event-notes.html", context)
@@ -704,41 +712,29 @@ def event_notes(request, event_id):
 @require_http_methods(["POST"])
 def note_create(request, event_id):
     """
-    Add a note to an event. If the event already has a note, do not create a new one.
+    Add or update a note for an event (now a field on Event).
     """
     event = get_object_or_404(Event, pk=event_id, trip__author=request.user)
-    if hasattr(event, "note") and event.note is not None:
-        messages.error(request, _("This event already has a note."))
-        return HttpResponse(status=400)
-    form = NoteForm(request.POST)
+    form = NoteForm(request.POST, instance=event)
     if form.is_valid():
-        note = form.save(commit=False)
-        note.event = event
-        note.save()
+        form.save()
         messages.add_message(
             request,
             messages.SUCCESS,
             _("Note added successfully"),
         )
-        context = {
-            "form": form,
-            "note": note,
-        }
-        return TemplateResponse(request, "trips/event-notes.html", context)
+        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
     return HttpResponse(status=400)
 
 
 @login_required
-def note_modify(request, note_id):
+def note_modify(request, event_id):
     """
-    Modify a note for an event. If the note does not exist, return 404.
+    Modify the note for an event (now a field on Event).
     """
-    note = get_object_or_404(Note, pk=note_id, event__trip__author=request.user)
-    form = NoteForm(request.POST or None, instance=note)
-    context = {
-        "form": form,
-        "note": note,
-    }
+    event = get_object_or_404(Event, pk=event_id, trip__author=request.user)
+    form = NoteForm(request.POST or None, instance=event)
+    context = {"form": form, "event": event}
     if form.is_valid():
         form.save()
         messages.add_message(
@@ -751,12 +747,13 @@ def note_modify(request, note_id):
 
 
 @login_required
-def note_delete(request, note_id):
+def note_delete(request, event_id):
     """
-    Delete a note from an event. If the note does not exist, return 404.
+    Delete the note from an event (clear the notes field).
     """
-    note = get_object_or_404(Note, pk=note_id, event__trip__author=request.user)
-    note.delete()
+    event = get_object_or_404(Event, pk=event_id, trip__author=request.user)
+    event.notes = ""
+    event.save()
     messages.add_message(
         request,
         messages.ERROR,

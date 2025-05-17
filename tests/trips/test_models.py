@@ -180,13 +180,13 @@ class TestLinkModel:
         assert trip.links.first() == link
 
 
-class TestNoteModel:
-    def test_factory(self, user_factory, event_factory, note_factory):
-        """Test note model factory"""
-        user_factory()
-        note = note_factory()
+# class TestNoteModel:
+#     def test_factory(self, user_factory, event_factory, note_factory):
+#         """Test note model factory"""
+#         user_factory()
+#         note = note_factory()
 
-        assert note.__str__() == f"{note.content[:35]} ..."
+#         assert note.__str__() == f"{note.content[:35]} ..."
 
 
 class TestEventModel:

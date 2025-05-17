@@ -25,7 +25,7 @@
         <div class="flex gap-2 justify-end items-center">
             <button id="form-submit" class="btn btn-sm btn-soft btn-primary" type="submit">{% trans 'Save' %}</button>
             <button class="btn btn-sm btn-soft btn-error"
-                    hx-post="{% url 'trips:note-delete' note.pk %}"
+                    hx-post="{% url 'trips:note-delete' event.pk %}"
                     hx-target="#dialog"
                     hx-swap="innerHTML">{% trans 'Delete' %}</button>
             <button type="button"

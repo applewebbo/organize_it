@@ -176,16 +176,19 @@ class TestLinkForm:
 
 
 class TestNoteForm:
-    def test_form(self, user_factory):
-        """Test that the form saves a note"""
+    def test_form(self, user_factory, event_factory):
+        """
+        Test that the form saves notes to an Event instance.
+        """
         user_factory()
-
+        event = event_factory()
         data = {
-            "content": "Test content",
+            "notes": "Test content",
         }
-        form = NoteForm(data=data)
-
+        form = NoteForm(data=data, instance=event)
         assert form.is_valid()
+        event = form.save()
+        assert event.notes == "Test content"
 
 
 class TestTransportForm:

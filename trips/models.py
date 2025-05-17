@@ -221,6 +221,7 @@ class Event(models.Model):
     category = models.PositiveSmallIntegerField(
         choices=Category.choices, default=Category.EXPERIENCE
     )
+    notes = models.CharField(max_length=500, blank=True)
 
     class Meta:
         ordering = ["start_time"]
@@ -342,14 +343,14 @@ class Meal(Event):
         return super().save(*args, **kwargs)
 
 
-class Note(models.Model):
-    content = models.CharField(max_length=500)
-    event = models.OneToOneField(
-        Event, on_delete=models.CASCADE, null=True, blank=True, related_name="note"
-    )
-    stay = models.OneToOneField(
-        Stay, on_delete=models.CASCADE, null=True, blank=True, related_name="note"
-    )
+# class Note(models.Model):
+#     content = models.CharField(max_length=500)
+#     event = models.OneToOneField(
+#         Event, on_delete=models.CASCADE, null=True, blank=True, related_name="note"
+#     )
+#     stay = models.OneToOneField(
+#         Stay, on_delete=models.CASCADE, null=True, blank=True, related_name="note"
+#     )
 
-    def __str__(self) -> str:
-        return f"{self.content[:35]} ..."
+#     def __str__(self) -> str:
+#         return f"{self.content[:35]} ..."

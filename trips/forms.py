@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
 
-from .models import Day, Event, Experience, Link, Meal, Note, Stay, Transport, Trip
+from .models import Day, Event, Experience, Link, Meal, Stay, Transport, Trip
 
 
 def urlfields_assume_https(db_field, **kwargs):
@@ -229,21 +229,28 @@ FIELDSET_CONTENT = """
 
 
 class NoteForm(forms.ModelForm):
+    """
+    Form to edit the notes field of an Event instance.
+    """
+
     class Meta:
-        model = Note
-        fields = ("content",)
+        model = Event
+        fields = ("notes",)
         widgets = {
-            "content": forms.Textarea(attrs={"placeholder": "Add notes..."}),
+            "notes": forms.Textarea(attrs={"placeholder": "Add notes..."}),
         }
 
     def __init__(self, *args, **kwargs):
+        """
+        Initialize the NoteForm for editing the notes field of an Event.
+        """
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.form_show_labels = False
         self.helper.layout = Layout(
             Div(
-                Field("content", css_class="fl-textarea"),
+                Field("notes", css_class="fl-textarea"),
                 css_class="sm:col-span-2",
             ),
         )

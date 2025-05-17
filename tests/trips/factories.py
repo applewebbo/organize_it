@@ -136,11 +136,11 @@ class LinkFactory(factory.django.DjangoModelFactory):
     title = factory.Faker("sentence")
 
 
-class NoteFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = "trips.Note"
+# class NoteFactory(factory.django.DjangoModelFactory):
+#     class Meta:
+#         model = "trips.Note"
 
-    content = factory.Faker("paragraph", nb_sentences=4)
+#     content = factory.Faker("paragraph", nb_sentences=4)
 
 
 class EventFactory(factory.django.DjangoModelFactory):
