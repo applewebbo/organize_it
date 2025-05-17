@@ -163,6 +163,11 @@ class EventFactory(factory.django.DjangoModelFactory):
     )
     category = factory.Faker("random_element", elements=[1, 2, 3])
     url = factory.Faker("url")
+    notes = factory.Maybe(
+        factory.Faker("pybool"),
+        factory.Faker("sentence", nb_words=8),
+        "",
+    )
 
 
 class TransportFactory(factory.django.DjangoModelFactory):
@@ -182,6 +187,11 @@ class TransportFactory(factory.django.DjangoModelFactory):
     type = factory.Faker("random_element", elements=[1, 2, 3, 4, 5, 6, 7])
     category = 1
     url = factory.Faker("url")
+    notes = factory.Maybe(
+        factory.Faker("pybool"),
+        factory.Faker("sentence", nb_words=8),
+        "",
+    )
 
 
 class ExperienceFactory(factory.django.DjangoModelFactory):
@@ -216,6 +226,11 @@ class ExperienceFactory(factory.django.DjangoModelFactory):
     )
     type = factory.Faker("random_element", elements=[1, 2, 3, 4, 5, 6])
     category = 2
+    notes = factory.Maybe(
+        factory.Faker("pybool"),
+        factory.Faker("sentence", nb_words=8),
+        "",
+    )
 
 
 class MealFactory(factory.django.DjangoModelFactory):
@@ -233,6 +248,11 @@ class MealFactory(factory.django.DjangoModelFactory):
     )
     type = factory.Faker("random_element", elements=[1, 2, 3, 4])
     category = 3
+    notes = factory.Maybe(
+        factory.Faker("pybool"),
+        factory.Faker("sentence", nb_words=8),
+        "",
+    )
 
 
 class StayFactory(factory.django.DjangoModelFactory):
@@ -262,3 +282,8 @@ class StayFactory(factory.django.DjangoModelFactory):
     phone_number = factory.Faker("phone_number", locale="it_IT")
     url = factory.Faker("url")
     address = factory.LazyAttribute(lambda obj: random.choice(ITALIAN_CITIES))
+    notes = factory.Maybe(
+        factory.Faker("pybool"),
+        factory.Faker("sentence", nb_words=8),
+        "",
+    )
