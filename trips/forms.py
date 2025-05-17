@@ -228,34 +228,6 @@ FIELDSET_CONTENT = """
             </fieldset>"""
 
 
-class NoteForm(forms.ModelForm):
-    """
-    Form to edit the notes field of an Event instance.
-    """
-
-    class Meta:
-        model = Event
-        fields = ("notes",)
-        widgets = {
-            "notes": forms.Textarea(attrs={"placeholder": "Add notes..."}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        """
-        Initialize the NoteForm for editing the notes field of an Event.
-        """
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_tag = False
-        self.helper.form_show_labels = False
-        self.helper.layout = Layout(
-            Div(
-                Field("notes", css_class="fl-textarea"),
-                css_class="sm:col-span-2",
-            ),
-        )
-
-
 class TransportForm(forms.ModelForm):
     class Meta:
         model = Transport
@@ -616,6 +588,37 @@ class EventChangeTimesForm(forms.ModelForm):
         return cleaned_data
 
 
+class NoteForm(forms.ModelForm):
+    """
+    Form to edit the notes field of an Event instance.
+    """
+
+    notes = forms.CharField(
+        label="Notes",
+        widget=forms.Textarea(attrs={"placeholder": "Add notes..."}),
+        required=True,
+    )
+
+    class Meta:
+        model = Event
+        fields = ("notes",)
+
+    def __init__(self, *args, **kwargs):
+        """
+        Initialize the NoteForm for editing the notes field of an Event.
+        """
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.form_show_labels = False
+        self.helper.layout = Layout(
+            Div(
+                Field("notes", css_class="fl-textarea"),
+                css_class="sm:col-span-2",
+            ),
+        )
+
+
 class AddNoteToStayForm(forms.ModelForm):
     """
     Form to add notes to a Stay instance.
@@ -624,7 +627,7 @@ class AddNoteToStayForm(forms.ModelForm):
     notes = forms.CharField(
         label="Notes",
         widget=forms.Textarea(attrs={"placeholder": "Add notes..."}),
-        required=False,
+        required=True,
     )
 
     class Meta:

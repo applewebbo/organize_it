@@ -689,18 +689,7 @@ def event_notes(request, event_id):
     View or edit the notes for an event (now a field on Event).
     """
     event = get_object_or_404(Event, pk=event_id, trip__author=request.user)
-    if request.method == "POST":
-        form = NoteForm(request.POST, instance=event)
-        if form.is_valid():
-            form.save()
-            messages.add_message(
-                request,
-                messages.SUCCESS,
-                _("Note updated successfully"),
-            )
-            return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
-    else:
-        form = NoteForm(instance=event)
+    form = NoteForm(instance=event)
     context = {
         "event": event,
         "form": form,
@@ -768,7 +757,7 @@ def stay_notes(request, stay_id):
     View the note for an event.
     """
     stay = get_object_or_404(Stay, pk=stay_id)
-    form = AddNoteToStayForm()
+    form = AddNoteToStayForm(instance=stay)
     context = {
         "stay": stay,
         "form": form,

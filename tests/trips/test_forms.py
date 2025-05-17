@@ -7,6 +7,7 @@ from django.utils.translation import activate
 from tests.test import TestCase
 from tests.trips.factories import TripFactory
 from trips.forms import (
+    AddNoteToStayForm,
     EventChangeTimesForm,
     ExperienceForm,
     LinkForm,
@@ -537,3 +538,20 @@ class TestEventChangeTimesForm:
 
         assert not form.is_valid()
         assert "End time must be after start time" in form.non_field_errors()
+
+
+class TestAddNoteToStayForm:
+    def test_form_valid(self, user_factory, trip_factory, stay_factory):
+        """
+        Test that the form saves notes to a Stay instance.
+        """
+        user = user_factory()
+        trip_factory(author=user)
+        stay = stay_factory()
+        data = {
+            "notes": "Test note for stay",
+        }
+        form = AddNoteToStayForm(data=data, instance=stay)
+        assert form.is_valid()
+        stay = form.save()
+        assert stay.notes == "Test note for stay"
