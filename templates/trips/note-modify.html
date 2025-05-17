@@ -19,10 +19,10 @@
             <span class="sr-only">Close modal</span>
         </button>
     </div>
-    <div class="grid gap-x-1 p-4 sm:grid-cols-4 sm:gap-x-2 md:p-5">
+    <div class="grid gap-x-1 p-4 sm:grid-cols-2 sm:gap-x-2 md:p-5">
         {% csrf_token %}
         {% crispy form %}
-        <div class="flex gap-2 justify-end items-center">
+        <div class="flex gap-2 justify-end items-center sm:col-span-2">
             <button id="form-submit" class="btn btn-sm btn-soft btn-primary" type="submit">{% trans 'Save' %}</button>
             <button class="btn btn-sm btn-soft btn-error"
                     hx-post="{% url 'trips:note-delete' event.pk %}"

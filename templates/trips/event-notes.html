@@ -18,7 +18,7 @@
     {% if event.notes %}
         {% include 'trips/includes/note.html' with action_url='trips:note-modify' element=event %}
     {% else %}
-        <div class="mt-3">
+        <div class="mt-3 sm:col-span-2">
             <form hx-post="{% url 'trips:note-create' event.pk %}"
                   hx-target="#dialog"
                   method="post">

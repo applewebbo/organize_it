@@ -12,7 +12,7 @@
     {% if stay.notes %}
     {% include 'trips/includes/note.html' with action_url='trips:stay-note-modify' element=stay %}
     {% else %}
-    <div class="mt-3">
+    <div class="mt-3 sm:col-span-2">
         <form hx-post="{% url 'trips:stay-note-create' stay.pk %}" hx-target="#dialog" method="post">
             {% csrf_token %}
             {% crispy form %}
