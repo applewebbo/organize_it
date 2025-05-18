@@ -2,6 +2,7 @@ name: Tests Runner
 on:
   push:
     branches: [main]
+  pull_request:
 
 jobs:
   test:
