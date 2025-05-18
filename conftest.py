@@ -6,7 +6,6 @@ from tests.trips.factories import (
     ExperienceFactory,
     LinkFactory,
     MealFactory,
-    NoteFactory,
     StayFactory,
     TransportFactory,
     TripFactory,
@@ -15,7 +14,6 @@ from tests.trips.factories import (
 register(TripFactory)
 register(UserFactory)
 register(LinkFactory)
-register(NoteFactory)
 register(MealFactory)
 register(StayFactory)
 register(TransportFactory)

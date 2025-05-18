@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
 
-from .models import Day, Event, Experience, Link, Meal, Note, Stay, Transport, Trip
+from .models import Day, Event, Experience, Link, Meal, Stay, Transport, Trip
 
 
 def urlfields_assume_https(db_field, **kwargs):
@@ -226,37 +226,6 @@ FIELDSET_CONTENT = """
               </div>
             </div>
             </fieldset>"""
-
-
-class NoteForm(forms.ModelForm):
-    class Meta:
-        model = Note
-        fields = ("content", "link")
-        widgets = {
-            "content": forms.Textarea(attrs={"placeholder": "content"}),
-        }
-        labels = {
-            "content": "Content",
-        }
-
-    def __init__(self, trip, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["link"].queryset = Link.objects.filter(trips=trip)
-        # self.fields["link"].empty_label = "None"
-        self.helper = FormHelper()
-        self.helper.form_tag = False
-        self.helper.layout = Layout(
-            Field("content", css_class="fl-textarea"),
-            Div(
-                HTML(FIELDSET_CONTENT),
-                # adding an extra div here to overcome django-crispy-forms issue with two subsequent Divs getting nested
-                Div(
-                    Div("link", x_show="open == 2"),
-                ),
-                x_data="{ open: 0 }",
-                x_init="$watch('open', () => resetInput())",
-            ),
-        )
 
 
 class TransportForm(forms.ModelForm):
@@ -524,7 +493,7 @@ class StayForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["apply_to_days"].queryset = Day.objects.filter(trip=trip)
         self.fields["apply_to_days"].label_from_instance = (
-            lambda obj: f"Day {obj.number}"
+            lambda obj: f"{_('Day')} {obj.number}"
         )
         # Only set initial values if we're editing an existing stay
         if self.instance.pk:
@@ -617,3 +586,65 @@ class EventChangeTimesForm(forms.ModelForm):
             raise ValidationError("End time must be after start time")
 
         return cleaned_data
+
+
+class NoteForm(forms.ModelForm):
+    """
+    Form to edit the notes field of an Event instance.
+    """
+
+    notes = forms.CharField(
+        label="Notes",
+        widget=forms.Textarea(attrs={"placeholder": "Add notes..."}),
+        required=True,
+    )
+
+    class Meta:
+        model = Event
+        fields = ("notes",)
+
+    def __init__(self, *args, **kwargs):
+        """
+        Initialize the NoteForm for editing the notes field of an Event.
+        """
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.form_show_labels = False
+        self.helper.layout = Layout(
+            Div(
+                Field("notes", css_class="fl-textarea"),
+                css_class="sm:col-span-2",
+            ),
+        )
+
+
+class AddNoteToStayForm(forms.ModelForm):
+    """
+    Form to add notes to a Stay instance.
+    """
+
+    notes = forms.CharField(
+        label="Notes",
+        widget=forms.Textarea(attrs={"placeholder": "Add notes..."}),
+        required=True,
+    )
+
+    class Meta:
+        model = Stay
+        fields = ["notes"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from crispy_forms.helper import FormHelper
+        from crispy_forms.layout import Div, Field, Layout
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.form_show_labels = False
+        self.helper.layout = Layout(
+            Div(
+                Field("notes", css_class="fl-textarea"),
+                css_class="sm:col-span-2",
+            ),
+        )

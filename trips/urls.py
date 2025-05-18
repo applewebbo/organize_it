@@ -26,6 +26,7 @@ htmx_urlpatterns = [
     path("stays/<int:day_id>/create", views.add_stay, name="add-stay"),
     path("stays/<int:pk>/modify", views.stay_modify, name="stay-modify"),
     path("stays/<int:pk>/delete", views.stay_delete, name="stay-delete"),
+    # EVENTS
     path("events/<int:pk>/modal", views.event_modal, name="event-modal"),
     path("events/<int:pk>/delete", views.event_delete, name="event-delete"),
     path("events/<int:pk>/unpair", views.event_unpair, name="event-unpair"),
@@ -51,6 +52,27 @@ htmx_urlpatterns = [
     ),
     path("days/<int:pk>/detail", views.day_detail, name="day-detail"),
     path("validate/dates/", views.validate_dates, name="validate-dates"),
+    # NOTES
+    path("notes/<int:event_id>/", views.event_notes, name="event-notes"),
+    path("notes/<int:event_id>/create", views.note_create, name="note-create"),
+    path("notes/<int:event_id>/delete", views.note_delete, name="note-delete"),
+    path("notes/<int:event_id>/modify", views.note_modify, name="note-modify"),
+    path("stay-notes/<int:stay_id>/", views.stay_notes, name="stay-notes"),
+    path(
+        "stay-notes/<int:stay_id>/create",
+        views.stay_note_create,
+        name="stay-note-create",
+    ),
+    path(
+        "stay-notes/<int:stay_id>/modify",
+        views.stay_note_modify,
+        name="stay-note-modify",
+    ),
+    path(
+        "stay-notes/<int:stay_id>/delete",
+        views.stay_note_delete,
+        name="stay-note-delete",
+    ),
 ]
 
 urlpatterns += htmx_urlpatterns

@@ -7,6 +7,7 @@ from django.utils.translation import activate
 from tests.test import TestCase
 from tests.trips.factories import TripFactory
 from trips.forms import (
+    AddNoteToStayForm,
     EventChangeTimesForm,
     ExperienceForm,
     LinkForm,
@@ -176,28 +177,19 @@ class TestLinkForm:
 
 
 class TestNoteForm:
-    def test_form(self, user_factory, trip_factory):
-        """Test that the form saves a note"""
-        user = user_factory()
-        trip = trip_factory(author=user, title="Test Trip")
+    def test_form(self, user_factory, event_factory):
+        """
+        Test that the form saves notes to an Event instance.
+        """
+        user_factory()
+        event = event_factory()
         data = {
-            "content": "Test content",
+            "notes": "Test content",
         }
-        form = NoteForm(trip=trip, data=data)
-
+        form = NoteForm(data=data, instance=event)
         assert form.is_valid()
-
-    def test_queryset(self, user_factory, trip_factory, link_factory):
-        """Test that the form display the correct links to be assigned to the newly created note"""
-        user = user_factory()
-        trip = trip_factory(author=user)
-        link = link_factory(author=user)
-        trip.links.add(link)
-        trip.save()
-
-        form = NoteForm(trip=trip)
-
-        assert link in form.fields["link"].queryset
+        event = form.save()
+        assert event.notes == "Test content"
 
 
 class TestTransportForm:
@@ -546,3 +538,20 @@ class TestEventChangeTimesForm:
 
         assert not form.is_valid()
         assert "End time must be after start time" in form.non_field_errors()
+
+
+class TestAddNoteToStayForm:
+    def test_form_valid(self, user_factory, trip_factory, stay_factory):
+        """
+        Test that the form saves notes to a Stay instance.
+        """
+        user = user_factory()
+        trip_factory(author=user)
+        stay = stay_factory()
+        data = {
+            "notes": "Test note for stay",
+        }
+        form = AddNoteToStayForm(data=data, instance=stay)
+        assert form.is_valid()
+        stay = form.save()
+        assert stay.notes == "Test note for stay"

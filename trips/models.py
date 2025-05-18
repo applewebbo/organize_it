@@ -121,6 +121,7 @@ class Stay(models.Model):
     address = models.CharField(max_length=200)
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
+    notes = models.CharField(max_length=500, blank=True)
 
     def save(self, *args, **kwargs):
         """convert address to coordinates for displaying on the map"""
@@ -200,16 +201,6 @@ class Link(models.Model):
         return self.url
 
 
-class Note(models.Model):
-    content = models.CharField(max_length=500)
-    trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="notes")
-    link = models.ForeignKey(Link, on_delete=models.SET_NULL, null=True, blank=True)
-    checked = models.BooleanField(default=False)
-
-    def __str__(self) -> str:
-        return f"{self.content[:35]} ..."
-
-
 class Event(models.Model):
     class Category(models.IntegerChoices):
         TRANSPORT = 1, _("Transport")
@@ -230,6 +221,7 @@ class Event(models.Model):
     category = models.PositiveSmallIntegerField(
         choices=Category.choices, default=Category.EXPERIENCE
     )
+    notes = models.CharField(max_length=500, blank=True)
 
     class Meta:
         ordering = ["start_time"]
@@ -349,3 +341,16 @@ class Meal(Event):
         """autosave category for meal"""
         self.category = self.Category.MEAL
         return super().save(*args, **kwargs)
+
+
+# class Note(models.Model):
+#     content = models.CharField(max_length=500)
+#     event = models.OneToOneField(
+#         Event, on_delete=models.CASCADE, null=True, blank=True, related_name="note"
+#     )
+#     stay = models.OneToOneField(
+#         Stay, on_delete=models.CASCADE, null=True, blank=True, related_name="note"
+#     )
+
+#     def __str__(self) -> str:
+#         return f"{self.content[:35]} ..."

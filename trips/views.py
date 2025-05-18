@@ -14,9 +14,11 @@ from django.views.decorators.http import require_http_methods
 
 from accounts.models import Profile
 from trips.forms import (
+    AddNoteToStayForm,
     EventChangeTimesForm,
     ExperienceForm,
     MealForm,
+    NoteForm,
     StayForm,
     TransportForm,
     TripDateUpdateForm,
@@ -679,3 +681,148 @@ def validate_dates(request):
         )
         return HttpResponse(html)
     return HttpResponse("")
+
+
+@login_required
+def event_notes(request, event_id):
+    """
+    View or edit the notes for an event (now a field on Event).
+    """
+    event = get_object_or_404(Event, pk=event_id, trip__author=request.user)
+    form = NoteForm(instance=event)
+    context = {
+        "event": event,
+        "form": form,
+    }
+    return TemplateResponse(request, "trips/event-notes.html", context)
+
+
+@login_required
+@require_http_methods(["POST"])
+def note_create(request, event_id):
+    """
+    Add or update a note for an event (now a field on Event).
+    """
+    event = get_object_or_404(Event, pk=event_id, trip__author=request.user)
+    form = NoteForm(request.POST, instance=event)
+    if form.is_valid():
+        form.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            _("Note added successfully"),
+        )
+        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+    return HttpResponse(status=400)
+
+
+@login_required
+def note_modify(request, event_id):
+    """
+    Modify the note for an event (now a field on Event).
+    """
+    event = get_object_or_404(Event, pk=event_id, trip__author=request.user)
+    form = NoteForm(request.POST or None, instance=event)
+    context = {"form": form, "event": event}
+    if form.is_valid():
+        form.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            _("Note updated successfully"),
+        )
+        response = TemplateResponse(request, "trips/event-notes.html", context)
+        response["HX-Trigger"] = "tripModified"
+        return response
+    return TemplateResponse(request, "trips/note-modify.html", context)
+
+
+@login_required
+def note_delete(request, event_id):
+    """
+    Delete the note from an event (clear the notes field).
+    """
+    event = get_object_or_404(Event, pk=event_id, trip__author=request.user)
+    event.notes = ""
+    event.save()
+    messages.add_message(
+        request,
+        messages.ERROR,
+        _("Note deleted successfully"),
+    )
+    return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+
+
+@login_required
+def stay_notes(request, stay_id):
+    """
+    View the note for an event.
+    """
+    stay = get_object_or_404(Stay, pk=stay_id)
+    form = AddNoteToStayForm(instance=stay)
+    context = {
+        "stay": stay,
+        "form": form,
+    }
+    return TemplateResponse(request, "trips/stay-notes.html", context)
+
+
+@login_required
+@require_http_methods(["POST"])
+def stay_note_create(request, stay_id):
+    """
+    Add a note to a stay. If the stay already has a note, do not create a new one.
+    """
+    stay = get_object_or_404(Stay, pk=stay_id)
+    form = AddNoteToStayForm(request.POST)
+    if form.is_valid():
+        notes_content = form.cleaned_data["notes"]
+        stay.notes = notes_content
+        stay.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            _("Note added successfully"),
+        )
+        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+    return HttpResponse(status=400)
+
+
+@login_required
+def stay_note_modify(request, stay_id):
+    """
+    Modify a note for a stay. If the note does not exist, return 404.
+    """
+    stay = get_object_or_404(Stay, pk=stay_id)
+    form = AddNoteToStayForm(request.POST or None, instance=stay)
+    context = {
+        "form": form,
+        "stay": stay,
+    }
+    if form.is_valid():
+        form.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            _("Note updated successfully"),
+        )
+        response = TemplateResponse(request, "trips/stay-notes.html", context)
+        response["HX-Trigger"] = "tripModified"
+        return response
+    return TemplateResponse(request, "trips/stay-note-modify.html", context)
+
+
+@login_required
+def stay_note_delete(request, stay_id):
+    """
+    Delete a note from a stay. If the note does not exist, return 404.
+    """
+    stay = get_object_or_404(Stay, pk=stay_id)
+    stay.notes = ""
+    stay.save()
+    messages.add_message(
+        request,
+        messages.ERROR,
+        _("Note deleted successfully"),
+    )
+    return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
