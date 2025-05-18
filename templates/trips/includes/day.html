@@ -18,13 +18,15 @@
             <ul class="grid grid-cols-1 gap-y-2 gap-x-4 md:grid-cols-2">
                 {% if day.stay %}
                     <li class="flex relative items-center py-3 px-6 rounded-lg border border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-100/30">
-                        <div class="absolute top-0 right-2 mt-2 text-right" x-data>
-                                    <button class="btn btn-xs btn-soft border-slate-300 bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-900/10 hover:bg-white/50"
-                                            hx-get="{% url 'trips:stay-notes' day.stay.pk %}"
-                                            @click="$dispatch('open-modal'); document.activeElement.blur()"
-                                            hx-target="#dialog"
-                                            hx-swap="innerHTML">{% heroicon_mini 'paper-clip' class="size-4" %}
-                                    </button>
+                        <div class="absolute top-0 right-2 mt-4 text-right me-2" x-data>
+                            <button class="relative btn btn-xs btn-soft border-slate-300 bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-900/10 hover:bg-white/50"
+                                    hx-get="{% url 'trips:stay-notes' day.stay.pk %}"
+                                    @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                    hx-target="#dialog"
+                                    hx-swap="innerHTML">
+                                {% heroicon_mini 'paper-clip' class="size-4" %}
+                                <span class="absolute w-2 h-2 text-xs font-bold text-white {% if day.stay.notes %}bg-slate-900/30 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
+                            </button>
                         </div>
                         <div class="p-2 mt-1 bg-white rounded-full border-2 text-slate-500 border-slate-300 dark:text-slate-300 dark:bg-slate-700 dark:border-slate-700">
                             {% heroicon_outline 'home-modern' class="stroke-2 size-5" %}
@@ -55,7 +57,17 @@
                     </li>
                     {% with next_day=day|next_day %}
                         {% if next_day and next_day.stay and day|has_different_stay:next_day and next_day.stay.check_in %}
-                            <li class="flex items-center py-3 px-6 rounded-lg border border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-100/30">
+                            <li class="flex relative items-center py-3 px-6 rounded-lg border border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-100/30">
+                                <div class="absolute top-0 right-2 mt-4 text-right me-2" x-data>
+                                    <button class="relative btn btn-xs btn-soft border-slate-300 bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-900/10 hover:bg-white/50"
+                                            hx-get="{% url 'trips:stay-notes' next_day.stay.pk %}"
+                                            @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                            hx-target="#dialog"
+                                            hx-swap="innerHTML">
+                                        {% heroicon_mini 'paper-clip' class="size-4" %}
+                                        <span class="absolute w-2 h-2 text-xs font-bold text-white {% if next_day.stay.notes %}bg-slate-900/30 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
+                                    </button>
+                                </div>
                                 <div class="p-2 mt-1 bg-white rounded-full border-2 text-slate-500 border-slate-300 dark:text-slate-300 dark:bg-slate-700 dark:border-slate-700">
                                     {% heroicon_outline 'home-modern' class="stroke-2 size-5" %}
                                 </div>

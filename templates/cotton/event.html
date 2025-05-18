@@ -17,17 +17,20 @@
         </div>
     </div>
     <div class="flex absolute top-0 right-2 flex-col gap-1 mt-4 text-right me-2" x-data>
-        <button class="btn btn-xs btn-soft {{ border_color }} {{ bg_color }} dark:hover:bg-slate-900/10 hover:bg-white/50"
+        <button class="relative btn btn-xs btn-soft {{ border_color }} {{ bg_color }} dark:hover:bg-slate-900/10 hover:bg-white/50"
                 hx-get="{% url 'trips:event-notes' event.pk %}"
                 @click="$dispatch('open-modal'); document.activeElement.blur()"
                 hx-target="#dialog"
-                hx-swap="innerHTML">{% heroicon_mini 'paper-clip' class="size-4" %}
+                hx-swap="innerHTML">
+            {% heroicon_mini 'paper-clip' class="size-4" %}
+            <span class="absolute w-2 h-2 text-xs font-bold text-white {% if event.notes %}bg-slate-900/30 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
         </button>
         <button class="btn btn-xs btn-soft {{ border_color }} {{ bg_color }} dark:hover:bg-slate-900/10 hover:bg-white/50"
                 hx-get="{% url 'trips:event-swap-modal' event.pk %}"
                 @click="$dispatch('open-modal'); document.activeElement.blur()"
                 hx-target="#dialog"
-                hx-swap="innerHTML">{% heroicon_mini 'arrows-up-down' class="size-4" %}
+                hx-swap="innerHTML">
+            {% heroicon_mini 'arrows-up-down' class="size-4" %}
         </button>
     </div>
 </div>

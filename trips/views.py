@@ -731,7 +731,9 @@ def note_modify(request, event_id):
             messages.SUCCESS,
             _("Note updated successfully"),
         )
-        return TemplateResponse(request, "trips/event-notes.html", context)
+        response = TemplateResponse(request, "trips/event-notes.html", context)
+        response["HX-Trigger"] = "tripModified"
+        return response
     return TemplateResponse(request, "trips/note-modify.html", context)
 
 
@@ -782,11 +784,7 @@ def stay_note_create(request, stay_id):
             messages.SUCCESS,
             _("Note added successfully"),
         )
-        context = {
-            "stay": stay,
-            "form": form,
-        }
-        return TemplateResponse(request, "trips/stay-notes.html", context)
+        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
     return HttpResponse(status=400)
 
 
@@ -808,7 +806,9 @@ def stay_note_modify(request, stay_id):
             messages.SUCCESS,
             _("Note updated successfully"),
         )
-        return TemplateResponse(request, "trips/stay-notes.html", context)
+        response = TemplateResponse(request, "trips/stay-notes.html", context)
+        response["HX-Trigger"] = "tripModified"
+        return response
     return TemplateResponse(request, "trips/stay-note-modify.html", context)
 
 

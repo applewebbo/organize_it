@@ -1628,7 +1628,7 @@ class StayNoteCreateView(TestCase):
         with self.login(user):
             response = self.post("trips:stay-note-create", stay_id=stay.pk, data=data)
 
-        self.response_200(response)
+        self.response_204(response)
         stay.refresh_from_db()
         assert stay.notes == data["notes"]
 
