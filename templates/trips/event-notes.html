@@ -16,7 +16,7 @@
 </div>
 <div class="grid gap-x-1 p-4 sm:grid-cols-2 sm:gap-x-2 md:p-5">
     {% if event.notes %}
-        {% include 'trips/includes/note.html' with action_url='trips:note-modify' element=event %}
+        {% include 'trips/includes/note.html' with modify_url='trips:note-modify' delete_url='trips:note-delete' element=event %}
     {% else %}
         <div class="mt-3 sm:col-span-2">
             <form hx-post="{% url 'trips:note-create' event.pk %}"

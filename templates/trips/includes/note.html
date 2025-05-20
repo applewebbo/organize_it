@@ -3,14 +3,13 @@
     {{ element.notes }}
     <div class="flex gap-2 justify-end mt-2">
         <button class="btn btn-sm btn-soft btn-primary"
-                hx-post="{% url action_url element.pk %}"
+                hx-post="{% url modify_url element.pk %}"
                 hx-target="#dialog"
-                hx-swap="innerHTML">
-            {% trans 'Edit' %}
-        </button>
-        <button class="btn btn-sm btn-soft"
-                x-on:click="openModal = false">
-            {% trans 'Close' %}
-        </button>
+                hx-swap="innerHTML">{% trans 'Edit' %}</button>
+        <button class="btn btn-sm btn-soft btn-error"
+                hx-post="{% url delete_url element.pk %}"
+                hx-target="#dialog"
+                hx-swap="innerHTML">{% trans 'Delete' %}</button>
+        <button class="btn btn-sm btn-soft" x-on:click="openModal = false">{% trans 'Close' %}</button>
     </div>
 </div>
