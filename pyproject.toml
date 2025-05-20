@@ -25,11 +25,11 @@ dependencies = [
   "django-anymail[mailgun]>=13.0",
   "croniter>=6.0.0"
 ]
-description = "Add your description here"
-name = "organize-it"
+description = "Help you organize your trips and travel plans."
+name = "organize_it"
 readme = "README.md"
-requires-python = ">=3.11"
-version = "0.1.0"
+requires-python = ">=3.13"
+version = "0.2.1"
 
 [tool.bandit]
 skips = ["B101", "B311"]
