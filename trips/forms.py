@@ -24,16 +24,20 @@ def urlfields_assume_https(db_field, **kwargs):
 
 
 class TripForm(forms.ModelForm):
-    title = forms.CharField(label="Titolo")
+    title = forms.CharField(label=_("Title"))
     description = forms.CharField(
-        widget=forms.Textarea(), label="Descrizione", required=False
+        widget=forms.Textarea(), label=_("Description"), required=False
     )
-    destination = forms.CharField(label="Destinazione")
+    destination = forms.CharField(label=_("Destination"))
     start_date = forms.DateField(
-        label="Inizio", required=False, widget=forms.DateInput(attrs={"type": "date"})
+        label=_("Start date"),
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date"}),
     )
     end_date = forms.DateField(
-        label="Fine", required=False, widget=forms.DateInput(attrs={"type": "date"})
+        label=_("End date"),
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date"}),
     )
 
     class Meta:
@@ -106,11 +110,11 @@ class TripForm(forms.ModelForm):
 
 class TripDateUpdateForm(forms.ModelForm):
     start_date = forms.DateField(
-        label="Inizio",
+        label=_("Start date"),
         required=False,
     )
     end_date = forms.DateField(
-        label="Fine",
+        label=_("End date"),
         required=False,
     )
 
@@ -240,7 +244,14 @@ class TransportForm(forms.ModelForm):
             "url",
         ]
         formfield_callback = urlfields_assume_https
-        labels = {"address": _("Departure")}
+        labels = {
+            "address": _("Departure"),
+            "destination": _("Destination"),
+            "start_time": _("Start Time"),
+            "end_time": _("End Time"),
+            "url": _("Url"),
+            "type": _("Type"),
+        }
         widgets = {
             "type": forms.Select(),
             "address": forms.TextInput(attrs={"placeholder": "Departure"}),
@@ -313,6 +324,14 @@ class ExperienceForm(forms.ModelForm):
             "url",
         ]
         formfield_callback = urlfields_assume_https
+        labels = {
+            "name": _("Name"),
+            "type": _("Type"),
+            "address": _("Address"),
+            "start_time": _("Start Time"),
+            "duration": _("Duration"),
+            "url": _("Url"),
+        }
         widgets = {
             "name": forms.TextInput(attrs={"placeholder": "Name"}),
             "type": forms.Select(),
@@ -393,6 +412,14 @@ class MealForm(forms.ModelForm):
             "url",
         ]
         formfield_callback = urlfields_assume_https
+        labels = {
+            "name": _("Name"),
+            "type": _("Type"),
+            "address": _("Address"),
+            "start_time": _("Start Time"),
+            "duration": _("Duration"),
+            "url": _("Url"),
+        }
         widgets = {
             "name": forms.TextInput(attrs={"placeholder": "Name"}),
             "type": forms.Select(),

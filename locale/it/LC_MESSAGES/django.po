@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-08 15:06+0200\n"
-"PO-Revision-Date: 2025-05-08 15:08+0200\n"
+"POT-Creation-Date: 2025-05-20 15:38+0200\n"
+"PO-Revision-Date: 2025-05-20 15:34+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: it\n"
@@ -209,15 +209,15 @@ msgstr ""
 "esitare a contattarci se non ricevi la email di verifica entro qualche "
 "minuto."
 
-#: templates/cotton/dropdown.html:10 trips/models.py:190
+#: templates/cotton/dropdown.html:10 trips/models.py:206
 msgid "Transport"
 msgstr "Trasferimento"
 
-#: templates/cotton/dropdown.html:16 trips/models.py:191
+#: templates/cotton/dropdown.html:16 trips/models.py:207
 msgid "Experience"
 msgstr "Esperienza"
 
-#: templates/cotton/dropdown.html:22 trips/models.py:192
+#: templates/cotton/dropdown.html:22 trips/models.py:208
 msgid "Meal"
 msgstr "Pasto"
 
@@ -244,6 +244,12 @@ msgstr ""
 msgid "© 2025 WEBBOgrafico - All right reserved"
 msgstr "© 2025 WEBBOgrafico - Tutti i diritti riservati"
 
+#: templates/includes/messages.html:20 templates/trips/event-notes.html:33
+#: templates/trips/includes/note.html:13 templates/trips/note-modify.html:29
+#: templates/trips/stay-note-modify.html:33 templates/trips/stay-notes.html:23
+msgid "Close"
+msgstr "Chiudi"
+
 #: templates/includes/navbar.html:17
 msgid "Logout"
 msgstr "Esci"
@@ -264,6 +270,26 @@ msgstr "Viaggi"
 msgid "Profile"
 msgstr "Profilo"
 
+#: templates/trips/event-notes.html:5
+msgid "Event Notes"
+msgstr "Note relative all’evento"
+
+#: templates/trips/event-notes.html:7 templates/trips/stay-notes.html:3
+msgid "Add Notes"
+msgstr "Aggiungi Note"
+
+#: templates/trips/event-notes.html:14 templates/trips/stay-notes.html:8
+msgid "Close modal"
+msgstr "Chiudi la finestra"
+
+#: templates/trips/event-notes.html:30
+#: templates/trips/experience-create.html:49
+#: templates/trips/note-modify.html:26 templates/trips/stay-modify.html:18
+#: templates/trips/stay-note-modify.html:26 templates/trips/stay-notes.html:20
+#: templates/trips/transport-create.html:48
+msgid "Save"
+msgstr "Salva"
+
 #: templates/trips/experience-create.html:8
 msgid "Create a new Experience"
 msgstr "Crea una nuova esperienza"
@@ -273,18 +299,22 @@ msgid "Unpaired Experiences"
 msgstr "Esperienze non abbinate"
 
 #: templates/trips/experience-create.html:48
-#: templates/trips/transport-create.html:47
+#: templates/trips/stay-modify.html:17 templates/trips/transport-create.html:47
 msgid "Cancel"
 msgstr "Annulla"
 
-#: templates/trips/experience-create.html:49
-#: templates/trips/transport-create.html:48
-msgid "Save"
-msgstr "Salva"
-
-#: templates/trips/includes/day.html:10 trips/models.py:163
+#: templates/trips/includes/day.html:10 trips/forms.py:512 trips/models.py:189
 msgid "Day"
 msgstr "Giorno"
+
+#: templates/trips/includes/note.html:8
+msgid "Edit"
+msgstr "Modifica"
+
+#: templates/trips/includes/note.html:12
+#: templates/trips/stay-note-modify.html:30 templates/trips/trip-list.html:51
+msgid "Delete"
+msgstr "Elimina"
 
 #: templates/trips/meal-create.html:8
 msgid "Create a new Meal"
@@ -293,6 +323,18 @@ msgstr "Crea un nuovo pasto"
 #: templates/trips/meal-create.html:28
 msgid "Unpaired Meals"
 msgstr "Pasti non abbinati"
+
+#: templates/trips/note-modify.html:8 templates/trips/stay-note-modify.html:8
+msgid "Modify notes"
+msgstr "Modifica Note"
+
+#: templates/trips/stay-modify.html:4
+msgid "Edit Stay"
+msgstr "Modifica soggiorno"
+
+#: templates/trips/stay-notes.html:3
+msgid "Stay Notes"
+msgstr "Note relative al soggiorno"
 
 #: templates/trips/transport-create.html:8
 msgid "Create a new Transport"
@@ -338,65 +380,97 @@ msgstr "Modifica date"
 msgid "Archive"
 msgstr "Archivia"
 
-#: templates/trips/trip-list.html:51
-msgid "Delete"
-msgstr "Elimina"
-
 #: templates/trips/trip-list.html:53
 msgid "View"
 msgstr "Vedi"
 
-#: trips/forms.py:89
+#: trips/forms.py:27
+msgid "Title"
+msgstr "Titolo"
+
+#: trips/forms.py:29
+msgid "Description"
+msgstr "Descrizione"
+
+#: trips/forms.py:31 trips/forms.py:243
+msgid "Destination"
+msgstr "Destinazione"
+
+#: trips/forms.py:33 trips/forms.py:109
+msgid "Start date"
+msgstr "Data di inizio"
+
+#: trips/forms.py:36 trips/forms.py:113
+msgid "End date"
+msgstr "Data di fine"
+
+#: trips/forms.py:90
 msgid "End date must be after start date"
 msgstr "La data di fine deve essere successiva alla data di inizio"
 
-#: trips/forms.py:95
+#: trips/forms.py:96
 msgid "Start date must be after today"
 msgstr "La data di inizio deve essere successiva a quella di oggi"
 
-#: trips/forms.py:102
+#: trips/forms.py:103
 msgid "Destination not found"
 msgstr "Destinazione non trovata"
 
-#: trips/forms.py:273
+#: trips/forms.py:243
 msgid "Departure"
 msgstr "Partenza"
 
-#: trips/forms.py:331 trips/forms.py:411
+#: trips/forms.py:243 trips/forms.py:320 trips/forms.py:408
+msgid "Start Time"
+msgstr "Orario di partenza"
+
+#: trips/forms.py:243
+msgid "End Time"
+msgstr "Orario di arrivo"
+
+#: trips/forms.py:243 trips/forms.py:322 trips/forms.py:410
+msgid "Url"
+msgstr "Indirizzo web"
+
+#: trips/forms.py:243 trips/forms.py:318 trips/forms.py:406
+msgid "Type"
+msgstr "Tipologia"
+
+#: trips/forms.py:301 trips/forms.py:321 trips/forms.py:389 trips/forms.py:409
 msgid "Duration"
 msgstr "Durata"
 
-#: trips/forms.py:486
-msgid "Period of stay"
-msgstr "Periodo di soggiorno"
-
-#: trips/forms.py:513
+#: trips/forms.py:317 trips/forms.py:405 trips/forms.py:499
 msgid "Name"
 msgstr "Nome"
 
-#: trips/forms.py:514
+#: trips/forms.py:319 trips/forms.py:407 trips/forms.py:505
+msgid "Address"
+msgstr "Indirizzo"
+
+#: trips/forms.py:472
+msgid "Period of stay"
+msgstr "Periodo di soggiorno"
+
+#: trips/forms.py:500
 msgid "Check-in"
 msgstr "Check-in"
 
-#: trips/forms.py:515
+#: trips/forms.py:501
 msgid "Check-out"
 msgstr "Check-out"
 
-#: trips/forms.py:516
+#: trips/forms.py:502
 msgid "Cancellation date"
 msgstr "Data di cancellazione gratuita"
 
-#: trips/forms.py:517
+#: trips/forms.py:503
 msgid "Phone number"
 msgstr "Numero di telefono"
 
-#: trips/forms.py:518
+#: trips/forms.py:504
 msgid "Website"
 msgstr "Sito Internet"
-
-#: trips/forms.py:519
-msgid "Address"
-msgstr "Indirizzo"
 
 #: trips/models.py:19
 msgid "Not started"
@@ -418,129 +492,141 @@ msgstr "Completata"
 msgid "Archived"
 msgstr "Archiviata"
 
-#: trips/models.py:93
+#: trips/models.py:115
 msgid "Enter a valid phone number (with or without international prefix)."
 msgstr ""
 "Inserisci un numero di telefono valido (con o senza il prefisso "
 "internazionale)"
 
-#: trips/models.py:262
+#: trips/models.py:279
 msgid "Car"
 msgstr "Automobile"
 
-#: trips/models.py:263
+#: trips/models.py:280
 msgid "Plane"
 msgstr "Aeroplano"
 
-#: trips/models.py:264
+#: trips/models.py:281
 msgid "Train"
 msgstr "Treno"
 
-#: trips/models.py:265
+#: trips/models.py:282
 msgid "Boat"
 msgstr "Nave"
 
-#: trips/models.py:266
+#: trips/models.py:283
 msgid "Bus"
 msgstr "Autobus"
 
-#: trips/models.py:267
+#: trips/models.py:284
 msgid "Taxi"
 msgstr "Taxi"
 
-#: trips/models.py:268 trips/models.py:298
+#: trips/models.py:285 trips/models.py:315
 msgid "Other"
 msgstr "Altro"
 
-#: trips/models.py:294
+#: trips/models.py:311
 msgid "Museum"
 msgstr "Museo"
 
-#: trips/models.py:295
+#: trips/models.py:312
 msgid "Park"
 msgstr "Parco"
 
-#: trips/models.py:296
+#: trips/models.py:313
 msgid "Walk"
 msgstr "Passeggiata"
 
-#: trips/models.py:297
+#: trips/models.py:314
 msgid "Sport"
 msgstr "Attività sportiva"
 
-#: trips/models.py:313
+#: trips/models.py:330
 msgid "Breakfast"
 msgstr "Colazione"
 
-#: trips/models.py:314
+#: trips/models.py:331
 msgid "Lunch"
 msgstr "Pranzo"
 
-#: trips/models.py:315
+#: trips/models.py:332
 msgid "Dinner"
 msgstr "Cena"
 
-#: trips/models.py:316
+#: trips/models.py:333
 msgid "Snack"
 msgstr "Spuntino"
 
-#: trips/views.py:226
+#: trips/views.py:235
 msgid "Transport added successfully"
-msgstr "Trasferimento aggiunto con successo"
+msgstr "Trasferimento aggiunto correttamente"
 
-#: trips/views.py:247
+#: trips/views.py:256
 msgid "Experience added successfully"
-msgstr "Esperienza aggiunta con successo"
+msgstr "Esperienza aggiunta correttamente"
 
-#: trips/views.py:268
+#: trips/views.py:277
 msgid "Meal added successfully"
-msgstr "Pasto aggiunto con successo"
+msgstr "Pasto aggiunto correttamente"
 
-#: trips/views.py:285
+#: trips/views.py:294
 msgid "Stay added successfully"
-msgstr "Soggiorno aggiunto con successo"
+msgstr "Soggiorno aggiunto correttamente"
 
-#: trips/views.py:326
+#: trips/views.py:335
 msgid "Stay updated successfully"
-msgstr "Soggiorno modificato con successo"
+msgstr "Soggiorno modificato correttamente"
 
-#: trips/views.py:354
+#: trips/views.py:363
 msgid "Stay deleted successfully"
-msgstr "Soggiorno eliminato con successo"
+msgstr "Soggiorno eliminato correttamente"
 
-#: trips/views.py:388
+#: trips/views.py:397
 msgid "Event deleted successfully"
-msgstr "Evento eliminato con successo"
+msgstr "Evento eliminato correttamente"
 
-#: trips/views.py:407
+#: trips/views.py:416
 msgid "Event unpaired successfully"
-msgstr "Evento scollegato con successo"
+msgstr "Evento scollegato correttamente"
 
-#: trips/views.py:427
+#: trips/views.py:436
 msgid "Event paired successfully"
-msgstr "Evento ricollegato con successo"
+msgstr "Evento ricollegato correttamente"
 
-#: trips/views.py:508
+#: trips/views.py:517
 msgid "Event updated successfully"
-msgstr "Evento modificato con successo"
+msgstr "Evento modificato correttamente"
 
-#: trips/views.py:531
+#: trips/views.py:540
 msgid "Event times updated successfully"
-msgstr "Orari dell'evento modificati con successo"
+msgstr "Orari dell'evento modificati correttamente"
 
-#: trips/views.py:562
+#: trips/views.py:571
 msgid "This event overlaps with another event"
 msgstr ""
 "Gli orari di questo evento si sovrappongono con quelli di un altro evento"
 
-#: trips/views.py:583
+#: trips/views.py:592
 msgid "Events swapped successfully"
-msgstr "Eventi scambiati con successo"
+msgstr "Eventi scambiati correttamente"
 
-#: trips/views.py:649
+#: trips/views.py:658
 msgid "Start date must be after today."
 msgstr "La data di inizio deve essere successiva a quella di oggi."
 
-#: trips/views.py:653
+#: trips/views.py:662
 msgid "Start date cannot be after end date."
 msgstr "La data di inizio deve essere successiva a quella di fine."
+
+#: trips/views.py:713 trips/views.py:785
+msgid "Note added successfully"
+msgstr "Nota aggiunta con successo"
+
+#: trips/views.py:732 trips/views.py:807
+msgid "Note updated successfully"
+msgstr "Nota modificata correttamente"
+
+#: trips/views.py:751 trips/views.py:826
+msgid "Note deleted successfully"
+msgstr "Nota eliminata correttamente"
