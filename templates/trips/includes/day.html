@@ -6,13 +6,15 @@
      hx-target="#day-{{ day.pk }}"
      hx-swap="innerHTML">
     <div class="card-body">
-        <div class="flex items-center">
-            <h2 class="text-xl font-medium sm:text-2xl grow">{% trans 'Day' %} {{ day.number }} ({{ day.date|date:"j F" }})</h2>
-            <button class="btn btn-sm me-2 sm:btn-md" disabled="disabled">
-                {% heroicon_mini "pencil-square" class="size-5" %}
-            </button>
-            <button class="btn btn-sm me-2 sm:btn-md" disabled="disabled">{% heroicon_mini "map" class="size-5" %}</button>
-            <c-dropdown :day="day" />
+        <div class="flex flex-col gap-y-3 items-center sm:flex-row">
+            <h2 class="text-xl font-medium sm:text-2xl grow">{% trans 'Day' %} {{ day.number }} - {{ day.date|date:"j F" }}</h2>
+            <div>
+                <button class="btn btn-xs me-2 sm:btn-md" disabled="disabled">
+                    {% heroicon_mini "pencil-square" class="size-4 sm:size-5" %}
+                </button>
+                <button class="btn btn-xs me-2 sm:btn-md" disabled="disabled">{% heroicon_mini "map" class="size-4 sm:size-5" %}</button>
+                <c-dropdown :day="day" />
+            </div>
         </div>
         <div id="stay-info" class="mt-4" x-data>
             <ul class="grid grid-cols-1 gap-y-2 gap-x-4 md:grid-cols-2">
