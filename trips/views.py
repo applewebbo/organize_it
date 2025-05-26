@@ -1,8 +1,12 @@
+import hashlib
+import time
 from datetime import date, timedelta
 
+import requests
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.core.cache import cache
 from django.db import transaction
 from django.db.models import Prefetch
 from django.http import Http404, HttpResponse
@@ -10,6 +14,7 @@ from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
 from accounts.models import Profile
@@ -42,6 +47,140 @@ def get_trips(user):
         "fav_trip": fav_trip,
     }
     return context
+
+
+def rate_limit_check():
+    """Rate limiting for Nominatim - max 1 request per second"""
+    last_request_time = cache.get("nominatim_last_request_time", 0)
+    current_time = time.time()
+
+    # Wait if the last request was less than 1 second ago
+    time_diff = current_time - last_request_time
+    if time_diff < 1:
+        time.sleep(1 - time_diff)
+
+    # Update the last request time in cache
+    cache.set("nominatim_last_request_time", time.time(), 60)
+
+
+def generate_cache_key(name, city):
+    """Unique cache key for geocoding requests"""
+    # Normalize name and city to lower case and strip whitespace
+    normalized = f"{name.lower().strip()}_{city.lower().strip()}"
+    # Use a hash function to create a unique key
+    return (
+        f"geocode_{hashlib.md5(normalized.encode(), usedforsecurity=False).hexdigest()}"
+    )
+
+
+def geocode_location(name, city):
+    """Geocoding using Nominatim OpenStreetMap with cache and rate limiting"""
+    if not name or not city:
+        return None
+
+    # Check cache first
+    cache_key = generate_cache_key(name, city)
+    cached_result = cache.get(cache_key)
+    if cached_result:
+        print(f"Cache hit per: {name}, {city}")
+        return cached_result
+
+    # Rate limit check to avoid hitting Nominatim too fast
+    rate_limit_check()
+
+    url = "https://nominatim.openstreetmap.org/search"
+    params = {
+        "q": f"{name.strip()}, {city.strip()}",
+        "format": "json",
+        "limit": 5,  # Get up to 5 results to choose the best one
+        "addressdetails": 1,
+    }
+
+    headers = {"User-Agent": "OrganizeIt-Geocoding"}
+
+    try:
+        print(f"API call for: {name}, {city}")
+        response = requests.get(url, params=params, headers=headers, timeout=5)
+
+        if response.status_code == 200 and response.json():
+            results = response.json()
+
+            # Select the best result based on custom scoring
+            best_result = select_best_result(results, name, city)
+
+            if best_result:
+                result = {
+                    "address": best_result.get("display_name", ""),
+                    "lat": float(best_result.get("lat", 0)),
+                    "lon": float(best_result.get("lon", 0)),
+                    "importance": best_result.get("importance", 0),
+                    "place_rank": best_result.get("place_rank", 999),
+                }
+
+                # Store the result in cache for 1 hour
+                cache.set(cache_key, result, 3600)
+                return result
+
+    except Exception as e:
+        print(f"Errore geocoding: {e}")
+
+    return None
+
+
+def select_best_result(results, name, city):
+    """Select the best result from Nominatim results based on custom scoring"""
+    if not results:
+        return None
+
+    city_lower = city.lower().strip()
+    name_lower = name.lower().strip()
+
+    # Scoring results based on various criteria
+    scored_results = []
+
+    for result in results:
+        score = 0
+        display_name = result.get("display_name", "").lower()
+        address = result.get("address", {})
+
+        # Base score based on importance
+        score += result.get("importance", 0) * 100
+
+        # Bonus if the city is in the address
+        city_in_address = (
+            address.get("city", "").lower() == city_lower
+            or address.get("town", "").lower() == city_lower
+            or address.get("village", "").lower() == city_lower
+        )
+        if city_in_address:
+            score += 50
+
+        # Bonus if the name is in the display_name
+        if name_lower in display_name:
+            score += 30
+
+        # Bonus for lower place_rank (more specific)
+        place_rank = result.get("place_rank", 999)
+        score += max(0, 30 - place_rank)
+
+        # Penalty for generic places
+        if result.get("class") == "place" and result.get("type") in [
+            "city",
+            "town",
+            "village",
+        ]:
+            score -= 20
+
+        scored_results.append((score, result))
+
+    # Sort results by score, highest first
+    scored_results.sort(key=lambda x: x[0], reverse=True)
+
+    print(f"Risultati trovati: {len(results)}")
+    for i, (score, result) in enumerate(scored_results[:3]):
+        print(f"  {i + 1}. Score: {score:.1f} - {result.get('display_name', '')[:80]}")
+
+    return scored_results[0][1] if scored_results else results[0]
 
 
 def home(request):
@@ -683,6 +822,34 @@ def validate_dates(request):
     return HttpResponse("")
 
 
+@csrf_exempt
+def geocode_address(request):
+    """Geocode a location based on name and city using Nominatim OpenStreetMap and HTMX."""
+    if request.method == "POST":
+        name = request.POST.get("name", "").strip()
+        city = request.POST.get("city", "").strip()
+
+        if name and city:
+            result = geocode_location(name, city)
+            if result:
+                return TemplateResponse(
+                    request,
+                    "address_results.html",
+                    {
+                        "address": result["address"],
+                        "lat": result["lat"],
+                        "lon": result["lon"],
+                        "importance": result.get("importance", 0),
+                        "place_rank": result.get("place_rank", 999),
+                        "found": True,
+                    },
+                )
+
+        return TemplateResponse(request, "address_results.html", {"found": False})
+
+    return TemplateResponse(request, "address_results.html", {"found": False})
+
+
 @login_required
 def event_notes(request, event_id):
     """
@@ -826,3 +993,19 @@ def stay_note_delete(request, stay_id):
         _("Note deleted successfully"),
     )
     return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+
+
+# @login_required
+# def event_detail(request, pk):
+#     """
+#     Get single event details in case of modification instead of refreshing the whole trip detail page
+#     """
+#     pass
+
+# @login_required
+# def stay_detail(request, day_id):
+#     """
+#     Get single stay for the day details in case of modification instead of refreshing the whole trip detail page
+#     """
+#     # TODO: think about refreshing the same stay in other days
+#     pass

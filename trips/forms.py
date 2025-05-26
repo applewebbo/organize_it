@@ -231,6 +231,12 @@ FIELDSET_CONTENT = """
             </div>
             </fieldset>"""
 
+ADDRESS_RESULTS_HTML = """
+                            <div id="address-results" class="sm:col-span-4">
+                            <!-- Address Results will be added here.. -->
+                            </div>
+                        """
+
 
 class TransportForm(forms.ModelForm):
     class Meta:
@@ -247,8 +253,8 @@ class TransportForm(forms.ModelForm):
         labels = {
             "address": _("Departure"),
             "destination": _("Destination"),
-            "start_time": _("Start Time"),
-            "end_time": _("End Time"),
+            "start_time": _("Departure Time"),
+            "end_time": _("Arrival Time"),
             "url": _("Url"),
             "type": _("Type"),
         }
@@ -313,10 +319,24 @@ class ExperienceForm(forms.ModelForm):
         initial=60,
     )
 
+    name = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(attrs={"placeholder": _("Name")}),
+        label=_("Name"),
+    )
+
+    city = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": _("City")}),
+        label=_("City"),
+    )
+
     class Meta:
         model = Experience
         fields = [
             "name",
+            "city",
             "type",
             "address",
             "start_time",
@@ -325,25 +345,33 @@ class ExperienceForm(forms.ModelForm):
         ]
         formfield_callback = urlfields_assume_https
         labels = {
-            "name": _("Name"),
             "type": _("Type"),
             "address": _("Address"),
             "start_time": _("Start Time"),
-            "duration": _("Duration"),
             "url": _("Url"),
         }
         widgets = {
-            "name": forms.TextInput(attrs={"placeholder": "Name"}),
+            "name": forms.TextInput(attrs={"placeholder": _("Name")}),
+            "city": forms.TextInput(attrs={"placeholder": _("City")}),
             "type": forms.Select(),
-            "url": forms.TextInput(attrs={"placeholder": "Url"}),
-            "address": forms.TextInput(attrs={"placeholder": "Address"}),
+            "url": forms.TextInput(attrs={"placeholder": _("Url")}),
+            "address": forms.TextInput(attrs={"placeholder": _("Address")}),
             "start_time": forms.TimeInput(attrs={"type": "time"}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        geocode_url = reverse("trips:geocode-address")
+        htmx_attrs = {
+            "hx-post": geocode_url,
+            "hx-trigger": "keyup changed delay:1000ms, blur",
+            "hx-target": "#address-results",
+            "hx-include": "[name='name'], [name='city']",
+        }
         self.helper = FormHelper()
         self.helper.form_tag = False
+        self.fields["name"].widget.attrs.update(htmx_attrs)
+        self.fields["city"].widget.attrs.update(htmx_attrs)
         self.fields["type"].choices = Experience.Type.choices
         if self.instance.pk and self.instance.end_time and self.instance.start_time:
             start_time = datetime.combine(date.today(), self.instance.start_time)
@@ -353,18 +381,22 @@ class ExperienceForm(forms.ModelForm):
         self.helper.layout = Layout(
             Field(
                 "name",
-                wrapper_class="sm:col-span-3",
+                wrapper_class="sm:col-span-2",
             ),
-            Field("type", css_class="select select-primary"),
+            Field(
+                "city",
+                wrapper_class="sm:col-span-2",
+            ),
             Field(
                 "address",
                 wrapper_class="sm:col-span-4",
             ),
+            HTML(ADDRESS_RESULTS_HTML),
             Field(
                 "start_time",
                 x_ref="startTime",
                 **{"x-on:change": "checkOverlap()"},
-                wrapper_class="sm:col-span-3",
+                wrapper_class="sm:col-span-2",
             ),
             Field(
                 "duration",
@@ -372,6 +404,7 @@ class ExperienceForm(forms.ModelForm):
                 **{"x-on:change": "checkOverlap()"},
                 wrapper_class="sm:col-span-1",
             ),
+            Field("type", css_class="select select-primary"),
             Div(id="overlap-warning", css_class="sm:col-span-4"),
             Field("url", wrapper_class="sm:col-span-4"),
         )

@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-20 15:38+0200\n"
-"PO-Revision-Date: 2025-05-20 15:34+0200\n"
+"POT-Creation-Date: 2025-05-26 14:26+0200\n"
+"PO-Revision-Date: 2025-05-26 14:27+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: it\n"
@@ -303,7 +303,7 @@ msgstr "Esperienze non abbinate"
 msgid "Cancel"
 msgstr "Annulla"
 
-#: templates/trips/includes/day.html:10 trips/forms.py:512 trips/models.py:189
+#: templates/trips/includes/day.html:10 trips/forms.py:534 trips/models.py:189
 msgid "Day"
 msgstr "Giorno"
 
@@ -392,83 +392,91 @@ msgstr "Titolo"
 msgid "Description"
 msgstr "Descrizione"
 
-#: trips/forms.py:31 trips/forms.py:243
+#: trips/forms.py:31 trips/forms.py:249
 msgid "Destination"
 msgstr "Destinazione"
 
-#: trips/forms.py:33 trips/forms.py:109
+#: trips/forms.py:33 trips/forms.py:113
 msgid "Start date"
 msgstr "Data di inizio"
 
-#: trips/forms.py:36 trips/forms.py:113
+#: trips/forms.py:38 trips/forms.py:117
 msgid "End date"
 msgstr "Data di fine"
 
-#: trips/forms.py:90
+#: trips/forms.py:94
 msgid "End date must be after start date"
 msgstr "La data di fine deve essere successiva alla data di inizio"
 
-#: trips/forms.py:96
+#: trips/forms.py:100
 msgid "Start date must be after today"
 msgstr "La data di inizio deve essere successiva a quella di oggi"
 
-#: trips/forms.py:103
+#: trips/forms.py:107
 msgid "Destination not found"
 msgstr "Destinazione non trovata"
 
-#: trips/forms.py:243
+#: trips/forms.py:248
 msgid "Departure"
 msgstr "Partenza"
 
-#: trips/forms.py:243 trips/forms.py:320 trips/forms.py:408
-msgid "Start Time"
+#: trips/forms.py:250
+msgid "Departure Time"
 msgstr "Orario di partenza"
 
-#: trips/forms.py:243
-msgid "End Time"
+#: trips/forms.py:251
+msgid "Arrival Time"
 msgstr "Orario di arrivo"
 
-#: trips/forms.py:243 trips/forms.py:322 trips/forms.py:410
+#: trips/forms.py:252 trips/forms.py:339 trips/forms.py:345 trips/forms.py:432
 msgid "Url"
 msgstr "Indirizzo web"
 
-#: trips/forms.py:243 trips/forms.py:318 trips/forms.py:406
+#: trips/forms.py:253 trips/forms.py:335 trips/forms.py:428
 msgid "Type"
 msgstr "Tipologia"
 
-#: trips/forms.py:301 trips/forms.py:321 trips/forms.py:389 trips/forms.py:409
+#: trips/forms.py:312 trips/forms.py:338 trips/forms.py:411 trips/forms.py:431
 msgid "Duration"
 msgstr "Durata"
 
-#: trips/forms.py:317 trips/forms.py:405 trips/forms.py:499
+#: trips/forms.py:333 trips/forms.py:342 trips/forms.py:427 trips/forms.py:521
 msgid "Name"
 msgstr "Nome"
 
-#: trips/forms.py:319 trips/forms.py:407 trips/forms.py:505
+#: trips/forms.py:334 trips/forms.py:343
+msgid "City"
+msgstr "Città"
+
+#: trips/forms.py:336 trips/forms.py:346 trips/forms.py:429 trips/forms.py:527
 msgid "Address"
 msgstr "Indirizzo"
 
-#: trips/forms.py:472
+#: trips/forms.py:337 trips/forms.py:347 trips/forms.py:430
+msgid "Start Time"
+msgstr "Orario di inizio"
+
+#: trips/forms.py:494
 msgid "Period of stay"
 msgstr "Periodo di soggiorno"
 
-#: trips/forms.py:500
+#: trips/forms.py:522
 msgid "Check-in"
 msgstr "Check-in"
 
-#: trips/forms.py:501
+#: trips/forms.py:523
 msgid "Check-out"
 msgstr "Check-out"
 
-#: trips/forms.py:502
+#: trips/forms.py:524
 msgid "Cancellation date"
 msgstr "Data di cancellazione gratuita"
 
-#: trips/forms.py:503
+#: trips/forms.py:525
 msgid "Phone number"
 msgstr "Numero di telefono"
 
-#: trips/forms.py:504
+#: trips/forms.py:526
 msgid "Website"
 msgstr "Sito Internet"
 
@@ -558,75 +566,78 @@ msgstr "Cena"
 msgid "Snack"
 msgstr "Spuntino"
 
-#: trips/views.py:235
+#: trips/views.py:362
 msgid "Transport added successfully"
 msgstr "Trasferimento aggiunto correttamente"
 
-#: trips/views.py:256
+#: trips/views.py:383
 msgid "Experience added successfully"
 msgstr "Esperienza aggiunta correttamente"
 
-#: trips/views.py:277
+#: trips/views.py:404
 msgid "Meal added successfully"
 msgstr "Pasto aggiunto correttamente"
 
-#: trips/views.py:294
+#: trips/views.py:421
 msgid "Stay added successfully"
 msgstr "Soggiorno aggiunto correttamente"
 
-#: trips/views.py:335
+#: trips/views.py:462
 msgid "Stay updated successfully"
 msgstr "Soggiorno modificato correttamente"
 
-#: trips/views.py:363
+#: trips/views.py:490
 msgid "Stay deleted successfully"
 msgstr "Soggiorno eliminato correttamente"
 
-#: trips/views.py:397
+#: trips/views.py:524
 msgid "Event deleted successfully"
 msgstr "Evento eliminato correttamente"
 
-#: trips/views.py:416
+#: trips/views.py:543
 msgid "Event unpaired successfully"
 msgstr "Evento scollegato correttamente"
 
-#: trips/views.py:436
+#: trips/views.py:563
 msgid "Event paired successfully"
 msgstr "Evento ricollegato correttamente"
 
-#: trips/views.py:517
+#: trips/views.py:644
 msgid "Event updated successfully"
 msgstr "Evento modificato correttamente"
 
-#: trips/views.py:540
+#: trips/views.py:667
 msgid "Event times updated successfully"
 msgstr "Orari dell'evento modificati correttamente"
 
-#: trips/views.py:571
+#: trips/views.py:698
 msgid "This event overlaps with another event"
 msgstr ""
 "Gli orari di questo evento si sovrappongono con quelli di un altro evento"
 
-#: trips/views.py:592
+#: trips/views.py:719
 msgid "Events swapped successfully"
 msgstr "Eventi scambiati correttamente"
 
-#: trips/views.py:658
+#: trips/views.py:785
 msgid "Start date must be after today."
 msgstr "La data di inizio deve essere successiva a quella di oggi."
 
-#: trips/views.py:662
+#: trips/views.py:789
 msgid "Start date cannot be after end date."
 msgstr "La data di inizio deve essere successiva a quella di fine."
 
-#: trips/views.py:713 trips/views.py:785
+#: trips/views.py:862 trips/views.py:934
 msgid "Note added successfully"
 msgstr "Nota aggiunta con successo"
 
-#: trips/views.py:732 trips/views.py:807
+#: trips/views.py:881 trips/views.py:956
 msgid "Note updated successfully"
 msgstr "Nota modificata correttamente"
 
-#: trips/views.py:751 trips/views.py:826
+#: trips/views.py:900 trips/views.py:975
 msgid "Note deleted successfully"
 msgstr "Nota eliminata correttamente"
+
+#~ msgid "End Time"
+#~ msgstr "Orario di arrivo"
