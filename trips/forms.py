@@ -203,39 +203,11 @@ class LinkForm(forms.ModelForm):
         )
 
 
-FIELDSET_CONTENT = """
-            <fieldset>
-            <legend class="block text-gray-700 text-sm font-bold mb-2">Connect to</legend>
-            <div class="flex">
-              <div class="flex items-center me-4">
-                <input class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" type="radio" name="gridRadios" id="gridRadios1" value="option1" checked
-                x-on:click="open = 0">
-                <label class="ms-2 text-sm font-medium text-gray-600 dark:text-gray-300" for="gridRadios1">
-                  None
-                </label>
-              </div>
-              <div class="flex items-center me-4">
-                <input class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" type="radio" name="gridRadios" id="gridRadios2" value="option2"
-                    x-on:click="open = 1" x-transition>
-                <label class="ms-2 text-sm font-medium text-gray-600 dark:text-gray-300" for="gridRadios2">
-                  Place
-                </label>
-              </div>
-              <div class="flex items-center me-4">
-                <input class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" type="radio" name="gridRadios" id="gridRadios3" value="option3"
-                x-on:click="open = 2" x-transition>
-                <label class="ms-2 text-sm font-medium text-gray-600 dark:text-gray-300" for="gridRadios3">
-                  Link
-                </label>
-              </div>
-            </div>
-            </fieldset>"""
-
 ADDRESS_RESULTS_HTML = """
-                            <div id="address-results" class="sm:col-span-4">
-                            <!-- Address Results will be added here.. -->
-                            </div>
-                        """
+    <div id="address-results" class="sm:col-span-4">
+    <!-- Address Results will be added here.. -->
+    </div>
+"""
 
 
 class TransportForm(forms.ModelForm):
@@ -362,16 +334,26 @@ class ExperienceForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         geocode_url = reverse("trips:geocode-address")
-        htmx_attrs = {
+        name_htmx_attrs = {
+            "x-ref": "name",
+            "@input": "checkAndTrigger",
             "hx-post": geocode_url,
-            "hx-trigger": "keyup changed delay:1000ms, blur",
+            "hx-trigger": "trigger-geocode",
+            "hx-target": "#address-results",
+            "hx-include": "[name='name'], [name='city']",
+        }
+        city_htmx_attrs = {
+            "x-ref": "city",
+            "@input": "checkAndTrigger",
+            "hx-post": geocode_url,
+            "hx-trigger": "trigger-geocode",
             "hx-target": "#address-results",
             "hx-include": "[name='name'], [name='city']",
         }
         self.helper = FormHelper()
         self.helper.form_tag = False
-        self.fields["name"].widget.attrs.update(htmx_attrs)
-        self.fields["city"].widget.attrs.update(htmx_attrs)
+        self.fields["name"].widget.attrs.update(name_htmx_attrs)
+        self.fields["city"].widget.attrs.update(city_htmx_attrs)
         self.fields["type"].choices = Experience.Type.choices
         if self.instance.pk and self.instance.end_time and self.instance.start_time:
             start_time = datetime.combine(date.today(), self.instance.start_time)

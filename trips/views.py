@@ -74,7 +74,7 @@ def generate_cache_key(name, city):
 
 
 def geocode_location(name, city):
-    """Geocoding using Nominatim OpenStreetMap with cache and rate limiting"""
+    """Geocoding using Nominatim OpenStreetMap with cache and rate limiting. Returns a list of addresses ordered by importance."""
     if not name or not city:
         return None
 
@@ -104,27 +104,63 @@ def geocode_location(name, city):
 
         if response.status_code == 200 and response.json():
             results = response.json()
+            if not results:
+                return []
 
-            # Select the best result based on custom scoring
-            best_result = select_best_result(results, name, city)
+            # Build a list of addresses with importance
+            address_list = []
+            for result in results:
+                address_data = result.get("address", {})
+                addresstags = result.get("addresstags", {})
+                street = (
+                    addresstags.get("street")
+                    or address_data.get("road")
+                    or address_data.get("pedestrian")
+                    or address_data.get("footway")
+                    or ""
+                )
+                housenumber = (
+                    addresstags.get("housenumber")
+                    or address_data.get("house_number")
+                    or ""
+                )
+                city_part = (
+                    addresstags.get("city")
+                    or address_data.get("city")
+                    or address_data.get("town")
+                    or address_data.get("village")
+                    or ""
+                )
+                address_parts = []
+                if street:
+                    address_parts.append(street)
+                if housenumber:
+                    address_parts.append(housenumber)
+                address = " ".join(address_parts)
+                if address and city_part:
+                    address = f"{address}, {city_part}"
+                elif city_part:
+                    address = city_part
+                address_list.append(
+                    {
+                        "name": result.get("name", ""),
+                        "address": address,
+                        "lat": float(result.get("lat", 0)),
+                        "lon": float(result.get("lon", 0)),
+                        "importance": result.get("importance", 0),
+                        "place_rank": result.get("place_rank", 999),
+                    }
+                )
 
-            if best_result:
-                result = {
-                    "address": best_result.get("display_name", ""),
-                    "lat": float(best_result.get("lat", 0)),
-                    "lon": float(best_result.get("lon", 0)),
-                    "importance": best_result.get("importance", 0),
-                    "place_rank": best_result.get("place_rank", 999),
-                }
-
-                # Store the result in cache for 1 hour
-                cache.set(cache_key, result, 3600)
-                return result
+            # Order the list by importance descending
+            address_list.sort(key=lambda x: x["importance"], reverse=True)
+            cache.set(cache_key, address_list, 3600)
+            return address_list
 
     except Exception as e:
-        print(f"Errore geocoding: {e}")
+        print(f"Error geocoding: {e}")
 
-    return None
+    return []
 
 
 def select_best_result(results, name, city):
@@ -176,7 +212,7 @@ def select_best_result(results, name, city):
     # Sort results by score, highest first
     scored_results.sort(key=lambda x: x[0], reverse=True)
 
-    print(f"Risultati trovati: {len(results)}")
+    print(f"Results found: {len(results)}")
     for i, (score, result) in enumerate(scored_results[:3]):
         print(f"  {i + 1}. Score: {score:.1f} - {result.get('display_name', '')[:80]}")
 
@@ -830,24 +866,25 @@ def geocode_address(request):
         city = request.POST.get("city", "").strip()
 
         if name and city:
-            result = geocode_location(name, city)
-            if result:
+            results = geocode_location(name, city)
+            if results:
+                print(results)
                 return TemplateResponse(
                     request,
-                    "address_results.html",
+                    "trips/includes/address-results.html",
                     {
-                        "address": result["address"],
-                        "lat": result["lat"],
-                        "lon": result["lon"],
-                        "importance": result.get("importance", 0),
-                        "place_rank": result.get("place_rank", 999),
+                        "addresses": results,
                         "found": True,
                     },
                 )
 
-        return TemplateResponse(request, "address_results.html", {"found": False})
+        return TemplateResponse(
+            request, "trips/includes/address-results.html", {"found": False}
+        )
 
-    return TemplateResponse(request, "address_results.html", {"found": False})
+    return TemplateResponse(
+        request, "trips/includes/address-results.html", {"found": False}
+    )
 
 
 @login_required
