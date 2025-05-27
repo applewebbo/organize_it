@@ -331,48 +331,43 @@ class ExperienceForm(forms.ModelForm):
             "start_time": forms.TimeInput(attrs={"type": "time"}),
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, include_city=False, **kwargs):
         super().__init__(*args, **kwargs)
-        geocode_url = reverse("trips:geocode-address")
-        name_htmx_attrs = {
-            "x-ref": "name",
-            "@input": "checkAndTrigger",
-            "hx-post": geocode_url,
-            "hx-trigger": "trigger-geocode",
-            "hx-target": "#address-results",
-            "hx-include": "[name='name'], [name='city']",
-        }
-        city_htmx_attrs = {
-            "x-ref": "city",
-            "@input": "checkAndTrigger",
-            "hx-post": geocode_url,
-            "hx-trigger": "trigger-geocode",
-            "hx-target": "#address-results",
-            "hx-include": "[name='name'], [name='city']",
-        }
-        self.helper = FormHelper()
-        self.helper.form_tag = False
-        self.fields["name"].widget.attrs.update(name_htmx_attrs)
-        self.fields["city"].widget.attrs.update(city_htmx_attrs)
+        layout_fields = []
+        if include_city:
+            geocode_url = reverse("trips:geocode-address")
+            name_htmx_attrs = {
+                "x-ref": "name",
+                "@input": "checkAndTrigger",
+                "hx-post": geocode_url,
+                "hx-trigger": "trigger-geocode",
+                "hx-target": "#address-results",
+                "hx-include": "[name='name'], [name='city']",
+            }
+            city_htmx_attrs = {
+                "x-ref": "city",
+                "@input": "checkAndTrigger",
+                "hx-post": geocode_url,
+                "hx-trigger": "trigger-geocode",
+                "hx-target": "#address-results",
+                "hx-include": "[name='name'], [name='city']",
+            }
+            self.fields["name"].widget.attrs.update(name_htmx_attrs)
+            self.fields["city"].widget.attrs.update(city_htmx_attrs)
+            layout_fields.append(Field("name", wrapper_class="sm:col-span-2"))
+            layout_fields.append(Field("city", wrapper_class="sm:col-span-2"))
+        else:
+            layout_fields.append(Field("name", wrapper_class="sm:col-span-4"))
         self.fields["type"].choices = Experience.Type.choices
         if self.instance.pk and self.instance.end_time and self.instance.start_time:
             start_time = datetime.combine(date.today(), self.instance.start_time)
             end_time = datetime.combine(date.today(), self.instance.end_time)
             duration = (end_time - start_time).total_seconds() // 60
             self.initial["duration"] = int(duration)
-        self.helper.layout = Layout(
-            Field(
-                "name",
-                wrapper_class="sm:col-span-2",
-            ),
-            Field(
-                "city",
-                wrapper_class="sm:col-span-2",
-            ),
-            Field(
-                "address",
-                wrapper_class="sm:col-span-4",
-            ),
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        layout_fields += [
+            Field("address", wrapper_class="sm:col-span-4"),
             HTML(ADDRESS_RESULTS_HTML),
             Field(
                 "start_time",
@@ -389,7 +384,8 @@ class ExperienceForm(forms.ModelForm):
             Field("type", css_class="select select-primary"),
             Div(id="overlap-warning", css_class="sm:col-span-4"),
             Field("url", wrapper_class="sm:col-span-4"),
-        )
+        ]
+        self.helper.layout = Layout(*layout_fields)
 
     def save(self, commit=True):
         instance = super().save(commit=False)

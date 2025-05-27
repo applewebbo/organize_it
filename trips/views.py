@@ -420,7 +420,7 @@ def add_experience(request, day_id):
     unpaired_experiences = Event.objects.filter(
         day__isnull=True, trip=day.trip, category=2
     )
-    form = ExperienceForm(request.POST or None)
+    form = ExperienceForm(request.POST or None, include_city=True)
     if form.is_valid():
         experience = form.save(commit=False)
         experience.day = day
