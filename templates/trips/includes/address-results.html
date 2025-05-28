@@ -1,7 +1,6 @@
 {% load heroicons %}
 {% if found %}
-    <div class="my-2"
-         x-data="{ setFields(nameId, addressId) { const name = document.getElementById(nameId)?.textContent || ''; const address = document.getElementById(addressId)?.textContent || ''; document.getElementById('id_name').value = name; document.getElementById('id_address').value = address; } }">
+    <div class="my-2">
         <ul>
             {% for address in addresses %}
                 <li class="flex gap-2 justify-between items-center py-2 px-3 mx-2 mb-2 text-sm rounded-lg border text-slate-600 bg-slate-100 border-slate-200">

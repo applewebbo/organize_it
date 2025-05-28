@@ -344,6 +344,7 @@ class ExperienceForm(forms.ModelForm):
                 "hx-target": "#address-results",
                 "hx-include": "[name='name'], [name='city']",
                 "hx-indicator": "#address-spinner",
+                ":class": "{ 'animate-pulse ring-2 ring-primary/60': nameFilled }",
             }
             city_htmx_attrs = {
                 "x-ref": "city",
@@ -354,8 +355,13 @@ class ExperienceForm(forms.ModelForm):
                 "hx-include": "[name='name'], [name='city']",
                 "hx-indicator": "#address-spinner",
             }
+            address_htmx_attrs = {
+                "x-ref": "address",
+                ":class": "{ 'animate-pulse ring-2 ring-primary/60': addressFilled }",
+            }
             self.fields["name"].widget.attrs.update(name_htmx_attrs)
             self.fields["city"].widget.attrs.update(city_htmx_attrs)
+            self.fields["address"].widget.attrs.update(address_htmx_attrs)
             layout_fields.append(Field("name", wrapper_class="sm:col-span-2"))
             layout_fields.append(Field("city", wrapper_class="sm:col-span-2"))
         else:
@@ -476,6 +482,7 @@ class MealForm(forms.ModelForm):
                 "hx-target": "#address-results",
                 "hx-include": "[name='name'], [name='city']",
                 "hx-indicator": "#address-spinner",
+                ":class": "{ 'animate-pulse ring-2 ring-primary/60': nameFilled }",
             }
             city_htmx_attrs = {
                 "x-ref": "city",
@@ -486,8 +493,13 @@ class MealForm(forms.ModelForm):
                 "hx-include": "[name='name'], [name='city']",
                 "hx-indicator": "#address-spinner",
             }
+            address_htmx_attrs = {
+                "x-ref": "address",
+                ":class": "{ 'animate-pulse ring-2 ring-primary/60': addressFilled }",
+            }
             self.fields["name"].widget.attrs.update(name_htmx_attrs)
             self.fields["city"].widget.attrs.update(city_htmx_attrs)
+            self.fields["address"].widget.attrs.update(address_htmx_attrs)
             layout_fields.append(Field("name", wrapper_class="sm:col-span-2"))
             layout_fields.append(Field("city", wrapper_class="sm:col-span-2"))
         else:
@@ -610,6 +622,7 @@ class StayForm(forms.ModelForm):
                 "hx-target": "#address-results",
                 "hx-include": "[name='name'], [name='city']",
                 "hx-indicator": "#address-spinner",
+                ":class": "{ 'animate-pulse ring-2 ring-primary/60': nameFilled }",
             }
             city_htmx_attrs = {
                 "x-ref": "city",
@@ -620,8 +633,13 @@ class StayForm(forms.ModelForm):
                 "hx-include": "[name='name'], [name='city']",
                 "hx-indicator": "#address-spinner",
             }
+            address_htmx_attrs = {
+                "x-ref": "address",
+                ":class": "{ 'animate-pulse ring-2 ring-primary/60': addressFilled }",
+            }
             self.fields["name"].widget.attrs.update(name_htmx_attrs)
             self.fields["city"].widget.attrs.update(city_htmx_attrs)
+            self.fields["address"].widget.attrs.update(address_htmx_attrs)
             layout_fields.append(Field("name", wrapper_class="sm:col-span-2"))
             layout_fields.append(Field("city", wrapper_class="sm:col-span-2"))
         else:

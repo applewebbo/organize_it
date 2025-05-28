@@ -4,7 +4,7 @@
       hx-disabled-elt="#form-submit"
       class="modal-content"
       method="post"
-      x-data="{ geocodeTimer: null, checkAndTrigger() { clearTimeout(this.geocodeTimer); if (this.$refs.name.value && this.$refs.city.value) { this.geocodeTimer = setTimeout(() => { this.$refs.name.dispatchEvent(new CustomEvent('trigger-geocode')); }, 500); } } }">
+      x-data="{ geocodeTimer: null, addressFilled: false, nameFilled: false, checkAndTrigger() { clearTimeout(this.geocodeTimer); if (this.$refs.name.value && this.$refs.city.value) { this.geocodeTimer = setTimeout(() => { this.$refs.name.dispatchEvent(new CustomEvent('trigger-geocode')); }, 500); } }, setFields(nameId, addressId) { const name = document.getElementById(nameId)?.textContent || ''; const address = document.getElementById(addressId)?.textContent || ''; document.getElementById('id_name').value = name; document.getElementById('id_address').value = address; this.nameFilled = true; this.addressFilled = true; setTimeout(() => { this.nameFilled = false; this.addressFilled = false }, 500); } }">
     <div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
         <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% trans 'Create a new Experience' %}</h3>
         <button type="button"
