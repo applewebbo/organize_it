@@ -343,6 +343,7 @@ class ExperienceForm(forms.ModelForm):
                 "hx-trigger": "trigger-geocode",
                 "hx-target": "#address-results",
                 "hx-include": "[name='name'], [name='city']",
+                "hx-indicator": "#address-spinner",
             }
             city_htmx_attrs = {
                 "x-ref": "city",
@@ -351,6 +352,7 @@ class ExperienceForm(forms.ModelForm):
                 "hx-trigger": "trigger-geocode",
                 "hx-target": "#address-results",
                 "hx-include": "[name='name'], [name='city']",
+                "hx-indicator": "#address-spinner",
             }
             self.fields["name"].widget.attrs.update(name_htmx_attrs)
             self.fields["city"].widget.attrs.update(city_htmx_attrs)
@@ -367,7 +369,15 @@ class ExperienceForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_tag = False
         layout_fields += [
-            Field("address", wrapper_class="sm:col-span-4"),
+            Div(
+                Field("address", wrapper_class="sm:col-span-4"),
+                HTML("""
+                    <span id="address-spinner" class="absolute right-2 top-1/2 -translate-y-1/2">
+                        <span class="loading loading-bars loading-lg text-primary mt-3.5 htmx-indicator"></span>
+                    </span>
+                    """),
+                css_class="relative sm:col-span-4",
+            ),
             HTML(ADDRESS_RESULTS_HTML),
             Field(
                 "start_time",
@@ -465,6 +475,7 @@ class MealForm(forms.ModelForm):
                 "hx-trigger": "trigger-geocode",
                 "hx-target": "#address-results",
                 "hx-include": "[name='name'], [name='city']",
+                "hx-indicator": "#address-spinner",
             }
             city_htmx_attrs = {
                 "x-ref": "city",
@@ -473,6 +484,7 @@ class MealForm(forms.ModelForm):
                 "hx-trigger": "trigger-geocode",
                 "hx-target": "#address-results",
                 "hx-include": "[name='name'], [name='city']",
+                "hx-indicator": "#address-spinner",
             }
             self.fields["name"].widget.attrs.update(name_htmx_attrs)
             self.fields["city"].widget.attrs.update(city_htmx_attrs)
@@ -489,7 +501,15 @@ class MealForm(forms.ModelForm):
             duration = (end_time - start_time).total_seconds() // 60
             self.initial["duration"] = int(duration)
         layout_fields += [
-            Field("address", wrapper_class="sm:col-span-4"),
+            Div(
+                Field("address", wrapper_class="sm:col-span-4"),
+                HTML("""
+                    <span id="address-spinner" class="absolute right-2 top-1/2 -translate-y-1/2">
+                        <span class="loading loading-bars loading-lg text-primary mt-3.5 htmx-indicator"></span>
+                    </span>
+                    """),
+                css_class="relative sm:col-span-4",
+            ),
             HTML(ADDRESS_RESULTS_HTML),
             Field(
                 "start_time",
@@ -589,6 +609,7 @@ class StayForm(forms.ModelForm):
                 "hx-trigger": "trigger-geocode",
                 "hx-target": "#address-results",
                 "hx-include": "[name='name'], [name='city']",
+                "hx-indicator": "#address-spinner",
             }
             city_htmx_attrs = {
                 "x-ref": "city",
@@ -597,6 +618,7 @@ class StayForm(forms.ModelForm):
                 "hx-trigger": "trigger-geocode",
                 "hx-target": "#address-results",
                 "hx-include": "[name='name'], [name='city']",
+                "hx-indicator": "#address-spinner",
             }
             self.fields["name"].widget.attrs.update(name_htmx_attrs)
             self.fields["city"].widget.attrs.update(city_htmx_attrs)
@@ -616,7 +638,15 @@ class StayForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_tag = False
         layout_fields += [
-            Field("address", wrapper_class="sm:col-span-4"),
+            Div(
+                Field("address", wrapper_class="sm:col-span-4"),
+                HTML("""
+                    <span id="address-spinner" class="absolute right-2 top-1/2 -translate-y-1/2">
+                        <span class="loading loading-bars loading-lg text-primary mt-3.5 htmx-indicator"></span>
+                    </span>
+                    """),
+                css_class="relative sm:col-span-4",
+            ),
             HTML(ADDRESS_RESULTS_HTML),
             Field("check_in", wrapper_class="sm:col-span-2"),
             Field("check_out", wrapper_class="sm:col-span-2"),
