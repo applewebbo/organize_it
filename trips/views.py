@@ -441,7 +441,7 @@ def add_meal(request, day_id):
     unpaired_experiences = Event.objects.filter(
         day__isnull=True, trip=day.trip, category=3
     )
-    form = MealForm(request.POST or None)
+    form = MealForm(request.POST or None, include_city=True)
     if form.is_valid():
         meal = form.save(commit=False)
         meal.day = day

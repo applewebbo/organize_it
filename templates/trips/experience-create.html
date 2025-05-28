@@ -4,7 +4,7 @@
       hx-disabled-elt="#form-submit"
       class="modal-content"
       method="post"
-      x-data="{ checkAndTrigger() { if (this.$refs.name.value && this.$refs.city.value) { this.$refs.name.dispatchEvent(new CustomEvent('trigger-geocode')); } } }">
+      x-data="{ geocodeTimer: null, checkAndTrigger() { clearTimeout(this.geocodeTimer); if (this.$refs.name.value && this.$refs.city.value) { this.geocodeTimer = setTimeout(() => { this.$refs.name.dispatchEvent(new CustomEvent('trigger-geocode')); }, 500); } } }">
     <div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
         <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% trans 'Create a new Experience' %}</h3>
         <button type="button"

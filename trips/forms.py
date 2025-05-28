@@ -412,10 +412,24 @@ class MealForm(forms.ModelForm):
         initial=60,
     )
 
+    name = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(attrs={"placeholder": _("Name")}),
+        label=_("Name"),
+    )
+
+    city = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": _("City")}),
+        label=_("City"),
+    )
+
     class Meta:
         model = Meal
         fields = [
             "name",
+            "city",
             "type",
             "address",
             "start_time",
@@ -439,8 +453,33 @@ class MealForm(forms.ModelForm):
             "start_time": forms.TimeInput(attrs={"type": "time"}),
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, include_city=False, **kwargs):
         super().__init__(*args, **kwargs)
+        layout_fields = []
+        if include_city:
+            geocode_url = reverse("trips:geocode-address")
+            name_htmx_attrs = {
+                "x-ref": "name",
+                "@input": "checkAndTrigger",
+                "hx-post": geocode_url,
+                "hx-trigger": "trigger-geocode",
+                "hx-target": "#address-results",
+                "hx-include": "[name='name'], [name='city']",
+            }
+            city_htmx_attrs = {
+                "x-ref": "city",
+                "@input": "checkAndTrigger",
+                "hx-post": geocode_url,
+                "hx-trigger": "trigger-geocode",
+                "hx-target": "#address-results",
+                "hx-include": "[name='name'], [name='city']",
+            }
+            self.fields["name"].widget.attrs.update(name_htmx_attrs)
+            self.fields["city"].widget.attrs.update(city_htmx_attrs)
+            layout_fields.append(Field("name", wrapper_class="sm:col-span-2"))
+            layout_fields.append(Field("city", wrapper_class="sm:col-span-2"))
+        else:
+            layout_fields.append(Field("name", wrapper_class="sm:col-span-4"))
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.fields["type"].choices = Meal.Type.choices
@@ -449,29 +488,26 @@ class MealForm(forms.ModelForm):
             end_time = datetime.combine(date.today(), self.instance.end_time)
             duration = (end_time - start_time).total_seconds() // 60
             self.initial["duration"] = int(duration)
-        self.helper.layout = Layout(
-            Div(
-                "name",
-                css_class="sm:col-span-3",
-            ),
-            Field("type", css_class="select select-primary w-full"),
-            Div(
-                "address",
-                css_class="sm:col-span-4",
-            ),
-            Div(
+        layout_fields += [
+            Field("address", wrapper_class="sm:col-span-4"),
+            HTML(ADDRESS_RESULTS_HTML),
+            Field(
                 "start_time",
-                css_class="sm:col-span-3",
+                x_ref="startTime",
+                **{"x-on:change": "checkOverlap()"},
+                wrapper_class="sm:col-span-2",
             ),
-            Div(
+            Field(
                 "duration",
-                css_class="sm:col-span-1",
+                x_ref="duration",
+                **{"x-on:change": "checkOverlap()"},
+                wrapper_class="sm:col-span-1",
             ),
-            Div(
-                "url",
-                css_class="sm:col-span-4",
-            ),
-        )
+            Field("type", css_class="select select-primary"),
+            Div(id="overlap-warning", css_class="sm:col-span-4"),
+            Field("url", wrapper_class="sm:col-span-4"),
+        ]
+        self.helper.layout = Layout(*layout_fields)
 
     def save(self, commit=True):
         instance = super().save(commit=False)
