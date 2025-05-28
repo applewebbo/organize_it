@@ -460,7 +460,12 @@ def add_meal(request, day_id):
 def add_stay(request, day_id):
     day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
     trip = day.trip
-    form = StayForm(trip, request.POST or None, initial={"apply_to_days": [day_id]})
+    form = StayForm(
+        trip,
+        include_city=True,
+        data=request.POST or None,
+        initial={"apply_to_days": [day_id]},
+    )
     if form.is_valid():
         form.save()
         messages.add_message(

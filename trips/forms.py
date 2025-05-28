@@ -531,10 +531,24 @@ class StayForm(forms.ModelForm):
         )
     )
 
+    name = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(attrs={"placeholder": _("Name")}),
+        label=_("Name"),
+    )
+
+    city = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": _("City")}),
+        label=_("City"),
+    )
+
     class Meta:
         model = Stay
         fields = [
             "name",
+            "city",
             "check_in",
             "check_out",
             "cancellation_date",
@@ -563,8 +577,33 @@ class StayForm(forms.ModelForm):
             "address": _("Address"),
         }
 
-    def __init__(self, trip, *args, **kwargs):
+    def __init__(self, trip, include_city=False, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        layout_fields = []
+        if include_city:
+            geocode_url = reverse("trips:geocode-address")
+            name_htmx_attrs = {
+                "x-ref": "name",
+                "@input": "checkAndTrigger",
+                "hx-post": geocode_url,
+                "hx-trigger": "trigger-geocode",
+                "hx-target": "#address-results",
+                "hx-include": "[name='name'], [name='city']",
+            }
+            city_htmx_attrs = {
+                "x-ref": "city",
+                "@input": "checkAndTrigger",
+                "hx-post": geocode_url,
+                "hx-trigger": "trigger-geocode",
+                "hx-target": "#address-results",
+                "hx-include": "[name='name'], [name='city']",
+            }
+            self.fields["name"].widget.attrs.update(name_htmx_attrs)
+            self.fields["city"].widget.attrs.update(city_htmx_attrs)
+            layout_fields.append(Field("name", wrapper_class="sm:col-span-2"))
+            layout_fields.append(Field("city", wrapper_class="sm:col-span-2"))
+        else:
+            layout_fields.append(Field("name", wrapper_class="sm:col-span-4"))
         self.fields["apply_to_days"].queryset = Day.objects.filter(trip=trip)
         self.fields["apply_to_days"].label_from_instance = (
             lambda obj: f"{_('Day')} {obj.number}"
@@ -576,40 +615,17 @@ class StayForm(forms.ModelForm):
             ).values_list("pk", flat=True)
         self.helper = FormHelper()
         self.helper.form_tag = False
-        self.helper.layout = Layout(
-            Div(
-                "name",
-                css_class="sm:col-span-4",
-            ),
-            Div(
-                "address",
-                css_class="sm:col-span-4",
-            ),
-            Div(
-                "check_in",
-                css_class="sm:col-span-2",
-            ),
-            Div(
-                "check_out",
-                css_class="sm:col-span-2",
-            ),
-            Div(
-                "cancellation_date",
-                css_class="sm:col-span-2",
-            ),
-            Div(
-                "phone_number",
-                css_class="sm:col-span-2",
-            ),
-            Div(
-                "url",
-                css_class="sm:col-span-4",
-            ),
-            Div(
-                "apply_to_days",
-                css_class="sm:col-span-4",
-            ),
-        )
+        layout_fields += [
+            Field("address", wrapper_class="sm:col-span-4"),
+            HTML(ADDRESS_RESULTS_HTML),
+            Field("check_in", wrapper_class="sm:col-span-2"),
+            Field("check_out", wrapper_class="sm:col-span-2"),
+            Field("cancellation_date", wrapper_class="sm:col-span-2"),
+            Field("phone_number", wrapper_class="sm:col-span-2"),
+            Field("url", wrapper_class="sm:col-span-4"),
+            Field("apply_to_days", wrapper_class="sm:col-span-4"),
+        ]
+        self.helper.layout = Layout(*layout_fields)
 
     def save(self, commit=True):
         stay = super().save(commit=False)
