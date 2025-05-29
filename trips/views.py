@@ -82,12 +82,14 @@ def geocode_location(name, city):
     cache_key = generate_cache_key(name, city)
     cached_result = cache.get(cache_key)
     if cached_result:
-        print(f"Cache hit per: {name}, {city}")
         return cached_result
 
     # Rate limit check to avoid hitting Nominatim too fast
     rate_limit_check()
 
+    time.sleep(
+        1
+    )  # Ensure at least 1 second between requests for showing a meaningfiul indicator on the frontend
     url = "https://nominatim.openstreetmap.org/search"
     params = {
         "q": f"{name.strip()}, {city.strip()}",
@@ -99,7 +101,6 @@ def geocode_location(name, city):
     headers = {"User-Agent": "OrganizeIt-Geocoding"}
 
     try:
-        print(f"API call for: {name}, {city}")
         response = requests.get(url, params=params, headers=headers, timeout=5)
 
         if response.status_code == 200 and response.json():
@@ -420,7 +421,9 @@ def add_experience(request, day_id):
     unpaired_experiences = Event.objects.filter(
         day__isnull=True, trip=day.trip, category=2
     )
-    form = ExperienceForm(request.POST or None, include_city=True)
+    form = ExperienceForm(
+        request.POST or None, include_city=True, initial={"city": day.trip.destination}
+    )
     if form.is_valid():
         experience = form.save(commit=False)
         experience.day = day
@@ -441,7 +444,9 @@ def add_meal(request, day_id):
     unpaired_experiences = Event.objects.filter(
         day__isnull=True, trip=day.trip, category=3
     )
-    form = MealForm(request.POST or None, include_city=True)
+    form = MealForm(
+        request.POST or None, include_city=True, initial={"city": day.trip.destination}
+    )
     if form.is_valid():
         meal = form.save(commit=False)
         meal.day = day
@@ -464,7 +469,7 @@ def add_stay(request, day_id):
         trip,
         include_city=True,
         data=request.POST or None,
-        initial={"apply_to_days": [day_id]},
+        initial={"apply_to_days": [day_id], "city": trip.destination},
     )
     if form.is_valid():
         form.save()
