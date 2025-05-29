@@ -1,9 +1,9 @@
-{% load heroicons %}
+{% load heroicons i18n %}
 {% if found %}
-    <div class="my-2">
+    <div class="mb-4 -mt-1">
         <ul>
             {% for address in addresses %}
-                <li class="flex gap-2 justify-between items-center py-2 px-3 mx-2 mb-2 text-sm rounded-lg border text-slate-600 bg-slate-100 border-slate-200">
+                <li class="flex gap-2 justify-between items-center py-2 px-3 mx-2 mb-2 text-sm rounded-lg border text-slate-600 bg-slate-50 border-slate-200">
                     <div>
                         <span id="name-{{ forloop.counter }}" class="font-bold">{{ address.name }}</span>&nbsp;<span id="address-{{ forloop.counter }}">{{ address.address }}</span>
                     </div>
@@ -17,7 +17,7 @@
         </ul>
     </div>
 {% else %}
-    <div>
-        <p>No address found.</p>
+    <div class="mb-4 -mt-1">
+        <p class="py-2 px-3 mx-2 mb-2 text-sm rounded-lg border text-slate-600 bg-slate-50 border-slate-200">{% trans 'No address found.' %}</p>
     </div>
 {% endif %}

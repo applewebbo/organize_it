@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-28 08:26+0200\n"
+"POT-Creation-Date: 2025-05-29 08:20+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -273,7 +273,11 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: templates/trips/includes/day.html:10 trips/forms.py:609 trips/models.py:189
+#: templates/trips/includes/address-results.html:21
+msgid "No address found."
+msgstr ""
+
+#: templates/trips/includes/day.html:10 trips/forms.py:649 trips/models.py:189
 msgid "Day"
 msgstr ""
 
@@ -402,58 +406,58 @@ msgstr ""
 msgid "Arrival Time"
 msgstr ""
 
-#: trips/forms.py:230 trips/forms.py:323 trips/forms.py:329 trips/forms.py:446
+#: trips/forms.py:230 trips/forms.py:323 trips/forms.py:329 trips/forms.py:462
 msgid "Url"
 msgstr ""
 
-#: trips/forms.py:231 trips/forms.py:320 trips/forms.py:442
+#: trips/forms.py:231 trips/forms.py:320 trips/forms.py:458
 msgid "Type"
 msgstr ""
 
-#: trips/forms.py:290 trips/forms.py:411 trips/forms.py:445
+#: trips/forms.py:290 trips/forms.py:427 trips/forms.py:461
 msgid "Duration"
 msgstr ""
 
-#: trips/forms.py:296 trips/forms.py:297 trips/forms.py:326 trips/forms.py:417
-#: trips/forms.py:418 trips/forms.py:441 trips/forms.py:536 trips/forms.py:537
-#: trips/forms.py:571
+#: trips/forms.py:296 trips/forms.py:297 trips/forms.py:326 trips/forms.py:433
+#: trips/forms.py:434 trips/forms.py:457 trips/forms.py:568 trips/forms.py:569
+#: trips/forms.py:603
 msgid "Name"
 msgstr ""
 
-#: trips/forms.py:303 trips/forms.py:304 trips/forms.py:327 trips/forms.py:424
-#: trips/forms.py:425 trips/forms.py:543 trips/forms.py:544
+#: trips/forms.py:303 trips/forms.py:304 trips/forms.py:327 trips/forms.py:440
+#: trips/forms.py:441 trips/forms.py:575 trips/forms.py:576
 msgid "City"
 msgstr ""
 
-#: trips/forms.py:321 trips/forms.py:330 trips/forms.py:443 trips/forms.py:577
+#: trips/forms.py:321 trips/forms.py:330 trips/forms.py:459 trips/forms.py:609
 msgid "Address"
 msgstr ""
 
-#: trips/forms.py:322 trips/forms.py:444
+#: trips/forms.py:322 trips/forms.py:460
 msgid "Start Time"
 msgstr ""
 
-#: trips/forms.py:530
+#: trips/forms.py:562
 msgid "Period of stay"
 msgstr ""
 
-#: trips/forms.py:572
+#: trips/forms.py:604
 msgid "Check-in"
 msgstr ""
 
-#: trips/forms.py:573
+#: trips/forms.py:605
 msgid "Check-out"
 msgstr ""
 
-#: trips/forms.py:574
+#: trips/forms.py:606
 msgid "Cancellation date"
 msgstr ""
 
-#: trips/forms.py:575
+#: trips/forms.py:607
 msgid "Phone number"
 msgstr ""
 
-#: trips/forms.py:576
+#: trips/forms.py:608
 msgid "Website"
 msgstr ""
 
@@ -541,74 +545,74 @@ msgstr ""
 msgid "Snack"
 msgstr ""
 
-#: trips/views.py:410
+#: trips/views.py:411
 msgid "Transport added successfully"
 msgstr ""
 
-#: trips/views.py:431
+#: trips/views.py:434
 msgid "Experience added successfully"
 msgstr ""
 
-#: trips/views.py:452
+#: trips/views.py:457
 msgid "Meal added successfully"
 msgstr ""
 
-#: trips/views.py:469
+#: trips/views.py:479
 msgid "Stay added successfully"
 msgstr ""
 
-#: trips/views.py:510
+#: trips/views.py:520
 msgid "Stay updated successfully"
 msgstr ""
 
-#: trips/views.py:538
+#: trips/views.py:548
 msgid "Stay deleted successfully"
 msgstr ""
 
-#: trips/views.py:572
+#: trips/views.py:582
 msgid "Event deleted successfully"
 msgstr ""
 
-#: trips/views.py:591
+#: trips/views.py:601
 msgid "Event unpaired successfully"
 msgstr ""
 
-#: trips/views.py:611
+#: trips/views.py:621
 msgid "Event paired successfully"
 msgstr ""
 
-#: trips/views.py:692
+#: trips/views.py:702
 msgid "Event updated successfully"
 msgstr ""
 
-#: trips/views.py:715
+#: trips/views.py:725
 msgid "Event times updated successfully"
 msgstr ""
 
-#: trips/views.py:746
+#: trips/views.py:756
 msgid "This event overlaps with another event"
 msgstr ""
 
-#: trips/views.py:767
+#: trips/views.py:777
 msgid "Events swapped successfully"
 msgstr ""
 
-#: trips/views.py:833
+#: trips/views.py:843
 msgid "Start date must be after today."
 msgstr ""
 
-#: trips/views.py:837
+#: trips/views.py:847
 msgid "Start date cannot be after end date."
 msgstr ""
 
-#: trips/views.py:917 trips/views.py:989
+#: trips/views.py:927 trips/views.py:999
 msgid "Note added successfully"
 msgstr ""
 
-#: trips/views.py:936 trips/views.py:1011
+#: trips/views.py:946 trips/views.py:1021
 msgid "Note updated successfully"
 msgstr ""
 
-#: trips/views.py:955 trips/views.py:1030
+#: trips/views.py:965 trips/views.py:1040
 msgid "Note deleted successfully"
 msgstr ""
