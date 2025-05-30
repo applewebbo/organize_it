@@ -110,10 +110,16 @@ class Stay(models.Model):
         blank=True,
         validators=[
             RegexValidator(
-                regex=r"^(?:\+?[1-9]\d{1,14}|\d{2,15})$",
+                # Allow at most 2 spaces anywhere after the first digit
+                regex=r"^\+?\d(?: ?\d){7,19}$",
                 message=_(
-                    "Enter a valid phone number (with or without international prefix)."
+                    "Enter a valid phone number (with or without international prefix, and at most 2 spaces)."
                 ),
+            ),
+            RegexValidator(
+                # Disallow more than 2 spaces
+                regex=r"^(?:[^ ]* ?){0,3}$|^\+?\d(?: ?\d){7,19}$",
+                message=_("Phone number can contain at most 2 spaces."),
             ),
         ],
     )

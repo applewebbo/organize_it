@@ -14,7 +14,6 @@ from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
 from accounts.models import Profile
@@ -103,7 +102,7 @@ def geocode_location(name, city):
     try:
         response = requests.get(url, params=params, headers=headers, timeout=5)
 
-        if response.status_code == 200 and response.json():
+        if response.status_code == 200:
             results = response.json()
             if not results:
                 return []
@@ -511,7 +510,11 @@ def stay_modify(request, pk):
     qs = Stay.objects.prefetch_related("days")
     stay = get_object_or_404(qs, pk=pk)
     trip = stay.days.first().trip
-    form = StayForm(trip, request.POST or None, instance=stay)
+    form = StayForm(
+        trip,
+        data=request.POST or None,
+        instance=stay,
+    )
     if form.is_valid():
         form.save()
         messages.add_message(
@@ -868,7 +871,6 @@ def validate_dates(request):
     return HttpResponse("")
 
 
-@csrf_exempt
 def geocode_address(request):
     """Geocode a location based on name and city using Nominatim OpenStreetMap and HTMX."""
     if request.method == "POST":
