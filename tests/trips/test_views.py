@@ -1804,7 +1804,7 @@ class GeocodeLocationTests(TestCase):
         from trips.views import geocode_location
 
         mock_get.return_value.status_code = 200
-        mock_get.return_value.json.return_value = []
+        mock_get.return_value.json.return_value = {}
         addresses = geocode_location("Nonexistent", "Nowhere")
         assert addresses == []
 
@@ -1875,28 +1875,6 @@ class GeocodeLocationTests(TestCase):
 
 
 class GeocodeLocationAddressFormatTests(TestCase):
-    def test_address_format_with_street_housenumber_and_city(self):
-        from trips.views import geocode_location
-
-        with patch("trips.views.requests.get") as mock_get:
-            mock_get.return_value.status_code = 200
-            mock_get.return_value.json.return_value = [
-                {
-                    "address": {
-                        "road": "Via Roma",
-                        "house_number": "10",
-                        "city": "Rome",
-                    },
-                    "lat": "41.9028",
-                    "lon": "12.4964",
-                    "importance": 0.7,
-                    "place_rank": 30,
-                    "name": "Hotel Roma",
-                }
-            ]
-            addresses = geocode_location("Hotel Roma", "Rome")
-            assert addresses[0]["address"] == "Via Roma 10, Rome"
-
     def test_address_format_with_only_street_and_city(self):
         from trips.views import geocode_location
 
@@ -1914,6 +1892,28 @@ class GeocodeLocationAddressFormatTests(TestCase):
             ]
             addresses = geocode_location("Hotel Milano", "Milan")
             assert addresses[0]["address"] == "Via Milano, Milan"
+
+    def test_address_format_with_street_housenumber_and_city(self):
+        from trips.views import geocode_location
+
+        with patch("trips.views.requests.get") as mock_get:
+            mock_get.return_value.status_code = 200
+            mock_get.return_value.json.return_value = [
+                {
+                    "address": {
+                        "road": "Via Roma",
+                        "house_number": "1",
+                        "city": "Rome",
+                    },
+                    "lat": "41.9028",
+                    "lon": "12.4964",
+                    "importance": 0.7,
+                    "place_rank": 30,
+                    "name": "Hotel Roma",
+                }
+            ]
+            addresses = geocode_location("Hotel Roma", "Rome")
+            assert addresses[0]["address"] == "Via Roma 1, Rome"
 
     def test_address_format_with_only_city(self):
         from trips.views import geocode_location
