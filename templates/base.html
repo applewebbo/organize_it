@@ -42,13 +42,13 @@
             <div id="messages" class="z-3">{% include 'includes/messages.html' %}</div>
         </div>
         <!-- Htmx -->
-        <script src="{% static 'js/htmx.min.js' %}"></script>
+        <script src="{% static 'js/htmx.min.js' %}" defer></script>
         <!-- Alpine.js -->
-        <script src="{% static 'js/alpine-collapse.min.js' %}"></script>
-        <script src="{% static 'js/alpine-focus.min.js' %}"></script>
-        <script src="{% static 'js/alpine.min.js' %}"></script>
-        <!-- Custom.js -->
-        <script src="{% static 'js/custom.js' %}"></script>
+        <script src="{% static 'js/alpine-collapse.min.js' %}" defer></script>
+        <script src="{% static 'js/alpine-focus.min.js' %}" defer></script>
+        <script src="{% static 'js/alpine.min.js' %}" defer></script>
+        <!-- Main.js -->
+        <script src="{% static 'js/main.js' %}" defer></script>
         {% django_htmx_script %}
         {% block script %}
         {% endblock script %}
