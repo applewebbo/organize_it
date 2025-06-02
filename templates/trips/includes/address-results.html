@@ -15,9 +15,13 @@
                 </li>
             {% endfor %}
         </ul>
+        <p class="flex gap-1 justify-end items-center px-3 my-1 mx-2 text-xs italic text-slate-400">{% heroicon_micro 'information-circle' class='size-3' %}{% trans 'Search conducted via' %}&nbsp;<a href="https://nominatim.openstreetmap.org/ui/search.html" class="link link-primary">Nominatim API</a></p>
     </div>
 {% else %}
     <div class="mb-4 -mt-1">
-        <p class="py-2 px-3 mx-2 mb-2 text-sm rounded-lg border text-slate-600 bg-slate-50 border-slate-200">{% trans 'No address found.' %}</p>
+        <p class="py-2 px-3 mx-2 mb-2 text-sm text-red-500 rounded-lg border bg-slate-50 border-slate-200">
+            {% trans 'No address found.' %}
+        </p>
+        <p class="flex gap-1 justify-end items-center px-3 my-1 mx-2 text-xs italic text-slate-400">{% heroicon_micro 'information-circle' class='size-3' %}{% trans 'Search conducted via' %}&nbsp;<a href="https://nominatim.openstreetmap.org/ui/search.html" class="link link-primary">Nominatim API</a></p>
     </div>
 {% endif %}

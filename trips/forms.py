@@ -376,13 +376,14 @@ class ExperienceForm(forms.ModelForm):
         self.helper.form_tag = False
         layout_fields += [
             Div(
-                Field("address", wrapper_class="sm:col-span-4"),
+                Field("address"),
                 HTML("""
                     <span id="address-spinner" class="absolute right-2 top-1/2 -translate-y-1/2">
                         <span class="loading loading-bars loading-lg text-primary mt-3.5 htmx-indicator"></span>
                     </span>
                     """),
                 css_class="relative sm:col-span-4",
+                # css_id="address-results"
             ),
             HTML(ADDRESS_RESULTS_HTML),
             Field(

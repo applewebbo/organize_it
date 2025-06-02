@@ -880,7 +880,6 @@ def geocode_address(request):
         if name and city:
             results = geocode_location(name, city)
             if results:
-                print(results)
                 return TemplateResponse(
                     request,
                     "trips/includes/address-results.html",
