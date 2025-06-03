@@ -73,6 +73,7 @@ htmx_urlpatterns = [
         views.stay_note_delete,
         name="stay-note-delete",
     ),
+    path("geocode-address/", views.geocode_address, name="geocode-address"),
 ]
 
 urlpatterns += htmx_urlpatterns

@@ -1,11 +1,12 @@
-{% load crispy_forms_tags %}
+{% load crispy_forms_tags i18n %}
 <form hx-post="{{ request.path }}"
       hx-target="#dialog"
       hx-disabled-elt="#form-submit"
       class="modal-content"
-      method="post">
+      method="post"
+      x-data="autocompleteForm()">
     <div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
-        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Create a new Stay</h3>
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% trans 'Create a new Stay' %}</h3>
         <button type="button"
                 class="inline-flex justify-center items-center w-8 h-8 text-sm text-gray-400 bg-transparent rounded-lg hover:text-gray-900 hover:bg-gray-200 ms-auto dark:hover:bg-gray-600 dark:hover:text-white"
                 x-on:click="openModal = false">
@@ -24,9 +25,9 @@
         {% crispy form %}
     </div>
     <div class="flex justify-end items-center p-4 rounded-b md:p-5">
-        <button id="form-submit" class="mr-2 btn btn-sm btn-success" type="submit">Save</button>
+        <button id="form-submit" class="mr-2 btn btn-sm btn-success" type="submit">{% trans 'Save' %}</button>
         <button type="button"
                 x-on:click="openModal = false"
-                class="mr-2 btn btn-outline btn-neutral btn-sm">Cancel</button>
+                class="mr-2 btn btn-outline btn-neutral btn-sm">{% trans 'Cancel' %}</button>
     </div>
 </form>

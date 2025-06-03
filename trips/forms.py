@@ -203,33 +203,11 @@ class LinkForm(forms.ModelForm):
         )
 
 
-FIELDSET_CONTENT = """
-            <fieldset>
-            <legend class="block text-gray-700 text-sm font-bold mb-2">Connect to</legend>
-            <div class="flex">
-              <div class="flex items-center me-4">
-                <input class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" type="radio" name="gridRadios" id="gridRadios1" value="option1" checked
-                x-on:click="open = 0">
-                <label class="ms-2 text-sm font-medium text-gray-600 dark:text-gray-300" for="gridRadios1">
-                  None
-                </label>
-              </div>
-              <div class="flex items-center me-4">
-                <input class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" type="radio" name="gridRadios" id="gridRadios2" value="option2"
-                    x-on:click="open = 1" x-transition>
-                <label class="ms-2 text-sm font-medium text-gray-600 dark:text-gray-300" for="gridRadios2">
-                  Place
-                </label>
-              </div>
-              <div class="flex items-center me-4">
-                <input class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" type="radio" name="gridRadios" id="gridRadios3" value="option3"
-                x-on:click="open = 2" x-transition>
-                <label class="ms-2 text-sm font-medium text-gray-600 dark:text-gray-300" for="gridRadios3">
-                  Link
-                </label>
-              </div>
-            </div>
-            </fieldset>"""
+ADDRESS_RESULTS_HTML = """
+    <div id="address-results" class="sm:col-span-4">
+    <!-- Address Results will be added here.. -->
+    </div>
+"""
 
 
 class TransportForm(forms.ModelForm):
@@ -247,8 +225,8 @@ class TransportForm(forms.ModelForm):
         labels = {
             "address": _("Departure"),
             "destination": _("Destination"),
-            "start_time": _("Start Time"),
-            "end_time": _("End Time"),
+            "start_time": _("Departure Time"),
+            "end_time": _("Arrival Time"),
             "url": _("Url"),
             "type": _("Type"),
         }
@@ -313,10 +291,24 @@ class ExperienceForm(forms.ModelForm):
         initial=60,
     )
 
+    name = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(attrs={"placeholder": _("Name")}),
+        label=_("Name"),
+    )
+
+    city = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": _("City")}),
+        label=_("City"),
+    )
+
     class Meta:
         model = Experience
         fields = [
             "name",
+            "city",
             "type",
             "address",
             "start_time",
@@ -325,46 +317,80 @@ class ExperienceForm(forms.ModelForm):
         ]
         formfield_callback = urlfields_assume_https
         labels = {
-            "name": _("Name"),
             "type": _("Type"),
             "address": _("Address"),
             "start_time": _("Start Time"),
-            "duration": _("Duration"),
             "url": _("Url"),
         }
         widgets = {
-            "name": forms.TextInput(attrs={"placeholder": "Name"}),
+            "name": forms.TextInput(attrs={"placeholder": _("Name")}),
+            "city": forms.TextInput(attrs={"placeholder": _("City")}),
             "type": forms.Select(),
-            "url": forms.TextInput(attrs={"placeholder": "Url"}),
-            "address": forms.TextInput(attrs={"placeholder": "Address"}),
+            "url": forms.TextInput(attrs={"placeholder": _("Url")}),
+            "address": forms.TextInput(attrs={"placeholder": _("Address")}),
             "start_time": forms.TimeInput(attrs={"type": "time"}),
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, include_city=False, **kwargs):
         super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_tag = False
+        layout_fields = []
+        if include_city:
+            geocode_url = reverse("trips:geocode-address")
+            name_htmx_attrs = {
+                "x-ref": "name",
+                "@input": "checkAndTrigger",
+                "hx-post": geocode_url,
+                "hx-trigger": "trigger-geocode",
+                "hx-target": "#address-results",
+                "hx-include": "[name='name'], [name='city']",
+                "hx-indicator": "#address-spinner",
+                ":class": "{ 'animate-pulse ring-2 ring-primary/60': nameFilled }",
+            }
+            city_htmx_attrs = {
+                "x-ref": "city",
+                "@input": "checkAndTrigger",
+                "hx-post": geocode_url,
+                "hx-trigger": "trigger-geocode",
+                "hx-target": "#address-results",
+                "hx-include": "[name='name'], [name='city']",
+                "hx-indicator": "#address-spinner",
+            }
+            address_htmx_attrs = {
+                "x-ref": "address",
+                ":class": "{ 'animate-pulse ring-2 ring-primary/60': addressFilled }",
+            }
+            self.fields["name"].widget.attrs.update(name_htmx_attrs)
+            self.fields["city"].widget.attrs.update(city_htmx_attrs)
+            self.fields["address"].widget.attrs.update(address_htmx_attrs)
+            layout_fields.append(Field("name", wrapper_class="sm:col-span-2"))
+            layout_fields.append(Field("city", wrapper_class="sm:col-span-2"))
+        else:
+            layout_fields.append(Field("name", wrapper_class="sm:col-span-4"))
         self.fields["type"].choices = Experience.Type.choices
         if self.instance.pk and self.instance.end_time and self.instance.start_time:
             start_time = datetime.combine(date.today(), self.instance.start_time)
             end_time = datetime.combine(date.today(), self.instance.end_time)
             duration = (end_time - start_time).total_seconds() // 60
             self.initial["duration"] = int(duration)
-        self.helper.layout = Layout(
-            Field(
-                "name",
-                wrapper_class="sm:col-span-3",
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        layout_fields += [
+            Div(
+                Field("address"),
+                HTML("""
+                    <span id="address-spinner" class="absolute right-2 top-1/2 -translate-y-1/2">
+                        <span class="loading loading-bars loading-lg text-primary mt-3.5 htmx-indicator"></span>
+                    </span>
+                    """),
+                css_class="relative sm:col-span-4",
+                # css_id="address-results"
             ),
-            Field("type", css_class="select select-primary"),
-            Field(
-                "address",
-                wrapper_class="sm:col-span-4",
-            ),
+            HTML(ADDRESS_RESULTS_HTML),
             Field(
                 "start_time",
                 x_ref="startTime",
                 **{"x-on:change": "checkOverlap()"},
-                wrapper_class="sm:col-span-3",
+                wrapper_class="sm:col-span-2",
             ),
             Field(
                 "duration",
@@ -372,9 +398,11 @@ class ExperienceForm(forms.ModelForm):
                 **{"x-on:change": "checkOverlap()"},
                 wrapper_class="sm:col-span-1",
             ),
+            Field("type", css_class="select select-primary"),
             Div(id="overlap-warning", css_class="sm:col-span-4"),
             Field("url", wrapper_class="sm:col-span-4"),
-        )
+        ]
+        self.helper.layout = Layout(*layout_fields)
 
     def save(self, commit=True):
         instance = super().save(commit=False)
@@ -401,10 +429,24 @@ class MealForm(forms.ModelForm):
         initial=60,
     )
 
+    name = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(attrs={"placeholder": _("Name")}),
+        label=_("Name"),
+    )
+
+    city = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": _("City")}),
+        label=_("City"),
+    )
+
     class Meta:
         model = Meal
         fields = [
             "name",
+            "city",
             "type",
             "address",
             "start_time",
@@ -428,8 +470,41 @@ class MealForm(forms.ModelForm):
             "start_time": forms.TimeInput(attrs={"type": "time"}),
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, include_city=False, **kwargs):
         super().__init__(*args, **kwargs)
+        layout_fields = []
+        if include_city:
+            geocode_url = reverse("trips:geocode-address")
+            name_htmx_attrs = {
+                "x-ref": "name",
+                "@input": "checkAndTrigger",
+                "hx-post": geocode_url,
+                "hx-trigger": "trigger-geocode",
+                "hx-target": "#address-results",
+                "hx-include": "[name='name'], [name='city']",
+                "hx-indicator": "#address-spinner",
+                ":class": "{ 'animate-pulse ring-2 ring-primary/60': nameFilled }",
+            }
+            city_htmx_attrs = {
+                "x-ref": "city",
+                "@input": "checkAndTrigger",
+                "hx-post": geocode_url,
+                "hx-trigger": "trigger-geocode",
+                "hx-target": "#address-results",
+                "hx-include": "[name='name'], [name='city']",
+                "hx-indicator": "#address-spinner",
+            }
+            address_htmx_attrs = {
+                "x-ref": "address",
+                ":class": "{ 'animate-pulse ring-2 ring-primary/60': addressFilled }",
+            }
+            self.fields["name"].widget.attrs.update(name_htmx_attrs)
+            self.fields["city"].widget.attrs.update(city_htmx_attrs)
+            self.fields["address"].widget.attrs.update(address_htmx_attrs)
+            layout_fields.append(Field("name", wrapper_class="sm:col-span-2"))
+            layout_fields.append(Field("city", wrapper_class="sm:col-span-2"))
+        else:
+            layout_fields.append(Field("name", wrapper_class="sm:col-span-4"))
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.fields["type"].choices = Meal.Type.choices
@@ -438,29 +513,34 @@ class MealForm(forms.ModelForm):
             end_time = datetime.combine(date.today(), self.instance.end_time)
             duration = (end_time - start_time).total_seconds() // 60
             self.initial["duration"] = int(duration)
-        self.helper.layout = Layout(
+        layout_fields += [
             Div(
-                "name",
-                css_class="sm:col-span-3",
+                Field("address", wrapper_class="sm:col-span-4"),
+                HTML("""
+                    <span id="address-spinner" class="absolute right-2 top-1/2 -translate-y-1/2">
+                        <span class="loading loading-bars loading-lg text-primary mt-3.5 htmx-indicator"></span>
+                    </span>
+                    """),
+                css_class="relative sm:col-span-4",
             ),
-            Field("type", css_class="select select-primary w-full"),
-            Div(
-                "address",
-                css_class="sm:col-span-4",
-            ),
-            Div(
+            HTML(ADDRESS_RESULTS_HTML),
+            Field(
                 "start_time",
-                css_class="sm:col-span-3",
+                x_ref="startTime",
+                **{"x-on:change": "checkOverlap()"},
+                wrapper_class="sm:col-span-2",
             ),
-            Div(
+            Field(
                 "duration",
-                css_class="sm:col-span-1",
+                x_ref="duration",
+                **{"x-on:change": "checkOverlap()"},
+                wrapper_class="sm:col-span-1",
             ),
-            Div(
-                "url",
-                css_class="sm:col-span-4",
-            ),
-        )
+            Field("type", css_class="select select-primary"),
+            Div(id="overlap-warning", css_class="sm:col-span-4"),
+            Field("url", wrapper_class="sm:col-span-4"),
+        ]
+        self.helper.layout = Layout(*layout_fields)
 
     def save(self, commit=True):
         instance = super().save(commit=False)
@@ -484,10 +564,24 @@ class StayForm(forms.ModelForm):
         )
     )
 
+    name = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(attrs={"placeholder": _("Name")}),
+        label=_("Name"),
+    )
+
+    city = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": _("City")}),
+        label=_("City"),
+    )
+
     class Meta:
         model = Stay
         fields = [
             "name",
+            "city",
             "check_in",
             "check_out",
             "cancellation_date",
@@ -516,8 +610,41 @@ class StayForm(forms.ModelForm):
             "address": _("Address"),
         }
 
-    def __init__(self, trip, *args, **kwargs):
+    def __init__(self, trip, include_city=False, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        layout_fields = []
+        if include_city:
+            geocode_url = reverse("trips:geocode-address")
+            name_htmx_attrs = {
+                "x-ref": "name",
+                "@input": "checkAndTrigger",
+                "hx-post": geocode_url,
+                "hx-trigger": "trigger-geocode",
+                "hx-target": "#address-results",
+                "hx-include": "[name='name'], [name='city']",
+                "hx-indicator": "#address-spinner",
+                ":class": "{ 'animate-pulse ring-2 ring-primary/60': nameFilled }",
+            }
+            city_htmx_attrs = {
+                "x-ref": "city",
+                "@input": "checkAndTrigger",
+                "hx-post": geocode_url,
+                "hx-trigger": "trigger-geocode",
+                "hx-target": "#address-results",
+                "hx-include": "[name='name'], [name='city']",
+                "hx-indicator": "#address-spinner",
+            }
+            address_htmx_attrs = {
+                "x-ref": "address",
+                ":class": "{ 'animate-pulse ring-2 ring-primary/60': addressFilled }",
+            }
+            self.fields["name"].widget.attrs.update(name_htmx_attrs)
+            self.fields["city"].widget.attrs.update(city_htmx_attrs)
+            self.fields["address"].widget.attrs.update(address_htmx_attrs)
+            layout_fields.append(Field("name", wrapper_class="sm:col-span-2"))
+            layout_fields.append(Field("city", wrapper_class="sm:col-span-2"))
+        else:
+            layout_fields.append(Field("name", wrapper_class="sm:col-span-4"))
         self.fields["apply_to_days"].queryset = Day.objects.filter(trip=trip)
         self.fields["apply_to_days"].label_from_instance = (
             lambda obj: f"{_('Day')} {obj.number}"
@@ -529,40 +656,25 @@ class StayForm(forms.ModelForm):
             ).values_list("pk", flat=True)
         self.helper = FormHelper()
         self.helper.form_tag = False
-        self.helper.layout = Layout(
+        layout_fields += [
             Div(
-                "name",
-                css_class="sm:col-span-4",
+                Field("address", wrapper_class="sm:col-span-4"),
+                HTML("""
+                    <span id="address-spinner" class="absolute right-2 top-1/2 -translate-y-1/2">
+                        <span class="loading loading-bars loading-lg text-primary mt-3.5 htmx-indicator"></span>
+                    </span>
+                    """),
+                css_class="relative sm:col-span-4",
             ),
-            Div(
-                "address",
-                css_class="sm:col-span-4",
-            ),
-            Div(
-                "check_in",
-                css_class="sm:col-span-2",
-            ),
-            Div(
-                "check_out",
-                css_class="sm:col-span-2",
-            ),
-            Div(
-                "cancellation_date",
-                css_class="sm:col-span-2",
-            ),
-            Div(
-                "phone_number",
-                css_class="sm:col-span-2",
-            ),
-            Div(
-                "url",
-                css_class="sm:col-span-4",
-            ),
-            Div(
-                "apply_to_days",
-                css_class="sm:col-span-4",
-            ),
-        )
+            HTML(ADDRESS_RESULTS_HTML),
+            Field("check_in", wrapper_class="sm:col-span-2"),
+            Field("check_out", wrapper_class="sm:col-span-2"),
+            Field("cancellation_date", wrapper_class="sm:col-span-2"),
+            Field("phone_number", wrapper_class="sm:col-span-2"),
+            Field("url", wrapper_class="sm:col-span-4"),
+            Field("apply_to_days", wrapper_class="sm:col-span-4"),
+        ]
+        self.helper.layout = Layout(*layout_fields)
 
     def save(self, commit=True):
         stay = super().save(commit=False)
