@@ -4,11 +4,6 @@ textarea.fl-textarea {
     height: 7rem !important;
 }
 
-#map {
-    width: 100%;
-    height: 400px;
-}
-
 .truncate {
     white-space: nowrap;
     overflow: hidden;

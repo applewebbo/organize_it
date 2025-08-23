@@ -1,11 +1,13 @@
 import datetime
 import tempfile
+import time
 from pathlib import Path
 from unittest.mock import Mock, patch
 
 import factory
 import pytest
 from django.contrib.messages import get_messages
+from django.core.cache import cache
 from django.db.models import signals
 from django.test import override_settings
 from django.urls import reverse
@@ -22,6 +24,7 @@ from tests.trips.factories import (
 )
 from trips.forms import ExperienceForm, MealForm, TransportForm
 from trips.models import Stay, Trip
+from trips.utils import generate_cache_key, geocode_location
 
 pytestmark = pytest.mark.django_db
 
@@ -1726,11 +1729,8 @@ class StayNoteDeleteView(TestCase):
 class RateLimitCheckTests(TestCase):
     def test_rate_limit_check_waits_if_called_too_soon(self):
         """Should sleep if called within 1 second of last request."""
-        import time
 
-        from django.core.cache import cache
-
-        from trips.views import rate_limit_check
+        from trips.utils import rate_limit_check
 
         cache.set("nominatim_last_request_time", time.time(), 60)
         start = time.time()
@@ -1740,11 +1740,8 @@ class RateLimitCheckTests(TestCase):
 
     def test_rate_limit_check_no_wait_if_enough_time_passed(self):
         """Should not sleep if more than 1 second has passed since last request."""
-        import time
 
-        from django.core.cache import cache
-
-        from trips.views import rate_limit_check
+        from trips.utils import rate_limit_check
 
         cache.set("nominatim_last_request_time", time.time() - 2, 60)
         start = time.time()
@@ -1755,24 +1752,20 @@ class RateLimitCheckTests(TestCase):
 
 class GenerateCacheKeyTests(TestCase):
     def test_generate_cache_key_basic(self):
-        from trips.views import generate_cache_key
-
         key = generate_cache_key("Hotel Milano", "Milan")
         assert key.startswith("geocode_")
         assert len(key) < 100  # Should not be excessively long
 
     def test_generate_cache_key_empty(self):
-        from trips.views import generate_cache_key
-
         key = generate_cache_key("", "")
         assert key.startswith("geocode_")
         assert len(key) < 100  # Should not be excessively long
 
 
 class GeocodeLocationTests(TestCase):
-    @patch("trips.views.requests.get")
+    @patch("trips.utils.requests.get")
     def test_geocode_location_returns_sorted_addresses(self, mock_get):
-        from trips.views import geocode_location
+        from trips.utils import geocode_location
 
         mock_get.return_value.status_code = 200
         mock_get.return_value.json.return_value = [
@@ -1799,37 +1792,29 @@ class GeocodeLocationTests(TestCase):
         assert addresses[0]["address"].endswith("Milan")
         assert addresses[1]["address"].endswith("Rome")
 
-    @patch("trips.views.requests.get")
+    @patch("trips.utils.requests.get")
     def test_geocode_location_returns_empty_on_no_results(self, mock_get):
-        from trips.views import geocode_location
-
         mock_get.return_value.status_code = 200
         mock_get.return_value.json.return_value = {}
         addresses = geocode_location("Nonexistent", "Nowhere")
         assert addresses == []
 
-    @patch("trips.views.requests.get")
+    @patch("trips.utils.requests.get")
     def test_geocode_location_returns_empty_on_error(self, mock_get):
-        from trips.views import geocode_location
-
         mock_get.side_effect = Exception("API error")
         addresses = geocode_location("Hotel", "Italy")
         assert addresses == []
 
-    @patch("trips.views.requests.get")
+    @patch("trips.utils.requests.get")
     def test_geocode_location_empty_list_response(self, mock_get):
-        from trips.views import geocode_location
-
         mock_get.return_value.status_code = 200
         mock_get.return_value.json.return_value = []  # Simulate API returns empty list
         addresses = geocode_location("Hotel", "Italy")
         assert addresses == []
 
-    @patch("trips.views.requests.get")
+    @patch("trips.utils.requests.get")
     def test_geocode_location_non_200_status_code(self, mock_get):
         """Should return [] if API response status code is not 200."""
-        from trips.views import geocode_location
-
         mock_get.return_value.status_code = 404
         mock_get.return_value.json.return_value = [
             {
@@ -1845,17 +1830,11 @@ class GeocodeLocationTests(TestCase):
         assert addresses == []
 
     def test_geocode_location_returns_none_if_name_or_city_missing(self):
-        from trips.views import geocode_location
-
         assert geocode_location("", "Rome") is None
         assert geocode_location("Hotel", "") is None
 
-    @patch("trips.views.requests.get")
+    @patch("trips.utils.requests.get")
     def test_geocode_location_returns_cached_result(self, mock_get):
-        from django.core.cache import cache
-
-        from trips.views import generate_cache_key, geocode_location
-
         # Prepare a fake cached result
         cached_result = [
             {
@@ -1876,9 +1855,7 @@ class GeocodeLocationTests(TestCase):
 
 class GeocodeLocationAddressFormatTests(TestCase):
     def test_address_format_with_only_street_and_city(self):
-        from trips.views import geocode_location
-
-        with patch("trips.views.requests.get") as mock_get:
+        with patch("trips.utils.requests.get") as mock_get:
             mock_get.return_value.status_code = 200
             mock_get.return_value.json.return_value = [
                 {
@@ -1894,9 +1871,7 @@ class GeocodeLocationAddressFormatTests(TestCase):
             assert addresses[0]["address"] == "Via Milano, Milan"
 
     def test_address_format_with_street_housenumber_and_city(self):
-        from trips.views import geocode_location
-
-        with patch("trips.views.requests.get") as mock_get:
+        with patch("trips.utils.requests.get") as mock_get:
             mock_get.return_value.status_code = 200
             mock_get.return_value.json.return_value = [
                 {
@@ -1916,9 +1891,7 @@ class GeocodeLocationAddressFormatTests(TestCase):
             assert addresses[0]["address"] == "Via Roma 1, Rome"
 
     def test_address_format_with_only_city(self):
-        from trips.views import geocode_location
-
-        with patch("trips.views.requests.get") as mock_get:
+        with patch("trips.utils.requests.get") as mock_get:
             mock_get.return_value.status_code = 200
             mock_get.return_value.json.return_value = [
                 {
@@ -1934,9 +1907,7 @@ class GeocodeLocationAddressFormatTests(TestCase):
             assert addresses[0]["address"] == "Naples"
 
     def test_address_format_with_street_housenumber_no_city(self):
-        from trips.views import geocode_location
-
-        with patch("trips.views.requests.get") as mock_get:
+        with patch("trips.utils.requests.get") as mock_get:
             mock_get.return_value.status_code = 200
             mock_get.return_value.json.return_value = [
                 {
@@ -1954,12 +1925,12 @@ class GeocodeLocationAddressFormatTests(TestCase):
 
 class SelectBestResultTests(TestCase):
     def test_select_best_result_returns_none_for_empty(self):
-        from trips.views import select_best_result
+        from trips.utils import select_best_result
 
         assert select_best_result([], "Hotel", "Rome") is None
 
     def test_select_best_result_prefers_city_and_name(self):
-        from trips.views import select_best_result
+        from trips.utils import select_best_result
 
         results = [
             {
@@ -1983,7 +1954,7 @@ class SelectBestResultTests(TestCase):
         assert best["address"]["city"] == "Rome"
 
     def test_select_best_result_penalizes_generic_place(self):
-        from trips.views import select_best_result
+        from trips.utils import select_best_result
 
         results = [
             {
@@ -2008,7 +1979,7 @@ class SelectBestResultTests(TestCase):
         assert best["type"] == "hotel"
 
     def test_select_best_result_returns_first_if_no_scores(self):
-        from trips.views import select_best_result
+        from trips.utils import select_best_result
 
         results = [
             {"display_name": "A", "address": {}, "importance": 0.1, "place_rank": 99},
