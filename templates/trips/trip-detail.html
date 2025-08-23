@@ -40,7 +40,7 @@
         </div>
     </section>
     <!-- END Details Section -->
-    {% partialdef days inline=true %}
+    {% partialdef days inline %}
     <div id="days-events"
          hx-get="{% url 'trips:trip-detail' trip.pk %}"
          hx-target="#days-events"

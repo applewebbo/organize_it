@@ -153,3 +153,4 @@ src/intellisense.css
 
 # DJANGO
 staticfiles/
+.envrc
