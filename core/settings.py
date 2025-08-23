@@ -1,3 +1,5 @@
+import logging
+import os
 from pathlib import Path
 
 import dj_database_url
@@ -5,7 +7,9 @@ import environ
 from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 env = environ.Env(
     ACCOUNT_DEFAULT_HTTP_PROTOCOL=(str, "https"),
@@ -20,9 +24,9 @@ env = environ.Env(
     SECURE_SSL_REDIRECT=(bool, True),
 )
 
-environ.Env.read_env(BASE_DIR / ".env")
 
 SECRET_KEY = env("SECRET_KEY")
+ENVIRONMENT = env("ENVIRONMENT", default="prod")
 
 DEBUG = env.bool("DEBUG")
 
@@ -303,3 +307,74 @@ LOGGING = {
 DATE_INPUT_FORMATS = [
     "%m/%d/%Y",
 ]
+
+# DEVELOPMENT SPECIFIC SETTINGS
+if ENVIRONMENT == "dev":
+    DEBUG = True
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    INTERNAL_IPS = [
+        "127.0.0.1",
+    ]
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+            "ATOMIC_REQUESTS": True,
+            "CONN_MAX_AGE": 0,  # Close connections after each request
+            "OPTIONS": {
+                "init_command": (
+                    "PRAGMA foreign_keys=ON;"
+                    "PRAGMA journal_mode = WAL;"
+                    "PRAGMA synchronous = NORMAL;"
+                    "PRAGMA busy_timeout = 5000;"
+                    "PRAGMA temp_store = MEMORY;"
+                    "PRAGMA mmap_size = 134217728;"
+                    "PRAGMA journal_size_limit = 67108864;"
+                    "PRAGMA cache_size = 2000;"
+                ),
+                "transaction_mode": "IMMEDIATE",
+            },
+        }
+    }
+
+# PRODUCTION SPECIFIC SETTINGS
+elif ENVIRONMENT == "prod":
+    DATABASES = {
+        "default": {
+            "ENGINE": env("SQL_ENGINE"),
+            "NAME": env("SQL_DATABASE"),
+            "USER": env("SQL_USER"),
+            "PASSWORD": env("SQL_PASSWORD"),
+            "HOST": env("SQL_HOST"),
+            "PORT": env("SQL_PORT"),
+        }
+    }
+
+    # CSRF_TRUSTED_ORIGINS: list[str] = env("DJANGO_CSRF_TRUSTED_ORIGINS")
+    CSRF_TRUSTED_ORIGINS = env("CSRF_TRUSTED_ORIGINS").split(",")
+
+    # DJANGO_ANYMAIL
+    EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
+    DEFAULT_FROM_EMAIL = "info@mg.webbografico.com"
+    ADMIN_EMAIL = env("ADMIN_EMAIL")
+
+    ANYMAIL = {
+        "MAILGUN_API_KEY": env("MAILGUN_API_KEY"),
+        "MAILGUN_API_URL": env("MAILGUN_API_URL"),
+        "MAILGUN_SENDER_DOMAIN": env("MAILGUN_SENDER_DOMAIN"),
+    }
+
+# TESTING SPECIFIC SETTINGS
+elif ENVIRONMENT == "test":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": ":memory:",
+        }
+    }
+
+    PASSWORD_HASHERS = ("django.contrib.auth.hashers.MD5PasswordHasher",)
+
+    EMAIL_BACKEND = "django.core.mail.backends.locmemp.EmailBackend"
+
+    logging.disable()
