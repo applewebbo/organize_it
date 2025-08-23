@@ -13,6 +13,7 @@ jobs:
       DEBUG: on
       SECRET_KEY: a secret to everybody
       MAPBOX_ACCESS_TOKEN: ${{ secrets.MAPBOX_ACCESS_TOKEN }}
+      ENVIRONMENT: test
 
     steps:
     - name: Get the code
