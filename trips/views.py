@@ -1,16 +1,18 @@
 from datetime import date, timedelta
 
+import folium
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import transaction
-from django.db.models import Prefetch
+from django.db.models import Avg, Prefetch
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
+from django.views.generic import View
 
 from accounts.models import Profile
 from trips.forms import (
@@ -850,6 +852,41 @@ def stay_note_delete(request, stay_id):
         _("Note deleted successfully"),
     )
     return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+
+
+class DayMapView(View):
+    def dispatch(self, request, day_id, *args, **kwargs):
+        self.day_obj = get_object_or_404(Day, pk=day_id)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        events = self.day_obj.events.all()
+        # Filter out events without latitude or longitude
+        events_with_location = events.exclude(latitude__isnull=True).exclude(
+            longitude__isnull=True
+        )
+        center = events_with_location.aggregate(
+            avg_lat=Avg("latitude"), avg_lon=Avg("longitude")
+        )
+
+        # Create a map centered on the average location of the events
+        if center["avg_lat"] and center["avg_lon"]:
+            map_center = [center["avg_lat"], center["avg_lon"]]
+            m = folium.Map(location=map_center, zoom_start=13)
+        else:
+            # Default to a location if no events have coordinates
+            m = folium.Map(location=[45.4642, 9.1900], zoom_start=10)  # Milan
+
+        # Add markers for each event
+        for event in events_with_location:
+            folium.Marker(
+                [event.latitude, event.longitude],
+                popup=event.name,
+                tooltip=event.name,
+            ).add_to(m)
+
+        context = {"map": m._repr_html_(), "day": self.day_obj}
+        return TemplateResponse(request, "trips/day-map.html", context)
 
 
 # @login_required

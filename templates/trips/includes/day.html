@@ -12,7 +12,10 @@
                 <button class="btn btn-xs me-2 sm:btn-md" disabled="disabled">
                     {% heroicon_mini "pencil-square" class="size-4 sm:size-5" %}
                 </button>
-                <button class="btn btn-xs me-2 sm:btn-md" disabled="disabled">{% heroicon_mini "map" class="size-4 sm:size-5" %}</button>
+                <button hx-get="{% url 'trips:day-map' day.pk %}"
+                        hx-target="#day-{{ day.pk }}"
+                        hx-swap="innerHTML"
+                        class="btn btn-xs me-2 sm:btn-md">{% heroicon_mini "map" class="size-4 sm:size-5" %}</button>
                 <c-dropdown :day="day" />
             </div>
         </div>
