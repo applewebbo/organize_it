@@ -120,7 +120,7 @@ class TripFactory(factory.django.DjangoModelFactory):
         model = "trips.Trip"
 
     author = factory.SubFactory(UserFactory)
-    title = factory.Faker("city", locale="it_IT")
+    title = factory.LazyAttribute(lambda obj: random.choice(ITALIAN_CITIES))
     description = factory.Faker("sentence", nb_words=10)
     destination = factory.LazyAttribute(lambda obj: obj.title)
     start_date = factory.Faker("date_between", start_date="today", end_date="+3d")

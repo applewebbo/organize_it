@@ -130,14 +130,20 @@ class Stay(models.Model):
     notes = models.CharField(max_length=500, blank=True)
 
     def save(self, *args, **kwargs):
-        """convert address to coordinates for displaying on the map"""
+        """
+        Convert address to coordinates for displaying on the map,
+        only if the address has changed or coordinates are not set.
+        """
         old = type(self).objects.get(pk=self.pk) if self.pk else None
-        # if address is not changed, don't update coordinates
-        if old and old.address == self.address:
-            return super().save(*args, **kwargs)
-        g = geocoder.mapbox(self.address, access_token=settings.MAPBOX_ACCESS_TOKEN)
-        self.latitude, self.longitude = g.latlng
-        return super().save(*args, **kwargs)
+        address_changed = old and old.address != self.address
+        coords_missing = self.latitude is None or self.longiude is None
+
+        if address_changed or coords_missing:
+            g = geocoder.mapbox(self.address, access_token=settings.MAPBOX_ACCESS_TOKEN)
+            if g.latlng:
+                self.latitude, self.longitude = g.latlng
+
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         first_day = self.days.first()
@@ -236,17 +242,24 @@ class Event(models.Model):
         ]
 
     def save(self, *args, **kwargs):
-        """convert address to coordinates for displaying on the map"""
+        """
+        Convert address to coordinates for displaying on the map,
+        only if the address has changed or coordinates are not set.
+        """
         old = type(self).objects.get(pk=self.pk) if self.pk else None
-        # if address is not changed, don't update coordinates
-        if old and old.address == self.address:
-            return super().save(*args, **kwargs)
-        g = geocoder.mapbox(self.address, access_token=settings.MAPBOX_ACCESS_TOKEN)
-        self.latitude, self.longitude = g.latlng
+        address_changed = old and old.address != self.address
+        coords_missing = self.latitude is None or self.longitude is None
+
+        if address_changed or coords_missing:
+            g = geocoder.mapbox(self.address, access_token=settings.MAPBOX_ACCESS_TOKEN)
+            if g.latlng:
+                self.latitude, self.longitude = g.latlng
+
         # Ensure trip is set from day if not already set
         if self.day and not self.trip_id:
             self.trip = self.day.trip
-        return super().save(*args, **kwargs)
+
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f"{self.name} ({self.start_time})"
