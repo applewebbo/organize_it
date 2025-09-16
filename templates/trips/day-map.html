@@ -1,18 +1,10 @@
-{% extends "base.html" %}
-{% load i18n %}
-
-{% block title %}
-    {% trans "Map for day" %} {{ day.date|date:"d M Y" }}
-{% endblock title %}
-
-{% block content %}
-    <div class="container px-4 mx-auto">
-        <h1 class="my-4 text-2xl font-bold">{% trans "Map for day" %} {{ day.date|date:"d M Y" }}</h1>
-        <div class="my-4">
-            <a href="{% url 'trips:trip-detail' day.trip.pk %}" class="text-blue-500 hover:underline">{% trans "Back to trip" %}</a>
-        </div>
-        <div class="map-container">
-            {{ map|safe }}
-        </div>
-    </div>
-{% endblock content %}
+{% load i18n heroicons %}
+<div class="container py-4 mx-auto">
+    {% if map %}
+        <div class="map-container">{{ map|safe }}</div>
+    {% else %}
+        <div class="my-4 md:my-5 alert alert-info alert-soft">
+            {% heroicon_mini "information-circle" class="stroke-2 size-5" %}
+            {% trans 'No events to display on a map for this day' %} </div>
+    {% endif %}
+</div>

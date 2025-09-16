@@ -136,7 +136,7 @@ class Stay(models.Model):
         """
         old = type(self).objects.get(pk=self.pk) if self.pk else None
         address_changed = old and old.address != self.address
-        coords_missing = self.latitude is None or self.longiude is None
+        coords_missing = self.latitude is None or self.longitude is None
 
         if address_changed or coords_missing:
             g = geocoder.mapbox(self.address, access_token=settings.MAPBOX_ACCESS_TOKEN)
@@ -315,7 +315,8 @@ class Transport(Event):
         if old and old.destination == self.destination:
             return super().save(*args, **kwargs)
         g = geocoder.mapbox(self.destination, access_token=settings.MAPBOX_ACCESS_TOKEN)
-        self.dest_latitude, self.dest_longitude = g.latlng
+        if g.latlng:
+            self.dest_latitude, self.dest_longitude = g.latlng
         # autosave category for transport
         self.category = self.Category.TRANSPORT
 

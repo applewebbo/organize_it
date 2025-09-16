@@ -2043,3 +2043,92 @@ class GeocodeAddressViewTests(TestCase):
         assert (
             b"No address found" in response.content or b"found" not in response.content
         )
+
+
+class DayMapViewTests(TestCase):
+    """Test cases for DayMapView"""
+
+    def test_get_day_map_view_success(self):
+        """Test successful retrieval of day map view"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event1 = EventFactory(day=day, latitude=45.4642, longitude=9.1900)
+        event2 = EventFactory(day=day, latitude=45.4652, longitude=9.1910)
+
+        with self.login(user):
+            response = self.get("trips:day-map", day_id=day.pk)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/day-map.html")
+        assert response.context["day"] == day
+        assert "map" in response.context
+        # Check that the map contains the coordinates of both events
+        assert str(event1.latitude) in response.context["map"]
+        assert str(event1.longitude) in response.context["map"]
+        assert str(event2.latitude) in response.context["map"]
+        assert str(event2.longitude) in response.context["map"]
+
+    def test_get_day_map_view_no_events(self):
+        """Test day map view with no events"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+
+        with self.login(user):
+            response = self.get("trips:day-map", day_id=day.pk)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/day-map.html")
+        assert response.context["day"] == day
+        assert "map" in response.context
+        # Check for a generic map tile URL as a proxy for the map being rendered
+        assert "tiles.openstreetmap.org" in response.context["map"]
+
+    def test_get_day_map_view_events_no_location(self):
+        """Test day map view with events that have no location"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        EventFactory(day=day, latitude=None, longitude=None)
+
+        with self.login(user):
+            response = self.get("trips:day-map", day_id=day.pk)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/day-map.html")
+        assert response.context["day"] == day
+        assert "map" in response.context
+        # Check for a generic map tile URL as a proxy for the map being rendered
+        assert "tiles.openstreetmap.org" in response.context["map"]
+        # Check that no markers were added
+        assert "folium.Marker" not in response.context["map"]
+
+    def test_get_day_map_view_not_found(self):
+        """Test 404 response for non-existent day"""
+        user = self.make_user("user")
+
+        with self.login(user):
+            response = self.get("trips:day-map", day_id=99999)
+
+        self.response_404(response)
+
+    def test_get_day_map_view_unauthenticated(self):
+        """Test that unauthenticated users are redirected to login"""
+        trip = TripFactory()
+        day = trip.days.first()
+        response = self.get("trips:day-map", day_id=day.pk)
+        self.response_302(response)
+        assert "/login/" in response.url
+
+    def test_get_day_map_view_unauthorized(self):
+        """Test that users cannot access other users' day maps"""
+        user1 = self.make_user("user1")
+        trip = TripFactory(author=user1)
+        day = trip.days.first()
+
+        user2 = self.make_user("user2")
+        with self.login(user2):
+            response = self.get("trips:day-map", day_id=day.pk)
+
+        self.response_404(response)

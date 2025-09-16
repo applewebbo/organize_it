@@ -93,3 +93,7 @@ textarea {
 input[type="checkbox"] {
   @apply w-5 h-5 accent-primary bg-slate-100 border-slate-300 rounded-sm  dark:bg-slate-700 dark:border-slate-600
 }
+
+.map-container {
+  @apply mb-4 border-2 border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden;
+}

@@ -9,6 +9,7 @@ from django.db.models import Avg, Prefetch
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
+from django.utils.decorators import method_decorator
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
@@ -855,8 +856,9 @@ def stay_note_delete(request, stay_id):
 
 
 class DayMapView(View):
+    @method_decorator(login_required, name="dispatch")
     def dispatch(self, request, day_id, *args, **kwargs):
-        self.day_obj = get_object_or_404(Day, pk=day_id)
+        self.day_obj = get_object_or_404(Day, pk=day_id, trip__author=request.user)
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
@@ -865,41 +867,34 @@ class DayMapView(View):
         events_with_location = events.exclude(latitude__isnull=True).exclude(
             longitude__isnull=True
         )
-        center = events_with_location.aggregate(
-            avg_lat=Avg("latitude"), avg_lon=Avg("longitude")
-        )
-
-        # Create a map centered on the average location of the events
-        if center["avg_lat"] and center["avg_lon"]:
-            map_center = [center["avg_lat"], center["avg_lon"]]
-            m = folium.Map(location=map_center, zoom_start=13)
+        if not events_with_location:
+            context = {"day": self.day_obj}
         else:
-            # Default to a location if no events have coordinates
-            m = folium.Map(location=[45.4642, 9.1900], zoom_start=10)  # Milan
+            center = events_with_location.aggregate(
+                avg_lat=Avg("latitude"), avg_lon=Avg("longitude")
+            )
 
-        # Add markers for each event
-        for event in events_with_location:
-            folium.Marker(
-                [event.latitude, event.longitude],
-                popup=event.name,
-                tooltip=event.name,
-            ).add_to(m)
+            # Create a map centered on the average location of the events
+            if center["avg_lat"] and center["avg_lon"]:
+                map_center = [center["avg_lat"], center["avg_lon"]]
+                m = folium.Map(
+                    tiles="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+                    attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                    subdomains="abcd",
+                    location=map_center,
+                    zoom_start=13,
+                )
+            else:
+                # Default to a location if no events have coordinates
+                m = folium.Map(location=[45.4642, 9.1900], zoom_start=10)  # Milan
 
-        context = {"map": m._repr_html_(), "day": self.day_obj}
+            # Add markers for each event
+            for event in events_with_location:
+                folium.Marker(
+                    [event.latitude, event.longitude],
+                    popup=event.name,
+                    tooltip=event.name,
+                ).add_to(m)
+
+            context = {"map": m._repr_html_(), "day": self.day_obj}
         return TemplateResponse(request, "trips/day-map.html", context)
-
-
-# @login_required
-# def event_detail(request, pk):
-#     """
-#     Get single event details in case of modification instead of refreshing the whole trip detail page
-#     """
-#     pass
-
-# @login_required
-# def stay_detail(request, day_id):
-#     """
-#     Get single stay for the day details in case of modification instead of refreshing the whole trip detail page
-#     """
-#     # TODO: think about refreshing the same stay in other days
-#     pass

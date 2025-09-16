@@ -13,7 +13,7 @@
                     {% heroicon_mini "pencil-square" class="size-4 sm:size-5" %}
                 </button>
                 <button hx-get="{% url 'trips:day-map' day.pk %}"
-                        hx-target="#day-{{ day.pk }}"
+                        hx-target="#events-list-{{ day.pk }}"
                         hx-swap="innerHTML"
                         class="btn btn-xs me-2 sm:btn-md">{% heroicon_mini "map" class="size-4 sm:size-5" %}</button>
                 <c-dropdown :day="day" />
@@ -96,7 +96,8 @@
             </ul>
         </div>
         {% if day.events.all and day.stay %}<div class="divider"></div>{% endif %}
-        <ul class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 grid-col">
+        <ul id="events-list-{{ day.pk }}"
+            class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 grid-col">
             {% for event in day.events.all %}
                 <li>
                     <c-event :event="event" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}">
