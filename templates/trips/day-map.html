@@ -5,6 +5,13 @@
     {% else %}
         <div class="my-4 md:my-5 alert alert-info alert-soft">
             {% heroicon_mini "information-circle" class="stroke-2 size-5" %}
-            {% trans 'No events to display on a map for this day' %} </div>
+            {% trans 'No events to display on a map for this day' %}
+        </div>
     {% endif %}
 </div>
+<button id="day-map-button-{{ day.pk }}"
+        hx-get="{% url 'trips:day-detail' day.pk %}"
+        hx-target="#day-{{ day.pk }}"
+        hx-swap="outerHTML"
+        hx-swap-oob="true"
+        class="btn btn-xs me-2 sm:btn-md">{% heroicon_mini "queue-list" class="size-4 sm:size-5" %}</button>
