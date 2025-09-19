@@ -1,11 +1,10 @@
 from datetime import date, timedelta
 
-import folium
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import transaction
-from django.db.models import Max, Min, Prefetch
+from django.db.models import Prefetch
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
@@ -28,7 +27,12 @@ from trips.forms import (
     TripForm,
 )
 from trips.models import Day, Event, Stay, Trip
-from trips.utils import annotate_event_overlaps, geocode_location, get_trips
+from trips.utils import (
+    annotate_event_overlaps,
+    create_day_map,
+    geocode_location,
+    get_trips,
+)
 
 
 def home(request):
@@ -866,109 +870,18 @@ class DayMapView(View):
         stay = self.day_obj.stay
         next_day = self.day_obj.next_day
         next_day_stay = next_day.stay if next_day else None
+        locations = {
+            "stay": stay,
+            "events": events,
+            "next_day_stay": next_day_stay,
+        }
 
         # Filter out events without latitude or longitude
         events_with_location = events.filter(
             latitude__isnull=False, longitude__isnull=False
         )
 
-        # Check if there's anything to show on the map
-        if not events_with_location and (not stay or not stay.latitude):
-            context = {"day": self.day_obj}
-            return TemplateResponse(request, "trips/day-map.html", context)
+        map = create_day_map(events_with_location, stay, next_day_stay)
 
-        # Aggregate event locations
-        bounds = events_with_location.aggregate(
-            min_lat=Min("latitude"),
-            max_lat=Max("latitude"),
-            min_lon=Min("longitude"),
-            max_lon=Max("longitude"),
-        )
-
-        # Include stay location in bounds calculation
-        if stay and stay.latitude and stay.longitude:
-            bounds["min_lat"] = min(bounds["min_lat"] or stay.latitude, stay.latitude)
-            bounds["max_lat"] = max(bounds["max_lat"] or stay.latitude, stay.latitude)
-            bounds["min_lon"] = min(bounds["min_lon"] or stay.longitude, stay.longitude)
-            bounds["max_lon"] = max(bounds["max_lon"] or stay.longitude, stay.longitude)
-
-        # Include next day's stay in bounds calculation if different
-        if next_day_stay and next_day_stay != stay and next_day_stay.latitude:
-            bounds["min_lat"] = min(
-                bounds["min_lat"] or next_day_stay.latitude, next_day_stay.latitude
-            )
-            bounds["max_lat"] = max(
-                bounds["max_lat"] or next_day_stay.latitude, next_day_stay.latitude
-            )
-            bounds["min_lon"] = min(
-                bounds["min_lon"] or next_day_stay.longitude, next_day_stay.longitude
-            )
-            bounds["max_lon"] = max(
-                bounds["max_lon"] or next_day_stay.longitude, next_day_stay.longitude
-            )
-
-        # Create a map
-        if (
-            bounds["min_lat"]
-            and bounds["max_lat"]
-            and bounds["min_lon"]
-            and bounds["max_lon"]
-        ):
-            m = folium.Map(
-                tiles="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-                attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-                subdomains="abcd",
-            )
-            # Add a bias
-            bias = 0.005
-            fit_bounds_payload = [
-                [bounds["min_lat"] - bias, bounds["min_lon"] - bias],
-                [bounds["max_lat"] + bias, bounds["max_lon"] + bias],
-            ]
-            m.fit_bounds(fit_bounds_payload)
-
-        else:
-            # Default to a location if no events have coordinates
-            m = folium.Map(location=[45.4642, 9.1900], zoom_start=10)  # Milan
-
-        # Add specific icons
-        kw = {"prefix": "fa", "color": "green", "icon": "star-of-life"}
-        experience_icon = folium.Icon(**kw)
-        meal_icon = folium.Icon(prefix="fa", color="orange", icon="utensils")
-        stay_icon = folium.Icon(prefix="fa", color="blue", icon="bed")
-
-        # Add markers for each event
-        for event in events_with_location:
-            icon = experience_icon if event.category == 2 else meal_icon
-            folium.Marker(
-                [event.latitude, event.longitude],
-                popup=event.name,
-                tooltip=event.name,
-                icon=icon,
-            ).add_to(m)
-
-        # Add marker for the stay
-        if stay and stay.latitude and stay.longitude:
-            folium.Marker(
-                [stay.latitude, stay.longitude],
-                popup=stay.name,
-                tooltip=stay.name,
-                icon=stay_icon,
-            ).add_to(m)
-
-        # Add marker for the next day's stay if it's different
-        if (
-            next_day_stay
-            and next_day_stay != stay
-            and next_day_stay.latitude
-            and next_day_stay.longitude
-        ):
-            folium.Marker(
-                [next_day_stay.latitude, next_day_stay.longitude],
-                popup=next_day_stay.name,
-                tooltip=f"Next day: {next_day_stay.name}",
-                icon=stay_icon,
-            ).add_to(m)
-
-        context = {"map": m._repr_html_(), "day": self.day_obj}
+        context = {"map": map, "day": self.day_obj, "locations": locations}
         return TemplateResponse(request, "trips/day-map.html", context)

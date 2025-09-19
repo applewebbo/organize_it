@@ -1,9 +1,10 @@
 import hashlib
 import time
 
+import folium
 import requests
 from django.core.cache import cache
-from django.db.models import BooleanField, Case, F, Q, When, Window
+from django.db.models import BooleanField, Case, F, Max, Min, Q, When, Window
 from django.db.models.functions import Lag, Lead
 
 from accounts.models import Profile
@@ -223,3 +224,107 @@ def select_best_result(results, name, city):
         print(f"  {i + 1}. Score: {score:.1f} - {result.get('display_name', '')[:80]}")
 
     return scored_results[0][1] if scored_results else results[0]
+
+
+def create_day_map(events_with_location, stay, next_day_stay):
+    """
+    Create a map for a given day with events, stay, and next day stay.
+    """
+    # Check if there's anything to show on the map
+    if not events_with_location and (not stay or not stay.latitude):
+        return None
+
+    # Aggregate event locations
+    bounds = events_with_location.aggregate(
+        min_lat=Min("latitude"),
+        max_lat=Max("latitude"),
+        min_lon=Min("longitude"),
+        max_lon=Max("longitude"),
+    )
+
+    # Include stay location in bounds calculation
+    if stay and stay.latitude and stay.longitude:
+        bounds["min_lat"] = min(bounds["min_lat"] or stay.latitude, stay.latitude)
+        bounds["max_lat"] = max(bounds["max_lat"] or stay.latitude, stay.latitude)
+        bounds["min_lon"] = min(bounds["min_lon"] or stay.longitude, stay.longitude)
+        bounds["max_lon"] = max(bounds["max_lon"] or stay.longitude, stay.longitude)
+
+    # Include next day's stay in bounds calculation if different
+    if next_day_stay and next_day_stay != stay and next_day_stay.latitude:
+        bounds["min_lat"] = min(
+            bounds["min_lat"] or next_day_stay.latitude, next_day_stay.latitude
+        )
+        bounds["max_lat"] = max(
+            bounds["max_lat"] or next_day_stay.latitude, next_day_stay.latitude
+        )
+        bounds["min_lon"] = min(
+            bounds["min_lon"] or next_day_stay.longitude, next_day_stay.longitude
+        )
+        bounds["max_lon"] = max(
+            bounds["max_lon"] or next_day_stay.longitude, next_day_stay.longitude
+        )
+
+    # Create a map
+    if (
+        bounds["min_lat"]
+        and bounds["max_lat"]
+        and bounds["min_lon"]
+        and bounds["max_lon"]
+    ):
+        m = folium.Map(
+            tiles="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+            attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains="abcd",
+        )
+        # Add a bias
+        bias = 0.005
+        fit_bounds_payload = [
+            [bounds["min_lat"] - bias, bounds["min_lon"] - bias],
+            [bounds["max_lat"] + bias, bounds["max_lon"] + bias],
+        ]
+        m.fit_bounds(fit_bounds_payload)
+
+    else:
+        # Default to a location if no events have coordinates
+        m = folium.Map(location=[45.4642, 9.1900], zoom_start=10)  # Milan
+
+    # Add specific icons
+    kw = {"prefix": "fa", "color": "green", "icon": "star-of-life"}
+    experience_icon = folium.Icon(**kw)
+    meal_icon = folium.Icon(prefix="fa", color="orange", icon="utensils")
+    stay_icon = folium.Icon(prefix="fa", color="blue", icon="bed")
+
+    # Add markers for each event
+    for event in events_with_location:
+        icon = experience_icon if event.category == 2 else meal_icon
+        folium.Marker(
+            [event.latitude, event.longitude],
+            popup=event.name,
+            tooltip=event.name,
+            icon=icon,
+        ).add_to(m)
+
+    # Add marker for the stay
+    if stay and stay.latitude and stay.longitude:
+        folium.Marker(
+            [stay.latitude, stay.longitude],
+            popup=stay.name,
+            tooltip=stay.name,
+            icon=stay_icon,
+        ).add_to(m)
+
+    # Add marker for the next day's stay if it's different
+    if (
+        next_day_stay
+        and next_day_stay != stay
+        and next_day_stay.latitude
+        and next_day_stay.longitude
+    ):
+        folium.Marker(
+            [next_day_stay.latitude, next_day_stay.longitude],
+            popup=next_day_stay.name,
+            tooltip=f"Next day: {next_day_stay.name}",
+            icon=stay_icon,
+        ).add_to(m)
+
+    return m._repr_html_()
