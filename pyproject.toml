@@ -1,3 +1,20 @@
+[dependency-groups]
+dev = [
+  "coverage>=7.6.1",
+  "django-coverage-plugin>=3.1.0",
+  "django-test-plus>=2.2.4",
+  "djlint>=1.35.2",
+  "pre-commit>=3.8.0",
+  "pytest>=8.0,<8.4.0",
+  "pytest-cov>=5.0.0",
+  "pytest-django>=4.9.0",
+  "pytest-factoryboy>=2.7.0",
+  "pytest-mock>=3.14.0",
+  "pytest-xdist>=3.6.1",
+  "pywatchman>=2.0.0",
+  "ruff>=0.9.6"
+]
+
 [project]
 dependencies = [
   "crispy-tailwind>=1.0.3",
@@ -61,20 +78,3 @@ target-version = "py311"
 [tool.ruff.lint]
 ignore = ["E501", "E741", "F405"]
 select = ["E", "F", "B", "I"]
-
-[tool.uv]
-dev-dependencies = [
-  "coverage>=7.6.1",
-  "django-coverage-plugin>=3.1.0",
-  "django-test-plus>=2.2.4",
-  "djlint>=1.35.2",
-  "pre-commit>=3.8.0",
-  "pytest>=8.0,<8.4.0",
-  "pytest-cov>=5.0.0",
-  "pytest-django>=4.9.0",
-  "pytest-factoryboy>=2.7.0",
-  "pytest-mock>=3.14.0",
-  "pytest-xdist>=3.6.1",
-  "pywatchman>=2.0.0",
-  "ruff>=0.9.6"
-]
