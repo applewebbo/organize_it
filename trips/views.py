@@ -869,12 +869,17 @@ class DayMapView(View):
         events = self.day_obj.events.exclude(category=1)
         stay = self.day_obj.stay
         next_day = self.day_obj.next_day
-        next_day_stay = next_day.stay if next_day else None
+        prev_day = self.day_obj.prev_day
+        next_day_stay = None
+        if next_day and next_day.stay and next_day.stay != stay:
+            next_day_stay = next_day.stay
         locations = {
             "stay": stay,
             "events": events,
             "next_day_stay": next_day_stay,
         }
+        if not (prev_day and prev_day.stay and prev_day.stay == stay):
+            locations["first_day"] = True
 
         # Filter out events without latitude or longitude
         events_with_location = events.filter(

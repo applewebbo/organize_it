@@ -361,16 +361,3 @@ class Meal(Event):
         """autosave category for meal"""
         self.category = self.Category.MEAL
         return super().save(*args, **kwargs)
-
-
-# class Note(models.Model):
-#     content = models.CharField(max_length=500)
-#     event = models.OneToOneField(
-#         Event, on_delete=models.CASCADE, null=True, blank=True, related_name="note"
-#     )
-#     stay = models.OneToOneField(
-#         Stay, on_delete=models.CASCADE, null=True, blank=True, related_name="note"
-#     )
-
-#     def __str__(self) -> str:
-#         return f"{self.content[:35]} ..."

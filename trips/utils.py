@@ -275,6 +275,8 @@ def create_day_map(events_with_location, stay, next_day_stay):
             tiles="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
             attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
             subdomains="abcd",
+            width="100%",
+            height="100%",
         )
         # Add a bias
         bias = 0.005

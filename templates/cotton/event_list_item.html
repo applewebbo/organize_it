@@ -1,0 +1,29 @@
+{% load heroicons %}
+
+<li class="flex gap-2 items-center py-1 mb-2 list-row">
+    <div class="flex gap-2 items-center grow">{% with icon_class="stroke-1 size-4 sm:size-5" %}
+        {% if icon == 'cake' %}
+            {% with final_class=icon_class|add:" text-yellow-500" %}
+                {% heroicon_mini icon class=final_class %}
+            {% endwith %}
+        {% else %}
+            {% with final_class=icon_class|add:" text-green-500" %}
+                {% heroicon_mini icon class=final_class %}
+            {% endwith %}
+        {% endif %}
+    {% endwith %}
+    <a class="link"
+       href="{% url 'trips:event-detail' event.pk %}"
+       hx-get="{% url 'trips:event-detail' event.pk %}"
+       @click="$dispatch('open-modal'); document.activeElement.blur()"
+       hx-target="#dialog"
+       hx-swap="innerHTML">{{ event.name }}</a>&nbsp;<span class="badge badge-sm badge-outline badge-info">{{ event.start_time }}</span></div>
+    <button class="relative btn btn-xs btn-outline ms-3"
+        hx-get="{% url 'trips:event-notes' event.pk %}"
+        @click="$dispatch('open-modal'); document.activeElement.blur()"
+        hx-target="#dialog"
+        hx-swap="innerHTML">
+        {% heroicon_mini 'paper-clip' class="size-4" %}
+        <span class="absolute size-2.5 text-xs font-bold text-white {% if event.notes %}bg-slate-400 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
+    </button>
+</li>
