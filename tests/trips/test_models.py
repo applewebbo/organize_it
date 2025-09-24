@@ -650,3 +650,19 @@ class TestStayModel:
         # Verify days were properly transferred
         assert stay2.days.count() == 3
         assert stay1.days.count() == 0
+
+    def test_stay_str_no_day(self, stay_factory):
+        """Test stay __str__ method when it has no associated day."""
+        stay = stay_factory(name="Lonely Stay")
+        assert str(stay) == "Lonely Stay"
+
+    @patch("geocoder.mapbox")
+    def test_save_with_no_geocoder_result(self, mock_geocoder, stay_factory):
+        # Setup mock response
+        mock_geocoder.return_value.latlng = None
+
+        stay = stay_factory(address="Nowhere")
+
+        # Verify the coordinates were not set
+        assert stay.latitude is None
+        assert stay.longitude is None

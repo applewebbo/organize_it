@@ -265,30 +265,20 @@ def create_day_map(events_with_location, stay, next_day_stay):
         )
 
     # Create a map
-    if (
-        bounds["min_lat"]
-        and bounds["max_lat"]
-        and bounds["min_lon"]
-        and bounds["max_lon"]
-    ):
-        m = folium.Map(
-            tiles="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-            attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-            subdomains="abcd",
-            width="100%",
-            height="100%",
-        )
-        # Add a bias
-        bias = 0.005
-        fit_bounds_payload = [
-            [bounds["min_lat"] - bias, bounds["min_lon"] - bias],
-            [bounds["max_lat"] + bias, bounds["max_lon"] + bias],
-        ]
-        m.fit_bounds(fit_bounds_payload)
-
-    else:
-        # Default to a location if no events have coordinates
-        m = folium.Map(location=[45.4642, 9.1900], zoom_start=10)  # Milan
+    m = folium.Map(
+        tiles="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+        attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains="abcd",
+        width="100%",
+        height="100%",
+    )
+    # Add a bias
+    bias = 0.005
+    fit_bounds_payload = [
+        [bounds["min_lat"] - bias, bounds["min_lon"] - bias],
+        [bounds["max_lat"] + bias, bounds["max_lon"] + bias],
+    ]
+    m.fit_bounds(fit_bounds_payload)
 
     # Add specific icons
     kw = {"prefix": "fa", "color": "green", "icon": "star-of-life"}

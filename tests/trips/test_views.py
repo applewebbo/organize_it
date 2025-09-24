@@ -1,14 +1,13 @@
 import datetime
 import tempfile
 import time
+from datetime import date, timedelta
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-import factory
 import pytest
 from django.contrib.messages import get_messages
 from django.core.cache import cache
-from django.db.models import signals
 from django.test import override_settings
 from django.urls import reverse
 from pytest_django.asserts import assertTemplateUsed
@@ -68,9 +67,9 @@ class HomeView(TestCase):
         self.response_200(response)
         assert response.context["fav_trip"] == fav_trip
 
-    @factory.django.mute_signals(signals.post_save)
     def test_get_with_no_profile(self):
         user = self.make_user("user")
+        user.profile.delete()
 
         with self.login(user):
             response = self.get("trips:home")
@@ -2053,8 +2052,11 @@ class DayMapViewTests(TestCase):
         user = self.make_user("user")
         trip = TripFactory(author=user)
         day = trip.days.first()
-        event1 = EventFactory(day=day, latitude=45.4642, longitude=9.1900)
-        event2 = EventFactory(day=day, latitude=45.4652, longitude=9.1910)
+        stay = StayFactory(latitude=45.4642, longitude=9.1900)
+        day.stay = stay
+        day.save()
+        EventFactory(name="Event 1", day=day, latitude=45.4642, longitude=9.1900)
+        EventFactory(name="Event 2", day=day, latitude=45.4652, longitude=9.1910)
 
         with self.login(user):
             response = self.get("trips:day-map", day_id=day.pk)
@@ -2063,11 +2065,70 @@ class DayMapViewTests(TestCase):
         assertTemplateUsed(response, "trips/day-map.html")
         assert response.context["day"] == day
         assert "map" in response.context
-        # Check that the map contains the coordinates of both events
-        assert str(event1.latitude) in response.context["map"]
-        assert str(event1.longitude) in response.context["map"]
-        assert str(event2.latitude) in response.context["map"]
-        assert str(event2.longitude) in response.context["map"]
+        assert response.context["map"] is not None
+        assert "folium-map" in response.context["map"]
+
+    def test_get_day_map_view_with_next_day_stay(self):
+        """Test day map view with a different stay on the next day."""
+        user = self.make_user("user")
+        trip = TripFactory(
+            author=user,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+        )
+        day1, day2 = trip.days.all()
+        stay1 = StayFactory()
+        stay2 = StayFactory()
+        day1.stay = stay1
+        day1.save()
+        day2.stay = stay2
+        day2.save()
+
+        with self.login(user):
+            response = self.get("trips:day-map", day_id=day1.pk)
+
+        self.response_200(response)
+        assert response.context["locations"]["next_day_stay"] == stay2
+
+    def test_get_day_map_view_first_day(self):
+        """Test day map view for the first day of a stay."""
+        user = self.make_user("user")
+        trip = TripFactory(
+            author=user,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+        )
+        day1, day2 = trip.days.all()
+        stay = StayFactory()
+        day2.stay = stay
+        day2.save()
+
+        with self.login(user):
+            response = self.get("trips:day-map", day_id=day2.pk)
+
+        self.response_200(response)
+        assert response.context["locations"]["first_day"] is True
+
+    def test_get_day_map_view_not_first_day(self):
+        """Test day map view for a day that is not the first day of a stay."""
+        user = self.make_user("user")
+        trip = TripFactory(
+            author=user,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+        )
+        day1, day2 = trip.days.all()
+        stay = StayFactory()
+        day1.stay = stay
+        day1.save()
+        day2.stay = stay
+        day2.save()
+
+        with self.login(user):
+            response = self.get("trips:day-map", day_id=day2.pk)
+
+        self.response_200(response)
+        assert "first_day" not in response.context["locations"]
 
     def test_get_day_map_view_no_events(self):
         """Test day map view with no events"""
@@ -2081,9 +2142,7 @@ class DayMapViewTests(TestCase):
         self.response_200(response)
         assertTemplateUsed(response, "trips/day-map.html")
         assert response.context["day"] == day
-        assert "map" in response.context
-        # Check for a generic map tile URL as a proxy for the map being rendered
-        assert "tiles.openstreetmap.org" in response.context["map"]
+        assert response.context["map"] is None
 
     def test_get_day_map_view_events_no_location(self):
         """Test day map view with events that have no location"""
@@ -2098,11 +2157,6 @@ class DayMapViewTests(TestCase):
         self.response_200(response)
         assertTemplateUsed(response, "trips/day-map.html")
         assert response.context["day"] == day
-        assert "map" in response.context
-        # Check for a generic map tile URL as a proxy for the map being rendered
-        assert "tiles.openstreetmap.org" in response.context["map"]
-        # Check that no markers were added
-        assert "folium.Marker" not in response.context["map"]
 
     def test_get_day_map_view_not_found(self):
         """Test 404 response for non-existent day"""

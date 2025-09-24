@@ -11,6 +11,7 @@
         {% endif %}
         <div class="hidden lg:block">
             <ul class="text-lg list">
+                {% if locations.day %}
                 <li class="flex gap-2 items-center py-1 mb-2 list-row">
                     <div class="flex gap-2 items-center grow">
                         {% heroicon_mini "home-modern" class="stroke-1 size-4 text-sky-500 sm:size-5" %}
@@ -35,6 +36,7 @@
                         <span class="absolute size-2.5 text-xs font-bold text-white {% if event.notes %}bg-slate-400 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
                     </button>
                 </li>
+                {% endif %}
                 {% for event in locations.events %}
                     <c-event-list-item :event="event" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}"></c-event-list-item>
                 {% endfor %}
