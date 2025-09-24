@@ -1,11 +1,11 @@
 {% load heroicons %}
 <div class="py-3 px-3 sm:px-6 rounded-lg border {{ border_color }} {{ bg_color }} relative">
     <div class="flex items-start mb-3">
-        <div class="{{ icon_color }} bg-slate-50 dark:bg-slate-700 mt-1 p-2 rounded-full border-2 {{ border_color }} ">
-            {% heroicon_outline icon class="stroke-2 size-6" %}
+        <div class="{{ icon_color }} bg-slate-50 dark:bg-slate-700 mt-1 p-1 sm:p-2 rounded-full border-2 {{ border_color }} ">
+            {% heroicon_outline icon class="stroke-2 size-4 sm:size-6" %}
         </div>
         <div class="ms-2" x-data>
-            <h2 class="{{ icon_color }} font-semibold text-lg">
+            <h2 class="{{ icon_color }} font-semibold text-base sm:text-lg">
                 <a class="link"
                    href="{% url 'trips:event-detail' event.pk %}"
                    hx-get="{% url 'trips:event-detail' event.pk %}"
@@ -16,14 +16,14 @@
             <div class="{{ icon_color }} flex items-center gap-x-2">{{ slot }}</div>
         </div>
     </div>
-    <div class="flex top-0 right-2 flex-row gap-1 justify-end sm:absolute sm:flex-col sm:mt-4 sm:me-2" x-data>
+    <div class="flex absolute top-0 right-2 flex-col gap-1 justify-end mt-4 me-2" x-data>
         <button class="relative btn btn-xs btn-soft {{ border_color }} {{ bg_color }} dark:hover:bg-slate-900/10 hover:bg-white/50"
                 hx-get="{% url 'trips:event-notes' event.pk %}"
                 @click="$dispatch('open-modal'); document.activeElement.blur()"
                 hx-target="#dialog"
                 hx-swap="innerHTML">
             {% heroicon_mini 'paper-clip' class="size-4" %}
-            <span class="absolute w-2 h-2 text-xs font-bold text-white {% if event.notes %}bg-slate-900/30 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
+            <span class="absolute size-2.5 text-xs font-bold text-white {% if event.notes %}bg-slate-400 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
         </button>
         <button class="btn btn-xs btn-soft {{ border_color }} {{ bg_color }} dark:hover:bg-slate-900/10 hover:bg-white/50"
                 hx-get="{% url 'trips:event-swap-modal' event.pk %}"

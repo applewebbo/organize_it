@@ -30,7 +30,7 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def handle(self, *args, **kwargs):
-        faker = Faker()
+        faker = Faker("it_IT")
         self.stdout.write("Deleting old data...")
         User.objects.exclude(is_superuser=True).delete()
         models = [Trip, Stay, Event]
@@ -38,12 +38,23 @@ class Command(BaseCommand):
             model.objects.all().delete()
 
         self.stdout.write("Creating new data...")
-        # Create users
         UserFactory.create_batch(NUMBER_OF_USERS)
         users = User.objects.all()
 
+        ITALIAN_CITIES_COORDS = [
+            {"name": "Roma", "lat": 41.902782, "lon": 12.496366},
+            {"name": "Milano", "lat": 45.464211, "lon": 9.191383},
+            {"name": "Firenze", "lat": 43.769562, "lon": 11.255814},
+            {"name": "Napoli", "lat": 40.851799, "lon": 14.26812},
+            {"name": "Venezia", "lat": 45.440847, "lon": 12.315515},
+            {"name": "Torino", "lat": 45.070339, "lon": 7.686864},
+            {"name": "Bologna", "lat": 44.494887, "lon": 11.342616},
+            {"name": "Genova", "lat": 44.40565, "lon": 8.946256},
+            {"name": "Palermo", "lat": 38.115688, "lon": 13.361267},
+            {"name": "Verona", "lat": 45.438384, "lon": 10.991622},
+        ]
+
         for user in users:
-            # Create trips for each user
             for _ in range(TRIPS_PER_USER):
                 trip = TripFactory(
                     author=user,
@@ -51,87 +62,98 @@ class Command(BaseCommand):
                     end_date=date.today() + timedelta(days=random.randint(4, 6)),
                 )
 
-                # Create stays for the trip
-                all_days = list(trip.days.all())
-                num_stays = 2 if len(all_days) > 2 else 1
-
-                # First stay always covers days 1-2
-                url = faker.url() if random.random() < 0.9 else None
-                first_stay = StayFactory(
-                    check_in=time(random.randint(14, 16), 0),
-                    check_out=time(random.randint(10, 12), 0),
-                    url=url,
+                city_coords = next(
+                    (
+                        city
+                        for city in ITALIAN_CITIES_COORDS
+                        if city["name"] == trip.title
+                    ),
+                    None,
                 )
-                first_stay.days.set(all_days[:2])
+                base_lat, base_lon = city_coords["lat"], city_coords["lon"]
 
-                # Second stay covers remaining days if they exist
-                if num_stays == 2 and len(all_days) > 2:
-                    url = faker.url() if random.random() < 0.9 else None
-                    second_stay = StayFactory(
-                        check_in=time(random.randint(14, 16), 0),
-                        check_out=time(random.randint(10, 12), 0),
-                        url=url,
-                    )
-                    second_stay.days.set(all_days[2:])
+                all_days = list(trip.days.all())
+                if len(all_days) > 2:
+                    stay1 = StayFactory()
+                    stay1.days.set(all_days[:2])
+                    stay2 = StayFactory()
+                    stay2.days.set(all_days[2:])
+                else:
+                    stay = StayFactory()
+                    stay.days.set(all_days)
 
-                # Create events for each day
                 for i, day in enumerate(trip.days.all()):
-                    # Create transport for first day and randomly for other days
+                    day_center_lat = base_lat + (i * random.uniform(-0.05, 0.05))
+                    day_center_lon = base_lon + (i * random.uniform(-0.05, 0.05))
+                    radius_in_degrees = 0.027  # Approx 3km
+
+                    # Create transport
                     if i == 0 or random.random() < 0.3:
-                        # Add URL with 50% probability for transports
-                        url = faker.url() if random.random() < 0.5 else None
-                        # Generate random start time between 8:00 and 14:00
-                        start_hour = random.randint(8, 14)
-                        start_minute = random.randrange(0, 59, 15)
-                        start_time = time(start_hour, start_minute)
-
-                        # Generate end time 1-4 hours after start time
-                        start_datetime = datetime.combine(day.date, start_time)
-                        duration = timedelta(hours=random.randint(1, 4))
-                        end_datetime = start_datetime + duration
-                        end_time = end_datetime.time()
-
-                        TransportFactory(
-                            day=day, start_time=start_time, end_time=end_time, url=url
+                        start_time = time(
+                            random.randint(8, 14), random.randrange(0, 59, 15)
+                        )
+                        end_time = (
+                            datetime.combine(day.date, start_time)
+                            + timedelta(hours=random.randint(1, 4))
+                        ).time()
+                        TransportFactory.create(
+                            day=day,
+                            trip=trip,
+                            start_time=start_time,
+                            end_time=end_time,
+                            url=faker.url() if random.random() < 0.5 else None,
+                            latitude=day_center_lat
+                            + random.uniform(-radius_in_degrees, radius_in_degrees),
+                            longitude=day_center_lon
+                            + random.uniform(-radius_in_degrees, radius_in_degrees),
                         )
 
-                    # Create two meals (lunch and dinner)
-                    # Add URL with 60% probability for meals
-                    url = faker.url() if random.random() < 0.6 else None
-                    MealFactory(
+                    # Create meals
+                    MealFactory.create(
                         day=day,
-                        type=2,  # Lunch
+                        trip=trip,
+                        type=2,
                         start_time=time(13, 0),
                         end_time=time(14, 30),
-                        url=url,
+                        url=faker.url() if random.random() < 0.6 else None,
+                        latitude=day_center_lat
+                        + random.uniform(-radius_in_degrees, radius_in_degrees),
+                        longitude=day_center_lon
+                        + random.uniform(-radius_in_degrees, radius_in_degrees),
                     )
-                    # Add URL with 60% probability for meals
-                    url = faker.url() if random.random() < 0.6 else None
-                    MealFactory(
+                    MealFactory.create(
                         day=day,
-                        type=3,  # Dinner
+                        trip=trip,
+                        type=3,
                         start_time=time(20, 0),
                         end_time=time(21, 30),
-                        url=url,
+                        url=faker.url() if random.random() < 0.6 else None,
+                        latitude=day_center_lat
+                        + random.uniform(-radius_in_degrees, radius_in_degrees),
+                        longitude=day_center_lon
+                        + random.uniform(-radius_in_degrees, radius_in_degrees),
                     )
 
-                    # Create 1-4 experiences
+                    # Create experiences
                     for _ in range(random.randint(1, 4)):
-                        # Add URL with 60% probability for experiences
-                        url = faker.url() if random.random() < 0.6 else None
-                        # Generate random start time between 8:00 and 19:00
-                        start_hour = random.randint(8, 19)
-                        start_minute = random.randrange(0, 59, 15)
-                        start_time = time(start_hour, start_minute)
-
-                        # Generate end time up to 2 hours after start time
-                        start_datetime = datetime.combine(day.date, start_time)
-                        duration = timedelta(minutes=random.randrange(0, 120, 15))
-                        end_datetime = start_datetime + duration
-                        end_time = end_datetime.time()
-
-                        ExperienceFactory(
-                            day=day, start_time=start_time, end_time=end_time, url=url
+                        start_time = time(
+                            random.randint(8, 19), random.randrange(0, 59, 15)
                         )
+                        end_time = (
+                            datetime.combine(day.date, start_time)
+                            + timedelta(minutes=random.randrange(0, 120, 15))
+                        ).time()
+                        ExperienceFactory.create(
+                            day=day,
+                            trip=trip,
+                            start_time=start_time,
+                            end_time=end_time,
+                            url=faker.url() if random.random() < 0.6 else None,
+                            latitude=day_center_lat
+                            + random.uniform(-radius_in_degrees, radius_in_degrees),
+                            longitude=day_center_lon
+                            + random.uniform(-radius_in_degrees, radius_in_degrees),
+                        )
+
         logger.info("Trips populated correctly!")
         self.stdout.write(self.style.SUCCESS("Successfully populated database"))

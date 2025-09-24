@@ -1,20 +1,18 @@
-import hashlib
-import time
 from datetime import date, timedelta
 
-import requests
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.core.cache import cache
 from django.db import transaction
 from django.db.models import Prefetch
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
+from django.utils.decorators import method_decorator
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
+from django.views.generic import View
 
 from accounts.models import Profile
 from trips.forms import (
@@ -29,194 +27,12 @@ from trips.forms import (
     TripForm,
 )
 from trips.models import Day, Event, Stay, Trip
-from trips.utils import annotate_event_overlaps
-
-
-def get_trips(user):
-    """Get the trips for the home page with favourite trip (if present) and others"""
-    fav_trip = Profile.objects.get(user=user).fav_trip or None
-    if fav_trip:
-        other_trips = (
-            Trip.objects.filter(author=user).exclude(pk=fav_trip.pk).order_by("status")
-        )
-    else:
-        other_trips = Trip.objects.filter(author=user).order_by("status")
-    context = {
-        "other_trips": other_trips,
-        "fav_trip": fav_trip,
-    }
-    return context
-
-
-def rate_limit_check():
-    """Rate limiting for Nominatim - max 1 request per second"""
-    last_request_time = cache.get("nominatim_last_request_time", 0)
-    current_time = time.time()
-
-    # Wait if the last request was less than 1 second ago
-    time_diff = current_time - last_request_time
-    if time_diff < 1:
-        time.sleep(1 - time_diff)
-
-    # Update the last request time in cache
-    cache.set("nominatim_last_request_time", time.time(), 60)
-
-
-def generate_cache_key(name, city):
-    """Unique cache key for geocoding requests"""
-    # Normalize name and city to lower case and strip whitespace
-    normalized = f"{name.lower().strip()}_{city.lower().strip()}"
-    # Use a hash function to create a unique key
-    return (
-        f"geocode_{hashlib.md5(normalized.encode(), usedforsecurity=False).hexdigest()}"
-    )
-
-
-def geocode_location(name, city):
-    """Geocoding using Nominatim OpenStreetMap with cache and rate limiting. Returns a list of addresses ordered by importance."""
-    if not name or not city:
-        return None
-
-    # Check cache first
-    cache_key = generate_cache_key(name, city)
-    cached_result = cache.get(cache_key)
-    if cached_result:
-        return cached_result
-
-    # Rate limit check to avoid hitting Nominatim too fast
-    rate_limit_check()
-
-    time.sleep(
-        1
-    )  # Ensure at least 1 second between requests for showing a meaningfiul indicator on the frontend
-    url = "https://nominatim.openstreetmap.org/search"
-    params = {
-        "q": f"{name.strip()}, {city.strip()}",
-        "format": "json",
-        "limit": 5,  # Get up to 5 results to choose the best one
-        "addressdetails": 1,
-    }
-
-    headers = {"User-Agent": "OrganizeIt-Geocoding"}
-
-    try:
-        response = requests.get(url, params=params, headers=headers, timeout=5)
-
-        if response.status_code == 200:
-            results = response.json()
-            if not results:
-                return []
-
-            # Build a list of addresses with importance
-            address_list = []
-            for result in results:
-                address_data = result.get("address", {})
-                addresstags = result.get("addresstags", {})
-                street = (
-                    addresstags.get("street")
-                    or address_data.get("road")
-                    or address_data.get("pedestrian")
-                    or address_data.get("footway")
-                    or ""
-                )
-                housenumber = (
-                    addresstags.get("housenumber")
-                    or address_data.get("house_number")
-                    or ""
-                )
-                city_part = (
-                    addresstags.get("city")
-                    or address_data.get("city")
-                    or address_data.get("town")
-                    or address_data.get("village")
-                    or ""
-                )
-                address_parts = []
-                if street:
-                    address_parts.append(street)
-                if housenumber:
-                    address_parts.append(housenumber)
-                address = " ".join(address_parts)
-                if address and city_part:
-                    address = f"{address}, {city_part}"
-                elif city_part:
-                    address = city_part
-                address_list.append(
-                    {
-                        "name": result.get("name", ""),
-                        "address": address,
-                        "lat": float(result.get("lat", 0)),
-                        "lon": float(result.get("lon", 0)),
-                        "importance": result.get("importance", 0),
-                        "place_rank": result.get("place_rank", 999),
-                    }
-                )
-
-            # Order the list by importance descending
-            address_list.sort(key=lambda x: x["importance"], reverse=True)
-            cache.set(cache_key, address_list, 3600)
-            return address_list
-
-    except Exception as e:
-        print(f"Error geocoding: {e}")
-
-    return []
-
-
-def select_best_result(results, name, city):
-    """Select the best result from Nominatim results based on custom scoring"""
-    if not results:
-        return None
-
-    city_lower = city.lower().strip()
-    name_lower = name.lower().strip()
-
-    # Scoring results based on various criteria
-    scored_results = []
-
-    for result in results:
-        score = 0
-        display_name = result.get("display_name", "").lower()
-        address = result.get("address", {})
-
-        # Base score based on importance
-        score += result.get("importance", 0) * 100
-
-        # Bonus if the city is in the address
-        city_in_address = (
-            address.get("city", "").lower() == city_lower
-            or address.get("town", "").lower() == city_lower
-            or address.get("village", "").lower() == city_lower
-        )
-        if city_in_address:
-            score += 50
-
-        # Bonus if the name is in the display_name
-        if name_lower in display_name:
-            score += 30
-
-        # Bonus for lower place_rank (more specific)
-        place_rank = result.get("place_rank", 999)
-        score += max(0, 30 - place_rank)
-
-        # Penalty for generic places
-        if result.get("class") == "place" and result.get("type") in [
-            "city",
-            "town",
-            "village",
-        ]:
-            score -= 20
-
-        scored_results.append((score, result))
-
-    # Sort results by score, highest first
-    scored_results.sort(key=lambda x: x[0], reverse=True)
-
-    print(f"Results found: {len(results)}")
-    for i, (score, result) in enumerate(scored_results[:3]):
-        print(f"  {i + 1}. Score: {score:.1f} - {result.get('display_name', '')[:80]}")
-
-    return scored_results[0][1] if scored_results else results[0]
+from trips.utils import (
+    annotate_event_overlaps,
+    create_day_map,
+    geocode_location,
+    get_trips,
+)
 
 
 def home(request):
@@ -1043,17 +859,34 @@ def stay_note_delete(request, stay_id):
     return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
 
 
-# @login_required
-# def event_detail(request, pk):
-#     """
-#     Get single event details in case of modification instead of refreshing the whole trip detail page
-#     """
-#     pass
+class DayMapView(View):
+    @method_decorator(login_required, name="dispatch")
+    def dispatch(self, request, day_id, *args, **kwargs):
+        self.day_obj = get_object_or_404(Day, pk=day_id, trip__author=request.user)
+        return super().dispatch(request, *args, **kwargs)
 
-# @login_required
-# def stay_detail(request, day_id):
-#     """
-#     Get single stay for the day details in case of modification instead of refreshing the whole trip detail page
-#     """
-#     # TODO: think about refreshing the same stay in other days
-#     pass
+    def get(self, request, *args, **kwargs):
+        events = self.day_obj.events.exclude(category=1)
+        stay = self.day_obj.stay
+        next_day = self.day_obj.next_day
+        prev_day = self.day_obj.prev_day
+        next_day_stay = None
+        if next_day and next_day.stay and next_day.stay != stay:
+            next_day_stay = next_day.stay
+        locations = {
+            "stay": stay,
+            "events": events,
+            "next_day_stay": next_day_stay,
+        }
+        if not (prev_day and prev_day.stay and prev_day.stay == stay):
+            locations["first_day"] = True
+
+        # Filter out events without latitude or longitude
+        events_with_location = events.filter(
+            latitude__isnull=False, longitude__isnull=False
+        )
+
+        map = create_day_map(events_with_location, stay, next_day_stay)
+
+        context = {"map": map, "day": self.day_obj, "locations": locations}
+        return TemplateResponse(request, "trips/day-map.html", context)

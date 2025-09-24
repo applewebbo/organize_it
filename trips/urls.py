@@ -74,6 +74,7 @@ htmx_urlpatterns = [
         name="stay-note-delete",
     ),
     path("geocode-address/", views.geocode_address, name="geocode-address"),
+    path("days/<int:day_id>/map/", views.DayMapView.as_view(), name="day-map"),
 ]
 
 urlpatterns += htmx_urlpatterns

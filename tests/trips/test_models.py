@@ -165,6 +165,57 @@ class TestDayModel:
         test_day.trip = empty_trip
         assert test_day.prev_day is None
 
+    def test_days_renumbered_when_trip_dates_updated(self, user_factory, trip_factory):
+        """Test days are renumbered correctly when trip start_date is moved earlier"""
+        user = user_factory()
+        trip = trip_factory(
+            author=user,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=2),
+        )
+
+        day1 = trip.days.get(number=1)
+        day2 = trip.days.get(number=2)
+        day3 = trip.days.get(number=3)
+
+        # Move start date one day earlier
+        trip.start_date = date.today() - timedelta(days=1)
+        trip.save()
+
+        assert trip.days.count() == 4
+
+        # Check the new day
+        new_day = trip.days.get(number=1)
+        assert new_day.date == date.today() - timedelta(days=1)
+
+        # Check renumbered days
+        day1.refresh_from_db()
+        day2.refresh_from_db()
+        day3.refresh_from_db()
+
+        assert day1.number == 2
+        assert day2.number == 3
+        assert day3.number == 4
+
+    def test_days_added_when_trip_dates_extended(self, user_factory, trip_factory):
+        """Test days are added correctly when trip end_date is moved later"""
+        user = user_factory()
+        trip = trip_factory(
+            author=user,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=2),
+        )
+        assert trip.days.count() == 3
+
+        # Move end date one day later
+        trip.end_date = date.today() + timedelta(days=3)
+        trip.save()
+
+        assert trip.days.count() == 4
+        last_day = trip.days.order_by("number").last()
+        assert last_day.number == 4
+        assert last_day.date == date.today() + timedelta(days=3)
+
 
 class TestLinkModel:
     def test_factory(self, user_factory, trip_factory, link_factory):
@@ -402,6 +453,66 @@ class TestTransportModel:
         # Verify geocoder was not called again
         mock_geocoder.assert_not_called()
 
+    @patch("geocoder.mapbox")
+    def test_save_updates_coordinates_if_destination_changed(
+        self, mock_geocoder, user_factory, trip_factory
+    ):
+        # Setup mock response
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
+
+        user = user_factory()
+        trip = trip_factory(author=user)
+        day = trip.days.first()
+
+        transport = Transport.objects.create(
+            day=day,
+            name="Train to Milan",
+            start_time="10:00",
+            end_time="11:00",
+            type=Transport.Type.TRAIN,
+            destination="Milan, Italy",
+        )
+
+        # Reset mock before saving again
+        mock_geocoder.reset_mock()
+        mock_geocoder.return_value.latlng = [48.8566, 2.3522]
+
+        # Save again with changed destination
+        transport.destination = "Paris, France"
+        transport.save()
+
+        # Verify geocoder was called again
+        mock_geocoder.assert_called_with(
+            "Paris, France", access_token=settings.MAPBOX_ACCESS_TOKEN
+        )
+        transport.refresh_from_db()
+        assert transport.dest_latitude == 48.8566
+        assert transport.dest_longitude == 2.3522
+
+    @patch("geocoder.mapbox")
+    def test_save_with_no_geocoder_result(
+        self, mock_geocoder, user_factory, trip_factory
+    ):
+        # Setup mock response
+        mock_geocoder.return_value.latlng = None
+
+        user = user_factory()
+        trip = trip_factory(author=user)
+        day = trip.days.first()
+
+        transport = Transport.objects.create(
+            day=day,
+            name="Train to Nowhere",
+            start_time="10:00",
+            end_time="11:00",
+            type=Transport.Type.TRAIN,
+            destination="Nowhere",
+        )
+
+        # Verify the coordinates were not set
+        assert transport.dest_latitude is None
+        assert transport.dest_longitude is None
+
 
 class TestExperienceModel:
     def test_factory(self, user_factory, trip_factory, experience_factory):
@@ -539,3 +650,19 @@ class TestStayModel:
         # Verify days were properly transferred
         assert stay2.days.count() == 3
         assert stay1.days.count() == 0
+
+    def test_stay_str_no_day(self, stay_factory):
+        """Test stay __str__ method when it has no associated day."""
+        stay = stay_factory(name="Lonely Stay")
+        assert str(stay) == "Lonely Stay"
+
+    @patch("geocoder.mapbox")
+    def test_save_with_no_geocoder_result(self, mock_geocoder, stay_factory):
+        # Setup mock response
+        mock_geocoder.return_value.latlng = None
+
+        stay = stay_factory(address="Nowhere")
+
+        # Verify the coordinates were not set
+        assert stay.latitude is None
+        assert stay.longitude is None
