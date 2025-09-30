@@ -162,7 +162,7 @@ class EventFactory(factory.django.DjangoModelFactory):
         )
     )
     category = factory.Faker("random_element", elements=[1, 2, 3])
-    url = factory.Faker("url")
+    website = factory.Faker("url")
     notes = factory.Maybe(
         factory.Faker("pybool"),
         factory.Faker("sentence", nb_words=8),
@@ -186,7 +186,7 @@ class TransportFactory(factory.django.DjangoModelFactory):
     destination = factory.LazyAttribute(lambda obj: obj.dest_location)
     type = factory.Faker("random_element", elements=[1, 2, 3, 4, 5, 6, 7])
     category = 1
-    url = factory.Faker("url")
+    website = factory.Faker("url")
     notes = factory.Maybe(
         factory.Faker("pybool"),
         factory.Faker("sentence", nb_words=8),
@@ -280,7 +280,7 @@ class StayFactory(factory.django.DjangoModelFactory):
     check_out = factory.Faker("time")
     cancellation_date = factory.Faker("future_date")
     phone_number = factory.Faker("phone_number", locale="it_IT")
-    url = factory.Faker("url")
+    website = factory.Faker("url")
     address = factory.LazyAttribute(lambda obj: random.choice(ITALIAN_CITIES))
     notes = factory.Maybe(
         factory.Faker("pybool"),

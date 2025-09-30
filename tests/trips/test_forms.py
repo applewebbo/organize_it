@@ -227,13 +227,13 @@ class TestTransportForm:
             "destination": "Rome",
             "start_time": "10:00",
             "end_time": "12:00",
-            "url": "example.com",
+            "website": "example.com",
         }
         form = TransportForm(data=data)
 
         assert form.is_valid()
         transport = form.save(commit=False)
-        assert transport.url == "https://example.com"
+        assert transport.website == "https://example.com"
 
 
 class TestExperienceForm:
@@ -274,7 +274,7 @@ class TestExperienceForm:
             "address": "Piazza del Colosseo, Rome",
             "start_time": "09:00",
             "duration": "90",
-            "url": "example.com",
+            "website": "example.com",
         }
         form = ExperienceForm(data=data)
 
@@ -282,7 +282,7 @@ class TestExperienceForm:
         experience = form.save(commit=False)
         experience.day = day
         experience.save()
-        assert experience.url == "https://example.com"
+        assert experience.website == "https://example.com"
 
     def test_init_with_existing_instance(
         self, user_factory, trip_factory, experience_factory
@@ -381,7 +381,7 @@ class TestMealForm:
             "address": "Via Stella, 22, Modena",
             "start_time": "20:00",
             "duration": "90",
-            "url": "example.com",
+            "website": "example.com",
         }
         form = MealForm(data=data)
 
@@ -389,7 +389,7 @@ class TestMealForm:
         meal = form.save(commit=False)
         meal.day = day
         meal.save()
-        assert meal.url == "https://example.com"
+        assert meal.website == "https://example.com"
 
     def test_init_with_existing_instance(
         self, user_factory, trip_factory, meal_factory
@@ -470,14 +470,14 @@ class TestStayForm:
             "check_in": "15:00",
             "check_out": "10:00",
             "address": "Beach Road 123, Miami",
-            "url": "example.com",
+            "website": "example.com",
             "apply_to_days": [day.pk for day in days],
         }
         form = StayForm(trip=trip, data=data)
 
         assert form.is_valid()
         stay = form.save()
-        assert stay.url == "https://example.com"
+        assert stay.website == "https://example.com"
 
     def test_init_with_trip(self, user_factory, trip_factory):
         """Test form initialization with trip instance"""

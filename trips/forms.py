@@ -219,7 +219,7 @@ class TransportForm(forms.ModelForm):
             "destination",
             "start_time",
             "end_time",
-            "url",
+            "website",
         ]
         formfield_callback = urlfields_assume_https
         labels = {
@@ -227,7 +227,7 @@ class TransportForm(forms.ModelForm):
             "destination": _("Destination"),
             "start_time": _("Departure Time"),
             "end_time": _("Arrival Time"),
-            "url": _("Url"),
+            "website": _("Website"),
             "type": _("Type"),
         }
         widgets = {
@@ -236,7 +236,7 @@ class TransportForm(forms.ModelForm):
             "destination": forms.TextInput(attrs={"placeholder": "Destination"}),
             "start_time": forms.TimeInput(attrs={"type": "time"}),
             "end_time": forms.TimeInput(attrs={"type": "time"}),
-            "url": forms.TextInput(attrs={"placeholder": "Url"}),
+            "website": forms.TextInput(attrs={"placeholder": "Website"}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -263,7 +263,7 @@ class TransportForm(forms.ModelForm):
             ),
             Field("type", css_class="select select-primary w-full"),
             Div(
-                "url",
+                "website",
                 css_class="sm:col-span-3",
             ),
         )
@@ -313,20 +313,20 @@ class ExperienceForm(forms.ModelForm):
             "address",
             "start_time",
             "duration",
-            "url",
+            "website",
         ]
         formfield_callback = urlfields_assume_https
         labels = {
             "type": _("Type"),
             "address": _("Address"),
             "start_time": _("Start Time"),
-            "url": _("Url"),
+            "website": _("Website"),
         }
         widgets = {
             "name": forms.TextInput(attrs={"placeholder": _("Name")}),
             "city": forms.TextInput(attrs={"placeholder": _("City")}),
             "type": forms.Select(),
-            "url": forms.TextInput(attrs={"placeholder": _("Url")}),
+            "website": forms.TextInput(attrs={"placeholder": _("Website")}),
             "address": forms.TextInput(attrs={"placeholder": _("Address")}),
             "start_time": forms.TimeInput(attrs={"type": "time"}),
         }
@@ -400,7 +400,7 @@ class ExperienceForm(forms.ModelForm):
             ),
             Field("type", css_class="select select-primary"),
             Div(id="overlap-warning", css_class="sm:col-span-4"),
-            Field("url", wrapper_class="sm:col-span-4"),
+            Field("website", wrapper_class="sm:col-span-4"),
         ]
         self.helper.layout = Layout(*layout_fields)
 
@@ -451,7 +451,7 @@ class MealForm(forms.ModelForm):
             "address",
             "start_time",
             "duration",
-            "url",
+            "website",
         ]
         formfield_callback = urlfields_assume_https
         labels = {
@@ -460,12 +460,12 @@ class MealForm(forms.ModelForm):
             "address": _("Address"),
             "start_time": _("Start Time"),
             "duration": _("Duration"),
-            "url": _("Url"),
+            "website": _("Website"),
         }
         widgets = {
             "name": forms.TextInput(attrs={"placeholder": "Name"}),
             "type": forms.Select(),
-            "url": forms.TextInput(attrs={"placeholder": "Url"}),
+            "website": forms.TextInput(attrs={"placeholder": "Website"}),
             "address": forms.TextInput(attrs={"placeholder": "Address"}),
             "start_time": forms.TimeInput(attrs={"type": "time"}),
         }
@@ -538,7 +538,7 @@ class MealForm(forms.ModelForm):
             ),
             Field("type", css_class="select select-primary"),
             Div(id="overlap-warning", css_class="sm:col-span-4"),
-            Field("url", wrapper_class="sm:col-span-4"),
+            Field("website", wrapper_class="sm:col-span-4"),
         ]
         self.helper.layout = Layout(*layout_fields)
 
@@ -586,14 +586,14 @@ class StayForm(forms.ModelForm):
             "check_out",
             "cancellation_date",
             "phone_number",
-            "url",
+            "website",
             "address",
             "apply_to_days",
         ]
         formfield_callback = urlfields_assume_https
         widgets = {
             "name": forms.TextInput(attrs={"placeholder": "Name"}),
-            "url": forms.TextInput(attrs={"placeholder": "Url"}),
+            "website": forms.TextInput(attrs={"placeholder": "Website"}),
             "address": forms.TextInput(attrs={"placeholder": "Address"}),
             "check_in": forms.TimeInput(attrs={"type": "time"}),
             "check_out": forms.TimeInput(attrs={"type": "time"}),
@@ -606,7 +606,7 @@ class StayForm(forms.ModelForm):
             "check_out": _("Check-out"),
             "cancellation_date": _("Cancellation date"),
             "phone_number": _("Phone number"),
-            "url": _("Website"),
+            "website": _("Website"),
             "address": _("Address"),
         }
 
@@ -671,7 +671,7 @@ class StayForm(forms.ModelForm):
             Field("check_out", wrapper_class="sm:col-span-2"),
             Field("cancellation_date", wrapper_class="sm:col-span-2"),
             Field("phone_number", wrapper_class="sm:col-span-2"),
-            Field("url", wrapper_class="sm:col-span-4"),
+            Field("website", wrapper_class="sm:col-span-4"),
             Field("apply_to_days", wrapper_class="sm:col-span-4"),
         ]
         self.helper.layout = Layout(*layout_fields)

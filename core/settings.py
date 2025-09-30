@@ -308,6 +308,8 @@ DATE_INPUT_FORMATS = [
     "%m/%d/%Y",
 ]
 
+GOOGLE_PLACES_API_KEY = env("GOOGLE_PLACES_API_KEY", default="")
+
 # DEVELOPMENT SPECIFIC SETTINGS
 if ENVIRONMENT == "dev":
     DEBUG = True

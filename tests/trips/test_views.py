@@ -380,7 +380,7 @@ class AddTransportView(TestCase):
             "destination": "Rome",
             "start_time": "10:00",
             "end_time": "12:00",
-            "url": "https://example.com",
+            "website": "https://example.com",
         }
 
         with self.login(user):
@@ -421,7 +421,7 @@ class AddExperienceView(TestCase):
             "address": "Starting Point",
             "start_time": "14:00",
             "duration": "120",
-            "url": "https://example.com",
+            "website": "https://example.com",
         }
 
         with self.login(user):
@@ -462,7 +462,7 @@ class AddMealView(TestCase):
             "address": "Via Alberto Cadlolo, 101, Rome",
             "start_time": "13:00",
             "duration": "60",  # 1 hour
-            "url": "https://example.com",
+            "website": "https://example.com",
         }
 
         with self.login(user):
@@ -505,7 +505,7 @@ class AddStayView(TestCase):
             "check_out": "11:00",
             "cancellation_date": "2024-12-31",
             "phone_number": "+1234567890",
-            "url": "https://example.com",
+            "website": "https://example.com",
             "address": "Via Roma 1, Rome",
             "apply_to_days": [day.pk for day in days],
         }
@@ -549,7 +549,7 @@ class AddStayView(TestCase):
             "check_out": "11:00",
             "cancellation_date": "2024-12-31",
             "phone_number": "+1234567890",
-            "url": "https://example.com",
+            "website": "https://example.com",
             "address": "Via Roma 1, Rome",
             "apply_to_days": [first_day.pk],  # Only apply to first day
         }
@@ -626,7 +626,7 @@ class StayModifyView(TestCase):
             "check_out": "10:00",
             "cancellation_date": "2024-12-31",
             "phone_number": "+1234567890",
-            "url": "https://example.com",
+            "website": "https://example.com",
             "address": "Via Roma 1, Rome",
             "apply_to_days": [day.pk for day in days],
         }
@@ -981,7 +981,7 @@ class EventModifyView(TestCase):
             "destination": "New Destination",
             "start_time": "10:00",
             "end_time": "12:00",
-            "url": "https://example.com",
+            "website": "https://example.com",
             "type": 1,
         }
 
