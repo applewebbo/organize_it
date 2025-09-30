@@ -123,7 +123,7 @@ class Stay(models.Model):
             ),
         ],
     )
-    url = models.URLField(null=True, blank=True)
+    website = models.URLField(null=True, blank=True)
     address = models.CharField(max_length=200)
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
@@ -226,14 +226,21 @@ class Event(models.Model):
     name = models.CharField(max_length=100)
     start_time = models.TimeField()
     end_time = models.TimeField()
-    url = models.URLField(null=True, blank=True)
     address = models.CharField(max_length=200)
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
     category = models.PositiveSmallIntegerField(
         choices=Category.choices, default=Category.EXPERIENCE
     )
-    notes = models.CharField(max_length=500, blank=True)
+    notes = models.CharField(
+        max_length=500,
+        blank=True,
+    )
+    # Additional fields for Google Places data
+    place_id = models.CharField(max_length=255, blank=True)
+    website = models.URLField(max_length=255, blank=True)
+    phone_number = models.CharField(max_length=50, blank=True)
+    opening_hours = models.JSONField(blank=True, null=True)
 
     class Meta:
         ordering = ["start_time"]
