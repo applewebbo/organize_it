@@ -22,11 +22,12 @@
     <div class="flex justify-end items-center p-4 px-8 rounded-b md:p-5">
         <button type="button"
                 class="flex items-center ms-2 btn btn-secondary btn-soft"
-                hx-get="{% url 'trips:event-modify' event.pk %}"
+                hx-get="#"
                 hx-target="#dialog"
                 hx-swap="innerHTML">
-                {% heroicon_mini 'sparkles' class='size-4' %}
-                {% trans 'Enrich' %}</button>
+            {% heroicon_mini 'sparkles' class='size-4' %}
+            {% trans 'Enrich' %}
+        </button>
         <button type="button"
                 class="ms-2 btn btn-success btn-soft"
                 hx-get="{% url 'trips:event-modify' event.pk %}"
