@@ -1,19 +1,20 @@
+{% load i18n %}
 <ul class="leading-10">
     <li>
-        <span class="font-bold">Address:&nbsp;</span>{{ event.address }}
+        <span class="font-bold">{% trans 'Address' %}:&nbsp;</span>{{ event.address }}
     </li>
     <li>
-        <span class="font-bold">Start time:&nbsp;</span>{{ event.start_time|time:"H:i" }}
+        <span class="font-bold">{% trans 'Start time' %}:&nbsp;</span>{{ event.start_time|time:"H:i" }}
     </li>
     <li>
-        <span class="font-bold">End time:&nbsp;</span>{{ event.end_time|time:"H:i" }}
+        <span class="font-bold">{% trans 'End time' %}:&nbsp;</span>{{ event.end_time|time:"H:i" }}
     </li>
 </ul>
 <ul class="leading-10">
     <li>
-        <span class="font-bold">Url:&nbsp;</span><a href="{{ event.url }}" class="link">{{ event.url }}</a>
+        <span class="font-bold">{% trans 'Url' %}:&nbsp;</span><a href="{{ event.url }}" class="link">{{ event.url }}</a>
     </li>
     <li>
-        <span class="font-bold">Type:&nbsp;</span>{{ event.get_type_display }}
+        <span class="font-bold">{% trans 'Type' %}:&nbsp;</span>{{ event.get_type_display }}
     </li>
 </ul>

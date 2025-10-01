@@ -1,7 +1,7 @@
-{% load trip_tags heroicons %}
+{% load trip_tags heroicons i18n %}
 <div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
     <h3 id="event-title"
-        class="text-xl font-semibold text-gray-900 dark:text-white">Details for {{ event.name }}</h3>
+        class="text-xl font-semibold text-gray-900 dark:text-white">{% trans 'Details for' %} {{ event.name }}</h3>
     <button type="button"
             class="btn btn-ghost btn-circle btn-sm"
             x-on:click="openModal = false">
@@ -21,17 +21,24 @@
     </div>
     <div class="flex justify-end items-center p-4 px-8 rounded-b md:p-5">
         <button type="button"
+                class="flex items-center ms-2 btn btn-secondary btn-soft"
+                hx-get="{% url 'trips:event-modify' event.pk %}"
+                hx-target="#dialog"
+                hx-swap="innerHTML">
+                {% heroicon_mini 'sparkles' class='size-4' %}
+                {% trans 'Enrich' %}</button>
+        <button type="button"
                 class="ms-2 btn btn-success btn-soft"
                 hx-get="{% url 'trips:event-modify' event.pk %}"
                 hx-target="#dialog"
-                hx-swap="innerHTML">Edit</button>
+                hx-swap="innerHTML">{% trans 'Edit' %}</button>
         <button type="button"
                 class="ms-2 btn btn-error btn-soft"
                 hx-get="{% url 'trips:event-modal' event.pk %}"
                 hx-target="#dialog"
-                hx-swap="innerHTML">Delete</button>
+                hx-swap="innerHTML">{% trans 'Delete' %}</button>
         <button type="button"
                 x-on:click="openModal = false"
-                class="ms-2 btn btn-soft btn-neutral">Close</button>
+                class="ms-2 btn btn-soft btn-neutral">{% trans 'Close' %}</button>
     </div>
 </div>
