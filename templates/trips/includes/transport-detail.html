@@ -1,23 +1,14 @@
 {% load i18n %}
 <ul class="leading-10">
-    <li>
-        <span class="font-bold">{% trans 'Departure' %}:&nbsp;</span>{{ event.address }}
+    <li class="flex gap-2 items-center">
+        {% heroicon_outline 'arrow-path-rounded-square' class='size-6' %}{{ event.address }} - {{ event.destination }}
     </li>
-    <li>
-        <span class="font-bold">{% trans 'Destination' %}:&nbsp;</span>{{ event.destination }}
+    <li class="flex gap-2 items-center">
+        {% heroicon_outline 'clock' class='size-6' %}{{ event.start_time|time:"H:i" }}&nbsp;-&nbsp;{{ event.end_time|time:"H:i" }}
     </li>
-    <li>
-        <span class="font-bold">{% trans 'Start time' %}:&nbsp;</span>{{ event.start_time|time:"H:i" }}
-    </li>
-</ul>
-<ul class="leading-10">
-    <li>
-        <span class="font-bold">{% trans 'End time' %}:&nbsp;</span>{{ event.end_time|time:"H:i" }}
-    </li>
-    <li>
-        <span class="font-bold">{% trans 'Url' %}:&nbsp;</span>{% if event.url %}<a href="{{ event.url }}" class="link">{{ event.url }}</a>{% else %}-{% endif %}
-    </li>
-    <li>
-        <span class="font-bold">{% trans 'Type' %}:&nbsp;</span>{{ event.get_type_display }}
-    </li>
+    {% if event.website %}
+        <li class="flex gap-2 items-center">
+            {% heroicon_outline 'globe-alt' class='size-6' %}<a href="{{ event.website }}" class="link">{{ event.website }}</a>
+        </li>
+    {% endif %}
 </ul>
