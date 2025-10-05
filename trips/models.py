@@ -339,7 +339,7 @@ class Experience(Event):
         PARK = 2, _("Park")
         WALK = 3, _("Walk")
         SPORT = 4, _("Sport")
-        OTHER = 6, _("Other")
+        OTHER = 5, _("Other")
 
     type = models.IntegerField(choices=Type.choices, default=Type.MUSEUM)
 
