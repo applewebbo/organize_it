@@ -101,7 +101,7 @@ class Command(BaseCommand):
                             trip=trip,
                             start_time=start_time,
                             end_time=end_time,
-                            url=faker.url() if random.random() < 0.5 else None,
+                            website=faker.url() if random.random() < 0.5 else "",
                             latitude=day_center_lat
                             + random.uniform(-radius_in_degrees, radius_in_degrees),
                             longitude=day_center_lon
@@ -115,7 +115,7 @@ class Command(BaseCommand):
                         type=2,
                         start_time=time(13, 0),
                         end_time=time(14, 30),
-                        url=faker.url() if random.random() < 0.6 else None,
+                        website=faker.url() if random.random() < 0.3 else "",
                         latitude=day_center_lat
                         + random.uniform(-radius_in_degrees, radius_in_degrees),
                         longitude=day_center_lon
@@ -127,7 +127,7 @@ class Command(BaseCommand):
                         type=3,
                         start_time=time(20, 0),
                         end_time=time(21, 30),
-                        url=faker.url() if random.random() < 0.6 else None,
+                        website=faker.url() if random.random() < 0.3 else "",
                         latitude=day_center_lat
                         + random.uniform(-radius_in_degrees, radius_in_degrees),
                         longitude=day_center_lon
@@ -148,7 +148,7 @@ class Command(BaseCommand):
                             trip=trip,
                             start_time=start_time,
                             end_time=end_time,
-                            url=faker.url() if random.random() < 0.6 else None,
+                            website=faker.url() if random.random() < 0.3 else "",
                             latitude=day_center_lat
                             + random.uniform(-radius_in_degrees, radius_in_degrees),
                             longitude=day_center_lon

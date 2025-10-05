@@ -132,7 +132,7 @@ class LinkFactory(factory.django.DjangoModelFactory):
         model = "trips.Link"
 
     author = factory.SubFactory(UserFactory)
-    url = factory.Faker("url")
+    website = factory.Faker("url")
     title = factory.Faker("sentence")
 
 
@@ -224,7 +224,7 @@ class ExperienceFactory(factory.django.DjangoModelFactory):
             CITY_ADDRESSES.get(obj.day.trip.destination, ["Via Roma 1"])
         )
     )
-    type = factory.Faker("random_element", elements=[1, 2, 3, 4, 5, 6])
+    type = factory.Faker("random_element", elements=[1, 2, 3, 4, 5])
     category = 2
     notes = factory.Maybe(
         factory.Faker("pybool"),
