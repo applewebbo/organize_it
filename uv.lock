@@ -822,6 +822,7 @@ dependencies = [
     { name = "granian", extra = ["pname"] },
     { name = "heroicons", extra = ["django"] },
     { name = "psycopg", extra = ["binary"] },
+    { name = "requests" },
     { name = "uvloop" },
     { name = "whitenoise" },
 ]
@@ -867,6 +868,7 @@ requires-dist = [
     { name = "granian", extras = ["pname"], specifier = ">=2.2.0" },
     { name = "heroicons", extras = ["django"], specifier = ">=2.8.0" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.2.1" },
+    { name = "requests", specifier = ">=2.32.5" },
     { name = "uvloop", specifier = ">=0.21.0" },
     { name = "whitenoise", specifier = ">=6.7.0" },
 ]
