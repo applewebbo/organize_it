@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 
+import requests
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -890,3 +891,84 @@ class DayMapView(View):
 
         context = {"map": map, "day": self.day_obj, "locations": locations}
         return TemplateResponse(request, "trips/day-map.html", context)
+
+
+@login_required
+@require_http_methods(["POST"])
+def enrich_event(request, event_id):
+    """
+    Enrich an event's details using the new Google Places API.
+    - Find Place ID using places:searchText.
+    - Use Place ID to get details (website, phone, opening hours).
+    - Update the event instance.
+    """
+    event = get_object_or_404(Event, pk=event_id, trip__author=request.user)
+
+    if not event.name or not event.address:
+        messages.error(
+            request, _("Event must have a name and an address to be enriched.")
+        )
+        return HttpResponse(status=400)
+
+    api_key = settings.GOOGLE_PLACES_API_KEY
+
+    if not api_key:
+        messages.error(request, _("Google Places API key is not configured."))
+        return HttpResponse(status=500)
+
+    # 1. Find Place ID using the new searchText endpoint
+    search_url = "https://places.googleapis.com/v1/places:searchText"
+    search_payload = {"textQuery": f"{event.name} {event.address}"}
+    search_headers = {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": api_key,
+        "X-Goog-FieldMask": "places.id",
+    }
+
+    try:
+        response = requests.post(
+            search_url, json=search_payload, headers=search_headers, timeout=10
+        )
+        response.raise_for_status()
+        data = response.json()
+
+        if data.get("places"):
+            event.place_id = data["places"][0]["id"]
+        else:
+            messages.warning(request, _("Could not find a matching place."))
+            return HttpResponse(status=404)
+
+    except requests.RequestException as e:
+        error_message = f"Error calling Google Places API: {e}"
+        if e.response is not None:
+            error_message = f"API Error: {e.response.text}"
+        messages.error(request, error_message)
+        return HttpResponse(status=500)
+
+    # 2. Get Place Details using the new getPlace endpoint
+    details_url = f"https://places.googleapis.com/v1/places/{event.place_id}"
+    details_headers = {
+        "X-Goog-Api-Key": api_key,
+        "X-Goog-FieldMask": "websiteUri,internationalPhoneNumber,regularOpeningHours",
+    }
+
+    try:
+        response = requests.get(details_url, headers=details_headers, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+
+        event.website = data.get("websiteUri", "")
+        event.phone_number = data.get("internationalPhoneNumber", "")
+        event.opening_hours = data.get("regularOpeningHours", None)
+        event.save()
+
+        messages.success(request, _("Event enriched successfully!"))
+
+    except requests.RequestException as e:
+        error_message = f"Error calling Google Places API: {e}"
+        if e.response is not None:
+            error_message = f"API Error: {e.response.text}"
+        messages.error(request, error_message)
+        return HttpResponse(status=500)
+
+    return HttpResponse(status=204, headers={"HX-Refresh": "true"})
