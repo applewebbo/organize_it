@@ -132,9 +132,9 @@ class TestEventFormatting:
     @pytest.mark.parametrize(
         "category,expected_icon",
         [
-            (1, "truck"),
-            (2, "photo"),
-            (3, "cake"),
+            (1, "car-profile"),
+            (2, "images"),
+            (3, "fork-knife"),
             (99, "question-mark-circle"),
         ],
     )
