@@ -548,7 +548,7 @@ class TestStayModel:
         user = user_factory()
         trip = trip_factory(author=user, title="Test Trip")
         day = trip.days.first()
-        stay = stay_factory(name="Grand Hotel")
+        stay = stay_factory(name="Grand Hotel", day=day)
 
         # Associate stay with trip's first day
         day.stay = stay
@@ -567,13 +567,14 @@ class TestStayModel:
             check_in="14:00",
             check_out="11:00",
             phone_number="+393334445566",
-            address="Via Example 123, Milan, Italy",
+            address="Via Example 123",
+            city="Milan",
         )
 
         assert stay.latitude == 45.4773
         assert stay.longitude == 9.1815
         mock_geocoder.assert_called_once_with(
-            "Via Example 123, Milan, Italy", access_token=settings.MAPBOX_ACCESS_TOKEN
+            "Via Example 123, Milan", access_token=settings.MAPBOX_ACCESS_TOKEN
         )
 
     @patch("geocoder.mapbox")
@@ -587,7 +588,8 @@ class TestStayModel:
             check_in="14:00",
             check_out="11:00",
             phone_number="+393334445566",
-            address="Via Example 123, Milan, Italy",
+            address="Via Example 123",
+            city="Milan",
         )
 
         mock_geocoder.reset_mock()
