@@ -338,6 +338,9 @@ if ENVIRONMENT == "dev":
             },
         }
     }
+    INSTALLED_APPS += [
+        "django_watchfiles",
+    ]
 
 # PRODUCTION SPECIFIC SETTINGS
 elif ENVIRONMENT == "prod":

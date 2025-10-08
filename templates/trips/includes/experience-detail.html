@@ -1,19 +1,19 @@
-{% load i18n heroicons %}
+{% load i18n %}
 <ul class="leading-10">
     <li class="flex gap-2 items-center">
-        {% heroicon_outline 'map-pin' class='size-6' %}{{ event.address }}
+        <i class="text-xl ph-bold ph-map-pin text-base-content/60"></i>{{ event.address }}
     </li>
     <li class="flex gap-2 items-center">
-        {% heroicon_outline 'clock' class='size-6' %}{{ event.start_time|time:"H:i" }}&nbsp;-&nbsp;{{ event.end_time|time:"H:i" }}
+        <i class="text-xl ph-bold ph-clock text-base-content/60"></i>{{ event.start_time|time:"H:i" }}&nbsp;-&nbsp;{{ event.end_time|time:"H:i" }}
     </li>
     {% if event.website %}
         <li class="flex gap-2 items-center">
-            {% heroicon_outline 'globe-alt' class='size-6' %}<a href="{{ event.website }}" class="link">{{ event.website }}</a>
+            <i class="text-xl ph-bold ph-browser text-base-content/60"></i><a href="{{ event.website }}" class="link">{{ event.website|truncatechars:38 }}</a>
         </li>
     {% endif %}
     {% if event.phone_number %}
         <li class="flex gap-2 items-center">
-            {% heroicon_outline 'phone' class='size-6' %}{{ event.phone_number }}
+            <i class="text-xl ph-bold ph-phone text-base-content/60"></i>{{ event.phone_number }}
         </li>
     {% endif %}
 </ul>

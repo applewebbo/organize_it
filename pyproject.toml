@@ -3,6 +3,7 @@ dev = [
   "coverage>=7.6.1",
   "django-coverage-plugin>=3.1.0",
   "django-test-plus>=2.2.4",
+  "django-watchfiles>=1.4.0",
   "djlint>=1.35.2",
   "pre-commit>=3.8.0",
   "pytest>=8.0,<8.4.0",
