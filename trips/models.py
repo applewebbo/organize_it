@@ -125,6 +125,7 @@ class Stay(models.Model):
     )
     website = models.URLField(null=True, blank=True)
     address = models.CharField(max_length=200)
+    city = models.CharField(max_length=100)
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
     notes = models.CharField(max_length=500, blank=True)
@@ -137,9 +138,14 @@ class Stay(models.Model):
         old = type(self).objects.get(pk=self.pk) if self.pk else None
         address_changed = old and old.address != self.address
         coords_missing = self.latitude is None or self.longitude is None
+        complete_address = self.address
+        if self.city:
+            complete_address = f"{self.address}, {self.city}"
 
         if address_changed or coords_missing:
-            g = geocoder.mapbox(self.address, access_token=settings.MAPBOX_ACCESS_TOKEN)
+            g = geocoder.mapbox(
+                complete_address, access_token=settings.MAPBOX_ACCESS_TOKEN
+            )
             if g.latlng:
                 self.latitude, self.longitude = g.latlng
 
