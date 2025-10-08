@@ -132,7 +132,7 @@ class LinkFactory(factory.django.DjangoModelFactory):
         model = "trips.Link"
 
     author = factory.SubFactory(UserFactory)
-    website = factory.Faker("url")
+    url = factory.Faker("url")
     title = factory.Faker("sentence")
 
 
