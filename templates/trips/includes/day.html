@@ -10,13 +10,13 @@
             <h2 class="text-xl font-medium sm:text-2xl grow">{% trans 'Day' %} {{ day.number }} - {{ day.date|date:"j F" }}</h2>
             <div>
                 <button class="btn btn-xs me-2 sm:btn-md" disabled="disabled">
-                    {% heroicon_mini "pencil-square" class="size-4 sm:size-5" %}
+                    <i class="ph-bold ph-pencil-line i-sm sm:i-md"></i>
                 </button>
                 <button id="day-map-button-{{ day.pk }}"
                         hx-get="{% url 'trips:day-map' day.pk %}"
                         hx-target="#day-info-{{ day.pk }}"
                         hx-swap="outerHTML"
-                        class="btn btn-xs me-2 sm:btn-md">{% heroicon_mini "map" class="size-4 sm:size-5" %}</button>
+                        class="btn btn-xs me-2 sm:btn-md"><i class="ph-bold ph-map-trifold i-sm sm:i-lg"></i></button>
                 <c-dropdown :day="day" />
             </div>
         </div>
@@ -24,19 +24,19 @@
             <div id="stay-info" class="mt-4" x-data>
                 <ul class="grid grid-cols-1 gap-y-2 gap-x-4 md:grid-cols-2">
                     {% if day.stay %}
-                        <li class="flex relative items-center py-3 px-6 rounded-lg border border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-100/30">
+                        <li class="flex relative items-center py-3 px-4 rounded-lg border border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-100/30">
                             <div class="absolute right-1 bottom-2 mt-4 text-right sm:top-0 me-2" x-data>
                                 <button class="relative btn btn-xs btn-soft border-slate-300 bg-slate-100 dark:bg-slate-200/20 dark:border-slate-700 dark:hover:bg-slate-900/10 hover:bg-white/50"
                                         hx-get="{% url 'trips:stay-notes' day.stay.pk %}"
                                         @click="$dispatch('open-modal'); document.activeElement.blur()"
                                         hx-target="#dialog"
                                         hx-swap="innerHTML">
-                                    {% heroicon_mini 'paper-clip' class="size-4" %}
+                                    <i class="ph-bold ph-paperclip i-sm text-slate-500 dark:text-slate-200"></i>
                                     <span class="absolute size-2.5 text-xs font-bold text-white {% if day.stay.notes %}bg-slate-400 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
                                 </button>
                             </div>
-                            <div class="p-2 mt-1 bg-white rounded-full border-2 text-slate-500 border-slate-300 dark:text-slate-300 dark:bg-slate-700 dark:border-slate-700">
-                                {% heroicon_outline 'home-modern' class="stroke-2 size-5" %}
+                            <div class="p-1.5 mt-1 bg-white rounded-md border-2 text-slate-500 border-slate-300 dark:text-slate-300 dark:bg-slate-700 dark:border-slate-700">
+                                <i class="text-xl ph-bold ph-bed align-sub"></i>
                             </div>
                             <div class="ms-3">
                                 <h2 class="text-lg font-semibold link text-slate-500 dark:text-slate-200">
@@ -48,14 +48,14 @@
                                 </h2>
                                 {% if day|is_first_day_of_trip and day.stay.check_in %}
                                     <div class="stay-in">
-                                        {% heroicon_mini 'information-circle' class="size-4 me-1.5" %}
+                                        <i class="ph-bold ph-info me-1.5"></i>
                                         Check-in: {{ day.stay.check_in|time:"H:i" }}
                                     </div>
                                 {% endif %}
                                 {% with next_day=day|next_day %}
                                     {% if day.stay.check_out and day|has_different_stay:next_day %}
                                         <div class="stay-out">
-                                            {% heroicon_mini 'information-circle' class="size-4 me-1.5" %}
+                                            <i class="ph-bold ph-info me-1.5"></i>
                                             Check-out: {{ day.stay.check_out|time:"H:i" }}
                                         </div>
                                     {% endif %}
@@ -64,19 +64,19 @@
                         </li>
                         {% with next_day=day|next_day %}
                             {% if next_day and next_day.stay and day|has_different_stay:next_day and next_day.stay.check_in %}
-                                <li class="flex relative items-center py-3 px-6 rounded-lg border border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-100/30">
+                                <li class="flex relative items-center py-3 px-4 rounded-lg border border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-100/30">
                                     <div class="absolute right-1 bottom-2 mt-4 text-right sm:top-0 me-2" x-data>
                                         <button class="relative btn btn-xs btn-soft border-slate-300 bg-slate-100 dark:bg-slate-200/20 dark:border-slate-700 dark:hover:bg-slate-900/10 hover:bg-white/50"
                                                 hx-get="{% url 'trips:stay-notes' next_day.stay.pk %}"
                                                 @click="$dispatch('open-modal'); document.activeElement.blur()"
                                                 hx-target="#dialog"
                                                 hx-swap="innerHTML">
-                                            {% heroicon_mini 'paper-clip' class="size-4" %}
+                                            <i class="ph-bold ph-paperclip i-sm text-slate-500 dark:text-slate-200"></i>
                                             <span class="absolute size-2.5 text-xs font-bold text-white {% if next_day.stay.notes %}bg-slate-400 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
                                         </button>
                                     </div>
-                                    <div class="p-2 mt-1 bg-white rounded-full border-2 text-slate-500 border-slate-300 dark:text-slate-300 dark:bg-slate-700 dark:border-slate-700">
-                                        {% heroicon_outline 'home-modern' class="stroke-2 size-5" %}
+                                    <div class="p-1.5 bg-white rounded-md border-2 text-slate-500 border-slate-300 dark:text-slate-300 dark:bg-slate-700 dark:border-slate-700">
+                                        <i class="text-xl ph-bold ph-bed align-sub"></i>
                                     </div>
                                     <div class="ms-3">
                                         <h2 class="text-lg font-semibold link text-slate-500 dark:text-slate-200">
@@ -87,7 +87,7 @@
                                             class="link">{{ next_day.stay.name }}</a>
                                         </h2>
                                         <div class="stay-in">
-                                            {% heroicon_mini 'information-circle' class="size-4 me-1.5" %}
+                                            <i class="ph-bold ph-info me-1.5"></i>
                                             Check-in: {{ next_day.stay.check_in|time:"H:i" }}
                                         </div>
                                     </div>
@@ -118,7 +118,7 @@
                            hx-target="#dialog"
                            hx-swap="innerHTML">
                             {{ event.start_time|time:"H:i" }}&nbsp;-&nbsp;{{ event.end_time|time:"H:i" }}
-                            <span x-show="showIcon">{% heroicon_mini "pencil-square" class="size-3 ms-2" %}</span>
+                            <i x-show="showIcon" class="ph-bold ph-pencil-line ms-2 align-sub"></i>
                         </a>
                     </div>
                     </c-event>

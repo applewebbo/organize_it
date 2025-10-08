@@ -57,9 +57,9 @@ def is_first_day_of_trip(day):
 @register.filter
 def event_icon(event):
     icons = {
-        1: "truck",  # Transport
-        2: "photo",  # Experience
-        3: "cake",  # Meal
+        1: "car-profile",  # Transport
+        2: "images",  # Experience
+        3: "fork-knife",  # Meal
     }
     return icons.get(event.category, "question-mark-circle")
 

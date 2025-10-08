@@ -1,13 +1,15 @@
-{% load trip_tags heroicons i18n partials %}
+{% load trip_tags i18n partials %}
 <div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
-    <h3 id="event-title"
-        class="text-xl font-semibold text-gray-900 dark:text-white"><span class="hidden sm:inline-block">{% trans 'Details for' %}&nbsp;</span>{{ event.name }}
-        <span class="badge badge-soft badge-secondary ms-2">{{ event.get_type_display }}</span>
-    </h3>
+    <div class="flex gap-1 items-center">
+        <h3 id="event-title"
+        class="text-xl font-semibold text-gray-900 dark:text-white">{{ event.name }}
+        </h3>
+        <span class="badge badge-outline badge-sm badge-info ms-2 align-sub">{{ event.get_type_display }}</span>
+    </div>
     <button type="button"
             class="btn btn-ghost btn-circle btn-sm"
             x-on:click="openModal = false">
-        {% heroicon_mini 'x-mark' class="size-5" %}
+        <i class="text-xl ph-bold ph-x"></i>
         <span class="sr-only">Close modal</span>
     </button>
 </div>
@@ -25,13 +27,13 @@
     {% endpartialdef 'event-detail' %}
     <div class="flex gap-2 justify-end items-center p-4 px-8 rounded-b md:p-5">
         <button type="button"
-                class="flex items-center btn btn-secondary btn-soft"
+                class="flex justify-center items-center btn btn-secondary btn-soft"
                 hx-post="{% url 'trips:enrich-event' event.id %}"
                 hx-indicator="#enrich-spinner"
                 hx-swap="innerHTML"
                 hx-target="#event-details">
-            <span class="block sm:hidden">{% heroicon_solid 'sparkles' class='size-5' %}</span>
-            <span class="hidden sm:block">{% trans 'Enrich' %}</span>
+            <i class="text-xl sm:hidden ph-bold ph-list-plus"></i>
+            <span class="hidden sm:inline">{% trans 'Enrich' %}</span>
             <span id="enrich-spinner" class="htmx-indicator spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
         </button>
         <button type="button"
@@ -39,22 +41,22 @@
                 hx-get="{% url 'trips:event-modify' event.pk %}"
                 hx-target="#dialog"
                 hx-swap="innerHTML">
-                    <span class="block sm:hidden">{% heroicon_solid 'pencil' class='size-5' %}</span>
-                    <span class="hidden sm:block">{% trans 'Edit' %}</span>
+                    <i class="text-xl sm:hidden ph-bold ph-pencil-line"></i>
+                    <span class="hidden sm:inline">{% trans 'Edit' %}</span>
         </button>
         <button type="button"
                 class="btn btn-error btn-soft"
                 hx-get="{% url 'trips:event-modal' event.pk %}"
                 hx-target="#dialog"
                 hx-swap="innerHTML">
-                    <span class="block sm:hidden">{% heroicon_solid 'trash' class='size-5' %}</span>
-                    <span class="hidden sm:block">{% trans 'Delete' %}</span>
+                    <i class="text-xl sm:hidden ph-bold ph-trash"></i>
+                    <span class="hidden sm:inline">{% trans 'Delete' %}</span>
         </button>
         <button type="button"
                 x-on:click="openModal = false"
                 class="btn btn-soft btn-neutral">
-                    <span class="block sm:hidden">{% heroicon_solid 'x-circle' class='size-5' %}</span>
-                    <span class="hidden sm:block">{% trans 'Close' %}</span>
+                    <i class="text-xl sm:hidden ph-bold ph-x-circle"></i>
+                    <span class="hidden sm:inline">{% trans 'Close' %}</span>
         </button>
     </div>
 </div>

@@ -281,8 +281,7 @@ def create_day_map(events_with_location, stay, next_day_stay):
     m.fit_bounds(fit_bounds_payload)
 
     # Add specific icons
-    kw = {"prefix": "fa", "color": "green", "icon": "star-of-life"}
-    experience_icon = folium.Icon(**kw)
+    experience_icon = folium.Icon(prefix="fa", color="green", icon="images")
     meal_icon = folium.Icon(prefix="fa", color="orange", icon="utensils")
     stay_icon = folium.Icon(prefix="fa", color="blue", icon="bed")
 

@@ -18,6 +18,30 @@ select ~ .pointer-events-none {
     display: none !important;
   }
 
+.htmx-indicator {
+  display: none;
+}
+
+.htmx-request .htmx-indicator,
+.htmx-request.htmx-indicator  {
+  display: inline-block;
+}
+
+.i-sm {
+  font-size: 1rem !important;
+  vertical-align: sub;
+}
+
+.i-md {
+  font-size: 1.25rem !important;
+  vertical-align: sub;
+}
+
+.i-lg {
+  font-size: 1.5rem !important;
+  vertical-align: sub;
+}
+
 @media (pointer: fine) {
     li.edit button {
       visibility: hidden;

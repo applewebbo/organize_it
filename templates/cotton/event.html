@@ -1,8 +1,8 @@
 {% load heroicons %}
 <div class="py-3 px-3 sm:px-6 rounded-lg border {{ border_color }} {{ bg_color }} relative">
     <div class="flex items-start mb-3">
-        <div class="{{ icon_color }} bg-slate-50 dark:bg-slate-700 mt-1 p-1 sm:p-2 rounded-full border-2 {{ border_color }} ">
-            {% heroicon_outline icon class="stroke-2 size-4 sm:size-6" %}
+        <div class="{{ icon_color }} bg-slate-50 dark:bg-slate-700 mt-1 p-1 sm:p-1.5 rounded-md border-2 {{ border_color }} ">
+            <i class="ph-bold ph-{{ icon }} i-sm sm:i-lg"></i>
         </div>
         <div class="ms-2" x-data>
             <h2 class="{{ icon_color }} font-semibold text-base sm:text-lg">
@@ -22,7 +22,7 @@
                 @click="$dispatch('open-modal'); document.activeElement.blur()"
                 hx-target="#dialog"
                 hx-swap="innerHTML">
-            {% heroicon_mini 'paper-clip' class="size-4" %}
+            <i class="ph-bold ph-paperclip i-sm {{ icon_color }}"></i>
             <span class="absolute size-2.5 text-xs font-bold text-white {% if event.notes %}bg-slate-400 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
         </button>
         <button class="btn btn-xs btn-soft {{ border_color }} {{ bg_color }} dark:hover:bg-slate-900/10 hover:bg-white/50"
@@ -30,7 +30,7 @@
                 @click="$dispatch('open-modal'); document.activeElement.blur()"
                 hx-target="#dialog"
                 hx-swap="innerHTML">
-            {% heroicon_mini 'arrows-up-down' class="size-4" %}
+            <i class="ph-bold ph-arrows-down-up i-sm {{ icon_color }}"></i>
         </button>
     </div>
 </div>
