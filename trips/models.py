@@ -125,7 +125,7 @@ class Stay(models.Model):
     )
     website = models.URLField(null=True, blank=True)
     address = models.CharField(max_length=200)
-    city = models.CharField(max_length=100)
+    city = models.CharField(max_length=100, blank=True)
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
     notes = models.CharField(max_length=500, blank=True)
@@ -233,6 +233,7 @@ class Event(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
     address = models.CharField(max_length=200)
+    city = models.CharField(max_length=100, blank=True)
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
     category = models.PositiveSmallIntegerField(
@@ -262,9 +263,14 @@ class Event(models.Model):
         old = type(self).objects.get(pk=self.pk) if self.pk else None
         address_changed = old and old.address != self.address
         coords_missing = self.latitude is None or self.longitude is None
+        complete_address = self.address
+        if self.city:
+            complete_address = f"{self.address}, {self.city}"
 
         if address_changed or coords_missing:
-            g = geocoder.mapbox(self.address, access_token=settings.MAPBOX_ACCESS_TOKEN)
+            g = geocoder.mapbox(
+                complete_address, access_token=settings.MAPBOX_ACCESS_TOKEN
+            )
             if g.latlng:
                 self.latitude, self.longitude = g.latlng
 
@@ -324,12 +330,15 @@ class Transport(Event):
     def save(self, *args, **kwargs):
         """convert destination to coordinates for displaying on the map"""
         old = type(self).objects.get(pk=self.pk) if self.pk else None
-        # if address is not changed, don't update coordinates
-        if old and old.destination == self.destination:
-            return super().save(*args, **kwargs)
-        g = geocoder.mapbox(self.destination, access_token=settings.MAPBOX_ACCESS_TOKEN)
-        if g.latlng:
-            self.dest_latitude, self.dest_longitude = g.latlng
+        destination_changed = old and old.destination != self.destination
+        dest_coords_missing = self.dest_latitude is None or self.dest_longitude is None
+
+        if destination_changed or dest_coords_missing:
+            g = geocoder.mapbox(
+                self.destination, access_token=settings.MAPBOX_ACCESS_TOKEN
+            )
+            if g.latlng:
+                self.dest_latitude, self.dest_longitude = g.latlng
         # autosave category for transport
         self.category = self.Category.TRANSPORT
 

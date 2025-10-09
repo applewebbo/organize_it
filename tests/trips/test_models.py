@@ -385,6 +385,19 @@ class TestEventModel:
         event.refresh_from_db()
         assert event.trip == trip2
 
+    @patch("geocoder.mapbox")
+    def test_event_geocoding_on_save(self, mock_geocoder, event_factory):
+        mock_geocoder.return_value.latlng = [41.890251, 12.492373]  # Colosseum
+        event = event_factory(
+            address="Colosseum", city="Roma", latitude=None, longitude=None
+        )
+        event.save()
+        mock_geocoder.assert_called_once_with(
+            "Colosseum, Roma", access_token=settings.MAPBOX_ACCESS_TOKEN
+        )
+        assert event.latitude == 41.890251
+        assert event.longitude == 12.492373
+
 
 class TestTransportModel:
     def test_factory(self, user_factory, trip_factory, transport_factory):
@@ -663,8 +676,21 @@ class TestStayModel:
         # Setup mock response
         mock_geocoder.return_value.latlng = None
 
-        stay = stay_factory(address="Nowhere")
+        stay = stay_factory(address="Nowhere", latitude=None, longitude=None)
 
         # Verify the coordinates were not set
         assert stay.latitude is None
         assert stay.longitude is None
+
+    @patch("geocoder.mapbox")
+    def test_stay_geocoding_on_save(self, mock_geocoder, stay_factory):
+        mock_geocoder.return_value.latlng = [41.890251, 12.492373]  # Colosseum
+        stay = stay_factory(
+            address="Colosseum", city="Roma", latitude=None, longitude=None
+        )
+        stay.save()
+        mock_geocoder.assert_called_once_with(
+            "Colosseum, Roma", access_token=settings.MAPBOX_ACCESS_TOKEN
+        )
+        assert stay.latitude == 41.890251
+        assert stay.longitude == 12.492373

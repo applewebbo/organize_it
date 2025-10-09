@@ -8,6 +8,7 @@ from django.db import transaction
 
 from tests.accounts.factories import UserFactory
 from tests.trips.factories import (
+    PLACES,
     ExperienceFactory,
     MealFactory,
     StayFactory,
@@ -19,7 +20,7 @@ from trips.models import Event, Stay, Trip
 logger = logging.getLogger("task")
 
 NUMBER_OF_USERS = 1
-TRIPS_PER_USER = 2
+TRIPS_PER_USER = 3
 
 User = get_user_model()
 
@@ -48,13 +49,26 @@ class Command(BaseCommand):
                 )
 
                 all_days = list(trip.days.all())
+                hotels_for_city = PLACES[trip.destination]["hotels"]
+
                 if len(all_days) > 2:
-                    stay1 = StayFactory(trip_destination=trip.destination)
-                    stay1.days.set(all_days[:2])
-                    stay2 = StayFactory(trip_destination=trip.destination)
-                    stay2.days.set(all_days[2:])
+                    # Ensure we have at least two distinct hotels to choose from
+                    if len(hotels_for_city) >= 2:
+                        chosen_hotels = random.sample(hotels_for_city, 2)
+                        stay1 = StayFactory(
+                            city=trip.destination, chosen_place=chosen_hotels[0]
+                        )
+                        stay1.days.set(all_days[:2])
+                        stay2 = StayFactory(
+                            city=trip.destination, chosen_place=chosen_hotels[1]
+                        )
+                        stay2.days.set(all_days[2:])
+                    else:
+                        # Fallback if not enough distinct hotels, create one stay
+                        stay = StayFactory(city=trip.destination)
+                        stay.days.set(all_days)
                 else:
-                    stay = StayFactory(trip_destination=trip.destination)
+                    stay = StayFactory(city=trip.destination)
                     stay.days.set(all_days)
 
                 for day in trip.days.all():
@@ -72,23 +86,49 @@ class Command(BaseCommand):
                             trip=trip,
                             start_time=start_time,
                             end_time=end_time,
+                            city=trip.destination,
                         )
 
                     # Create meals
-                    MealFactory.create(
-                        day=day,
-                        trip=trip,
-                        type=2,
-                        start_time=time(13, 0),
-                        end_time=time(14, 30),
-                    )
-                    MealFactory.create(
-                        day=day,
-                        trip=trip,
-                        type=3,
-                        start_time=time(20, 0),
-                        end_time=time(21, 30),
-                    )
+                    restaurants_for_city = PLACES[trip.destination]["restaurants"]
+                    if len(restaurants_for_city) >= 2:
+                        chosen_restaurants = random.sample(restaurants_for_city, 2)
+                        MealFactory.create(
+                            day=day,
+                            trip=trip,
+                            type=2,
+                            start_time=time(13, 0),
+                            end_time=time(14, 30),
+                            city=trip.destination,
+                            chosen_place=chosen_restaurants[0],
+                        )
+                        MealFactory.create(
+                            day=day,
+                            trip=trip,
+                            type=3,
+                            start_time=time(20, 0),
+                            end_time=time(21, 30),
+                            city=trip.destination,
+                            chosen_place=chosen_restaurants[1],
+                        )
+                    else:
+                        # Fallback if not enough distinct restaurants, use the same one
+                        MealFactory.create(
+                            day=day,
+                            trip=trip,
+                            type=2,
+                            start_time=time(13, 0),
+                            end_time=time(14, 30),
+                            city=trip.destination,
+                        )
+                        MealFactory.create(
+                            day=day,
+                            trip=trip,
+                            type=3,
+                            start_time=time(20, 0),
+                            end_time=time(21, 30),
+                            city=trip.destination,
+                        )
 
                     # Create experiences
                     for _ in range(random.randint(1, 2)):
@@ -104,6 +144,7 @@ class Command(BaseCommand):
                             trip=trip,
                             start_time=start_time,
                             end_time=end_time,
+                            city=trip.destination,
                         )
 
         logger.info("Trips populated correctly!")
