@@ -4,8 +4,8 @@
             hx-target="#dialog"
             hx-swap="innerHTML"
             @click="$dispatch('open-modal'); document.activeElement.blur()">
-        <div class="{{ icon_color }} bg-slate-50 dark:bg-slate-700 mt-1 p-2 rounded-full border-2 {{ border_color }} ">
-            {% heroicon_solid icon class='size-4' %}
+        <div class="{{ icon_color }} bg-slate-50 dark:bg-slate-700 mt-1 p-1 sm:p-1.5 rounded-md border-2 {{ border_color }} ">
+            <i class="ph-bold ph-{{ icon }} i-sm sm:i-lg"></i>
         </div>
         <span class="font-semibold text-base {{ icon_color }}">{{ event.name }}</span>
     </button>
