@@ -6,7 +6,8 @@
       hx-target="#dialog"
       hx-disabled-elt="#form-submit"
       class="modal-content"
-      method="post">
+      method="post"
+      x-data="autocompleteForm()">
     <div class="grid gap-x-1 p-4 sm:grid-cols-4 sm:gap-x-2 md:p-5">
         {% csrf_token %}
         {% crispy form %}
