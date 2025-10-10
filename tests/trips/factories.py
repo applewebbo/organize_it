@@ -176,26 +176,26 @@ PLACES = {
             {
                 "name": "Cracco",
                 "address": "Galleria Vittorio Emanuele II",
-                "latitude": 45.420935,
-                "longitude": 9.108565,
+                "latitude": 45.465599,
+                "longitude": 9.190020,
             },
             {
                 "name": "Il Luogo di Aimo e Nadia",
                 "address": "Via Privata Raimondo Montecuccoli 6",
-                "latitude": 45.458423,
-                "longitude": 9.131077,
+                "latitude": 45.458420,
+                "longitude": 9.131080,
             },
             {
                 "name": "Trippa Milano",
                 "address": "Via Giorgio Vasari 1",
-                "latitude": 45.566537,
-                "longitude": 9.205706,
+                "latitude": 45.451992,
+                "longitude": 9.205444,
             },
             {
                 "name": "Ratanà",
                 "address": "Via Gaetano de Castillia 28",
-                "latitude": 45.485767,
-                "longitude": 9.192715,
+                "latitude": 45.485738,
+                "longitude": 9.192806,
             },
         ],
         "attractions": [
@@ -589,6 +589,14 @@ PLACES = {
 
 ITALIAN_CITIES = list(PLACES.keys())
 
+TRANSPORT_DESTINATIONS = {
+    "Roma": ["Frascati", "Tivoli", "Ostia", "Civitavecchia"],
+    "Milano": ["Monza", "Como", "Pavia", "Bergamo"],
+    "Firenze": ["Prato", "Sesto Fiorentino", "Empoli", "Fiesole"],
+    "Venezia": ["Mestre", "Chioggia", "Jesolo", "Mogliano Veneto"],
+    "Napoli": ["Pozzuoli", "Ercolano", "Pompei", "Sorrento"],
+}
+
 
 class TripFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -671,9 +679,9 @@ class TransportFactory(factory.django.DjangoModelFactory):
         )
 
     day = factory.LazyAttribute(lambda obj: obj.trip.days.order_by("?").first())
-    name = factory.Faker("company", locale="it_IT")
-    start_time = factory.Faker("time")
-    end_time = factory.Faker("time")
+    name = factory.Faker("city", locale="it_IT")
+    start_time = factory.Faker("time", pattern="%H:%M")
+    end_time = factory.Faker("time", pattern="%H:%M")
     address = factory.LazyAttribute(lambda obj: obj.origin_details["address"])
     latitude = factory.LazyAttribute(lambda obj: obj.origin_details.get("latitude"))
     longitude = factory.LazyAttribute(lambda obj: obj.origin_details.get("longitude"))
@@ -712,8 +720,8 @@ class ExperienceFactory(factory.django.DjangoModelFactory):
     address = factory.LazyAttribute(lambda o: o.chosen_place["address"])
     latitude = factory.LazyAttribute(lambda o: o.chosen_place.get("latitude"))
     longitude = factory.LazyAttribute(lambda o: o.chosen_place.get("longitude"))
-    start_time = factory.Faker("time")
-    end_time = factory.Faker("time")
+    start_time = factory.Faker("time", pattern="%H:%M")
+    end_time = factory.Faker("time", pattern="%H:%M")
     type = factory.Faker("random_element", elements=[1, 2, 3, 4, 5])
     category = 2
     website = factory.Maybe(factory.Faker("pybool"), factory.Faker("url"), "")
@@ -742,8 +750,8 @@ class MealFactory(factory.django.DjangoModelFactory):
     address = factory.LazyAttribute(lambda o: o.chosen_place["address"])
     latitude = factory.LazyAttribute(lambda o: o.chosen_place.get("latitude"))
     longitude = factory.LazyAttribute(lambda o: o.chosen_place.get("longitude"))
-    start_time = factory.Faker("time")
-    end_time = factory.Faker("time")
+    start_time = factory.Faker("time", pattern="%H:%M")
+    end_time = factory.Faker("time", pattern="%H:%M")
     type = factory.Faker("random_element", elements=[1, 2, 3, 4])
     category = 3
     website = factory.Maybe(factory.Faker("pybool"), factory.Faker("url"), "")
@@ -770,8 +778,12 @@ class StayFactory(factory.django.DjangoModelFactory):
     address = factory.LazyAttribute(lambda o: o.chosen_place["address"])
     latitude = factory.LazyAttribute(lambda o: o.chosen_place.get("latitude"))
     longitude = factory.LazyAttribute(lambda o: o.chosen_place.get("longitude"))
-    check_in = factory.Faker("time")
-    check_out = factory.Faker("time")
+    check_in = factory.LazyFunction(
+        lambda: f"{random.randint(12, 15):02d}:{random.choice([0, 30]):02d}"
+    )
+    check_out = factory.LazyFunction(
+        lambda: f"{random.randint(7, 11):02d}:{random.choice([0, 30]):02d}"
+    )
     cancellation_date = factory.Faker("future_date")
     phone_number = factory.Faker("phone_number", locale="it_IT")
     website = factory.Maybe(factory.Faker("pybool"), factory.Faker("url"), "")

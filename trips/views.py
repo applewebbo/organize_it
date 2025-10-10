@@ -329,6 +329,7 @@ def stay_modify(request, pk):
     trip = stay.days.first().trip
     form = StayForm(
         trip,
+        include_city=True,
         data=request.POST or None,
         instance=stay,
     )
