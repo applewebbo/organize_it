@@ -1,7 +1,7 @@
-{% load i18n heroicons %}
+{% load i18n %}
 <div class="flex items-center">
 <label for="language-select" class="sr-only">Choose your language:</label>
-{% heroicon_mini 'language' class='hidden md:flex size-6 me-1' %}
+<i class="ph-bold ph-translate i-sm me-1"></i>
 {% get_current_language as current_language %}
 <select id="language-select"
         name="language"

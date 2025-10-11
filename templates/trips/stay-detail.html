@@ -1,11 +1,11 @@
-{% load trip_tags heroicons %}
+{% load trip_tags %}
 <div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
     <h3 id="stay-title"
         class="text-xl font-semibold text-gray-900 dark:text-white">Details for {{ stay.name }}</h3>
     <button type="button"
             class="btn btn-ghost btn-circle btn-sm"
             x-on:click="openModal = false">
-        {% heroicon_mini 'x-mark' class="size-5" %}
+        <i class="ph-bold ph-x i-md"></i>
         <span class="sr-only">Close modal</span>
     </button>
 </div>

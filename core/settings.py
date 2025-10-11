@@ -54,7 +54,6 @@ INSTALLED_APPS = [
     "django_extensions",
     "django_htmx",
     "django_tailwind_cli",
-    "heroicons",
     "template_partials.apps.SimpleAppConfig",
     "django_q",
     # INTERNAL_APP
@@ -108,7 +107,6 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
             ],
             "builtins": [
-                "heroicons.templatetags.heroicons",
                 "django_cotton.templatetags.cotton",
                 "template_partials.templatetags.partials",
             ],
