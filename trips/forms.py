@@ -331,41 +331,38 @@ class ExperienceForm(forms.ModelForm):
             "start_time": forms.TimeInput(attrs={"type": "time"}),
         }
 
-    def __init__(self, *args, include_city=False, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         layout_fields = []
-        if include_city:
-            geocode_url = reverse("trips:geocode-address")
-            name_htmx_attrs = {
-                "x-ref": "name",
-                "@input": "checkAndTrigger",
-                "hx-post": geocode_url,
-                "hx-trigger": "trigger-geocode",
-                "hx-target": "#address-results",
-                "hx-include": "[name='name'], [name='city']",
-                "hx-indicator": "#address-spinner",
-                ":class": "{ 'animate-pulse ring-2 ring-primary/60': nameFilled }",
-            }
-            city_htmx_attrs = {
-                "x-ref": "city",
-                "@input": "checkAndTrigger",
-                "hx-post": geocode_url,
-                "hx-trigger": "trigger-geocode",
-                "hx-target": "#address-results",
-                "hx-include": "[name='name'], [name='city']",
-                "hx-indicator": "#address-spinner",
-            }
-            address_htmx_attrs = {
-                "x-ref": "address",
-                ":class": "{ 'animate-pulse ring-2 ring-primary/60': addressFilled }",
-            }
-            self.fields["name"].widget.attrs.update(name_htmx_attrs)
-            self.fields["city"].widget.attrs.update(city_htmx_attrs)
-            self.fields["address"].widget.attrs.update(address_htmx_attrs)
-            layout_fields.append(Field("name", wrapper_class="sm:col-span-2"))
-            layout_fields.append(Field("city", wrapper_class="sm:col-span-2"))
-        else:
-            layout_fields.append(Field("name", wrapper_class="sm:col-span-4"))
+        geocode_url = reverse("trips:geocode-address")
+        name_htmx_attrs = {
+            "x-ref": "name",
+            "@input": "checkAndTrigger",
+            "hx-post": geocode_url,
+            "hx-trigger": "trigger-geocode",
+            "hx-target": "#address-results",
+            "hx-include": "[name='name'], [name='city']",
+            "hx-indicator": "#address-spinner",
+            ":class": "{ 'animate-pulse ring-2 ring-primary/60': nameFilled }",
+        }
+        city_htmx_attrs = {
+            "x-ref": "city",
+            "@input": "checkAndTrigger",
+            "hx-post": geocode_url,
+            "hx-trigger": "trigger-geocode",
+            "hx-target": "#address-results",
+            "hx-include": "[name='name'], [name='city']",
+            "hx-indicator": "#address-spinner",
+        }
+        address_htmx_attrs = {
+            "x-ref": "address",
+            ":class": "{ 'animate-pulse ring-2 ring-primary/60': addressFilled }",
+        }
+        self.fields["name"].widget.attrs.update(name_htmx_attrs)
+        self.fields["city"].widget.attrs.update(city_htmx_attrs)
+        self.fields["address"].widget.attrs.update(address_htmx_attrs)
+        layout_fields.append(Field("name", wrapper_class="sm:col-span-2"))
+        layout_fields.append(Field("city", wrapper_class="sm:col-span-2"))
         self.fields["type"].choices = Experience.Type.choices
         if self.instance.pk and self.instance.end_time and self.instance.start_time:
             start_time = datetime.combine(date.today(), self.instance.start_time)
@@ -470,41 +467,38 @@ class MealForm(forms.ModelForm):
             "start_time": forms.TimeInput(attrs={"type": "time"}),
         }
 
-    def __init__(self, *args, include_city=False, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         layout_fields = []
-        if include_city:
-            geocode_url = reverse("trips:geocode-address")
-            name_htmx_attrs = {
-                "x-ref": "name",
-                "@input": "checkAndTrigger",
-                "hx-post": geocode_url,
-                "hx-trigger": "trigger-geocode",
-                "hx-target": "#address-results",
-                "hx-include": "[name='name'], [name='city']",
-                "hx-indicator": "#address-spinner",
-                ":class": "{ 'animate-pulse ring-2 ring-primary/60': nameFilled }",
-            }
-            city_htmx_attrs = {
-                "x-ref": "city",
-                "@input": "checkAndTrigger",
-                "hx-post": geocode_url,
-                "hx-trigger": "trigger-geocode",
-                "hx-target": "#address-results",
-                "hx-include": "[name='name'], [name='city']",
-                "hx-indicator": "#address-spinner",
-            }
-            address_htmx_attrs = {
-                "x-ref": "address",
-                ":class": "{ 'animate-pulse ring-2 ring-primary/60': addressFilled }",
-            }
-            self.fields["name"].widget.attrs.update(name_htmx_attrs)
-            self.fields["city"].widget.attrs.update(city_htmx_attrs)
-            self.fields["address"].widget.attrs.update(address_htmx_attrs)
-            layout_fields.append(Field("name", wrapper_class="sm:col-span-2"))
-            layout_fields.append(Field("city", wrapper_class="sm:col-span-2"))
-        else:
-            layout_fields.append(Field("name", wrapper_class="sm:col-span-4"))
+        geocode_url = reverse("trips:geocode-address")
+        name_htmx_attrs = {
+            "x-ref": "name",
+            "@input": "checkAndTrigger",
+            "hx-post": geocode_url,
+            "hx-trigger": "trigger-geocode",
+            "hx-target": "#address-results",
+            "hx-include": "[name='name'], [name='city']",
+            "hx-indicator": "#address-spinner",
+            ":class": "{ 'animate-pulse ring-2 ring-primary/60': nameFilled }",
+        }
+        city_htmx_attrs = {
+            "x-ref": "city",
+            "@input": "checkAndTrigger",
+            "hx-post": geocode_url,
+            "hx-trigger": "trigger-geocode",
+            "hx-target": "#address-results",
+            "hx-include": "[name='name'], [name='city']",
+            "hx-indicator": "#address-spinner",
+        }
+        address_htmx_attrs = {
+            "x-ref": "address",
+            ":class": "{ 'animate-pulse ring-2 ring-primary/60': addressFilled }",
+        }
+        self.fields["name"].widget.attrs.update(name_htmx_attrs)
+        self.fields["city"].widget.attrs.update(city_htmx_attrs)
+        self.fields["address"].widget.attrs.update(address_htmx_attrs)
+        layout_fields.append(Field("name", wrapper_class="sm:col-span-2"))
+        layout_fields.append(Field("city", wrapper_class="sm:col-span-2"))
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.fields["type"].choices = Meal.Type.choices
@@ -610,41 +604,38 @@ class StayForm(forms.ModelForm):
             "address": _("Address"),
         }
 
-    def __init__(self, trip, include_city=False, *args, **kwargs):
+    def __init__(self, trip, *args, **kwargs):
         super().__init__(*args, **kwargs)
         layout_fields = []
-        if include_city:
-            geocode_url = reverse("trips:geocode-address")
-            name_htmx_attrs = {
-                "x-ref": "name",
-                "@input": "checkAndTrigger",
-                "hx-post": geocode_url,
-                "hx-trigger": "trigger-geocode",
-                "hx-target": "#address-results",
-                "hx-include": "[name='name'], [name='city']",
-                "hx-indicator": "#address-spinner",
-                ":class": "{ 'animate-pulse ring-2 ring-primary/60': nameFilled }",
-            }
-            city_htmx_attrs = {
-                "x-ref": "city",
-                "@input": "checkAndTrigger",
-                "hx-post": geocode_url,
-                "hx-trigger": "trigger-geocode",
-                "hx-target": "#address-results",
-                "hx-include": "[name='name'], [name='city']",
-                "hx-indicator": "#address-spinner",
-            }
-            address_htmx_attrs = {
-                "x-ref": "address",
-                ":class": "{ 'animate-pulse ring-2 ring-primary/60': addressFilled }",
-            }
-            self.fields["name"].widget.attrs.update(name_htmx_attrs)
-            self.fields["city"].widget.attrs.update(city_htmx_attrs)
-            self.fields["address"].widget.attrs.update(address_htmx_attrs)
-            layout_fields.append(Field("name", wrapper_class="sm:col-span-2"))
-            layout_fields.append(Field("city", wrapper_class="sm:col-span-2"))
-        else:
-            layout_fields.append(Field("name", wrapper_class="sm:col-span-4"))
+        geocode_url = reverse("trips:geocode-address")
+        name_htmx_attrs = {
+            "x-ref": "name",
+            "@input": "checkAndTrigger",
+            "hx-post": geocode_url,
+            "hx-trigger": "trigger-geocode",
+            "hx-target": "#address-results",
+            "hx-include": "[name='name'], [name='city']",
+            "hx-indicator": "#address-spinner",
+            ":class": "{ 'animate-pulse ring-2 ring-primary/60': nameFilled }",
+        }
+        city_htmx_attrs = {
+            "x-ref": "city",
+            "@input": "checkAndTrigger",
+            "hx-post": geocode_url,
+            "hx-trigger": "trigger-geocode",
+            "hx-target": "#address-results",
+            "hx-include": "[name='name'], [name='city']",
+            "hx-indicator": "#address-spinner",
+        }
+        address_htmx_attrs = {
+            "x-ref": "address",
+            ":class": "{ 'animate-pulse ring-2 ring-primary/60': addressFilled }",
+        }
+        self.fields["name"].widget.attrs.update(name_htmx_attrs)
+        self.fields["city"].widget.attrs.update(city_htmx_attrs)
+        self.fields["address"].widget.attrs.update(address_htmx_attrs)
+        layout_fields.append(Field("name", wrapper_class="sm:col-span-2"))
+        layout_fields.append(Field("city", wrapper_class="sm:col-span-2"))
         self.fields["apply_to_days"].queryset = Day.objects.filter(trip=trip)
         self.fields["apply_to_days"].label_from_instance = (
             lambda obj: f"{_('Day')} {obj.number}"
