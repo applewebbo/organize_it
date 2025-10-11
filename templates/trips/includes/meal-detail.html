@@ -1,14 +1,14 @@
 {% load i18n %}
 <ul class="leading-10">
     <li class="flex gap-2 items-center">
-        {% heroicon_outline 'map-pin' class='size-6' %}{{ event.address }}
+        <i class="ph-bold ph-map-pin i-md text-base-content/60"></i>{{ event.address }}
     </li>
     <li class="flex gap-2 items-center">
-        {% heroicon_outline 'clock' class='size-6' %}{{ event.start_time|time:"H:i" }}&nbsp;-&nbsp;{{ event.end_time|time:"H:i" }}
+        <i class="ph-bold ph-clock i-md text-base-content/60"></i>{{ event.start_time|time:"H:i" }}&nbsp;-&nbsp;{{ event.end_time|time:"H:i" }}
     </li>
     {% if event.website %}
         <li class="flex gap-2 items-center">
-            {% heroicon_outline 'globe-alt' class='size-6' %}<a href="{{ event.website }}" class="link">{{ event.website }}</a>
+            <i class="ph-bold ph-globe i-md text-base-content/60"></i><a href="{{ event.website }}" class="link">{{ event.website }}</a>
         </li>
     {% endif %}
 </ul>

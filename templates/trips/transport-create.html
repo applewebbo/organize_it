@@ -34,7 +34,7 @@
                        hx-get="{% url 'trips:event-pair' exp.pk day.pk %}"
                        hx-target="#dialog">
                         {{ exp.name }}
-                        {% heroicon_mini 'plus-circle' class="size-4" %}
+                        <i class="ph-bold ph-plus-circle i-sm"></i>
                     </a>
                 </li>
             {% endfor %}

@@ -1,19 +1,19 @@
 {% load i18n %}
 <ul class="leading-10">
     <li class="flex gap-2 items-center">
-        <i class="text-xl ph-bold ph-map-pin text-base-content/60"></i>{{ event.address }}
+        <i class="ph-bold ph-map-pin i-md text-base-content/60"></i>{{ event.address }}
     </li>
     <li class="flex gap-2 items-center">
-        <i class="text-xl ph-bold ph-clock text-base-content/60"></i>{{ event.start_time|time:"H:i" }}&nbsp;-&nbsp;{{ event.end_time|time:"H:i" }}
+        <i class="ph-bold ph-clock i-md text-base-content/60"></i>{{ event.start_time|time:"H:i" }}&nbsp;-&nbsp;{{ event.end_time|time:"H:i" }}
     </li>
     {% if event.website %}
         <li class="flex gap-2 items-center">
-            <i class="text-xl ph-bold ph-browser text-base-content/60"></i><a href="{{ event.website }}" class="link">{{ event.website|truncatechars:38 }}</a>
+            <i class="ph-bold ph-browser i-md text-base-content/60"></i><a href="{{ event.website }}" class="link">{{ event.website|truncatechars:38 }}</a>
         </li>
     {% endif %}
     {% if event.phone_number %}
         <li class="flex gap-2 items-center">
-            <i class="text-xl ph-bold ph-phone text-base-content/60"></i>{{ event.phone_number }}
+            <i class="ph-bold ph-phone i-md text-base-content/60"></i>{{ event.phone_number }}
         </li>
     {% endif %}
 </ul>
