@@ -1,20 +1,20 @@
-{% load i18n heroicons trip_tags %}
+{% load i18n trip_tags %}
 <div class="container py-4 px-0 mx-auto xl:px-6">
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {% if map %}
             <div class="map-container">{{ map|safe }}</div>
         {% else %}
             <div class="my-4 md:my-5 alert alert-info alert-soft">
-                {% heroicon_mini "information-circle" class="stroke-2 size-5" %}
+                <i class="ph-bold ph-info i-md text-info"></i>
                 {% trans 'No events to display on a map for this day' %}
             </div>
         {% endif %}
         <div class="hidden lg:block">
             <ul class="text-lg list">
-                {% if locations.day %}
+                {% if locations.stay %}
                 <li class="flex gap-2 items-center py-1 mb-2 list-row">
                     <div class="flex gap-2 items-center grow">
-                        {% heroicon_mini "home-modern" class="stroke-1 size-4 text-sky-500 sm:size-5" %}
+                        <i class="text-xl ph-bold ph-bed i-sm text-sky-500"></i>
                         <a hx-get="{% url 'trips:stay-detail' locations.stay.pk %}"
                             hx-target="#dialog"
                             hx-swap="innerHTML"
@@ -23,8 +23,8 @@
                         {% if locations.first_day %}
                             <span class="badge badge-sm badge-outline badge-success">{{ locations.stay.check_in|time:"H:i" }}</span>
                         {% endif %}
-                        {% if locations.next_day_stay %}
-                            <span class="badge badge-sm badge-soft badge-error">{{ locations.stay.check_out|time:"H:i" }}</span>
+                        {% if locations.next_day_stay or locations.last_day %}
+                            <span class="badge badge-sm badge-outline badge-error">{{ locations.stay.check_out|time:"H:i" }}</span>
                         {% endif %}
                     </div>
                     <button class="relative btn btn-xs btn-outline ms-3"
@@ -32,7 +32,7 @@
                             @click="$dispatch('open-modal'); document.activeElement.blur()"
                             hx-target="#dialog"
                             hx-swap="innerHTML">
-                        {% heroicon_mini 'paper-clip' class="size-4" %}
+                        <i class="ph-bold ph-paperclip i-sm"></i>
                         <span class="absolute size-2.5 text-xs font-bold text-white {% if event.notes %}bg-slate-400 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
                     </button>
                 </li>
@@ -42,7 +42,7 @@
                 {% endfor %}
                 {% if locations.next_day_stay %}
                     <li class="flex gap-2 items-center py-1 mb-2 list-row">
-                        {% heroicon_mini "home-modern" class="stroke-1 size-4 text-sky-500 sm:size-5" %}
+                        <i class="text-xl ph-bold ph-bed i-sm text-sky-500"></i>
                         <a hx-get="{% url 'trips:stay-detail' locations.next_day_stay.pk %}"
                             hx-target="#dialog"
                             hx-swap="innerHTML"
@@ -59,4 +59,4 @@
         hx-target="#day-{{ day.pk }}"
         hx-swap="outerHTML"
         hx-swap-oob="true"
-        class="btn btn-xs me-2 sm:btn-md">{% heroicon_mini "queue-list" class="size-4 sm:size-5" %}</button>
+        class="btn btn-xs me-2 sm:btn-md"><i class="ph-bold ph-list-dashes i-sm sm:i-lg"></i></button>
