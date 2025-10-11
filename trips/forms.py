@@ -586,13 +586,13 @@ class StayForm(forms.ModelForm):
         ]
         formfield_callback = urlfields_assume_https
         widgets = {
-            "name": forms.TextInput(attrs={"placeholder": "Name"}),
-            "website": forms.TextInput(attrs={"placeholder": "Website"}),
-            "address": forms.TextInput(attrs={"placeholder": "Address"}),
+            "name": forms.TextInput(attrs={"placeholder": _("Name")}),
+            "website": forms.TextInput(attrs={"placeholder": _("Website")}),
+            "address": forms.TextInput(attrs={"placeholder": _("Address")}),
             "check_in": forms.TimeInput(attrs={"type": "time"}),
             "check_out": forms.TimeInput(attrs={"type": "time"}),
             "cancellation_date": forms.DateInput(attrs={"type": "date"}),
-            "phone_number": forms.TextInput(attrs={"placeholder": "Phone Number"}),
+            "phone_number": forms.TextInput(attrs={"placeholder": _("Phone number")}),
         }
         labels = {
             "name": _("Name"),
