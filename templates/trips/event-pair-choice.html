@@ -22,7 +22,7 @@
                    hx-get="{% url 'trips:event-pair' event.pk day.pk %}"
                    hx-target="#dialog"
                    class="flex items-center btn btn-soft btn-primary">
-                    {% heroicon_solid 'plus-circle' class='size-4' %}
+                    <i class="ph-bold ph-plus-circle i-sm"></i>
                     Day&nbsp;{{ day.number }}
                 </a>
             </li>
