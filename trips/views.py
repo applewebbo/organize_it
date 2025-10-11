@@ -875,10 +875,12 @@ class DayMapView(View):
         next_day_stay = None
         if next_day and next_day.stay and next_day.stay != stay:
             next_day_stay = next_day.stay
+        is_last_day = not next_day
         locations = {
             "stay": stay,
             "events": events,
             "next_day_stay": next_day_stay,
+            "last_day": is_last_day,
         }
         if not (prev_day and prev_day.stay and prev_day.stay == stay):
             locations["first_day"] = True

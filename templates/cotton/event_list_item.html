@@ -1,5 +1,3 @@
-{% load heroicons %}
-
 <li class="flex gap-2 items-center py-1 mb-2 list-row">
     <div class="flex gap-2 items-center grow">
         {% if icon == 'fork-knife' %}
@@ -18,7 +16,7 @@
         @click="$dispatch('open-modal'); document.activeElement.blur()"
         hx-target="#dialog"
         hx-swap="innerHTML">
-        {% heroicon_mini 'paper-clip' class="size-4" %}
+        <i class="ph-bold ph-paperclip i-sm"></i>
         <span class="absolute size-2.5 text-xs font-bold text-white {% if event.notes %}bg-slate-400 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
     </button>
 </li>
