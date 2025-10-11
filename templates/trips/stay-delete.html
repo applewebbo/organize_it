@@ -1,4 +1,4 @@
-{% load crispy_forms_tags heroicons %}
+{% load crispy_forms_tags %}
 <h3 id="stay-title"
     class="text-xl font-semibold text-gray-900 dark:text-white"
     hx-swap-oob="true">Delete Stay:&nbsp;{{ stay.name }}</h3>
@@ -7,8 +7,8 @@
         You are deleting <strong>{{ stay.name }}</strong>. This is a permanent deletion, are you sure?
     </p>
     {% if other_stays %}
-        <div role="alert" class="flex py-4 alert alert-info alert-outline">
-            <div>{% heroicon_solid 'information-circle' class="size-5" %}</div>
+        <div role="alert" class="flex py-4 mt-3 alert alert-info alert-soft">
+            <div><i class="ph-bold ph-info i-sm"></i></div>
             {% if show_dropdown %}
                 <div class="flex items-center grow">
                     <label for="new_stay" class="block text-sm font-medium grow">Select stay to reassign days to:</label>

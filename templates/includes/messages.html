@@ -1,4 +1,4 @@
-{% load heroicons i18n %}
+{% load i18n %}
 <div class="toast toast-top toast-center">
     {% if messages %}
         {% for message in messages %}
@@ -8,7 +8,7 @@
                  x-data="{ show: true }"
                  x-show="show"
                  x-init="setTimeout(() => show = false, 4000)">
-                    {% heroicon_solid 'information-circle' class='size-6' %}
+                    <i class="ph-bold ph-info i-md"></i>
                 <span class="sr-only">Info</span>
                 <div class="flex gap-6 items-center text-sm font-medium">
                     {{ message|safe }}

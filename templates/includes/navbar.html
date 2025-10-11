@@ -1,4 +1,4 @@
-{% load static i18n heroicons %}
+{% load static i18n %}
 <div x-data="{ open: false}">
     <nav nav class="bg-white border-slate-200 dark:bg-slate-900">
         <div class="flex flex-wrap items-center p-4 mx-auto max-w-screen-xl">
@@ -26,8 +26,8 @@
                         aria-expanded="false"
                         x-on:click="open = ! open">
                     <span class="sr-only">{% trans 'Open main menu' %}</span>
-                    {% heroicon_outline 'bars-3' class='size-6' x_show='!open' aria_hidden='true' %}
-                    {% heroicon_outline 'x-mark' class='size-6' x_show='open' aria_hidden='true' %}
+                    <i class="ph-bold ph-list i-md" x-show='!open' aria-hidden='true'></i>
+                    <i class="ph-bold ph-x i-md" x-show='open' aria-hidden='true'></i>
                 </button>
             </div>
             <div class="hidden justify-between items-center w-full md:flex md:order-1 md:w-auto md:me-8"
