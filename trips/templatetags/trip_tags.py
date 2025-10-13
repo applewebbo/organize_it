@@ -11,31 +11,26 @@ register = template.Library()
 
 @register.filter
 def format_opening_hours(hours_data):
-    """
-    Formats opening hours from Google Places API by grouping consecutive days with the same hours,
-    with the week starting on Monday.
-    """
     if not isinstance(hours_data, dict):
         return ""
 
-    if "periods" not in hours_data:
-        descriptions = hours_data.get("weekdayDescriptions", [])
-        if not descriptions:
-            return ""
-        list_items = format_html_join("", "<li>{}</li>", ((d,) for d in descriptions))
-        return format_html('<ul class="list-none p-0 m-0">{}</ul>', list_items)
+    day_map_from_name = {
+        "monday": 1,
+        "tuesday": 2,
+        "wednesday": 3,
+        "thursday": 4,
+        "friday": 5,
+        "saturday": 6,
+        "sunday": 0,
+    }
 
     day_names = {0: "Dom", 1: "Lun", 2: "Mar", 3: "Mer", 4: "Gio", 5: "Ven", 6: "Sab"}
     hours_by_day = {i: "Chiuso" for i in range(7)}
 
-    for period in hours_data.get("periods", []):
-        if "open" in period and "close" in period:
-            day = period["open"]["day"]
-            open_time = f"{period['open']['hour']:02d}:{period['open']['minute']:02d}"
-            close_time = (
-                f"{period['close']['hour']:02d}:{period['close']['minute']:02d}"
-            )
-            hours_by_day[day] = f"{open_time} – {close_time}"
+    for day_name, times in hours_data.items():
+        day_index = day_map_from_name.get(day_name)
+        if day_index is not None and times.get("open") and times.get("close"):
+            hours_by_day[day_index] = f"{times['open']} – {times['close']}"
 
     output_lines = []
     week_order = [1, 2, 3, 4, 5, 6, 0]  # Monday to Sunday

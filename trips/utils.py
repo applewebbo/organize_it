@@ -319,3 +319,35 @@ def create_day_map(events_with_location, stay, next_day_stay):
         ).add_to(m)
 
     return m._repr_html_()
+
+
+def convert_google_opening_hours(google_hours):
+    if not google_hours or "periods" not in google_hours:
+        return None
+
+    custom_hours = {}
+    day_map = {
+        0: "sunday",
+        1: "monday",
+        2: "tuesday",
+        3: "wednesday",
+        4: "thursday",
+        5: "friday",
+        6: "saturday",
+    }
+
+    for period in google_hours.get("periods", []):
+        if "open" in period and "close" in period:
+            day_of_week_int = period["open"]["day"]
+            day_name = day_map.get(day_of_week_int)
+            if day_name:
+                open_minute = period["open"].get("minute", 0)
+                close_minute = period["close"].get("minute", 0)
+                open_time = f"{period['open']['hour']:02d}:{open_minute:02d}"
+                close_time = f"{period['close']['hour']:02d}:{close_minute:02d}"
+
+                custom_hours[day_name] = {
+                    "open": open_time,
+                    "close": close_time,
+                }
+    return custom_hours if custom_hours else None
