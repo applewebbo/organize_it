@@ -2,7 +2,7 @@ from datetime import date, datetime, timedelta
 
 import geocoder
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import HTML, Div, Field, Layout
+from crispy_forms.layout import HTML, Div, Field, Fieldset, Layout
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -369,18 +369,70 @@ class ExperienceForm(forms.ModelForm):
             end_time = datetime.combine(date.today(), self.instance.end_time)
             duration = (end_time - start_time).total_seconds() // 60
             self.initial["duration"] = int(duration)
+
+        # Opening hours dynamic fields
+        days = [
+            ("monday", _("Monday")),
+            ("tuesday", _("Tuesday")),
+            ("wednesday", _("Wednesday")),
+            ("thursday", _("Thursday")),
+            ("friday", _("Friday")),
+            ("saturday", _("Saturday")),
+            ("sunday", _("Sunday")),
+        ]
+        for key, _label in days:
+            self.fields[f"{key}_closed"] = forms.BooleanField(
+                required=False,
+                label=_("Closed"),
+            )
+            self.fields[f"{key}_open"] = forms.TimeField(
+                required=False,
+                label="",
+                widget=forms.TimeInput(
+                    attrs={"type": "time", "placeholder": _("Open")}
+                ),
+            )
+            self.fields[f"{key}_close"] = forms.TimeField(
+                required=False,
+                label="",
+                widget=forms.TimeInput(
+                    attrs={"type": "time", "placeholder": _("Close")}
+                ),
+            )
+
+        # Defaults: assume closed for all days
+        for key, _label in days:
+            self.initial[f"{key}_closed"] = True
+            self.fields[f"{key}_closed"].initial = True
+
+        # Populate initial from instance.opening_hours
+        oh = getattr(self.instance, "opening_hours", None)
+        if isinstance(oh, dict):
+            for key, _label in days:
+                day_data = oh.get(key)
+                if day_data and day_data.get("open") and day_data.get("close"):
+                    # Mark as open and set times
+                    self.initial[f"{key}_closed"] = False
+                    self.fields[f"{key}_closed"].initial = False
+                    self.initial[f"{key}_open"] = day_data.get("open")
+                    self.initial[f"{key}_close"] = day_data.get("close")
+        elif oh in ("", None):
+            # Special case: empty string means not configured yet -> all checkboxes unchecked and inputs visible
+            for key, _label in days:
+                self.initial[f"{key}_closed"] = False
+                self.fields[f"{key}_closed"].initial = False
+
         self.helper = FormHelper()
         self.helper.form_tag = False
         layout_fields += [
             Div(
                 Field("address"),
                 HTML("""
-                    <span id="address-spinner" class="absolute right-2 top-1/2 -translate-y-1/2">
-                        <span class="loading loading-bars loading-lg text-primary mt-3.5 htmx-indicator"></span>
+                    <span id=\"address-spinner\" class=\"absolute right-2 top-1/2 -translate-y-1/2\">
+                        <span class=\"loading loading-bars loading-lg text-primary mt-3.5 htmx-indicator\"></span>
                     </span>
                     """),
                 css_class="relative sm:col-span-4",
-                # css_id="address-results"
             ),
             HTML(ADDRESS_RESULTS_HTML),
             Field(
@@ -398,16 +450,75 @@ class ExperienceForm(forms.ModelForm):
             Field("type", css_class="select select-primary"),
             Div(id="overlap-warning", css_class="sm:col-span-4"),
             Field("website", wrapper_class="sm:col-span-4"),
+            HTML(
+                """
+            <h2 class=\"text-lg font-semibold mt-4 mb-2\">%s</h2>
+            """
+                % _("Opening hours")
+            ),
         ]
+        # Add per-day fields to layout using Fieldset for legend
+        for key, label in days:
+            if self.is_bound:
+                bound_val = self.data.get(f"{key}_closed")
+                is_checked = str(bound_val).lower() in {"on", "true", "1", "checked"}
+            else:
+                is_checked = bool(self.initial.get(f"{key}_closed"))
+            checked_attr = ' checked="checked"' if is_checked else ""
+            closed_txt = _("Closed")
+
+            layout_fields += [
+                Div(
+                    Fieldset(
+                        label,
+                        HTML(
+                            f'<label for="id_{key}_closed" class="label"><input x-model="closed" type="checkbox" name="{key}_closed" id="id_{key}_closed" {checked_attr}>{closed_txt}</label>'
+                        ),
+                        Div(
+                            Field(f"{key}_open"),
+                            Field(f"{key}_close"),
+                            css_class="grid grid-cols-2 gap-2",
+                            **{"x-show": "!closed", "x-cloak": ""},
+                        ),
+                    ),
+                    **{"x-data": f"{{ closed: {str(is_checked).lower()} }}"},
+                    css_class="sm:col-span-4",
+                )
+            ]
         self.helper.layout = Layout(*layout_fields)
 
     def save(self, commit=True):
         instance = super().save(commit=False)
         # convert duration to end_time
         duration = self.cleaned_data.get("duration")
+
         start_time = datetime.combine(date.today(), self.cleaned_data["start_time"])
         end_time = start_time + timedelta(minutes=int(duration))
         instance.end_time = end_time.time()
+
+        # Build opening_hours JSON from form fields
+        opening_hours = {}
+        days = [
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday",
+        ]
+        for key in days:
+            if self.cleaned_data.get(f"{key}_closed"):
+                continue
+            open_v = self.cleaned_data.get(f"{key}_open")
+            close_v = self.cleaned_data.get(f"{key}_close")
+            if open_v and close_v:
+                opening_hours[key] = {
+                    "open": open_v.strftime("%H:%M"),
+                    "close": close_v.strftime("%H:%M"),
+                }
+        instance.opening_hours = opening_hours or None
+
         if commit:  # pragma: no cover
             instance.save()
         return instance
@@ -533,7 +644,90 @@ class MealForm(forms.ModelForm):
             Field("type", css_class="select select-primary"),
             Div(id="overlap-warning", css_class="sm:col-span-4"),
             Field("website", wrapper_class="sm:col-span-4"),
+            HTML(
+                """
+            <h2 class=\"text-lg font-semibold mt-4 mb-2\">%s</h2>
+            """
+                % _("Opening hours")
+            ),
         ]
+        # Opening hours dynamic fields
+        days = [
+            ("monday", _("Monday")),
+            ("tuesday", _("Tuesday")),
+            ("wednesday", _("Wednesday")),
+            ("thursday", _("Thursday")),
+            ("friday", _("Friday")),
+            ("saturday", _("Saturday")),
+            ("sunday", _("Sunday")),
+        ]
+        for key, _label in days:
+            self.fields[f"{key}_closed"] = forms.BooleanField(
+                required=False,
+                label=_("Closed"),
+            )
+            self.fields[f"{key}_open"] = forms.TimeField(
+                required=False,
+                label="",
+                widget=forms.TimeInput(
+                    attrs={"type": "time", "placeholder": _("Open")}
+                ),
+            )
+            self.fields[f"{key}_close"] = forms.TimeField(
+                required=False,
+                label="",
+                widget=forms.TimeInput(
+                    attrs={"type": "time", "placeholder": _("Close")}
+                ),
+            )
+        # Defaults: assume closed for all days
+        for key, _label in days:
+            self.initial[f"{key}_closed"] = True
+            self.fields[f"{key}_closed"].initial = True
+        # Populate initial from instance.opening_hours
+        oh = getattr(self.instance, "opening_hours", None)
+        if isinstance(oh, dict):
+            for key, _label in days:
+                day_data = oh.get(key)
+                if day_data and day_data.get("open") and day_data.get("close"):
+                    # Mark as open and set times
+                    self.initial[f"{key}_closed"] = False
+                    self.fields[f"{key}_closed"].initial = False
+                    self.initial[f"{key}_open"] = day_data.get("open")
+                    self.initial[f"{key}_close"] = day_data.get("close")
+        elif oh in ("", None):
+            # Empty or None -> all checkboxes unchecked, inputs visible (no times preset)
+            for key, _label in days:
+                self.initial[f"{key}_closed"] = False
+                self.fields[f"{key}_closed"].initial = False
+        # Add per-day fields to layout using Fieldset with Alpine bindings
+        for key, label in days:
+            if self.is_bound:
+                bound_val = self.data.get(f"{key}_closed")
+                is_checked = str(bound_val).lower() in {"on", "true", "1", "checked"}
+            else:
+                is_checked = bool(self.initial.get(f"{key}_closed"))
+            checked_attr = ' checked="checked"' if is_checked else ""
+            closed_txt = _("Closed")
+            layout_fields += [
+                Div(
+                    Fieldset(
+                        label,
+                        HTML(
+                            f'<label for="id_{key}_closed" class="label"><input x-model="closed" type="checkbox" name="{key}_closed" id="id_{key}_closed" {checked_attr}>{closed_txt}</label>'
+                        ),
+                        Div(
+                            Field(f"{key}_open"),
+                            Field(f"{key}_close"),
+                            css_class="grid grid-cols-2 gap-2",
+                            **{"x-show": "!closed", "x-cloak": ""},
+                        ),
+                    ),
+                    **{"x-data": f"{{ closed: {str(is_checked).lower()} }}"},
+                    css_class="sm:col-span-4",
+                )
+            ]
+
         self.helper.layout = Layout(*layout_fields)
 
     def save(self, commit=True):
@@ -543,6 +737,28 @@ class MealForm(forms.ModelForm):
         start_time = datetime.combine(date.today(), self.cleaned_data["start_time"])
         end_time = start_time + timedelta(minutes=int(duration))
         instance.end_time = end_time.time()
+        # Build opening_hours JSON from form fields
+        opening_hours = {}
+        days = [
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday",
+        ]
+        for key in days:
+            if self.cleaned_data.get(f"{key}_closed"):
+                continue
+            open_v = self.cleaned_data.get(f"{key}_open")
+            close_v = self.cleaned_data.get(f"{key}_close")
+            if open_v and close_v:
+                opening_hours[key] = {
+                    "open": open_v.strftime("%H:%M"),
+                    "close": close_v.strftime("%H:%M"),
+                }
+        instance.opening_hours = opening_hours or None
         if commit:  # pragma: no cover
             instance.save()
         return instance
