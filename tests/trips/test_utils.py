@@ -1,3 +1,4 @@
+import time as time_module
 from datetime import date, time
 from unittest.mock import MagicMock, patch
 
@@ -9,12 +10,52 @@ from tests.test import TestCase
 from tests.trips.factories import EventFactory, MealFactory, StayFactory, TripFactory
 from trips.utils import (
     annotate_event_overlaps,
+    convert_google_opening_hours,
     create_day_map,
     generate_cache_key,
     geocode_location,
     get_trips,
+    rate_limit_check,
     select_best_result,
 )
+
+
+class TestRateLimitCheck(TestCase):
+    @patch("trips.utils.time.sleep")
+    @patch("trips.utils.cache.get")
+    @patch("trips.utils.cache.set")
+    def test_rate_limit_check_no_wait(self, mock_cache_set, mock_cache_get, mock_sleep):
+        mock_cache_get.return_value = (
+            time_module.time() - 2
+        )  # Last request was 2 seconds ago
+        rate_limit_check()
+        mock_sleep.assert_not_called()
+        mock_cache_set.assert_called_once()
+
+    @patch("trips.utils.time.sleep")
+    @patch("trips.utils.cache.get")
+    @patch("trips.utils.cache.set")
+    def test_rate_limit_check_with_wait(
+        self, mock_cache_set, mock_cache_get, mock_sleep
+    ):
+        mock_cache_get.return_value = (
+            time_module.time() - 0.5
+        )  # Last request was 0.5 seconds ago
+        rate_limit_check()
+        mock_sleep.assert_called_once_with(pytest.approx(0.5, abs=0.01))
+        mock_cache_set.assert_called_once()
+
+    @patch("trips.utils.time.sleep")
+    @patch("trips.utils.cache.get")
+    @patch("trips.utils.cache.set")
+    def test_rate_limit_check_first_request(
+        self, mock_cache_set, mock_cache_get, mock_sleep
+    ):
+        mock_cache_get.return_value = 0  # No previous request
+        rate_limit_check()
+        mock_sleep.assert_not_called()
+        mock_cache_set.assert_called_once()
+
 
 pytestmark = pytest.mark.django_db
 User = get_user_model()
@@ -307,3 +348,57 @@ class TestCreateDayMap(TestCase):
         map_html = create_day_map(day.events.all(), day.stay, None)
         self.assertIn(event.name, map_html)
         self.assertNotIn(stay_no_location.name, map_html)
+
+
+class TestConvertGoogleOpeningHours(TestCase):
+    def test_convert_google_opening_hours_valid_data(self):
+        google_hours = {
+            "periods": [
+                {
+                    "open": {"day": 1, "hour": 9, "minute": 0},
+                    "close": {"day": 1, "hour": 17, "minute": 0},
+                },
+                {
+                    "open": {"day": 2, "hour": 10, "minute": 30},
+                    "close": {"day": 2, "hour": 18, "minute": 30},
+                },
+            ]
+        }
+        expected_hours = {
+            "monday": {"open": "09:00", "close": "17:00"},
+            "tuesday": {"open": "10:30", "close": "18:30"},
+        }
+        self.assertEqual(convert_google_opening_hours(google_hours), expected_hours)
+
+    def test_convert_google_opening_hours_empty_input(self):
+        self.assertIsNone(convert_google_opening_hours(None))
+        self.assertIsNone(convert_google_opening_hours({}))
+        self.assertIsNone(convert_google_opening_hours({"periods": []}))
+
+    def test_convert_google_opening_hours_missing_keys(self):
+        google_hours = {
+            "periods": [
+                {"open": {"day": 1, "hour": 9}},  # Missing close
+                {"close": {"day": 2, "hour": 18}},  # Missing open
+            ]
+        }
+        self.assertIsNone(convert_google_opening_hours(google_hours))
+
+    def test_convert_google_opening_hours_no_minutes(self):
+        google_hours = {
+            "periods": [
+                {"open": {"day": 1, "hour": 9}, "close": {"day": 1, "hour": 17}},
+            ]
+        }
+        expected_hours = {
+            "monday": {"open": "09:00", "close": "17:00"},
+        }
+        self.assertEqual(convert_google_opening_hours(google_hours), expected_hours)
+
+    def test_convert_google_opening_hours_unmapped_day(self):
+        google_hours = {
+            "periods": [
+                {"open": {"day": 99, "hour": 9}, "close": {"day": 99, "hour": 17}},
+            ]
+        }
+        self.assertIsNone(convert_google_opening_hours(google_hours))
