@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n trip_tags %}
 <ul class="leading-10">
     <li class="flex gap-2 items-center">
         <i class="ph-bold ph-map-pin i-md text-base-content/60"></i>{{ event.address }}
@@ -16,4 +16,10 @@
             <i class="ph-bold ph-phone i-md text-base-content/60"></i>{{ event.phone_number }}
         </li>
     {% endif %}
+    {% if event.opening_hours %}
+        <li class="flex gap-2 items-center">
+            <i class="ph-bold ph-door-open i-md text-base-content/60"></i>{{ event.opening_hours|format_opening_hours }}
+        </li>
+    {% endif %}
+
 </ul>
