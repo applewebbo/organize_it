@@ -30,6 +30,7 @@ from trips.forms import (
 from trips.models import Day, Event, Stay, Trip
 from trips.utils import (
     annotate_event_overlaps,
+    convert_google_opening_hours,
     create_day_map,
     geocode_location,
     get_trips,
@@ -956,7 +957,8 @@ def enrich_event(request, event_id):
 
         event.website = data.get("websiteUri", "")
         event.phone_number = data.get("internationalPhoneNumber", "")
-        event.opening_hours = data.get("regularOpeningHours", None)
+        google_opening_hours = data.get("regularOpeningHours", None)
+        event.opening_hours = convert_google_opening_hours(google_opening_hours)
         event.save()
 
         messages.success(request, _("Event enriched successfully!"))
