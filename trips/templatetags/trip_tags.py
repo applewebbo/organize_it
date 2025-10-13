@@ -14,6 +14,9 @@ def format_opening_hours(hours_data):
     if not isinstance(hours_data, dict):
         return ""
 
+    if not hours_data:
+        return ""
+
     day_map_from_name = {
         "monday": 1,
         "tuesday": 2,
@@ -58,9 +61,6 @@ def format_opening_hours(hours_data):
             format_html("<strong>{}:</strong> {}", day_range_str, current_hours)
         )
         i = j + 1
-
-    if not output_lines:
-        return ""
 
     list_items = format_html_join("", "<li>{}</li>", ((line,) for line in output_lines))
     return format_html(
