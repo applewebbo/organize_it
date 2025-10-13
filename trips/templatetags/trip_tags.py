@@ -2,10 +2,75 @@ import re
 
 from django import template
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.html import format_html, format_html_join
 
 from trips.data.phone_prefixes import ITALIAN_PREFIXES
 
 register = template.Library()
+
+
+@register.filter
+def format_opening_hours(hours_data):
+    """
+    Formats opening hours from Google Places API by grouping consecutive days with the same hours,
+    with the week starting on Monday.
+    """
+    if not isinstance(hours_data, dict):
+        return ""
+
+    if "periods" not in hours_data:
+        descriptions = hours_data.get("weekdayDescriptions", [])
+        if not descriptions:
+            return ""
+        list_items = format_html_join("", "<li>{}</li>", ((d,) for d in descriptions))
+        return format_html('<ul class="list-none p-0 m-0">{}</ul>', list_items)
+
+    day_names = {0: "Dom", 1: "Lun", 2: "Mar", 3: "Mer", 4: "Gio", 5: "Ven", 6: "Sab"}
+    hours_by_day = {i: "Chiuso" for i in range(7)}
+
+    for period in hours_data.get("periods", []):
+        if "open" in period and "close" in period:
+            day = period["open"]["day"]
+            open_time = f"{period['open']['hour']:02d}:{period['open']['minute']:02d}"
+            close_time = (
+                f"{period['close']['hour']:02d}:{period['close']['minute']:02d}"
+            )
+            hours_by_day[day] = f"{open_time} – {close_time}"
+
+    output_lines = []
+    week_order = [1, 2, 3, 4, 5, 6, 0]  # Monday to Sunday
+
+    i = 0
+    while i < 7:
+        start_of_week_index = i
+        google_day_index = week_order[start_of_week_index]
+        current_hours = hours_by_day[google_day_index]
+
+        j = i
+        while j + 1 < 7 and hours_by_day[week_order[j + 1]] == current_hours:
+            j += 1
+        end_of_week_index = j
+
+        start_day_name = day_names[week_order[start_of_week_index]]
+        end_day_name = day_names[week_order[end_of_week_index]]
+
+        if start_of_week_index == end_of_week_index:
+            day_range_str = start_day_name
+        else:
+            day_range_str = f"{start_day_name}-{end_day_name}"
+
+        output_lines.append(
+            format_html("<strong>{}:</strong> {}", day_range_str, current_hours)
+        )
+        i = j + 1
+
+    if not output_lines:
+        return ""
+
+    list_items = format_html_join("", "<li>{}</li>", ((line,) for line in output_lines))
+    return format_html(
+        '<ul class="list-none p-0 m-0 leading-normal">{}</ul>', list_items
+    )
 
 
 @register.filter
