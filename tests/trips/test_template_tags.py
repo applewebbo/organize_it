@@ -5,6 +5,8 @@ from trips.templatetags.trip_tags import (
     event_bg_color,
     event_border_color,
     event_icon,
+    event_icon_color,
+    format_opening_hours,
     has_different_stay,
     is_first_day_of_stay,
     is_first_day_of_trip,
@@ -171,6 +173,20 @@ class TestEventFormatting:
         event = EventFactory(category=category)
         assert event_border_color(event) == expected_class
 
+    @pytest.mark.parametrize(
+        "category,expected_class",
+        [
+            (1, "text-tr-blue-700 dark:text-tr-blue-300"),
+            (2, "text-exp-green-700 dark:text-exp-green-300"),
+            (3, "text-meal-yellow-700 dark:text-meal-yellow-300"),
+            (99, "text-base-content"),
+        ],
+    )
+    def test_event_icon_color(self, category, expected_class):
+        """Test event_icon_color returns correct icon color"""
+        event = EventFactory(category=category)
+        assert event_icon_color(event) == expected_class
+
 
 class TestPhoneFormat:
     """Tests for phone number formatting"""
@@ -203,3 +219,110 @@ class TestPhoneFormat:
         """Test phone_format handles Italian prefixes correctly"""
         full_number = f"{prefix}{number}"
         assert phone_format(full_number) == expected
+
+
+class TestFormatOpeningHours:
+    """Tests for format_opening_hours template tag"""
+
+    def test_empty_input(self):
+        """Test with empty dictionary input"""
+        assert format_opening_hours({}) == ""
+
+    def test_invalid_input_type(self):
+        """Test with invalid input type (not a dictionary)"""
+        assert format_opening_hours(None) == ""
+        assert format_opening_hours("string") == ""
+        assert format_opening_hours([]) == ""
+
+    def test_all_days_same_hours(self):
+        """Test when all days have the same opening hours"""
+        hours_data = {
+            "monday": {"open": "09:00", "close": "17:00"},
+            "tuesday": {"open": "09:00", "close": "17:00"},
+            "wednesday": {"open": "09:00", "close": "17:00"},
+            "thursday": {"open": "09:00", "close": "17:00"},
+            "friday": {"open": "09:00", "close": "17:00"},
+            "saturday": {"open": "09:00", "close": "17:00"},
+            "sunday": {"open": "09:00", "close": "17:00"},
+        }
+        expected = (
+            '<ul class="list-none p-0 m-0 leading-normal">'
+            "<li><strong>Lun-Dom:</strong> 09:00 – 17:00</li>"
+            "</ul>"
+        )
+        assert format_opening_hours(hours_data) == expected
+
+    def test_some_days_closed(self):
+        """Test when some days are closed"""
+        hours_data = {
+            "monday": {"open": "09:00", "close": "17:00"},
+            "tuesday": {"open": "09:00", "close": "17:00"},
+            "wednesday": {"open": "09:00", "close": "17:00"},
+            "thursday": {"open": "09:00", "close": "17:00"},
+            "friday": {"open": "09:00", "close": "17:00"},
+            "saturday": {"open": "10:00", "close": "14:00"},
+            "sunday": {},  # Closed
+        }
+        expected = (
+            '<ul class="list-none p-0 m-0 leading-normal">'
+            "<li><strong>Lun-Ven:</strong> 09:00 – 17:00</li>"
+            "<li><strong>Sab:</strong> 10:00 – 14:00</li>"
+            "<li><strong>Dom:</strong> Chiuso</li>"
+            "</ul>"
+        )
+        assert format_opening_hours(hours_data) == expected
+
+    def test_complex_schedule(self):
+        """Test with a more complex opening hours schedule"""
+        hours_data = {
+            "monday": {"open": "09:00", "close": "13:00"},
+            "tuesday": {"open": "09:00", "close": "13:00"},
+            "wednesday": {"open": "14:00", "close": "18:00"},
+            "thursday": {"open": "09:00", "close": "13:00"},
+            "friday": {"open": "09:00", "close": "13:00"},
+            "saturday": {"open": "10:00", "close": "14:00"},
+            "sunday": {"open": "10:00", "close": "14:00"},
+        }
+        expected = (
+            '<ul class="list-none p-0 m-0 leading-normal">'
+            "<li><strong>Lun-Mar:</strong> 09:00 – 13:00</li>"
+            "<li><strong>Mer:</strong> 14:00 – 18:00</li>"
+            "<li><strong>Gio-Ven:</strong> 09:00 – 13:00</li>"
+            "<li><strong>Sab-Dom:</strong> 10:00 – 14:00</li>"
+            "</ul>"
+        )
+        assert format_opening_hours(hours_data) == expected
+
+    def test_missing_open_close_keys(self):
+        """Test with missing 'open' or 'close' keys for a day"""
+        hours_data = {
+            "monday": {"open": "09:00"},  # Missing close
+            "tuesday": {"close": "17:00"},  # Missing open
+            "wednesday": {},  # Both missing
+            "thursday": {"open": "09:00", "close": "17:00"},
+        }
+        expected = (
+            '<ul class="list-none p-0 m-0 leading-normal">'
+            "<li><strong>Lun-Mer:</strong> Chiuso</li>"
+            "<li><strong>Gio:</strong> 09:00 – 17:00</li>"
+            "<li><strong>Ven-Dom:</strong> Chiuso</li>"
+            "</ul>"
+        )
+        assert format_opening_hours(hours_data) == expected
+
+    def test_empty_hours_data_for_day(self):
+        """Test with empty hours data for a specific day"""
+        hours_data = {
+            "monday": {"open": "09:00", "close": "17:00"},
+            "tuesday": {},
+            "wednesday": {"open": "09:00", "close": "17:00"},
+        }
+        expected = (
+            '<ul class="list-none p-0 m-0 leading-normal">'
+            "<li><strong>Lun:</strong> 09:00 – 17:00</li>"
+            "<li><strong>Mar:</strong> Chiuso</li>"
+            "<li><strong>Mer:</strong> 09:00 – 17:00</li>"
+            "<li><strong>Gio-Dom:</strong> Chiuso</li>"
+            "</ul>"
+        )
+        assert format_opening_hours(hours_data) == expected
