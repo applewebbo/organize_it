@@ -452,8 +452,15 @@ class ExperienceForm(forms.ModelForm):
             Field("website", wrapper_class="sm:col-span-4"),
             HTML(
                 """
-            <h2 class=\"text-lg font-semibold mt-4 mb-2\">%s</h2>
-            """
+                    <div x-data=\"{ openHours: false }\" x-on:click.stop class=\"sm:col-span-4\">
+                        <div class=\"flex items-center gap-4 mt-2 py-2 cursor-pointer\" @click.stop=\"openHours = !openHours\">
+                            <h2 class=\"text-sm font-semibold\">%s</h2>
+                            <button type=\"button\" @click.stop=\"openHours = !openHours\" class=\"btn btn-xs btn-ghost me-2\">
+                                <i class=\"\" :class=\"openHours ? 'ph-bold ph-caret-up i-md text-base-content/60' : 'ph-bold ph-caret-down i-md text-base-content/60'\"></i>
+                            </button>
+                        </div>
+                        <div x-show=\"openHours\" >
+                 """
                 % _("Opening hours")
             ),
         ]
@@ -470,9 +477,15 @@ class ExperienceForm(forms.ModelForm):
             layout_fields += [
                 Div(
                     Fieldset(
-                        label,
-                        HTML(
-                            f'<label for="id_{key}_closed" class="label"><input x-model="closed" type="checkbox" name="{key}_closed" id="id_{key}_closed" {checked_attr}>{closed_txt}</label>'
+                        "",  # Empty legend
+                        Div(  # New flex div for label and checkbox
+                            HTML(
+                                f'<h3 class="text-base font-semibold">{label}</h3>'
+                            ),  # Custom label
+                            HTML(
+                                f'<input x-model="closed" type="checkbox" name="{key}_closed" id="id_{key}_closed" class="h-3 w-3 text-primary" {checked_attr}><label for="id_{key}_closed">{closed_txt}</label>'
+                            ),
+                            css_class="flex items-center gap-4 mb-2",  # Flex classes
                         ),
                         Div(
                             Field(f"{key}_open"),
@@ -485,6 +498,12 @@ class ExperienceForm(forms.ModelForm):
                     css_class="sm:col-span-4",
                 )
             ]
+        layout_fields += [
+            HTML("""
+                                    </div>
+                                </div>
+                                """)
+        ]
         self.helper.layout = Layout(*layout_fields)
 
     def save(self, commit=True):
