@@ -629,14 +629,15 @@ class MealForm(forms.ModelForm):
         self.fields["address"].widget.attrs.update(address_htmx_attrs)
         layout_fields.append(Field("name", wrapper_class="sm:col-span-2"))
         layout_fields.append(Field("city", wrapper_class="sm:col-span-2"))
+        self.fields["type"].choices = Meal.Type.choices
         self.helper = FormHelper()
         self.helper.form_tag = False
-        self.fields["type"].choices = Meal.Type.choices
         if self.instance.pk and self.instance.end_time and self.instance.start_time:
             start_time = datetime.combine(date.today(), self.instance.start_time)
             end_time = datetime.combine(date.today(), self.instance.end_time)
             duration = (end_time - start_time).total_seconds() // 60
             self.initial["duration"] = int(duration)
+
         layout_fields += [
             Div(
                 Field("address", wrapper_class="sm:col-span-4"),
@@ -665,8 +666,15 @@ class MealForm(forms.ModelForm):
             Field("website", wrapper_class="sm:col-span-4"),
             HTML(
                 """
-            <h2 class=\"text-lg font-semibold mt-4 mb-2\">%s</h2>
-            """
+                    <div x-data=\"{ openHours: false }\" x-on:click.stop class=\"sm:col-span-4\">
+                        <div class=\"flex items-center gap-4 mt-2 py-2 cursor-pointer\" @click.stop=\"openHours = !openHours\">
+                            <h2 class=\"text-sm font-semibold\">%s</h2>
+                            <button type=\"button\" @click.stop=\"openHours = !openHours\" class=\"btn btn-xs btn-ghost me-2\">
+                                <i class=\"\" :class=\"openHours ? 'ph-bold ph-caret-up i-md text-base-content/60' : 'ph-bold ph-caret-down i-md text-base-content/60'\"></i>
+                            </button>
+                        </div>
+                        <div x-show=\"openHours\" >
+                 """
                 % _("Opening hours")
             ),
         ]
@@ -746,6 +754,12 @@ class MealForm(forms.ModelForm):
                     css_class="sm:col-span-4",
                 )
             ]
+        layout_fields += [
+            HTML("""
+                                    </div>
+                                </div>
+                                """)
+        ]
 
         self.helper.layout = Layout(*layout_fields)
 
