@@ -6,6 +6,7 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
+import requests
 from django.contrib.messages import get_messages
 from django.core.cache import cache
 from django.test import override_settings
@@ -634,9 +635,8 @@ class StayModifyView(TestCase):
         with self.login(user):
             response = self.post("trips:stay-modify", pk=stay.pk, data=data)
 
-        self.response_204(response)
-        message = list(get_messages(response.wsgi_request))[0].message
-        assert message == "Stay updated successfully"
+        self.response_200(response)
+        assert response.context["modified"]
         stay.refresh_from_db()
         assert stay.name == "Updated Hotel"
         assert stay.check_in == datetime.time(15, 0)
@@ -988,9 +988,7 @@ class EventModifyView(TestCase):
         with self.login(user):
             response = self.post("trips:event-modify", pk=event.pk, data=data)
 
-        self.response_204(response)
-        message = list(get_messages(response.wsgi_request))[0].message
-        assert message == "Event updated successfully"
+        self.response_200(response)
         event.refresh_from_db()
         assert event.name == "New Address - New Destination"
 
@@ -2186,3 +2184,206 @@ class DayMapViewTests(TestCase):
             response = self.get("trips:day-map", day_id=day.pk)
 
         self.response_404(response)
+
+
+class SingleEventViewTest(TestCase):
+    """Test cases for single_event view"""
+
+    def test_get_single_event_success(self):
+        """Test successful retrieval of a single event"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(day=day, trip=trip)
+
+        with self.login(user):
+            response = self.get("trips:single-event", pk=event.pk)
+
+        self.response_200(response)
+        self.assertContains(response, event.name)
+        assert response.context["event"] == event
+
+
+@patch("trips.views.requests.get")
+@patch("trips.views.requests.post")
+class EnrichEventViewTest(TestCase):
+    """Test cases for enrich_event view"""
+
+    def test_enrich_event_success(self, mock_post, mock_get):
+        """Test successful enrichment of an event"""
+        # Mock Google Places API responses
+        mock_post.return_value.raise_for_status.return_value = None
+        mock_post.return_value.json.return_value = {"places": [{"id": "test_place_id"}]}
+        mock_get.return_value.raise_for_status.return_value = None
+        mock_get.return_value.json.return_value = {
+            "websiteUri": "https://example.com",
+            "internationalPhoneNumber": "+1234567890",
+            "regularOpeningHours": {
+                "periods": [
+                    {
+                        "open": {"day": 1, "hour": 9, "minute": 0},
+                        "close": {"day": 1, "hour": 17, "minute": 0},
+                    }
+                ]
+            },
+        }
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(
+            day=day, trip=trip, name="Test Event", address="Test Address"
+        )
+
+        with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
+            response = self.post("trips:enrich-event", event_id=event.pk)
+
+        self.response_204(response)
+        event.refresh_from_db()
+        assert event.place_id == "test_place_id"
+        assert event.website == "https://example.com"
+        assert event.phone_number == "+1234567890"
+        assert "monday" in event.opening_hours
+        messages = list(get_messages(response.wsgi_request))
+        assert len(messages) == 1
+        assert str(messages[0]) == "Event enriched successfully!"
+
+    def test_enrich_event_no_name_or_address(self, mock_post, mock_get):
+        """Test enrichment with no name or address"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(day=day, trip=trip, name="", address="")
+
+        with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
+            response = self.post("trips:enrich-event", event_id=event.pk)
+
+        assert response.status_code == 400
+        messages = list(get_messages(response.wsgi_request))
+        assert len(messages) == 1
+        assert (
+            str(messages[0]) == "Event must have a name and an address to be enriched."
+        )
+
+    def test_enrich_event_no_api_key(self, mock_post, mock_get):
+        """Test enrichment with no API key"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(
+            day=day, trip=trip, name="Test Event", address="Test Address"
+        )
+
+        with self.login(user), override_settings(GOOGLE_PLACES_API_KEY=""):
+            response = self.post("trips:enrich-event", event_id=event.pk)
+
+        assert response.status_code == 500
+        messages = list(get_messages(response.wsgi_request))
+        assert len(messages) == 1
+        assert str(messages[0]) == "Google Places API key is not configured."
+
+    def test_enrich_event_search_request_fails(self, mock_post, mock_get):
+        """Test enrichment when search request fails"""
+        mock_post.side_effect = requests.RequestException("Test error")
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(
+            day=day, trip=trip, name="Test Event", address="Test Address"
+        )
+
+        with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
+            response = self.post("trips:enrich-event", event_id=event.pk)
+
+        assert response.status_code == 500
+        messages = list(get_messages(response.wsgi_request))
+        assert len(messages) == 1
+        assert "Error calling Google Places API: Test error" in str(messages[0])
+
+    def test_enrich_event_search_request_fails_with_response(self, mock_post, mock_get):
+        """Test enrichment when search request fails with a response"""
+        exception = requests.RequestException("Test error")
+        exception.response = Mock(text="API error details")
+        mock_post.side_effect = exception
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(
+            day=day, trip=trip, name="Test Event", address="Test Address"
+        )
+
+        with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
+            response = self.post("trips:enrich-event", event_id=event.pk)
+
+        assert response.status_code == 500
+        messages = list(get_messages(response.wsgi_request))
+        assert len(messages) == 1
+        assert "API Error: API error details" in str(messages[0])
+
+    def test_enrich_event_no_place_found(self, mock_post, mock_get):
+        """Test enrichment when no place is found"""
+        mock_post.return_value.raise_for_status.return_value = None
+        mock_post.return_value.json.return_value = {"places": []}
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(
+            day=day, trip=trip, name="Test Event", address="Test Address"
+        )
+
+        with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
+            response = self.post("trips:enrich-event", event_id=event.pk)
+
+        assert response.status_code == 404
+        messages = list(get_messages(response.wsgi_request))
+        assert len(messages) == 1
+        assert str(messages[0]) == "Could not find a matching place."
+
+    def test_enrich_event_details_request_fails(self, mock_post, mock_get):
+        """Test enrichment when details request fails"""
+        mock_post.return_value.raise_for_status.return_value = None
+        mock_post.return_value.json.return_value = {"places": [{"id": "test_place_id"}]}
+        mock_get.side_effect = requests.RequestException("Test error")
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(
+            day=day, trip=trip, name="Test Event", address="Test Address"
+        )
+
+        with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
+            response = self.post("trips:enrich-event", event_id=event.pk)
+
+        assert response.status_code == 500
+        messages = list(get_messages(response.wsgi_request))
+        assert len(messages) == 1
+        assert "Error calling Google Places API: Test error" in str(messages[0])
+
+    def test_enrich_event_details_request_fails_with_response(
+        self, mock_post, mock_get
+    ):
+        """Test enrichment when details request fails with a response"""
+        mock_post.return_value.raise_for_status.return_value = None
+        mock_post.return_value.json.return_value = {"places": [{"id": "test_place_id"}]}
+        exception = requests.RequestException("Test error")
+        exception.response = Mock(text="API error details")
+        mock_get.side_effect = exception
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(
+            day=day, trip=trip, name="Test Event", address="Test Address"
+        )
+
+        with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
+            response = self.post("trips:enrich-event", event_id=event.pk)
+
+        assert response.status_code == 500
+        messages = list(get_messages(response.wsgi_request))
+        assert len(messages) == 1
+        assert "API Error: API error details" in str(messages[0])

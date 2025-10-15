@@ -278,7 +278,7 @@ class TransportForm(forms.ModelForm):
         return instance
 
 
-class ExperienceForm(forms.ModelForm):
+class EventForm(forms.ModelForm):
     duration = forms.ChoiceField(
         choices=[
             (
@@ -305,11 +305,10 @@ class ExperienceForm(forms.ModelForm):
     )
 
     class Meta:
-        model = Experience
+        model = Event
         fields = [
             "name",
             "city",
-            "type",
             "address",
             "start_time",
             "duration",
@@ -317,7 +316,6 @@ class ExperienceForm(forms.ModelForm):
         ]
         formfield_callback = urlfields_assume_https
         labels = {
-            "type": _("Type"),
             "address": _("Address"),
             "start_time": _("Start Time"),
             "website": _("Website"),
@@ -325,7 +323,6 @@ class ExperienceForm(forms.ModelForm):
         widgets = {
             "name": forms.TextInput(attrs={"placeholder": _("Name")}),
             "city": forms.TextInput(attrs={"placeholder": _("City")}),
-            "type": forms.Select(),
             "website": forms.TextInput(attrs={"placeholder": _("Website")}),
             "address": forms.TextInput(attrs={"placeholder": _("Address")}),
             "start_time": forms.TimeInput(attrs={"type": "time"}),
@@ -365,7 +362,6 @@ class ExperienceForm(forms.ModelForm):
             self.fields["address"].widget.attrs.update(address_htmx_attrs)
         layout_fields.append(Field("name", wrapper_class="sm:col-span-2"))
         layout_fields.append(Field("city", wrapper_class="sm:col-span-2"))
-        self.fields["type"].choices = Experience.Type.choices
         if self.instance.pk and self.instance.end_time and self.instance.start_time:
             start_time = datetime.combine(date.today(), self.instance.start_time)
             end_time = datetime.combine(date.today(), self.instance.end_time)
@@ -430,8 +426,8 @@ class ExperienceForm(forms.ModelForm):
             Div(
                 Field("address"),
                 HTML("""
-                    <span id=\"address-spinner\" class=\"absolute right-2 top-1/2 -translate-y-1/2\">
-                        <span class=\"loading loading-bars loading-lg text-primary mt-3.5 htmx-indicator\"></span>
+                    <span id="address-spinner" class="absolute right-2 top-1/2 -translate-y-1/2">
+                        <span class="loading loading-bars loading-lg text-primary mt-3.5 htmx-indicator"></span>
                     </span>
                     """),
                 css_class="relative sm:col-span-4",
@@ -454,14 +450,14 @@ class ExperienceForm(forms.ModelForm):
             Field("website", wrapper_class="sm:col-span-4"),
             HTML(
                 """
-                    <div x-data=\"{ openHours: false }\" x-on:click.stop class=\"sm:col-span-4\">
-                        <div class=\"flex items-center gap-4 mt-2 py-2 cursor-pointer\" @click.stop=\"openHours = !openHours\">
-                            <h2 class=\"text-sm font-semibold\">%s</h2>
-                            <button type=\"button\" @click.stop=\"openHours = !openHours\" class=\"btn btn-xs btn-ghost me-2\">
-                                <i class=\"\" :class=\"openHours ? 'ph-bold ph-caret-up i-md text-base-content/60' : 'ph-bold ph-caret-down i-md text-base-content/60'\"></i>
+                    <div x-data="{ openHours: false }" x-on:click.stop class="sm:col-span-4">
+                        <div class="flex items-center gap-4 mt-2 py-2 cursor-pointer" @click.stop="openHours = !openHours">
+                            <h2 class="text-sm font-semibold">%s</h2>
+                            <button type="button" @click.stop="openHours = !openHours" class="btn btn-xs btn-ghost me-2">
+                                <i class="" :class="openHours ? 'ph-bold ph-caret-up i-md text-base-content/60' : 'ph-bold ph-caret-down i-md text-base-content/60'"></i>
                             </button>
                         </div>
-                        <div x-show=\"openHours\" >
+                        <div x-show="openHours" >
                  """
                 % _("Opening hours")
             ),
@@ -512,7 +508,6 @@ class ExperienceForm(forms.ModelForm):
         instance = super().save(commit=False)
         # convert duration to end_time
         duration = self.cleaned_data.get("duration")
-
         start_time = datetime.combine(date.today(), self.cleaned_data["start_time"])
         end_time = start_time + timedelta(minutes=int(duration))
         instance.end_time = end_time.time()
@@ -545,260 +540,40 @@ class ExperienceForm(forms.ModelForm):
         return instance
 
 
-class MealForm(forms.ModelForm):
-    duration = forms.ChoiceField(
-        choices=[
-            (
-                i * 30,
-                (datetime.min + timedelta(minutes=i * 15)).strftime("%H h %M min"),
-            )
-            for i in range(8)
-        ],
-        label=_("Duration"),
-        initial=60,
-    )
-
-    name = forms.CharField(
-        max_length=200,
-        widget=forms.TextInput(attrs={"placeholder": _("Name")}),
-        label=_("Name"),
-    )
-
-    city = forms.CharField(
-        max_length=100,
-        required=False,
-        widget=forms.TextInput(attrs={"placeholder": _("City")}),
-        label=_("City"),
-    )
-
-    class Meta:
-        model = Meal
-        fields = [
-            "name",
-            "city",
-            "type",
-            "address",
-            "start_time",
-            "duration",
-            "website",
-        ]
-        formfield_callback = urlfields_assume_https
+class ExperienceForm(EventForm):
+    class Meta(EventForm.Meta):
+        model = Experience
+        fields = EventForm.Meta.fields + ["type"]
         labels = {
-            "name": _("Name"),
+            **EventForm.Meta.labels,
             "type": _("Type"),
-            "address": _("Address"),
-            "start_time": _("Start Time"),
-            "duration": _("Duration"),
-            "website": _("Website"),
         }
         widgets = {
-            "name": forms.TextInput(attrs={"placeholder": "Name"}),
+            **EventForm.Meta.widgets,
             "type": forms.Select(),
-            "website": forms.TextInput(attrs={"placeholder": "Website"}),
-            "address": forms.TextInput(attrs={"placeholder": "Address"}),
-            "start_time": forms.TimeInput(attrs={"type": "time"}),
         }
 
     def __init__(self, *args, **kwargs):
-        geocode = kwargs.pop("geocode", False)
         super().__init__(*args, **kwargs)
-        layout_fields = []
-        if geocode:
-            geocode_url = reverse("trips:geocode-address")
-            name_htmx_attrs = {
-                "x-ref": "name",
-                "@input": "checkAndTrigger",
-                "hx-post": geocode_url,
-                "hx-trigger": "trigger-geocode",
-                "hx-target": "#address-results",
-                "hx-include": "[name='name'], [name='city']",
-                "hx-indicator": "#address-spinner",
-                ":class": "{ 'animate-pulse ring-2 ring-primary/60': nameFilled }",
-            }
-            city_htmx_attrs = {
-                "x-ref": "city",
-                "@input": "checkAndTrigger",
-                "hx-post": geocode_url,
-                "hx-trigger": "trigger-geocode",
-                "hx-target": "#address-results",
-                "hx-include": "[name='name'], [name='city']",
-                "hx-indicator": "#address-spinner",
-            }
-            address_htmx_attrs = {
-                "x-ref": "address",
-                ":class": "{ 'animate-pulse ring-2 ring-primary/60': addressFilled }",
-            }
-            self.fields["name"].widget.attrs.update(name_htmx_attrs)
-            self.fields["city"].widget.attrs.update(city_htmx_attrs)
-            self.fields["address"].widget.attrs.update(address_htmx_attrs)
-        layout_fields.append(Field("name", wrapper_class="sm:col-span-2"))
-        layout_fields.append(Field("city", wrapper_class="sm:col-span-2"))
+        self.fields["type"].choices = Experience.Type.choices
+
+
+class MealForm(EventForm):
+    class Meta(EventForm.Meta):
+        model = Meal
+        fields = EventForm.Meta.fields + ["type"]
+        labels = {
+            **EventForm.Meta.labels,
+            "type": _("Type"),
+        }
+        widgets = {
+            **EventForm.Meta.widgets,
+            "type": forms.Select(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.fields["type"].choices = Meal.Type.choices
-        self.helper = FormHelper()
-        self.helper.form_tag = False
-        if self.instance.pk and self.instance.end_time and self.instance.start_time:
-            start_time = datetime.combine(date.today(), self.instance.start_time)
-            end_time = datetime.combine(date.today(), self.instance.end_time)
-            duration = (end_time - start_time).total_seconds() // 60
-            self.initial["duration"] = int(duration)
-
-        layout_fields += [
-            Div(
-                Field("address", wrapper_class="sm:col-span-4"),
-                HTML("""
-                    <span id="address-spinner" class="absolute right-2 top-1/2 -translate-y-1/2">
-                        <span class="loading loading-bars loading-lg text-primary mt-3.5 htmx-indicator"></span>
-                    </span>
-                    """),
-                css_class="relative sm:col-span-4",
-            ),
-            HTML(ADDRESS_RESULTS_HTML),
-            Field(
-                "start_time",
-                x_ref="startTime",
-                **{"x-on:change": "checkOverlap()"},
-                wrapper_class="sm:col-span-2",
-            ),
-            Field(
-                "duration",
-                x_ref="duration",
-                **{"x-on:change": "checkOverlap()"},
-                wrapper_class="sm:col-span-1",
-            ),
-            Field("type", css_class="select select-primary"),
-            Div(id="overlap-warning", css_class="sm:col-span-4"),
-            Field("website", wrapper_class="sm:col-span-4"),
-            HTML(
-                """
-                    <div x-data=\"{ openHours: false }\" x-on:click.stop class=\"sm:col-span-4\">
-                        <div class=\"flex items-center gap-4 mt-2 py-2 cursor-pointer\" @click.stop=\"openHours = !openHours\">
-                            <h2 class=\"text-sm font-semibold\">%s</h2>
-                            <button type=\"button\" @click.stop=\"openHours = !openHours\" class=\"btn btn-xs btn-ghost me-2\">
-                                <i class=\"\" :class=\"openHours ? 'ph-bold ph-caret-up i-md text-base-content/60' : 'ph-bold ph-caret-down i-md text-base-content/60'\"></i>
-                            </button>
-                        </div>
-                        <div x-show=\"openHours\" >
-                 """
-                % _("Opening hours")
-            ),
-        ]
-        # Opening hours dynamic fields
-        days = [
-            ("monday", _("Monday")),
-            ("tuesday", _("Tuesday")),
-            ("wednesday", _("Wednesday")),
-            ("thursday", _("Thursday")),
-            ("friday", _("Friday")),
-            ("saturday", _("Saturday")),
-            ("sunday", _("Sunday")),
-        ]
-        for key, _label in days:
-            self.fields[f"{key}_closed"] = forms.BooleanField(
-                required=False,
-                label=_("Closed"),
-            )
-            self.fields[f"{key}_open"] = forms.TimeField(
-                required=False,
-                label="",
-                widget=forms.TimeInput(
-                    attrs={"type": "time", "placeholder": _("Open")}
-                ),
-            )
-            self.fields[f"{key}_close"] = forms.TimeField(
-                required=False,
-                label="",
-                widget=forms.TimeInput(
-                    attrs={"type": "time", "placeholder": _("Close")}
-                ),
-            )
-        # Defaults: assume closed for all days
-        for key, _label in days:
-            self.initial[f"{key}_closed"] = True
-            self.fields[f"{key}_closed"].initial = True
-        # Populate initial from instance.opening_hours
-        oh = getattr(self.instance, "opening_hours", None)
-        if isinstance(oh, dict):
-            for key, _label in days:
-                day_data = oh.get(key)
-                if day_data and day_data.get("open") and day_data.get("close"):
-                    # Mark as open and set times
-                    self.initial[f"{key}_closed"] = False
-                    self.fields[f"{key}_closed"].initial = False
-                    self.initial[f"{key}_open"] = day_data.get("open")
-                    self.initial[f"{key}_close"] = day_data.get("close")
-        elif oh in ("", None):
-            # Empty or None -> all checkboxes unchecked, inputs visible (no times preset)
-            for key, _label in days:
-                self.initial[f"{key}_closed"] = False
-                self.fields[f"{key}_closed"].initial = False
-        # Add per-day fields to layout using Fieldset with Alpine bindings
-        for key, label in days:
-            if self.is_bound:
-                bound_val = self.data.get(f"{key}_closed")
-                is_checked = str(bound_val).lower() in {"on", "true", "1", "checked"}
-            else:
-                is_checked = bool(self.initial.get(f"{key}_closed"))
-            checked_attr = ' checked="checked"' if is_checked else ""
-            closed_txt = _("Closed")
-            layout_fields += [
-                Div(
-                    Fieldset(
-                        label,
-                        HTML(
-                            f'<label for="id_{key}_closed" class="label"><input x-model="closed" type="checkbox" name="{key}_closed" id="id_{key}_closed" {checked_attr}>{closed_txt}</label>'
-                        ),
-                        Div(
-                            Field(f"{key}_open"),
-                            Field(f"{key}_close"),
-                            css_class="grid grid-cols-2 gap-2",
-                            **{"x-show": "!closed", "x-cloak": ""},
-                        ),
-                    ),
-                    **{"x-data": f"{{ closed: {str(is_checked).lower()} }}"},
-                    css_class="sm:col-span-4",
-                )
-            ]
-        layout_fields += [
-            HTML("""
-                                    </div>
-                                </div>
-                                """)
-        ]
-
-        self.helper.layout = Layout(*layout_fields)
-
-    def save(self, commit=True):
-        instance = super().save(commit=False)
-        # convert duration to end_time
-        duration = self.cleaned_data.get("duration")
-        start_time = datetime.combine(date.today(), self.cleaned_data["start_time"])
-        end_time = start_time + timedelta(minutes=int(duration))
-        instance.end_time = end_time.time()
-        # Build opening_hours JSON from form fields
-        opening_hours = {}
-        days = [
-            "monday",
-            "tuesday",
-            "wednesday",
-            "thursday",
-            "friday",
-            "saturday",
-            "sunday",
-        ]
-        for key in days:
-            if self.cleaned_data.get(f"{key}_closed"):
-                continue
-            open_v = self.cleaned_data.get(f"{key}_open")
-            close_v = self.cleaned_data.get(f"{key}_close")
-            if open_v and close_v:
-                opening_hours[key] = {
-                    "open": open_v.strftime("%H:%M"),
-                    "close": close_v.strftime("%H:%M"),
-                }
-        instance.opening_hours = opening_hours or None
-        if commit:  # pragma: no cover
-            instance.save()
-        return instance
 
 
 class StayForm(forms.ModelForm):
