@@ -330,12 +330,24 @@ def stay_modify(request, pk):
     )
     if form.is_valid():
         form.save()
-        messages.add_message(
-            request,
-            messages.SUCCESS,
-            _("Stay updated successfully"),
+
+        days = stay.days.order_by("date")
+        last_day = days.last()
+        first_stay_day = days.first()
+        # Find the day before the first stay day in the trip's days
+        first_day = (
+            Day.objects.filter(
+                trip=first_stay_day.trip, date=first_stay_day.date - timedelta(days=1)
+            ).first()
+            or first_stay_day
         )
-        return HttpResponse(status=204, headers={"HX-Refresh": "true"})
+        context = {
+            "stay": stay,
+            "first_day": first_day,
+            "last_day": last_day,
+            "modified": True,
+        }
+        return TemplateResponse(request, "trips/stay-detail.html", context)
     context = {"form": form, "stay": stay}
     return TemplateResponse(request, "trips/stay-modify.html", context)
 
