@@ -238,7 +238,9 @@ def add_experience(request, day_id):
     unpaired_experiences = Event.objects.filter(
         day__isnull=True, trip=day.trip, category=2
     )
-    form = ExperienceForm(request.POST or None, initial={"city": day.trip.destination})
+    form = ExperienceForm(
+        request.POST or None, initial={"city": day.trip.destination}, geocode=True
+    )
     if form.is_valid():
         experience = form.save(commit=False)
         experience.day = day
@@ -259,7 +261,9 @@ def add_meal(request, day_id):
     unpaired_experiences = Event.objects.filter(
         day__isnull=True, trip=day.trip, category=3
     )
-    form = MealForm(request.POST or None, initial={"city": day.trip.destination})
+    form = MealForm(
+        request.POST or None, initial={"city": day.trip.destination}, geocode=True
+    )
     if form.is_valid():
         meal = form.save(commit=False)
         meal.day = day
@@ -282,6 +286,7 @@ def add_stay(request, day_id):
         trip,
         data=request.POST or None,
         initial={"apply_to_days": [day_id], "city": trip.destination},
+        geocode=True,
     )
     if form.is_valid():
         form.save()
