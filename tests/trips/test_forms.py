@@ -342,6 +342,29 @@ class TestExperienceForm:
         # Verify that the instance wasn't saved to the database
         assert not Experience.objects.filter(name="Walking Tour").exists()
 
+    def test_save_with_opening_hours(self):
+        """Test save method with opening hours data."""
+        data = {
+            "name": "Test Cafe",
+            "type": 1,
+            "address": "Someplace",
+            "start_time": "10:00",
+            "duration": "60",
+            "website": "https://example.com",
+            "monday_closed": "on",  # closed
+            "tuesday_open": "09:00",
+            "tuesday_close": "17:00",  # open
+            "wednesday_open": "10:00",  # only open
+        }
+        form = ExperienceForm(data=data)
+        assert form.is_valid()
+        instance = form.save(commit=False)
+        assert "monday" not in instance.opening_hours
+        assert "tuesday" in instance.opening_hours
+        assert instance.opening_hours["tuesday"]["open"] == "09:00"
+        assert instance.opening_hours["tuesday"]["close"] == "17:00"
+        assert "wednesday" not in instance.opening_hours
+
 
 class TestMealForm:
     @patch("geocoder.mapbox")
@@ -555,3 +578,83 @@ class TestAddNoteToStayForm:
         assert form.is_valid()
         stay = form.save()
         assert stay.notes == "Test note for stay"
+
+
+class TestEventForm:
+    def test_save_commit_false(self, event_factory):
+        """Test that save(commit=False) does not save the instance"""
+        event = event_factory()
+        data = {
+            "name": "Test Event",
+            "address": "Test Address",
+            "start_time": "10:00",
+            "duration": "60",
+            "type": 1,
+            "website": "https://example.com",
+        }
+        form = ExperienceForm(data=data, instance=event)
+        assert form.is_valid()
+        instance = form.save(commit=False)
+        assert not Experience.objects.filter(pk=instance.pk).exists()
+
+    def test_opening_hours_initial_data(self, event_factory):
+        """Test that opening hours are correctly initialized from instance"""
+        event = event_factory(
+            opening_hours={"monday": {"open": "09:00", "close": "17:00"}}
+        )
+        form = ExperienceForm(instance=event)
+        assert not form.initial["monday_closed"]
+        assert form.initial["monday_open"] == "09:00"
+        assert form.initial["monday_close"] == "17:00"
+
+    def test_opening_hours_empty_string_initial(self, event_factory):
+        """Test that opening hours are correctly initialized when empty string"""
+        event = event_factory(opening_hours="")
+        form = ExperienceForm(instance=event)
+        for day in [
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday",
+        ]:
+            assert not form.initial[f"{day}_closed"]
+
+    def test_geocode_htmx_attributes(self):
+        """Test that htmx attributes are added for geocoding"""
+        form = ExperienceForm(geocode=True, data={"type": 1})
+        assert "hx-post" in form.fields["name"].widget.attrs
+        assert "hx-post" in form.fields["city"].widget.attrs
+        assert "x-ref" in form.fields["address"].widget.attrs
+
+    def test_opening_hours_none_initial(self, event_factory):
+        """Test that opening hours are correctly initialized when opening_hours is None."""
+        event = event_factory(opening_hours=None)
+        form = ExperienceForm(instance=event)
+        for day in [
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday",
+        ]:
+            assert not form.initial[f"{day}_closed"]
+
+    def test_opening_hours_invalid_data_initial(self, event_factory):
+        """Test that opening hours are correctly initialized with invalid data."""
+        event = event_factory(opening_hours=[])
+        form = ExperienceForm(instance=event)
+        for day in [
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday",
+        ]:
+            assert form.initial[f"{day}_closed"]
