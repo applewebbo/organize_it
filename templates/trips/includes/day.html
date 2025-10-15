@@ -102,7 +102,12 @@
         <ul id="events-list-{{ day.pk }}"
             class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 grid-col">
             {% for event in day.events.all %}
-                <li>
+                {% partialdef single_event inline %}
+                <li id="event-{{ event.pk }}"
+                    hx-get="{% url 'trips:single-event' event.pk %}"
+                    hx-trigger="eventModified{{ event.pk }} from:body"
+                    hx-target="#event-{{ event.pk }}"
+                    hx-swap="outerHTML">
                     <c-event :event="event" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}">
                     <div class="flex items-center" x-data>
                         {% if event.has_overlap %}
@@ -123,6 +128,7 @@
                     </div>
                     </c-event>
                 </li>
+                {% endpartialdef single_event %}
             {% endfor %}
         </ul>
     </div>

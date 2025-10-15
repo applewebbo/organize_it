@@ -512,12 +512,13 @@ def event_modify(request, pk):
     form = event_form(request.POST or None, instance=event)
     if form.is_valid():
         form.save()
-        messages.add_message(
-            request,
-            messages.SUCCESS,
-            _("Event updated successfully"),
-        )
-        return HttpResponse(status=204, headers={"HX-Refresh": "true"})
+        context = {
+            "event": event,
+            "category": event.category,
+        }
+        response = TemplateResponse(request, "trips/event-detail.html", context)
+        response["HX-Trigger"] = f"eventModified{event.pk}"
+        return response
     context = {"form": form, "event": event}
     return TemplateResponse(request, "trips/event-modify.html", context)
 
@@ -596,6 +597,18 @@ def event_swap(request, pk1, pk2):
     except ValueError as e:
         messages.error(request, str(e))
         return HttpResponse(status=400)
+
+
+@login_required
+def single_event(request, pk):
+    """
+    Return a single event partial for HTMX updates.
+    """
+    event = get_object_or_404(Event, pk=pk, day__trip__author=request.user)
+    context = {
+        "event": event,
+    }
+    return TemplateResponse(request, "trips/includes/day.html#single_event", context)
 
 
 @login_required
