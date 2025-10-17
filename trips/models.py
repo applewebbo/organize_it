@@ -248,6 +248,7 @@ class Event(models.Model):
     website = models.URLField(max_length=255, blank=True)
     phone_number = models.CharField(max_length=50, blank=True)
     opening_hours = models.JSONField(blank=True, null=True)
+    enriched = models.BooleanField(default=False)
 
     class Meta:
         ordering = ["start_time"]

@@ -8,7 +8,7 @@
     </li>
     {% if event.website %}
         <li class="flex gap-2 items-center">
-            <i class="ph-bold ph-globe i-md text-base-content/60"></i><a href="{{ event.website }}" class="link">{{ event.website }}</a>
+            <i class="ph-bold ph-globe i-md text-base-content/60"></i><a href="{{ event.website }}" class="link">{{ event.website|truncatechars:38 }}</a>
         </li>
     {% endif %}
     {% if event.phone_number %}

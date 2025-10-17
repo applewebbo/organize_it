@@ -21,7 +21,7 @@
             </div>
         </div>
         {% partialdef 'event-detail' inline %}
-        <div class="grid gap-1 p-4 sm:grid-cols-2 sm:gap-2 md:p-5">
+        <div class="grid gap-1 p-4 sm:gap-2 md:p-5">
             {% if event.category == 1 %}
                 {% include 'trips/includes/transport-detail.html' %}
             {% elif event.category == 2 %}
@@ -48,7 +48,7 @@
     {% endpartialdef 'event-detail' %}
 </div>
 <div class="flex gap-2 justify-end items-center p-4 px-8 rounded-b md:p-5">
-    {% if event.category != 1 %}
+    {% if event.category != 1 and not event.enriched %}
         <button type="button"
                 class="flex justify-center items-center btn btn-secondary btn-soft"
                 hx-post="{% url 'trips:enrich-event' event.id %}"

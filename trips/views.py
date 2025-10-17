@@ -990,6 +990,7 @@ def enrich_event(request, event_id):
             event.phone_number = data.get("internationalPhoneNumber", "")
             google_opening_hours = data.get("regularOpeningHours", None)
             event.opening_hours = convert_google_opening_hours(google_opening_hours)
+            event.enriched = True
             event.save()
 
             messages.success(request, _("Event enriched successfully!"))
