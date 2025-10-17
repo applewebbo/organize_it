@@ -494,7 +494,6 @@ def event_detail(request, pk):
 
     context = {
         "event": event,
-        "category": event.category,
     }
     return TemplateResponse(request, "trips/event-detail.html", context)
 
@@ -930,7 +929,9 @@ def enrich_event(request, event_id):
     - Use Place ID to get details (website, phone, opening hours).
     - Update the event instance.
     """
-    event = get_object_or_404(Event, pk=event_id, trip__author=request.user)
+    qs = Event.objects.select_related("trip__author", "transport", "experience", "meal")
+    event = get_object_or_404(qs, pk=event_id, trip__author=request.user)
+    context = {}
 
     if not event.name or not event.address:
         messages.error(
@@ -941,63 +942,79 @@ def enrich_event(request, event_id):
     api_key = settings.GOOGLE_PLACES_API_KEY
 
     if not api_key:
-        messages.error(request, _("Google Places API key is not configured."))
-        return HttpResponse(status=500)
+        context["error_message"] = _("Google Places API key is not configured.")
+    else:
+        # 1. Find Place ID
+        search_url = "https://places.googleapis.com/v1/places:searchText"
+        search_payload = {"textQuery": f"{event.name} {event.address}"}
+        search_headers = {
+            "Content-Type": "application/json",
+            "X-Goog-Api-Key": api_key,
+            "X-Goog-FieldMask": "places.id",
+        }
 
-    # 1. Find Place ID using the new searchText endpoint
-    search_url = "https://places.googleapis.com/v1/places:searchText"
-    search_payload = {"textQuery": f"{event.name} {event.address}"}
-    search_headers = {
-        "Content-Type": "application/json",
-        "X-Goog-Api-Key": api_key,
-        "X-Goog-FieldMask": "places.id",
-    }
+        try:
+            response = requests.post(
+                search_url, json=search_payload, headers=search_headers, timeout=5
+            )
+            response.raise_for_status()
+            data = response.json()
 
-    try:
-        response = requests.post(
-            search_url, json=search_payload, headers=search_headers, timeout=10
-        )
-        response.raise_for_status()
-        data = response.json()
+            if data.get("places"):
+                event.place_id = data["places"][0]["id"]
+            else:
+                context["error_message"] = _("Could not find a matching place.")
 
-        if data.get("places"):
-            event.place_id = data["places"][0]["id"]
-        else:
-            messages.warning(request, _("Could not find a matching place."))
-            return HttpResponse(status=404)
+        except requests.exceptions.Timeout:
+            context["error_message"] = _("Google Places API request timed out.")
+        except requests.RequestException as e:
+            error_message = f"Error calling Google Places API: {e}"
+            if e.response is not None:
+                error_message = f"API Error: {e.response.text}"
+            context["error_message"] = error_message
 
-    except requests.RequestException as e:
-        error_message = f"Error calling Google Places API: {e}"
-        if e.response is not None:
-            error_message = f"API Error: {e.response.text}"
-        messages.error(request, error_message)
-        return HttpResponse(status=500)
+    if "error_message" not in context and event.place_id:
+        # 2. Get Place Details
+        details_url = f"https://places.googleapis.com/v1/places/{event.place_id}"
+        details_headers = {
+            "X-Goog-Api-Key": api_key,
+            "X-Goog-FieldMask": "websiteUri,internationalPhoneNumber,regularOpeningHours",
+        }
 
-    # 2. Get Place Details using the new getPlace endpoint
-    details_url = f"https://places.googleapis.com/v1/places/{event.place_id}"
-    details_headers = {
-        "X-Goog-Api-Key": api_key,
-        "X-Goog-FieldMask": "websiteUri,internationalPhoneNumber,regularOpeningHours",
-    }
+        try:
+            response = requests.get(details_url, headers=details_headers, timeout=5)
+            response.raise_for_status()
+            data = response.json()
 
-    try:
-        response = requests.get(details_url, headers=details_headers, timeout=10)
-        response.raise_for_status()
-        data = response.json()
+            event.website = data.get("websiteUri", "")
+            event.phone_number = data.get("internationalPhoneNumber", "")
+            google_opening_hours = data.get("regularOpeningHours", None)
+            event.opening_hours = convert_google_opening_hours(google_opening_hours)
+            event.save()
 
-        event.website = data.get("websiteUri", "")
-        event.phone_number = data.get("internationalPhoneNumber", "")
-        google_opening_hours = data.get("regularOpeningHours", None)
-        event.opening_hours = convert_google_opening_hours(google_opening_hours)
-        event.save()
+            messages.success(request, _("Event enriched successfully!"))
 
-        messages.success(request, _("Event enriched successfully!"))
+        except requests.exceptions.Timeout:
+            context["error_message"] = _("Google Places API request timed out.")
+        except requests.RequestException as e:
+            error_message = f"Error calling Google Places API: {e}"
+            if e.response is not None:
+                error_message = f"API Error: {e.response.text}"
+            context["error_message"] = error_message
 
-    except requests.RequestException as e:
-        error_message = f"Error calling Google Places API: {e}"
-        if e.response is not None:
-            error_message = f"API Error: {e.response.text}"
-        messages.error(request, error_message)
-        return HttpResponse(status=500)
+    # Refetch the event to get the updated data in the child instance
+    event.refresh_from_db()
 
-    return HttpResponse(status=204, headers={"HX-Refresh": "true"})
+    # Get proper instance based on category
+    if event.category == 1:
+        event = event.transport
+    elif event.category == 2:
+        event = event.experience
+    elif event.category == 3:
+        event = event.meal
+    else:
+        raise Http404("Invalid event category")
+
+    context["event"] = event
+    context["success_message"] = _("Event enriched successfully!")
+    return TemplateResponse(request, "trips/event-detail.html", context)
