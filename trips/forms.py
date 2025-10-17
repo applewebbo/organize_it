@@ -5,6 +5,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import HTML, Div, Field, Fieldset, Layout
 from django import forms
 from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import get_language
@@ -304,6 +305,25 @@ class EventForm(forms.ModelForm):
         label=_("City"),
     )
 
+    phone_number = forms.CharField(
+        max_length=50,
+        required=False,
+        validators=[
+            RegexValidator(
+                regex=r"^\+?\d(?: ?\d){7,19}$",
+                message=_(
+                    "Enter a valid phone number (with or without international prefix, and at most 2 spaces)."
+                ),
+            ),
+            RegexValidator(
+                regex=r"^(?:[^ ]* ?){0,3}$|^\+?\d(?: ?\d){7,19}$",
+                message=_("Phone number can contain at most 2 spaces."),
+            ),
+        ],
+        widget=forms.TextInput(attrs={"placeholder": _("Phone number")}),
+        label=_("Phone number"),
+    )
+
     class Meta:
         model = Event
         fields = [
@@ -313,6 +333,7 @@ class EventForm(forms.ModelForm):
             "start_time",
             "duration",
             "website",
+            "phone_number",
         ]
         formfield_callback = urlfields_assume_https
         labels = {
@@ -448,6 +469,7 @@ class EventForm(forms.ModelForm):
             Field("type", css_class="select select-primary"),
             Div(id="overlap-warning", css_class="sm:col-span-4"),
             Field("website", wrapper_class="sm:col-span-4"),
+            Field("phone_number", wrapper_class="sm:col-span-4"),
             HTML(
                 """
                     <div x-data="{ openHours: false }" x-on:click.stop class="sm:col-span-4">
@@ -597,6 +619,25 @@ class StayForm(forms.ModelForm):
         required=False,
         widget=forms.TextInput(attrs={"placeholder": _("City")}),
         label=_("City"),
+    )
+
+    phone_number = forms.CharField(
+        max_length=50,
+        required=False,
+        validators=[
+            RegexValidator(
+                regex=r"^\+?\d(?: ?\d){7,19}$",
+                message=_(
+                    "Enter a valid phone number (with or without international prefix, and at most 2 spaces)."
+                ),
+            ),
+            RegexValidator(
+                regex=r"^(?:[^ ]* ?){0,3}$|^\+?\d(?: ?\d){7,19}$",
+                message=_("Phone number can contain at most 2 spaces."),
+            ),
+        ],
+        widget=forms.TextInput(attrs={"placeholder": _("Phone number")}),
+        label=_("Phone number"),
     )
 
     class Meta:

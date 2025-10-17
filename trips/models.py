@@ -2,7 +2,6 @@ from datetime import date, timedelta
 
 import geocoder
 from django.conf import settings
-from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
@@ -105,30 +104,16 @@ class Stay(models.Model):
     check_in = models.TimeField(null=True, blank=True)
     check_out = models.TimeField(null=True, blank=True)
     cancellation_date = models.DateField(null=True, blank=True)
-    phone_number = models.CharField(
-        max_length=30,
-        blank=True,
-        validators=[
-            RegexValidator(
-                # Allow at most 2 spaces anywhere after the first digit
-                regex=r"^\+?\d(?: ?\d){7,19}$",
-                message=_(
-                    "Enter a valid phone number (with or without international prefix, and at most 2 spaces)."
-                ),
-            ),
-            RegexValidator(
-                # Disallow more than 2 spaces
-                regex=r"^(?:[^ ]* ?){0,3}$|^\+?\d(?: ?\d){7,19}$",
-                message=_("Phone number can contain at most 2 spaces."),
-            ),
-        ],
-    )
-    website = models.URLField(null=True, blank=True)
+    phone_number = models.CharField(max_length=50, blank=True)
+    website = models.URLField(max_length=255, blank=True)
     address = models.CharField(max_length=200)
     city = models.CharField(max_length=100, blank=True)
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
     notes = models.CharField(max_length=500, blank=True)
+    place_id = models.CharField(max_length=255, blank=True)
+    opening_hours = models.JSONField(blank=True, null=True)
+    enriched = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         """
