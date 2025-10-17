@@ -2,8 +2,7 @@
 <div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
     <div class="flex gap-1 items-center">
         <h3 id="event-title"
-        class="text-xl font-semibold text-gray-900 dark:text-white">{{ event.name }}
-        </h3>
+            class="text-xl font-semibold text-gray-900 dark:text-white">{{ event.name }}</h3>
         <span class="badge badge-outline badge-sm badge-info ms-2 align-sub">{{ event.get_type_display }}</span>
     </div>
     <button type="button"
@@ -14,49 +13,73 @@
     </button>
 </div>
 <div id="event-details">
-    {% partialdef 'event-detail' inline %}
-    <div class="grid gap-1 p-4 sm:grid-cols-2 sm:gap-2 md:p-5">
-        {% if category == 1 %}
-            {% include 'trips/includes/transport-detail.html' %}
-        {% elif category == 2 %}
-            {% include 'trips/includes/experience-detail.html' %}
-        {% elif category == 3 %}
-            {% include 'trips/includes/meal-detail.html' %}
-        {% endif %}
-    </div>
+    <div class="relative">
+        <div id="enrich-overlay"
+             class="absolute inset-0 z-50 htmx-indicator bg-base-100/90">
+            <div class="flex justify-center items-center w-full h-full">
+                <span class="loading loading-bars loading-lg text-primary"></span>
+            </div>
+        </div>
+        {% partialdef 'event-detail' inline %}
+        <div class="grid gap-1 p-4 sm:grid-cols-2 sm:gap-2 md:p-5">
+            {% if event.category == 1 %}
+                {% include 'trips/includes/transport-detail.html' %}
+            {% elif event.category == 2 %}
+                {% include 'trips/includes/experience-detail.html' %}
+            {% elif event.category == 3 %}
+                {% include 'trips/includes/meal-detail.html' %}
+            {% endif %}
+            {% if error_message %}
+                <div role="alert"
+                     class="mt-4 alert alert-error alert-soft"
+                     x-cloak
+                     x-data="{ show: true }"
+                     x-show="show"
+                     x-init="setTimeout(() => show = false, 4000)">{{ error_message }}</div>
+            {% elif success_message %}
+                <div role="alert"
+                     class="mt-4 alert alert-success alert-soft"
+                     x-cloak
+                    x-data="{ show: true }"
+                    x-show="show"
+                    x-init="setTimeout(() => show = false, 4000)">{{ success_message }}</div>
+            {% endif %}
+        </div>
     {% endpartialdef 'event-detail' %}
-    <div class="flex gap-2 justify-end items-center p-4 px-8 rounded-b md:p-5">
+</div>
+<div class="flex gap-2 justify-end items-center p-4 px-8 rounded-b md:p-5">
+    {% if event.category != 1 %}
         <button type="button"
                 class="flex justify-center items-center btn btn-secondary btn-soft"
                 hx-post="{% url 'trips:enrich-event' event.id %}"
-                hx-indicator="#enrich-spinner"
+                hx-indicator="#enrich-overlay"
                 hx-swap="innerHTML"
-                hx-target="#event-details">
+                hx-target="#dialog">
             <i class="text-xl sm:hidden ph-bold ph-list-plus"></i>
             <span class="hidden sm:inline">{% trans 'Enrich' %}</span>
-            <span id="enrich-spinner" class="htmx-indicator spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
         </button>
-        <button type="button"
-                class="btn btn-success btn-soft"
-                hx-get="{% url 'trips:event-modify' event.pk %}"
-                hx-target="#dialog"
-                hx-swap="innerHTML">
-                    <i class="text-xl sm:hidden ph-bold ph-pencil-line"></i>
-                    <span class="hidden sm:inline">{% trans 'Edit' %}</span>
-        </button>
-        <button type="button"
-                class="btn btn-error btn-soft"
-                hx-get="{% url 'trips:event-modal' event.pk %}"
-                hx-target="#dialog"
-                hx-swap="innerHTML">
-                    <i class="text-xl sm:hidden ph-bold ph-trash"></i>
-                    <span class="hidden sm:inline">{% trans 'Delete' %}</span>
-        </button>
-        <button type="button"
-                x-on:click="openModal = false"
-                class="btn btn-soft btn-neutral">
-                    <i class="text-xl sm:hidden ph-bold ph-x-circle"></i>
-                    <span class="hidden sm:inline">{% trans 'Close' %}</span>
-        </button>
-    </div>
+    {% endif %}
+    <button type="button"
+            class="btn btn-success btn-soft"
+            hx-get="{% url 'trips:event-modify' event.pk %}"
+            hx-target="#dialog"
+            hx-swap="innerHTML">
+        <i class="text-xl sm:hidden ph-bold ph-pencil-line"></i>
+        <span class="hidden sm:inline">{% trans 'Edit' %}</span>
+    </button>
+    <button type="button"
+            class="btn btn-error btn-soft"
+            hx-get="{% url 'trips:event-modal' event.pk %}"
+            hx-target="#dialog"
+            hx-swap="innerHTML">
+        <i class="text-xl sm:hidden ph-bold ph-trash"></i>
+        <span class="hidden sm:inline">{% trans 'Delete' %}</span>
+    </button>
+    <button type="button"
+            x-on:click="openModal = false"
+            class="btn btn-soft btn-neutral">
+        <i class="text-xl sm:hidden ph-bold ph-x-circle"></i>
+        <span class="hidden sm:inline">{% trans 'Close' %}</span>
+    </button>
+</div>
 </div>

@@ -1174,7 +1174,6 @@ class TestEventDetail(TestCase):
         self.response_200(response)
         assertTemplateUsed(response, "trips/event-detail.html")
         assert response.context["event"] == transport
-        assert response.context["category"] == transport.category
 
     def test_get_experience_detail(self):
         """Test successful retrieval of experience event detail"""
@@ -1188,7 +1187,6 @@ class TestEventDetail(TestCase):
 
         self.response_200(response)
         assert response.context["event"] == experience
-        assert response.context["category"] == experience.category
 
     def test_get_meal_detail(self):
         """Test successful retrieval of meal event detail"""
@@ -1202,7 +1200,6 @@ class TestEventDetail(TestCase):
 
         self.response_200(response)
         assert response.context["event"] == meal
-        assert response.context["category"] == meal.category
 
     def test_get_detail_unauthorized(self):
         """Test unauthorized access to event detail"""
@@ -2231,14 +2228,14 @@ class EnrichEventViewTest(TestCase):
         user = self.make_user("user")
         trip = TripFactory(author=user)
         day = trip.days.first()
-        event = EventFactory(
+        event = ExperienceFactory(
             day=day, trip=trip, name="Test Event", address="Test Address"
         )
 
         with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
             response = self.post("trips:enrich-event", event_id=event.pk)
 
-        self.response_204(response)
+        self.response_200(response)
         event.refresh_from_db()
         assert event.place_id == "test_place_id"
         assert event.website == "https://example.com"
@@ -2253,7 +2250,7 @@ class EnrichEventViewTest(TestCase):
         user = self.make_user("user")
         trip = TripFactory(author=user)
         day = trip.days.first()
-        event = EventFactory(day=day, trip=trip, name="", address="")
+        event = ExperienceFactory(day=day, trip=trip, name="", address="")
 
         with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
             response = self.post("trips:enrich-event", event_id=event.pk)
@@ -2270,17 +2267,19 @@ class EnrichEventViewTest(TestCase):
         user = self.make_user("user")
         trip = TripFactory(author=user)
         day = trip.days.first()
-        event = EventFactory(
+        event = ExperienceFactory(
             day=day, trip=trip, name="Test Event", address="Test Address"
         )
 
         with self.login(user), override_settings(GOOGLE_PLACES_API_KEY=""):
             response = self.post("trips:enrich-event", event_id=event.pk)
 
-        assert response.status_code == 500
-        messages = list(get_messages(response.wsgi_request))
-        assert len(messages) == 1
-        assert str(messages[0]) == "Google Places API key is not configured."
+        self.response_200(response)
+        assert "error_message" in response.context
+        assert (
+            "Google Places API key is not configured."
+            in response.context["error_message"]
+        )
 
     def test_enrich_event_search_request_fails(self, mock_post, mock_get):
         """Test enrichment when search request fails"""
@@ -2289,17 +2288,19 @@ class EnrichEventViewTest(TestCase):
         user = self.make_user("user")
         trip = TripFactory(author=user)
         day = trip.days.first()
-        event = EventFactory(
+        event = ExperienceFactory(
             day=day, trip=trip, name="Test Event", address="Test Address"
         )
 
         with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
             response = self.post("trips:enrich-event", event_id=event.pk)
 
-        assert response.status_code == 500
-        messages = list(get_messages(response.wsgi_request))
-        assert len(messages) == 1
-        assert "Error calling Google Places API: Test error" in str(messages[0])
+        self.response_200(response)
+        assert "error_message" in response.context
+        assert (
+            "Error calling Google Places API: Test error"
+            in response.context["error_message"]
+        )
 
     def test_enrich_event_search_request_fails_with_response(self, mock_post, mock_get):
         """Test enrichment when search request fails with a response"""
@@ -2310,17 +2311,16 @@ class EnrichEventViewTest(TestCase):
         user = self.make_user("user")
         trip = TripFactory(author=user)
         day = trip.days.first()
-        event = EventFactory(
+        event = ExperienceFactory(
             day=day, trip=trip, name="Test Event", address="Test Address"
         )
 
         with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
             response = self.post("trips:enrich-event", event_id=event.pk)
 
-        assert response.status_code == 500
-        messages = list(get_messages(response.wsgi_request))
-        assert len(messages) == 1
-        assert "API Error: API error details" in str(messages[0])
+        self.response_200(response)
+        assert "error_message" in response.context
+        assert "API Error: API error details" in response.context["error_message"]
 
     def test_enrich_event_no_place_found(self, mock_post, mock_get):
         """Test enrichment when no place is found"""
@@ -2330,17 +2330,16 @@ class EnrichEventViewTest(TestCase):
         user = self.make_user("user")
         trip = TripFactory(author=user)
         day = trip.days.first()
-        event = EventFactory(
+        event = ExperienceFactory(
             day=day, trip=trip, name="Test Event", address="Test Address"
         )
 
         with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
             response = self.post("trips:enrich-event", event_id=event.pk)
 
-        assert response.status_code == 404
-        messages = list(get_messages(response.wsgi_request))
-        assert len(messages) == 1
-        assert str(messages[0]) == "Could not find a matching place."
+        self.response_200(response)
+        assert "error_message" in response.context
+        assert "Could not find a matching place." in response.context["error_message"]
 
     def test_enrich_event_details_request_fails(self, mock_post, mock_get):
         """Test enrichment when details request fails"""
@@ -2351,17 +2350,19 @@ class EnrichEventViewTest(TestCase):
         user = self.make_user("user")
         trip = TripFactory(author=user)
         day = trip.days.first()
-        event = EventFactory(
+        event = ExperienceFactory(
             day=day, trip=trip, name="Test Event", address="Test Address"
         )
 
         with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
             response = self.post("trips:enrich-event", event_id=event.pk)
 
-        assert response.status_code == 500
-        messages = list(get_messages(response.wsgi_request))
-        assert len(messages) == 1
-        assert "Error calling Google Places API: Test error" in str(messages[0])
+        self.response_200(response)
+        assert "error_message" in response.context
+        assert (
+            "Error calling Google Places API: Test error"
+            in response.context["error_message"]
+        )
 
     def test_enrich_event_details_request_fails_with_response(
         self, mock_post, mock_get
@@ -2376,14 +2377,13 @@ class EnrichEventViewTest(TestCase):
         user = self.make_user("user")
         trip = TripFactory(author=user)
         day = trip.days.first()
-        event = EventFactory(
+        event = ExperienceFactory(
             day=day, trip=trip, name="Test Event", address="Test Address"
         )
 
         with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
             response = self.post("trips:enrich-event", event_id=event.pk)
 
-        assert response.status_code == 500
-        messages = list(get_messages(response.wsgi_request))
-        assert len(messages) == 1
-        assert "API Error: API error details" in str(messages[0])
+        self.response_200(response)
+        assert "error_message" in response.context
+        assert "API Error: API error details" in response.context["error_message"]
