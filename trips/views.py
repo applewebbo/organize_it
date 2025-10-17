@@ -33,6 +33,7 @@ from trips.utils import (
     convert_google_opening_hours,
     create_day_map,
     geocode_location,
+    get_event_instance,
     get_trips,
 )
 
@@ -482,15 +483,7 @@ def event_detail(request, pk):
     qs = Event.objects.select_related("trip__author", "transport", "experience", "meal")
     event = get_object_or_404(qs, pk=pk, trip__author=request.user)
 
-    # Get proper instance based on category
-    if event.category == 1:  # Transport
-        event = event.transport
-    elif event.category == 2:  # Experience
-        event = event.experience
-    elif event.category == 3:  # Meal
-        event = event.meal
-    else:
-        raise Http404("Invalid event category")
+    event = get_event_instance(event)
 
     context = {
         "event": event,
@@ -507,13 +500,7 @@ def event_modify(request, pk):
     qs = Event.objects.select_related("day__trip", "transport", "experience", "meal")
     event = get_object_or_404(qs, pk=pk, day__trip__author=request.user)
 
-    # Get proper instance based on category
-    if event.category == 1:  # Transport
-        event = event.transport
-    elif event.category == 2:  # Experience
-        event = event.experience
-    elif event.category == 3:  # Meal
-        event = event.meal
+    event = get_event_instance(event)
 
     # Select form class based on event category
     event_form = {
@@ -885,6 +872,98 @@ def stay_note_delete(request, stay_id):
     return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
 
 
+@login_required
+@require_http_methods(["POST"])
+def enrich_stay(request, stay_id):
+    """
+    Enrich a stay's details using the new Google Places API.
+    - Find Place ID using places:searchText.
+    - Use Place ID to get details (website, phone, opening hours).
+    - Update the stay instance.
+    """
+    stay = get_object_or_404(
+        Stay.objects.filter(days__trip__author=request.user).distinct(), pk=stay_id
+    )
+    context = {}
+
+    if not stay.name or not stay.address:
+        messages.error(
+            request, _("Stay must have a name and an address to be enriched.")
+        )
+        return HttpResponse(status=400)
+
+    api_key = settings.GOOGLE_PLACES_API_KEY
+
+    if not api_key:
+        context["error_message"] = _("Google Places API key is not configured.")
+    else:
+        # 1. Find Place ID
+        search_url = "https://places.googleapis.com/v1/places:searchText"
+        search_payload = {"textQuery": f"{stay.name} {stay.address}"}
+        search_headers = {
+            "Content-Type": "application/json",
+            "X-Goog-Api-Key": api_key,
+            "X-Goog-FieldMask": "places.id",
+        }
+
+        try:
+            response = requests.post(
+                search_url, json=search_payload, headers=search_headers, timeout=5
+            )
+            response.raise_for_status()
+            data = response.json()
+
+            if data.get("places"):
+                stay.place_id = data["places"][0]["id"]
+            else:
+                context["error_message"] = _("Could not find a matching place.")
+
+        except requests.exceptions.Timeout:
+            context["error_message"] = _("Google Places API request timed out.")
+        except requests.RequestException as e:
+            error_message = f"Error calling Google Places API: {e}"
+            if e.response is not None:
+                error_message = f"API Error: {e.response.text}"
+            context["error_message"] = error_message
+
+    if "error_message" not in context and stay.place_id:
+        # 2. Get Place Details
+        details_url = f"https://places.googleapis.com/v1/places/{stay.place_id}"
+        details_headers = {
+            "X-Goog-Api-Key": api_key,
+            "X-Goog-FieldMask": "websiteUri,internationalPhoneNumber,regularOpeningHours",
+        }
+
+        try:
+            response = requests.get(details_url, headers=details_headers, timeout=5)
+            response.raise_for_status()
+            data = response.json()
+
+            stay.website = data.get("websiteUri", "")
+            stay.phone_number = data.get("internationalPhoneNumber", "")
+            google_opening_hours = data.get("regularOpeningHours", None)
+            stay.opening_hours = convert_google_opening_hours(google_opening_hours)
+            stay.enriched = True
+            stay.save()
+
+            messages.success(request, _("Stay enriched successfully!"))
+
+        except requests.exceptions.Timeout:
+            context["error_message"] = _("Google Places API request timed out.")
+        except requests.RequestException as e:
+            error_message = f"Error calling Google Places API: {e}"
+            if e.response is not None:
+                error_message = f"API Error: {e.response.text}"
+            context["error_message"] = error_message
+
+    # Refetch the stay to get the updated data
+    stay.refresh_from_db()
+
+    context["stay"] = stay
+    context["success_message"] = _("Stay enriched successfully!")
+    return TemplateResponse(request, "trips/stay-detail.html", context)
+
+
 class DayMapView(View):
     @method_decorator(login_required, name="dispatch")
     def dispatch(self, request, day_id, *args, **kwargs):
@@ -934,10 +1013,13 @@ def enrich_event(request, event_id):
     context = {}
 
     if not event.name or not event.address:
-        messages.error(
-            request, _("Event must have a name and an address to be enriched.")
+        context["error_message"] = _(
+            "Event must have a name and an address to be enriched."
         )
-        return HttpResponse(status=400)
+        event = get_event_instance(event)
+
+        context["event"] = event
+        return TemplateResponse(request, "trips/event-detail.html", context)
 
     api_key = settings.GOOGLE_PLACES_API_KEY
 
@@ -1006,15 +1088,7 @@ def enrich_event(request, event_id):
     # Refetch the event to get the updated data in the child instance
     event.refresh_from_db()
 
-    # Get proper instance based on category
-    if event.category == 1:
-        event = event.transport
-    elif event.category == 2:
-        event = event.experience
-    elif event.category == 3:
-        event = event.meal
-    else:
-        raise Http404("Invalid event category")
+    event = get_event_instance(event)
 
     context["event"] = event
     context["success_message"] = _("Event enriched successfully!")

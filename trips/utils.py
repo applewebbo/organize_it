@@ -6,6 +6,7 @@ import requests
 from django.core.cache import cache
 from django.db.models import BooleanField, Case, F, Max, Min, Q, When, Window
 from django.db.models.functions import Lag, Lead
+from django.http import Http404
 
 from accounts.models import Profile
 from trips.models import Trip
@@ -351,3 +352,17 @@ def convert_google_opening_hours(google_hours):
                     "close": close_time,
                 }
     return custom_hours if custom_hours else None
+
+
+def get_event_instance(event):
+    """
+    Get the specific event instance based on its category.
+    """
+    if event.category == 1:  # Transport
+        return event.transport
+    elif event.category == 2:  # Experience
+        return event.experience
+    elif event.category == 3:  # Meal
+        return event.meal
+    else:
+        raise Http404("Invalid event category")
