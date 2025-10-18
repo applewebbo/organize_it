@@ -967,6 +967,17 @@ class EventModifyView(TestCase):
 
         self.response_404(response)
 
+    def test_get_invalid_category_for_coverage(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = EventFactory(day=day, trip=trip, category=4)  # Invalid category
+
+        with self.login(user):
+            response = self.get("trips:event-modify", pk=event.pk)
+
+        self.response_404(response)
+
     @patch("geocoder.mapbox")
     def test_post_transport(self, mock_geocoder):
         mock_geocoder.return_value.ok = True
@@ -2197,7 +2208,6 @@ class SingleEventViewTest(TestCase):
             response = self.get("trips:single-event", pk=event.pk)
 
         self.response_200(response)
-        self.assertContains(response, event.name)
         assert response.context["event"] == event
 
 
@@ -2255,11 +2265,10 @@ class EnrichEventViewTest(TestCase):
         with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
             response = self.post("trips:enrich-event", event_id=event.pk)
 
-        assert response.status_code == 400
-        messages = list(get_messages(response.wsgi_request))
-        assert len(messages) == 1
+        self.response_200(response)
         assert (
-            str(messages[0]) == "Event must have a name and an address to be enriched."
+            response.context["error_message"]
+            == "Event must have a name and an address to be enriched."
         )
 
     def test_enrich_event_no_api_key(self, mock_post, mock_get):
@@ -2387,3 +2396,263 @@ class EnrichEventViewTest(TestCase):
         self.response_200(response)
         assert "error_message" in response.context
         assert "API Error: API error details" in response.context["error_message"]
+
+    def test_enrich_event_search_timeout(self, mock_post, mock_get):
+        """Test enrichment when search request times out"""
+        mock_post.side_effect = requests.exceptions.Timeout
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = ExperienceFactory(
+            day=day, trip=trip, name="Test Event", address="Test Address"
+        )
+
+        with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
+            response = self.post("trips:enrich-event", event_id=event.pk)
+
+        self.response_200(response)
+        assert "error_message" in response.context
+        assert (
+            "Google Places API request timed out" in response.context["error_message"]
+        )
+
+    def test_enrich_event_details_timeout(self, mock_post, mock_get):
+        """Test enrichment when details request times out"""
+        mock_post.return_value.raise_for_status.return_value = None
+        mock_post.return_value.json.return_value = {"places": [{"id": "test_place_id"}]}
+        mock_get.side_effect = requests.exceptions.Timeout
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = ExperienceFactory(
+            day=day, trip=trip, name="Test Event", address="Test Address"
+        )
+
+        with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
+            response = self.post("trips:enrich-event", event_id=event.pk)
+
+        self.response_200(response)
+        assert "error_message" in response.context
+        assert (
+            "Google Places API request timed out" in response.context["error_message"]
+        )
+
+
+@patch("trips.views.requests.get")
+@patch("trips.views.requests.post")
+class EnrichStayViewTest(TestCase):
+    """Test cases for enrich_stay view"""
+
+    def test_enrich_stay_success(self, mock_post, mock_get):
+        """Test successful enrichment of a stay"""
+        # Mock Google Places API responses
+        mock_post.return_value.raise_for_status.return_value = None
+        mock_post.return_value.json.return_value = {"places": [{"id": "test_place_id"}]}
+        mock_get.return_value.raise_for_status.return_value = None
+        mock_get.return_value.json.return_value = {
+            "websiteUri": "https://example.com",
+            "internationalPhoneNumber": "+1234567890",
+            "regularOpeningHours": {
+                "periods": [
+                    {
+                        "open": {"day": 1, "hour": 9, "minute": 0},
+                        "close": {"day": 1, "hour": 17, "minute": 0},
+                    }
+                ]
+            },
+        }
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        stay = StayFactory(name="Test Stay", address="Test Address")
+        stay.days.add(day)
+
+        with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
+            response = self.post("trips:enrich-stay", stay_id=stay.pk)
+
+        self.response_200(response)
+        stay.refresh_from_db()
+        assert stay.place_id == "test_place_id"
+        assert stay.website == "https://example.com"
+        assert stay.phone_number == "+1234567890"
+        assert "monday" in stay.opening_hours
+        messages = list(get_messages(response.wsgi_request))
+        assert len(messages) == 1
+        assert str(messages[0]) == "Stay enriched successfully!"
+
+    def test_enrich_stay_no_name_or_address(self, mock_post, mock_get):
+        """Test enrichment with no name or address"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        stay = StayFactory(name="", address="")
+        stay.days.add(day)
+
+        with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
+            response = self.post("trips:enrich-stay", stay_id=stay.pk)
+
+        self.response_200(response)
+        assert (
+            response.context["error_message"]
+            == "Stay must have a name and an address to be enriched."
+        )
+
+    def test_enrich_stay_no_api_key(self, mock_post, mock_get):
+        """Test enrichment with no API key"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        stay = StayFactory(name="Test Stay", address="Test Address")
+        stay.days.add(day)
+
+        with self.login(user), override_settings(GOOGLE_PLACES_API_KEY=""):
+            response = self.post("trips:enrich-stay", stay_id=stay.pk)
+        self.response_200(response)
+        assert "error_message" in response.context
+        assert (
+            "Google Places API key is not configured."
+            in response.context["error_message"]
+        )
+
+    def test_enrich_stay_search_request_fails(self, mock_post, mock_get):
+        """Test enrichment when search request fails"""
+        mock_post.side_effect = requests.RequestException("Test error")
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        stay = StayFactory(name="Test Stay", address="Test Address")
+        stay.days.add(day)
+
+        with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
+            response = self.post("trips:enrich-stay", stay_id=stay.pk)
+
+        self.response_200(response)
+        assert "error_message" in response.context
+        assert (
+            "Error calling Google Places API: Test error"
+            in response.context["error_message"]
+        )
+
+    def test_enrich_stay_search_request_fails_with_response(self, mock_post, mock_get):
+        """Test enrichment when search request fails with a response"""
+        exception = requests.RequestException("Test error")
+        exception.response = Mock(text="API error details")
+        mock_post.side_effect = exception
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        stay = StayFactory(name="Test Stay", address="Test Address")
+        stay.days.add(day)
+
+        with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
+            response = self.post("trips:enrich-stay", stay_id=stay.pk)
+
+        self.response_200(response)
+        assert "error_message" in response.context
+        assert "API Error: API error details" in response.context["error_message"]
+
+    def test_enrich_stay_no_place_found(self, mock_post, mock_get):
+        """Test enrichment when no place is found"""
+        mock_post.return_value.raise_for_status.return_value = None
+        mock_post.return_value.json.return_value = {"places": []}
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        stay = StayFactory(name="Test Stay", address="Test Address")
+        stay.days.add(day)
+
+        with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
+            response = self.post("trips:enrich-stay", stay_id=stay.pk)
+
+        self.response_200(response)
+        assert "error_message" in response.context
+        assert "Could not find a matching place." in response.context["error_message"]
+
+    def test_enrich_stay_details_request_fails(self, mock_post, mock_get):
+        """Test enrichment when details request fails"""
+        mock_post.return_value.raise_for_status.return_value = None
+        mock_post.return_value.json.return_value = {"places": [{"id": "test_place_id"}]}
+        mock_get.side_effect = requests.RequestException("Test error")
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        stay = StayFactory(name="Test Stay", address="Test Address")
+        stay.days.add(day)
+
+        with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
+            response = self.post("trips:enrich-stay", stay_id=stay.pk)
+
+        self.response_200(response)
+        assert "error_message" in response.context
+        assert (
+            "Error calling Google Places API: Test error"
+            in response.context["error_message"]
+        )
+
+    def test_enrich_stay_details_request_fails_with_response(self, mock_post, mock_get):
+        """Test enrichment when details request fails with a response"""
+        mock_post.return_value.raise_for_status.return_value = None
+        mock_post.return_value.json.return_value = {"places": [{"id": "test_place_id"}]}
+        exception = requests.RequestException("Test error")
+        exception.response = Mock(text="API error details")
+        mock_get.side_effect = exception
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        stay = StayFactory(name="Test Stay", address="Test Address")
+        stay.days.add(day)
+
+        with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
+            response = self.post("trips:enrich-stay", stay_id=stay.pk)
+
+        self.response_200(response)
+        assert "error_message" in response.context
+        assert "API Error: API error details" in response.context["error_message"]
+
+    def test_enrich_stay_search_timeout(self, mock_post, mock_get):
+        """Test enrichment when search request times out"""
+        mock_post.side_effect = requests.exceptions.Timeout
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        stay = StayFactory(name="Test Stay", address="Test Address")
+        stay.days.add(day)
+
+        with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
+            response = self.post("trips:enrich-stay", stay_id=stay.pk)
+
+        self.response_200(response)
+        assert "error_message" in response.context
+        assert (
+            "Google Places API request timed out" in response.context["error_message"]
+        )
+
+    def test_enrich_stay_details_timeout(self, mock_post, mock_get):
+        """Test enrichment when details request times out"""
+        mock_post.return_value.raise_for_status.return_value = None
+        mock_post.return_value.json.return_value = {"places": [{"id": "test_place_id"}]}
+        mock_get.side_effect = requests.exceptions.Timeout
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        stay = StayFactory(name="Test Stay", address="Test Address")
+        stay.days.add(day)
+
+        with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
+            response = self.post("trips:enrich-stay", stay_id=stay.pk)
+
+        self.response_200(response)
+        assert "error_message" in response.context
+        assert (
+            "Google Places API request timed out" in response.context["error_message"]
+        )

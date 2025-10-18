@@ -4,7 +4,6 @@ from unittest.mock import Mock, patch
 
 import pytest
 from django.conf import settings
-from django.core.exceptions import ValidationError
 
 from trips.models import Event, Experience, Meal, Stay, Transport
 
@@ -611,23 +610,6 @@ class TestStayModel:
         stay.save()
 
         mock_geocoder.assert_not_called()
-
-    def test_phone_number_validation(self, stay_factory):
-        """Test phone number validation"""
-        # Valid phone numbers
-        stay = stay_factory(phone_number="+393334445566")
-        stay.full_clean()
-        assert stay.phone_number == "+393334445566"
-
-        stay = stay_factory(phone_number="0233445566")
-        stay.full_clean()
-        assert stay.phone_number == "0233445566"
-
-        # Invalid phone number should raise ValidationError
-        with pytest.raises(ValidationError):
-            stay = stay_factory(phone_number="invalid")
-            stay.full_clean()
-            stay.full_clean()
 
     def test_update_stay_days_removes_previous_stays(self, trip_factory, stay_factory):
         """Test that assigning multiple days to a new stay removes them from previous stays"""

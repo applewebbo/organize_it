@@ -509,9 +509,6 @@ def event_modify(request, pk):
         3: MealForm,  # Meal
     }.get(event.category)
 
-    if not event_form:
-        raise Http404("Invalid event category")
-
     form = event_form(request.POST or None, instance=event)
     if form.is_valid():
         form.save()
@@ -887,10 +884,11 @@ def enrich_stay(request, stay_id):
     context = {}
 
     if not stay.name or not stay.address:
-        messages.error(
-            request, _("Stay must have a name and an address to be enriched.")
+        context["error_message"] = _(
+            "Stay must have a name and an address to be enriched."
         )
-        return HttpResponse(status=400)
+        context["stay"] = stay
+        return TemplateResponse(request, "trips/stay-detail.html", context)
 
     api_key = settings.GOOGLE_PLACES_API_KEY
 
