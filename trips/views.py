@@ -944,8 +944,6 @@ def enrich_stay(request, stay_id):
             stay.enriched = True
             stay.save()
 
-            messages.success(request, _("Stay enriched successfully!"))
-
         except requests.exceptions.Timeout:
             context["error_message"] = _("Google Places API request timed out.")
         except requests.RequestException as e:
@@ -1072,8 +1070,6 @@ def enrich_event(request, event_id):
             event.opening_hours = convert_google_opening_hours(google_opening_hours)
             event.enriched = True
             event.save()
-
-            messages.success(request, _("Event enriched successfully!"))
 
         except requests.exceptions.Timeout:
             context["error_message"] = _("Google Places API request timed out.")
