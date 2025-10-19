@@ -17,7 +17,7 @@
                 <span class="loading loading-bars loading-lg text-primary"></span>
             </div>
         </div>
-    <div class="grid gap-1 p-4 sm:grid-cols-2 sm:gap-2 md:p-5">
+    <div class="grid gap-1 p-4 sm:gap-2 md:p-5">
         <ul class="leading-10">
             <li class="flex gap-2 items-center">
                 <i class="ph-bold ph-map-pin i-md text-base-content/60"></i>{{ stay.address }}
@@ -43,6 +43,21 @@
                 </li>
             {% endif %}
         </ul>
+        {% if error_message %}
+            <div role="alert"
+                    class="mt-4 alert alert-error alert-soft"
+                    x-cloak
+                    x-data="{ show: true }"
+                    x-show="show"
+                    x-init="setTimeout(() => show = false, 4000)">{{ error_message }}</div>
+        {% elif success_message %}
+            <div role="alert"
+                    class="mt-4 alert alert-success alert-soft"
+                    x-cloak
+                x-data="{ show: true }"
+                x-show="show"
+                x-init="setTimeout(() => show = false, 4000)">{{ success_message }}</div>
+        {% endif %}
     </div>
     </div>
     <div class="flex justify-end items-center p-4 px-8 rounded-b md:p-5">
@@ -61,14 +76,23 @@
                 class="ms-2 btn btn-success btn-soft"
                 hx-get="{% url 'trips:stay-modify' stay.pk %}"
                 hx-target="#stay-details"
-                hx-swap="innerHTML">{% trans 'Edit' %}</button>
+                hx-swap="innerHTML">
+            <i class="text-xl sm:hidden ph-bold ph-pencil-line"></i>
+            <span class="hidden sm:inline">{% trans 'Edit' %}</span>
+        </button>
         <button type="button"
                 class="ms-2 btn btn-error btn-soft"
                 hx-get="{% url 'trips:stay-delete' stay.pk %}"
                 hx-target="#stay-details"
-                hx-swap="innerHTML">{% trans 'Delete' %}</button>
+                hx-swap="innerHTML">
+            <i class="text-xl sm:hidden ph-bold ph-trash"></i>
+            <span class="hidden sm:inline">{% trans 'Delete' %}</span>
+        </button>
         <button type="button"
                 x-on:click="openModal = false{% if modified %}; location.reload(){% endif %}"
-                class="ms-2 btn btn-soft btn-neutral">{% trans 'Close' %}</button>
+                class="ms-2 btn btn-soft btn-neutral">
+            <i class="text-xl sm:hidden ph-bold ph-x-circle"></i>
+            <span class="hidden sm:inline">{% trans 'Close' %}</span>
+        </button>
     </div>
 </div>
