@@ -1,0 +1,42 @@
+{% load i18n trip_tags %}
+<ul class="leading-10">
+    <li class="flex gap-2 items-center">
+        <i class="ph-bold ph-map-pin i-md text-base-content/60"></i>{{ event.address }}
+    </li>
+    <li class="flex gap-2 items-center">
+        <i class="ph-bold ph-clock i-md text-base-content/60"></i>{{ event.start_time|time:"H:i" }}&nbsp;-&nbsp;{{ event.end_time|time:"H:i" }}
+    </li>
+    {% if enriched_data.website %}
+        <li class="flex gap-2 items-center py-1 px-2 rounded bg-success/10">
+            <i class="ph-bold ph-globe i-md text-success"></i>
+            <a href="{{ enriched_data.website }}" class="font-semibold link text-success">{{ enriched_data.website|truncatechars:38 }}</a>
+            <span class="ml-auto badge badge-success badge-xs">{% trans 'New' %}</span>
+        </li>
+    {% elif event.website %}
+        <li class="flex gap-2 items-center">
+            <i class="ph-bold ph-globe i-md text-base-content/60"></i><a href="{{ event.website }}" class="link">{{ event.website|truncatechars:38 }}</a>
+        </li>
+    {% endif %}
+    {% if enriched_data.phone_number %}
+        <li class="flex gap-2 items-center py-1 px-2 rounded bg-success/10">
+            <i class="ph-bold ph-phone i-md text-success"></i>
+            <span class="font-semibold text-success">{{ enriched_data.phone_number }}</span>
+            <span class="ml-auto badge badge-success badge-xs">{% trans 'New' %}</span>
+        </li>
+    {% elif event.phone_number %}
+        <li class="flex gap-2 items-center">
+            <i class="ph-bold ph-phone i-md text-base-content/60"></i>{{ event.phone_number }}
+        </li>
+    {% endif %}
+    {% if enriched_data.opening_hours %}
+        <li class="flex gap-2 items-center py-1 px-2 rounded bg-success/10">
+            <i class="ph-bold ph-door-open i-md text-success"></i>
+            <span class="font-semibold text-success">{{ enriched_data.opening_hours|format_opening_hours }}</span>
+            <span class="ml-auto badge badge-success badge-xs">{% trans 'New' %}</span>
+        </li>
+    {% elif event.opening_hours %}
+        <li class="flex gap-2 items-center">
+            <i class="ph-bold ph-door-open i-md text-base-content/60"></i>{{ event.opening_hours|format_opening_hours }}
+        </li>
+    {% endif %}
+</ul>

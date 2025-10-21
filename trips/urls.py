@@ -40,6 +40,11 @@ htmx_urlpatterns = [
     path("events/single/<int:pk>/", views.single_event, name="single-event"),
     path("events/<int:event_id>/enrich/", views.enrich_event, name="enrich-event"),
     path(
+        "events/<int:event_id>/enrich/confirm/",
+        views.confirm_enrich_event,
+        name="confirm-enrich-event",
+    ),
+    path(
         "events/<int:pk>/change-times",
         views.event_change_times,
         name="event-change-times",

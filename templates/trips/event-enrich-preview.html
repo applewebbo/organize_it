@@ -1,0 +1,81 @@
+{% load trip_tags i18n partials %}
+<div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
+    <div class="flex gap-1 items-center">
+        <h3 id="event-title"
+            class="text-xl font-semibold text-gray-900 dark:text-white">{{ event.name }}</h3>
+        <span class="badge badge-outline badge-sm badge-info ms-2 align-sub">{{ event.get_type_display }}</span>
+    </div>
+    <button type="button"
+            class="btn btn-ghost btn-circle btn-sm"
+            x-on:click="openModal = false">
+        <i class="text-xl ph-bold ph-x"></i>
+        <span class="sr-only">Close modal</span>
+    </button>
+</div>
+<div id="event-details">
+    {% if show_preview %}
+        <div class="p-4 md:p-5">
+            <div class="mb-4 alert alert-info alert-soft">
+                <i class="text-xl ph-bold ph-info"></i>
+                <span>{% trans 'Review the enriched data below. New information is highlighted in green.' %}</span>
+            </div>
+
+            {% partialdef 'event-preview' inline %}
+            <div class="grid gap-1 sm:gap-2">
+                {% if event.category == 2 %}
+                    {% include 'trips/includes/experience-preview.html' %}
+                {% elif event.category == 3 %}
+                    {% include 'trips/includes/meal-preview.html' %}
+                {% endif %}
+            </div>
+            {% endpartialdef 'event-preview' %}
+        </div>
+
+        <div class="flex gap-2 justify-end items-center p-4 px-8 rounded-b border-t md:p-5 border-base-300">
+            <form hx-post="{% url 'trips:confirm-enrich-event' event.id %}"
+                  hx-target="#dialog"
+                  hx-swap="innerHTML">
+                {% csrf_token %}
+                <input type="hidden" name="place_id" value="{{ enriched_data.place_id }}">
+                <input type="hidden" name="website" value="{{ enriched_data.website }}">
+                <input type="hidden" name="phone_number" value="{{ enriched_data.phone_number }}">
+                {% if enriched_data.opening_hours_json %}
+                <input type="hidden" name="opening_hours" value="{{ enriched_data.opening_hours_json }}">
+                {% endif %}
+
+                <div class="flex gap-2">
+                    <button type="submit"
+                            class="btn btn-success btn-soft">
+                        <i class="text-xl ph-bold ph-check"></i>
+                        <span>{% trans 'Accept' %}</span>
+                    </button>
+                    <button type="button"
+                            hx-get="{% url 'trips:event-detail' event.pk %}"
+                            hx-target="#dialog"
+                            hx-swap="innerHTML"
+                            class="btn btn-error btn-soft">
+                        <i class="text-xl ph-bold ph-x"></i>
+                        <span>{% trans 'Cancel' %}</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    {% elif error_message %}
+        <div class="p-4 md:p-5">
+            <div role="alert" class="alert alert-error alert-soft">
+                <i class="text-xl ph-bold ph-warning"></i>
+                <span>{{ error_message }}</span>
+            </div>
+        </div>
+        <div class="flex gap-2 justify-end items-center p-4 px-8 rounded-b border-t md:p-5 border-base-300">
+            <button type="button"
+                    hx-get="{% url 'trips:event-detail' event.pk %}"
+                    hx-target="#dialog"
+                    hx-swap="innerHTML"
+                    class="btn btn-soft btn-neutral">
+                <i class="text-xl ph-bold ph-arrow-left"></i>
+                <span>{% trans 'Back' %}</span>
+            </button>
+        </div>
+    {% endif %}
+</div>

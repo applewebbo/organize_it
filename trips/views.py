@@ -1,3 +1,4 @@
+import json
 from datetime import date, timedelta
 
 import requests
@@ -1000,9 +1001,10 @@ class DayMapView(View):
 def enrich_event(request, event_id):
     """
     Enrich an event's details using the new Google Places API.
+    Shows a preview of enriched data without saving it.
     - Find Place ID using places:searchText.
     - Use Place ID to get details (website, phone, opening hours).
-    - Update the event instance.
+    - Return preview for user confirmation.
     """
     qs = Event.objects.select_related("trip__author", "transport", "experience", "meal")
     event = get_object_or_404(qs, pk=event_id, trip__author=request.user)
@@ -1031,6 +1033,7 @@ def enrich_event(request, event_id):
             "X-Goog-FieldMask": "places.id",
         }
 
+        place_id = None
         try:
             response = requests.post(
                 search_url, json=search_payload, headers=search_headers, timeout=5
@@ -1039,7 +1042,7 @@ def enrich_event(request, event_id):
             data = response.json()
 
             if data.get("places"):
-                event.place_id = data["places"][0]["id"]
+                place_id = data["places"][0]["id"]
             else:
                 context["error_message"] = _("Could not find a matching place.")
 
@@ -1051,9 +1054,11 @@ def enrich_event(request, event_id):
                 error_message = f"API Error: {e.response.text}"
             context["error_message"] = error_message
 
-    if "error_message" not in context and event.place_id:
+    # Store enriched data in context without saving to database
+    enriched_data = {}
+    if "error_message" not in context and place_id:
         # 2. Get Place Details
-        details_url = f"https://places.googleapis.com/v1/places/{event.place_id}"
+        details_url = f"https://places.googleapis.com/v1/places/{place_id}"
         details_headers = {
             "X-Goog-Api-Key": api_key,
             "X-Goog-FieldMask": "websiteUri,internationalPhoneNumber,regularOpeningHours",
@@ -1064,12 +1069,13 @@ def enrich_event(request, event_id):
             response.raise_for_status()
             data = response.json()
 
-            event.website = data.get("websiteUri", "")
-            event.phone_number = data.get("internationalPhoneNumber", "")
+            enriched_data["place_id"] = place_id
+            enriched_data["website"] = data.get("websiteUri", "")
+            enriched_data["phone_number"] = data.get("internationalPhoneNumber", "")
             google_opening_hours = data.get("regularOpeningHours", None)
-            event.opening_hours = convert_google_opening_hours(google_opening_hours)
-            event.enriched = True
-            event.save()
+            enriched_data["opening_hours"] = convert_google_opening_hours(
+                google_opening_hours
+            )
 
         except requests.exceptions.Timeout:
             context["error_message"] = _("Google Places API request timed out.")
@@ -1079,11 +1085,59 @@ def enrich_event(request, event_id):
                 error_message = f"API Error: {e.response.text}"
             context["error_message"] = error_message
 
-    # Refetch the event to get the updated data in the child instance
-    event.refresh_from_db()
-
     event = get_event_instance(event)
 
+    # Serialize opening_hours to JSON string for form submission
+    if enriched_data and enriched_data.get("opening_hours"):
+        enriched_data["opening_hours_json"] = json.dumps(enriched_data["opening_hours"])
+
     context["event"] = event
-    context["success_message"] = _("Event enriched successfully!")
-    return TemplateResponse(request, "trips/event-detail.html", context)
+    context["enriched_data"] = enriched_data
+    context["show_preview"] = bool(enriched_data and "error_message" not in context)
+    return TemplateResponse(request, "trips/event-enrich-preview.html", context)
+
+
+@login_required
+@require_http_methods(["POST"])
+def confirm_enrich_event(request, event_id):
+    """
+    Confirm and save enriched event data.
+    Receives enriched data from the preview and saves it to the database.
+    """
+    qs = Event.objects.select_related("trip__author", "transport", "experience", "meal")
+    event = get_object_or_404(qs, pk=event_id, trip__author=request.user)
+
+    # Get enriched data from POST parameters
+    place_id = request.POST.get("place_id", "")
+    website = request.POST.get("website", "")
+    phone_number = request.POST.get("phone_number", "")
+    opening_hours_json = request.POST.get("opening_hours", "")
+
+    # Parse opening_hours JSON if present
+    opening_hours = None
+    if opening_hours_json:
+        try:
+            opening_hours = json.loads(opening_hours_json)
+        except json.JSONDecodeError:
+            pass
+
+    # Save the enriched data
+    event.place_id = place_id
+    event.website = website
+    event.phone_number = phone_number
+    event.opening_hours = opening_hours
+    event.enriched = True
+    event.save()
+
+    # Refetch the event to get the updated data in the child instance
+    event.refresh_from_db()
+    event = get_event_instance(event)
+
+    # Return the updated event detail view
+    context = {
+        "event": event,
+        "success_message": _("Event enriched successfully!"),
+    }
+    response = TemplateResponse(request, "trips/event-detail.html", context)
+    response["HX-Trigger"] = "tripModified"
+    return response

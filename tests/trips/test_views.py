@@ -2217,7 +2217,7 @@ class EnrichEventViewTest(TestCase):
     """Test cases for enrich_event view"""
 
     def test_enrich_event_success(self, mock_post, mock_get):
-        """Test successful enrichment of an event"""
+        """Test successful enrichment of an event - returns preview"""
         # Mock Google Places API responses
         mock_post.return_value.raise_for_status.return_value = None
         mock_post.return_value.json.return_value = {"places": [{"id": "test_place_id"}]}
@@ -2246,13 +2246,48 @@ class EnrichEventViewTest(TestCase):
             response = self.post("trips:enrich-event", event_id=event.pk)
 
         self.response_200(response)
+        # Event should NOT be saved yet (preview mode)
         event.refresh_from_db()
-        assert event.place_id == "test_place_id"
-        assert event.website == "https://example.com"
-        assert event.phone_number == "+1234567890"
-        assert "monday" in event.opening_hours
-        assert "success_message" in response.context
-        assert response.context["success_message"] == "Event enriched successfully!"
+        assert event.place_id == ""
+        assert event.enriched is False
+        # Check that enriched_data is in context for preview
+        assert "enriched_data" in response.context
+        assert response.context["enriched_data"]["place_id"] == "test_place_id"
+        assert response.context["enriched_data"]["website"] == "https://example.com"
+        assert response.context["enriched_data"]["phone_number"] == "+1234567890"
+        assert "monday" in response.context["enriched_data"]["opening_hours"]
+        assert response.context["show_preview"] is True
+
+    def test_enrich_event_success_no_opening_hours(self, mock_post, mock_get):
+        """Test successful enrichment without opening hours"""
+        # Mock Google Places API responses without opening hours
+        mock_post.return_value.raise_for_status.return_value = None
+        mock_post.return_value.json.return_value = {"places": [{"id": "test_place_id"}]}
+        mock_get.return_value.raise_for_status.return_value = None
+        mock_get.return_value.json.return_value = {
+            "websiteUri": "https://example.com",
+            "internationalPhoneNumber": "+1234567890",
+            # No regularOpeningHours
+        }
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = ExperienceFactory(
+            day=day, trip=trip, name="Test Event", address="Test Address"
+        )
+
+        with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
+            response = self.post("trips:enrich-event", event_id=event.pk)
+
+        self.response_200(response)
+        # Check that enriched_data is in context without opening_hours
+        assert "enriched_data" in response.context
+        assert response.context["enriched_data"]["website"] == "https://example.com"
+        assert response.context["enriched_data"]["phone_number"] == "+1234567890"
+        assert response.context["enriched_data"]["opening_hours"] is None
+        assert "opening_hours_json" not in response.context["enriched_data"]
+        assert response.context["show_preview"] is True
 
     def test_enrich_event_no_name_or_address(self, mock_post, mock_get):
         """Test enrichment with no name or address"""
@@ -2437,6 +2472,135 @@ class EnrichEventViewTest(TestCase):
         assert (
             "Google Places API request timed out" in response.context["error_message"]
         )
+
+
+class ConfirmEnrichEventViewTest(TestCase):
+    """Test cases for confirm_enrich_event view"""
+
+    def test_confirm_enrich_event_success(self):
+        """Test successful confirmation and saving of enriched data"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = ExperienceFactory(
+            day=day, trip=trip, name="Test Event", address="Test Address"
+        )
+
+        enriched_data = {
+            "place_id": "test_place_id",
+            "website": "https://example.com",
+            "phone_number": "+1234567890",
+            "opening_hours": '{"monday": {"open": "9:00 AM", "close": "5:00 PM"}}',
+        }
+
+        with self.login(user):
+            response = self.post(
+                "trips:confirm-enrich-event", event_id=event.pk, data=enriched_data
+            )
+
+        # Should return 200 with event detail view and HX-Trigger header
+        self.response_200(response)
+        assert "HX-Trigger" in response.headers
+        assert response.headers["HX-Trigger"] == "tripModified"
+        assert "success_message" in response.context
+        assert response.context["success_message"] == "Event enriched successfully!"
+
+        # Event should be saved with enriched data
+        event.refresh_from_db()
+        assert event.place_id == "test_place_id"
+        assert event.website == "https://example.com"
+        assert event.phone_number == "+1234567890"
+        assert event.opening_hours == {
+            "monday": {"open": "9:00 AM", "close": "5:00 PM"}
+        }
+        assert event.enriched is True
+
+    def test_confirm_enrich_event_no_opening_hours(self):
+        """Test confirmation without opening_hours"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = ExperienceFactory(
+            day=day, trip=trip, name="Test Event", address="Test Address"
+        )
+
+        enriched_data = {
+            "place_id": "test_place_id",
+            "website": "https://example.com",
+            "phone_number": "+1234567890",
+            # No opening_hours field
+        }
+
+        with self.login(user):
+            response = self.post(
+                "trips:confirm-enrich-event", event_id=event.pk, data=enriched_data
+            )
+
+        # Should save successfully, opening_hours will be None
+        self.response_200(response)
+        assert "HX-Trigger" in response.headers
+        assert response.headers["HX-Trigger"] == "tripModified"
+        event.refresh_from_db()
+        assert event.place_id == "test_place_id"
+        assert event.website == "https://example.com"
+        assert event.phone_number == "+1234567890"
+        assert event.opening_hours is None
+        assert event.enriched is True
+
+    def test_confirm_enrich_event_invalid_json(self):
+        """Test confirmation with invalid opening_hours JSON"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = ExperienceFactory(
+            day=day, trip=trip, name="Test Event", address="Test Address"
+        )
+
+        enriched_data = {
+            "place_id": "test_place_id",
+            "website": "https://example.com",
+            "phone_number": "+1234567890",
+            "opening_hours": "invalid json",
+        }
+
+        with self.login(user):
+            response = self.post(
+                "trips:confirm-enrich-event", event_id=event.pk, data=enriched_data
+            )
+
+        # Should still save successfully, opening_hours will be None
+        self.response_200(response)
+        assert "HX-Trigger" in response.headers
+        assert response.headers["HX-Trigger"] == "tripModified"
+        event.refresh_from_db()
+        assert event.place_id == "test_place_id"
+        assert event.opening_hours is None
+        assert event.enriched is True
+
+    def test_confirm_enrich_event_unauthorized(self):
+        """Test confirmation by unauthorized user"""
+        user = self.make_user("user")
+        other_user = self.make_user("other_user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = ExperienceFactory(
+            day=day, trip=trip, name="Test Event", address="Test Address"
+        )
+
+        enriched_data = {
+            "place_id": "test_place_id",
+            "website": "https://example.com",
+        }
+
+        with self.login(other_user):
+            response = self.post(
+                "trips:confirm-enrich-event", event_id=event.pk, data=enriched_data
+            )
+
+        # Should return 404 for unauthorized access
+        self.response_404(response)
+        event.refresh_from_db()
+        assert event.enriched is False
 
 
 @patch("trips.views.requests.get")
