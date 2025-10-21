@@ -27,6 +27,11 @@ htmx_urlpatterns = [
     path("stays/<int:pk>/modify", views.stay_modify, name="stay-modify"),
     path("stays/<int:pk>/delete", views.stay_delete, name="stay-delete"),
     path("stays/<int:stay_id>/enrich/", views.enrich_stay, name="enrich-stay"),
+    path(
+        "stays/<int:stay_id>/enrich/confirm/",
+        views.confirm_enrich_stay,
+        name="confirm-enrich-stay",
+    ),
     # EVENTS
     path("events/<int:pk>/modal", views.event_modal, name="event-modal"),
     path("events/<int:pk>/delete", views.event_delete, name="event-delete"),

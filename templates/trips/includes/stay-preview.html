@@ -1,0 +1,51 @@
+{% load i18n trip_tags %}
+<ul class="leading-10">
+    <li class="flex gap-2 items-center">
+        <i class="ph-bold ph-map-pin i-md text-base-content/60"></i>{{ stay.address }}
+    </li>
+    <li class="flex gap-2 items-center">
+        <i class="ph-bold ph-sign-in i-md text-base-content/60"></i>{{ first_day.date|date:"d/m" }} {% trans 'from' %} {{ stay.check_in|time:"H:i" }}
+    </li>
+    <li class="flex gap-2 items-center">
+        <i class="ph-bold ph-sign-out i-md text-base-content/60"></i>{{ last_day.date|date:"d/m" }} {% trans 'before' %} {{ stay.check_out|time:"H:i" }}
+    </li>
+    {% if enriched_data.website %}
+        <li class="flex gap-2 items-center py-1 px-2 rounded bg-success/10">
+            <i class="ph-bold ph-browser i-md text-success"></i>
+            <a href="{{ enriched_data.website }}" class="font-semibold link text-success">{{ enriched_data.website|truncatechars:38 }}</a>
+            <span class="ml-auto badge badge-success badge-xs">{% trans 'New' %}</span>
+        </li>
+    {% elif stay.website %}
+        <li class="flex gap-2 items-center">
+            <i class="ph-bold ph-browser i-md text-base-content/60"></i><a href="{{ stay.website }}" class="link">{{ stay.website|truncatechars:38 }}</a>
+        </li>
+    {% endif %}
+    {% if enriched_data.phone_number %}
+        <li class="flex gap-2 items-center py-1 px-2 rounded bg-success/10">
+            <i class="ph-bold ph-phone i-md text-success"></i>
+            <span class="font-semibold text-success">{{ enriched_data.phone_number }}</span>
+            <span class="ml-auto badge badge-success badge-xs">{% trans 'New' %}</span>
+        </li>
+    {% elif stay.phone_number %}
+        <li class="flex gap-2 items-center">
+            <i class="ph-bold ph-phone i-md text-base-content/60"></i>{{ stay.phone_number|phone_format }}
+        </li>
+    {% endif %}
+    {% if enriched_data.opening_hours %}
+        <li class="flex gap-2 items-center py-1 px-2 rounded bg-success/10">
+            <i class="ph-bold ph-door-open i-md text-success"></i>
+            <span class="font-semibold text-success">{{ enriched_data.opening_hours|format_opening_hours }}</span>
+            <span class="ml-auto badge badge-success badge-xs">{% trans 'New' %}</span>
+        </li>
+    {% elif stay.opening_hours %}
+        <li class="flex gap-2 items-center">
+            <i class="ph-bold ph-door-open i-md text-base-content/60"></i>{{ stay.opening_hours|format_opening_hours }}
+        </li>
+    {% endif %}
+    {% if stay.cancellation_date %}
+        <li class="flex gap-2 items-center">
+            <i class="ph-bold ph-calendar-x i-md text-base-content/60"></i>
+                {{ stay.cancellation_date }}
+        </li>
+    {% endif %}
+</ul>

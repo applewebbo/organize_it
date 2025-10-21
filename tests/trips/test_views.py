@@ -2609,7 +2609,7 @@ class EnrichStayViewTest(TestCase):
     """Test cases for enrich_stay view"""
 
     def test_enrich_stay_success(self, mock_post, mock_get):
-        """Test successful enrichment of a stay"""
+        """Test successful enrichment of a stay - returns preview"""
         # Mock Google Places API responses
         mock_post.return_value.raise_for_status.return_value = None
         mock_post.return_value.json.return_value = {"places": [{"id": "test_place_id"}]}
@@ -2637,13 +2637,17 @@ class EnrichStayViewTest(TestCase):
             response = self.post("trips:enrich-stay", stay_id=stay.pk)
 
         self.response_200(response)
+        # Stay should NOT be saved yet (preview mode)
         stay.refresh_from_db()
-        assert stay.place_id == "test_place_id"
-        assert stay.website == "https://example.com"
-        assert stay.phone_number == "+1234567890"
-        assert "monday" in stay.opening_hours
-        assert "success_message" in response.context
-        assert response.context["success_message"] == "Stay enriched successfully!"
+        assert stay.place_id == ""
+        assert stay.enriched is False
+        # Check that enriched_data is in context for preview
+        assert "enriched_data" in response.context
+        assert response.context["enriched_data"]["place_id"] == "test_place_id"
+        assert response.context["enriched_data"]["website"] == "https://example.com"
+        assert response.context["enriched_data"]["phone_number"] == "+1234567890"
+        assert "monday" in response.context["enriched_data"]["opening_hours"]
+        assert response.context["show_preview"] is True
 
     def test_enrich_stay_no_name_or_address(self, mock_post, mock_get):
         """Test enrichment with no name or address"""
@@ -2818,3 +2822,156 @@ class EnrichStayViewTest(TestCase):
         assert (
             "Google Places API request timed out" in response.context["error_message"]
         )
+
+    def test_enrich_stay_success_no_opening_hours(self, mock_post, mock_get):
+        """Test successful enrichment without opening hours"""
+        # Mock Google Places API responses without opening hours
+        mock_post.return_value.raise_for_status.return_value = None
+        mock_post.return_value.json.return_value = {"places": [{"id": "test_place_id"}]}
+        mock_get.return_value.raise_for_status.return_value = None
+        mock_get.return_value.json.return_value = {
+            "websiteUri": "https://example.com",
+            "internationalPhoneNumber": "+1234567890",
+            # No regularOpeningHours
+        }
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        stay = StayFactory(name="Test Stay", address="Test Address")
+        stay.days.add(day)
+
+        with self.login(user), override_settings(GOOGLE_PLACES_API_KEY="test_key"):
+            response = self.post("trips:enrich-stay", stay_id=stay.pk)
+
+        self.response_200(response)
+        # Check that enriched_data is in context without opening_hours
+        assert "enriched_data" in response.context
+        assert response.context["enriched_data"]["website"] == "https://example.com"
+        assert response.context["enriched_data"]["phone_number"] == "+1234567890"
+        assert response.context["enriched_data"]["opening_hours"] is None
+        assert "opening_hours_json" not in response.context["enriched_data"]
+        assert response.context["show_preview"] is True
+
+
+class ConfirmEnrichStayViewTest(TestCase):
+    """Test cases for confirm_enrich_stay view"""
+
+    def test_confirm_enrich_stay_success(self):
+        """Test successful confirmation and saving of enriched data"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        stay = StayFactory(name="Test Stay", address="Test Address")
+        stay.days.add(day)
+
+        enriched_data = {
+            "place_id": "test_place_id",
+            "website": "https://example.com",
+            "phone_number": "+1234567890",
+            "opening_hours": '{"monday": {"open": "9:00 AM", "close": "5:00 PM"}}',
+        }
+
+        with self.login(user):
+            response = self.post(
+                "trips:confirm-enrich-stay", stay_id=stay.pk, data=enriched_data
+            )
+
+        # Should return 200 with stay detail view and HX-Trigger header
+        self.response_200(response)
+        assert "HX-Trigger" in response.headers
+        assert response.headers["HX-Trigger"] == "tripModified"
+        assert "success_message" in response.context
+        assert response.context["success_message"] == "Stay enriched successfully!"
+
+        # Stay should be saved with enriched data
+        stay.refresh_from_db()
+        assert stay.place_id == "test_place_id"
+        assert stay.website == "https://example.com"
+        assert stay.phone_number == "+1234567890"
+        assert stay.opening_hours == {"monday": {"open": "9:00 AM", "close": "5:00 PM"}}
+        assert stay.enriched is True
+
+    def test_confirm_enrich_stay_no_opening_hours(self):
+        """Test confirmation without opening_hours"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        stay = StayFactory(name="Test Stay", address="Test Address")
+        stay.days.add(day)
+
+        enriched_data = {
+            "place_id": "test_place_id",
+            "website": "https://example.com",
+            "phone_number": "+1234567890",
+            # No opening_hours field
+        }
+
+        with self.login(user):
+            response = self.post(
+                "trips:confirm-enrich-stay", stay_id=stay.pk, data=enriched_data
+            )
+
+        # Should save successfully, opening_hours will be None
+        self.response_200(response)
+        assert "HX-Trigger" in response.headers
+        assert response.headers["HX-Trigger"] == "tripModified"
+        stay.refresh_from_db()
+        assert stay.place_id == "test_place_id"
+        assert stay.website == "https://example.com"
+        assert stay.phone_number == "+1234567890"
+        assert stay.opening_hours is None
+        assert stay.enriched is True
+
+    def test_confirm_enrich_stay_invalid_json(self):
+        """Test confirmation with invalid opening_hours JSON"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        stay = StayFactory(name="Test Stay", address="Test Address")
+        stay.days.add(day)
+
+        enriched_data = {
+            "place_id": "test_place_id",
+            "website": "https://example.com",
+            "phone_number": "+1234567890",
+            "opening_hours": "invalid json",
+        }
+
+        with self.login(user):
+            response = self.post(
+                "trips:confirm-enrich-stay", stay_id=stay.pk, data=enriched_data
+            )
+
+        # Should still save successfully, opening_hours will be None
+        self.response_200(response)
+        assert "HX-Trigger" in response.headers
+        assert response.headers["HX-Trigger"] == "tripModified"
+        stay.refresh_from_db()
+        assert stay.place_id == "test_place_id"
+        assert stay.opening_hours is None
+        assert stay.enriched is True
+
+    def test_confirm_enrich_stay_unauthorized(self):
+        """Test confirmation by unauthorized user"""
+        user = self.make_user("user")
+        other_user = self.make_user("other_user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        stay = StayFactory(name="Test Stay", address="Test Address")
+        stay.days.add(day)
+
+        enriched_data = {
+            "place_id": "test_place_id",
+            "website": "https://example.com",
+        }
+
+        with self.login(other_user):
+            response = self.post(
+                "trips:confirm-enrich-stay", stay_id=stay.pk, data=enriched_data
+            )
+
+        # Should return 404 for unauthorized access
+        self.response_404(response)
+        stay.refresh_from_db()
+        assert stay.enriched is False

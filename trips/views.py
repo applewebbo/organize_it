@@ -875,9 +875,10 @@ def stay_note_delete(request, stay_id):
 def enrich_stay(request, stay_id):
     """
     Enrich a stay's details using the new Google Places API.
+    Shows a preview of enriched data without saving it.
     - Find Place ID using places:searchText.
     - Use Place ID to get details (website, phone, opening hours).
-    - Update the stay instance.
+    - Return preview for user confirmation.
     """
     stay = get_object_or_404(
         Stay.objects.filter(days__trip__author=request.user).distinct(), pk=stay_id
@@ -905,6 +906,7 @@ def enrich_stay(request, stay_id):
             "X-Goog-FieldMask": "places.id",
         }
 
+        place_id = None
         try:
             response = requests.post(
                 search_url, json=search_payload, headers=search_headers, timeout=5
@@ -913,7 +915,7 @@ def enrich_stay(request, stay_id):
             data = response.json()
 
             if data.get("places"):
-                stay.place_id = data["places"][0]["id"]
+                place_id = data["places"][0]["id"]
             else:
                 context["error_message"] = _("Could not find a matching place.")
 
@@ -925,9 +927,11 @@ def enrich_stay(request, stay_id):
                 error_message = f"API Error: {e.response.text}"
             context["error_message"] = error_message
 
-    if "error_message" not in context and stay.place_id:
+    # Store enriched data in context without saving to database
+    enriched_data = {}
+    if "error_message" not in context and place_id:
         # 2. Get Place Details
-        details_url = f"https://places.googleapis.com/v1/places/{stay.place_id}"
+        details_url = f"https://places.googleapis.com/v1/places/{place_id}"
         details_headers = {
             "X-Goog-Api-Key": api_key,
             "X-Goog-FieldMask": "websiteUri,internationalPhoneNumber,regularOpeningHours",
@@ -938,12 +942,13 @@ def enrich_stay(request, stay_id):
             response.raise_for_status()
             data = response.json()
 
-            stay.website = data.get("websiteUri", "")
-            stay.phone_number = data.get("internationalPhoneNumber", "")
+            enriched_data["place_id"] = place_id
+            enriched_data["website"] = data.get("websiteUri", "")
+            enriched_data["phone_number"] = data.get("internationalPhoneNumber", "")
             google_opening_hours = data.get("regularOpeningHours", None)
-            stay.opening_hours = convert_google_opening_hours(google_opening_hours)
-            stay.enriched = True
-            stay.save()
+            enriched_data["opening_hours"] = convert_google_opening_hours(
+                google_opening_hours
+            )
 
         except requests.exceptions.Timeout:
             context["error_message"] = _("Google Places API request timed out.")
@@ -953,12 +958,90 @@ def enrich_stay(request, stay_id):
                 error_message = f"API Error: {e.response.text}"
             context["error_message"] = error_message
 
+    # Serialize opening_hours to JSON string for form submission
+    if enriched_data and enriched_data.get("opening_hours"):
+        enriched_data["opening_hours_json"] = json.dumps(enriched_data["opening_hours"])
+
+    # Get first and last day for display
+    days = stay.days.order_by("date")
+    last_day = days.last()
+    first_stay_day = days.first()
+
+    # Find the day before the first stay day in the trip's days
+    first_day = (
+        Day.objects.filter(
+            trip=first_stay_day.trip, date=first_stay_day.date - timedelta(days=1)
+        ).first()
+        or first_stay_day
+    )
+
+    context["stay"] = stay
+    context["first_day"] = first_day
+    context["last_day"] = last_day
+    context["enriched_data"] = enriched_data
+    context["show_preview"] = bool(enriched_data and "error_message" not in context)
+    return TemplateResponse(request, "trips/stay-enrich-preview.html", context)
+
+
+@login_required
+@require_http_methods(["POST"])
+def confirm_enrich_stay(request, stay_id):
+    """
+    Confirm and save enriched stay data.
+    Receives enriched data from the preview and saves it to the database.
+    """
+    stay = get_object_or_404(
+        Stay.objects.filter(days__trip__author=request.user).distinct(), pk=stay_id
+    )
+
+    # Get enriched data from POST parameters
+    place_id = request.POST.get("place_id", "")
+    website = request.POST.get("website", "")
+    phone_number = request.POST.get("phone_number", "")
+    opening_hours_json = request.POST.get("opening_hours", "")
+
+    # Parse opening_hours JSON if present
+    opening_hours = None
+    if opening_hours_json:
+        try:
+            opening_hours = json.loads(opening_hours_json)
+        except json.JSONDecodeError:
+            pass
+
+    # Save the enriched data
+    stay.place_id = place_id
+    stay.website = website
+    stay.phone_number = phone_number
+    stay.opening_hours = opening_hours
+    stay.enriched = True
+    stay.save()
+
     # Refetch the stay to get the updated data
     stay.refresh_from_db()
 
-    context["stay"] = stay
-    context["success_message"] = _("Stay enriched successfully!")
-    return TemplateResponse(request, "trips/stay-detail.html", context)
+    # Get first and last day for display
+    days = stay.days.order_by("date")
+    last_day = days.last()
+    first_stay_day = days.first()
+
+    # Find the day before the first stay day in the trip's days
+    first_day = (
+        Day.objects.filter(
+            trip=first_stay_day.trip, date=first_stay_day.date - timedelta(days=1)
+        ).first()
+        or first_stay_day
+    )
+
+    # Return the updated stay detail view
+    context = {
+        "stay": stay,
+        "first_day": first_day,
+        "last_day": last_day,
+        "success_message": _("Stay enriched successfully!"),
+    }
+    response = TemplateResponse(request, "trips/stay-detail.html", context)
+    response["HX-Trigger"] = "tripModified"
+    return response
 
 
 class DayMapView(View):
