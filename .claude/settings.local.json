@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(just test:*)",
+      "Bash(just ftest:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
