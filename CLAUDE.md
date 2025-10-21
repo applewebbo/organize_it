@@ -2,6 +2,43 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Git Workflow (CRITICAL - READ FIRST)
+
+**ALWAYS follow these rules before making any code changes:**
+
+1. **NEVER work directly on main branch** - Always create a feature branch first
+2. **Create feature branches** with descriptive names: `feature/description` or `fix/issue-description`
+3. **Ask for GitHub issue number** - Always ask the user which issue number this work relates to
+4. **Make frequent commits** - Commit logical chunks of work to better track changes
+5. **Reference issues in commits** - Include `Fix #123` or `Related to #123` in commit messages
+6. **Test before committing** - Run `just ftest` to ensure 100% coverage before committing
+7. **Use rebase, not merge** - When ready to save changes to main: `git checkout main && git rebase feature-branch`
+8. **Verify coverage** - Always check that coverage remains at 100% before final commit to main
+
+### Standard Workflow
+```bash
+# 1. Ask user for issue number first
+# 2. Create feature branch
+git checkout -b feature/descriptive-name
+
+# 3. Make changes and commit frequently
+git add <files>
+git commit -m "descriptive message (fix #123)"
+
+# 4. Before final commit, verify tests
+just ftest
+
+# 5. When ready, rebase onto main
+git checkout main
+git rebase feature/descriptive-name
+
+# 6. Verify everything still works
+just ftest
+
+# 7. Push to remote
+git push origin main
+```
+
 ## Project Overview
 
 Organize It is a Django-based web application for organizing trips and travel plans. Built with Django 5.1+, TailwindCSS (with DaisyUI), HTMX, and Alpine.js, it provides a modern, reactive user experience without heavy frontend frameworks.
