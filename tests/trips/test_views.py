@@ -2251,9 +2251,8 @@ class EnrichEventViewTest(TestCase):
         assert event.website == "https://example.com"
         assert event.phone_number == "+1234567890"
         assert "monday" in event.opening_hours
-        messages = list(get_messages(response.wsgi_request))
-        assert len(messages) == 1
-        assert str(messages[0]) == "Event enriched successfully!"
+        assert "success_message" in response.context
+        assert response.context["success_message"] == "Event enriched successfully!"
 
     def test_enrich_event_no_name_or_address(self, mock_post, mock_get):
         """Test enrichment with no name or address"""
@@ -2479,9 +2478,8 @@ class EnrichStayViewTest(TestCase):
         assert stay.website == "https://example.com"
         assert stay.phone_number == "+1234567890"
         assert "monday" in stay.opening_hours
-        messages = list(get_messages(response.wsgi_request))
-        assert len(messages) == 1
-        assert str(messages[0]) == "Stay enriched successfully!"
+        assert "success_message" in response.context
+        assert response.context["success_message"] == "Stay enriched successfully!"
 
     def test_enrich_stay_no_name_or_address(self, mock_post, mock_get):
         """Test enrichment with no name or address"""
