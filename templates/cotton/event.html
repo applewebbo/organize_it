@@ -21,16 +21,18 @@
                 hx-get="{% url 'trips:event-notes' event.pk %}"
                 @click="$dispatch('open-modal'); document.activeElement.blur()"
                 hx-target="#dialog"
-                hx-swap="innerHTML">
-            <i class="ph-bold ph-paperclip i-sm {{ icon_color }}"></i>
+                hx-swap="innerHTML"
+                aria-label="{% trans 'View or add notes' %}">
+            <i class="ph-bold ph-paperclip i-sm {{ icon_color }}" aria-hidden="true"></i>
             <span class="absolute size-2.5 text-xs font-bold text-white {% if event.notes %}bg-slate-400 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
         </button>
         <button class="btn btn-xs btn-soft {{ border_color }} {{ bg_color }} dark:hover:bg-slate-900/10 hover:bg-white/50"
                 hx-get="{% url 'trips:event-swap-modal' event.pk %}"
                 @click="$dispatch('open-modal'); document.activeElement.blur()"
                 hx-target="#dialog"
-                hx-swap="innerHTML">
-            <i class="ph-bold ph-arrows-down-up i-sm {{ icon_color }}"></i>
+                hx-swap="innerHTML"
+                aria-label="{% trans 'Swap event times' %}">
+            <i class="ph-bold ph-arrows-down-up i-sm {{ icon_color }}" aria-hidden="true"></i>
         </button>
     </div>
 </div>
