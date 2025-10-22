@@ -278,7 +278,6 @@ class TransportForm(forms.ModelForm):
             self.fields["origin_city"].initial = trip.destination
 
         self.helper.layout = Layout(
-            Field("type", css_class="select select-primary w-full"),
             Div(
                 "origin_city",
                 css_class="sm:col-span-2",
@@ -303,6 +302,11 @@ class TransportForm(forms.ModelForm):
                 "end_time",
                 css_class="sm:col-span-2",
             ),
+            Field("type", css_class="select select-primary w-full"),
+            Div(
+                "website",
+                css_class="sm:col-span-3",
+            ),
             Div(
                 "company",
                 css_class="sm:col-span-2",
@@ -318,10 +322,6 @@ class TransportForm(forms.ModelForm):
             Div(
                 "price",
                 css_class="sm:col-span-2",
-            ),
-            Div(
-                "website",
-                css_class="sm:col-span-3",
             ),
         )
 
