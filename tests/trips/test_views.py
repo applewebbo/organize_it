@@ -1,4 +1,5 @@
 import datetime
+import json
 import tempfile
 import time
 from datetime import date, timedelta
@@ -2501,7 +2502,7 @@ class ConfirmEnrichEventViewTest(TestCase):
         # Should return 200 with event detail view and HX-Trigger header
         self.response_200(response)
         assert "HX-Trigger" in response.headers
-        assert response.headers["HX-Trigger"] == "tripModified"
+        assert response.headers["HX-Trigger"] == f"eventModified{event.pk}"
         assert "success_message" in response.context
         assert response.context["success_message"] == "Event enriched successfully!"
 
@@ -2539,7 +2540,7 @@ class ConfirmEnrichEventViewTest(TestCase):
         # Should save successfully, opening_hours will be None
         self.response_200(response)
         assert "HX-Trigger" in response.headers
-        assert response.headers["HX-Trigger"] == "tripModified"
+        assert response.headers["HX-Trigger"] == f"eventModified{event.pk}"
         event.refresh_from_db()
         assert event.place_id == "test_place_id"
         assert event.website == "https://example.com"
@@ -2571,7 +2572,7 @@ class ConfirmEnrichEventViewTest(TestCase):
         # Should still save successfully, opening_hours will be None
         self.response_200(response)
         assert "HX-Trigger" in response.headers
-        assert response.headers["HX-Trigger"] == "tripModified"
+        assert response.headers["HX-Trigger"] == f"eventModified{event.pk}"
         event.refresh_from_db()
         assert event.place_id == "test_place_id"
         assert event.opening_hours is None
@@ -2880,7 +2881,9 @@ class ConfirmEnrichStayViewTest(TestCase):
         # Should return 200 with stay detail view and HX-Trigger header
         self.response_200(response)
         assert "HX-Trigger" in response.headers
-        assert response.headers["HX-Trigger"] == "tripModified"
+        # Check that it triggers update for the day
+        triggers = json.loads(response.headers["HX-Trigger"])
+        assert f"dayModified{day.pk}" in triggers
         assert "success_message" in response.context
         assert response.context["success_message"] == "Stay enriched successfully!"
 
@@ -2915,7 +2918,9 @@ class ConfirmEnrichStayViewTest(TestCase):
         # Should save successfully, opening_hours will be None
         self.response_200(response)
         assert "HX-Trigger" in response.headers
-        assert response.headers["HX-Trigger"] == "tripModified"
+        # Check that it triggers update for the day
+        triggers = json.loads(response.headers["HX-Trigger"])
+        assert f"dayModified{day.pk}" in triggers
         stay.refresh_from_db()
         assert stay.place_id == "test_place_id"
         assert stay.website == "https://example.com"
@@ -2946,7 +2951,9 @@ class ConfirmEnrichStayViewTest(TestCase):
         # Should still save successfully, opening_hours will be None
         self.response_200(response)
         assert "HX-Trigger" in response.headers
-        assert response.headers["HX-Trigger"] == "tripModified"
+        # Check that it triggers update for the day
+        triggers = json.loads(response.headers["HX-Trigger"])
+        assert f"dayModified{day.pk}" in triggers
         stay.refresh_from_db()
         assert stay.place_id == "test_place_id"
         assert stay.opening_hours is None

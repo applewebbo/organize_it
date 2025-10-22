@@ -229,7 +229,7 @@ def add_transport(request, day_id):
             messages.SUCCESS,
             _("Transport added successfully"),
         )
-        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+        return HttpResponse(status=204, headers={"HX-Trigger": f"dayModified{day.pk}"})
     context = {"form": form, "day": day, "unpaired_experiences": unpaired_experiences}
     return TemplateResponse(request, "trips/transport-create.html", context)
 
@@ -252,7 +252,7 @@ def add_experience(request, day_id):
             messages.SUCCESS,
             _("Experience added successfully"),
         )
-        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+        return HttpResponse(status=204, headers={"HX-Trigger": f"dayModified{day.pk}"})
     context = {"form": form, "day": day, "unpaired_experiences": unpaired_experiences}
     return TemplateResponse(request, "trips/experience-create.html", context)
 
@@ -275,7 +275,7 @@ def add_meal(request, day_id):
             messages.SUCCESS,
             _("Meal added successfully"),
         )
-        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+        return HttpResponse(status=204, headers={"HX-Trigger": f"dayModified{day.pk}"})
     context = {"form": form, "day": day, "unpaired_experiences": unpaired_experiences}
     return TemplateResponse(request, "trips/meal-create.html", context)
 
@@ -455,7 +455,9 @@ def event_pair(request, pk, day_id):
         messages.SUCCESS,
         _("Event paired successfully"),
     )
-    return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+    # Trigger update for the day and for the unpaired events section
+    triggers = {f"dayModified{day.pk}": {}, "tripModified": {}}
+    return HttpResponse(status=204, headers={"HX-Trigger": json.dumps(triggers)})
 
 
 @login_required
@@ -542,7 +544,9 @@ def event_change_times(request, pk):
             messages.SUCCESS,
             _("Event times updated successfully"),
         )
-        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+        return HttpResponse(
+            status=204, headers={"HX-Trigger": f"eventModified{event.pk}"}
+        )
 
     return TemplateResponse(
         request, "trips/event-change-times.html", {"event": event, "form": form}
@@ -754,7 +758,9 @@ def note_create(request, event_id):
             messages.SUCCESS,
             _("Note added successfully"),
         )
-        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+        return HttpResponse(
+            status=204, headers={"HX-Trigger": f"eventModified{event.pk}"}
+        )
     return HttpResponse(status=400)
 
 
@@ -774,7 +780,7 @@ def note_modify(request, event_id):
             _("Note updated successfully"),
         )
         response = TemplateResponse(request, "trips/event-notes.html", context)
-        response["HX-Trigger"] = "tripModified"
+        response["HX-Trigger"] = f"eventModified{event.pk}"
         return response
     return TemplateResponse(request, "trips/note-modify.html", context)
 
@@ -792,7 +798,7 @@ def note_delete(request, event_id):
         messages.ERROR,
         _("Note deleted successfully"),
     )
-    return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+    return HttpResponse(status=204, headers={"HX-Trigger": f"eventModified{event.pk}"})
 
 
 @login_required
@@ -826,7 +832,11 @@ def stay_note_create(request, stay_id):
             messages.SUCCESS,
             _("Note added successfully"),
         )
-        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+        # Trigger update for all days associated with this stay
+        day_triggers = {f"dayModified{day.pk}": {} for day in stay.days.all()}
+        return HttpResponse(
+            status=204, headers={"HX-Trigger": json.dumps(day_triggers)}
+        )
     return HttpResponse(status=400)
 
 
@@ -849,7 +859,9 @@ def stay_note_modify(request, stay_id):
             _("Note updated successfully"),
         )
         response = TemplateResponse(request, "trips/stay-notes.html", context)
-        response["HX-Trigger"] = "tripModified"
+        # Trigger update for all days associated with this stay
+        day_triggers = {f"dayModified{day.pk}": {} for day in stay.days.all()}
+        response["HX-Trigger"] = json.dumps(day_triggers)
         return response
     return TemplateResponse(request, "trips/stay-note-modify.html", context)
 
@@ -867,7 +879,9 @@ def stay_note_delete(request, stay_id):
         messages.ERROR,
         _("Note deleted successfully"),
     )
-    return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+    # Trigger update for all days associated with this stay
+    day_triggers = {f"dayModified{day.pk}": {} for day in stay.days.all()}
+    return HttpResponse(status=204, headers={"HX-Trigger": json.dumps(day_triggers)})
 
 
 @login_required
@@ -1040,7 +1054,9 @@ def confirm_enrich_stay(request, stay_id):
         "success_message": _("Stay enriched successfully!"),
     }
     response = TemplateResponse(request, "trips/stay-detail.html", context)
-    response["HX-Trigger"] = "tripModified"
+    # Trigger update for all days associated with this stay
+    day_triggers = {f"dayModified{day.pk}": {} for day in stay.days.all()}
+    response["HX-Trigger"] = json.dumps(day_triggers)
     return response
 
 
@@ -1222,5 +1238,5 @@ def confirm_enrich_event(request, event_id):
         "success_message": _("Event enriched successfully!"),
     }
     response = TemplateResponse(request, "trips/event-detail.html", context)
-    response["HX-Trigger"] = "tripModified"
+    response["HX-Trigger"] = f"eventModified{event.pk}"
     return response
