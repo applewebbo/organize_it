@@ -230,10 +230,10 @@ class TransportForm(forms.ModelForm):
         ]
         formfield_callback = urlfields_assume_https
         labels = {
-            "origin_city": _("Origin City"),
-            "origin_address": _("Origin Address"),
-            "destination_city": _("Destination City"),
-            "destination_address": _("Destination Address"),
+            "origin_city": _("City"),
+            "origin_address": _("Address"),
+            "destination_city": _("City"),
+            "destination_address": _("Address"),
             "start_time": _("Departure Time"),
             "end_time": _("Arrival Time"),
             "company": _("Company"),
@@ -276,23 +276,20 @@ class TransportForm(forms.ModelForm):
         # Prepopulate origin_city with trip destination if available
         if trip and not self.instance.pk:
             self.fields["origin_city"].initial = trip.destination
+            self.fields["destination_city"].initial = trip.destination
 
         self.helper.layout = Layout(
-            Div(
+            Fieldset(
+                _("Origin"),
                 "origin_city",
-                css_class="sm:col-span-2",
-            ),
-            Div(
                 "origin_address",
-                css_class="sm:col-span-2",
+                css_class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:col-span-4",
             ),
-            Div(
+            Fieldset(
+                _("Destination"),
                 "destination_city",
-                css_class="sm:col-span-2",
-            ),
-            Div(
                 "destination_address",
-                css_class="sm:col-span-2",
+                css_class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:col-span-4",
             ),
             Div(
                 "start_time",
@@ -307,22 +304,30 @@ class TransportForm(forms.ModelForm):
                 "website",
                 css_class="sm:col-span-3",
             ),
+            HTML(
+                """
+                    <div x-data="{ openDetails: false }" x-on:click.stop class="sm:col-span-4">
+                        <div class="flex items-center gap-4 mt-2 py-2 cursor-pointer" @click.stop="openDetails = !openDetails">
+                            <h2 class="text-sm font-semibold">%s</h2>
+                            <button type="button" @click.stop="openDetails = !openDetails" class="btn btn-xs btn-ghost me-2">
+                                <i class="" :class="openDetails ? 'ph-bold ph-caret-up i-md text-base-content/60' : 'ph-bold ph-caret-down i-md text-base-content/60'"></i>
+                            </button>
+                        </div>
+                        <div x-show="openDetails" >
+                 """
+                % _("Booking Reference (optional)")
+            ),
             Div(
                 "company",
-                css_class="sm:col-span-2",
-            ),
-            Div(
                 "booking_reference",
-                css_class="sm:col-span-2",
-            ),
-            Div(
                 "ticket_url",
-                css_class="sm:col-span-2",
-            ),
-            Div(
                 "price",
-                css_class="sm:col-span-2",
+                css_class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:col-span-4",
             ),
+            HTML("""
+                                    </div>
+                                </div>
+                                """),
         )
 
     def save(self, commit=True):

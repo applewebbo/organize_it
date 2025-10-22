@@ -39,6 +39,15 @@ just ftest
 git push origin main
 ```
 
+### Commit Message Guidelines
+
+- Write clear, descriptive commit messages
+- Reference issue numbers with `fix #123` or `Related to #123`
+- **DO NOT include attribution lines** like:
+  - `🤖 Generated with [Claude Code](https://claude.com/claude-code)`
+  - `Co-Authored-By: Claude <noreply@anthropic.com>`
+- Keep commit messages concise and focused on the changes made
+
 ## Project Overview
 
 Organize It is a Django-based web application for organizing trips and travel plans. Built with Django 5.1+, TailwindCSS (with DaisyUI), HTMX, and Alpine.js, it provides a modern, reactive user experience without heavy frontend frameworks.
