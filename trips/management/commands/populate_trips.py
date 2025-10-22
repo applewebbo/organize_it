@@ -81,12 +81,12 @@ class Command(BaseCommand):
                             datetime.combine(day.date, start_time)
                             + timedelta(hours=random.randint(1, 4))
                         ).time()
+                        # TransportFactory automatically sets origin_city and destination_city
                         TransportFactory.create(
                             day=day,
                             trip=trip,
                             start_time=start_time,
                             end_time=end_time,
-                            city=trip.destination,
                         )
 
                     # Create meals
