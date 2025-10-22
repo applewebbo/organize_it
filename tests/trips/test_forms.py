@@ -203,17 +203,25 @@ class TestTransportForm:
         trip_factory(author=user)
         data = {
             "type": 1,
-            "address": "Milan",
-            "destination": "Rome",
+            "origin_city": "Milan",
+            "origin_address": "Piazza Duomo",
+            "destination_city": "Rome",
+            "destination_address": "Via del Corso",
             "start_time": "10:00",
             "end_time": "12:00",
-            "url": "https://example.com",
+            "company": "Trenitalia",
+            "booking_reference": "ABC123",
+            "price": "45.50",
         }
         form = TransportForm(data=data)
 
         assert form.is_valid()
         transport = form.save(commit=False)
-        assert transport.name == "Milan - Rome"
+        assert transport.name == "Milan → Rome"
+        assert transport.origin_city == "Milan"
+        assert transport.destination_city == "Rome"
+        assert transport.company == "Trenitalia"
+        assert transport.booking_reference == "ABC123"
 
     @patch("geocoder.mapbox")
     def test_form_url_assumes_https(self, mock_geocoder):
@@ -223,8 +231,8 @@ class TestTransportForm:
 
         data = {
             "type": 1,
-            "address": "Milan",
-            "destination": "Rome",
+            "origin_city": "Milan",
+            "destination_city": "Rome",
             "start_time": "10:00",
             "end_time": "12:00",
             "website": "example.com",

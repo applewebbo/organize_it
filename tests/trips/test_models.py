@@ -405,107 +405,96 @@ class TestTransportModel:
         trip = trip_factory(author=user, title="Test Trip")
         transport = transport_factory(day=trip.days.first(), type=Transport.Type.CAR)
 
-        assert transport.__str__() == f"{transport.name} ({trip.title} - Day 1)"
+        assert (
+            transport.__str__()
+            == f"{transport.origin_city} → {transport.destination_city} (Car)"
+        )
         assert transport.day.trip == trip
         assert transport.category == Event.Category.TRANSPORT
         assert transport.type == Transport.Type.CAR
 
-    @patch("geocoder.mapbox")
-    def test_save_updates_coordinates(self, mock_geocoder, user_factory, trip_factory):
-        # Setup mock response
-        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
-
+    def test_duration_property(self, user_factory, trip_factory, transport_factory):
+        """Test that duration property calculates correctly"""
         user = user_factory()
         trip = trip_factory(author=user)
-        day = trip.days.first()
+        transport = transport_factory(day=trip.days.first())
 
-        mock_geocoder.reset_mock()
+        # Factory sets start_time to 10:00 and end_time to 11:00
+        from datetime import timedelta
 
-        transport = Transport.objects.create(
-            day=day,
-            name="Train to Milan",
-            start_time="10:00",
-            end_time="11:00",
-            type=Transport.Type.TRAIN,
-            destination="Milan, Italy",
-        )
+        expected_duration = timedelta(hours=1)
+        assert transport.duration == expected_duration
 
-        # Verify the coordinates were set from the mock response
-        assert transport.dest_latitude == 45.4773
-        assert transport.dest_longitude == 9.1815
-        assert mock_geocoder.call_count == 2
-
-    @patch("geocoder.mapbox")
-    def test_save_does_not_update_coordinates_if_destination_unchanged(
-        self, mock_geocoder, user_factory, trip_factory
-    ):
-        # Setup mock response
-        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
-
+    def test_duration_property_overnight(self, user_factory, trip_factory):
+        """Test that duration handles overnight transports"""
         user = user_factory()
         trip = trip_factory(author=user)
         day = trip.days.first()
 
         transport = Transport.objects.create(
             day=day,
-            name="Train to Milan",
-            start_time="10:00",
-            end_time="11:00",
+            name="Overnight Train",
+            start_time="23:00",
+            end_time="06:00",
             type=Transport.Type.TRAIN,
-            destination="Milan, Italy",
+            origin_city="Roma",
+            origin_address="Via Marsala 1",
+            origin_latitude=41.9009,
+            origin_longitude=12.5028,
+            destination_city="Milano",
+            destination_address="Piazza Duca d'Aosta",
+            destination_latitude=45.4842,
+            destination_longitude=9.2040,
         )
 
-        # Reset mock before saving again
-        mock_geocoder.reset_mock()
+        from datetime import timedelta
 
-        # Save again without changing the destination
-        transport.name = "Updated Transport Name"
-        transport.save()
+        expected_duration = timedelta(hours=7)
+        assert transport.duration == expected_duration
 
-        # Verify geocoder was not called again
-        mock_geocoder.assert_not_called()
-
-    @patch("geocoder.mapbox")
-    def test_save_updates_coordinates_if_destination_changed(
-        self, mock_geocoder, user_factory, trip_factory
-    ):
-        # Setup mock response
-        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
-
+    def test_booking_fields(self, user_factory, trip_factory):
+        """Test that booking fields are saved correctly"""
         user = user_factory()
         trip = trip_factory(author=user)
         day = trip.days.first()
 
         transport = Transport.objects.create(
             day=day,
-            name="Train to Milan",
+            name="Flight to Paris",
             start_time="10:00",
-            end_time="11:00",
-            type=Transport.Type.TRAIN,
-            destination="Milan, Italy",
+            end_time="12:00",
+            type=Transport.Type.PLANE,
+            origin_city="Roma",
+            destination_city="Paris",
+            company="Air France",
+            booking_reference="AF1234",
+            ticket_url="https://airfrance.com/booking/123",
+            price="150.00",
         )
 
-        # Reset mock before saving again
-        mock_geocoder.reset_mock()
-        mock_geocoder.return_value.latlng = [48.8566, 2.3522]
+        assert transport.company == "Air France"
+        assert transport.booking_reference == "AF1234"
+        assert transport.ticket_url == "https://airfrance.com/booking/123"
+        assert str(transport.price) == "150.00"
 
-        # Save again with changed destination
-        transport.destination = "Paris, France"
-        transport.save()
+    def test_coordinates_from_factory(
+        self, user_factory, trip_factory, transport_factory
+    ):
+        """Test that coordinates are set correctly from factory"""
+        user = user_factory()
+        trip = trip_factory(author=user)
+        transport = transport_factory(day=trip.days.first())
 
-        # Verify geocoder was called again
-        mock_geocoder.assert_called_with(
-            "Paris, France", access_token=settings.MAPBOX_ACCESS_TOKEN
-        )
-        transport.refresh_from_db()
-        assert transport.dest_latitude == 48.8566
-        assert transport.dest_longitude == 2.3522
+        # Factory provides coordinates from PLACES data
+        assert transport.origin_latitude is not None
+        assert transport.origin_longitude is not None
+        assert transport.destination_latitude is not None
+        assert transport.destination_longitude is not None
 
     @patch("geocoder.mapbox")
-    def test_save_with_no_geocoder_result(
-        self, mock_geocoder, user_factory, trip_factory
-    ):
-        # Setup mock response
+    def test_geocoding_failure(self, mock_geocoder, user_factory, trip_factory):
+        """Test that transport handles geocoding failures gracefully"""
+        # Mock geocoder to return None for latlng
         mock_geocoder.return_value.latlng = None
 
         user = user_factory()
@@ -514,16 +503,19 @@ class TestTransportModel:
 
         transport = Transport.objects.create(
             day=day,
-            name="Train to Nowhere",
+            name="Transport with failed geocoding",
             start_time="10:00",
-            end_time="11:00",
-            type=Transport.Type.TRAIN,
-            destination="Nowhere",
+            end_time="12:00",
+            type=Transport.Type.CAR,
+            origin_city="InvalidCity",
+            destination_city="AnotherInvalidCity",
         )
 
-        # Verify the coordinates were not set
-        assert transport.dest_latitude is None
-        assert transport.dest_longitude is None
+        # Coordinates should remain None when geocoding fails
+        assert transport.origin_latitude is None
+        assert transport.origin_longitude is None
+        assert transport.destination_latitude is None
+        assert transport.destination_longitude is None
 
 
 class TestExperienceModel:

@@ -309,29 +309,106 @@ class Transport(Event):
         OTHER = 7, _("Other")
 
     type = models.IntegerField(choices=Type.choices, default=Type.CAR)
-    destination = models.CharField(max_length=100)
-    dest_latitude = models.FloatField(null=True, blank=True)
-    dest_longitude = models.FloatField(null=True, blank=True)
+
+    # Origin fields
+    origin_city = models.CharField(max_length=100)
+    origin_address = models.CharField(max_length=200, blank=True)
+    origin_latitude = models.FloatField(null=True, blank=True)
+    origin_longitude = models.FloatField(null=True, blank=True)
+
+    # Destination fields
+    destination_city = models.CharField(max_length=100)
+    destination_address = models.CharField(max_length=200, blank=True)
+    destination_latitude = models.FloatField(null=True, blank=True)
+    destination_longitude = models.FloatField(null=True, blank=True)
+
+    # Booking fields
+    booking_reference = models.CharField(max_length=100, blank=True)
+    company = models.CharField(max_length=100, blank=True)
+    ticket_url = models.URLField(max_length=255, blank=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+    @property
+    def duration(self):
+        """Calculate duration between start_time and end_time"""
+        from datetime import datetime, timedelta
+
+        # Handle both time objects and string representations
+        start_time = self.start_time
+        end_time = self.end_time
+
+        if isinstance(start_time, str):
+            start_time = datetime.strptime(start_time, "%H:%M").time()
+        if isinstance(end_time, str):
+            end_time = datetime.strptime(end_time, "%H:%M").time()
+
+        # Convert times to datetime for calculation
+        start = datetime.combine(datetime.today(), start_time)
+        end = datetime.combine(datetime.today(), end_time)
+
+        # Handle overnight transports (end time is next day)
+        if end < start:
+            end += timedelta(days=1)
+
+        return end - start
 
     def save(self, *args, **kwargs):
-        """convert destination to coordinates for displaying on the map"""
+        """Geocode origin and destination addresses for displaying on the map"""
         old = type(self).objects.get(pk=self.pk) if self.pk else None
-        destination_changed = old and old.destination != self.destination
-        dest_coords_missing = self.dest_latitude is None or self.dest_longitude is None
 
-        if destination_changed or dest_coords_missing:
+        # Geocode origin
+        origin_changed = old and (
+            old.origin_city != self.origin_city
+            or old.origin_address != self.origin_address
+        )
+        origin_coords_missing = (
+            self.origin_latitude is None or self.origin_longitude is None
+        )
+
+        if origin_changed or origin_coords_missing:
+            # Build complete origin address
+            complete_origin = self.origin_city
+            if self.origin_address:
+                complete_origin = f"{self.origin_address}, {self.origin_city}"
+
             g = geocoder.mapbox(
-                self.destination, access_token=settings.MAPBOX_ACCESS_TOKEN
+                complete_origin, access_token=settings.MAPBOX_ACCESS_TOKEN
             )
             if g.latlng:
-                self.dest_latitude, self.dest_longitude = g.latlng
-        # autosave category for transport
+                self.origin_latitude, self.origin_longitude = g.latlng
+
+        # Geocode destination
+        destination_changed = old and (
+            old.destination_city != self.destination_city
+            or old.destination_address != self.destination_address
+        )
+        dest_coords_missing = (
+            self.destination_latitude is None or self.destination_longitude is None
+        )
+
+        if destination_changed or dest_coords_missing:
+            # Build complete destination address
+            complete_destination = self.destination_city
+            if self.destination_address:
+                complete_destination = (
+                    f"{self.destination_address}, {self.destination_city}"
+                )
+
+            g = geocoder.mapbox(
+                complete_destination, access_token=settings.MAPBOX_ACCESS_TOKEN
+            )
+            if g.latlng:
+                self.destination_latitude, self.destination_longitude = g.latlng
+
+        # Autosave category for transport
         self.category = self.Category.TRANSPORT
 
         return super().save(*args, **kwargs)
 
     def __str__(self) -> str:
-        return f"{self.name} ({self.day.trip.title} - Day {self.day.number})"
+        return (
+            f"{self.origin_city} → {self.destination_city} ({self.get_type_display()})"
+        )
 
 
 class Experience(Event):

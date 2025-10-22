@@ -682,16 +682,54 @@ class TransportFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("city", locale="it_IT")
     start_time = factory.LazyFunction(lambda: time(10, 0))
     end_time = factory.LazyFunction(lambda: time(11, 0))
+
+    # Parent Event fields (still needed for compatibility)
     address = factory.LazyAttribute(lambda obj: obj.origin_details["address"])
     latitude = factory.LazyAttribute(lambda obj: obj.origin_details.get("latitude"))
     longitude = factory.LazyAttribute(lambda obj: obj.origin_details.get("longitude"))
-    destination = factory.LazyAttribute(lambda obj: obj.destination_details["address"])
-    dest_latitude = factory.LazyAttribute(
+
+    # Origin fields
+    origin_city = factory.LazyAttribute(lambda obj: obj.trip_destination)
+    origin_address = factory.LazyAttribute(lambda obj: obj.origin_details["address"])
+    origin_latitude = factory.LazyAttribute(
+        lambda obj: obj.origin_details.get("latitude")
+    )
+    origin_longitude = factory.LazyAttribute(
+        lambda obj: obj.origin_details.get("longitude")
+    )
+
+    # Destination fields
+    destination_city = factory.LazyAttribute(
+        lambda obj: random.choice(TRANSPORT_DESTINATIONS[obj.trip_destination])
+    )
+    destination_address = factory.LazyAttribute(
+        lambda obj: obj.destination_details["address"]
+    )
+    destination_latitude = factory.LazyAttribute(
         lambda obj: obj.destination_details.get("latitude")
     )
-    dest_longitude = factory.LazyAttribute(
+    destination_longitude = factory.LazyAttribute(
         lambda obj: obj.destination_details.get("longitude")
     )
+
+    # Booking fields
+    booking_reference = factory.Maybe(
+        factory.Faker("pybool"),
+        factory.Faker("bothify", text="??#####"),
+        "",
+    )
+    company = factory.Maybe(
+        factory.Faker("pybool"),
+        factory.Faker("company", locale="it_IT"),
+        "",
+    )
+    ticket_url = factory.Maybe(factory.Faker("pybool"), factory.Faker("url"), "")
+    price = factory.Maybe(
+        factory.Faker("pybool"),
+        factory.Faker("pydecimal", left_digits=3, right_digits=2, positive=True),
+        None,
+    )
+
     type = factory.Faker("random_element", elements=[1, 2, 3, 4, 5, 6, 7])
     category = 1
     website = factory.Maybe(factory.Faker("pybool"), factory.Faker("url"), "")

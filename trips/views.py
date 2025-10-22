@@ -219,7 +219,7 @@ def add_transport(request, day_id):
     unpaired_experiences = Event.objects.filter(
         day__isnull=True, trip=day.trip, category=1
     )
-    form = TransportForm(request.POST or None)
+    form = TransportForm(request.POST or None, trip=day.trip)
     if form.is_valid():
         transport = form.save(commit=False)
         transport.day = day
@@ -512,7 +512,11 @@ def event_modify(request, pk):
         3: MealForm,  # Meal
     }.get(event.category)
 
-    form = event_form(request.POST or None, instance=event)
+    # Pass trip parameter for TransportForm
+    if event.category == 1:  # Transport
+        form = event_form(request.POST or None, instance=event, trip=event.day.trip)
+    else:
+        form = event_form(request.POST or None, instance=event)
     if form.is_valid():
         form.save()
         context = {

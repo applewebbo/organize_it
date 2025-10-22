@@ -216,42 +216,83 @@ class TransportForm(forms.ModelForm):
         model = Transport
         fields = [
             "type",
-            "address",
-            "destination",
+            "origin_city",
+            "origin_address",
+            "destination_city",
+            "destination_address",
             "start_time",
             "end_time",
+            "company",
+            "booking_reference",
+            "ticket_url",
+            "price",
             "website",
         ]
         formfield_callback = urlfields_assume_https
         labels = {
-            "address": _("Departure"),
-            "destination": _("Destination"),
+            "origin_city": _("Origin City"),
+            "origin_address": _("Origin Address"),
+            "destination_city": _("Destination City"),
+            "destination_address": _("Destination Address"),
             "start_time": _("Departure Time"),
             "end_time": _("Arrival Time"),
+            "company": _("Company"),
+            "booking_reference": _("Booking Reference"),
+            "ticket_url": _("Ticket URL"),
+            "price": _("Price"),
             "website": _("Website"),
             "type": _("Type"),
         }
         widgets = {
             "type": forms.Select(),
-            "address": forms.TextInput(attrs={"placeholder": "Departure"}),
-            "destination": forms.TextInput(attrs={"placeholder": "Destination"}),
+            "origin_city": forms.TextInput(attrs={"placeholder": "Origin City"}),
+            "origin_address": forms.TextInput(
+                attrs={"placeholder": "Origin Address (optional)"}
+            ),
+            "destination_city": forms.TextInput(
+                attrs={"placeholder": "Destination City"}
+            ),
+            "destination_address": forms.TextInput(
+                attrs={"placeholder": "Destination Address (optional)"}
+            ),
             "start_time": forms.TimeInput(attrs={"type": "time"}),
             "end_time": forms.TimeInput(attrs={"type": "time"}),
+            "company": forms.TextInput(attrs={"placeholder": "Transport Company"}),
+            "booking_reference": forms.TextInput(
+                attrs={"placeholder": "Booking Reference"}
+            ),
+            "ticket_url": forms.TextInput(attrs={"placeholder": "Ticket URL"}),
+            "price": forms.NumberInput(attrs={"placeholder": "0.00", "step": "0.01"}),
             "website": forms.TextInput(attrs={"placeholder": "Website"}),
         }
 
     def __init__(self, *args, **kwargs):
+        trip = kwargs.pop("trip", None)
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.fields["type"].choices = Transport.Type.choices
+
+        # Prepopulate origin_city with trip destination if available
+        if trip and not self.instance.pk:
+            self.fields["origin_city"].initial = trip.destination
+
         self.helper.layout = Layout(
+            Field("type", css_class="select select-primary w-full"),
             Div(
-                "address",
+                "origin_city",
                 css_class="sm:col-span-2",
             ),
             Div(
-                "destination",
+                "origin_address",
+                css_class="sm:col-span-2",
+            ),
+            Div(
+                "destination_city",
+                css_class="sm:col-span-2",
+            ),
+            Div(
+                "destination_address",
                 css_class="sm:col-span-2",
             ),
             Div(
@@ -262,7 +303,22 @@ class TransportForm(forms.ModelForm):
                 "end_time",
                 css_class="sm:col-span-2",
             ),
-            Field("type", css_class="select select-primary w-full"),
+            Div(
+                "company",
+                css_class="sm:col-span-2",
+            ),
+            Div(
+                "booking_reference",
+                css_class="sm:col-span-2",
+            ),
+            Div(
+                "ticket_url",
+                css_class="sm:col-span-2",
+            ),
+            Div(
+                "price",
+                css_class="sm:col-span-2",
+            ),
             Div(
                 "website",
                 css_class="sm:col-span-3",
@@ -271,8 +327,11 @@ class TransportForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super().save(commit=False)
-        instance.name = (
-            f"{self.cleaned_data['address']} - {self.cleaned_data['destination']}"
+        # Set name based on origin and destination cities
+        instance.name = f"{self.cleaned_data['origin_city']} → {self.cleaned_data['destination_city']}"
+        # Ensure address field from parent Event is populated (use origin_address or city)
+        instance.address = (
+            self.cleaned_data.get("origin_address") or self.cleaned_data["origin_city"]
         )
         if commit:
             instance.save()

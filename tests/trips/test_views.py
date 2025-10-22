@@ -378,10 +378,13 @@ class AddTransportView(TestCase):
         day = trip.days.first()
         data = {
             "type": 1,
-            "address": "Milan",
-            "destination": "Rome",
+            "origin_city": "Milan",
+            "origin_address": "Central Station",
+            "destination_city": "Rome",
+            "destination_address": "Termini",
             "start_time": "10:00",
             "end_time": "12:00",
+            "company": "Trenitalia",
             "website": "https://example.com",
         }
 
@@ -989,10 +992,16 @@ class EventModifyView(TestCase):
         day = trip.days.first()
         event = TransportFactory(day=day)  # Transport
         data = {
-            "address": "New Address",
-            "destination": "New Destination",
+            "origin_city": "Milan",
+            "origin_address": "Piazza Duomo",
+            "destination_city": "Rome",
+            "destination_address": "Termini Station",
             "start_time": "10:00",
             "end_time": "12:00",
+            "company": "Trenitalia",
+            "booking_reference": "TR123",
+            "ticket_url": "https://example.com",
+            "price": "50.00",
             "website": "https://example.com",
             "type": 1,
         }
@@ -1002,7 +1011,11 @@ class EventModifyView(TestCase):
 
         self.response_200(response)
         event.refresh_from_db()
-        assert event.name == "New Address - New Destination"
+        assert event.name == "Milan → Rome"
+        assert event.origin_city == "Milan"
+        assert event.destination_city == "Rome"
+        assert event.company == "Trenitalia"
+        assert event.booking_reference == "TR123"
 
     def test_post_with_invalid_data(self):
         user = self.make_user("user")
