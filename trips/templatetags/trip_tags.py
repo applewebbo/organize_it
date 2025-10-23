@@ -183,3 +183,65 @@ def phone_format(value):
             formatted_rest = rest
 
     return f"{country_code} {formatted_rest}"
+
+
+@register.filter
+def format_duration(duration):
+    """Format timedelta object to human-readable format (e.g., 2h 30m)"""
+    if not duration:
+        return ""
+
+    total_seconds = int(duration.total_seconds())
+    days = duration.days
+    hours = (total_seconds % 86400) // 3600
+    minutes = (total_seconds % 3600) // 60
+
+    parts = []
+    if days > 0:
+        parts.append(f"{days}d")
+    if hours > 0:
+        parts.append(f"{hours}h")
+    if minutes > 0:
+        parts.append(f"{minutes}m")
+
+    return " ".join(parts) if parts else "0m"
+
+
+@register.filter
+def event_type_icon(event):
+    """Return the appropriate Phosphor icon class based on event category and type"""
+    # Transport icons (category == 1)
+    if event.category == 1:
+        transport_icons = {
+            1: "ph-car",  # CAR
+            2: "ph-airplane",  # PLANE
+            3: "ph-train",  # TRAIN
+            4: "ph-boat",  # BOAT
+            5: "ph-bus",  # BUS
+            6: "ph-taxi",  # TAXI
+            7: "ph-question",  # OTHER
+        }
+        return transport_icons.get(event.type, "ph-question")
+
+    # Experience icons (category == 2)
+    elif event.category == 2:
+        experience_icons = {
+            1: "ph-bank",  # MUSEUM
+            2: "ph-tree",  # PARK
+            3: "ph-person-simple-walk",  # WALK
+            4: "ph-barbell",  # SPORT
+            5: "ph-question",  # OTHER
+        }
+        return experience_icons.get(event.type, "ph-question")
+
+    # Meal icons (category == 3)
+    elif event.category == 3:
+        meal_icons = {
+            1: "ph-coffee",  # BREAKFAST
+            2: "ph-fork-knife",  # LUNCH
+            3: "ph-wine",  # DINNER
+            4: "ph-cookie",  # SNACK
+        }
+        return meal_icons.get(event.type, "ph-fork-knife")
+
+    return "ph-question"

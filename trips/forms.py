@@ -245,25 +245,21 @@ class TransportForm(forms.ModelForm):
         }
         widgets = {
             "type": forms.Select(),
-            "origin_city": forms.TextInput(attrs={"placeholder": "Origin City"}),
-            "origin_address": forms.TextInput(
-                attrs={"placeholder": "Origin Address (optional)"}
-            ),
+            "origin_city": forms.TextInput(attrs={"placeholder": _("Origin City")}),
+            "origin_address": forms.TextInput(attrs={"placeholder": _("Address")}),
             "destination_city": forms.TextInput(
-                attrs={"placeholder": "Destination City"}
+                attrs={"placeholder": _("Destination City")}
             ),
-            "destination_address": forms.TextInput(
-                attrs={"placeholder": "Destination Address (optional)"}
-            ),
+            "destination_address": forms.TextInput(attrs={"placeholder": _("Address")}),
             "start_time": forms.TimeInput(attrs={"type": "time"}),
             "end_time": forms.TimeInput(attrs={"type": "time"}),
-            "company": forms.TextInput(attrs={"placeholder": "Transport Company"}),
+            "company": forms.TextInput(attrs={"placeholder": _("Company")}),
             "booking_reference": forms.TextInput(
-                attrs={"placeholder": "Booking Reference"}
+                attrs={"placeholder": _("Booking Reference")}
             ),
-            "ticket_url": forms.TextInput(attrs={"placeholder": "Ticket URL"}),
+            "ticket_url": forms.TextInput(attrs={"placeholder": _("Ticket URL")}),
             "price": forms.NumberInput(attrs={"placeholder": "0.00", "step": "0.01"}),
-            "website": forms.TextInput(attrs={"placeholder": "Website"}),
+            "website": forms.TextInput(attrs={"placeholder": _("Website")}),
         }
 
     def __init__(self, *args, **kwargs):

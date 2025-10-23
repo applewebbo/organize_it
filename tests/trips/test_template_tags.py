@@ -1,11 +1,20 @@
 import pytest
 
-from tests.trips.factories import EventFactory, StayFactory, TripFactory
+from tests.trips.factories import (
+    EventFactory,
+    ExperienceFactory,
+    MealFactory,
+    StayFactory,
+    TransportFactory,
+    TripFactory,
+)
 from trips.templatetags.trip_tags import (
     event_bg_color,
     event_border_color,
     event_icon,
     event_icon_color,
+    event_type_icon,
+    format_duration,
     format_opening_hours,
     has_different_stay,
     is_first_day_of_stay,
@@ -186,6 +195,128 @@ class TestEventFormatting:
         """Test event_icon_color returns correct icon color"""
         event = EventFactory(category=category)
         assert event_icon_color(event) == expected_class
+
+    @pytest.mark.parametrize(
+        "event_type,expected_icon",
+        [
+            (1, "ph-car"),  # CAR
+            (2, "ph-airplane"),  # PLANE
+            (3, "ph-train"),  # TRAIN
+            (4, "ph-boat"),  # BOAT
+            (5, "ph-bus"),  # BUS
+            (6, "ph-taxi"),  # TAXI
+            (7, "ph-question"),  # OTHER
+        ],
+    )
+    def test_event_type_icon_transport(self, event_type, expected_icon):
+        """Test event_type_icon returns correct icon for transport types"""
+        trip = TripFactory()
+        transport = TransportFactory(trip=trip, type=event_type)
+        assert event_type_icon(transport) == expected_icon
+
+    @pytest.mark.parametrize(
+        "event_type,expected_icon",
+        [
+            (1, "ph-bank"),  # MUSEUM
+            (2, "ph-tree"),  # PARK
+            (3, "ph-person-simple-walk"),  # WALK
+            (4, "ph-barbell"),  # SPORT
+            (5, "ph-question"),  # OTHER
+        ],
+    )
+    def test_event_type_icon_experience(self, event_type, expected_icon):
+        """Test event_type_icon returns correct icon for experience types"""
+        trip = TripFactory()
+        experience = ExperienceFactory(trip=trip, type=event_type)
+        assert event_type_icon(experience) == expected_icon
+
+    @pytest.mark.parametrize(
+        "event_type,expected_icon",
+        [
+            (1, "ph-coffee"),  # BREAKFAST
+            (2, "ph-fork-knife"),  # LUNCH
+            (3, "ph-wine"),  # DINNER
+            (4, "ph-cookie"),  # SNACK
+        ],
+    )
+    def test_event_type_icon_meal(self, event_type, expected_icon):
+        """Test event_type_icon returns correct icon for meal types"""
+        trip = TripFactory()
+        meal = MealFactory(trip=trip, type=event_type)
+        assert event_type_icon(meal) == expected_icon
+
+    def test_event_type_icon_unknown_category(self):
+        """Test event_type_icon returns default icon for unknown category"""
+        event = EventFactory(category=99)
+        assert event_type_icon(event) == "ph-question"
+
+    def test_event_type_icon_unknown_transport_type(self):
+        """Test event_type_icon returns default icon for unknown transport type"""
+        trip = TripFactory()
+        transport = TransportFactory(trip=trip, type=99)
+        assert event_type_icon(transport) == "ph-question"
+
+    def test_event_type_icon_unknown_experience_type(self):
+        """Test event_type_icon returns default icon for unknown experience type"""
+        trip = TripFactory()
+        experience = ExperienceFactory(trip=trip, type=99)
+        assert event_type_icon(experience) == "ph-question"
+
+    def test_event_type_icon_unknown_meal_type(self):
+        """Test event_type_icon returns default icon for unknown meal type"""
+        trip = TripFactory()
+        meal = MealFactory(trip=trip, type=99)
+        assert event_type_icon(meal) == "ph-fork-knife"
+
+
+class TestFormatDuration:
+    """Tests for format_duration template tag"""
+
+    def test_format_duration_none(self):
+        """Test format_duration with None input"""
+        assert format_duration(None) == ""
+
+    def test_format_duration_with_days(self):
+        """Test format_duration with days"""
+        from datetime import timedelta
+
+        duration = timedelta(days=2, hours=3, minutes=30)
+        assert format_duration(duration) == "2d 3h 30m"
+
+    def test_format_duration_hours_only(self):
+        """Test format_duration with hours and minutes, no days"""
+        from datetime import timedelta
+
+        duration = timedelta(hours=5, minutes=45)
+        assert format_duration(duration) == "5h 45m"
+
+    def test_format_duration_minutes_only(self):
+        """Test format_duration with only minutes"""
+        from datetime import timedelta
+
+        duration = timedelta(minutes=30)
+        assert format_duration(duration) == "30m"
+
+    def test_format_duration_zero_minutes(self):
+        """Test format_duration with zero minutes (hours only)"""
+        from datetime import timedelta
+
+        duration = timedelta(hours=2)
+        assert format_duration(duration) == "2h"
+
+    def test_format_duration_zero_hours(self):
+        """Test format_duration with zero hours (days and minutes)"""
+        from datetime import timedelta
+
+        duration = timedelta(days=1, minutes=15)
+        assert format_duration(duration) == "1d 15m"
+
+    def test_format_duration_less_than_minute(self):
+        """Test format_duration with less than a minute (shows as 0m)"""
+        from datetime import timedelta
+
+        duration = timedelta(seconds=45)
+        assert format_duration(duration) == "0m"
 
 
 class TestPhoneFormat:

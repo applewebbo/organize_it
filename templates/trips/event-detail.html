@@ -3,7 +3,10 @@
     <div class="flex gap-1 items-center">
         <h3 id="event-title"
             class="text-xl font-semibold text-gray-900 dark:text-white">{{ event.name }}</h3>
-        <span class="badge badge-outline badge-sm badge-info ms-2 align-sub">{{ event.get_type_display }}</span>
+        <span class="badge badge-outline badge-sm badge-info ms-2 align-sub">
+            <i class="ph-bold {{ event|event_type_icon }}" aria-hidden="true"></i>
+            <span class="ml-1">{{ event.get_type_display }}</span>
+        </span>
     </div>
     <button type="button"
             class="btn btn-ghost btn-circle btn-sm"
