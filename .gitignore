@@ -154,3 +154,6 @@ src/intellisense.css
 # DJANGO
 staticfiles/
 .envrc
+
+#  CLAUDE
+.claude/plans/
