@@ -274,17 +274,50 @@ class TransportForm(forms.ModelForm):
             self.fields["origin_city"].initial = trip.destination
             self.fields["destination_city"].initial = trip.destination
 
+        # Store trip_id for HTMX requests
+        trip_id = trip.pk if trip else ""
+        trip_addresses_url = reverse("trips:get-trip-addresses")
+
         self.helper.layout = Layout(
+            HTML(
+                f'<input type="hidden" name="trip_id" value="{trip_id}" id="trip_id">'
+            ),
             Fieldset(
                 _("Origin"),
                 "origin_city",
                 "origin_address",
+                HTML(
+                    f"""
+                    <div class="sm:col-span-2"
+                         id="origin-trip-addresses"
+                         hx-post="{trip_addresses_url}"
+                         hx-trigger="load"
+                         hx-target="#origin-trip-addresses"
+                         hx-swap="innerHTML"
+                         hx-include="#trip_id"
+                         hx-vals='{{"field_type": "origin"}}'>
+                    </div>
+                    """
+                ),
                 css_class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:col-span-4",
             ),
             Fieldset(
                 _("Destination"),
                 "destination_city",
                 "destination_address",
+                HTML(
+                    f"""
+                    <div class="sm:col-span-2"
+                         id="destination-trip-addresses"
+                         hx-post="{trip_addresses_url}"
+                         hx-trigger="load"
+                         hx-target="#destination-trip-addresses"
+                         hx-swap="innerHTML"
+                         hx-include="#trip_id"
+                         hx-vals='{{"field_type": "destination"}}'>
+                    </div>
+                    """
+                ),
                 css_class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:col-span-4",
             ),
             Div(

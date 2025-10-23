@@ -1,0 +1,15 @@
+{% load i18n %}
+{% if found %}
+    <div class="flex flex-wrap gap-2 mt-2">
+        {% for address in addresses %}
+            <button type="button"
+                    class="inline-flex gap-1 items-center btn btn-xs btn-outline btn-primary"
+                    @click="setTripFields('trip-city-{{ forloop.counter }}', 'trip-address-{{ forloop.counter }}', '{{ field_type }}')">
+                <span id="trip-city-{{ forloop.counter }}" class="hidden">{{ address.city }}</span>
+                <span id="trip-address-{{ forloop.counter }}" class="hidden">{{ address.address }}</span>
+                {{ address.name }}
+                <i class="ph-bold ph-plus-circle i-sm"></i>
+            </button>
+        {% endfor %}
+    </div>
+{% endif %}

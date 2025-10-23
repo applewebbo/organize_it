@@ -3,7 +3,23 @@
       hx-target="#dialog"
       hx-disabled-elt="#form-submit"
       class="modal-content"
-      method="post">
+      method="post"
+      x-data="{
+        setTripFields(cityId, addressId, fieldType) {
+            const cityEl = document.getElementById(cityId);
+            const addressEl = document.getElementById(addressId);
+            const city = cityEl ? cityEl.textContent.trim() : '';
+            const address = addressEl ? addressEl.textContent.trim() : '';
+
+            if (fieldType === 'origin') {
+                document.getElementById('id_origin_city').value = city;
+                document.getElementById('id_origin_address').value = address;
+            } else if (fieldType === 'destination') {
+                document.getElementById('id_destination_city').value = city;
+                document.getElementById('id_destination_address').value = address;
+            }
+        }
+      }">
     <div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
         <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% trans 'Create a new Transport' %}</h3>
         <button type="button"

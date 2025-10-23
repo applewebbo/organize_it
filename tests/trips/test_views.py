@@ -2995,3 +2995,187 @@ class ConfirmEnrichStayViewTest(TestCase):
         self.response_404(response)
         stay.refresh_from_db()
         assert stay.enriched is False
+
+
+class TestGetTripAddresses(TestCase):
+    def test_get_trip_addresses_with_events(self):
+        """Test fetching addresses from trip events."""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        ExperienceFactory(
+            day=day, trip=trip, name="Museum", address="123 Main St", city="Roma"
+        )
+
+        with self.login(user):
+            response = self.post(
+                "trips:get-trip-addresses",
+                data={"trip_id": trip.pk, "field_type": "origin"},
+            )
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/includes/trip-address-results.html")
+        assert "Museum" in str(response.content)
+        assert "123 Main St" in str(response.content)
+
+    def test_get_trip_addresses_with_stays(self):
+        """Test fetching addresses from trip stays."""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        stay = StayFactory(name="Hotel Roma", address="456 Via Roma", city="Roma")
+        day.stay = stay
+        day.save()
+
+        with self.login(user):
+            response = self.post(
+                "trips:get-trip-addresses",
+                data={"trip_id": trip.pk, "field_type": "destination"},
+            )
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/includes/trip-address-results.html")
+        assert "Hotel Roma" in str(response.content)
+        assert "456 Via Roma" in str(response.content)
+
+    def test_get_trip_addresses_mixed(self):
+        """Test fetching addresses from both events and stays."""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+
+        # Add an event
+        ExperienceFactory(
+            day=day, trip=trip, name="Restaurant", address="789 Food St", city="Milano"
+        )
+
+        # Add a stay
+        stay = StayFactory(name="Hotel Milano", address="101 Sleep Ave", city="Milano")
+        day.stay = stay
+        day.save()
+
+        with self.login(user):
+            response = self.post(
+                "trips:get-trip-addresses",
+                data={"trip_id": trip.pk, "field_type": "origin"},
+            )
+
+        self.response_200(response)
+        content = str(response.content)
+        assert "Restaurant" in content
+        assert "789 Food St" in content
+        assert "Hotel Milano" in content
+        assert "101 Sleep Ave" in content
+
+    def test_get_trip_addresses_no_addresses(self):
+        """Test when trip has no addresses."""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+
+        with self.login(user):
+            response = self.post(
+                "trips:get-trip-addresses",
+                data={"trip_id": trip.pk, "field_type": "origin"},
+            )
+
+        self.response_200(response)
+        # Should return empty content when not found
+        content = response.content.decode().strip()
+        assert content == "" or "No addresses found" in content
+
+    def test_get_trip_addresses_unauthorized(self):
+        """Test unauthorized access to another user's trip."""
+        user = self.make_user("user")
+        other_user = self.make_user("other_user")
+        trip = TripFactory(author=user)
+
+        with self.login(other_user):
+            response = self.post(
+                "trips:get-trip-addresses",
+                data={"trip_id": trip.pk, "field_type": "origin"},
+            )
+
+        self.response_404(response)
+
+    def test_get_trip_addresses_no_trip_id(self):
+        """Test when no trip_id is provided."""
+        user = self.make_user("user")
+
+        with self.login(user):
+            response = self.post(
+                "trips:get-trip-addresses", data={"field_type": "origin"}
+            )
+
+        self.response_200(response)
+        # Should return empty content when not found
+        content = response.content.decode().strip()
+        assert content == "" or "No addresses found" in content
+
+    def test_get_trip_addresses_excludes_empty_addresses(self):
+        """Test that events/stays with empty addresses are excluded."""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+
+        # Event with address
+        ExperienceFactory(
+            day=day, trip=trip, name="Museum", address="123 Main St", city="Roma"
+        )
+
+        # Event without address
+        ExperienceFactory(day=day, trip=trip, name="Park", address="", city="")
+
+        with self.login(user):
+            response = self.post(
+                "trips:get-trip-addresses",
+                data={"trip_id": trip.pk, "field_type": "origin"},
+            )
+
+        self.response_200(response)
+        content = str(response.content)
+        assert "Museum" in content
+        assert "Park" not in content
+
+    def test_get_trip_addresses_get_request(self):
+        """Test GET request returns empty result."""
+        user = self.make_user("user")
+
+        with self.login(user):
+            response = self.get("trips:get-trip-addresses")
+
+        self.response_200(response)
+        # Should return empty content when not found
+        content = response.content.decode().strip()
+        assert content == "" or "No addresses found" in content
+
+    def test_get_trip_addresses_excludes_transports(self):
+        """Test that Transport events are excluded from suggestions."""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+
+        # Add an Experience
+        ExperienceFactory(
+            day=day, trip=trip, name="Museum Visit", address="123 Art St", city="Roma"
+        )
+
+        # Add a Transport (should be excluded)
+        transport = TransportFactory(
+            day=day,
+            trip=trip,
+            origin_city="Roma",
+            origin_address="456 Station Rd",
+        )
+
+        with self.login(user):
+            response = self.post(
+                "trips:get-trip-addresses",
+                data={"trip_id": trip.pk, "field_type": "origin"},
+            )
+
+        self.response_200(response)
+        content = str(response.content)
+        # Experience should be in results
+        assert "Museum Visit" in content
+        # Transport should NOT be in results
+        assert transport.name not in content

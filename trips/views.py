@@ -733,6 +733,72 @@ def geocode_address(request):
     )
 
 
+def get_trip_addresses(request):
+    """Get addresses from existing events and stays in a trip for transport origin/destination selection."""
+    if request.method == "POST":
+        trip_id = request.POST.get("trip_id", "").strip()
+        field_type = request.POST.get(
+            "field_type", ""
+        ).strip()  # 'origin' or 'destination'
+
+        if trip_id:
+            trip = get_object_or_404(Trip, pk=trip_id, author=request.user)
+            addresses = []
+
+            # Get addresses from events (exclude Transport events - category=1)
+            events = (
+                Event.objects.filter(trip=trip)
+                .exclude(category=1)
+                .exclude(address="")
+                .exclude(city="")
+            )
+            for event in events:
+                addresses.append(
+                    {
+                        "name": event.name,
+                        "address": event.address,
+                        "city": event.city,
+                        "type": "event",
+                    }
+                )
+
+            # Get addresses from stays
+            stays = (
+                Stay.objects.filter(days__trip=trip)
+                .exclude(address="")
+                .exclude(city="")
+                .distinct()
+            )
+            for stay in stays:
+                addresses.append(
+                    {
+                        "name": stay.name,
+                        "address": stay.address,
+                        "city": stay.city,
+                        "type": "stay",
+                    }
+                )
+
+            if addresses:
+                return TemplateResponse(
+                    request,
+                    "trips/includes/trip-address-results.html",
+                    {
+                        "addresses": addresses,
+                        "found": True,
+                        "field_type": field_type,
+                    },
+                )
+
+        return TemplateResponse(
+            request, "trips/includes/trip-address-results.html", {"found": False}
+        )
+
+    return TemplateResponse(
+        request, "trips/includes/trip-address-results.html", {"found": False}
+    )
+
+
 @login_required
 def event_notes(request, event_id):
     """
