@@ -288,14 +288,23 @@ class TransportForm(forms.ModelForm):
                 "origin_address",
                 HTML(
                     f"""
-                    <div class="sm:col-span-2"
-                         id="origin-trip-addresses"
-                         hx-post="{trip_addresses_url}"
-                         hx-trigger="load"
-                         hx-target="#origin-trip-addresses"
-                         hx-swap="innerHTML"
-                         hx-include="#trip_id"
-                         hx-vals='{{"field_type": "origin"}}'>
+                    <div class="sm:col-span-2">
+                        <div class="flex items-center gap-4 -mt-6 mb-2 cursor-pointer" @click.stop="showOriginSuggestions = !showOriginSuggestions">
+                            <h2 class="text-sm font-semibold">Quick fill from trip locations</h2>
+                            <button type="button" @click.stop="showOriginSuggestions = !showOriginSuggestions" class="btn btn-xs btn-ghost me-2">
+                                <i class="" :class="showOriginSuggestions ? 'ph-bold ph-caret-up i-md text-base-content/60' : 'ph-bold ph-caret-down i-md text-base-content/60'"></i>
+                            </button>
+                        </div>
+                        <div x-show="showOriginSuggestions"
+                             x-collapse
+                             id="origin-trip-addresses"
+                             hx-post="{trip_addresses_url}"
+                             hx-trigger="intersect once"
+                             hx-target="#origin-trip-addresses"
+                             hx-swap="innerHTML"
+                             hx-include="#trip_id"
+                             hx-vals='{{"field_type": "origin"}}'>
+                        </div>
                     </div>
                     """
                 ),
@@ -307,14 +316,23 @@ class TransportForm(forms.ModelForm):
                 "destination_address",
                 HTML(
                     f"""
-                    <div class="sm:col-span-2"
-                         id="destination-trip-addresses"
-                         hx-post="{trip_addresses_url}"
-                         hx-trigger="load"
-                         hx-target="#destination-trip-addresses"
-                         hx-swap="innerHTML"
-                         hx-include="#trip_id"
-                         hx-vals='{{"field_type": "destination"}}'>
+                    <div class="sm:col-span-2">
+                        <div class="flex items-center gap-4 -mt-6 mb-2 cursor-pointer" @click.stop="showDestinationSuggestions = !showDestinationSuggestions">
+                            <h2 class="text-sm font-semibold">Quick fill from trip locations</h2>
+                            <button type="button" @click.stop="showDestinationSuggestions = !showDestinationSuggestions" class="btn btn-xs btn-ghost me-2">
+                                <i class="" :class="showDestinationSuggestions ? 'ph-bold ph-caret-up i-md text-base-content/60' : 'ph-bold ph-caret-down i-md text-base-content/60'"></i>
+                            </button>
+                        </div>
+                        <div x-show="showDestinationSuggestions"
+                             x-collapse
+                             id="destination-trip-addresses"
+                             hx-post="{trip_addresses_url}"
+                             hx-trigger="intersect once"
+                             hx-target="#destination-trip-addresses"
+                             hx-swap="innerHTML"
+                             hx-include="#trip_id"
+                             hx-vals='{{"field_type": "destination"}}'>
+                        </div>
                     </div>
                     """
                 ),

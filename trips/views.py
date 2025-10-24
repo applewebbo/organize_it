@@ -743,34 +743,19 @@ def get_trip_addresses(request):
 
         if trip_id:
             trip = get_object_or_404(Trip, pk=trip_id, author=request.user)
-            addresses = []
+            stays_addresses = []
+            events_addresses = []
 
-            # Get addresses from events (exclude Transport events - category=1)
-            events = (
-                Event.objects.filter(trip=trip)
-                .exclude(category=1)
-                .exclude(address="")
-                .exclude(city="")
-            )
-            for event in events:
-                addresses.append(
-                    {
-                        "name": event.name,
-                        "address": event.address,
-                        "city": event.city,
-                        "type": "event",
-                    }
-                )
-
-            # Get addresses from stays
+            # Get addresses from stays (always return all stays)
             stays = (
                 Stay.objects.filter(days__trip=trip)
                 .exclude(address="")
                 .exclude(city="")
                 .distinct()
+                .order_by("name")
             )
             for stay in stays:
-                addresses.append(
+                stays_addresses.append(
                     {
                         "name": stay.name,
                         "address": stay.address,
@@ -779,12 +764,43 @@ def get_trip_addresses(request):
                     }
                 )
 
-            if addresses:
+            # Get addresses from events (exclude Transport events - category=1)
+            events = (
+                Event.objects.filter(trip=trip)
+                .exclude(category=1)
+                .exclude(address="")
+                .exclude(city="")
+                .order_by("name")
+            )
+
+            # Track unique events to avoid duplicates
+            seen_events = set()
+            for event in events:
+                # Create a unique key based on name, address, and city
+                event_key = (
+                    event.name.lower().strip(),
+                    event.address.lower().strip(),
+                    event.city.lower().strip(),
+                )
+
+                if event_key not in seen_events:
+                    seen_events.add(event_key)
+                    events_addresses.append(
+                        {
+                            "name": event.name,
+                            "address": event.address,
+                            "city": event.city,
+                            "type": "event",
+                        }
+                    )
+
+            if stays_addresses or events_addresses:
                 return TemplateResponse(
                     request,
                     "trips/includes/trip-address-results.html",
                     {
-                        "addresses": addresses,
+                        "stays": stays_addresses,
+                        "events": events_addresses,
                         "found": True,
                         "field_type": field_type,
                     },

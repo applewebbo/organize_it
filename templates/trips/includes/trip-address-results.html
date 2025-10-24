@@ -1,15 +1,47 @@
 {% load i18n %}
 {% if found %}
-    <div class="flex flex-wrap gap-2 mt-2">
-        {% for address in addresses %}
-            <button type="button"
-                    class="inline-flex gap-1 items-center btn btn-xs btn-outline btn-primary"
-                    @click="setTripFields('trip-city-{{ forloop.counter }}', 'trip-address-{{ forloop.counter }}', '{{ field_type }}')">
-                <span id="trip-city-{{ forloop.counter }}" class="hidden">{{ address.city }}</span>
-                <span id="trip-address-{{ forloop.counter }}" class="hidden">{{ address.address }}</span>
-                {{ address.name }}
-                <i class="ph-bold ph-plus-circle i-sm"></i>
-            </button>
-        {% endfor %}
+    <div class="my-2 space-y-3">
+        {# Stays Section - Always shown in full #}
+        {% if stays %}
+            <div>
+                <p class="mb-1.5 text-xs font-semibold text-base-content/60">
+                    <i class="ph-bold ph-bed"></i> {% trans "Hotels & Stays" %}
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    {% for stay in stays %}
+                        <button type="button"
+                                class="inline-flex gap-1 items-center btn btn-xs btn-accent"
+                                @click="setTripFields('trip-city-stay-{{ forloop.counter }}', 'trip-address-stay-{{ forloop.counter }}', '{{ field_type }}')">
+                            <span id="trip-city-stay-{{ forloop.counter }}" class="hidden">{{ stay.city }}</span>
+                            <span id="trip-address-stay-{{ forloop.counter }}" class="hidden">{{ stay.address }}</span>
+                            <i class="ph-bold ph-bed i-xs"></i>
+                            {{ stay.name }}
+                            <i class="ph-bold ph-plus-circle i-sm"></i>
+                        </button>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        {# Events Section - All events shown #}
+        {% if events %}
+            <div>
+                <p class="mb-1.5 text-xs font-semibold text-base-content/60">
+                    <i class="ph-bold ph-map-pin"></i> {% trans "Experiences & Restaurants" %}
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    {% for event in events %}
+                        <button type="button"
+                                class="inline-flex gap-1 items-center btn btn-xs btn-primary"
+                                @click="setTripFields('trip-city-event-{{ forloop.counter }}', 'trip-address-event-{{ forloop.counter }}', '{{ field_type }}')">
+                            <span id="trip-city-event-{{ forloop.counter }}" class="hidden">{{ event.city }}</span>
+                            <span id="trip-address-event-{{ forloop.counter }}" class="hidden">{{ event.address }}</span>
+                            {{ event.name }}
+                            <i class="ph-bold ph-plus-circle i-sm"></i>
+                        </button>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
     </div>
 {% endif %}

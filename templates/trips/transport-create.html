@@ -5,6 +5,8 @@
       class="modal-content"
       method="post"
       x-data="{
+        showOriginSuggestions: false,
+        showDestinationSuggestions: false,
         setTripFields(cityId, addressId, fieldType) {
             const cityEl = document.getElementById(cityId);
             const addressEl = document.getElementById(addressId);

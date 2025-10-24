@@ -12,6 +12,7 @@ from django.contrib.messages import get_messages
 from django.core.cache import cache
 from django.test import override_settings
 from django.urls import reverse
+from django.utils import timezone
 from pytest_django.asserts import assertTemplateUsed
 
 from tests.test import TestCase
@@ -3015,8 +3016,13 @@ class TestGetTripAddresses(TestCase):
 
         self.response_200(response)
         assertTemplateUsed(response, "trips/includes/trip-address-results.html")
-        assert "Museum" in str(response.content)
-        assert "123 Main St" in str(response.content)
+        content = str(response.content)
+        assert "Museum" in content
+        assert "123 Main St" in content
+        assert (
+            "Experiences &amp; Restaurants" in content
+            or "Experiences & Restaurants" in content
+        )
 
     def test_get_trip_addresses_with_stays(self):
         """Test fetching addresses from trip stays."""
@@ -3035,8 +3041,10 @@ class TestGetTripAddresses(TestCase):
 
         self.response_200(response)
         assertTemplateUsed(response, "trips/includes/trip-address-results.html")
-        assert "Hotel Roma" in str(response.content)
-        assert "456 Via Roma" in str(response.content)
+        content = str(response.content)
+        assert "Hotel Roma" in content
+        assert "456 Via Roma" in content
+        assert "Hotels &amp; Stays" in content or "Hotels & Stays" in content
 
     def test_get_trip_addresses_mixed(self):
         """Test fetching addresses from both events and stays."""
@@ -3062,6 +3070,13 @@ class TestGetTripAddresses(TestCase):
 
         self.response_200(response)
         content = str(response.content)
+        # Check both sections are present
+        assert "Hotels &amp; Stays" in content or "Hotels & Stays" in content
+        assert (
+            "Experiences &amp; Restaurants" in content
+            or "Experiences & Restaurants" in content
+        )
+        # Check content
         assert "Restaurant" in content
         assert "789 Food St" in content
         assert "Hotel Milano" in content
@@ -3179,3 +3194,148 @@ class TestGetTripAddresses(TestCase):
         assert "Museum Visit" in content
         # Transport should NOT be in results
         assert transport.name not in content
+
+    def test_get_trip_addresses_all_events_shown(self):
+        """Test that all events are shown without pagination."""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+
+        # Create 10 events
+        for i in range(10):
+            ExperienceFactory(
+                day=day,
+                trip=trip,
+                name=f"Event {i}",
+                address=f"{i} Street",
+                city="Roma",
+            )
+
+        with self.login(user):
+            response = self.post(
+                "trips:get-trip-addresses",
+                data={"trip_id": trip.pk, "field_type": "origin"},
+            )
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/includes/trip-address-results.html")
+        content = str(response.content)
+
+        # All 10 events should be present
+        for i in range(10):
+            assert f"Event {i}" in content
+
+        # No "Show more" button should be present
+        assert "Show more" not in content
+
+    def test_get_trip_addresses_stays_always_shown_in_full(self):
+        """Test that all stays are shown."""
+        user = self.make_user("user")
+        # Create trip with enough days
+        start_date = timezone.now().date()
+        end_date = start_date + timezone.timedelta(days=7)
+        trip = TripFactory(author=user, start_date=start_date, end_date=end_date)
+
+        # Create 7 unique stays across different days
+        days = list(trip.days.all()[:7])
+        for i, day in enumerate(days):
+            stay = StayFactory(name=f"Hotel {i}", address=f"{i} Hotel St", city="Roma")
+            day.stay = stay
+            day.save()
+
+        with self.login(user):
+            response = self.post(
+                "trips:get-trip-addresses",
+                data={"trip_id": trip.pk, "field_type": "origin"},
+            )
+
+        self.response_200(response)
+        content = str(response.content)
+
+        # All stays should be present
+        for i in range(len(days)):
+            assert f"Hotel {i}" in content
+
+    def test_get_trip_addresses_stays_before_events(self):
+        """Test that stays section appears before events section."""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+
+        # Add a stay
+        stay = StayFactory(name="Hotel First", address="1 Hotel St", city="Roma")
+        day.stay = stay
+        day.save()
+
+        # Add an event
+        ExperienceFactory(
+            day=day, trip=trip, name="Event Second", address="2 Event St", city="Roma"
+        )
+
+        with self.login(user):
+            response = self.post(
+                "trips:get-trip-addresses",
+                data={"trip_id": trip.pk, "field_type": "origin"},
+            )
+
+        self.response_200(response)
+        content = str(response.content)
+
+        # Find positions of stays and events sections
+        stays_pos = content.find("Hotels")
+        events_pos = content.find("Experiences")
+
+        # Stays section should come before events section
+        assert stays_pos < events_pos
+        assert events_pos > 0  # Make sure events section was found
+
+    def test_get_trip_addresses_deduplicates_events(self):
+        """Test that duplicate events are only shown once."""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+
+        # Create multiple days
+        start_date = timezone.now().date()
+        end_date = start_date + timezone.timedelta(days=3)
+        trip.start_date = start_date
+        trip.end_date = end_date
+        trip.save()
+
+        days = list(trip.days.all()[:3])
+
+        # Add the same event on multiple days
+        for day in days:
+            ExperienceFactory(
+                day=day,
+                trip=trip,
+                name="Colosseum Tour",
+                address="Piazza del Colosseo",
+                city="Roma",
+            )
+
+        # Add a different event to ensure there are multiple events
+        ExperienceFactory(
+            day=days[0],
+            trip=trip,
+            name="Vatican Museum",
+            address="Viale Vaticano",
+            city="Roma",
+        )
+
+        with self.login(user):
+            response = self.post(
+                "trips:get-trip-addresses",
+                data={"trip_id": trip.pk, "field_type": "origin"},
+            )
+
+        self.response_200(response)
+        content = str(response.content)
+
+        # Count occurrences of "Colosseum Tour" - should appear only once
+        colosseum_count = content.count("Colosseum Tour")
+        assert colosseum_count == 1, (
+            f"Expected 1 occurrence of 'Colosseum Tour', found {colosseum_count}"
+        )
+
+        # Vatican Museum should also appear
+        assert "Vatican Museum" in content
