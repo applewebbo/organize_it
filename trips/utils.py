@@ -1,4 +1,5 @@
 import hashlib
+import logging
 import time
 
 import folium
@@ -10,6 +11,8 @@ from django.http import Http404
 
 from accounts.models import Profile
 from trips.models import Trip
+
+logger = logging.getLogger(__name__)
 
 
 def annotate_event_overlaps(queryset):
@@ -166,7 +169,7 @@ def geocode_location(name, city):
             return address_list
 
     except Exception as e:
-        print(f"Error geocoding: {e}")
+        logger.error(f"Error geocoding: {e}")
 
     return []
 
@@ -219,10 +222,6 @@ def select_best_result(results, name, city):
 
     # Sort results by score, highest first
     scored_results.sort(key=lambda x: x[0], reverse=True)
-
-    print(f"Results found: {len(results)}")
-    for i, (score, result) in enumerate(scored_results[:3]):
-        print(f"  {i + 1}. Score: {score:.1f} - {result.get('display_name', '')[:80]}")
 
     return scored_results[0][1] if scored_results else results[0]
 
