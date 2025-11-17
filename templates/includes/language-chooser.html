@@ -10,7 +10,7 @@
         hx-trigger="change"
         hx-swap="none"
         hx-headers='{"HX-Request": "true"}'
-        hx-on="htmx:afterRequest: window.location.reload()">
+        hx-on::after-request="window.location.reload()">
     <option value="en" {% if current_language == "en" %}selected{% endif %}>ENG</option>
     <option value="it" {% if current_language == "it" %}selected{% endif %}>ITA</option>
 </select>
