@@ -207,7 +207,10 @@ def trip_dates_update(request, pk):
             messages.SUCCESS,
             "Dates updated successfully",
         )
-        return HttpResponse(status=204, headers={"HX-Trigger": "tripSaved"})
+        return HttpResponse(
+            status=204,
+            headers={"HX-Trigger": json.dumps({"tripSaved": {}, "tripModified": {}})},
+        )
 
     context = {"form": form}
     return TemplateResponse(request, "trips/trip-dates-update.html", context)

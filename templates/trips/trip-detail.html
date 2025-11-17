@@ -8,9 +8,22 @@
     <section id="details" class="mb-8 text-center md:text-start">
         <div class="shadow card card-border bg-base-100">
             <div class="card-body">
-                <div class="flex flex-col-reverse items-center mb-3 md:flex-row">
-                    <h2 class="mt-0 mb-2 text-2xl font-semibold tracking-tight md:mt-0 md:text-3xl md:me-4">{{ trip.title }}</h2>
-                    <span class="mb-2 badge badge-secondary badge-outline badge-sm md:ms-2 lg:badge-md">{{ trip.get_status_display }}</span>
+                <div class="flex flex-col gap-y-3 items-center mb-3 sm:flex-row">
+                    <div class="flex flex-col-reverse items-center md:flex-row grow">
+                        <h2 class="mt-0 mb-2 text-2xl font-semibold tracking-tight md:mt-0 md:text-3xl md:me-4">{{ trip.title }}</h2>
+                        <span class="mb-2 badge badge-secondary badge-outline badge-sm md:ms-2 lg:badge-md">{{ trip.get_status_display }}</span>
+                    </div>
+                    <div>
+                        <button class="btn btn-sm sm:btn-lg"
+                                hx-get="{% url 'trips:trip-dates' trip.pk %}"
+                                hx-target="#dialog"
+                                hx-swap="innerHTML"
+                                @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                aria-label="{% trans 'Modify trip dates' %}">
+                            <i class="ph-bold ph-calendar-plus i-sm sm:i-md" aria-hidden="true"></i>
+                            {% trans 'Modify Dates' %}
+                        </button>
+                    </div>
                 </div>
                 <div id="trip-details"
                      class="flex flex-col gap-x-3 mb-4 md:flex-row lg:gap-x-6 lg:justify-start">

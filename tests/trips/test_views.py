@@ -162,6 +162,101 @@ class TripDetailView(TestCase):
         assert response.context["trip"] == trip
 
 
+class TestTripDatesUpdate(TestCase):
+    """Test cases for trip dates update view"""
+
+    def test_get_displays_form(self):
+        """Test GET request displays date edit form"""
+        user = self.make_user("user")
+        trip = TripFactory(
+            author=user, start_date=date(2025, 6, 1), end_date=date(2025, 6, 5)
+        )
+
+        with self.login(user):
+            response = self.get("trips:trip-dates", pk=trip.pk)
+
+        self.response_200(response)
+        assert "form" in response.context
+        assertTemplateUsed(response, "trips/trip-dates-update.html")
+
+    def test_post_valid_updates_dates_and_days(self):
+        """Test valid POST updates dates and regenerates days"""
+        user = self.make_user("user")
+        trip = TripFactory(
+            author=user, start_date=date(2025, 6, 1), end_date=date(2025, 6, 5)
+        )
+        # Trip initially has 5 days (June 1-5)
+        assert trip.days.count() == 5
+
+        data = {
+            "start_date": "06/01/2025",  # Same start (MM/DD/YYYY)
+            "end_date": "06/10/2025",  # Extended by 5 days (MM/DD/YYYY)
+        }
+
+        with self.login(user):
+            response = self.post("trips:trip-dates", pk=trip.pk, data=data)
+
+        self.assertEqual(response.status_code, 204)
+        trip.refresh_from_db()
+        assert trip.days.count() == 10  # Signal auto-generated 5 more days
+        assert trip.end_date == date(2025, 6, 10)
+
+    def test_post_valid_triggers_htmx_events(self):
+        """Test valid POST triggers tripSaved and tripModified events"""
+        user = self.make_user("user")
+        trip = TripFactory(
+            author=user, start_date=date(2025, 6, 1), end_date=date(2025, 6, 5)
+        )
+
+        data = {
+            "start_date": "06/01/2025",  # MM/DD/YYYY
+            "end_date": "06/10/2025",  # MM/DD/YYYY
+        }
+
+        with self.login(user):
+            response = self.post("trips:trip-dates", pk=trip.pk, data=data)
+
+        self.assertEqual(response.status_code, 204)
+        # Check that HX-Trigger header contains both events
+        hx_trigger = response.headers.get("HX-Trigger")
+        assert hx_trigger is not None
+        trigger_data = json.loads(hx_trigger)
+        assert "tripSaved" in trigger_data
+        assert "tripModified" in trigger_data
+
+    def test_post_invalid_shows_errors(self):
+        """Test invalid POST shows validation errors"""
+        user = self.make_user("user")
+        trip = TripFactory(
+            author=user, start_date=date(2025, 6, 1), end_date=date(2025, 6, 5)
+        )
+
+        data = {
+            "start_date": "06/10/2025",  # MM/DD/YYYY
+            "end_date": "06/01/2025",  # End before start - invalid (MM/DD/YYYY)
+        }
+
+        with self.login(user):
+            response = self.post("trips:trip-dates", pk=trip.pk, data=data)
+
+        self.response_200(response)  # Re-renders form with errors
+        assert "form" in response.context
+        assert response.context["form"].errors
+
+    def test_unauthorized_user_cannot_access(self):
+        """Test only trip author can edit dates"""
+        user = self.make_user("user")
+        other_user = self.make_user("other")
+        trip = TripFactory(
+            author=user, start_date=date(2025, 6, 1), end_date=date(2025, 6, 5)
+        )
+
+        with self.login(other_user):
+            self.get("trips:trip-dates", pk=trip.pk)
+
+        self.response_404()  # get_object_or_404 checks author
+
+
 class DayDetailView(TestCase):
     """Test cases for day detail view"""
 

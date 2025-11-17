@@ -23,26 +23,28 @@ git checkout -b feature/descriptive-name
 
 # 3. Make changes and commit frequently
 git add <files>
-git commit -m "descriptive message (fix #123)"
+git commit -m "descriptive message (for #123)"
 
 # 4. Before final commit, verify tests
 just ftest
 
-# 5. When ready, rebase onto main
+# 5. Only use (fix #123) instead of (for #123)  on final commit
+
+# 6. When ready, rebase onto main
 git checkout main
 git rebase feature/descriptive-name
 
-# 6. Verify everything still works
+# 7. Verify everything still works
 just ftest
 
-# 7. Push to remote
+# 8. Push to remote
 git push origin main
 ```
 
 ### Commit Message Guidelines
 
 - Write clear, descriptive commit messages
-- Reference issue numbers with `fix #123` or `Related to #123`
+- Reference issue numbers with `fix #123` or `for #123`
 - **DO NOT include attribution lines** like:
   - `🤖 Generated with [Claude Code](https://claude.com/claude-code)`
   - `Co-Authored-By: Claude <noreply@anthropic.com>`

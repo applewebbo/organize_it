@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(just test:*)",
-      "Bash(just ftest:*)"
+      "Bash(just ftest:*)",
+      "Bash(gh issue view:*)"
     ],
     "deny": [],
     "ask": []
