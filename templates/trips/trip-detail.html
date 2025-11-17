@@ -13,15 +13,16 @@
                         <h2 class="mt-0 mb-2 text-2xl font-semibold tracking-tight md:mt-0 md:text-3xl md:me-4">{{ trip.title }}</h2>
                         <span class="mb-2 badge badge-secondary badge-outline badge-sm md:ms-2 lg:badge-md">{{ trip.get_status_display }}</span>
                     </div>
-                    <div>
+                    <div x-data>
                         <button class="btn btn-sm sm:btn-lg"
                                 hx-get="{% url 'trips:trip-dates' trip.pk %}"
                                 hx-target="#dialog"
                                 hx-swap="innerHTML"
                                 @click="$dispatch('open-modal'); document.activeElement.blur()"
                                 aria-label="{% trans 'Modify trip dates' %}">
-                            <i class="ph-bold ph-calendar-plus i-sm sm:i-md" aria-hidden="true"></i>
-                            {% trans 'Modify Dates' %}
+                            <i class="ph-bold ph-calendar-dots i-md sm:i-lg" aria-hidden="true"></i>
+                            {% comment %} <i class="sm:hidden ph-bold ph-pencil-simple i-sm sm:i-md" aria-hidden="true"></i> {% endcomment %}
+                            <span class="hidden sm:inline">{% trans 'Modify Dates' %}</span>
                         </button>
                     </div>
                 </div>
