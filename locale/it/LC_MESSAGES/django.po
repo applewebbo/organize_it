@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-18 12:11+0100\n"
-"PO-Revision-Date: 2025-11-18 12:12+0100\n"
+"POT-Creation-Date: 2025-11-18 12:46+0100\n"
+"PO-Revision-Date: 2025-11-18 12:46+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: it\n"
@@ -176,6 +176,26 @@ msgstr "cambia password"
 msgid "Your password is now changed."
 msgstr "La tua password è stata cambiata."
 
+#: templates/account/profile.html:4
+#, fuzzy
+#| msgid "Profile"
+msgid "Personal Profile"
+msgstr "Profilo"
+
+#: templates/account/profile.html:9
+#, fuzzy
+#| msgid "Profile"
+msgid "Profile Page"
+msgstr "Profilo"
+
+#: templates/account/profile.html:10
+msgid "This is the profile page of"
+msgstr "Questa è la pagina del profilo di"
+
+#: templates/account/profile.html:10
+msgid "Here you can modify your preferences"
+msgstr "Qui puoi modificare le tue preferenze"
+
 #: templates/account/signup.html:4
 msgid "Signup"
 msgstr "Registrati"
@@ -260,7 +280,7 @@ msgstr "Parti da qui"
 msgid "Favourite"
 msgstr "Preferito"
 
-#: templates/includes/auth-index.html:12 templates/includes/auth-index.html:41
+#: templates/includes/auth-index.html:12
 msgid "View Trip"
 msgstr "Vedi Viaggio"
 
@@ -271,6 +291,12 @@ msgstr "Altri"
 #: templates/includes/auth-index.html:36
 msgid "Latest"
 msgstr "Più recente"
+
+#: templates/includes/auth-index.html:41
+#, fuzzy
+#| msgid "Edit trip"
+msgid "Edit Trip"
+msgstr "Modifica viaggio"
 
 #: templates/includes/auth-index.html:63
 msgid "You have no trips yet!"
@@ -321,13 +347,13 @@ msgid "Enrich"
 msgstr "Arricchisci"
 
 #: templates/trips/event-detail.html:71 templates/trips/includes/note.html:8
-#: templates/trips/stay-detail.html:88
+#: templates/trips/stay-detail.html:88 templates/trips/trip-list.html:57
 msgid "Edit"
 msgstr "Modifica"
 
 #: templates/trips/event-detail.html:79 templates/trips/includes/note.html:12
 #: templates/trips/stay-detail.html:96 templates/trips/stay-note-modify.html:30
-#: templates/trips/trip-list.html:51
+#: templates/trips/trip-list.html:54
 msgid "Delete"
 msgstr "Elimina"
 
@@ -547,21 +573,17 @@ msgstr "Lista dei Viaggi"
 msgid "My Trips"
 msgstr "Viaggi Personali"
 
-#: templates/trips/trip-list.html:21
+#: templates/trips/trip-list.html:23
 msgid "Create a new trip"
 msgstr "Crea un nuovo viaggio"
 
-#: templates/trips/trip-list.html:42
+#: templates/trips/trip-list.html:44
 msgid "Modify Dates"
 msgstr "Modifica date"
 
-#: templates/trips/trip-list.html:48
+#: templates/trips/trip-list.html:50
 msgid "Archive"
 msgstr "Archivia"
-
-#: templates/trips/trip-list.html:53
-msgid "View"
-msgstr "Vedi"
 
 #: trips/forms.py:28
 msgid "Title"
@@ -905,6 +927,9 @@ msgstr ""
 #: trips/views.py:1327
 msgid "Event enriched successfully!"
 msgstr "Dati aggiunti con successo!"
+
+#~ msgid "View"
+#~ msgstr "Vedi"
 
 #, fuzzy
 #~| msgid "Add event"

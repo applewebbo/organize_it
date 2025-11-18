@@ -1,10 +1,18 @@
 {% extends "base.html" %}
-{% load crispy_forms_tags %}
+{% load crispy_forms_tags i18n %}
 {% block page_title %}
-    Personal Profile
+    {% trans "Personal Profile" %}
 {% endblock page_title %}
 {% block content %}
-    <h1 class="mb-8 text-2xl font-semibold">Profile Page</h1>
-    <p>This is the profile page of {{ user.email }}. Here you can modify your preferences</p>
-    {% crispy profile_form %}
+    <div class="my-5 mx-auto max-w-7xl">
+        <div class="mb-12 text-center md:text-start">
+            <h1 class="mb-2 text-3xl font-semibold">{% trans "Profile Page" %}</h1>
+            <p class="text-base-content/80">{% trans "This is the profile page of" %} {{ user.email }}. {% trans "Here you can modify your preferences" %}</p>
+        </div>
+        <div class="mx-auto max-w-2xl shadow card card-border bg-base-100">
+            <div class="card-body">
+                {% crispy profile_form %}
+            </div>
+        </div>
+    </div>
 {% endblock content %}

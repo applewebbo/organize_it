@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-18 12:11+0100\n"
+"POT-Creation-Date: 2025-11-18 12:46+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -155,6 +155,22 @@ msgstr ""
 msgid "Your password is now changed."
 msgstr ""
 
+#: templates/account/profile.html:4
+msgid "Personal Profile"
+msgstr ""
+
+#: templates/account/profile.html:9
+msgid "Profile Page"
+msgstr ""
+
+#: templates/account/profile.html:10
+msgid "This is the profile page of"
+msgstr ""
+
+#: templates/account/profile.html:10
+msgid "Here you can modify your preferences"
+msgstr ""
+
 #: templates/account/signup.html:4
 msgid "Signup"
 msgstr ""
@@ -229,7 +245,7 @@ msgstr ""
 msgid "Favourite"
 msgstr ""
 
-#: templates/includes/auth-index.html:12 templates/includes/auth-index.html:41
+#: templates/includes/auth-index.html:12
 msgid "View Trip"
 msgstr ""
 
@@ -239,6 +255,10 @@ msgstr ""
 
 #: templates/includes/auth-index.html:36
 msgid "Latest"
+msgstr ""
+
+#: templates/includes/auth-index.html:41
+msgid "Edit Trip"
 msgstr ""
 
 #: templates/includes/auth-index.html:63
@@ -290,13 +310,13 @@ msgid "Enrich"
 msgstr ""
 
 #: templates/trips/event-detail.html:71 templates/trips/includes/note.html:8
-#: templates/trips/stay-detail.html:88
+#: templates/trips/stay-detail.html:88 templates/trips/trip-list.html:57
 msgid "Edit"
 msgstr ""
 
 #: templates/trips/event-detail.html:79 templates/trips/includes/note.html:12
 #: templates/trips/stay-detail.html:96 templates/trips/stay-note-modify.html:30
-#: templates/trips/trip-list.html:51
+#: templates/trips/trip-list.html:54
 msgid "Delete"
 msgstr ""
 
@@ -514,20 +534,16 @@ msgstr ""
 msgid "My Trips"
 msgstr ""
 
-#: templates/trips/trip-list.html:21
+#: templates/trips/trip-list.html:23
 msgid "Create a new trip"
 msgstr ""
 
-#: templates/trips/trip-list.html:42
+#: templates/trips/trip-list.html:44
 msgid "Modify Dates"
 msgstr ""
 
-#: templates/trips/trip-list.html:48
+#: templates/trips/trip-list.html:50
 msgid "Archive"
-msgstr ""
-
-#: templates/trips/trip-list.html:53
-msgid "View"
 msgstr ""
 
 #: trips/forms.py:28
