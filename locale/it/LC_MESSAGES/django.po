@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-18 11:56+0100\n"
-"PO-Revision-Date: 2025-11-18 11:57+0100\n"
+"POT-Creation-Date: 2025-11-18 12:11+0100\n"
+"PO-Revision-Date: 2025-11-18 12:12+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: it\n"
@@ -251,6 +251,30 @@ msgstr ""
 "e note. Organizzali per giorno e guardali su una mappa per creare il tuo "
 "prossimo viaggio. Condividi il piano di viaggio con la tua famiglia e i tuoi "
 "amici."
+
+#: templates/includes/anonymous-index.html:15
+msgid "Get started"
+msgstr "Parti da qui"
+
+#: templates/includes/auth-index.html:7
+msgid "Favourite"
+msgstr "Preferito"
+
+#: templates/includes/auth-index.html:12 templates/includes/auth-index.html:41
+msgid "View Trip"
+msgstr "Vedi Viaggio"
+
+#: templates/includes/auth-index.html:19 templates/includes/auth-index.html:49
+msgid "Others"
+msgstr "Altri"
+
+#: templates/includes/auth-index.html:36
+msgid "Latest"
+msgstr "Più recente"
+
+#: templates/includes/auth-index.html:63
+msgid "You have no trips yet!"
+msgstr ""
 
 #: templates/includes/footer.html:6
 msgid "© 2025 WEBBOgrafico - All right reserved"

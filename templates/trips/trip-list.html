@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% load partials i18n %}
 {% block page_title %}
-{% trans "Trips List" %}
+    {% trans "Trips List" %}
 {% endblock page_title %}
 {% block content %}
     {% partialdef trip-list inline %}
     <div id="trips">
         <!-- Active Trips Section -->
-        <section class="my-5"
+        <section class="my-5 mx-auto max-w-7xl"
                  hx-swap="outerHTML"
                  hx-trigger="tripSaved from:body"
                  hx-get="{% url 'trips:trip-list' %}"
@@ -18,13 +18,15 @@
                         hx-get="{% url 'trips:trip-create' %}"
                         hx-target="#dialog"
                         hx-swap="innerHTML"
-                        @click="$dispatch('open-modal')">{% trans 'Create a new trip' %}</button>
+                        @click="$dispatch('open-modal')">
+                    <i class="ph-bold ph-plus-circle i-lg" aria-hidden="true"></i>
+                    {% trans 'Create a new trip' %}
+                </button>
             </div>
             <div class="grid grid-cols-1 gap-x-4 gap-y-8 md:grid-cols-2 xl:grid-cols-3">
                 {% for trip in active_trips %}
-                    <div class="shadow card card-border bg-base-100"
-                         id="{{ trip.id }}">
-                         <div class="card-body">
+                    <div class="shadow card card-border bg-base-100" id="{{ trip.id }}">
+                        <div class="card-body">
                             <span class="badge badge-outline badge-secondary">{{ trip.get_status_display }}</span>
                             <h2 class="card-title">{{ trip.title }}</h2>
                             <div x-data class="flex items-center">
@@ -48,9 +50,11 @@
                                         hx-target="">{% trans 'Archive' %}</button>
                                 <button class="btn btn-sm btn-error btn-soft me-2"
                                         hx-delete="{% url 'trips:trip-delete' trip.id %}"
-                                        hx-confirm="Are you sure you want to delete {{ trip.title }}?">{% trans 'Delete' %}</button>
+                                        hx-confirm="Are you sure you want to delete {{ trip.title }}?">
+                                    {% trans 'Delete' %}
+                                </button>
                                 <a href="{% url 'trips:trip-detail' trip.id %}"
-                                   class="btn btn-sm btn-primary btn-soft">{% trans 'View' %}</a>
+                                   class="btn btn-sm btn-primary btn-soft">{% trans 'Edit' %}</a>
                             </div>
                         </div>
                     </div>

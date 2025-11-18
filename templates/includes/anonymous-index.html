@@ -1,18 +1,18 @@
 {% load static i18n %}
-<section class="mx-auto max-w-screen-xl shadow card card-border bg-base-100">
+<section class="mx-auto max-w-7xl text-center shadow card card-border bg-base-100">
             <img src="{% static 'img/hero.jpg' %}"
-                 class="hidden rounded-t-lg sm:block"
+                 class="rounded-t-lg"
                  alt="Planner">
-            <div class="py-5 px-6 lg:py-6 lg:px-8">
-                <h1 class="mb-4 max-w-2xl text-3xl font-extrabold tracking-tight leading-none md:text-4xl xl:text-5xl dark:text-white">
+            <div class="py-5 px-6 m-auto lg:py-12 lg:px-10">
+                <h1 class="mb-4 max-w-3xl text-3xl font-extrabold tracking-tight leading-none md:text-4xl xl:text-5xl dark:text-white">
                     {% trans 'Organize your next trip!' %}
                 </h1>
-                <p class="mb-6 max-w-2xl font-light text-gray-500 lg:mb-8 dark:text-gray-400 text-base/6 md:text-lg/6 lg:text-xl/7">
+                <p class="mb-6 max-w-3xl font-light text-gray-500 lg:mb-8 dark:text-gray-400 text-base/6 md:text-lg/6 lg:text-xl/7">
                     {% trans 'Register experiences, stays and transports. Keep links and notes about them. Organize them by day and look at a map to set up your next journey. Share the journey plan with your friends and family.' %}
                 </p>
                 <a href="{% url 'account_signup' %}"
                    class="inline-flex justify-center items-center btn btn-primary md:btn-lg">
-                    Get started
+                    {% trans 'Get started' %}
                     <svg class="ml-2 -mr-1 w-5 h-5"
                          fill="currentColor"
                          viewBox="0 0 20 20"

@@ -1,21 +1,22 @@
+{% load i18n %}
 <div id="trip-list"
-     class="grid grid-cols-1 gap-x-4 gap-y-8 mt-8 md:grid-cols-2">
+     class="grid grid-cols-1 gap-x-4 gap-y-8 mx-auto mt-8 max-w-7xl md:grid-cols-2">
     {% if fav_trip %}
         <div class="relative shadow card card-border bg-base-100">
             <div class="card-body">
-                <span class="text-sm text-slate-600 dark:text-slate-300">Favourite</span>
+                <span class="text-sm text-slate-600 dark:text-slate-300">{% trans 'Favourite' %}</span>
                 <h5 class="card-title">{{ fav_trip.title }}</h5>
                 <p>{{ fav_trip.description }}</p>
                 <div class="justify-end card-actions">
                     <a href="{% url 'trips:trip-detail' fav_trip.id %}"
-                       class="btn btn-sm btn-primary btn-outline">View Trip</a>
+                       class="btn btn-sm btn-primary btn-outline">{% trans 'View Trip' %}</a>
                 </div>
             </div>
         </div>
         {% if other_trips %}
             <div class="relative shadow card card-border bg-base-100">
                 <div class="card-body">
-                    <span class="text-sm text-slate-600 dark:text-slate-300">Others</span>
+                    <span class="text-sm text-slate-600 dark:text-slate-300">{% trans 'Others' %}</span>
                     <ul class="list-unstyled">
                         {% for trip in other_trips %}
                             <li>
@@ -32,12 +33,12 @@
                 {% if forloop.first %}
                     <div class="relative shadow card card-border bg-base-100">
                         <div class="card-body">
-                            <span class="text-sm text-slate-600 dark:text-slate-300">Latest</span>
+                            <span class="text-sm text-slate-600 dark:text-slate-300">{% trans 'Latest' %}</span>
                             <h5 class="card-title">{{ trip.title }}</h5>
                             <p>{{ trip.description }}</p>
                             <div class="justify-end card-actions">
                                 <a href="{% url 'trips:trip-detail' trip.id %}"
-                                   class="btn btn-sm btn-primary btn-outline">View Trip</a>
+                                   class="btn btn-sm btn-primary btn-outline">{% trans 'Edit Trip' %}</a>
                             </div>
                         </div>
                     </div>
@@ -45,7 +46,7 @@
             {% endfor %}
             <div class="relative shadow card card-border bg-base-100">
                 <div class="card-body">
-                    <span class="text-sm text-slate-600 dark:text-slate-300">Others</span>
+                    <span class="text-sm text-slate-600 dark:text-slate-300">{% trans 'Others' %}</span>
                     <ul class="list-unstyled">
                         {% for trip in other_trips %}
                             {% if forloop.first %}
@@ -59,7 +60,7 @@
                 </div>
             </div>
         {% else %}
-            <p>You have no trips yet!</p>
+            <p>{% trans 'You have no trips yet!' %}</p>
         {% endif %}
     {% endif %}
 </div>

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-18 11:56+0100\n"
+"POT-Creation-Date: 2025-11-18 12:11+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -219,6 +219,30 @@ msgid ""
 "Register experiences, stays and transports. Keep links and notes about them. "
 "Organize them by day and look at a map to set up your next journey. Share "
 "the journey plan with your friends and family."
+msgstr ""
+
+#: templates/includes/anonymous-index.html:15
+msgid "Get started"
+msgstr ""
+
+#: templates/includes/auth-index.html:7
+msgid "Favourite"
+msgstr ""
+
+#: templates/includes/auth-index.html:12 templates/includes/auth-index.html:41
+msgid "View Trip"
+msgstr ""
+
+#: templates/includes/auth-index.html:19 templates/includes/auth-index.html:49
+msgid "Others"
+msgstr ""
+
+#: templates/includes/auth-index.html:36
+msgid "Latest"
+msgstr ""
+
+#: templates/includes/auth-index.html:63
+msgid "You have no trips yet!"
 msgstr ""
 
 #: templates/includes/footer.html:6
