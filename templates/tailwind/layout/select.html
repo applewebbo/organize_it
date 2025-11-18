@@ -1,14 +1,19 @@
 {% load crispy_forms_filters l10n tailwind_filters %}
-{% comment %} <div class="relative"> {% endcomment %}
-<select class="select {% if field.errors %}select-error{% endif %}"
-        name="{{ field.html_name }}"
-        {{ field|build_attrs }}>
-    {% for group, options, index in field|optgroups %}
-        {% if group %}<optgroup label="{{ group }}">{% endif %}
-            {% for option in options %}
-                {% include "tailwind/layout/select_option.html" %}
-            {% endfor %}
-            {% if group %}</optgroup>{% endif %}
-    {% endfor %}
-</select>
-{% comment %} </div> {% endcomment %}
+<div class="relative">
+    {% if field.label and form_show_labels %}
+        <label for="{{ field.id_for_label }}" class="w-full select">
+            <span class="label">{{ field.label|safe }}{% if field.field.required %}<span class="asteriskField">*</span>{% endif %}</span>
+    {% endif %}
+    <select class="{% if field.errors %}select-error{% endif %}" name="{{ field.html_name }}" {{ field|build_attrs }}>
+        {% for group, options, index in field|optgroups %}
+            {% if group %}<optgroup label="{{ group }}">{% endif %}
+                {% for option in options %}
+                    {% include "tailwind/layout/select_option.html" %}
+                {% endfor %}
+                {% if group %}</optgroup>{% endif %}
+        {% endfor %}
+    </select>
+    {% if field.label and form_show_labels %}
+        </label>
+    {% endif %}
+</div>

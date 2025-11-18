@@ -1,36 +1,56 @@
-{% load tailwind_field %}
+{% load custom_tailwind %}
+
 {% if field.is_hidden %}
     {{ field }}
 {% else %}
-    {# Opening Div and Label first #}
-    <!-- djlint:off --><{% if tag %}{{ tag }}{% else %}div{% endif %} id="div_{{ field.auto_id }}" class="{% if wrapper_class %}{{ wrapper_class }} {% endif %}{% if field_class %}{{ field_class }}{% else %}mb-3{% endif %}"><!-- djlint:on -->
-    {% if field.label and form_show_labels %}
-        <label for="{{ field.id_for_label }}"
-               class="{% if label_class %}{{ label_class }}{% else %}block text-base-content text-sm font-medium mb-2{% endif %}">
-            {{ field.label|safe }}
-            {% if field.field.required %}<span class="asteriskField">*</span>{% endif %}
-        </label>
-    {% endif %}
-    {# if field has a special template then use this #}
-    {% if field|is_select %}
-        <div class="{% if field_class %}{{ field_class }}{% else %}mb-3{% endif %}"
-             {% if flat_attrs %}{{ flat_attrs|safe }}{% endif %}>
+
+    {% if field|is_checkbox %}
+        <div id="div_id_{{ field.auto_id }}" class="mb-4">
+            <div class="flex items-center">
+                <label for="{{ field.id_for_label }}" class="text-sm font-bold label text-base-content">
+                    {% tailwind_field field %}
+                    {{ field.label|safe }}
+                </label>
+            </div>
+            {% include 'tailwind/layout/field_errors.html' %}
+            {% include 'tailwind/layout/help_text.html' %}
+        </div>
+    {% elif field|is_select %}
+        <div class="{% if field_class %}{{ field_class }}{% else %}mb-4{% endif %}"{% if flat_attrs %} {{ flat_attrs|safe }}{% endif %}>
             {% include 'tailwind/layout/select.html' %}
         </div>
+    {# if field has a special template then use this #}
     {% elif field|is_checkboxselectmultiple %}
-        <div class="{% if field_class %}{{ field_class }}{% else %}flex flex-wrap mb-3{% endif %}"
-             {% if flat_attrs %}{{ flat_attrs|safe }}{% endif %}>
+        <div class="{% if field_class %}{{ field_class }}{% else %}mb-3{% endif %}"{% if flat_attrs %} {{ flat_attrs|safe }}{% endif %}>
             {% include 'tailwind/layout/checkboxselectmultiple.html' %}
         </div>
     {% elif field|is_radioselect %}
-        <div class="{% if field_class %}{{ field_class }}{% else %}mb-3{% endif %}"
-             {% if flat_attrs %}{{ flat_attrs|safe }}{% endif %}>
+        <div class="{% if field_class %}{{ field_class }}{% else %}mb-3{% endif %}"{% if flat_attrs %} {{ flat_attrs|safe }}{% endif %}>
             {% include 'tailwind/layout/radioselect.html' %}
         </div>
+    {% elif field|is_textarea %}
+        <div id="div_{{ field.auto_id }}" class="{% if wrapper_class %}{{ wrapper_class }} {% endif %}{% if field_class %}{{ field_class }}{% else %}mb-3{% endif %}">
+            {% if field.label and form_show_labels %}
+                <label for="{{ field.id_for_label }}" class="sr-only label">
+                    <span class="label-text">{{ field.label|safe }}{% if field.field.required %}<span class="asteriskField">*</span>{% endif %}</span>
+                </label>
+            {% endif %}
+            <textarea name="{{ field.name }}" id="{{ field.auto_id }}" class="w-full h-32 textarea textarea-bordered text-base-content" {% for name, value in field.field.widget.attrs.items %}{{ name }}="{{ value }}"{% endfor %}>{{ field.value|default_if_none:"" }}</textarea>
+            {% include 'tailwind/layout/help_text_and_errors.html' %}
+        </div>
     {% else %}
+        <{% if tag %}{{ tag }}{% else %}div{% endif %} id="div_{{ field.auto_id }}" class="{% if wrapper_class %}{{ wrapper_class }} {% endif %}{% if field_class %}{{ field_class }}{% else %}mb-3{% endif %}">
+        {% if field.label and form_show_labels %}
+            <label for="{{ field.id_for_label }}" class="{% if label_class %}{{ label_class }}{% else %}input w-full{% endif %}">
+                <span class="label">{{ field.label|safe }}{% if field.field.required %}<span class="asteriskField">*</span>{% endif %}</span>
+                {% tailwind_field field %}
+            </label>
+        {% endif %}
+
         {# otherwise use django rendering with additional classes added #}
-        {% tailwind_field field %}
+
+        {% include 'tailwind/layout/help_text_and_errors.html' %}
+
+    </{% if tag %}{{ tag }}{% else %}div{% endif %}>
     {% endif %}
-    {% include 'tailwind/layout/help_text_and_errors.html' %}
-    <!-- djlint:off --></{% if tag %}{{ tag }}{% else %}div{% endif %}><!-- djlint:on -->
 {% endif %}

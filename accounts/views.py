@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from .forms import ProfileUpdateForm
 from .models import Profile
@@ -23,7 +24,7 @@ def profile(request):
             messages.add_message(
                 request,
                 messages.SUCCESS,
-                "Profile modified succesfully",
+                _("Settings modified succesfully"),
             )
             return redirect(reverse("trips:home"))
         form = ProfileUpdateForm(request.POST, instance=profile)

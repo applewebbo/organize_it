@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-18 12:46+0100\n"
-"PO-Revision-Date: 2025-11-18 12:46+0100\n"
+"POT-Creation-Date: 2025-11-18 21:02+0100\n"
+"PO-Revision-Date: 2025-11-18 21:02+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: it\n"
@@ -18,6 +18,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.8\n"
+
+#: accounts/forms.py:30
+msgid "Favourite trip"
+msgstr "Viaggio preferito"
+
+#: accounts/forms.py:43 templates/includes/navbar.html:43
+#: templates/includes/navbar.html:66
+msgid "Trips"
+msgstr "Viaggi"
 
 #: accounts/managers.py:16
 msgid "The Email must be set"
@@ -34,6 +43,10 @@ msgstr "Superuser deve avere is_superuser=True."
 #: accounts/models.py:12
 msgid "email address"
 msgstr "indirizzo email"
+
+#: accounts/views.py:27
+msgid "Settings modified succesfully"
+msgstr "Impostazioni salvate"
 
 #: core/settings.py:256
 msgid "Italian"
@@ -176,25 +189,18 @@ msgstr "cambia password"
 msgid "Your password is now changed."
 msgstr "La tua password è stata cambiata."
 
-#: templates/account/profile.html:4
-#, fuzzy
-#| msgid "Profile"
-msgid "Personal Profile"
-msgstr "Profilo"
+#: templates/account/profile.html:4 templates/account/profile.html:9
+msgid "Personal Settings"
+msgstr "Impostazioni"
 
-#: templates/account/profile.html:9
-#, fuzzy
-#| msgid "Profile"
-msgid "Profile Page"
-msgstr "Profilo"
-
-#: templates/account/profile.html:10
-msgid "This is the profile page of"
-msgstr "Questa è la pagina del profilo di"
-
-#: templates/account/profile.html:10
-msgid "Here you can modify your preferences"
-msgstr "Qui puoi modificare le tue preferenze"
+#: templates/account/profile.html:15 templates/trips/event-notes.html:30
+#: templates/trips/experience-create.html:45
+#: templates/trips/note-modify.html:26 templates/trips/stay-create.html:28
+#: templates/trips/stay-modify.html:19 templates/trips/stay-note-modify.html:26
+#: templates/trips/stay-notes.html:20 templates/trips/transport-create.html:66
+#: templates/trips/trip-dates-update.html:32
+msgid "Save"
+msgstr "Salva"
 
 #: templates/account/signup.html:4
 msgid "Signup"
@@ -293,14 +299,12 @@ msgid "Latest"
 msgstr "Più recente"
 
 #: templates/includes/auth-index.html:41
-#, fuzzy
-#| msgid "Edit trip"
 msgid "Edit Trip"
 msgstr "Modifica viaggio"
 
 #: templates/includes/auth-index.html:63
 msgid "You have no trips yet!"
-msgstr ""
+msgstr "Non hai creato ancora nessun viaggio!"
 
 #: templates/includes/footer.html:6
 msgid "© 2025 WEBBOgrafico - All right reserved"
@@ -326,11 +330,11 @@ msgstr "Entra"
 msgid "Open main menu"
 msgstr "Apri il menu principale"
 
-#: templates/includes/navbar.html:43 templates/includes/navbar.html:66
-msgid "Trips"
-msgstr "Viaggi"
+#: templates/includes/navbar.html:48
+msgid "Settings"
+msgstr "Impostazioni"
 
-#: templates/includes/navbar.html:48 templates/includes/navbar.html:71
+#: templates/includes/navbar.html:71
 msgid "Profile"
 msgstr "Profilo"
 
@@ -394,15 +398,6 @@ msgstr "Aggiungi Note"
 #: templates/trips/stay-notes.html:8 templates/trips/trip-dates-update.html:15
 msgid "Close modal"
 msgstr "Chiudi la finestra"
-
-#: templates/trips/event-notes.html:30
-#: templates/trips/experience-create.html:45
-#: templates/trips/note-modify.html:26 templates/trips/stay-create.html:28
-#: templates/trips/stay-modify.html:19 templates/trips/stay-note-modify.html:26
-#: templates/trips/stay-notes.html:20 templates/trips/transport-create.html:66
-#: templates/trips/trip-dates-update.html:32
-msgid "Save"
-msgstr "Salva"
 
 #: templates/trips/experience-create.html:9
 msgid "Create a new Experience"
@@ -927,6 +922,18 @@ msgstr ""
 #: trips/views.py:1327
 msgid "Event enriched successfully!"
 msgstr "Dati aggiunti con successo!"
+
+#~ msgid "Trip Preferences"
+#~ msgstr "Viaggi"
+
+#~ msgid "This is the profile page of"
+#~ msgstr "Questa è la pagina del profilo di"
+
+#~ msgid "Here you can modify your preferences"
+#~ msgstr "Qui puoi modificare le tue preferenze"
+
+#~ msgid "Profile Page"
+#~ msgstr "Profilo"
 
 #~ msgid "View"
 #~ msgstr "Vedi"

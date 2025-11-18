@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-18 12:46+0100\n"
+"POT-Creation-Date: 2025-11-18 21:02+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,15 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: accounts/forms.py:30
+msgid "Favourite trip"
+msgstr ""
+
+#: accounts/forms.py:43 templates/includes/navbar.html:43
+#: templates/includes/navbar.html:66
+msgid "Trips"
+msgstr ""
 
 #: accounts/managers.py:16
 msgid "The Email must be set"
@@ -32,6 +41,10 @@ msgstr ""
 
 #: accounts/models.py:12
 msgid "email address"
+msgstr ""
+
+#: accounts/views.py:27
+msgid "Settings modified succesfully"
 msgstr ""
 
 #: core/settings.py:256
@@ -155,20 +168,17 @@ msgstr ""
 msgid "Your password is now changed."
 msgstr ""
 
-#: templates/account/profile.html:4
-msgid "Personal Profile"
+#: templates/account/profile.html:4 templates/account/profile.html:9
+msgid "Personal Settings"
 msgstr ""
 
-#: templates/account/profile.html:9
-msgid "Profile Page"
-msgstr ""
-
-#: templates/account/profile.html:10
-msgid "This is the profile page of"
-msgstr ""
-
-#: templates/account/profile.html:10
-msgid "Here you can modify your preferences"
+#: templates/account/profile.html:15 templates/trips/event-notes.html:30
+#: templates/trips/experience-create.html:45
+#: templates/trips/note-modify.html:26 templates/trips/stay-create.html:28
+#: templates/trips/stay-modify.html:19 templates/trips/stay-note-modify.html:26
+#: templates/trips/stay-notes.html:20 templates/trips/transport-create.html:66
+#: templates/trips/trip-dates-update.html:32
+msgid "Save"
 msgstr ""
 
 #: templates/account/signup.html:4
@@ -289,11 +299,11 @@ msgstr ""
 msgid "Open main menu"
 msgstr ""
 
-#: templates/includes/navbar.html:43 templates/includes/navbar.html:66
-msgid "Trips"
+#: templates/includes/navbar.html:48
+msgid "Settings"
 msgstr ""
 
-#: templates/includes/navbar.html:48 templates/includes/navbar.html:71
+#: templates/includes/navbar.html:71
 msgid "Profile"
 msgstr ""
 
@@ -356,15 +366,6 @@ msgstr ""
 #: templates/trips/event-notes.html:14 templates/trips/stay-detail.html:9
 #: templates/trips/stay-notes.html:8 templates/trips/trip-dates-update.html:15
 msgid "Close modal"
-msgstr ""
-
-#: templates/trips/event-notes.html:30
-#: templates/trips/experience-create.html:45
-#: templates/trips/note-modify.html:26 templates/trips/stay-create.html:28
-#: templates/trips/stay-modify.html:19 templates/trips/stay-note-modify.html:26
-#: templates/trips/stay-notes.html:20 templates/trips/transport-create.html:66
-#: templates/trips/trip-dates-update.html:32
-msgid "Save"
 msgstr ""
 
 #: templates/trips/experience-create.html:9

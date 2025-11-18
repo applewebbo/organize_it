@@ -1,7 +1,7 @@
 {% load static i18n %}
 <div x-data="{ open: false}">
     <nav nav class="bg-white border-slate-200 dark:bg-slate-900">
-        <div class="flex flex-wrap items-center p-4 mx-auto max-w-screen-xl">
+        <div class="flex flex-wrap items-center p-4 mx-auto max-w-7xl">
             <a href="{% url 'trips:home' %}"
                class="flex items-center space-x-3 rtl:space-x-reverse grow">
                 <img src="{% static 'img/logo.png' %}" class="size-7 sm:size-9" alt="Logo">
@@ -45,7 +45,7 @@
                     {% if user.is_authenticated %}
                         <li>
                             <a href="{% url 'accounts:profile' %}"
-                               class="block py-2 px-3 text-gray-900 rounded md:p-0 dark:text-white md:hover:bg-transparent md:hover:text-tr-blue-700 md:dark:hover:text-tr-blue-500 md:dark:hover:bg-transparent dark:border-slate-700 dark:hover:bg-gray-700 dark:hover:text-white hover:bg-slate-100">{% trans 'Profile' %}</a>
+                               class="block py-2 px-3 text-gray-900 rounded md:p-0 dark:text-white md:hover:bg-transparent md:hover:text-tr-blue-700 md:dark:hover:text-tr-blue-500 md:dark:hover:bg-transparent dark:border-slate-700 dark:hover:bg-gray-700 dark:hover:text-white hover:bg-slate-100">{% trans 'Settings' %}</a>
                         </li>
                     {% endif %}
                 </ul>
