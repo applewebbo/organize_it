@@ -9,14 +9,18 @@
         <div class="flex flex-col gap-y-3 items-center sm:flex-row">
             <h2 class="text-xl font-medium sm:text-2xl grow">{% trans 'Day' %} {{ day.number }} - {{ day.date|date:"j F" }}</h2>
             <div>
-                <button class="btn btn-xs me-2 sm:btn-md" disabled="disabled" aria-label="{% trans 'Edit day' %}">
-                    <i class="ph-bold ph-pencil-line i-sm sm:i-md" aria-hidden="true"></i>
+                <button class="btn me-2 btn-md" disabled="disabled" aria-label="{% trans 'Edit day' %}">
+                    <i class="ph-bold ph-pencil-simple i-lg" aria-hidden="true"></i>
+                    <span class="hidden sm:inline">{% trans 'Edit day' %}</span>
                 </button>
                 <button id="day-map-button-{{ day.pk }}"
                         hx-get="{% url 'trips:day-map' day.pk %}"
                         hx-target="#day-info-{{ day.pk }}"
                         hx-swap="outerHTML"
-                        class="btn btn-xs me-2 sm:btn-md"><i class="ph-bold ph-map-trifold i-sm sm:i-lg"></i></button>
+                        class="btn me-2 btn-md">
+                        <i class="ph-bold ph-map-trifold i-lg"></i>
+                        <span class="hidden sm:inline">{% trans 'View map' %}</span>
+                    </button>
                 <c-dropdown :day="day" />
             </div>
         </div>
@@ -125,7 +129,7 @@
                            hx-target="#dialog"
                            hx-swap="innerHTML">
                             {{ event.start_time|time:"H:i" }}&nbsp;-&nbsp;{{ event.end_time|time:"H:i" }}
-                            <i x-show="showIcon" class="ph-bold ph-pencil-line ms-2 align-sub"></i>
+                            <i x-show="showIcon" class="ph-bold ph-pencil-simple ms-2 align-sub"></i>
                         </a>
                     </div>
                     </c-event>
