@@ -5,12 +5,12 @@ import time
 import folium
 import requests
 from django.core.cache import cache
-from django.db.models import BooleanField, Case, F, Max, Min, Q, When, Window
+from django.db.models import BooleanField, Case, F, Max, Min, Prefetch, Q, When, Window
 from django.db.models.functions import Lag, Lead
 from django.http import Http404
 
 from accounts.models import Profile
-from trips.models import Trip
+from trips.models import Event, Trip
 
 logger = logging.getLogger(__name__)
 
@@ -44,19 +44,70 @@ def annotate_event_overlaps(queryset):
 
 
 def get_trips(user):
-    """Get the trips for the home page with favourite trip (if present) and others"""
-    fav_trip = Profile.objects.get(user=user).fav_trip or None
+    """Get the trips for the home page with favourite trip and latest/others"""
+    profile = Profile.objects.get(user=user)
+    fav_trip = profile.fav_trip
+
+    # If there's a favorite trip, fetch it with full prefetch for detail view
     if fav_trip:
-        other_trips = (
-            Trip.objects.filter(author=user).exclude(pk=fav_trip.pk).order_by("status")
+        fav_trip = (
+            Trip.objects.prefetch_related(
+                Prefetch(
+                    "days__events",
+                    queryset=annotate_event_overlaps(Event.objects.all()).order_by(
+                        "start_time"
+                    ),
+                ),
+                "days__stay",
+            )
+            .select_related("author")
+            .get(pk=fav_trip.pk)
+        )
+        unpaired_events = fav_trip.all_events.filter(day__isnull=True)
+    else:
+        unpaired_events = None
+
+    # Base queryset: all user trips excluding archived
+    base_qs = Trip.objects.filter(author=user).exclude(status=Trip.Status.ARCHIVED)
+    if fav_trip:
+        base_qs = base_qs.exclude(pk=fav_trip.pk)
+
+    # Determine "latest trip" with smart logic only if NO favorite
+    latest_trip = None
+    if not fav_trip and base_qs.exists():
+        # Queryset with prefetch for the detail view
+        latest_qs = base_qs.prefetch_related(
+            Prefetch(
+                "days__events",
+                queryset=annotate_event_overlaps(Event.objects.all()).order_by(
+                    "start_time"
+                ),
+            ),
+            "days__stay",
+        ).select_related("author")
+
+        # Priority: IN_PROGRESS > IMPENDING (by start_date) > others
+        latest_trip = (
+            latest_qs.filter(status=Trip.Status.IN_PROGRESS).first()
+            or latest_qs.filter(status=Trip.Status.IMPENDING)
+            .order_by("start_date")
+            .first()
+            or latest_qs.order_by("status", "start_date").first()
+        )
+
+        unpaired_events = latest_trip.all_events.filter(day__isnull=True)
+        other_trips = base_qs.exclude(pk=latest_trip.pk).order_by(
+            "status", "start_date"
         )
     else:
-        other_trips = Trip.objects.filter(author=user).order_by("status")
-    context = {
-        "other_trips": other_trips,
+        other_trips = base_qs.order_by("status", "start_date")
+
+    return {
         "fav_trip": fav_trip,
+        "latest_trip": latest_trip,
+        "other_trips": other_trips,
+        "unpaired_events": unpaired_events,
     }
-    return context
 
 
 def rate_limit_check():

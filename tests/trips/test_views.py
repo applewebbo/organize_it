@@ -56,7 +56,32 @@ class HomeView(TestCase):
             response = self.get("trips:home")
 
         self.response_200(response)
-        assert trip in response.context["other_trips"]
+        assert (
+            response.context["latest_trip"] == trip
+            or trip in response.context["other_trips"]
+        )
+
+    def test_get_with_latest_trip(self):
+        user = self.make_user("user")
+        trip1 = TripFactory(
+            author=user,
+            status=1,
+            start_date=date(2026, 1, 1),
+            end_date=date(2026, 1, 10),
+        )
+        trip2 = TripFactory(
+            author=user,
+            status=3,
+            start_date=date(2026, 2, 1),
+            end_date=date(2026, 2, 10),
+        )  # IN_PROGRESS
+
+        with self.login(user):
+            response = self.get("trips:home")
+
+        self.response_200(response)
+        assert response.context["latest_trip"] == trip2
+        assert trip1 in response.context["other_trips"]
 
     def test_get_with_fav_trip(self):
         user = self.make_user("user")
@@ -69,6 +94,59 @@ class HomeView(TestCase):
 
         self.response_200(response)
         assert response.context["fav_trip"] == fav_trip
+        assert response.context["latest_trip"] is None
+
+    def test_get_with_fav_trip_and_days(self):
+        user = self.make_user("user")
+        fav_trip = TripFactory(
+            author=user, start_date=date(2024, 1, 1), end_date=date(2024, 1, 3)
+        )
+        user.profile.fav_trip = fav_trip
+        user.profile.save()
+
+        day = fav_trip.days.first()
+        ExperienceFactory(day=day, trip=fav_trip)
+
+        with self.login(user):
+            response = self.get("trips:home")
+
+        self.response_200(response)
+        assert response.context["fav_trip"] == fav_trip
+        assert len(response.context["fav_trip"].days.all()) == 3
+
+    def test_get_with_unpaired_events(self):
+        from datetime import time as time_obj
+
+        from trips.models import Experience
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        unpaired_event = Experience.objects.create(
+            trip=trip,
+            day=None,
+            name="Test Event",
+            start_time=time_obj(10, 0),
+            end_time=time_obj(11, 0),
+            address="Test Address",
+            city=trip.destination,
+        )
+
+        with self.login(user):
+            response = self.get("trips:home")
+
+        self.response_200(response)
+        assert unpaired_event.event_ptr in response.context["unpaired_events"]
+
+    def test_get_excludes_archived_trips(self):
+        user = self.make_user("user")
+        TripFactory(author=user, status=5)  # ARCHIVED
+
+        with self.login(user):
+            response = self.get("trips:home")
+
+        self.response_200(response)
+        assert response.context["latest_trip"] is None
+        assert len(response.context["other_trips"]) == 0
 
     def test_get_with_no_profile(self):
         user = self.make_user("user")

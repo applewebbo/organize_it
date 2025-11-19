@@ -58,7 +58,7 @@ exclude_also = [
 
 [tool.coverage.run]
 branch = true
-omit = ['*/node_modules/*', '*/venv/*', '*/migrations/*', '*/tests/*', '*/test_*.py', '*/settings/*', '*/wsgi.py', '*/asgi.py', '*/manage.py', '*/core/*', '*/accounts/managers.py', '*/trips/tasks.py']
+omit = ['*/node_modules/*', '*/venv/*', '*/migrations/*', '*/tests/*', '*/test_*.py', '*/settings/*', '*/wsgi.py', '*/asgi.py', '*/manage.py', '*/core/*', '*/accounts/managers.py', '*/trips/tasks.py', "accounts/templatetags/custom_tailwind.py"]
 
 [tool.djlint]
 ignore = "T002,H006"

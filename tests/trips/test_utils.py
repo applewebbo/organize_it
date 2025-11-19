@@ -7,7 +7,12 @@ from django.contrib.auth import get_user_model
 from django.core.cache import cache
 
 from tests.test import TestCase
-from tests.trips.factories import EventFactory, MealFactory, StayFactory, TripFactory
+from tests.trips.factories import (
+    EventFactory,
+    MealFactory,
+    StayFactory,
+    TripFactory,
+)
 from trips.utils import (
     annotate_event_overlaps,
     convert_google_opening_hours,
@@ -269,9 +274,9 @@ class TestGetTrips(TestCase):
         trip2 = TripFactory(author=self.user)
         context = get_trips(self.user)
         self.assertIsNone(context["fav_trip"])
-        self.assertEqual(len(context["other_trips"]), 2)
-        self.assertIn(trip1, context["other_trips"])
-        self.assertIn(trip2, context["other_trips"])
+        self.assertIsNotNone(context["latest_trip"])
+        self.assertIn(trip1, [context["latest_trip"]] + list(context["other_trips"]))
+        self.assertIn(trip2, [context["latest_trip"]] + list(context["other_trips"]))
 
     def test_get_trips_with_fav(self):
         """Test get_trips when user has a favorite trip."""
@@ -283,9 +288,177 @@ class TestGetTrips(TestCase):
 
         context = get_trips(self.user)
         self.assertEqual(context["fav_trip"], fav_trip)
+        self.assertIsNone(context["latest_trip"])
         self.assertEqual(len(context["other_trips"]), 1)
         self.assertIn(other_trip, context["other_trips"])
         self.assertNotIn(fav_trip, context["other_trips"])
+
+    def test_get_trips_fav_with_prefetch(self):
+        """Test favorite trip has proper prefetch for days and events."""
+        profile = self.user.profile
+        fav_trip = TripFactory(
+            author=self.user, start_date=date(2024, 1, 1), end_date=date(2024, 1, 3)
+        )
+        profile.fav_trip = fav_trip
+        profile.save()
+
+        day = fav_trip.days.first()
+        event = EventFactory(day=day, start_time=time(9, 0), end_time=time(10, 0))
+
+        context = get_trips(self.user)
+        self.assertEqual(context["fav_trip"], fav_trip)
+        self.assertEqual(len(context["fav_trip"].days.all()), 3)
+        self.assertIn(event, context["fav_trip"].days.first().events.all())
+
+    def test_get_trips_fav_with_unpaired_events(self):
+        """Test unpaired events are included for favorite trip."""
+        from trips.models import Experience
+
+        profile = self.user.profile
+        fav_trip = TripFactory(author=self.user)
+        profile.fav_trip = fav_trip
+        profile.save()
+
+        unpaired_event = Experience.objects.create(
+            trip=fav_trip,
+            day=None,
+            name="Test Event",
+            start_time=time(10, 0),
+            end_time=time(11, 0),
+            address="Test Address",
+            city=fav_trip.destination,
+        )
+
+        context = get_trips(self.user)
+        self.assertIn(unpaired_event.event_ptr, context["unpaired_events"])
+
+    def test_get_trips_latest_in_progress(self):
+        """Test latest trip is IN_PROGRESS trip when available."""
+        TripFactory(
+            author=self.user,
+            status=1,
+            start_date=date(2026, 1, 1),
+            end_date=date(2026, 1, 10),
+        )  # NOT_STARTED
+        in_progress_trip = TripFactory(
+            author=self.user,
+            status=3,
+            start_date=date(2026, 2, 1),
+            end_date=date(2026, 2, 10),
+        )  # IN_PROGRESS
+        TripFactory(
+            author=self.user,
+            status=2,
+            start_date=date(2026, 3, 1),
+            end_date=date(2026, 3, 10),
+        )  # IMPENDING
+
+        context = get_trips(self.user)
+        self.assertEqual(context["latest_trip"], in_progress_trip)
+
+    def test_get_trips_latest_impending(self):
+        """Test latest trip is IMPENDING with earliest start_date."""
+        TripFactory(
+            author=self.user,
+            status=1,
+            start_date=date(2026, 1, 1),
+            end_date=date(2026, 1, 10),
+        )
+        impending1 = TripFactory(
+            author=self.user,
+            status=2,
+            start_date=date(2026, 2, 1),
+            end_date=date(2026, 2, 10),
+        )
+        TripFactory(
+            author=self.user,
+            status=2,
+            start_date=date(2026, 3, 1),
+            end_date=date(2026, 3, 10),
+        )
+
+        context = get_trips(self.user)
+        self.assertEqual(context["latest_trip"], impending1)
+
+    def test_get_trips_latest_by_status(self):
+        """Test latest trip ordering by status when no IN_PROGRESS or IMPENDING."""
+        not_started = TripFactory(
+            author=self.user,
+            status=1,
+            start_date=date(2026, 1, 1),
+            end_date=date(2026, 1, 10),
+        )
+        TripFactory(
+            author=self.user,
+            status=4,
+            start_date=date(2023, 12, 1),
+            end_date=date(2023, 12, 10),
+        )  # COMPLETED
+
+        context = get_trips(self.user)
+        self.assertEqual(context["latest_trip"], not_started)
+
+    def test_get_trips_excludes_archived(self):
+        """Test archived trips are excluded from latest and others."""
+        TripFactory(author=self.user, status=5)  # ARCHIVED
+
+        context = get_trips(self.user)
+        self.assertIsNone(context["latest_trip"])
+        self.assertEqual(len(context["other_trips"]), 0)
+
+    def test_get_trips_no_trips(self):
+        """Test get_trips when user has no trips."""
+        context = get_trips(self.user)
+        self.assertIsNone(context["fav_trip"])
+        self.assertIsNone(context["latest_trip"])
+        self.assertIsNone(context["unpaired_events"])
+        self.assertEqual(len(context["other_trips"]), 0)
+
+    def test_get_trips_latest_with_unpaired_events(self):
+        """Test unpaired events are included for latest trip."""
+        from trips.models import Experience
+
+        trip = TripFactory(author=self.user)
+        unpaired_event = Experience.objects.create(
+            trip=trip,
+            day=None,
+            name="Test Event",
+            start_time=time(10, 0),
+            end_time=time(11, 0),
+            address="Test Address",
+            city=trip.destination,
+        )
+
+        context = get_trips(self.user)
+        self.assertEqual(context["latest_trip"], trip)
+        self.assertIn(unpaired_event.event_ptr, context["unpaired_events"])
+
+    def test_get_trips_other_trips_exclude_latest(self):
+        """Test other_trips excludes the latest trip."""
+        trip1 = TripFactory(
+            author=self.user,
+            status=3,
+            start_date=date(2026, 1, 1),
+            end_date=date(2026, 1, 10),
+        )  # IN_PROGRESS (will be latest)
+        trip2 = TripFactory(
+            author=self.user,
+            status=1,
+            start_date=date(2026, 2, 1),
+            end_date=date(2026, 2, 10),
+        )
+        trip3 = TripFactory(
+            author=self.user,
+            status=1,
+            start_date=date(2026, 3, 1),
+            end_date=date(2026, 3, 10),
+        )
+
+        context = get_trips(self.user)
+        self.assertEqual(context["latest_trip"], trip1)
+        self.assertNotIn(trip1, context["other_trips"])
+        self.assertIn(trip2, context["other_trips"])
+        self.assertIn(trip3, context["other_trips"])
 
 
 class TestCacheKey(TestCase):
