@@ -85,17 +85,30 @@
         <!-- Other Trips Section -->
         {% if other_trips %}
             <section id="other-trips" class="mb-8">
-                <div class="shadow card card-border bg-base-100">
-                    <div class="card-body">
-                        <h2 class="text-xl font-semibold">{% trans 'Other Trips' %}</h2>
-                        <ul class="list-unstyled">
-                            {% for trip in other_trips %}
-                                <li>
-                                    <a class="link" href="{% url 'trips:trip-detail' trip.id %}">{{ trip.title }}</a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
+                <h2 class="mb-6 text-2xl font-semibold ms-2">{% trans 'Other Trips' %}</h2>
+                <div class="grid grid-cols-1 gap-x-4 gap-y-8 md:grid-cols-2 xl:grid-cols-3">
+                    {% for trip in other_trips %}
+                        <div class="shadow card card-border bg-base-100">
+                            <div class="card-body">
+                                <span class="badge badge-outline badge-secondary">{{ trip.get_status_display }}</span>
+                                <h3 class="card-title">{{ trip.title }}</h3>
+                                <div class="flex items-center">
+                                    <span>
+                                        {% if trip.start_date and trip.end_date %}
+                                            {{ trip.start_date|date:"d/m/y" }}&nbsp;-&nbsp;{{ trip.end_date|date:"d/m/y" }}
+                                        {% else %}
+                                            - / -
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <p class="mb-3 italic text-base-content/80">{{ trip.description }}</p>
+                                <div class="justify-end text-right">
+                                    <a href="{% url 'trips:trip-detail' trip.id %}"
+                                       class="btn btn-sm btn-primary btn-soft">{% trans 'Edit' %}</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
                 </div>
             </section>
         {% endif %}
