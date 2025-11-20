@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load partials i18n %}
+{% load partials i18n static %}
 {% block page_title %}
     {% trans "Trips List" %}
 {% endblock page_title %}
@@ -12,16 +12,21 @@
                  hx-trigger="tripSaved from:body"
                  hx-get="{% url 'trips:trip-list' %}"
                  hx-target="#trips">
-            <div x-data class="items-center mb-12 text-center md:flex md:text-start">
-                <h1 class="mb-2 text-3xl font-semibold grow">{% trans 'My Trips' %}</h1>
-                <button class="btn btn-sm btn-primary md:btn-md"
-                        hx-get="{% url 'trips:trip-create' %}"
-                        hx-target="#dialog"
-                        hx-swap="innerHTML"
-                        @click="$dispatch('open-modal')">
-                    <i class="ph-bold ph-plus-circle i-lg" aria-hidden="true"></i>
-                    {% trans 'Create a new trip' %}
-                </button>
+            <div class="mb-12 shadow card bg-base-100 trip-header-pattern">
+                <div class="card-body">
+                    <div x-data class="items-center text-center md:flex md:flex-1 md:text-start">
+                        <h1 class="inline-block py-2 px-4 text-3xl font-semibold rounded-lg">{% trans 'My Trips' %}</h1>
+                        <div class="grow"></div>
+                        <button class="btn btn-sm btn-primary me-4 md:btn-md"
+                                hx-get="{% url 'trips:trip-create' %}"
+                                hx-target="#dialog"
+                                hx-swap="innerHTML"
+                                @click="$dispatch('open-modal')">
+                            <i class="ph-bold ph-plus-circle i-lg" aria-hidden="true"></i>
+                            {% trans 'Create a new trip' %}
+                        </button>
+                    </div>
+                </div>
             </div>
             <div class="grid grid-cols-1 gap-x-4 gap-y-8 md:grid-cols-2 xl:grid-cols-3">
                 {% for trip in active_trips %}

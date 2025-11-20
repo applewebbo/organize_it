@@ -55,3 +55,10 @@ select ~ .pointer-events-none {
     li.edit:hover button {
       visibility: visible;
     }
+}
+
+
+.body-pattern {
+  background-image: url('/static/img/pattern_body.png');
+  background-repeat: repeat;
+  background-size: 215px 215px;

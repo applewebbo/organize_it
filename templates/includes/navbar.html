@@ -1,11 +1,11 @@
 {% load static i18n %}
 <div x-data="{ open: false}">
-    <nav nav class="bg-white border-slate-200 dark:bg-slate-900">
-        <div class="flex flex-wrap items-center p-4 mx-auto max-w-7xl">
+    <nav nav class="shadow bg-base-100 border-base-200">
+        <div class="flex flex-wrap items-center p-5 mx-auto max-w-7xl lg:p-6">
             <a href="{% url 'trips:home' %}"
                class="flex items-center space-x-3 rtl:space-x-reverse grow">
-                <img src="{% static 'img/logo.png' %}" class="size-7 sm:size-9" alt="Logo">
-                <span class="self-center text-sm font-semibold whitespace-nowrap sm:text-xl md:text-2xl dark:text-white">Organizeit!</span>
+                <img src="{% static 'img/logo.png' %}" class="size-8 sm:size-10" alt="Logo">
+                <span class="self-center text-lg font-semibold whitespace-nowrap sm:text-xl md:text-2xl dark:text-white">Organizeit!</span>
             </a>
             <div class="flex items-center space-x-3 md:order-2 md:space-x-0 rtl:space-x-reverse">
                 <div class="flex me-4">{% include 'includes/language-chooser.html' %}</div>
