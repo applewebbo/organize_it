@@ -33,10 +33,23 @@
                     <div class="overflow-hidden shadow card card-border bg-base-100" id="{{ trip.id }}">
                         <!-- Trip Image Header -->
                         <figure class="relative w-full h-48">
-                            <img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&h=400&fit=crop"
-                                 alt="{{ trip.title }}"
-                                 class="object-cover w-full h-full"
-                                 loading="lazy">
+                            {% if trip.get_image_url %}
+                                <img src="{{ trip.get_image_url }}"
+                                     alt="{{ trip.title }}"
+                                     class="object-cover w-full h-full"
+                                     loading="lazy">
+                            {% else %}
+                                <img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&h=400&fit=crop"
+                                     alt="{{ trip.title }}"
+                                     class="object-cover w-full h-full"
+                                     loading="lazy">
+                            {% endif %}
+
+                            {% if trip.needs_attribution %}
+                                <div class="absolute bottom-1 left-1 py-1 px-2 text-xs text-white rounded bg-black/50">
+                                    {{ trip.get_attribution_text }}
+                                </div>
+                            {% endif %}
                         </figure>
                         <div class="card-body">
                             <span class="badge badge-outline badge-secondary">{{ trip.get_status_display }}</span>

@@ -54,14 +54,36 @@
                         <i class="ph-bold ph-calendar-blank i-lg" aria-hidden="true"></i>
                         <span class="hidden sm:inline">{% trans 'Edit Dates' %}</span>
                     </button>
+                    <button class="btn btn-md btn-soft"
+                            hx-get="{% url 'trips:manage-trip-image' trip.pk %}"
+                            hx-target="#dialog"
+                            hx-swap="innerHTML"
+                            @click="$dispatch('open-modal'); document.activeElement.blur()">
+                        <i class="ph-bold ph-image i-lg"></i>
+                        <span class="hidden sm:inline">{% trans 'Manage Image' %}</span>
+                    </button>
                 </div>
             </div>
             <!-- Center: Trip Image -->
             <figure class="relative w-full h-48 md:h-80">
-                <img src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1200&h=500&fit=crop"
-                     alt="{{ trip.title }}"
-                     class="object-cover w-full h-full"
-                     loading="eager">
+                {% if trip.get_image_url %}
+                    <img src="{{ trip.get_image_url }}"
+                         alt="{{ trip.title }}"
+                         class="object-cover w-full h-full"
+                         loading="eager">
+                {% else %}
+                    <img src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1200&h=500&fit=crop"
+                         alt="{{ trip.title }}"
+                         class="object-cover w-full h-full"
+                         loading="eager">
+                {% endif %}
+
+                {% if trip.needs_attribution %}
+                    <div class="absolute bottom-3 left-3 py-1 px-2 text-xs text-white rounded bg-black/50">
+                        {{ trip.get_attribution_text }}
+                    </div>
+                {% endif %}
+
                 <!-- Status Badge on Image -->
                 <div class="absolute right-3 bottom-3">
                     <span class="badge badge-secondary badge-sm md:badge-lg">{{ trip.get_status_display }}</span>

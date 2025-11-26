@@ -1,0 +1,42 @@
+{% load crispy_forms_tags i18n %}
+
+<form hx-post="{% url 'trips:upload-trip-image' trip.pk %}"
+      hx-encoding="multipart/form-data"
+      hx-target="#dialog"
+      method="post"
+      enctype="multipart/form-data"
+      class="modal-content"
+      x-data="{ searchMode: false }">
+
+    <!-- Modal Header -->
+    <div class="flex justify-between items-center p-4 rounded-t border-b">
+        <h3 class="text-xl font-semibold">
+            {% trans "Manage Trip Image" %}
+        </h3>
+        <button type="button"
+                x-on:click="openModal = false"
+                class="text-gray-400 hover:text-gray-900">
+            <i class="i-md ph-bold ph-x"></i>
+        </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="p-6">
+        {% csrf_token %}
+        {% crispy form %}
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="flex justify-end items-center p-4 border-t">
+        <button type="button"
+                x-on:click="openModal = false"
+                class="mr-2 btn btn-error btn-outline">
+            {% trans "Cancel" %}
+        </button>
+        <button type="submit"
+                x-show="!searchMode"
+                class="btn btn-primary">
+            {% trans "Upload" %}
+        </button>
+    </div>
+</form>
