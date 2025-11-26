@@ -91,16 +91,6 @@ htmx_urlpatterns = [
     path("days/<int:day_id>/map/", views.DayMapView.as_view(), name="day-map"),
     # IMAGE MANAGEMENT
     path("images/search/", views.search_trip_images, name="search-images"),
-    path(
-        "<int:trip_id>/image/select/<str:photo_id>/",
-        views.select_unsplash_image,
-        name="select-unsplash-image",
-    ),
-    path(
-        "<int:trip_id>/image/upload/",
-        views.upload_trip_image,
-        name="upload-trip-image",
-    ),
 ]
 
 urlpatterns += htmx_urlpatterns
