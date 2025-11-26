@@ -89,6 +89,23 @@ htmx_urlpatterns = [
     path("geocode-address/", views.geocode_address, name="geocode-address"),
     path("get-trip-addresses/", views.get_trip_addresses, name="get-trip-addresses"),
     path("days/<int:day_id>/map/", views.DayMapView.as_view(), name="day-map"),
+    # IMAGE MANAGEMENT
+    path("images/search/", views.search_trip_images, name="search-images"),
+    path(
+        "<int:trip_id>/image/select/<str:photo_id>/",
+        views.select_unsplash_image,
+        name="select-unsplash-image",
+    ),
+    path(
+        "<int:trip_id>/image/upload/",
+        views.upload_trip_image,
+        name="upload-trip-image",
+    ),
+    path(
+        "<int:trip_id>/image/manage/",
+        views.manage_trip_image,
+        name="manage-trip-image",
+    ),
 ]
 
 urlpatterns += htmx_urlpatterns
