@@ -29,6 +29,15 @@ class Trip(models.Model):
     end_date = models.DateField(null=True, blank=True)
     status = models.IntegerField(choices=Status, default=Status.NOT_STARTED)
     links = models.ManyToManyField("Link", related_name="trips", blank=True)
+    image = models.ImageField(
+        upload_to="trips/%Y/%m/",
+        blank=True,
+        null=True,
+        help_text="Trip cover image (landscape, max 2MB)",
+    )
+    image_metadata = models.JSONField(
+        default=dict, blank=True, help_text="Image source and attribution data"
+    )
 
     class Meta:
         ordering = ("status",)
@@ -58,6 +67,23 @@ class Trip(models.Model):
                 self.status = 1
 
         super().save(*args, **kwargs)
+
+    @property
+    def get_image_url(self):
+        """Get image URL for template use"""
+        return self.image.url if self.image else None
+
+    @property
+    def needs_attribution(self):
+        """Check if Unsplash attribution required"""
+        return self.image_metadata.get("source") == "unsplash"
+
+    def get_attribution_text(self):
+        """Get formatted attribution text"""
+        if self.needs_attribution:
+            photographer = self.image_metadata.get("photographer", "Unknown")
+            return f"Photo by {photographer} on Unsplash"
+        return None
 
 
 @receiver(post_save, sender=Trip)
