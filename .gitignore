@@ -153,6 +153,7 @@ src/intellisense.css
 
 # DJANGO
 staticfiles/
+media/
 .envrc
 
 #  CLAUDE
