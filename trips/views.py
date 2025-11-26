@@ -27,15 +27,19 @@ from trips.forms import (
     TransportForm,
     TripDateUpdateForm,
     TripForm,
+    TripImageForm,
 )
 from trips.models import Day, Event, Stay, Trip
 from trips.utils import (
     annotate_event_overlaps,
     convert_google_opening_hours,
     create_day_map,
+    download_unsplash_photo,
     geocode_location,
     get_event_instance,
     get_trips,
+    process_trip_image,
+    search_unsplash_photos,
 )
 
 
@@ -1329,3 +1333,147 @@ def confirm_enrich_event(request, event_id):
     response = TemplateResponse(request, "trips/event-detail.html", context)
     response["HX-Trigger"] = f"eventModified{event.pk}"
     return response
+
+
+@login_required
+def search_trip_images(request):
+    """HTMX endpoint for searching Unsplash images"""
+    if request.method == "POST":
+        query = request.POST.get("search_query", "").strip()
+        trip_id = request.POST.get("trip_id")
+
+        if not query:
+            return TemplateResponse(
+                request,
+                "trips/includes/image-search-results.html",
+                {"error": _("Please enter a search term")},
+            )
+
+        # Search Unsplash
+        photos = search_unsplash_photos(query, per_page=3)
+
+        if photos is None:
+            return TemplateResponse(
+                request,
+                "trips/includes/image-search-results.html",
+                {"error": _("Unsplash API error. Please try again later.")},
+            )
+
+        if not photos:
+            return TemplateResponse(
+                request,
+                "trips/includes/image-search-results.html",
+                {"error": _("No images found for '{query}'").format(query=query)},
+            )
+
+        return TemplateResponse(
+            request,
+            "trips/includes/image-search-results.html",
+            {"photos": photos, "trip_id": trip_id, "query": query},
+        )
+
+    return HttpResponse(status=405)
+
+
+@login_required
+def select_unsplash_image(request, trip_id, photo_id):
+    """Download and attach Unsplash image to trip"""
+    trip = get_object_or_404(Trip, pk=trip_id, author=request.user)
+
+    # Get photo data from cache or re-search
+    query = trip.destination
+    photos = search_unsplash_photos(query, per_page=10)
+
+    if not photos:
+        messages.add_message(
+            request,
+            messages.ERROR,
+            _("Could not retrieve photo. Please try again."),
+        )
+        return HttpResponse(status=204)
+
+    # Find selected photo
+    photo_data = next((p for p in photos if p["id"] == photo_id), None)
+    if not photo_data:
+        messages.add_message(
+            request, messages.ERROR, _("Photo not found. Please search again.")
+        )
+        return HttpResponse(status=204)
+
+    # Download and process image
+    image_content, metadata = download_unsplash_photo(photo_data)
+    if not image_content:
+        messages.add_message(
+            request,
+            messages.ERROR,
+            _("Failed to download image. Please try again."),
+        )
+        return HttpResponse(status=204)
+
+    # Process image
+    processed_image = process_trip_image(image_content)
+    if not processed_image:
+        messages.add_message(request, messages.ERROR, _("Failed to process image."))
+        return HttpResponse(status=204)
+
+    # Save to trip
+    filename = f"{trip.pk}_{photo_id}.jpg"
+    trip.image.save(filename, processed_image, save=False)
+    trip.image_metadata = metadata
+    trip.save()
+
+    messages.add_message(request, messages.SUCCESS, _("Image added successfully!"))
+
+    return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+
+
+@login_required
+def upload_trip_image(request, trip_id):
+    """Handle user image upload"""
+    trip = get_object_or_404(Trip, pk=trip_id, author=request.user)
+
+    if request.method == "POST" and request.FILES.get("image"):
+        image_file = request.FILES["image"]
+
+        # Validate file size (2MB max)
+        if image_file.size > 2 * 1024 * 1024:
+            messages.add_message(
+                request,
+                messages.ERROR,
+                _("Image too large. Maximum size is 2MB."),
+            )
+            return HttpResponse(status=204)
+
+        # Process image
+        processed_image = process_trip_image(image_file)
+        if not processed_image:
+            messages.add_message(
+                request,
+                messages.ERROR,
+                _("Invalid image file or processing failed."),
+            )
+            return HttpResponse(status=204)
+
+        # Save to trip
+        trip.image.save(image_file.name, processed_image, save=False)
+        trip.image_metadata = {"source": "upload"}
+        trip.save()
+
+        messages.add_message(
+            request, messages.SUCCESS, _("Image uploaded successfully!")
+        )
+
+        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+
+    return HttpResponse(status=405)
+
+
+@login_required
+def manage_trip_image(request, trip_id):
+    """Show image management modal"""
+    trip = get_object_or_404(Trip, pk=trip_id, author=request.user)
+    form = TripImageForm(instance=trip)
+
+    return TemplateResponse(
+        request, "trips/trip-image-modal.html", {"trip": trip, "form": form}
+    )
