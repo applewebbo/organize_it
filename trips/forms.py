@@ -40,10 +40,20 @@ class TripForm(forms.ModelForm):
         required=False,
         widget=forms.DateInput(attrs={"type": "date"}),
     )
+    selected_photo_id = forms.CharField(
+        required=False, widget=forms.HiddenInput(), initial=""
+    )
 
     class Meta:
         model = Trip
-        fields = ["title", "destination", "description", "start_date", "end_date"]
+        fields = [
+            "title",
+            "destination",
+            "description",
+            "start_date",
+            "end_date",
+            "image",
+        ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -56,6 +66,15 @@ class TripForm(forms.ModelForm):
         }
         self.fields["start_date"].widget.attrs.update(htmx_attrs)
         self.fields["end_date"].widget.attrs.update(htmx_attrs)
+
+        # Configure image upload field
+        self.fields["image"].required = False
+        self.fields["image"].widget.attrs.update(
+            {"accept": "image/*", "x-show": "!searchMode"}
+        )
+
+        trip_id = self.instance.pk if self.instance.pk else "new"
+
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.layout = Layout(
@@ -82,6 +101,63 @@ class TripForm(forms.ModelForm):
             Div(
                 HTML('<div id="validate_dates"></div>'),
                 css_class="sm:col-span-2",
+            ),
+            # Trip Image Section
+            HTML("<hr class='my-4 sm:col-span-2'>"),
+            HTML(
+                "<h3 class='text-lg font-semibold mb-3 sm:col-span-2'>"
+                + str(_("Trip Image"))
+                + "</h3>"
+            ),
+            HTML(
+                f'<input type="hidden" name="trip_id" value="{trip_id}" id="trip_id">'
+            ),
+            Field("selected_photo_id"),
+            # Mode Toggle
+            HTML(
+                """
+            <div class="mb-4 flex gap-2 sm:col-span-2">
+                <button type="button"
+                        class="btn btn-sm"
+                        :class="searchMode ? 'btn-primary' : 'btn-outline'"
+                        @click="searchMode = true"
+                        hx-post="""
+                + f'"{reverse("trips:search-images")}"'
+                + """
+                        hx-trigger="click"
+                        hx-target="#image-results"
+                        hx-indicator="#search-spinner"
+                        hx-include="[name='destination'], [name='trip_id']">
+                    <i class="ph-bold ph-magnifying-glass"></i>
+                    """
+                + str(_("Search Unsplash"))
+                + """
+                </button>
+                <button type="button"
+                        class="btn btn-sm"
+                        :class="!searchMode ? 'btn-primary' : 'btn-outline'"
+                        @click="searchMode = false">
+                    <i class="ph-bold ph-upload"></i>
+                    """
+                + str(_("Upload Image"))
+                + """
+                </button>
+            </div>
+            """
+            ),
+            # Search results section
+            Div(
+                HTML(
+                    '<div id="search-spinner" class="loading loading-spinner htmx-indicator"></div>'
+                ),
+                HTML('<div id="image-results" class="mt-4"></div>'),
+                css_class="search-section sm:col-span-2",
+            ),
+            # Upload section
+            Div(
+                Field("image", wrapper_class="w-full"),
+                HTML('<div id="upload-preview" class="mt-4"></div>'),
+                css_class="upload-section sm:col-span-2",
             ),
         )
 
@@ -958,95 +1034,5 @@ class AddNoteToStayForm(forms.ModelForm):
             Div(
                 Field("notes", css_class="fl-textarea"),
                 css_class="sm:col-span-2",
-            ),
-        )
-
-
-class TripImageForm(forms.ModelForm):
-    """Form for selecting/uploading trip image"""
-
-    search_query = forms.CharField(
-        max_length=100,
-        required=False,
-        label=_("Search Unsplash"),
-        help_text=_("Search for images by destination"),
-        widget=forms.TextInput(
-            attrs={"placeholder": _("e.g., Paris, Tokyo, Beach...")}
-        ),
-    )
-
-    class Meta:
-        model = Trip
-        fields = ["image"]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_tag = False
-
-        # Configure image upload field
-        self.fields["image"].required = False
-        self.fields["image"].widget.attrs.update(
-            {"accept": "image/*", "x-ref": "imageUpload", ":disabled": "searchMode"}
-        )
-
-        # Configure search field with HTMX
-        self.fields["search_query"].widget.attrs.update(
-            {
-                "hx-post": reverse("trips:search-images"),
-                "hx-trigger": "keyup changed delay:500ms",
-                "hx-target": "#image-results",
-                "hx-indicator": "#search-spinner",
-                "hx-include": "[name='trip_id']",
-                "x-ref": "searchInput",
-                ":disabled": "!searchMode",
-            }
-        )
-
-        self.helper.layout = Layout(
-            HTML(
-                '<input type="hidden" name="trip_id" value="{{ trip.pk }}" id="trip_id">'
-            ),
-            # Mode Toggle
-            HTML(
-                """
-            <div class="mb-4 flex gap-2" x-data="{ searchMode: false }">
-                <button type="button"
-                        class="btn btn-sm"
-                        :class="searchMode ? 'btn-primary' : 'btn-outline'"
-                        @click="searchMode = true">
-                    <i class="ph-bold ph-magnifying-glass"></i>
-                    """
-                + str(_("Search Unsplash"))
-                + """
-                </button>
-                <button type="button"
-                        class="btn btn-sm"
-                        :class="!searchMode ? 'btn-primary' : 'btn-outline'"
-                        @click="searchMode = false">
-                    <i class="ph-bold ph-upload"></i>
-                    """
-                + str(_("Upload Image"))
-                + """
-                </button>
-            </div>
-            """
-            ),
-            # Search section
-            Div(
-                Field("search_query", wrapper_class="w-full"),
-                HTML(
-                    '<div id="search-spinner" class="loading loading-spinner htmx-indicator"></div>'
-                ),
-                HTML('<div id="image-results" class="mt-4"></div>'),
-                css_class="search-section",
-                x_show="searchMode",
-            ),
-            # Upload section
-            Div(
-                Field("image", wrapper_class="w-full"),
-                HTML('<div id="upload-preview" class="mt-4"></div>'),
-                css_class="upload-section",
-                x_show="!searchMode",
             ),
         )

@@ -27,7 +27,6 @@ from trips.forms import (
     TransportForm,
     TripDateUpdateForm,
     TripForm,
-    TripImageForm,
 )
 from trips.models import Day, Event, Stay, Trip
 from trips.utils import (
@@ -122,10 +121,38 @@ def day_detail(request, pk):
 @login_required
 def trip_create(request):
     if request.method == "POST":
-        form = TripForm(request.POST)
+        form = TripForm(request.POST, request.FILES)
         if form.is_valid():
             trip = form.save(commit=False)
             trip.author = request.user
+
+            # Handle Unsplash photo selection
+            selected_photo_id = form.cleaned_data.get("selected_photo_id")
+            if selected_photo_id:
+                # Search Unsplash to get photo data
+                query = trip.destination
+                photos = search_unsplash_photos(query, per_page=10)
+                if photos:
+                    photo_data = next(
+                        (p for p in photos if p["id"] == selected_photo_id), None
+                    )
+                    if photo_data:
+                        # Download and process image
+                        image_content, metadata = download_unsplash_photo(photo_data)
+                        if image_content:
+                            processed_image = process_trip_image(image_content)
+                            if processed_image:
+                                filename = f"trip_{selected_photo_id}.jpg"
+                                trip.image.save(filename, processed_image, save=False)
+                                trip.image_metadata = metadata
+
+            # Process uploaded image if present (overrides Unsplash)
+            if request.FILES.get("image"):
+                processed_image = process_trip_image(request.FILES["image"])
+                if processed_image:
+                    trip.image = processed_image
+                    trip.image_metadata = {"source": "upload"}
+
             trip.save()
             messages.add_message(
                 request,
@@ -161,16 +188,44 @@ def trip_delete(request, pk):
 def trip_update(request, pk):
     trip = get_object_or_404(Trip, pk=pk, author=request.user)
     if request.method == "POST":
-        form = TripForm(request.POST or None, instance=trip)
+        form = TripForm(request.POST, request.FILES, instance=trip)
         if form.is_valid():
-            trip = form.save()
+            trip = form.save(commit=False)
+
+            # Handle Unsplash photo selection
+            selected_photo_id = form.cleaned_data.get("selected_photo_id")
+            if selected_photo_id:
+                # Search Unsplash to get photo data
+                query = trip.destination
+                photos = search_unsplash_photos(query, per_page=10)
+                if photos:
+                    photo_data = next(
+                        (p for p in photos if p["id"] == selected_photo_id), None
+                    )
+                    if photo_data:
+                        # Download and process image
+                        image_content, metadata = download_unsplash_photo(photo_data)
+                        if image_content:
+                            processed_image = process_trip_image(image_content)
+                            if processed_image:
+                                filename = f"trip_{trip.pk}_{selected_photo_id}.jpg"
+                                trip.image.save(filename, processed_image, save=False)
+                                trip.image_metadata = metadata
+
+            # Process uploaded image if present (overrides Unsplash)
+            if request.FILES.get("image"):
+                processed_image = process_trip_image(request.FILES["image"])
+                if processed_image:
+                    trip.image = processed_image
+                    trip.image_metadata = {"source": "upload"}
+
+            trip.save()
             messages.add_message(
                 request,
                 messages.SUCCESS,
                 f"<strong>{trip.title}</strong> updated successfully",
             )
             return HttpResponse(status=204, headers={"HX-Trigger": "tripSaved"})
-        form = TripForm(request.POST, instance=trip)
         context = {"form": form}
         return TemplateResponse(request, "trips/trip-create.html", context)
 
@@ -1337,16 +1392,16 @@ def confirm_enrich_event(request, event_id):
 
 @login_required
 def search_trip_images(request):
-    """HTMX endpoint for searching Unsplash images"""
+    """HTMX endpoint for searching Unsplash images using destination"""
     if request.method == "POST":
-        query = request.POST.get("search_query", "").strip()
+        query = request.POST.get("destination", "").strip()
         trip_id = request.POST.get("trip_id")
 
         if not query:
             return TemplateResponse(
                 request,
                 "trips/includes/image-search-results.html",
-                {"error": _("Please enter a search term")},
+                {"error": _("Please enter a destination first")},
             )
 
         # Search Unsplash
@@ -1466,14 +1521,3 @@ def upload_trip_image(request, trip_id):
         return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
 
     return HttpResponse(status=405)
-
-
-@login_required
-def manage_trip_image(request, trip_id):
-    """Show image management modal"""
-    trip = get_object_or_404(Trip, pk=trip_id, author=request.user)
-    form = TripImageForm(instance=trip)
-
-    return TemplateResponse(
-        request, "trips/trip-image-modal.html", {"trip": trip, "form": form}
-    )

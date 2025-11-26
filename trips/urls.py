@@ -101,11 +101,6 @@ htmx_urlpatterns = [
         views.upload_trip_image,
         name="upload-trip-image",
     ),
-    path(
-        "<int:trip_id>/image/manage/",
-        views.manage_trip_image,
-        name="manage-trip-image",
-    ),
 ]
 
 urlpatterns += htmx_urlpatterns

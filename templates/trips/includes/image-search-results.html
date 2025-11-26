@@ -6,12 +6,11 @@
         <span>{{ error }}</span>
     </div>
 {% elif photos %}
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-3" x-data="{ selectedId: '' }">
         {% for photo in photos %}
             <div class="overflow-hidden relative rounded-lg shadow-lg cursor-pointer group"
-                 hx-post="{% url 'trips:select-unsplash-image' trip_id=trip_id photo_id=photo.id %}"
-                 hx-target="#dialog"
-                 hx-disabled-elt="this">
+                 @click="selectedId = '{{ photo.id }}'; document.getElementById('id_selected_photo_id').value = '{{ photo.id }}'"
+                 :class="selectedId === '{{ photo.id }}' ? 'ring-4 ring-primary' : ''">
 
                 <!-- Image -->
                 <img src="{{ photo.urls.small }}"
@@ -29,8 +28,10 @@
                 </div>
 
                 <!-- Selection indicator -->
-                <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100">
-                    <div class="p-2 rounded-full bg-primary/80">
+                <div class="absolute top-2 right-2"
+                     :class="selectedId === '{{ photo.id }}' ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'">
+                    <div class="p-2 rounded-full"
+                         :class="selectedId === '{{ photo.id }}' ? 'bg-success' : 'bg-primary/80'">
                         <i class="text-white i-md ph-bold ph-check"></i>
                     </div>
                 </div>
@@ -39,6 +40,6 @@
     </div>
 
     <p class="mt-4 text-xs text-center text-base-content/60">
-        Click an image to select it for your trip
+        Click an image to select it for your trip, then save the form
     </p>
 {% endif %}
