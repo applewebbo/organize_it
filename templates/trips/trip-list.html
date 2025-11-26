@@ -30,7 +30,14 @@
             </div>
             <div class="grid grid-cols-1 gap-x-4 gap-y-8 md:grid-cols-2 xl:grid-cols-3">
                 {% for trip in active_trips %}
-                    <div class="shadow card card-border bg-base-100" id="{{ trip.id }}">
+                    <div class="overflow-hidden shadow card card-border bg-base-100" id="{{ trip.id }}">
+                        <!-- Trip Image Header -->
+                        <figure class="relative w-full h-48">
+                            <img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&h=400&fit=crop"
+                                 alt="{{ trip.title }}"
+                                 class="object-cover w-full h-full"
+                                 loading="lazy">
+                        </figure>
                         <div class="card-body">
                             <span class="badge badge-outline badge-secondary">{{ trip.get_status_display }}</span>
                             <h2 class="card-title">{{ trip.title }}</h2>
