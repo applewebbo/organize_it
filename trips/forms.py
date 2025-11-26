@@ -70,7 +70,7 @@ class TripForm(forms.ModelForm):
         # Configure image upload field
         self.fields["image"].required = False
         self.fields["image"].widget.attrs.update(
-            {"accept": "image/*", "x-show": "!searchMode"}
+            {"accept": "image/*", "x-show": "imageMode === 'upload'"}
         )
 
         trip_id = self.instance.pk if self.instance.pk else "new"
@@ -119,12 +119,19 @@ class TripForm(forms.ModelForm):
             <div class="mb-4 flex gap-2 sm:col-span-2">
                 <button type="button"
                         class="btn btn-sm"
-                        :class="searchMode ? 'btn-primary' : 'btn-outline'"
-                        @click="searchMode = true"
+                        :class="imageMode === 'search' ? 'btn-primary' : 'btn-outline'"
+                        @click="
+                            imageMode = 'search';
+                            const destValue = document.querySelector('[name=destination]').value;
+                            if (destValue && destValue !== lastSearchQuery) {
+                                lastSearchQuery = destValue;
+                                $el.dispatchEvent(new Event('doSearch'));
+                            }
+                        "
                         hx-post="""
                 + f'"{reverse("trips:search-images")}"'
                 + """
-                        hx-trigger="click"
+                        hx-trigger="doSearch"
                         hx-target="#image-results"
                         hx-indicator="#search-spinner"
                         hx-include="[name='destination'], [name='trip_id']">
@@ -135,8 +142,8 @@ class TripForm(forms.ModelForm):
                 </button>
                 <button type="button"
                         class="btn btn-sm"
-                        :class="!searchMode ? 'btn-primary' : 'btn-outline'"
-                        @click="searchMode = false">
+                        :class="imageMode === 'upload' ? 'btn-primary' : 'btn-outline'"
+                        @click="imageMode = 'upload'">
                     <i class="ph-bold ph-upload"></i>
                     """
                 + str(_("Upload Image"))
@@ -152,12 +159,14 @@ class TripForm(forms.ModelForm):
                 ),
                 HTML('<div id="image-results" class="mt-4"></div>'),
                 css_class="search-section sm:col-span-2",
+                x_show="imageMode === 'search'",
             ),
             # Upload section
             Div(
                 Field("image", wrapper_class="w-full"),
                 HTML('<div id="upload-preview" class="mt-4"></div>'),
                 css_class="upload-section sm:col-span-2",
+                x_show="imageMode === 'upload'",
             ),
         )
 
