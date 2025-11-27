@@ -58,6 +58,35 @@ select ~ .pointer-events-none {
 }
 
 
+.trip-list-background {
+  position: relative;
+}
+
+.trip-list-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('/static/img/trip_list_hero.jpg');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.2;
+  z-index: 0;
+}
+
+.trip-list-background > * {
+  position: relative;
+  z-index: 1;
+}
+
+.navbar-background > * {
+  position: relative;
+  z-index: 1;
+}
+
 .body-pattern {
   background-image: url('/static/img/pattern_body.png');
   background-repeat: repeat;

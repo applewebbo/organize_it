@@ -12,18 +12,18 @@
                  hx-trigger="tripSaved from:body"
                  hx-get="{% url 'trips:trip-list' %}"
                  hx-target="#trips">
-            <div class="mb-12 shadow card bg-base-100 trip-header-pattern">
+            <div class="mb-12 shadow trip-list-background card bg-base-100">
                 <div class="card-body">
                     <div x-data class="items-center text-center md:flex md:flex-1 md:text-start">
-                        <h1 class="inline-block py-2 px-4 text-3xl font-semibold rounded-lg">{% trans 'My Trips' %}</h1>
+                        <h1 class="inline-block py-2 px-4 mb-4 text-3xl font-semibold rounded-lg">{% trans 'My Trips' %}</h1>
                         <div class="grow"></div>
-                        <button class="btn btn-sm btn-primary me-4 md:btn-md"
+                        <button class="btn btn-md btn-primary md:me-4 md:btn-lg"
                                 hx-get="{% url 'trips:trip-create' %}"
                                 hx-target="#dialog"
                                 hx-swap="innerHTML"
                                 @click="$dispatch('open-modal')">
-                            <i class="ph-bold ph-plus-circle i-lg" aria-hidden="true"></i>
-                            {% trans 'Create a new trip' %}
+                                {% trans 'Create a new trip' %}
+                                <i class="hidden md:inline ph-bold ph-arrow-right i-lg ms-2" aria-hidden="true"></i>
                         </button>
                     </div>
                 </div>
@@ -39,14 +39,14 @@
                                      class="object-cover w-full h-full"
                                      loading="lazy">
                             {% else %}
-                                <img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&h=400&fit=crop"
+                                <img src=" {% static 'img/trip_generic.jpg' %} "
                                      alt="{{ trip.title }}"
                                      class="object-cover w-full h-full"
                                      loading="lazy">
                             {% endif %}
 
                             {% if trip.needs_attribution %}
-                                <div class="absolute bottom-1 left-1 py-1 px-2 text-xs text-white rounded bg-black/50">
+                                <div class="absolute right-1 bottom-1 py-1 px-2 text-xs text-white rounded bg-black/50">
                                     {{ trip.get_attribution_text }}
                                 </div>
                             {% endif %}
