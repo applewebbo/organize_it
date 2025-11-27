@@ -17,10 +17,13 @@ from trips.utils import (
     annotate_event_overlaps,
     convert_google_opening_hours,
     create_day_map,
+    download_unsplash_photo,
     generate_cache_key,
     geocode_location,
     get_trips,
+    process_trip_image,
     rate_limit_check,
+    search_unsplash_photos,
     select_best_result,
 )
 
@@ -575,3 +578,350 @@ class TestConvertGoogleOpeningHours(TestCase):
             ]
         }
         self.assertIsNone(convert_google_opening_hours(google_hours))
+
+
+class TestUnsplashAPI(TestCase):
+    """Test cases for Unsplash API integration"""
+
+    def setUp(self):
+        cache.clear()
+
+    @patch("trips.utils.requests.get")
+    def test_search_unsplash_photos_success(self, mock_get):
+        """Test successful Unsplash search"""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "results": [
+                {
+                    "id": "abc123",
+                    "urls": {
+                        "regular": "https://example.com/regular.jpg",
+                        "small": "https://example.com/small.jpg",
+                        "thumb": "https://example.com/thumb.jpg",
+                    },
+                    "user": {
+                        "name": "John Doe",
+                        "username": "johndoe",
+                        "links": {"html": "https://unsplash.com/@johndoe"},
+                    },
+                    "links": {
+                        "html": "https://unsplash.com/photos/abc123",
+                        "download_location": "https://api.unsplash.com/photos/abc123/download",
+                    },
+                    "alt_description": "Beautiful landscape",
+                }
+            ]
+        }
+        mock_get.return_value = mock_response
+
+        photos = search_unsplash_photos("Paris")
+
+        self.assertEqual(len(photos), 1)
+        self.assertEqual(photos[0]["id"], "abc123")
+        self.assertEqual(photos[0]["user"]["name"], "John Doe")
+        mock_get.assert_called_once()
+
+    @patch("trips.utils.requests.get")
+    def test_search_unsplash_photos_cached(self, mock_get):
+        """Test that search results are cached"""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "results": [
+                {
+                    "id": "cached123",
+                    "urls": {
+                        "regular": "https://example.com/regular.jpg",
+                        "small": "https://example.com/small.jpg",
+                        "thumb": "https://example.com/thumb.jpg",
+                    },
+                    "user": {
+                        "name": "Cached User",
+                        "username": "cacheduser",
+                        "links": {"html": "https://unsplash.com/@cacheduser"},
+                    },
+                    "links": {
+                        "html": "https://unsplash.com/photos/cached123",
+                        "download_location": "https://api.unsplash.com/photos/cached123/download",
+                    },
+                    "alt_description": "Cached image",
+                }
+            ]
+        }
+        mock_get.return_value = mock_response
+
+        # First call
+        search_unsplash_photos("Paris")
+        self.assertEqual(mock_get.call_count, 1)
+
+        # Second call should use cache
+        search_unsplash_photos("Paris")
+        self.assertEqual(mock_get.call_count, 1)  # Still 1, not called again
+
+    @patch("trips.utils.requests.get")
+    def test_search_unsplash_photos_timeout(self, mock_get):
+        """Test Unsplash API timeout handling"""
+        import requests
+
+        mock_get.side_effect = requests.exceptions.Timeout("Timeout")
+
+        photos = search_unsplash_photos("Paris")
+
+        self.assertIsNone(photos)
+
+    @patch("trips.utils.requests.get")
+    def test_search_unsplash_photos_api_error(self, mock_get):
+        """Test Unsplash API error handling"""
+        import requests
+
+        mock_get.side_effect = requests.RequestException("API Error")
+
+        photos = search_unsplash_photos("Paris")
+
+        self.assertIsNone(photos)
+
+    @patch("django.conf.settings.UNSPLASH_ACCESS_KEY", "")
+    def test_search_unsplash_photos_no_api_key(self):
+        """Test search without API key configured"""
+        photos = search_unsplash_photos("Paris")
+
+        self.assertIsNone(photos)
+
+    @patch("trips.utils.requests.get")
+    def test_download_unsplash_photo_success(self, mock_get):
+        """Test successful photo download from Unsplash"""
+        # Mock download tracking response
+        mock_download_response = MagicMock()
+        mock_download_response.status_code = 200
+
+        # Mock image download response
+        mock_image_response = MagicMock()
+        mock_image_response.status_code = 200
+        mock_image_response.content = b"fake_image_data"
+
+        mock_get.side_effect = [mock_download_response, mock_image_response]
+
+        photo_data = {
+            "id": "abc123",
+            "urls": {"regular": "https://example.com/image.jpg"},
+            "user": {
+                "name": "John Doe",
+                "profile": "https://unsplash.com/@johndoe",
+            },
+            "links": {
+                "html": "https://unsplash.com/photos/abc123",
+                "download_location": "https://api.unsplash.com/photos/abc123/download",
+            },
+        }
+
+        content, metadata = download_unsplash_photo(photo_data)
+
+        self.assertEqual(content, b"fake_image_data")
+        self.assertEqual(metadata["source"], "unsplash")
+        self.assertEqual(metadata["unsplash_id"], "abc123")
+        self.assertEqual(metadata["photographer"], "John Doe")
+        self.assertEqual(mock_get.call_count, 2)  # Download tracking + image download
+
+    @patch("trips.utils.requests.get")
+    def test_download_unsplash_photo_error(self, mock_get):
+        """Test download error handling"""
+        import requests
+
+        mock_get.side_effect = requests.RequestException("Download failed")
+
+        photo_data = {
+            "id": "abc123",
+            "urls": {"regular": "https://example.com/image.jpg"},
+            "links": {"download_location": "https://api.unsplash.com/download"},
+        }
+
+        content, metadata = download_unsplash_photo(photo_data)
+
+        self.assertIsNone(content)
+        self.assertIsNone(metadata)
+
+    @patch("django.conf.settings.UNSPLASH_ACCESS_KEY", "")
+    def test_download_unsplash_photo_no_api_key(self):
+        """Test download without API key configured"""
+        photo_data = {
+            "id": "abc123",
+            "urls": {"regular": "https://example.com/image.jpg"},
+            "links": {"download_location": "https://api.unsplash.com/download"},
+        }
+
+        content, metadata = download_unsplash_photo(photo_data)
+
+        self.assertIsNone(content)
+        self.assertIsNone(metadata)
+
+
+class TestImageProcessing(TestCase):
+    """Test cases for image processing utilities"""
+
+    def test_process_trip_image_from_bytes(self):
+        """Test processing image from bytes"""
+        from io import BytesIO
+
+        from PIL import Image
+
+        # Create a test image
+        img = Image.new("RGB", (800, 600), color="red")
+        img_io = BytesIO()
+        img.save(img_io, "JPEG")
+        img_bytes = img_io.getvalue()
+
+        processed = process_trip_image(img_bytes)
+
+        self.assertIsNotNone(processed)
+        self.assertEqual(processed.content_type, "image/jpeg")
+
+    def test_process_trip_image_landscape_orientation(self):
+        """Test that portrait images are rotated to landscape"""
+        from io import BytesIO
+
+        from PIL import Image
+
+        # Create a portrait image (height > width)
+        img = Image.new("RGB", (600, 800), color="blue")
+        img_io = BytesIO()
+        img.save(img_io, "JPEG")
+        img_bytes = img_io.getvalue()
+
+        processed = process_trip_image(img_bytes)
+
+        self.assertIsNotNone(processed)
+        # Verify image was rotated by checking it can be opened
+        processed_img = Image.open(processed)
+        self.assertGreater(processed_img.width, processed_img.height)
+
+    def test_process_trip_image_resize_large(self):
+        """Test that large images are resized"""
+        from io import BytesIO
+
+        from PIL import Image
+
+        # Create an oversized image
+        img = Image.new("RGB", (3000, 2000), color="green")
+        img_io = BytesIO()
+        img.save(img_io, "JPEG")
+        img_bytes = img_io.getvalue()
+
+        processed = process_trip_image(img_bytes)
+
+        self.assertIsNotNone(processed)
+        processed_img = Image.open(processed)
+        self.assertLessEqual(processed_img.width, 1200)
+        self.assertLessEqual(processed_img.height, 800)
+
+    def test_process_trip_image_invalid_data(self):
+        """Test processing invalid image data"""
+        result = process_trip_image(b"not an image")
+
+        self.assertIsNone(result)
+
+    def test_process_trip_image_from_uploaded_file(self):
+        """Test processing from UploadedFile object"""
+        from io import BytesIO
+
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        from PIL import Image
+
+        # Create test image
+        img = Image.new("RGB", (800, 600), color="blue")
+        img_io = BytesIO()
+        img.save(img_io, "JPEG")
+        img_io.seek(0)
+
+        uploaded_file = SimpleUploadedFile(
+            "test.jpg", img_io.read(), content_type="image/jpeg"
+        )
+
+        processed = process_trip_image(uploaded_file)
+
+        self.assertIsNotNone(processed)
+
+    def test_process_trip_image_large_file(self):
+        """Test processing large file (>2MB) triggers size warning"""
+        from io import BytesIO
+        from unittest.mock import patch
+
+        import numpy as np
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        from PIL import Image
+
+        # Create large image with random pixels to prevent compression
+        # This ensures the file will be > 2MB
+        width, height = 3000, 2500
+        # Generate random RGB data
+        random_data = np.random.randint(0, 256, (height, width, 3), dtype=np.uint8)
+        img = Image.fromarray(random_data, "RGB")
+
+        img_io = BytesIO()
+        img.save(img_io, "JPEG", quality=100)
+        img_io.seek(0)
+        img_bytes = img_io.read()
+
+        # Verify the image is actually > 2MB
+        size_mb = len(img_bytes) / (1024 * 1024)
+        self.assertGreater(size_mb, 2, f"Test image size {size_mb:.2f}MB is not > 2MB")
+
+        uploaded_file = SimpleUploadedFile(
+            "large.jpg", img_bytes, content_type="image/jpeg"
+        )
+
+        # Mock logger to verify warning is called
+        with patch("trips.utils.logger.warning") as mock_warning:
+            # Should still process and resize
+            processed = process_trip_image(uploaded_file)
+
+            self.assertIsNotNone(processed)
+            # Verify warning was logged
+            mock_warning.assert_called_once()
+            # Check warning message contains size info
+            warning_msg = mock_warning.call_args[0][0]
+            self.assertIn("Image too large", warning_msg)
+            self.assertIn("MB", warning_msg)
+
+        processed_img = Image.open(processed)
+        # Should be resized
+        self.assertLessEqual(processed_img.width, 1200)
+        self.assertLessEqual(processed_img.height, 800)
+
+    def test_process_trip_image_rgba_conversion(self):
+        """Test RGBA to RGB conversion"""
+        from io import BytesIO
+
+        from PIL import Image
+
+        # Create RGBA image
+        img = Image.new("RGBA", (800, 600), color=(255, 0, 0, 128))
+        img_io = BytesIO()
+        img.save(img_io, "PNG")
+        img_bytes = img_io.getvalue()
+
+        processed = process_trip_image(img_bytes)
+
+        self.assertIsNotNone(processed)
+        processed_img = Image.open(processed)
+        self.assertEqual(processed_img.mode, "RGB")
+
+    def test_process_trip_image_wide_aspect_ratio(self):
+        """Test image with wide aspect ratio (wider than target)"""
+        from io import BytesIO
+
+        from PIL import Image
+
+        # Create very wide image (2400x600 = 4:1 ratio)
+        img = Image.new("RGB", (2400, 600), color="yellow")
+        img_io = BytesIO()
+        img.save(img_io, "JPEG")
+        img_bytes = img_io.getvalue()
+
+        processed = process_trip_image(img_bytes)
+
+        self.assertIsNotNone(processed)
+        processed_img = Image.open(processed)
+        # Should be resized to max width 1200
+        self.assertLessEqual(processed_img.width, 1200)
+        self.assertLessEqual(processed_img.height, 800)

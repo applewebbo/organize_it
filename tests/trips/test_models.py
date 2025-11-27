@@ -67,6 +67,48 @@ class TestTripModel:
 
         assert trip.status == 5
 
+    def test_trip_get_image_url_none(self, trip_factory):
+        """Test get_image_url property returns None when no image"""
+        trip = trip_factory()
+        assert trip.get_image_url is None
+
+    def test_trip_get_image_url_with_image(self, trip_factory):
+        """Test get_image_url property returns URL when image exists"""
+        trip = trip_factory()
+        trip.image = "trips/2025/11/test.jpg"
+        trip.save()
+        assert "/media/trips/2025/11/test.jpg" in trip.get_image_url
+
+    def test_trip_needs_attribution_upload(self, trip_factory):
+        """Test needs_attribution returns False for uploaded images"""
+        trip = trip_factory()
+        trip.image_metadata = {"source": "upload"}
+        assert trip.needs_attribution is False
+
+    def test_trip_needs_attribution_unsplash(self, trip_factory):
+        """Test needs_attribution returns True for Unsplash images"""
+        trip = trip_factory()
+        trip.image_metadata = {"source": "unsplash", "photographer": "John Doe"}
+        assert trip.needs_attribution is True
+
+    def test_trip_get_attribution_text_upload(self, trip_factory):
+        """Test get_attribution_text returns None for uploads"""
+        trip = trip_factory()
+        trip.image_metadata = {"source": "upload"}
+        assert trip.get_attribution_text() is None
+
+    def test_trip_get_attribution_text_unsplash(self, trip_factory):
+        """Test get_attribution_text returns formatted text for Unsplash"""
+        trip = trip_factory()
+        trip.image_metadata = {
+            "source": "unsplash",
+            "photographer": "John Doe",
+            "photo_url": "https://unsplash.com/photos/abc123",
+        }
+        attribution = trip.get_attribution_text()
+        assert "John Doe" in attribution
+        assert "Unsplash" in attribution
+
 
 class TestDayModel:
     def test_factory(self, user_factory, trip_factory):

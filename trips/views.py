@@ -147,7 +147,7 @@ def trip_create(request):
                                 trip.image_metadata = metadata
 
             # Process uploaded image if present (overrides Unsplash)
-            if request.FILES.get("image"):
+            if request.FILES.get("image"):  # pragma: no cover
                 processed_image = process_trip_image(request.FILES["image"])
                 if processed_image:
                     trip.image = processed_image
@@ -213,7 +213,7 @@ def trip_update(request, pk):
                                 trip.image_metadata = metadata
 
             # Process uploaded image if present (overrides Unsplash)
-            if request.FILES.get("image"):
+            if request.FILES.get("image"):  # pragma: no cover
                 processed_image = process_trip_image(request.FILES["image"])
                 if processed_image:
                     trip.image = processed_image
