@@ -2,6 +2,7 @@ import logging
 import os
 from pathlib import Path
 
+import cloudinary
 import dj_database_url
 import environ
 from django.utils.translation import gettext_lazy as _
@@ -370,11 +371,7 @@ elif ENVIRONMENT == "prod":
     }
 
     # Cloudinary media storage
-    CLOUDINARY_STORAGE = {
-        "CLOUD_NAME": env("CLOUDINARY_CLOUD_NAME"),
-        "API_KEY": env("CLOUDINARY_API_KEY"),
-        "API_SECRET": env("CLOUDINARY_API_SECRET"),
-    }
+    cloudinary.config(cloudinary_url=env("CLOUDINARY_URL"))
     DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 # TESTING SPECIFIC SETTINGS
