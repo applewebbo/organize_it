@@ -77,7 +77,8 @@ All commands use `just` (justfile). Never use `pip` - always use `uv`.
 
 ### Running the App
 - `just local` - Run development server with Tailwind compilation
-- `just tasks` - Run django-q2 background task worker
+- `just serve` - Run web + worker together with Overmind (recommended)
+- `just tasks` - Run django-q2 background task worker manually
 - `just migrate` - Run database migrations
 - `just makemigrations` - Create new migrations
 
@@ -148,10 +149,41 @@ Forms use crispy-forms with crispy-tailwind template pack. Two geocoding approac
 
 ### Background Tasks
 
-Django-Q2 handles async tasks:
-- `trips/tasks.py` contains task definitions
-- `check_trips_status()` - Periodic task to update trip statuses based on dates
-- Tasks log to `tasks.log` file (configured in settings.LOGGING)
+Django-Q2 handles async tasks with environment-specific configuration:
+
+**Configuration**:
+- **Development**: ORM-based queue, 4 workers (configurable via env)
+- **Production**: Redis-based queue, 4 workers (configurable via env)
+- **Test**: Synchronous execution (sync=True), 1 worker
+
+**Available Tasks** (trips/tasks.py):
+- `check_trips_status()` - Update trip statuses based on dates
+- `cleanup_old_sessions()` - Delete expired sessions
+- `backup_database()` - Backup database using django-dbbackup
+- `populate_trips()` - Populate with dummy trips (dev only)
+
+**Worker Management**:
+- `just tasks` - Run worker manually
+- `just serve` - Run web + worker with Overmind (recommended for dev)
+- Production: Uses `Procfile` with Gunicorn + worker process
+
+**Configuration Variables** (.env):
+```bash
+# Worker configuration (optional, has defaults)
+Q_CLUSTER_WORKERS=4
+Q_CLUSTER_TIMEOUT=90
+Q_CLUSTER_RETRY=120
+Q_CLUSTER_MAX_ATTEMPTS=3
+Q_CLUSTER_QUEUE_LIMIT=50
+
+# Redis (production only)
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_DB=0
+REDIS_PASSWORD=
+```
+
+Tasks log to `tasks.log` file (configured in settings.LOGGING)
 
 ### Authentication
 
@@ -173,13 +205,15 @@ Required in `.env`:
 Production-specific:
 - Database config: `SQL_ENGINE`, `SQL_DATABASE`, `SQL_USER`, `SQL_PASSWORD`, `SQL_HOST`, `SQL_PORT`
 - Mailgun: `MAILGUN_API_KEY`, `MAILGUN_API_URL`, `MAILGUN_SENDER_DOMAIN`
+- Redis: `REDIS_HOST`, `REDIS_PORT`, `REDIS_DB`, `REDIS_PASSWORD`
+- Django-Q2 workers: `Q_CLUSTER_WORKERS`, `Q_CLUSTER_TIMEOUT`, `Q_CLUSTER_RETRY`, `Q_CLUSTER_MAX_ATTEMPTS`, `Q_CLUSTER_QUEUE_LIMIT`
 
 ### Settings Structure
 
 Single `core/settings.py` file with environment-based conditionals:
-- Lines 312-341: Development settings (DEBUG=True, SQLite, console email)
-- Lines 344-368: Production settings (PostgreSQL, Mailgun email)
-- Lines 371-383: Test settings (in-memory SQLite, fast password hashing)
+- Lines 315-350: Development settings (DEBUG=True, SQLite, console email, ORM-based Q_CLUSTER)
+- Lines 352-415: Production settings (PostgreSQL, Mailgun email, Redis-based Q_CLUSTER)
+- Lines 418-439: Test settings (in-memory SQLite, fast password hashing, sync Q_CLUSTER)
 
 ## Coding Standards (from .github/copilot-instructions.md)
 
