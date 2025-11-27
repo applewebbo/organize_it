@@ -236,17 +236,7 @@ CRISPY_TEMPLATE_PACK = "tailwind"
 MAPBOX_ACCESS_TOKEN = env("MAPBOX_ACCESS_TOKEN")
 
 # DJANGO-Q
-
-Q_CLUSTER = {
-    "name": "organize_it",
-    "workers": 1,
-    "timeout": 90,
-    "retry": 120,
-    "queue_limit": 50,
-    "bulk": 10,
-    "orm": "default",
-    "catch_up": False,
-}
+# Environment-specific configuration will be set below in respective sections
 
 # DJANGO-TAILWIND-CLI
 
@@ -343,6 +333,21 @@ if ENVIRONMENT == "dev":
         "django_watchfiles",
     ]
 
+    # DJANGO-Q configuration for development
+    Q_CLUSTER = {
+        "name": "organize_it",
+        "workers": env.int("Q_CLUSTER_WORKERS", default=4),
+        "timeout": env.int("Q_CLUSTER_TIMEOUT", default=90),
+        "retry": env.int("Q_CLUSTER_RETRY", default=120),
+        "max_attempts": env.int("Q_CLUSTER_MAX_ATTEMPTS", default=3),
+        "queue_limit": env.int("Q_CLUSTER_QUEUE_LIMIT", default=50),
+        "bulk": 10,
+        "orm": "default",  # Use Django ORM in development for simplicity
+        "catch_up": False,
+        "save_limit": 250,  # Keep last 250 successful tasks
+        "error_reporter": {},  # Can add custom error reporting
+    }
+
 # PRODUCTION SPECIFIC SETTINGS
 elif ENVIRONMENT == "prod":
     DATABASES = {
@@ -377,6 +382,38 @@ elif ENVIRONMENT == "prod":
     }
     DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
+    # DJANGO-Q configuration for production with Redis
+    Q_CLUSTER = {
+        "name": "organize_it",
+        "workers": env.int("Q_CLUSTER_WORKERS", default=4),
+        "timeout": env.int("Q_CLUSTER_TIMEOUT", default=90),
+        "retry": env.int("Q_CLUSTER_RETRY", default=120),
+        "max_attempts": env.int("Q_CLUSTER_MAX_ATTEMPTS", default=3),
+        "queue_limit": env.int("Q_CLUSTER_QUEUE_LIMIT", default=50),
+        "bulk": 10,
+        "orm": "default",
+        "catch_up": False,
+        "save_limit": 250,
+        "error_reporter": {},
+        "redis": {
+            "host": env("REDIS_HOST", default="localhost"),
+            "port": env.int("REDIS_PORT", default=6379),
+            "db": env.int("REDIS_DB", default=0),
+            "password": env("REDIS_PASSWORD", default=""),
+        },
+    }
+
+    # Redis cache configuration
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": f"redis://:{env('REDIS_PASSWORD', default='')}@{env('REDIS_HOST', default='localhost')}:{env.int('REDIS_PORT', default=6379)}/1",
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            },
+        }
+    }
+
 # TESTING SPECIFIC SETTINGS
 elif ENVIRONMENT == "test":
     DATABASES = {
@@ -388,6 +425,15 @@ elif ENVIRONMENT == "test":
 
     PASSWORD_HASHERS = ("django.contrib.auth.hashers.MD5PasswordHasher",)
 
-    EMAIL_BACKEND = "django.core.mail.backends.locmemp.EmailBackend"
+    EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+
+    # DJANGO-Q configuration for testing (synchronous)
+    Q_CLUSTER = {
+        "name": "organize_it",
+        "workers": 1,
+        "sync": True,  # Run tasks synchronously in tests
+        "timeout": 60,
+        "retry": 120,
+    }
 
     logging.disable()
