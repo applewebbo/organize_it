@@ -372,6 +372,9 @@ elif ENVIRONMENT == "prod":
 
     # Cloudinary media storage
     cloudinary.config(cloudinary_url=env("CLOUDINARY_URL"))
+    CLOUDINARY_STORAGE = {
+        "PREFIX": "organize-it",  # All media files will be in organize-it/ folder
+    }
     DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 # TESTING SPECIFIC SETTINGS
