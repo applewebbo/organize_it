@@ -346,6 +346,14 @@ if ENVIRONMENT == "dev":
         "catch_up": False,
         "save_limit": 250,  # Keep last 250 successful tasks
         "error_reporter": {},  # Can add custom error reporting
+        "schedule": [
+            {
+                "func": "trips.tasks.check_trips_status",
+                "name": "Check Trips Status",
+                "schedule_type": "H",  # Hourly for testing in dev
+                "repeats": -1,  # Infinite
+            },
+        ],
     }
 
 # PRODUCTION SPECIFIC SETTINGS
@@ -401,6 +409,28 @@ elif ENVIRONMENT == "prod":
             "db": env.int("REDIS_DB", default=0),
             "password": env("REDIS_PASSWORD", default=""),
         },
+        "schedule": [
+            {
+                "func": "trips.tasks.check_trips_status",
+                "name": "Check Trips Status",
+                "schedule_type": "C",  # Cron
+                "cron": "0 3 * * *",  # Every day at 3 AM
+                "repeats": -1,
+            },
+            {
+                "func": "trips.tasks.cleanup_old_sessions",
+                "name": "Cleanup Old Sessions",
+                "schedule_type": "W",  # Weekly
+                "repeats": -1,
+            },
+            {
+                "func": "trips.tasks.backup_database",
+                "name": "Database Backup",
+                "schedule_type": "C",  # Cron
+                "cron": "0 2 * * 0",  # Every Sunday at 2 AM
+                "repeats": -1,
+            },
+        ],
     }
 
     # Redis cache configuration

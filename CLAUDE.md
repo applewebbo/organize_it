@@ -162,6 +162,14 @@ Django-Q2 handles async tasks with environment-specific configuration:
 - `backup_database()` - Backup database using django-dbbackup
 - `populate_trips()` - Populate with dummy trips (dev only)
 
+**Scheduled Tasks** (configured in settings.py):
+- **Development**:
+  - `check_trips_status` - Every hour (for testing)
+- **Production**:
+  - `check_trips_status` - Daily at 3 AM
+  - `cleanup_old_sessions` - Weekly
+  - `backup_database` - Every Sunday at 2 AM
+
 **Worker Management**:
 - `just tasks` - Run worker manually
 - `just serve` - Run web + worker with Overmind (recommended for dev)
