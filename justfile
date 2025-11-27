@@ -49,6 +49,12 @@ fresh: clean install
 @local:
     uv run python manage.py tailwind runserver
 
+# Run development server + worker with Overmind
+[group('development')]
+@serve:
+    rm -f ./.overmind.sock
+    uv run overmind start -r all -f ./Procfile.dev
+
 # Add dummy trips to the database
 [group('development')]
 @populate_trips:
