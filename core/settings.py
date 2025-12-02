@@ -402,7 +402,7 @@ elif ENVIRONMENT == "prod":
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     }
     STORAGES["staticfiles"] = {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     }
 
     # DJANGO-Q configuration for production with Redis
