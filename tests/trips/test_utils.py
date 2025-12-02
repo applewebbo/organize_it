@@ -586,6 +586,7 @@ class TestUnsplashAPI(TestCase):
     def setUp(self):
         cache.clear()
 
+    @patch("django.conf.settings.UNSPLASH_ACCESS_KEY", "test_key")
     @patch("trips.utils.requests.get")
     def test_search_unsplash_photos_success(self, mock_get):
         """Test successful Unsplash search"""
@@ -622,6 +623,7 @@ class TestUnsplashAPI(TestCase):
         self.assertEqual(photos[0]["user"]["name"], "John Doe")
         mock_get.assert_called_once()
 
+    @patch("django.conf.settings.UNSPLASH_ACCESS_KEY", "test_key")
     @patch("trips.utils.requests.get")
     def test_search_unsplash_photos_cached(self, mock_get):
         """Test that search results are cached"""
@@ -659,6 +661,7 @@ class TestUnsplashAPI(TestCase):
         search_unsplash_photos("Paris")
         self.assertEqual(mock_get.call_count, 1)  # Still 1, not called again
 
+    @patch("django.conf.settings.UNSPLASH_ACCESS_KEY", "test_key")
     @patch("trips.utils.requests.get")
     def test_search_unsplash_photos_timeout(self, mock_get):
         """Test Unsplash API timeout handling"""
@@ -670,6 +673,7 @@ class TestUnsplashAPI(TestCase):
 
         self.assertIsNone(photos)
 
+    @patch("django.conf.settings.UNSPLASH_ACCESS_KEY", "test_key")
     @patch("trips.utils.requests.get")
     def test_search_unsplash_photos_api_error(self, mock_get):
         """Test Unsplash API error handling"""
