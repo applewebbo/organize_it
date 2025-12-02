@@ -81,7 +81,7 @@ def pairwise(iterable):
 
 
 class CrispyTailwindFieldNode(template.Node):
-    base_input = ""
+    base_input = "input input-bordered w-full"
 
     default_styles = {
         "text": base_input,

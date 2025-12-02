@@ -31,7 +31,7 @@
     {% elif field|is_textarea %}
         <div id="div_{{ field.auto_id }}" class="{% if wrapper_class %}{{ wrapper_class }} {% endif %}{% if field_class %}{{ field_class }}{% else %}mb-3{% endif %}">
             {% if field.label and form_show_labels %}
-                <label for="{{ field.id_for_label }}" class="sr-only label">
+                <label for="{{ field.id_for_label }}" class="label">
                     <span class="label-text">{{ field.label|safe }}{% if field.field.required %}<span class="asteriskField">*</span>{% endif %}</span>
                 </label>
             {% endif %}
@@ -41,11 +41,11 @@
     {% else %}
         <{% if tag %}{{ tag }}{% else %}div{% endif %} id="div_{{ field.auto_id }}" class="{% if wrapper_class %}{{ wrapper_class }} {% endif %}{% if field_class %}{{ field_class }}{% else %}mb-3{% endif %}">
         {% if field.label and form_show_labels %}
-            <label for="{{ field.id_for_label }}" class="{% if label_class %}{{ label_class }}{% else %}input w-full{% endif %}">
-                <span class="label">{{ field.label|safe }}{% if field.field.required %}<span class="asteriskField">*</span>{% endif %}</span>
-                {% tailwind_field field %}
+            <label for="{{ field.id_for_label }}" class="{% if label_class %}{{ label_class }}{% else %}label{% endif %}">
+                <span class="label-text">{{ field.label|safe }}{% if field.field.required %}<span class="asteriskField">*</span>{% endif %}</span>
             </label>
         {% endif %}
+        {% tailwind_field field %}
 
         {# otherwise use django rendering with additional classes added #}
 
