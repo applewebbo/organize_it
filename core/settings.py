@@ -3,7 +3,6 @@ import os
 from pathlib import Path
 
 import cloudinary
-import dj_database_url
 import environ
 from django.utils.translation import gettext_lazy as _
 
@@ -131,17 +130,6 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
-
-POSTGRES_LOCALLY = env("POSTGRES_LOCALLY")
-
-if POSTGRES_LOCALLY:
-    DATABASES["default"] = dj_database_url.config(
-        default=env("DATABASE_URL"),
-        conn_max_age=600,
-        conn_health_checks=True,
-        ssl_require=True,
-    )
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
