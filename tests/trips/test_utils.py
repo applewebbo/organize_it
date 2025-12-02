@@ -688,6 +688,7 @@ class TestUnsplashAPI(TestCase):
 
         self.assertIsNone(photos)
 
+    @patch("django.conf.settings.UNSPLASH_ACCESS_KEY", "test_key")
     @patch("trips.utils.requests.get")
     def test_download_unsplash_photo_success(self, mock_get):
         """Test successful photo download from Unsplash"""
@@ -723,6 +724,7 @@ class TestUnsplashAPI(TestCase):
         self.assertEqual(metadata["photographer"], "John Doe")
         self.assertEqual(mock_get.call_count, 2)  # Download tracking + image download
 
+    @patch("django.conf.settings.UNSPLASH_ACCESS_KEY", "test_key")
     @patch("trips.utils.requests.get")
     def test_download_unsplash_photo_error(self, mock_get):
         """Test download error handling"""
