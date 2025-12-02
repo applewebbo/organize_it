@@ -58,6 +58,8 @@ INSTALLED_APPS = [
     "django_tailwind_cli",
     "template_partials.apps.SimpleAppConfig",
     "django_q",
+    "storages",
+    "dbbackup",
     # INTERNAL_APP
     "trips",
     "accounts",
@@ -301,6 +303,31 @@ DATE_INPUT_FORMATS = [
 GOOGLE_PLACES_API_KEY = env("GOOGLE_PLACES_API_KEY", default="")
 UNSPLASH_ACCESS_KEY = env("UNSPLASH_ACCESS_KEY", default="")
 
+# DJANGO-DBBACKUP with Django Storages
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+    "dbbackup": {
+        "BACKEND": "storages.backends.dropbox.DropboxStorage",
+        "OPTIONS": {
+            "app_key": env("DROPBOX_APP_KEY", default=""),
+            "app_secret": env("DROPBOX_APP_SECRET", default=""),
+            "oauth2_access_token": env("DROPBOX_OAUTH2_ACCESS_TOKEN", default=""),
+            "oauth2_refresh_token": env("DROPBOX_OAUTH2_REFRESH_TOKEN", default=""),
+            "root_path": env(
+                "DBBACKUP_DROPBOX_FILE_PATH", default="/organize-it-backups/"
+            ),
+        },
+    },
+}
+
+DBBACKUP_CLEANUP_KEEP = env.int("DBBACKUP_CLEANUP_KEEP", default=10)
+DBBACKUP_CLEANUP_KEEP_MEDIA = env.int("DBBACKUP_CLEANUP_KEEP_MEDIA", default=10)
+
 # DEVELOPMENT SPECIFIC SETTINGS
 if ENVIRONMENT == "dev":
     DEBUG = True
@@ -388,7 +415,13 @@ elif ENVIRONMENT == "prod":
     CLOUDINARY_STORAGE = {
         "PREFIX": "organize-it",  # All media files will be in organize-it/ folder
     }
-    DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+    # Override storages for production
+    STORAGES["default"] = {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    }
+    STORAGES["staticfiles"] = {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    }
 
     # DJANGO-Q configuration for production with Redis
     Q_CLUSTER = {
