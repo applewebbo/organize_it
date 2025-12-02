@@ -2,7 +2,6 @@ import logging
 import os
 from pathlib import Path
 
-import cloudinary
 import environ
 from django.utils.translation import gettext_lazy as _
 
@@ -41,7 +40,6 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "cloudinary_storage",
     "django.contrib.staticfiles",
     # THIRD_PARTY
     "allauth",
@@ -398,14 +396,10 @@ elif ENVIRONMENT == "prod":
         "MAILGUN_SENDER_DOMAIN": env("MAILGUN_SENDER_DOMAIN"),
     }
 
-    # Cloudinary media storage
-    cloudinary.config(cloudinary_url=env("CLOUDINARY_URL"))
-    CLOUDINARY_STORAGE = {
-        "PREFIX": "organize-it",  # All media files will be in organize-it/ folder
-    }
     # Override storages for production
+    # Use FileSystemStorage for media files (for #199)
     STORAGES["default"] = {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
     }
     STORAGES["staticfiles"] = {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
