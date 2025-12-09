@@ -6,7 +6,6 @@ from .models import Day, Experience, Link, Meal, Stay, Transport, Trip
 @admin.register(Trip)
 class ProjectAdmin(admin.ModelAdmin):
     list_display = ["title", "author"]
-    exclude = ["status"]
 
 
 admin.site.register(Link)

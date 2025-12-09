@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-18 21:02+0100\n"
+"POT-Creation-Date: 2025-12-09 07:56+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -47,11 +47,11 @@ msgstr ""
 msgid "Settings modified succesfully"
 msgstr ""
 
-#: core/settings.py:256
+#: core/settings.py:233
 msgid "Italian"
 msgstr ""
 
-#: core/settings.py:257
+#: core/settings.py:234
 msgid "English"
 msgstr ""
 
@@ -212,15 +212,15 @@ msgstr ""
 msgid "Add event"
 msgstr ""
 
-#: templates/cotton/dropdown.html:17 trips/models.py:209
+#: templates/cotton/dropdown.html:17 trips/models.py:235
 msgid "Transport"
 msgstr ""
 
-#: templates/cotton/dropdown.html:23 trips/models.py:210
+#: templates/cotton/dropdown.html:23 trips/models.py:236
 msgid "Experience"
 msgstr ""
 
-#: templates/cotton/dropdown.html:29 trips/models.py:211
+#: templates/cotton/dropdown.html:29 trips/models.py:237
 msgid "Meal"
 msgstr ""
 
@@ -251,27 +251,48 @@ msgstr ""
 msgid "Get started"
 msgstr ""
 
-#: templates/includes/auth-index.html:7
-msgid "Favourite"
+#: templates/includes/auth-index.html:18 templates/includes/auth-index.html:27
+#: templates/includes/auth-index.html:41 templates/includes/auth-index.html:51
+#: templates/trips/trip-detail.html:20 templates/trips/trip-detail.html:29
+#: templates/trips/trip-detail.html:43 templates/trips/trip-detail.html:53
+msgid "Modify trip dates"
 msgstr ""
 
-#: templates/includes/auth-index.html:12
-msgid "View Trip"
+#: templates/includes/auth-index.html:44 templates/trips/trip-detail.html:46
+msgid "Edit trip"
 msgstr ""
 
-#: templates/includes/auth-index.html:19 templates/includes/auth-index.html:49
-msgid "Others"
+#: templates/includes/auth-index.html:53 templates/trips/trip-detail.html:55
+msgid "Edit Dates"
 msgstr ""
 
-#: templates/includes/auth-index.html:36
-msgid "Latest"
+#: templates/includes/auth-index.html:89 templates/trips/trip-detail.html:91
+msgid "Start Date:"
 msgstr ""
 
-#: templates/includes/auth-index.html:41
-msgid "Edit Trip"
+#: templates/includes/auth-index.html:92 templates/trips/trip-detail.html:94
+msgid "End Date:"
 msgstr ""
 
-#: templates/includes/auth-index.html:63
+#: templates/includes/auth-index.html:97 templates/trips/trip-detail.html:99
+msgid "Destination:"
+msgstr ""
+
+#: templates/includes/auth-index.html:116 templates/trips/trip-detail.html:126
+msgid "Unpaired Events"
+msgstr ""
+
+#: templates/includes/auth-index.html:130
+msgid "Other Trips"
+msgstr ""
+
+#: templates/includes/auth-index.html:149 templates/trips/event-detail.html:71
+#: templates/trips/includes/note.html:8 templates/trips/stay-detail.html:88
+#: templates/trips/trip-list.html:78
+msgid "Edit"
+msgstr ""
+
+#: templates/includes/auth-index.html:158
 msgid "You have no trips yet!"
 msgstr ""
 
@@ -283,7 +304,7 @@ msgstr ""
 #: templates/trips/event-notes.html:33 templates/trips/includes/note.html:13
 #: templates/trips/note-modify.html:29 templates/trips/stay-detail.html:102
 #: templates/trips/stay-note-modify.html:33 templates/trips/stay-notes.html:23
-#: trips/forms.py:529
+#: trips/forms.py:614
 msgid "Close"
 msgstr ""
 
@@ -319,14 +340,9 @@ msgstr ""
 msgid "Enrich"
 msgstr ""
 
-#: templates/trips/event-detail.html:71 templates/trips/includes/note.html:8
-#: templates/trips/stay-detail.html:88 templates/trips/trip-list.html:57
-msgid "Edit"
-msgstr ""
-
 #: templates/trips/event-detail.html:79 templates/trips/includes/note.html:12
 #: templates/trips/stay-detail.html:96 templates/trips/stay-note-modify.html:30
-#: templates/trips/trip-list.html:54
+#: templates/trips/trip-list.html:75
 msgid "Delete"
 msgstr ""
 
@@ -385,7 +401,7 @@ msgstr ""
 msgid "No address found."
 msgstr ""
 
-#: templates/trips/includes/day.html:10 trips/forms.py:823 trips/models.py:192
+#: templates/trips/includes/day.html:10 trips/forms.py:908 trips/models.py:218
 msgid "Day"
 msgstr ""
 
@@ -427,13 +443,13 @@ msgstr ""
 msgid "Booking Details"
 msgstr ""
 
-#: templates/trips/includes/transport-detail.html:36 trips/forms.py:239
-#: trips/forms.py:256
+#: templates/trips/includes/transport-detail.html:36 trips/forms.py:324
+#: trips/forms.py:341
 msgid "Company"
 msgstr ""
 
-#: templates/trips/includes/transport-detail.html:43 trips/forms.py:240
-#: trips/forms.py:258
+#: templates/trips/includes/transport-detail.html:43 trips/forms.py:325
+#: trips/forms.py:343
 msgid "Booking Reference"
 msgstr ""
 
@@ -441,7 +457,7 @@ msgstr ""
 msgid "View Ticket"
 msgstr ""
 
-#: templates/trips/includes/transport-detail.html:57 trips/forms.py:242
+#: templates/trips/includes/transport-detail.html:57 trips/forms.py:327
 msgid "Price"
 msgstr ""
 
@@ -499,52 +515,28 @@ msgid ""
 "cannot be undone."
 msgstr ""
 
-#: templates/trips/trip-detail.html:22 templates/trips/trip-detail.html:32
-msgid "Modify trip dates"
-msgstr ""
-
-#: templates/trips/trip-detail.html:25
-msgid "Edit trip"
-msgstr ""
-
-#: templates/trips/trip-detail.html:36
-msgid "Edit Dates"
-msgstr ""
-
-#: templates/trips/trip-detail.html:44 templates/trips/trip-detail.html:51
-msgid "Start Date:"
-msgstr ""
-
-#: templates/trips/trip-detail.html:47 templates/trips/trip-detail.html:54
-msgid "End Date:"
-msgstr ""
-
-#: templates/trips/trip-detail.html:58
-msgid "Destination:"
-msgstr ""
-
-#: templates/trips/trip-detail.html:86
-msgid "Unpaired Events"
-msgstr ""
-
 #: templates/trips/trip-list.html:4
 msgid "Trips List"
 msgstr ""
 
-#: templates/trips/trip-list.html:16
+#: templates/trips/trip-list.html:17
 msgid "My Trips"
 msgstr ""
 
-#: templates/trips/trip-list.html:23
-msgid "Create a new trip"
-msgstr ""
-
-#: templates/trips/trip-list.html:44
+#: templates/trips/trip-list.html:65
 msgid "Modify Dates"
 msgstr ""
 
-#: templates/trips/trip-list.html:50
+#: templates/trips/trip-list.html:71
 msgid "Archive"
+msgstr ""
+
+#: templates/trips/trip-list.html:92
+msgid "Create a new trip"
+msgstr ""
+
+#: templates/trips/trip-list.html:105
+msgid "Archived Trips"
 msgstr ""
 
 #: trips/forms.py:28
@@ -555,158 +547,170 @@ msgstr ""
 msgid "Description"
 msgstr ""
 
-#: trips/forms.py:32 trips/forms.py:314
+#: trips/forms.py:32 trips/forms.py:399
 msgid "Destination"
 msgstr ""
 
-#: trips/forms.py:34 trips/forms.py:114
+#: trips/forms.py:34 trips/forms.py:199
 msgid "Start date"
 msgstr ""
 
-#: trips/forms.py:39 trips/forms.py:118
+#: trips/forms.py:39 trips/forms.py:203
 msgid "End date"
 msgstr ""
 
-#: trips/forms.py:95
+#: trips/forms.py:109
+msgid "Trip Image"
+msgstr ""
+
+#: trips/forms.py:140
+msgid "Search Unsplash"
+msgstr ""
+
+#: trips/forms.py:149
+msgid "Upload Image"
+msgstr ""
+
+#: trips/forms.py:180
 msgid "End date must be after start date"
 msgstr ""
 
-#: trips/forms.py:101
+#: trips/forms.py:186
 msgid "Start date must be after today"
 msgstr ""
 
-#: trips/forms.py:108
+#: trips/forms.py:193
 msgid "Destination not found"
 msgstr ""
 
-#: trips/forms.py:233 trips/forms.py:235 trips/forms.py:415 trips/forms.py:416
-#: trips/forms.py:457 trips/forms.py:731 trips/forms.py:732
+#: trips/forms.py:318 trips/forms.py:320 trips/forms.py:500 trips/forms.py:501
+#: trips/forms.py:542 trips/forms.py:816 trips/forms.py:817
 msgid "City"
 msgstr ""
 
-#: trips/forms.py:234 trips/forms.py:236 trips/forms.py:249 trips/forms.py:253
-#: trips/forms.py:451 trips/forms.py:459 trips/forms.py:771 trips/forms.py:784
+#: trips/forms.py:319 trips/forms.py:321 trips/forms.py:334 trips/forms.py:338
+#: trips/forms.py:536 trips/forms.py:544 trips/forms.py:856 trips/forms.py:869
 msgid "Address"
 msgstr ""
 
-#: trips/forms.py:237
+#: trips/forms.py:322
 msgid "Departure Time"
 msgstr ""
 
-#: trips/forms.py:238
+#: trips/forms.py:323
 msgid "Arrival Time"
 msgstr ""
 
-#: trips/forms.py:241 trips/forms.py:260
+#: trips/forms.py:326 trips/forms.py:345
 msgid "Ticket URL"
 msgstr ""
 
-#: trips/forms.py:243 trips/forms.py:262 trips/forms.py:453 trips/forms.py:458
-#: trips/forms.py:770 trips/forms.py:783
+#: trips/forms.py:328 trips/forms.py:347 trips/forms.py:538 trips/forms.py:543
+#: trips/forms.py:855 trips/forms.py:868
 msgid "Website"
 msgstr ""
 
-#: trips/forms.py:244 trips/forms.py:682 trips/forms.py:700
+#: trips/forms.py:329 trips/forms.py:767 trips/forms.py:785
 msgid "Type"
 msgstr ""
 
-#: trips/forms.py:248
+#: trips/forms.py:333
 msgid "Origin City"
 msgstr ""
 
-#: trips/forms.py:251
+#: trips/forms.py:336
 msgid "Destination City"
 msgstr ""
 
-#: trips/forms.py:286
+#: trips/forms.py:371
 msgid "Origin"
 msgstr ""
 
-#: trips/forms.py:365
+#: trips/forms.py:450
 msgid "Booking Reference (optional)"
 msgstr ""
 
-#: trips/forms.py:402
+#: trips/forms.py:487
 msgid "Duration"
 msgstr ""
 
-#: trips/forms.py:408 trips/forms.py:409 trips/forms.py:456 trips/forms.py:724
-#: trips/forms.py:725 trips/forms.py:769 trips/forms.py:778
+#: trips/forms.py:493 trips/forms.py:494 trips/forms.py:541 trips/forms.py:809
+#: trips/forms.py:810 trips/forms.py:854 trips/forms.py:863
 msgid "Name"
 msgstr ""
 
-#: trips/forms.py:426 trips/forms.py:742
+#: trips/forms.py:511 trips/forms.py:827
 msgid ""
 "Enter a valid phone number (with or without international prefix, and at "
 "most 2 spaces)."
 msgstr ""
 
-#: trips/forms.py:431 trips/forms.py:747
+#: trips/forms.py:516 trips/forms.py:832
 msgid "Phone number can contain at most 2 spaces."
 msgstr ""
 
-#: trips/forms.py:434 trips/forms.py:435 trips/forms.py:750 trips/forms.py:751
-#: trips/forms.py:775 trips/forms.py:782
+#: trips/forms.py:519 trips/forms.py:520 trips/forms.py:835 trips/forms.py:836
+#: trips/forms.py:860 trips/forms.py:867
 msgid "Phone number"
 msgstr ""
 
-#: trips/forms.py:452
+#: trips/forms.py:537
 msgid "Start Time"
 msgstr ""
 
-#: trips/forms.py:505
+#: trips/forms.py:590
 msgid "Monday"
 msgstr ""
 
-#: trips/forms.py:506
+#: trips/forms.py:591
 msgid "Tuesday"
 msgstr ""
 
-#: trips/forms.py:507
+#: trips/forms.py:592
 msgid "Wednesday"
 msgstr ""
 
-#: trips/forms.py:508
+#: trips/forms.py:593
 msgid "Thursday"
 msgstr ""
 
-#: trips/forms.py:509
+#: trips/forms.py:594
 msgid "Friday"
 msgstr ""
 
-#: trips/forms.py:510
+#: trips/forms.py:595
 msgid "Saturday"
 msgstr ""
 
-#: trips/forms.py:511
+#: trips/forms.py:596
 msgid "Sunday"
 msgstr ""
 
-#: trips/forms.py:516 trips/forms.py:606
+#: trips/forms.py:601 trips/forms.py:691
 msgid "Closed"
 msgstr ""
 
-#: trips/forms.py:522
+#: trips/forms.py:607
 msgid "Open"
 msgstr ""
 
-#: trips/forms.py:595
+#: trips/forms.py:680
 msgid "Opening hours"
 msgstr ""
 
-#: trips/forms.py:718
+#: trips/forms.py:803
 msgid "Period of stay"
 msgstr ""
 
-#: trips/forms.py:779
+#: trips/forms.py:864
 msgid "Check-in"
 msgstr ""
 
-#: trips/forms.py:780
+#: trips/forms.py:865
 msgid "Check-out"
 msgstr ""
 
-#: trips/forms.py:781
+#: trips/forms.py:866
 msgid "Cancellation date"
 msgstr ""
 
@@ -730,155 +734,168 @@ msgstr ""
 msgid "Archived"
 msgstr ""
 
-#: trips/models.py:303
+#: trips/models.py:329
 msgid "Car"
 msgstr ""
 
-#: trips/models.py:304
+#: trips/models.py:330
 msgid "Plane"
 msgstr ""
 
-#: trips/models.py:305
+#: trips/models.py:331
 msgid "Train"
 msgstr ""
 
-#: trips/models.py:306
+#: trips/models.py:332
 msgid "Boat"
 msgstr ""
 
-#: trips/models.py:307
+#: trips/models.py:333
 msgid "Bus"
 msgstr ""
 
-#: trips/models.py:308
+#: trips/models.py:334
 msgid "Taxi"
 msgstr ""
 
-#: trips/models.py:309 trips/models.py:420
+#: trips/models.py:335 trips/models.py:446
 msgid "Other"
 msgstr ""
 
-#: trips/models.py:416
+#: trips/models.py:442
 msgid "Museum"
 msgstr ""
 
-#: trips/models.py:417
+#: trips/models.py:443
 msgid "Park"
 msgstr ""
 
-#: trips/models.py:418
+#: trips/models.py:444
 msgid "Walk"
 msgstr ""
 
-#: trips/models.py:419
+#: trips/models.py:445
 msgid "Sport"
 msgstr ""
 
-#: trips/models.py:435
+#: trips/models.py:461
 msgid "Breakfast"
 msgstr ""
 
-#: trips/models.py:436
+#: trips/models.py:462
 msgid "Lunch"
 msgstr ""
 
-#: trips/models.py:437
+#: trips/models.py:463
 msgid "Dinner"
 msgstr ""
 
-#: trips/models.py:438
+#: trips/models.py:464
 msgid "Snack"
 msgstr ""
 
-#: trips/views.py:233
+#: trips/views.py:292
 msgid "Transport added successfully"
 msgstr ""
 
-#: trips/views.py:256
+#: trips/views.py:315
 msgid "Experience added successfully"
 msgstr ""
 
-#: trips/views.py:279
+#: trips/views.py:338
 msgid "Meal added successfully"
 msgstr ""
 
-#: trips/views.py:301
+#: trips/views.py:360
 msgid "Stay added successfully"
 msgstr ""
 
-#: trips/views.py:386
+#: trips/views.py:445
 msgid "Stay deleted successfully"
 msgstr ""
 
-#: trips/views.py:420
+#: trips/views.py:479
 msgid "Event deleted successfully"
 msgstr ""
 
-#: trips/views.py:439
+#: trips/views.py:498
 msgid "Event unpaired successfully"
 msgstr ""
 
-#: trips/views.py:459
+#: trips/views.py:518
 msgid "Event paired successfully"
 msgstr ""
 
-#: trips/views.py:552
+#: trips/views.py:611
 msgid "Event times updated successfully"
 msgstr ""
 
-#: trips/views.py:585
+#: trips/views.py:644
 msgid "This event overlaps with another event"
 msgstr ""
 
-#: trips/views.py:606
+#: trips/views.py:665
 msgid "Events swapped successfully"
 msgstr ""
 
-#: trips/views.py:684
+#: trips/views.py:743
 msgid "Start date must be after today."
 msgstr ""
 
-#: trips/views.py:688
+#: trips/views.py:747
 msgid "Start date cannot be after end date."
 msgstr ""
 
-#: trips/views.py:848 trips/views.py:922
+#: trips/views.py:907 trips/views.py:981
 msgid "Note added successfully"
 msgstr ""
 
-#: trips/views.py:869 trips/views.py:948
+#: trips/views.py:928 trips/views.py:1007
 msgid "Note updated successfully"
 msgstr ""
 
-#: trips/views.py:888 trips/views.py:969
+#: trips/views.py:947 trips/views.py:1028
 msgid "Note deleted successfully"
 msgstr ""
 
-#: trips/views.py:993
+#: trips/views.py:1052
 msgid "Stay must have a name and an address to be enriched."
 msgstr ""
 
-#: trips/views.py:1001 trips/views.py:1213
+#: trips/views.py:1060 trips/views.py:1272
 msgid "Google Places API key is not configured."
 msgstr ""
 
-#: trips/views.py:1023 trips/views.py:1235
+#: trips/views.py:1082 trips/views.py:1294
 msgid "Could not find a matching place."
 msgstr ""
 
-#: trips/views.py:1026 trips/views.py:1057 trips/views.py:1238
-#: trips/views.py:1269
+#: trips/views.py:1085 trips/views.py:1116 trips/views.py:1297
+#: trips/views.py:1328
 msgid "Google Places API request timed out."
 msgstr ""
 
-#: trips/views.py:1143
+#: trips/views.py:1202
 msgid "Stay enriched successfully!"
 msgstr ""
 
-#: trips/views.py:1203
+#: trips/views.py:1262
 msgid "Event must have a name and an address to be enriched."
 msgstr ""
 
-#: trips/views.py:1327
+#: trips/views.py:1386
 msgid "Event enriched successfully!"
+msgstr ""
+
+#: trips/views.py:1404
+msgid "Please enter a destination first"
+msgstr ""
+
+#: trips/views.py:1414
+msgid "Unsplash API error. Please try again later."
+msgstr ""
+
+#: trips/views.py:1421
+#, python-brace-format
+msgid "No images found for '{query}'"
 msgstr ""

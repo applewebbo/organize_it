@@ -137,7 +137,7 @@
                                 <div class="flex items-center">
                                     <span>
                                         {% if trip.start_date and trip.end_date %}
-                                            {{ trip.start_date|date:"d/m/y" }}&nbsp;-&nbsp;{{ trip.end_date|date:"d/m/y" }}
+                                            {{ trip.start_date|date:"SHORT_DATE_FORMAT" }}&nbsp;-&nbsp;{{ trip.end_date|date:"SHORT_DATE_FORMAT" }}
                                         {% else %}
                                             - / -
                                         {% endif %}

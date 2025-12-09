@@ -23,10 +23,10 @@
                 <i class="ph-bold ph-map-pin i-md text-base-content/60"></i>{{ stay.address }}
             </li>
             <li class="flex gap-2 items-center">
-                <i class="ph-bold ph-sign-in i-md text-base-content/60"></i>{{ first_day.date|date:"d/m" }} {% trans 'from' %} {{ stay.check_in|time:"H:i" }}
+                <i class="ph-bold ph-sign-in i-md text-base-content/60"></i>{{ first_day.date|date:"SHORT_DATE_FORMAT" }} {% trans 'from' %} {{ stay.check_in|time:"H:i" }}
             </li>
             <li class="flex gap-2 items-center">
-                <i class="ph-bold ph-sign-out i-md text-base-content/60"></i>{{ last_day.date|date:"d/m" }} {% trans 'before' %} {{ stay.check_out|time:"H:i" }}
+                <i class="ph-bold ph-sign-out i-md text-base-content/60"></i>{{ last_day.date|date:"SHORT_DATE_FORMAT" }} {% trans 'before' %} {{ stay.check_out|time:"H:i" }}
             </li>
             {% if stay.website %}
                 <li class="flex gap-2 items-center">

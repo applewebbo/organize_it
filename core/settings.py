@@ -275,7 +275,9 @@ LOGGING = {
 }
 
 DATE_INPUT_FORMATS = [
-    "%m/%d/%Y",
+    "%d/%m/%Y",  # Italiano: 25/12/2009
+    "%m/%d/%Y",  # Inglese: 12/25/2009
+    "%Y-%m-%d",  # ISO: 2009-12-25
 ]
 
 GOOGLE_PLACES_API_KEY = env("GOOGLE_PLACES_API_KEY", default="")
