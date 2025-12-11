@@ -103,17 +103,49 @@
         <!-- Archived Trips Section -->
         {% if archived_trips %}
             <section class="my-5 mx-auto max-w-7xl">
-                <div class="mb-12 text-center shadow card bg-base-100">
-                    <div class="card-body">
-                        <h2 class="inline-block py-2 px-4 mb-4 text-2xl font-semibold rounded-lg">{% trans 'Archived Trips' %}</h2>
-                        <ul class="list-unstyled">
-                            {% for trip in archived_trips %}
-                                <li>
-                                    <a href="{% url 'trips:trip-detail' trip.id %}">{{ trip.title }}</a>
-                                </li>
-                            {% endfor %}
-                        </ul>
+                <div class="mb-6 shadow card bg-base-100">
+                    <div class="items-center text-center card-body md:text-start">
+                        <h2 class="inline-block py-2 px-4 text-2xl font-semibold rounded-lg">{% trans 'Archived Trips' %}</h2>
                     </div>
+                </div>
+                <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+                    {% for trip in archived_trips %}
+                        <div class="overflow-hidden shadow card card-side card-compact bg-base-100"
+                             id="archived-{{ trip.id }}">
+                            <figure class="w-20 shrink-0">
+                                {% if trip.get_image_url %}
+                                    <img src="{{ trip.get_image_url }}"
+                                         alt="{{ trip.title }}"
+                                         class="object-cover w-full h-full"
+                                         loading="lazy">
+                                {% else %}
+                                    <img src="{% static 'img/trip_generic.jpg' %}"
+                                         alt="{{ trip.title }}"
+                                         class="object-cover w-full h-full"
+                                         loading="lazy">
+                                {% endif %}
+                            </figure>
+                            <div class="card-body">
+                                <h3 class="text-sm font-semibold card-title">{{ trip.title }}</h3>
+                                <div class="text-xs text-base-content/70">
+                                    {% if trip.start_date and trip.end_date %}
+                                        {{ trip.start_date|date:"SHORT_DATE_FORMAT" }}&nbsp;-&nbsp;{{ trip.end_date|date:"SHORT_DATE_FORMAT" }}
+                                    {% else %}
+                                        - / -
+                                    {% endif %}
+                                </div>
+                                <div class="gap-1 justify-end card-actions">
+                                    <a href="{% url 'trips:trip-detail' trip.id %}"
+                                       class="btn btn-xs btn-primary btn-soft">{% trans 'View' %}</a>
+                                    <button class="btn btn-xs btn-error btn-soft"
+                                            hx-delete="{% url 'trips:trip-delete' trip.id %}"
+                                            hx-confirm="Are you sure you want to delete {{ trip.title }}?">
+                                        {% trans 'Delete' %}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
                 </div>
             </section>
         {% endif %}

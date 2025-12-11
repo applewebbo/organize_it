@@ -6,16 +6,21 @@
         </div>
         <div class="ms-2" x-data>
             <h2 class="{{ icon_color }} font-semibold text-base sm:text-lg">
+                {% if event.day.trip.status != 5 %}
                 <a class="link"
                    href="{% url 'trips:event-detail' event.pk %}"
                    hx-get="{% url 'trips:event-detail' event.pk %}"
                    @click="$dispatch('open-modal'); document.activeElement.blur()"
                    hx-target="#dialog"
                    hx-swap="innerHTML">{{ event.name }}</a>
+                {% else %}
+                {{ event.name }}
+                {% endif %}
             </h2>
             <div class="{{ icon_color }} flex items-center gap-x-2">{{ slot }}</div>
         </div>
     </div>
+    {% if event.day.trip.status != 5 %}
     <div class="flex absolute top-0 right-2 flex-col gap-1 justify-end mt-4 me-2"
          x-data>
         <button class="relative btn btn-xs btn-soft {{ border_color }} {{ bg_color }} dark:hover:bg-slate-900/10 hover:bg-white/50"
@@ -36,4 +41,5 @@
             <i class="ph-bold ph-arrows-down-up i-sm {{ icon_color }}" aria-hidden="true"></i>
         </button>
     </div>
+    {% endif %}
 </div>

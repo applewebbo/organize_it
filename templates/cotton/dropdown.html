@@ -1,4 +1,5 @@
 {% load i18n %}
+{% if day.trip.status != 5 %}
 <div class="dropdown dropdown-bottom dropdown-end" x-data>
     <div tabindex="0"
          role="button"
@@ -36,3 +37,4 @@
         </li>
     </ul>
 </div>
+{% endif %}

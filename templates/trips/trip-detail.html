@@ -12,6 +12,7 @@
                 <!-- Mobile: Title and Buttons -->
                 <h2 class="text-xl font-semibold tracking-tight sm:hidden">{{ trip.title }}</h2>
                 <div x-data class="flex gap-1.5 sm:hidden">
+                    {% if trip.status != 5 %}
                     <button class="btn btn-sm btn-soft"
                             hx-get="#"
                             hx-target="#dialog"
@@ -29,12 +30,14 @@
                             aria-label="{% trans 'Modify trip dates' %}">
                         <i class="ph-bold ph-calendar-blank i-md" aria-hidden="true"></i>
                     </button>
+                    {% endif %}
                 </div>
                 <!-- Desktop: Full Layout -->
                 <div class="hidden sm:flex sm:gap-2 sm:items-center sm:grow">
                     <h2 class="text-3xl font-semibold tracking-tight">{{ trip.title }}</h2>
                 </div>
                 <div x-data class="hidden gap-2 sm:flex">
+                    {% if trip.status != 5 %}
                     <button class="btn btn-md btn-soft"
                             hx-get="#"
                             hx-target="#dialog"
@@ -54,6 +57,7 @@
                         <i class="ph-bold ph-calendar-blank i-lg" aria-hidden="true"></i>
                         <span class="hidden sm:inline">{% trans 'Edit Dates' %}</span>
                     </button>
+                    {% endif %}
                 </div>
             </div>
             <!-- Center: Trip Image -->

@@ -9,10 +9,12 @@
         <div class="flex flex-col gap-y-3 items-center sm:flex-row">
             <h2 class="text-xl font-medium sm:text-2xl grow">{% trans 'Day' %} {{ day.number }} - {{ day.date|date:"j F" }}</h2>
             <div>
+                {% if day.trip.status != 5 %}
                 <button class="btn me-2 btn-md" disabled="disabled" aria-label="{% trans 'Edit day' %}">
                     <i class="ph-bold ph-pencil-simple i-lg" aria-hidden="true"></i>
                     <span class="hidden sm:inline">{% trans 'Edit day' %}</span>
                 </button>
+                {% endif %}
                 <button id="day-map-button-{{ day.pk }}"
                         hx-get="{% url 'trips:day-map' day.pk %}"
                         hx-target="#day-info-{{ day.pk }}"
@@ -29,6 +31,7 @@
                 <ul class="grid grid-cols-1 gap-y-2 gap-x-4 md:grid-cols-2">
                     {% if day.stay %}
                         <li class="flex relative items-center py-3 px-4 rounded-lg border border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-100/30">
+                            {% if day.trip.status != 5 %}
                             <div class="absolute right-1 bottom-2 mt-4 text-right sm:top-0 me-2" x-data>
                                 <button class="relative btn btn-xs btn-soft border-slate-300 bg-slate-100 dark:bg-slate-200/20 dark:border-slate-700 dark:hover:bg-slate-900/10 hover:bg-white/50"
                                         hx-get="{% url 'trips:stay-notes' day.stay.pk %}"
@@ -40,16 +43,21 @@
                                     <span class="absolute size-2.5 text-xs font-bold text-white {% if day.stay.notes %}bg-slate-400 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
                                 </button>
                             </div>
+                            {% endif %}
                             <div class="p-1.5 mt-1 bg-white rounded-md border-2 text-slate-500 border-slate-300 dark:text-slate-300 dark:bg-slate-700 dark:border-slate-700">
                                 <i class="text-xl ph-bold ph-bed align-sub" aria-hidden="true"></i>
                             </div>
                             <div class="ms-3">
-                                <h2 class="text-lg font-semibold link text-slate-500 dark:text-slate-200">
+                                <h2 class="text-lg font-semibold text-slate-500 dark:text-slate-200">
+                                    {% if day.trip.status != 5 %}
                                     <a hx-get="{% url 'trips:stay-detail' day.stay.pk %}"
                                     hx-target="#dialog"
                                     hx-swap="innerHTML"
                                     @click="$dispatch('open-modal'); document.activeElement.blur()"
                                     class="link">{{ day.stay.name }}</a>
+                                    {% else %}
+                                    {{ day.stay.name }}
+                                    {% endif %}
                                 </h2>
                                 {% if day|is_first_day_of_trip and day.stay.check_in %}
                                     <div class="stay-in">
@@ -70,6 +78,7 @@
                         {% with next_day=day|next_day %}
                             {% if next_day and next_day.stay and day|has_different_stay:next_day and next_day.stay.check_in %}
                                 <li class="flex relative items-center py-3 px-4 rounded-lg border border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-100/30">
+                                    {% if day.trip.status != 5 %}
                                     <div class="absolute right-1 bottom-2 mt-4 text-right sm:top-0 me-2" x-data>
                                         <button class="relative btn btn-xs btn-soft border-slate-300 bg-slate-100 dark:bg-slate-200/20 dark:border-slate-700 dark:hover:bg-slate-900/10 hover:bg-white/50"
                                                 hx-get="{% url 'trips:stay-notes' next_day.stay.pk %}"
@@ -81,16 +90,21 @@
                                             <span class="absolute size-2.5 text-xs font-bold text-white {% if next_day.stay.notes %}bg-slate-400 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
                                         </button>
                                     </div>
+                                    {% endif %}
                                     <div class="p-1.5 bg-white rounded-md border-2 text-slate-500 border-slate-300 dark:text-slate-300 dark:bg-slate-700 dark:border-slate-700">
                                         <i class="text-xl ph-bold ph-bed align-sub" aria-hidden="true"></i>
                                     </div>
                                     <div class="ms-3">
-                                        <h2 class="text-lg font-semibold link text-slate-500 dark:text-slate-200">
+                                        <h2 class="text-lg font-semibold text-slate-500 dark:text-slate-200">
+                                            {% if day.trip.status != 5 %}
                                             <a hx-get="{% url 'trips:stay-detail' next_day.stay.pk %}"
                                             hx-target="#dialog"
                                             hx-swap="innerHTML"
                                             @click="$dispatch('open-modal'); document.activeElement.blur()"
                                             class="link">{{ next_day.stay.name }}</a>
+                                            {% else %}
+                                            {{ next_day.stay.name }}
+                                            {% endif %}
                                         </h2>
                                         <div class="stay-in">
                                             <i class="ph-bold ph-info me-1.5"></i>
@@ -119,6 +133,7 @@
                         {% if event.has_overlap %}
                             <div class="px-1 font-semibold rounded-sm me-1.5 text-error bg-slate-50 dark:bg-slate-700">!!</div>
                         {% endif %}
+                        {% if day.trip.status != 5 %}
                         <a href="#"
                            class="flex items-center"
                            x-data="{ showIcon: false }"
@@ -131,6 +146,9 @@
                             {{ event.start_time|time:"H:i" }}&nbsp;-&nbsp;{{ event.end_time|time:"H:i" }}
                             <i x-show="showIcon" class="ph-bold ph-pencil-simple ms-2 align-sub"></i>
                         </a>
+                        {% else %}
+                        <span>{{ event.start_time|time:"H:i" }}&nbsp;-&nbsp;{{ event.end_time|time:"H:i" }}</span>
+                        {% endif %}
                     </div>
                     </c-event>
                 </li>

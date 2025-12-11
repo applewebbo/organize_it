@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-09 07:56+0100\n"
+"POT-Creation-Date: 2025-12-11 07:59+0100\n"
 "PO-Revision-Date: 2025-12-09 07:55+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -48,11 +48,11 @@ msgstr "indirizzo email"
 msgid "Settings modified succesfully"
 msgstr "Impostazioni salvate"
 
-#: core/settings.py:233
+#: core/settings.py:228
 msgid "Italian"
 msgstr "Italiano"
 
-#: core/settings.py:234
+#: core/settings.py:229
 msgid "English"
 msgstr "Inglese"
 
@@ -319,7 +319,7 @@ msgstr "Altri Viaggi"
 
 #: templates/includes/auth-index.html:149 templates/trips/event-detail.html:71
 #: templates/trips/includes/note.html:8 templates/trips/stay-detail.html:88
-#: templates/trips/trip-list.html:78
+#: templates/trips/trip-list.html:72
 msgid "Edit"
 msgstr "Modifica"
 
@@ -373,7 +373,7 @@ msgstr "Arricchisci"
 
 #: templates/trips/event-detail.html:79 templates/trips/includes/note.html:12
 #: templates/trips/stay-detail.html:96 templates/trips/stay-note-modify.html:30
-#: templates/trips/trip-list.html:75
+#: templates/trips/trip-list.html:69 templates/trips/trip-list.html:143
 msgid "Delete"
 msgstr "Elimina"
 
@@ -556,21 +556,25 @@ msgstr "Lista dei Viaggi"
 msgid "My Trips"
 msgstr "Viaggi Personali"
 
-#: templates/trips/trip-list.html:65
+#: templates/trips/trip-list.html:59
 msgid "Modify Dates"
 msgstr "Modifica date"
 
-#: templates/trips/trip-list.html:71
+#: templates/trips/trip-list.html:65
 msgid "Archive"
 msgstr "Archivia"
 
-#: templates/trips/trip-list.html:92
+#: templates/trips/trip-list.html:85 templates/trips/trip-list.html:98
 msgid "Create a new trip"
 msgstr "Crea un nuovo viaggio"
 
-#: templates/trips/trip-list.html:105
+#: templates/trips/trip-list.html:108
 msgid "Archived Trips"
 msgstr "Viaggi Archiviati"
+
+#: templates/trips/trip-list.html:139
+msgid "View"
+msgstr "Vedi"
 
 #: trips/forms.py:28
 msgid "Title"
@@ -963,9 +967,6 @@ msgstr ""
 
 #~ msgid "Profile Page"
 #~ msgstr "Profilo"
-
-#~ msgid "View"
-#~ msgstr "Vedi"
 
 #, fuzzy
 #~| msgid "Add event"
