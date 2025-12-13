@@ -479,6 +479,26 @@ class TripArchiveView(TestCase):
         assert Trip.objects.filter(author=user, status=5).count() == 1
 
 
+class TripUnarchiveView(TestCase):
+    def test_unarchive(self):
+        user = self.make_user("user")
+        trip = TripFactory(
+            author=user,
+            status=5,
+            start_date=date.today() - timedelta(days=10),
+            end_date=date.today() - timedelta(days=5),
+        )
+
+        with self.login(user):
+            response = self.post("trips:trip-unarchive", pk=trip.pk)
+
+        self.response_204(response)
+        message = list(get_messages(response.wsgi_request))[0].message
+        assert message == f"<strong>{trip.title}</strong> unarchived successfully"
+        trip.refresh_from_db()
+        assert trip.status == Trip.Status.COMPLETED
+
+
 class TripDatesUpdateView(TestCase):
     def test_get(self):
         user = self.make_user("user")

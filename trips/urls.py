@@ -17,6 +17,7 @@ htmx_urlpatterns = [
     path("trips/<int:pk>/delete", views.trip_delete, name="trip-delete"),
     path("trips/<int:pk>/update", views.trip_update, name="trip-update"),
     path("trips/<int:pk>/archive", views.trip_archive, name="trip-archive"),
+    path("trips/<int:pk>/unarchive", views.trip_unarchive, name="trip-unarchive"),
     path("trips/<int:pk>/dates", views.trip_dates_update, name="trip-dates"),
     path("transports/<int:day_id>/create", views.add_transport, name="add-transport"),
     path(

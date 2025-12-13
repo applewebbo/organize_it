@@ -251,6 +251,22 @@ def trip_archive(request, pk):
 
 
 @login_required
+def trip_unarchive(request, pk):
+    trip = get_object_or_404(Trip, pk=pk, author=request.user)
+    trip.status = Trip.Status.NOT_STARTED
+    trip.save()
+    messages.add_message(
+        request,
+        messages.SUCCESS,
+        f"<strong>{trip.title}</strong> unarchived successfully",
+    )
+    return HttpResponse(
+        status=204,
+        headers={"HX-Trigger": "tripSaved"},
+    )
+
+
+@login_required
 def trip_dates_update(request, pk):
     """
     Update the start and end dates of a trip.

@@ -135,18 +135,22 @@
                                     {% endif %}
                                 </div>
                                 <div class="gap-1 justify-end card-actions">
-                                    <a href="{% url 'trips:trip-detail' trip.id %}"
-                                       class="btn btn-xs btn-primary btn-soft">{% trans 'View' %}</a>
+                                    <button class="btn btn-xs btn-warning btn-soft"
+                                            hx-get="{% url 'trips:trip-unarchive' trip.id %}"
+                                            hx-target="">{% trans 'Unarchive' %}</button>
                                     <button class="btn btn-xs btn-error btn-soft"
                                             hx-delete="{% url 'trips:trip-delete' trip.id %}"
                                             hx-confirm="Are you sure you want to delete {{ trip.title }}?">
                                         {% trans 'Delete' %}
                                     </button>
+                                    <a href="{% url 'trips:trip-detail' trip.id %}"
+                                       class="btn btn-xs btn-primary btn-soft">{% trans 'View' %}</a>
                                 </div>
                             </div>
                         </div>
                     {% endfor %}
                 </div>
+
             </section>
         {% endif %}
     </div>
