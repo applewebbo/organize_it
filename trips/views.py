@@ -157,7 +157,8 @@ def trip_create(request):
             messages.add_message(
                 request,
                 messages.SUCCESS,
-                f"<strong>{trip.title}</strong> added successfully",
+                _("<strong>%(title)s</strong> added successfully")
+                % {"title": trip.title},
             )
             return HttpResponse(status=204, headers={"HX-Trigger": "tripSaved"})
         context = {"form": form}
@@ -176,7 +177,7 @@ def trip_delete(request, pk):
     messages.add_message(
         request,
         messages.ERROR,
-        f"<strong>{trip.title}</strong> deleted successfully",
+        _("<strong>%(title)s</strong> deleted successfully") % {"title": trip.title},
     )
     return HttpResponse(
         status=204,
@@ -223,7 +224,8 @@ def trip_update(request, pk):
             messages.add_message(
                 request,
                 messages.SUCCESS,
-                f"<strong>{trip.title}</strong> updated successfully",
+                _("<strong>%(title)s</strong> updated successfully")
+                % {"title": trip.title},
             )
             return HttpResponse(status=204, headers={"HX-Trigger": "tripSaved"})
         context = {"form": form}
@@ -242,7 +244,7 @@ def trip_archive(request, pk):
     messages.add_message(
         request,
         messages.SUCCESS,
-        f"<strong>{trip.title}</strong> archived successfully",
+        _("<strong>%(title)s</strong> archived successfully") % {"title": trip.title},
     )
     return HttpResponse(
         status=204,
@@ -258,11 +260,11 @@ def trip_unarchive(request, pk):
     messages.add_message(
         request,
         messages.SUCCESS,
-        f"<strong>{trip.title}</strong> unarchived successfully",
+        _("<strong>%(title)s</strong> unarchived successfully") % {"title": trip.title},
     )
     return HttpResponse(
         status=204,
-        headers={"HX-Trigger": "tripSaved"},
+        headers={"HX-Trigger": "tripSaved", "HX-Refresh": "true"},
     )
 
 
@@ -280,7 +282,7 @@ def trip_dates_update(request, pk):
         messages.add_message(
             request,
             messages.SUCCESS,
-            "Dates updated successfully",
+            _("Dates updated successfully"),
         )
         return HttpResponse(
             status=204,

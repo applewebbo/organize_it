@@ -4,6 +4,21 @@
     {{ trip.title }}
 {% endblock page_title %}
 {% block content %}
+    <!-- Archived Trip Alert -->
+    {% if trip.status == 5 %}
+        <div class="mb-6 alert alert-warning alert-soft alert-vertical sm:alert-horizontal" role="alert">
+            <i class="ph-bold ph-warning i-md"></i>
+            <span>{% trans "This trip is archived and cannot be modified." %}</span>
+            <div>
+                <button class="btn btn-sm btn-warning"
+                        hx-get="{% url 'trips:trip-unarchive' trip.id %}"
+                        hx-target="">
+                    {% trans 'Unarchive' %}
+                </button>
+            </div>
+        </div>
+    {% endif %}
+    <!-- END Archived Trip Alert -->
     <!-- Trip Header with Image Section -->
     <section id="details" class="mb-8">
         <div class="overflow-hidden shadow card card-border bg-base-100">
