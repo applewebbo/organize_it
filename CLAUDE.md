@@ -52,17 +52,18 @@ git push origin main
 
 ## Project Overview
 
-Organize It is a Django-based web application for organizing trips and travel plans. Built with Django 5.1+, TailwindCSS (with DaisyUI), HTMX, and Alpine.js, it provides a modern, reactive user experience without heavy frontend frameworks.
+Organize It is a Django-based web application for organizing trips and travel plans. Built with Django 6.0+, TailwindCSS (with DaisyUI), HTMX, and Alpine.js, it provides a modern, reactive user experience without heavy frontend frameworks.
 
 ## Tech Stack
 
-- **Backend**: Django 5.1+, Python 3.13+
+- **Backend**: Django 6.0+, Python 3.14+
 - **Database**: SQLite (dev), PostgreSQL (production)
 - **Frontend**: TailwindCSS with DaisyUI, HTMX, Alpine.js
-- **Template System**: Django templates with django-cotton components and template-partials
+- **Template System**: Django templates with django-cotton components
 - **Auth**: django-allauth (email-based, no username)
 - **Task Queue**: django-q2 for background tasks
 - **Maps**: Mapbox for geocoding, Folium for map rendering
+- **Images**: Pillow for image processing, Unsplash API for photo search
 - **Package Manager**: uv (not pip)
 
 ## Development Commands
@@ -101,6 +102,7 @@ The app has two main Django apps: `accounts` and `trips`.
 
 **Core Entity Relationships:**
 - `Trip` (1) → (many) `Day` - A trip contains multiple days
+- `Trip` (many) → (many) `Link` - A trip can have multiple links (URLs)
 - `Day` (1) → (many) `Event` - Each day can have multiple events
 - `Day` (1) → (0-1) `Stay` - Each day can have one stay (hotel, etc.)
 - `Event` is a polymorphic parent model with three child types:
@@ -111,6 +113,7 @@ The app has two main Django apps: `accounts` and `trips`.
 
 **Key Model Behaviors:**
 - Trip status auto-updates based on dates (NOT_STARTED → IMPENDING → IN_PROGRESS → COMPLETED → ARCHIVED)
+- Trip images can be uploaded directly or searched/downloaded from Unsplash with attribution tracking
 - Days auto-generate/update when trip dates change via `update_trip_days` signal (trips/models.py:63)
 - Events can be "unpaired" (day=None) and later paired to days
 - Stays can span multiple consecutive days
@@ -121,8 +124,7 @@ The app has two main Django apps: `accounts` and `trips`.
 
 **All views are function-based** (FBV preferred over CBV per coding guidelines). Most views use HTMX for interactivity:
 
-- HTMX views check `request.htmx` and return partials (template fragments using `#fragment` syntax)
-- Template partials use django-template-partials package
+- HTMX views check `request.htmx` and return template fragments using `#fragment` syntax
 - Most mutations return `HttpResponse(status=204, headers={"HX-Trigger": "..."})`
 - Uses `get_object_or_404` for safety and `@login_required` for auth
 
@@ -145,7 +147,7 @@ Forms use crispy-forms with crispy-tailwind template pack. Two geocoding approac
 - Cotton components: `templates/cotton/` (reusable UI components)
 - App templates: `templates/trips/` (trip-specific views)
 - Template inheritance uses django-cotton for component composition
-- Partials system allows fragment rendering for HTMX swaps
+- Template fragments (using `#fragment` syntax) allow partial rendering for HTMX swaps
 
 ### Background Tasks
 
@@ -209,12 +211,14 @@ Required in `.env`:
 - `ENVIRONMENT` - "dev", "prod", or "test"
 - `MAPBOX_ACCESS_TOKEN` - For geocoding
 - `GOOGLE_PLACES_API_KEY` - For enriching events/stays (optional)
+- `UNSPLASH_ACCESS_KEY` - For Unsplash photo search/download (optional)
 
 Production-specific:
 - Database config: `SQL_ENGINE`, `SQL_DATABASE`, `SQL_USER`, `SQL_PASSWORD`, `SQL_HOST`, `SQL_PORT`
 - Mailgun: `MAILGUN_API_KEY`, `MAILGUN_API_URL`, `MAILGUN_SENDER_DOMAIN`
 - Redis: `REDIS_HOST`, `REDIS_PORT`, `REDIS_DB`, `REDIS_PASSWORD`
 - Django-Q2 workers: `Q_CLUSTER_WORKERS`, `Q_CLUSTER_TIMEOUT`, `Q_CLUSTER_RETRY`, `Q_CLUSTER_MAX_ATTEMPTS`, `Q_CLUSTER_QUEUE_LIMIT`
+- Dropbox backup: `DROPBOX_APP_KEY`, `DROPBOX_APP_SECRET`, `DROPBOX_OAUTH2_ACCESS_TOKEN`, `DROPBOX_OAUTH2_REFRESH_TOKEN`
 
 ### Settings Structure
 
@@ -272,6 +276,16 @@ Events and Stays can be "enriched" with additional data from Google Places API:
 - Requires `GOOGLE_PLACES_API_KEY` environment variable
 - Sets `enriched=True` flag and populates `opening_hours` JSON field
 
+## Unsplash Integration
+
+Trip cover images can be searched and downloaded from Unsplash:
+- **Search**: `search_unsplash_photos()` (trips/utils.py) - Search Unsplash photos with caching
+- **Download**: `download_unsplash_photo()` (trips/utils.py) - Download photo and trigger tracking endpoint (TOS requirement)
+- **Attribution**: Trip model tracks image metadata for Unsplash attribution requirements
+- **Views**: Integrated into trip create/edit forms with HTMX search endpoint
+- Requires `UNSPLASH_ACCESS_KEY` environment variable
+- Images are processed with Pillow for optimization before storage
+
 ## Common Patterns
 
 ### HTMX Response Pattern
@@ -303,6 +317,7 @@ event = get_event_instance(event)  # Returns Transport/Experience/Meal instance
 - Never use `pip` - always use `uv` for package management
 - Tests must achieve 100% coverage (see pyproject.toml)
 - Use `just` for all commands (see justfile)
-- Template fragments use `#fragment` syntax for partials
+- Template fragments use `#fragment` syntax for HTMX partial rendering
 - All location models geocode automatically on address change
 - Events can exist without a day (orphaned) for later scheduling
+- Trip images from Unsplash require proper attribution (automatically tracked via `image_metadata`)
