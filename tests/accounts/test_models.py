@@ -17,3 +17,32 @@ class TestCustomUser:
         assert hasattr(user, "profile")
         assert user.profile.__str__() == user.email
         assert user.profile.fav_trip is None
+
+
+class TestProfile:
+    def test_new_fields_default_values(self, user_factory):
+        """Test that new profile fields have correct default values"""
+        user = user_factory()
+        profile = user.profile
+
+        assert profile.first_name == ""
+        assert profile.last_name == ""
+        assert profile.city == ""
+        assert profile.avatar == ""
+
+    def test_update_personal_information(self, user_factory):
+        """Test updating profile personal information fields"""
+        user = user_factory()
+        profile = user.profile
+
+        profile.first_name = "John"
+        profile.last_name = "Doe"
+        profile.city = "Milan"
+        profile.avatar = "hiker.png"
+        profile.save()
+
+        profile.refresh_from_db()
+        assert profile.first_name == "John"
+        assert profile.last_name == "Doe"
+        assert profile.city == "Milan"
+        assert profile.avatar == "hiker.png"

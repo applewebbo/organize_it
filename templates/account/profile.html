@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load crispy_forms_tags i18n %}
+{% load i18n %}
 {% block page_title %}
     {% trans "Personal Settings" %}
 {% endblock page_title %}
@@ -10,7 +10,61 @@
         <div class="mx-auto max-w-2xl shadow card card-border bg-base-100">
             <form method="post" class="card-body">
                 {% csrf_token %}
-                {% crispy profile_form %}
+
+                <h2 class="mb-4 text-xl font-semibold">{% trans "Personal Information" %}</h2>
+
+                <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2">
+                    <div>
+                        <label for="{{ profile_form.first_name.id_for_label }}" class="block mb-2 font-medium">
+                            {{ profile_form.first_name.label }}
+                        </label>
+                        {{ profile_form.first_name }}
+                        {% if profile_form.first_name.errors %}
+                            <div class="mt-1 text-sm text-error">{{ profile_form.first_name.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ profile_form.last_name.id_for_label }}" class="block mb-2 font-medium">
+                            {{ profile_form.last_name.label }}
+                        </label>
+                        {{ profile_form.last_name }}
+                        {% if profile_form.last_name.errors %}
+                            <div class="mt-1 text-sm text-error">{{ profile_form.last_name.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="{{ profile_form.city.id_for_label }}" class="block mb-2 font-medium">
+                        {{ profile_form.city.label }}
+                    </label>
+                    {{ profile_form.city }}
+                    {% if profile_form.city.errors %}
+                        <div class="mt-1 text-sm text-error">{{ profile_form.city.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-6">
+                    <label class="block mb-3 font-medium">{{ profile_form.avatar.label }}</label>
+                    {{ profile_form.avatar }}
+                    {% if profile_form.avatar.errors %}
+                        <div class="mt-1 text-sm text-error">{{ profile_form.avatar.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <h2 class="mt-8 mb-4 text-xl font-semibold">{% trans "Trips" %}</h2>
+
+                <div class="mb-4">
+                    <label for="{{ profile_form.fav_trip.id_for_label }}" class="block mb-2 font-medium">
+                        {{ profile_form.fav_trip.label }}
+                    </label>
+                    {{ profile_form.fav_trip }}
+                    {% if profile_form.fav_trip.errors %}
+                        <div class="mt-1 text-sm text-error">{{ profile_form.fav_trip.errors }}</div>
+                    {% endif %}
+                </div>
+
                 <div class="flex justify-end mt-6">
                     <button type="submit" class="btn btn-sm btn-soft btn-primary">{% trans "Save" %}</button>
                 </div>

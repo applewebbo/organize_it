@@ -27,7 +27,7 @@ def profile(request):
                 _("Settings modified succesfully"),
             )
             return redirect(reverse("trips:home"))
-        form = ProfileUpdateForm(request.POST, instance=profile)
+        context["profile_form"] = form
         return TemplateResponse(request, "account/profile.html", context)
 
     return TemplateResponse(request, "account/profile.html", context)

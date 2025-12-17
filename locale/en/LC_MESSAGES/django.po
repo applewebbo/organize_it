@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-14 11:59+0100\n"
+"POT-Creation-Date: 2025-12-17 08:11+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,13 +18,26 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: accounts/forms.py:30
-msgid "Favourite trip"
+#: accounts/forms.py:30 accounts/models.py:47
+msgid "First name"
 msgstr ""
 
-#: accounts/forms.py:43 templates/includes/navbar.html:43
-#: templates/includes/navbar.html:66
-msgid "Trips"
+#: accounts/forms.py:31 accounts/models.py:53
+msgid "Last name"
+msgstr ""
+
+#: accounts/forms.py:32 accounts/models.py:59 trips/forms.py:318
+#: trips/forms.py:320 trips/forms.py:500 trips/forms.py:501 trips/forms.py:542
+#: trips/forms.py:816 trips/forms.py:817
+msgid "City"
+msgstr ""
+
+#: accounts/forms.py:33 accounts/models.py:65
+msgid "Avatar"
+msgstr ""
+
+#: accounts/forms.py:34
+msgid "Favourite trip"
 msgstr ""
 
 #: accounts/managers.py:16
@@ -172,7 +185,16 @@ msgstr ""
 msgid "Personal Settings"
 msgstr ""
 
-#: templates/account/profile.html:15 templates/trips/event-notes.html:30
+#: templates/account/profile.html:14
+msgid "Personal Information"
+msgstr ""
+
+#: templates/account/profile.html:56 templates/includes/navbar.html:43
+#: templates/includes/navbar.html:66
+msgid "Trips"
+msgstr ""
+
+#: templates/account/profile.html:69 templates/trips/event-notes.html:30
 #: templates/trips/experience-create.html:45
 #: templates/trips/note-modify.html:26 templates/trips/stay-create.html:28
 #: templates/trips/stay-modify.html:19 templates/trips/stay-note-modify.html:26
@@ -595,11 +617,6 @@ msgstr ""
 msgid "Destination not found"
 msgstr ""
 
-#: trips/forms.py:318 trips/forms.py:320 trips/forms.py:500 trips/forms.py:501
-#: trips/forms.py:542 trips/forms.py:816 trips/forms.py:817
-msgid "City"
-msgstr ""
-
 #: trips/forms.py:319 trips/forms.py:321 trips/forms.py:334 trips/forms.py:338
 #: trips/forms.py:536 trips/forms.py:544 trips/forms.py:856 trips/forms.py:869
 msgid "Address"
@@ -811,132 +828,132 @@ msgstr ""
 msgid "<strong>%(title)s</strong> added successfully"
 msgstr ""
 
-#: trips/views.py:179
+#: trips/views.py:180
 #, python-format
 msgid "<strong>%(title)s</strong> deleted successfully"
 msgstr ""
 
-#: trips/views.py:226
+#: trips/views.py:227
 #, python-format
 msgid "<strong>%(title)s</strong> updated successfully"
 msgstr ""
 
-#: trips/views.py:245
+#: trips/views.py:247
 #, python-format
 msgid "<strong>%(title)s</strong> archived successfully"
 msgstr ""
 
-#: trips/views.py:261
+#: trips/views.py:263
 #, python-format
 msgid "<strong>%(title)s</strong> unarchived successfully"
 msgstr ""
 
-#: trips/views.py:283
+#: trips/views.py:285
 msgid "Dates updated successfully"
 msgstr ""
 
-#: trips/views.py:308
+#: trips/views.py:310
 msgid "Transport added successfully"
 msgstr ""
 
-#: trips/views.py:331
+#: trips/views.py:333
 msgid "Experience added successfully"
 msgstr ""
 
-#: trips/views.py:354
+#: trips/views.py:356
 msgid "Meal added successfully"
 msgstr ""
 
-#: trips/views.py:376
+#: trips/views.py:378
 msgid "Stay added successfully"
 msgstr ""
 
-#: trips/views.py:461
+#: trips/views.py:463
 msgid "Stay deleted successfully"
 msgstr ""
 
-#: trips/views.py:495
+#: trips/views.py:497
 msgid "Event deleted successfully"
 msgstr ""
 
-#: trips/views.py:514
+#: trips/views.py:516
 msgid "Event unpaired successfully"
 msgstr ""
 
-#: trips/views.py:534
+#: trips/views.py:536
 msgid "Event paired successfully"
 msgstr ""
 
-#: trips/views.py:627
+#: trips/views.py:629
 msgid "Event times updated successfully"
 msgstr ""
 
-#: trips/views.py:660
+#: trips/views.py:662
 msgid "This event overlaps with another event"
 msgstr ""
 
-#: trips/views.py:681
+#: trips/views.py:683
 msgid "Events swapped successfully"
 msgstr ""
 
-#: trips/views.py:759
+#: trips/views.py:761
 msgid "Start date must be after today."
 msgstr ""
 
-#: trips/views.py:763
+#: trips/views.py:765
 msgid "Start date cannot be after end date."
 msgstr ""
 
-#: trips/views.py:923 trips/views.py:997
+#: trips/views.py:925 trips/views.py:999
 msgid "Note added successfully"
 msgstr ""
 
-#: trips/views.py:944 trips/views.py:1023
+#: trips/views.py:946 trips/views.py:1025
 msgid "Note updated successfully"
 msgstr ""
 
-#: trips/views.py:963 trips/views.py:1044
+#: trips/views.py:965 trips/views.py:1046
 msgid "Note deleted successfully"
 msgstr ""
 
-#: trips/views.py:1068
+#: trips/views.py:1070
 msgid "Stay must have a name and an address to be enriched."
 msgstr ""
 
-#: trips/views.py:1076 trips/views.py:1288
+#: trips/views.py:1078 trips/views.py:1290
 msgid "Google Places API key is not configured."
 msgstr ""
 
-#: trips/views.py:1098 trips/views.py:1310
+#: trips/views.py:1100 trips/views.py:1312
 msgid "Could not find a matching place."
 msgstr ""
 
-#: trips/views.py:1101 trips/views.py:1132 trips/views.py:1313
-#: trips/views.py:1344
+#: trips/views.py:1103 trips/views.py:1134 trips/views.py:1315
+#: trips/views.py:1346
 msgid "Google Places API request timed out."
 msgstr ""
 
-#: trips/views.py:1218
+#: trips/views.py:1220
 msgid "Stay enriched successfully!"
 msgstr ""
 
-#: trips/views.py:1278
+#: trips/views.py:1280
 msgid "Event must have a name and an address to be enriched."
 msgstr ""
 
-#: trips/views.py:1402
+#: trips/views.py:1404
 msgid "Event enriched successfully!"
 msgstr ""
 
-#: trips/views.py:1420
+#: trips/views.py:1422
 msgid "Please enter a destination first"
 msgstr ""
 
-#: trips/views.py:1430
+#: trips/views.py:1432
 msgid "Unsplash API error. Please try again later."
 msgstr ""
 
-#: trips/views.py:1437
+#: trips/views.py:1439
 #, python-brace-format
 msgid "No images found for '{query}'"
 msgstr ""

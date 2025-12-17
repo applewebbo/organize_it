@@ -812,7 +812,7 @@ requires-dist = [
     { name = "crispy-tailwind", specifier = ">=1.0.3" },
     { name = "croniter", specifier = ">=6.0.0" },
     { name = "dj-database-url", specifier = ">=2.2.0" },
-    { name = "django", specifier = ">=5.1.1" },
+    { name = "django", specifier = ">=6.0" },
     { name = "django-allauth", specifier = ">=64.2.1" },
     { name = "django-anymail", extras = ["mailgun"], specifier = ">=13.0" },
     { name = "django-browser-reload", specifier = ">=1.18.0" },

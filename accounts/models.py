@@ -23,12 +23,50 @@ class CustomUser(AbstractUser):
 class Profile(models.Model):
     """Profile holds user informations not related to auth"""
 
+    AVATAR_CHOICES = [
+        ("passport.png", "Passport"),
+        ("camping.png", "Camping"),
+        ("car.png", "Car"),
+        ("desert.png", "Desert"),
+        ("hiker.png", "Hiker"),
+        ("scuba-diving.png", "Scuba Diving"),
+        ("tourist.png", "Tourist"),
+        ("traveller.png", "Traveller"),
+    ]
+
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     fav_trip = models.OneToOneField(
         "trips.Trip",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
+    )
+
+    # Personal Information (Phase 1)
+    first_name = models.CharField(
+        _("First name"),
+        max_length=150,
+        blank=True,
+        default="",
+    )
+    last_name = models.CharField(
+        _("Last name"),
+        max_length=150,
+        blank=True,
+        default="",
+    )
+    city = models.CharField(
+        _("City"),
+        max_length=255,
+        blank=True,
+        default="",
+    )
+    avatar = models.CharField(
+        _("Avatar"),
+        max_length=50,
+        choices=AVATAR_CHOICES,
+        blank=True,
+        default="",
     )
 
     def __str__(self):
