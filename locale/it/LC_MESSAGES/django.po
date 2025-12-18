@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-17 08:11+0100\n"
-"PO-Revision-Date: 2025-12-17 08:13+0100\n"
+"POT-Creation-Date: 2025-12-18 08:04+0100\n"
+"PO-Revision-Date: 2025-12-18 08:05+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: it\n"
@@ -19,25 +19,29 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.8\n"
 
-#: accounts/forms.py:30 accounts/models.py:47
+#: accounts/forms.py:30 accounts/models.py:53
 msgid "First name"
 msgstr "Nome"
 
-#: accounts/forms.py:31 accounts/models.py:53
+#: accounts/forms.py:31 accounts/models.py:59
 msgid "Last name"
 msgstr "Cognome"
 
-#: accounts/forms.py:32 accounts/models.py:59 trips/forms.py:318
+#: accounts/forms.py:32 accounts/models.py:65 trips/forms.py:318
 #: trips/forms.py:320 trips/forms.py:500 trips/forms.py:501 trips/forms.py:542
 #: trips/forms.py:816 trips/forms.py:817
 msgid "City"
 msgstr "Città"
 
-#: accounts/forms.py:33 accounts/models.py:65
+#: accounts/forms.py:33 accounts/models.py:71
 msgid "Avatar"
 msgstr "Immagine profilo"
 
-#: accounts/forms.py:34
+#: accounts/forms.py:34 accounts/models.py:80
+msgid "Preferred currency"
+msgstr "Valuta preferita"
+
+#: accounts/forms.py:35
 msgid "Favourite trip"
 msgstr "Viaggio preferito"
 
@@ -210,12 +214,11 @@ msgstr "Impostazioni"
 msgid "Personal Information"
 msgstr "Informazioni Personali"
 
-#: templates/account/profile.html:56 templates/includes/navbar.html:43
-#: templates/includes/navbar.html:66
-msgid "Trips"
-msgstr "Viaggi"
+#: templates/account/profile.html:56
+msgid "Travel Preferences"
+msgstr "Preferenze di viaggio"
 
-#: templates/account/profile.html:69 templates/trips/event-notes.html:30
+#: templates/account/profile.html:81 templates/trips/event-notes.html:30
 #: templates/trips/experience-create.html:45
 #: templates/trips/note-modify.html:26 templates/trips/stay-create.html:28
 #: templates/trips/stay-modify.html:19 templates/trips/stay-note-modify.html:26
@@ -372,6 +375,10 @@ msgstr "Entra"
 #: templates/includes/navbar.html:28
 msgid "Open main menu"
 msgstr "Apri il menu principale"
+
+#: templates/includes/navbar.html:43 templates/includes/navbar.html:66
+msgid "Trips"
+msgstr "Viaggi"
 
 #: templates/includes/navbar.html:48
 msgid "Settings"
@@ -1009,9 +1016,6 @@ msgstr "Nessuna immagine trovata per '{query}'"
 
 #~ msgid "Edit Trip"
 #~ msgstr "Modifica viaggio"
-
-#~ msgid "Trip Preferences"
-#~ msgstr "Viaggi"
 
 #~ msgid "This is the profile page of"
 #~ msgstr "Questa è la pagina del profilo di"

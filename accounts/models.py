@@ -34,6 +34,12 @@ class Profile(models.Model):
         ("traveller.png", "Traveller"),
     ]
 
+    CURRENCY_CHOICES = [
+        ("EUR", "Euro (€)"),
+        ("USD", "US Dollar ($)"),
+        ("GBP", "Pound Sterling (£)"),
+    ]
+
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     fav_trip = models.OneToOneField(
         "trips.Trip",
@@ -67,6 +73,15 @@ class Profile(models.Model):
         choices=AVATAR_CHOICES,
         blank=True,
         default="",
+    )
+
+    # Travel Preferences (Phase 1)
+    currency = models.CharField(
+        _("Preferred currency"),
+        max_length=3,
+        choices=CURRENCY_CHOICES,
+        default="EUR",
+        blank=True,
     )
 
     def __str__(self):

@@ -91,6 +91,18 @@ class TestProfileView(TestCase):
         profile = Profile.objects.get(user=user)
         assert profile.avatar == "hiker.png"
 
+    def test_post_currency(self):
+        """Test updating currency preference"""
+        user = self.make_user("user")
+        data = {"currency": "USD"}
+
+        with self.login(user):
+            response = self.post("accounts:profile", data=data)
+
+        self.response_302(response)
+        profile = Profile.objects.get(user=user)
+        assert profile.currency == "USD"
+
     def test_post_all_fields(self):
         """Test updating all profile fields together"""
         user = self.make_user("user")
@@ -100,6 +112,7 @@ class TestProfileView(TestCase):
             "last_name": "Smith",
             "city": "Rome",
             "avatar": "tourist.png",
+            "currency": "GBP",
             "fav_trip": trip.pk,
         }
 
@@ -112,4 +125,5 @@ class TestProfileView(TestCase):
         assert profile.last_name == "Smith"
         assert profile.city == "Rome"
         assert profile.avatar == "tourist.png"
+        assert profile.currency == "GBP"
         assert profile.fav_trip == trip

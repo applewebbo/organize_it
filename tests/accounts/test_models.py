@@ -29,6 +29,7 @@ class TestProfile:
         assert profile.last_name == ""
         assert profile.city == ""
         assert profile.avatar == ""
+        assert profile.currency == "EUR"
 
     def test_update_personal_information(self, user_factory):
         """Test updating profile personal information fields"""
@@ -46,3 +47,23 @@ class TestProfile:
         assert profile.last_name == "Doe"
         assert profile.city == "Milan"
         assert profile.avatar == "hiker.png"
+
+    def test_currency_field_choices(self, user_factory):
+        """Test that currency field accepts valid choices"""
+        user = user_factory()
+        profile = user.profile
+
+        # Test EUR (default)
+        assert profile.currency == "EUR"
+
+        # Test USD
+        profile.currency = "USD"
+        profile.save()
+        profile.refresh_from_db()
+        assert profile.currency == "USD"
+
+        # Test GBP
+        profile.currency = "GBP"
+        profile.save()
+        profile.refresh_from_db()
+        assert profile.currency == "GBP"

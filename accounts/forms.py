@@ -25,12 +25,13 @@ class ProfileUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ("first_name", "last_name", "city", "avatar", "fav_trip")
+        fields = ("first_name", "last_name", "city", "avatar", "currency", "fav_trip")
         labels = {
             "first_name": _("First name"),
             "last_name": _("Last name"),
             "city": _("City"),
             "avatar": _("Avatar"),
+            "currency": _("Preferred currency"),
             "fav_trip": _("Favourite trip"),
         }
         widgets = {
@@ -42,6 +43,7 @@ class ProfileUpdateForm(forms.ModelForm):
             ),
             "city": forms.TextInput(attrs={"class": "input input-bordered w-full"}),
             "avatar": AvatarRadioSelect(),
+            "currency": forms.Select(attrs={"class": "select select-bordered w-full"}),
             "fav_trip": forms.Select(attrs={"class": "select select-bordered w-full"}),
         }
 

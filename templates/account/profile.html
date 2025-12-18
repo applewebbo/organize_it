@@ -53,16 +53,28 @@
                     {% endif %}
                 </div>
 
-                <h2 class="mt-8 mb-4 text-xl font-semibold">{% trans "Trips" %}</h2>
+                <h2 class="mt-8 mb-4 text-xl font-semibold">{% trans "Travel Preferences" %}</h2>
 
-                <div class="mb-4">
-                    <label for="{{ profile_form.fav_trip.id_for_label }}" class="block mb-2 font-medium">
-                        {{ profile_form.fav_trip.label }}
-                    </label>
-                    {{ profile_form.fav_trip }}
-                    {% if profile_form.fav_trip.errors %}
-                        <div class="mt-1 text-sm text-error">{{ profile_form.fav_trip.errors }}</div>
-                    {% endif %}
+                <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2">
+                    <div>
+                        <label for="{{ profile_form.fav_trip.id_for_label }}" class="block mb-2 font-medium">
+                            {{ profile_form.fav_trip.label }}
+                        </label>
+                        {{ profile_form.fav_trip }}
+                        {% if profile_form.fav_trip.errors %}
+                            <div class="mt-1 text-sm text-error">{{ profile_form.fav_trip.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ profile_form.currency.id_for_label }}" class="block mb-2 font-medium">
+                            {{ profile_form.currency.label }}
+                        </label>
+                        {{ profile_form.currency }}
+                        {% if profile_form.currency.errors %}
+                            <div class="mt-1 text-sm text-error">{{ profile_form.currency.errors }}</div>
+                        {% endif %}
+                    </div>
                 </div>
 
                 <div class="flex justify-end mt-6">
