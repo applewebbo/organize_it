@@ -103,6 +103,18 @@ class TestProfileView(TestCase):
         profile = Profile.objects.get(user=user)
         assert profile.currency == "USD"
 
+    def test_post_default_map_view(self):
+        """Test updating default map view preference"""
+        user = self.make_user("user")
+        data = {"default_map_view": "map"}
+
+        with self.login(user):
+            response = self.post("accounts:profile", data=data)
+
+        self.response_302(response)
+        profile = Profile.objects.get(user=user)
+        assert profile.default_map_view == "map"
+
     def test_post_all_fields(self):
         """Test updating all profile fields together"""
         user = self.make_user("user")
@@ -113,6 +125,7 @@ class TestProfileView(TestCase):
             "city": "Rome",
             "avatar": "tourist.png",
             "currency": "GBP",
+            "default_map_view": "map",
             "fav_trip": trip.pk,
         }
 
@@ -126,4 +139,5 @@ class TestProfileView(TestCase):
         assert profile.city == "Rome"
         assert profile.avatar == "tourist.png"
         assert profile.currency == "GBP"
+        assert profile.default_map_view == "map"
         assert profile.fav_trip == trip

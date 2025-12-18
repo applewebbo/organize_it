@@ -77,6 +77,16 @@
                     </div>
                 </div>
 
+                <div class="mb-4">
+                    <label for="{{ profile_form.default_map_view.id_for_label }}" class="block mb-2 font-medium">
+                        {{ profile_form.default_map_view.label }}
+                    </label>
+                    {{ profile_form.default_map_view }}
+                    {% if profile_form.default_map_view.errors %}
+                        <div class="mt-1 text-sm text-error">{{ profile_form.default_map_view.errors }}</div>
+                    {% endif %}
+                </div>
+
                 <div class="flex justify-end mt-6">
                     <button type="submit" class="btn btn-sm btn-soft btn-primary">{% trans "Save" %}</button>
                 </div>

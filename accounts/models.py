@@ -40,6 +40,11 @@ class Profile(models.Model):
         ("GBP", "Pound Sterling (£)"),
     ]
 
+    MAP_VIEW_CHOICES = [
+        ("list", "List"),
+        ("map", "Map"),
+    ]
+
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     fav_trip = models.OneToOneField(
         "trips.Trip",
@@ -81,6 +86,13 @@ class Profile(models.Model):
         max_length=3,
         choices=CURRENCY_CHOICES,
         default="EUR",
+        blank=True,
+    )
+    default_map_view = models.CharField(
+        _("Default map view"),
+        max_length=4,
+        choices=MAP_VIEW_CHOICES,
+        default="list",
         blank=True,
     )
 

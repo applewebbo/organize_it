@@ -18,8 +18,11 @@
                 <button id="day-map-button-{{ day.pk }}"
                         hx-get="{% url 'trips:day-map' day.pk %}"
                         hx-target="#day-info-{{ day.pk }}"
-                        hx-swap="outerHTML"
-                        class="btn me-2 btn-md">
+                        hx-swap="innerHTML"
+                        class="btn me-2 btn-md"
+                        {% if request.user.profile.default_map_view == 'map' %}
+                        x-init="$nextTick(() => $el.click())"
+                        {% endif %}>
                         <i class="ph-bold ph-map-trifold i-lg"></i>
                         <span class="hidden sm:inline">{% trans 'View map' %}</span>
                     </button>

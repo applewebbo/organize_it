@@ -30,6 +30,7 @@ class TestProfile:
         assert profile.city == ""
         assert profile.avatar == ""
         assert profile.currency == "EUR"
+        assert profile.default_map_view == "list"
 
     def test_update_personal_information(self, user_factory):
         """Test updating profile personal information fields"""
@@ -67,3 +68,17 @@ class TestProfile:
         profile.save()
         profile.refresh_from_db()
         assert profile.currency == "GBP"
+
+    def test_default_map_view_field_choices(self, user_factory):
+        """Test that default_map_view field accepts valid choices"""
+        user = user_factory()
+        profile = user.profile
+
+        # Test list (default)
+        assert profile.default_map_view == "list"
+
+        # Test map
+        profile.default_map_view = "map"
+        profile.save()
+        profile.refresh_from_db()
+        assert profile.default_map_view == "map"
