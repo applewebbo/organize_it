@@ -138,9 +138,13 @@ def day_detail(request, pk):
 
     day = get_object_or_404(qs, pk=pk, trip__author=request.user)
 
-    # Check user preference for default view
-    default_view = request.user.profile.default_map_view
-    show_map = default_view == "map"
+    # Check for forced view from query parameter, otherwise use user preference
+    force_view = request.GET.get("view")
+    if force_view in ["list", "map"]:
+        show_map = force_view == "map"
+    else:
+        default_view = request.user.profile.default_map_view
+        show_map = default_view == "map"
 
     context = {
         "day": day,

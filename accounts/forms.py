@@ -70,3 +70,4 @@ class ProfileUpdateForm(forms.ModelForm):
             author=self.instance.user
         )
         self.fields["trip_sort_preference"].empty_label = None
+        self.fields["default_map_view"].empty_label = None

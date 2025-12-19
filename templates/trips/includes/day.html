@@ -17,7 +17,7 @@
                 {% endif %}
                 {% if show_map %}
                 <button id="day-map-button-{{ day.pk }}"
-                        hx-get="{% url 'trips:day-detail' day.pk %}"
+                        hx-get="{% url 'trips:day-detail' day.pk %}?view=list"
                         hx-target="#day-{{ day.pk }}"
                         hx-swap="outerHTML"
                         class="btn me-2 btn-md">
@@ -26,9 +26,9 @@
                 </button>
                 {% else %}
                 <button id="day-map-button-{{ day.pk }}"
-                        hx-get="{% url 'trips:day-map' day.pk %}"
-                        hx-target="#day-info-{{ day.pk }}"
-                        hx-swap="innerHTML"
+                        hx-get="{% url 'trips:day-detail' day.pk %}?view=map"
+                        hx-target="#day-{{ day.pk }}"
+                        hx-swap="outerHTML"
                         class="btn me-2 btn-md">
                     <i class="ph-bold ph-map-trifold i-lg"></i>
                     <span class="hidden sm:inline">{% trans 'View map' %}</span>
@@ -37,9 +37,12 @@
                 <c-dropdown :day="day" />
             </div>
         </div>
-        <div id="day-info-{{ day.pk }}">
+        <div id="day-info-{{ day.pk }}"
+             {% if show_map and not map %}hx-get="{% url 'trips:day-detail' day.pk %}" hx-trigger="load" hx-target="#day-{{ day.pk }}" hx-swap="outerHTML"{% endif %}>
             {% if show_map %}
-                {% include 'trips/includes/day-map-content.html' %}
+                {% if map %}
+                    {% include 'trips/includes/day-map-content.html' %}
+                {% endif %}
             {% else %}
                 {% include 'trips/includes/day-list-content.html' %}
             {% endif %}

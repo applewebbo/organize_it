@@ -51,6 +51,10 @@ def get_trips(user):
     profile = Profile.objects.get(user=user)
     fav_trip = profile.fav_trip
 
+    # Check user preference for default view
+    default_view = profile.default_map_view
+    show_map = default_view == "map"
+
     # If there's a favorite trip, fetch it with full prefetch for detail view
     if fav_trip:
         fav_trip = (
@@ -110,6 +114,7 @@ def get_trips(user):
         "latest_trip": latest_trip,
         "other_trips": other_trips,
         "unpaired_events": unpaired_events,
+        "show_map": show_map,
     }
 
 

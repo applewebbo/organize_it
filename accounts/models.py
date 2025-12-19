@@ -100,7 +100,6 @@ class Profile(models.Model):
         max_length=4,
         choices=MAP_VIEW_CHOICES,
         default="list",
-        blank=True,
     )
     trip_sort_preference = models.CharField(
         _("Trip sorting"),
