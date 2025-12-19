@@ -112,9 +112,43 @@ def day_detail(request, pk):
 
     day = get_object_or_404(qs, pk=pk, trip__author=request.user)
 
+    # Check user preference for default view
+    default_view = request.user.profile.default_map_view
+    show_map = default_view == "map"
+
     context = {
         "day": day,
+        "show_map": show_map,
     }
+
+    # If map view is preferred, prepare map context
+    if show_map:
+        events = day.events.exclude(category=1)
+        stay = day.stay
+        next_day = day.next_day
+        prev_day = day.prev_day
+        next_day_stay = None
+        if next_day and next_day.stay and next_day.stay != stay:
+            next_day_stay = next_day.stay
+        is_last_day = not next_day
+        locations = {
+            "stay": stay,
+            "events": events,
+            "next_day_stay": next_day_stay,
+            "last_day": is_last_day,
+        }
+        if not (prev_day and prev_day.stay and prev_day.stay == stay):
+            locations["first_day"] = True
+
+        # Filter out events without latitude or longitude
+        events_with_location = events.filter(
+            latitude__isnull=False, longitude__isnull=False
+        )
+
+        map_obj = create_day_map(events_with_location, stay, next_day_stay)
+        context["map"] = map_obj
+        context["locations"] = locations
+
     return TemplateResponse(request, "trips/includes/day.html", context)
 
 
@@ -697,7 +731,9 @@ def single_event(request, pk):
     context = {
         "event": event,
     }
-    return TemplateResponse(request, "trips/includes/day.html#single_event", context)
+    return TemplateResponse(
+        request, "trips/includes/day-list-content.html#single_event", context
+    )
 
 
 @login_required

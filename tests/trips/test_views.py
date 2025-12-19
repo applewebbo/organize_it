@@ -353,6 +353,135 @@ class DayDetailView(TestCase):
         assert day.events.first() == event
         assert "day" in response.context
         assert response.context["day"] == day
+        assert "show_map" in response.context
+        assert response.context["show_map"] is False
+
+    def test_get_day_detail_with_map_preference(self):
+        """Test day detail respects user's map view preference"""
+        user = self.make_user("user")
+        user.profile.default_map_view = "map"
+        user.profile.save()
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        EventFactory(day=day, latitude=45.4773, longitude=9.1815)
+
+        with self.login(user):
+            response = self.get("trips:day-detail", pk=day.pk)
+
+        self.response_200(response)
+        assert response.context["show_map"] is True
+        assert "map" in response.context
+        assert "locations" in response.context
+
+    def test_get_day_detail_map_with_stay_spanning_days(self):
+        """Test day detail map view with stay spanning multiple days"""
+        user = self.make_user("user")
+        user.profile.default_map_view = "map"
+        user.profile.save()
+        trip = TripFactory(
+            author=user,
+            start_date=datetime.date.today(),
+            end_date=datetime.date.today() + datetime.timedelta(days=2),
+        )
+        stay = StayFactory(latitude=45.4773, longitude=9.1815)
+        day1 = trip.days.first()
+        day2 = trip.days.all()[1]
+        day1.stay = stay
+        day1.save()
+        day2.stay = stay
+        day2.save()
+        EventFactory(day=day2, trip=trip, latitude=45.4773, longitude=9.1815)
+
+        with self.login(user):
+            response = self.get("trips:day-detail", pk=day2.pk)
+
+        self.response_200(response)
+        assert response.context["show_map"] is True
+        assert "locations" in response.context
+        assert "first_day" not in response.context["locations"]
+
+    def test_get_day_detail_map_with_different_stays(self):
+        """Test day detail map view with different stays on consecutive days"""
+        user = self.make_user("user")
+        user.profile.default_map_view = "map"
+        user.profile.save()
+        trip = TripFactory(
+            author=user,
+            start_date=datetime.date.today(),
+            end_date=datetime.date.today() + datetime.timedelta(days=2),
+        )
+        stay1 = StayFactory(latitude=45.4773, longitude=9.1815)
+        stay2 = StayFactory(latitude=45.5, longitude=9.2)
+        day1 = trip.days.first()
+        day2 = trip.days.all()[1]
+        trip.days.all()[2]
+        day1.stay = stay1
+        day1.save()
+        day2.stay = stay2
+        day2.save()
+        EventFactory(day=day2, trip=trip, latitude=45.4773, longitude=9.1815)
+
+        with self.login(user):
+            response = self.get("trips:day-detail", pk=day2.pk)
+
+        self.response_200(response)
+        assert response.context["show_map"] is True
+        assert "locations" in response.context
+        assert "next_day_stay" in response.context["locations"]
+        # day3 has no stay, so next_day_stay should be None
+        assert response.context["locations"]["next_day_stay"] is None
+
+    def test_get_day_detail_map_without_next_day_stay(self):
+        """Test day detail map view when next day has no stay"""
+        user = self.make_user("user")
+        user.profile.default_map_view = "map"
+        user.profile.save()
+        trip = TripFactory(
+            author=user,
+            start_date=datetime.date.today(),
+            end_date=datetime.date.today() + datetime.timedelta(days=1),
+        )
+        stay = StayFactory(latitude=45.4773, longitude=9.1815)
+        day1 = trip.days.first()
+        day1.stay = stay
+        day1.save()
+        EventFactory(day=day1, trip=trip, latitude=45.4773, longitude=9.1815)
+
+        with self.login(user):
+            response = self.get("trips:day-detail", pk=day1.pk)
+
+        self.response_200(response)
+        assert response.context["show_map"] is True
+        assert "locations" in response.context
+        assert response.context["locations"]["next_day_stay"] is None
+
+    def test_get_day_detail_map_with_next_day_different_stay(self):
+        """Test day detail map view when next day has a different stay"""
+        user = self.make_user("user")
+        user.profile.default_map_view = "map"
+        user.profile.save()
+        trip = TripFactory(
+            author=user,
+            start_date=datetime.date.today(),
+            end_date=datetime.date.today() + datetime.timedelta(days=2),
+        )
+        stay1 = StayFactory(latitude=45.4773, longitude=9.1815)
+        stay2 = StayFactory(latitude=45.5, longitude=9.2)
+        day1 = trip.days.first()
+        day2 = trip.days.all()[1]
+        day1.stay = stay1
+        day1.save()
+        day2.stay = stay2
+        day2.save()
+        EventFactory(day=day1, trip=trip, latitude=45.4773, longitude=9.1815)
+
+        with self.login(user):
+            response = self.get("trips:day-detail", pk=day1.pk)
+
+        self.response_200(response)
+        assert response.context["show_map"] is True
+        assert "locations" in response.context
+        assert response.context["locations"]["next_day_stay"] == stay2
 
 
 class TripCreateView(TestCase):
