@@ -82,3 +82,36 @@ class TestProfile:
         profile.save()
         profile.refresh_from_db()
         assert profile.default_map_view == "map"
+
+    def test_trip_sort_preference_default_value(self, user_factory):
+        """Test that trip_sort_preference has correct default value"""
+        user = user_factory()
+        profile = user.profile
+
+        assert profile.trip_sort_preference == "date_asc"
+
+    def test_trip_sort_preference_field_choices(self, user_factory):
+        """Test that trip_sort_preference field accepts valid choices"""
+        user = user_factory()
+        profile = user.profile
+
+        # Test date_asc (default)
+        assert profile.trip_sort_preference == "date_asc"
+
+        # Test date_desc
+        profile.trip_sort_preference = "date_desc"
+        profile.save()
+        profile.refresh_from_db()
+        assert profile.trip_sort_preference == "date_desc"
+
+        # Test name_asc
+        profile.trip_sort_preference = "name_asc"
+        profile.save()
+        profile.refresh_from_db()
+        assert profile.trip_sort_preference == "name_asc"
+
+        # Test name_desc
+        profile.trip_sort_preference = "name_desc"
+        profile.save()
+        profile.refresh_from_db()
+        assert profile.trip_sort_preference == "name_desc"

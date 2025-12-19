@@ -42,7 +42,7 @@ class TestProfileView(TestCase):
     def test_post(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)
-        data = {"fav_trip": trip.pk}
+        data = {"fav_trip": trip.pk, "trip_sort_preference": "date_asc"}
 
         with self.login(user):
             response = self.post("accounts:profile", data=data)
@@ -68,6 +68,7 @@ class TestProfileView(TestCase):
             "first_name": "John",
             "last_name": "Doe",
             "city": "Milan",
+            "trip_sort_preference": "date_asc",
         }
 
         with self.login(user):
@@ -82,7 +83,7 @@ class TestProfileView(TestCase):
     def test_post_avatar(self):
         """Test selecting avatar"""
         user = self.make_user("user")
-        data = {"avatar": "hiker.png"}
+        data = {"avatar": "hiker.png", "trip_sort_preference": "date_asc"}
 
         with self.login(user):
             response = self.post("accounts:profile", data=data)
@@ -94,7 +95,7 @@ class TestProfileView(TestCase):
     def test_post_currency(self):
         """Test updating currency preference"""
         user = self.make_user("user")
-        data = {"currency": "USD"}
+        data = {"currency": "USD", "trip_sort_preference": "date_asc"}
 
         with self.login(user):
             response = self.post("accounts:profile", data=data)
@@ -106,7 +107,7 @@ class TestProfileView(TestCase):
     def test_post_default_map_view(self):
         """Test updating default map view preference"""
         user = self.make_user("user")
-        data = {"default_map_view": "map"}
+        data = {"default_map_view": "map", "trip_sort_preference": "date_asc"}
 
         with self.login(user):
             response = self.post("accounts:profile", data=data)
@@ -114,6 +115,18 @@ class TestProfileView(TestCase):
         self.response_302(response)
         profile = Profile.objects.get(user=user)
         assert profile.default_map_view == "map"
+
+    def test_post_trip_sort_preference(self):
+        """Test updating trip sort preference"""
+        user = self.make_user("user")
+        data = {"trip_sort_preference": "date_desc"}
+
+        with self.login(user):
+            response = self.post("accounts:profile", data=data)
+
+        self.response_302(response)
+        profile = Profile.objects.get(user=user)
+        assert profile.trip_sort_preference == "date_desc"
 
     def test_post_all_fields(self):
         """Test updating all profile fields together"""
@@ -126,6 +139,7 @@ class TestProfileView(TestCase):
             "avatar": "tourist.png",
             "currency": "GBP",
             "default_map_view": "map",
+            "trip_sort_preference": "name_asc",
             "fav_trip": trip.pk,
         }
 
@@ -140,4 +154,5 @@ class TestProfileView(TestCase):
         assert profile.avatar == "tourist.png"
         assert profile.currency == "GBP"
         assert profile.default_map_view == "map"
+        assert profile.trip_sort_preference == "name_asc"
         assert profile.fav_trip == trip

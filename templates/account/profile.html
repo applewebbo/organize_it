@@ -77,14 +77,26 @@
                     </div>
                 </div>
 
-                <div class="mb-4">
-                    <label for="{{ profile_form.default_map_view.id_for_label }}" class="block mb-2 font-medium">
-                        {{ profile_form.default_map_view.label }}
-                    </label>
-                    {{ profile_form.default_map_view }}
-                    {% if profile_form.default_map_view.errors %}
-                        <div class="mt-1 text-sm text-error">{{ profile_form.default_map_view.errors }}</div>
-                    {% endif %}
+                <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2">
+                    <div>
+                        <label for="{{ profile_form.default_map_view.id_for_label }}" class="block mb-2 font-medium">
+                            {{ profile_form.default_map_view.label }}
+                        </label>
+                        {{ profile_form.default_map_view }}
+                        {% if profile_form.default_map_view.errors %}
+                            <div class="mt-1 text-sm text-error">{{ profile_form.default_map_view.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ profile_form.trip_sort_preference.id_for_label }}" class="block mb-2 font-medium">
+                            {{ profile_form.trip_sort_preference.label }}
+                        </label>
+                        {{ profile_form.trip_sort_preference }}
+                        {% if profile_form.trip_sort_preference.errors %}
+                            <div class="mt-1 text-sm text-error">{{ profile_form.trip_sort_preference.errors }}</div>
+                        {% endif %}
+                    </div>
                 </div>
 
                 <div class="flex justify-end mt-6">

@@ -32,6 +32,7 @@ class ProfileUpdateForm(forms.ModelForm):
             "avatar",
             "currency",
             "default_map_view",
+            "trip_sort_preference",
             "fav_trip",
         )
         labels = {
@@ -40,7 +41,8 @@ class ProfileUpdateForm(forms.ModelForm):
             "city": _("City"),
             "avatar": _("Avatar"),
             "currency": _("Preferred currency"),
-            "default_map_view": _("Default map view"),
+            "default_map_view": _("Default event view"),
+            "trip_sort_preference": _("Sort trips by"),
             "fav_trip": _("Favourite trip"),
         }
         widgets = {
@@ -56,6 +58,9 @@ class ProfileUpdateForm(forms.ModelForm):
             "default_map_view": forms.Select(
                 attrs={"class": "select select-bordered w-full"}
             ),
+            "trip_sort_preference": forms.Select(
+                attrs={"class": "select select-bordered w-full"}
+            ),
             "fav_trip": forms.Select(attrs={"class": "select select-bordered w-full"}),
         }
 
@@ -64,3 +69,4 @@ class ProfileUpdateForm(forms.ModelForm):
         self.fields["fav_trip"].queryset = Trip.objects.filter(
             author=self.instance.user
         )
+        self.fields["trip_sort_preference"].empty_label = None

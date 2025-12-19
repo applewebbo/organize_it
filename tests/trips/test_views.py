@@ -188,6 +188,120 @@ class TripListView(TestCase):
         self.response_200(response)
         assert "trips/trip-list.html" not in [t.name for t in response.templates]
 
+    def test_trip_list_sorted_by_date_asc_default(self):
+        """Test trip list uses date_asc sorting by default"""
+        user = self.make_user("user")
+        trip1 = TripFactory(author=user, title="Alpha", start_date=date(2026, 3, 1))
+        trip2 = TripFactory(author=user, title="Beta", start_date=date(2026, 1, 1))
+        trip3 = TripFactory(author=user, title="Gamma", start_date=date(2026, 2, 1))
+
+        with self.login(user):
+            response = self.get("trips:trip-list")
+
+        self.response_200(response)
+        active_trips = list(response.context["active_trips"])
+        assert active_trips == [trip2, trip3, trip1]  # sorted by start_date asc
+
+    def test_trip_list_sorted_by_date_asc(self):
+        """Test trip list sorting by date ascending"""
+        user = self.make_user("user")
+        user.profile.trip_sort_preference = "date_asc"
+        user.profile.save()
+
+        trip1 = TripFactory(author=user, title="Alpha", start_date=date(2025, 3, 1))
+        trip2 = TripFactory(author=user, title="Beta", start_date=date(2025, 1, 1))
+        trip3 = TripFactory(author=user, title="Gamma", start_date=date(2025, 2, 1))
+
+        with self.login(user):
+            response = self.get("trips:trip-list")
+
+        self.response_200(response)
+        active_trips = list(response.context["active_trips"])
+        assert active_trips == [trip2, trip3, trip1]  # sorted by start_date asc
+
+    def test_trip_list_sorted_by_date_desc(self):
+        """Test trip list sorting by date descending"""
+        user = self.make_user("user")
+        user.profile.trip_sort_preference = "date_desc"
+        user.profile.save()
+
+        trip1 = TripFactory(author=user, title="Alpha", start_date=date(2025, 3, 1))
+        trip2 = TripFactory(author=user, title="Beta", start_date=date(2025, 1, 1))
+        trip3 = TripFactory(author=user, title="Gamma", start_date=date(2025, 2, 1))
+
+        with self.login(user):
+            response = self.get("trips:trip-list")
+
+        self.response_200(response)
+        active_trips = list(response.context["active_trips"])
+        assert active_trips == [trip1, trip3, trip2]  # sorted by start_date desc
+
+    def test_trip_list_sorted_by_name_asc(self):
+        """Test trip list sorting by name ascending"""
+        user = self.make_user("user")
+        user.profile.trip_sort_preference = "name_asc"
+        user.profile.save()
+
+        trip1 = TripFactory(author=user, title="Gamma Trip")
+        trip2 = TripFactory(author=user, title="Alpha Trip")
+        trip3 = TripFactory(author=user, title="Beta Trip")
+
+        with self.login(user):
+            response = self.get("trips:trip-list")
+
+        self.response_200(response)
+        active_trips = list(response.context["active_trips"])
+        assert active_trips == [trip2, trip3, trip1]  # sorted by title asc
+
+    def test_trip_list_sorted_by_name_desc(self):
+        """Test trip list sorting by name descending"""
+        user = self.make_user("user")
+        user.profile.trip_sort_preference = "name_desc"
+        user.profile.save()
+
+        trip1 = TripFactory(author=user, title="Gamma Trip")
+        trip2 = TripFactory(author=user, title="Alpha Trip")
+        trip3 = TripFactory(author=user, title="Beta Trip")
+
+        with self.login(user):
+            response = self.get("trips:trip-list")
+
+        self.response_200(response)
+        active_trips = list(response.context["active_trips"])
+        assert active_trips == [trip1, trip3, trip2]  # sorted by title desc
+
+    def test_trip_list_sorting_applies_to_archived(self):
+        """Test that sorting preference applies to archived trips too"""
+        user = self.make_user("user")
+        user.profile.trip_sort_preference = "name_asc"
+        user.profile.save()
+
+        archived1 = TripFactory(author=user, status=5, title="Zulu")
+        archived2 = TripFactory(author=user, status=5, title="Alpha")
+
+        with self.login(user):
+            response = self.get("trips:trip-list")
+
+        self.response_200(response)
+        archived_trips = list(response.context["archived_trips"])
+        assert archived_trips == [archived2, archived1]  # sorted by title asc
+
+    def test_trip_list_with_none_start_dates(self):
+        """Test trip list sorting handles None start_dates gracefully"""
+        user = self.make_user("user")
+        user.profile.trip_sort_preference = "date_asc"
+        user.profile.save()
+
+        TripFactory(author=user, title="Alpha", start_date=None)
+        TripFactory(author=user, title="Beta", start_date=date(2025, 1, 1))
+
+        with self.login(user):
+            response = self.get("trips:trip-list")
+
+        self.response_200(response)
+        # Should not crash, None dates sorted to end or beginning depending on DB
+        assert response.status_code == 200
+
 
 class TripDetailView(TestCase):
     """Test cases for trip detail view"""

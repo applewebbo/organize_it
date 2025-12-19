@@ -41,8 +41,15 @@ class Profile(models.Model):
     ]
 
     MAP_VIEW_CHOICES = [
-        ("list", "List"),
-        ("map", "Map"),
+        ("list", _("List")),
+        ("map", _("Map")),
+    ]
+
+    SORT_CHOICES = [
+        ("date_asc", _("Date (oldest first)")),
+        ("date_desc", _("Date (newest first)")),
+        ("name_asc", _("Name (A-Z)")),
+        ("name_desc", _("Name (Z-A)")),
     ]
 
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
@@ -94,6 +101,12 @@ class Profile(models.Model):
         choices=MAP_VIEW_CHOICES,
         default="list",
         blank=True,
+    )
+    trip_sort_preference = models.CharField(
+        _("Trip sorting"),
+        max_length=10,
+        choices=SORT_CHOICES,
+        default="date_asc",
     )
 
     def __str__(self):
