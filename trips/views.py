@@ -104,7 +104,15 @@ def trip_detail(request, pk):
     trip = get_object_or_404(qs, pk=pk, author=request.user)
     unpaired_events = trip.all_events.filter(day__isnull=True)
 
-    context = {"trip": trip, "unpaired_events": unpaired_events}
+    # Check user preference for default view
+    default_view = request.user.profile.default_map_view
+    show_map = default_view == "map"
+
+    context = {
+        "trip": trip,
+        "unpaired_events": unpaired_events,
+        "show_map": show_map,
+    }
     if request.htmx:
         template = "trips/trip-detail.html#days"
     else:
