@@ -6,4 +6,5 @@ app_name = "accounts"
 
 urlpatterns = [
     path("profile/", views.profile, name="profile"),
+    path("update-theme/", views.update_theme, name="update_theme"),
 ]

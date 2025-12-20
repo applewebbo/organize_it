@@ -33,6 +33,7 @@ class ProfileUpdateForm(forms.ModelForm):
             "currency",
             "default_map_view",
             "trip_sort_preference",
+            "use_system_theme",
             "fav_trip",
         )
         labels = {
@@ -43,6 +44,7 @@ class ProfileUpdateForm(forms.ModelForm):
             "currency": _("Preferred currency"),
             "default_map_view": _("Default event view"),
             "trip_sort_preference": _("Sort trips by"),
+            "use_system_theme": _("Use system theme"),
             "fav_trip": _("Favourite trip"),
         }
         widgets = {
@@ -61,6 +63,7 @@ class ProfileUpdateForm(forms.ModelForm):
             "trip_sort_preference": forms.Select(
                 attrs={"class": "select select-bordered w-full"}
             ),
+            "use_system_theme": forms.CheckboxInput(attrs={"class": "checkbox"}),
             "fav_trip": forms.Select(attrs={"class": "select select-bordered w-full"}),
         }
 

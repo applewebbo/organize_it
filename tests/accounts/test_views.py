@@ -42,7 +42,11 @@ class TestProfileView(TestCase):
     def test_post(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)
-        data = {"fav_trip": trip.pk, "trip_sort_preference": "date_asc"}
+        data = {
+            "fav_trip": trip.pk,
+            "trip_sort_preference": "date_asc",
+            "default_map_view": "list",
+        }
 
         with self.login(user):
             response = self.post("accounts:profile", data=data)
@@ -69,6 +73,7 @@ class TestProfileView(TestCase):
             "last_name": "Doe",
             "city": "Milan",
             "trip_sort_preference": "date_asc",
+            "default_map_view": "list",
         }
 
         with self.login(user):
@@ -83,7 +88,11 @@ class TestProfileView(TestCase):
     def test_post_avatar(self):
         """Test selecting avatar"""
         user = self.make_user("user")
-        data = {"avatar": "hiker.png", "trip_sort_preference": "date_asc"}
+        data = {
+            "avatar": "hiker.png",
+            "trip_sort_preference": "date_asc",
+            "default_map_view": "list",
+        }
 
         with self.login(user):
             response = self.post("accounts:profile", data=data)
@@ -95,7 +104,11 @@ class TestProfileView(TestCase):
     def test_post_currency(self):
         """Test updating currency preference"""
         user = self.make_user("user")
-        data = {"currency": "USD", "trip_sort_preference": "date_asc"}
+        data = {
+            "currency": "USD",
+            "trip_sort_preference": "date_asc",
+            "default_map_view": "list",
+        }
 
         with self.login(user):
             response = self.post("accounts:profile", data=data)
@@ -119,7 +132,10 @@ class TestProfileView(TestCase):
     def test_post_trip_sort_preference(self):
         """Test updating trip sort preference"""
         user = self.make_user("user")
-        data = {"trip_sort_preference": "date_desc"}
+        data = {
+            "trip_sort_preference": "date_desc",
+            "default_map_view": "list",
+        }
 
         with self.login(user):
             response = self.post("accounts:profile", data=data)
@@ -128,6 +144,40 @@ class TestProfileView(TestCase):
         profile = Profile.objects.get(user=user)
         assert profile.trip_sort_preference == "date_desc"
 
+    def test_post_use_system_theme(self):
+        """Test enabling use system theme"""
+        user = self.make_user("user")
+        data = {
+            "use_system_theme": True,
+            "trip_sort_preference": "date_asc",
+            "default_map_view": "list",
+        }
+
+        with self.login(user):
+            response = self.post("accounts:profile", data=data)
+
+        self.response_302(response)
+        profile = Profile.objects.get(user=user)
+        assert profile.use_system_theme is True
+
+
+class TestUpdateThemeView(TestCase):
+    def test_update_theme_endpoint(self):
+        """Test that update_theme endpoint exists and returns 204"""
+        user = self.make_user("user")
+
+        with self.login(user):
+            response = self.post("accounts:update_theme", data={})
+
+        self.assertEqual(response.status_code, 204)
+
+    def test_update_theme_unauthenticated(self):
+        """Test that unauthenticated users are redirected"""
+        self.post("accounts:update_theme", data={})
+        self.response_302()
+
+
+class TestProfileViewAllFields(TestCase):
     def test_post_all_fields(self):
         """Test updating all profile fields together"""
         user = self.make_user("user")
@@ -140,6 +190,7 @@ class TestProfileView(TestCase):
             "currency": "GBP",
             "default_map_view": "map",
             "trip_sort_preference": "name_asc",
+            "use_system_theme": True,
             "fav_trip": trip.pk,
         }
 
@@ -155,4 +206,5 @@ class TestProfileView(TestCase):
         assert profile.currency == "GBP"
         assert profile.default_map_view == "map"
         assert profile.trip_sort_preference == "name_asc"
+        assert profile.use_system_theme is True
         assert profile.fav_trip == trip

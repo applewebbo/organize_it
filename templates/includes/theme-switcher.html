@@ -1,10 +1,10 @@
 {% load i18n %}
-<div class="flex items-center" x-data="themeSwitcher()">
+<div class="flex items-center" x-data="themeSwitcher({{ user.profile.use_system_theme|yesno:'true,false' }})">
     <label class="swap swap-rotate">
         <input type="checkbox"
                class="theme-controller"
                x-model="isDark"
-               @change="applyTheme()" />
+               @change="toggleTheme()" />
 
         <!-- Sun icon for light mode -->
         <i class="ph-bold ph-sun swap-off i-sm"></i>
@@ -15,11 +15,34 @@
 </div>
 
 <script>
-function themeSwitcher() {
+function themeSwitcher(useSystemTheme) {
     return {
-        isDark: localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches),
+        useSystemTheme: useSystemTheme,
+        isDark: false,
 
         init() {
+            this.isDark = this.getInitialTheme() === 'dark';
+            this.applyTheme();
+        },
+
+        getInitialTheme() {
+            // If user wants to follow system preference
+            if (this.useSystemTheme) {
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+
+            // Otherwise check localStorage (manual selection)
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                return savedTheme;
+            }
+
+            // Default to system preference if nothing is set
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        },
+
+        toggleTheme() {
+            // Save to localStorage (works for both authenticated and non-authenticated users)
             this.applyTheme();
         },
 
@@ -33,9 +56,20 @@ function themeSwitcher() {
 
 // Apply theme on page load (before Alpine.js initializes)
 (function() {
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+    const useSystemTheme = {{ user.profile.use_system_theme|default:'false'|yesno:'true,false' }};
+
+    let theme;
+    if (useSystemTheme) {
+        theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    } else {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            theme = savedTheme;
+        } else {
+            theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+    }
+
     document.documentElement.setAttribute('data-theme', theme);
 })();
 </script>

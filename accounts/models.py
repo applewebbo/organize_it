@@ -108,6 +108,15 @@ class Profile(models.Model):
         default="date_asc",
     )
 
+    # Display Preferences (Phase 2)
+    use_system_theme = models.BooleanField(
+        _("Use system theme"),
+        default=False,
+        help_text=_(
+            "Follow your device's theme preference instead of manual selection"
+        ),
+    )
+
     def __str__(self):
         return str(self.user)
 

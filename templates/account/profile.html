@@ -77,6 +77,8 @@
                     </div>
                 </div>
 
+                <h2 class="mt-8 mb-4 text-xl font-semibold">{% trans "Display Preferences" %}</h2>
+
                 <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2">
                     <div>
                         <label for="{{ profile_form.default_map_view.id_for_label }}" class="block mb-2 font-medium">
@@ -97,6 +99,19 @@
                             <div class="mt-1 text-sm text-error">{{ profile_form.trip_sort_preference.errors }}</div>
                         {% endif %}
                     </div>
+                </div>
+
+                <div class="mb-4 form-control">
+                    <label class="gap-3 justify-start cursor-pointer label">
+                        {{ profile_form.use_system_theme }}
+                        <span class="label-text">
+                            {{ profile_form.use_system_theme.label }}
+                        </span>
+                    </label>
+                    {% if profile_form.use_system_theme.errors %}
+                        <div class="mt-1 text-sm text-error">{{ profile_form.use_system_theme.errors }}</div>
+                    {% endif %}
+                    <p class="mt-1 text-sm text-gray-500">{% trans "When enabled, the theme will follow your device settings. When disabled, use the theme switcher in the navbar to choose your preferred theme." %}</p>
                 </div>
 
                 <div class="flex justify-end mt-6">

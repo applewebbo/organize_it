@@ -487,6 +487,20 @@ class DayDetailView(TestCase):
         assert "map" in response.context
         assert "locations" in response.context
 
+    def test_get_day_detail_with_forced_view_parameter(self):
+        """Test day detail with ?view=map query parameter overrides user preference"""
+        user = self.make_user("user")
+        user.profile.default_map_view = "list"
+        user.profile.save()
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+
+        with self.login(user):
+            response = self.get("trips:day-detail", pk=day.pk, data={"view": "map"})
+
+        self.response_200(response)
+        assert response.context["show_map"] is True
+
     def test_get_day_detail_map_with_stay_spanning_days(self):
         """Test day detail map view with stay spanning multiple days"""
         user = self.make_user("user")
