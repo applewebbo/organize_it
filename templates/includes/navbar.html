@@ -8,7 +8,10 @@
                 <span class="hidden self-center text-lg font-semibold whitespace-nowrap sm:block sm:text-xl md:text-2xl dark:text-white">Organizeit!</span>
             </a>
             <div class="flex items-center space-x-3 md:order-2 md:space-x-0 rtl:space-x-reverse">
-                <div class="flex me-4">{% include 'includes/language-chooser.html' %}</div>
+                <div class="flex gap-4 me-4">
+                    {% include 'includes/theme-switcher.html' %}
+                    {% include 'includes/language-chooser.html' %}
+                </div>
                 {% if user.is_authenticated %}
                     <form action="{% url 'account_logout' %}" method="post">
                         {% csrf_token %}

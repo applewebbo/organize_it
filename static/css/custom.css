@@ -91,3 +91,9 @@ select ~ .pointer-events-none {
   background-image: url('/static/img/pattern_body.png');
   background-repeat: repeat;
   background-size: 215px 215px;
+  background-color: rgb(241 245 249); /* slate-100 */
+}
+
+[data-theme="dark"] .body-pattern {
+  background-color: rgb(51 65 85); /* slate-700 */
+}

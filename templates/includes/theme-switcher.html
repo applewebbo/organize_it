@@ -1,0 +1,41 @@
+{% load i18n %}
+<div class="flex items-center" x-data="themeSwitcher()">
+    <label class="swap swap-rotate">
+        <input type="checkbox"
+               class="theme-controller"
+               x-model="isDark"
+               @change="applyTheme()" />
+
+        <!-- Sun icon for light mode -->
+        <i class="ph-bold ph-sun swap-off i-sm"></i>
+
+        <!-- Moon icon for dark mode -->
+        <i class="ph-bold ph-moon swap-on i-sm"></i>
+    </label>
+</div>
+
+<script>
+function themeSwitcher() {
+    return {
+        isDark: localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches),
+
+        init() {
+            this.applyTheme();
+        },
+
+        applyTheme() {
+            const theme = this.isDark ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        }
+    }
+}
+
+// Apply theme on page load (before Alpine.js initializes)
+(function() {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
