@@ -9,7 +9,9 @@
             </a>
             <div class="flex items-center space-x-3 md:order-2 md:space-x-0 rtl:space-x-reverse">
                 <div class="flex gap-4 me-4">
-                    {% include 'includes/theme-switcher.html' %}
+                    {% if not user.is_authenticated or not user.profile.use_system_theme %}
+                        {% include 'includes/theme-switcher.html' %}
+                    {% endif %}
                     {% include 'includes/language-chooser.html' %}
                 </div>
                 {% if user.is_authenticated %}

@@ -177,6 +177,42 @@ class TestUpdateThemeView(TestCase):
         self.response_302()
 
 
+class TestThemeSwitcherVisibility(TestCase):
+    def test_theme_switcher_visible_when_not_using_system_theme(self):
+        """Test that theme switcher is visible when use_system_theme is False"""
+        user = self.make_user("user")
+        user.profile.use_system_theme = False
+        user.profile.save()
+
+        with self.login(user):
+            response = self.get("trips:home")
+
+        self.response_200()
+        content = response.content.decode()
+        assert "theme-switcher.html" in content or "themeSwitcher" in content
+
+    def test_theme_switcher_hidden_when_using_system_theme(self):
+        """Test that theme switcher is hidden when use_system_theme is True"""
+        user = self.make_user("user")
+        user.profile.use_system_theme = True
+        user.profile.save()
+
+        with self.login(user):
+            response = self.get("trips:home")
+
+        self.response_200()
+        content = response.content.decode()
+        assert "themeSwitcher" not in content
+
+    def test_theme_switcher_visible_for_unauthenticated_users(self):
+        """Test that theme switcher is visible for unauthenticated users"""
+        response = self.get("trips:home")
+
+        self.response_200()
+        content = response.content.decode()
+        assert "themeSwitcher" in content
+
+
 class TestProfileViewAllFields(TestCase):
     def test_post_all_fields(self):
         """Test updating all profile fields together"""
