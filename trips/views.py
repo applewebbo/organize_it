@@ -179,7 +179,11 @@ def day_detail(request, pk):
         context["map"] = map_obj
         context["locations"] = locations
 
-    return TemplateResponse(request, "trips/includes/day.html", context)
+    # Use wrapper template for HTMX requests to include OOB message swap
+    template = (
+        "trips/day-detail-wrapper.html" if request.htmx else "trips/includes/day.html"
+    )
+    return TemplateResponse(request, template, context)
 
 
 @login_required

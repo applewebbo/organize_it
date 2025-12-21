@@ -7,6 +7,14 @@ htmx.on("htmx:beforeSwap", (e) => {
   }
 })
 
+// Re-initialize Alpine.js after HTMX OOB swaps
+htmx.on("htmx:oobAfterSwap", (e) => {
+  // Re-initialize Alpine on the OOB swapped element
+  if (window.Alpine && e.detail.target) {
+    Alpine.initTree(e.detail.target)
+  }
+})
+
 
 // LeafletJs Map
 function createMap(bounds) {
