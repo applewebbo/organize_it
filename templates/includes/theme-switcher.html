@@ -70,6 +70,8 @@ function themeSwitcher(useSystemTheme) {
         }
     }
 
+    console.log('Setting theme:', theme, 'useSystemTheme:', useSystemTheme);
     document.documentElement.setAttribute('data-theme', theme);
+    console.log('Current data-theme:', document.documentElement.getAttribute('data-theme'));
 })();
 </script>

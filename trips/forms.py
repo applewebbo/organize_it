@@ -103,11 +103,11 @@ class TripForm(forms.ModelForm):
                 css_class="sm:col-span-2",
             ),
             # Trip Image Section
-            HTML("<hr class='my-4 sm:col-span-2'>"),
+            # HTML("<hr class='my-4 sm:col-span-2'>"),
             HTML(
-                "<h3 class='text-lg font-semibold mb-3 sm:col-span-2'>"
+                '<div class="divider my-4 sm:col-span-2"><span class="text-gray-400">'
                 + str(_("Trip Image"))
-                + "</h3>"
+                + "</span></div>"
             ),
             HTML(
                 f'<input type="hidden" name="trip_id" value="{trip_id}" id="trip_id">'
@@ -116,39 +116,57 @@ class TripForm(forms.ModelForm):
             # Mode Toggle
             HTML(
                 """
-            <div class="mb-4 flex gap-2 sm:col-span-2">
-                <button type="button"
-                        class="btn btn-sm"
-                        :class="imageMode === 'search' ? 'btn-primary' : 'btn-outline'"
-                        @click="
-                            imageMode = 'search';
-                            const destValue = document.querySelector('[name=destination]').value;
-                            if (destValue && destValue !== lastSearchQuery) {
-                                lastSearchQuery = destValue;
-                                $el.dispatchEvent(new Event('doSearch'));
-                            }
-                        "
-                        hx-post="""
+            <div class="mb-4 sm:col-span-2" x-data="{ showDestinationError: false }">
+                <div class="flex gap-2">
+                    <button type="button"
+                            class="btn btn-outline dark:btn-soft"
+                            :class="imageMode === 'search' ? 'btn-primary' : ''"
+                            @click="
+                                const destValue = document.querySelector('[name=destination]').value;
+                                if (!destValue || destValue.trim() === '') {
+                                    showDestinationError = true;
+                                    document.querySelector('[name=destination]').classList.add('input-error', 'border-error', 'border-2');
+                                    setTimeout(() => {
+                                        showDestinationError = false;
+                                        document.querySelector('[name=destination]').classList.remove('input-error', 'border-error', 'border-2');
+                                    }, 5000);
+                                    return;
+                                }
+                                imageMode = 'search';
+                                if (destValue !== lastSearchQuery) {
+                                    lastSearchQuery = destValue;
+                                    $el.dispatchEvent(new Event('doSearch'));
+                                }
+                            "
+                            hx-post="""
                 + f'"{reverse("trips:search-images")}"'
                 + """
-                        hx-trigger="doSearch"
-                        hx-target="#image-results"
-                        hx-indicator="#search-spinner"
-                        hx-include="[name='destination'], [name='trip_id']">
-                    <i class="ph-bold ph-magnifying-glass"></i>
-                    """
+                            hx-trigger="doSearch"
+                            hx-target="#image-results"
+                            hx-indicator="#search-spinner"
+                            hx-include="[name='destination'], [name='trip_id']">
+                        <i class="ph-bold ph-magnifying-glass"></i>
+                        """
                 + str(_("Search Unsplash"))
                 + """
-                </button>
-                <button type="button"
-                        class="btn btn-sm"
-                        :class="imageMode === 'upload' ? 'btn-primary' : 'btn-outline'"
-                        @click="imageMode = 'upload'">
-                    <i class="ph-bold ph-upload"></i>
-                    """
+                    </button>
+                    <button type="button"
+                            class="btn btn-outline dark:btn-soft"
+                            :class="imageMode === 'upload' ? 'btn-primary' : ''"
+                            @click="imageMode = 'upload'">
+                        <i class="ph-bold ph-upload"></i>
+                        """
                 + str(_("Upload Image"))
                 + """
-                </button>
+                    </button>
+                </div>
+                <div x-show="showDestinationError"
+                     x-transition
+                     class="mt-2 text-sm text-error">
+                    """
+                + str(_("Please fill in the destination field to search for images"))
+                + """
+                </div>
             </div>
             """
             ),
