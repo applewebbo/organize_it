@@ -309,6 +309,13 @@ def trip_archive(request, pk):
     trip = get_object_or_404(Trip, pk=pk, author=request.user)
     trip.status = 5
     trip.save()
+
+    # Reset fav_trip if this trip was the favourite
+    profile = request.user.profile
+    if profile.fav_trip == trip:
+        profile.fav_trip = None
+        profile.save()
+
     messages.add_message(
         request,
         messages.SUCCESS,

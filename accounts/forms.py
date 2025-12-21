@@ -71,6 +71,6 @@ class ProfileUpdateForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["fav_trip"].queryset = Trip.objects.filter(
             author=self.instance.user
-        )
+        ).exclude(status=Trip.Status.ARCHIVED)
         self.fields["trip_sort_preference"].empty_label = None
         self.fields["default_map_view"].empty_label = None

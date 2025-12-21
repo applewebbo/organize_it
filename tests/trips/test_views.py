@@ -735,6 +735,35 @@ class TripArchiveView(TestCase):
         assert Trip.objects.filter(author=user).count() == 1
         assert Trip.objects.filter(author=user, status=5).count() == 1
 
+    def test_archive_resets_fav_trip_if_favourite(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        user.profile.fav_trip = trip
+        user.profile.save()
+
+        with self.login(user):
+            response = self.post("trips:trip-archive", pk=trip.pk)
+
+        self.response_204(response)
+        user.profile.refresh_from_db()
+        assert user.profile.fav_trip is None
+        assert Trip.objects.filter(author=user, status=5).count() == 1
+
+    def test_archive_does_not_reset_fav_trip_if_different(self):
+        user = self.make_user("user")
+        trip1 = TripFactory(author=user)
+        trip2 = TripFactory(author=user)
+        user.profile.fav_trip = trip1
+        user.profile.save()
+
+        with self.login(user):
+            response = self.post("trips:trip-archive", pk=trip2.pk)
+
+        self.response_204(response)
+        user.profile.refresh_from_db()
+        assert user.profile.fav_trip == trip1
+        assert Trip.objects.filter(author=user, status=5).count() == 1
+
 
 class TripUnarchiveView(TestCase):
     def test_unarchive(self):
