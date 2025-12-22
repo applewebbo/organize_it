@@ -92,6 +92,7 @@ select ~ .pointer-events-none {
   background-repeat: repeat;
   background-size: 215px 215px;
   background-color: rgb(241 245 249); /* slate-100 */
+  transition: background-color 0.3s ease;
 }
 
 [data-theme="dark"] .body-pattern {

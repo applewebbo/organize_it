@@ -54,24 +54,5 @@ function themeSwitcher(useSystemTheme) {
     }
 }
 
-// Apply theme on page load (before Alpine.js initializes)
-(function() {
-    const useSystemTheme = {{ user.profile.use_system_theme|default:'false'|yesno:'true,false' }};
-
-    let theme;
-    if (useSystemTheme) {
-        theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    } else {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            theme = savedTheme;
-        } else {
-            theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        }
-    }
-
-    console.log('Setting theme:', theme, 'useSystemTheme:', useSystemTheme);
-    document.documentElement.setAttribute('data-theme', theme);
-    console.log('Current data-theme:', document.documentElement.getAttribute('data-theme'));
-})();
+{# Theme initialization is now handled by theme-init.html which is always included #}
 </script>

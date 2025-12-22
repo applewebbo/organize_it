@@ -1,0 +1,47 @@
+{% load i18n %}
+{# This script must ALWAYS be included to set data-theme attribute #}
+<script>
+// Apply theme on page load (before Alpine.js initializes)
+(function() {
+    const useSystemTheme = {{ user.profile.use_system_theme|default:'false'|yesno:'true,false' }};
+
+    function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+    }
+
+    let theme;
+    if (useSystemTheme) {
+        theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    } else {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            theme = savedTheme;
+        } else {
+            theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+    }
+
+    applyTheme(theme);
+
+    // Listen for system theme changes (only when useSystemTheme is true)
+    if (useSystemTheme) {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+        // Modern browsers support addEventListener
+        if (mediaQuery.addEventListener) {
+            mediaQuery.addEventListener('change', (e) => {
+                const newTheme = e.matches ? 'dark' : 'light';
+                applyTheme(newTheme);
+            });
+        }
+        // Fallback for older browsers
+        else if (mediaQuery.addListener) {
+            mediaQuery.addListener((e) => {
+                const newTheme = e.matches ? 'dark' : 'light';
+                applyTheme(newTheme);
+            });
+        }
+    }
+})();
+</script>
