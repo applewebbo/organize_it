@@ -16,5 +16,5 @@ echo "Collecting static files..."
 python manage.py collectstatic --no-input
 
 # Start the web server and tasks worker
-echo "Starting supervisord.."
-exec supervisord -c /app/supervisord.conf
+echo "Starting mprocs.."
+exec mprocs -c /app/mprocs.yaml

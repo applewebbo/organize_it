@@ -52,8 +52,7 @@ fresh: clean install
 # Run development server + worker with Overmind
 [group('development')]
 @serve:
-    rm -f ./.overmind.sock
-    uv run overmind start -r all -f ./Procfile.dev
+    mprocs -c mprocs-local.yaml
 
 # Add dummy trips to the database
 [group('development')]
@@ -84,6 +83,15 @@ makemessages:
 [group('development')]
 @tasks:
     uv run python manage.py qcluster
+
+# Test Docker locally before deploy on Caprover
+[group('development')]
+@docker-test:
+    docker build -t organize-it:test .
+    docker run -it -p 80:80 \
+        -v $(pwd)/.env.dev:/app/.env:ro \
+        -e ENVIRONMENT=prod \
+        organize-it:test
 
 ##########################################################################
 # Utility

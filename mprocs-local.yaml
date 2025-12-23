@@ -1,0 +1,5 @@
+procs:
+  web:
+    shell: python manage.py tailwind runserver
+  worker:
+    shell: python manage.py qcluster
