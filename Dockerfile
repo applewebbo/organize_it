@@ -11,7 +11,7 @@ ENV PYTHONPATH=/srv
 ENV PYTHONUNBUFFERED=1
 ENV ENVIRONMENT=prod
 
-# ---- System deps + mprocs + PGDG keyring prereqs ----
+# ---- System deps + hivemind + PGDG keyring prereqs ----
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     curl \
@@ -20,18 +20,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     lsb-release \
     gnupg \
-  # Install mprocs (static musl)
-  && MPROCS_VERSION="0.7.3" \
+  # Install hivemind (static binary)
+  && HIVEMIND_VERSION="1.1.0" \
   && ARCH="$(dpkg --print-architecture)" \
   && case "$ARCH" in \
-       amd64)  MPROCS_ARCH="x86_64" ;; \
-       arm64)  MPROCS_ARCH="aarch64" ;; \
+       amd64)  HIVEMIND_ARCH="amd64" ;; \
+       arm64)  HIVEMIND_ARCH="arm64" ;; \
        *) echo "Unsupported arch: $ARCH" >&2; exit 1 ;; \
      esac \
-  && curl -fsSL "https://github.com/pvolok/mprocs/releases/download/v${MPROCS_VERSION}/mprocs-${MPROCS_VERSION}-linux-${MPROCS_ARCH}-musl.tar.gz" \
-     | tar -xz -C /usr/local/bin mprocs \
-  && chmod +x /usr/local/bin/mprocs \
-  && mprocs --version \
+  && curl -fsSL "https://github.com/DarthSim/hivemind/releases/download/v${HIVEMIND_VERSION}/hivemind-v${HIVEMIND_VERSION}-linux-${HIVEMIND_ARCH}.gz" \
+     | gunzip > /usr/local/bin/hivemind \
+  && chmod +x /usr/local/bin/hivemind \
+  && hivemind --version \
   # PGDG repo (PostgreSQL Apt Repository)
   && install -d /usr/share/keyrings \
   && curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
@@ -63,8 +63,8 @@ RUN uv sync --frozen --no-dev --no-install-project
 WORKDIR /app
 COPY . /app
 
-# mprocs config (sostituisce supervisord.conf)
-COPY mprocs.yaml /app/mprocs.yaml
+# Procfile for hivemind
+COPY Procfile /app/Procfile
 
 # create logs directory
 RUN mkdir -p /app/logs
@@ -72,5 +72,5 @@ RUN mkdir -p /app/logs
 # expose port for granian
 EXPOSE 80
 
-# run entrypoint (che poi fa exec mprocs)
+# run entrypoint (che poi fa exec hivemind)
 CMD ["sh", "./entrypoint.sh"]

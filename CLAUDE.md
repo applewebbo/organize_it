@@ -62,6 +62,7 @@ Organize It is a Django-based web application for organizing trips and travel pl
 - **Template System**: Django templates with django-cotton components
 - **Auth**: django-allauth (email-based, no username)
 - **Task Queue**: django-q2 for background tasks
+- **Process Management**: mprocs (local dev), hivemind (production)
 - **Maps**: Mapbox for geocoding, Folium for map rendering
 - **Images**: Pillow for image processing, Unsplash API for photo search
 - **Package Manager**: uv (not pip)
@@ -78,7 +79,7 @@ All commands use `just` (justfile). Never use `pip` - always use `uv`.
 
 ### Running the App
 - `just local` - Run development server with Tailwind compilation
-- `just serve` - Run web + worker together with Overmind (recommended)
+- `just serve` - Run web + worker together with mprocs (recommended for local development)
 - `just tasks` - Run django-q2 background task worker manually
 - `just migrate` - Run database migrations
 - `just makemigrations` - Create new migrations
@@ -174,8 +175,8 @@ Django-Q2 handles async tasks with environment-specific configuration:
 
 **Worker Management**:
 - `just tasks` - Run worker manually
-- `just serve` - Run web + worker with Overmind (recommended for dev)
-- Production: Uses `Procfile` with Gunicorn + worker process
+- `just serve` - Run web + worker with mprocs (recommended for local dev)
+- Production: Uses `Procfile` with hivemind process manager (granian + worker)
 
 **Configuration Variables** (.env):
 ```bash
