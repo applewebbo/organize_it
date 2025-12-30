@@ -361,13 +361,13 @@ class TestGetTrips(TestCase):
 
     def test_get_trips_latest_impending(self):
         """Test latest trip is IMPENDING with earliest start_date."""
-        TripFactory(
+        earliest_impending = TripFactory(
             author=self.user,
-            status=1,
+            status=2,
             start_date=date(2026, 1, 1),
             end_date=date(2026, 1, 10),
         )
-        impending1 = TripFactory(
+        TripFactory(
             author=self.user,
             status=2,
             start_date=date(2026, 2, 1),
@@ -381,7 +381,7 @@ class TestGetTrips(TestCase):
         )
 
         context = get_trips(self.user)
-        self.assertEqual(context["latest_trip"], impending1)
+        self.assertEqual(context["latest_trip"].pk, earliest_impending.pk)
 
     def test_get_trips_latest_by_status(self):
         """Test latest trip ordering by status when no IN_PROGRESS or IMPENDING."""
