@@ -710,3 +710,213 @@ class TestStayModel:
         )
         assert stay.latitude == 41.890251
         assert stay.longitude == 12.492373
+
+
+class TestMainTransferModel:
+    def test_main_transfer_factory(self, main_transfer_factory):
+        """Test MainTransferFactory creates valid main transfer"""
+        transfer = main_transfer_factory()
+
+        assert transfer.is_main_transfer is True
+        assert transfer.direction in [
+            Transport.Direction.ARRIVAL,
+            Transport.Direction.DEPARTURE,
+        ]
+        assert transfer.day is None
+        assert transfer.trip is not None
+
+    def test_main_transfer_forces_day_none(self, main_transfer_factory, trip_factory):
+        """Test that main transfers always have day=None even if set"""
+        trip = trip_factory()
+        day = trip.days.first()
+
+        transport = main_transfer_factory(
+            trip=trip,
+            day=day,
+            direction=Transport.Direction.ARRIVAL,
+        )
+
+        transport.refresh_from_db()
+        assert transport.day is None
+
+    def test_main_transfer_unique_direction_per_trip(self, main_transfer_factory):
+        """Test that only one main transfer per direction allowed per trip"""
+        from django.core.exceptions import ValidationError
+
+        transfer1 = main_transfer_factory(direction=Transport.Direction.ARRIVAL)
+        trip = transfer1.trip
+
+        transport2 = Transport(
+            trip=trip,
+            name="Train to Paris",
+            start_time="14:00",
+            end_time="18:00",
+            type=Transport.Type.TRAIN,
+            origin_city="Roma",
+            destination_city="Paris",
+            is_main_transfer=True,
+            direction=Transport.Direction.ARRIVAL,
+        )
+
+        with pytest.raises(ValidationError) as exc:
+            transport2.full_clean()
+
+        assert "direction" in exc.value.message_dict
+        assert "Arrival" in str(exc.value.message_dict["direction"])
+
+    def test_main_transfer_different_directions_allowed(self, main_transfer_factory):
+        """Test that arrival and departure transfers can coexist"""
+        arrival = main_transfer_factory(direction=Transport.Direction.ARRIVAL)
+        trip = arrival.trip
+        departure = main_transfer_factory(
+            trip=trip,
+            direction=Transport.Direction.DEPARTURE,
+        )
+
+        assert arrival.direction == Transport.Direction.ARRIVAL
+        assert departure.direction == Transport.Direction.DEPARTURE
+        assert trip.all_events.filter(transport__is_main_transfer=True).count() == 2
+
+    def test_normal_transport_cannot_have_direction(self, trip_factory):
+        """Test that non-main transfers cannot have a direction"""
+        from django.core.exceptions import ValidationError
+
+        trip = trip_factory()
+        day = trip.days.first()
+
+        transport = Transport(
+            trip=trip,
+            day=day,
+            name="City bus",
+            start_time="10:00",
+            end_time="10:30",
+            type=Transport.Type.BUS,
+            origin_city="Paris",
+            destination_city="Paris",
+            is_main_transfer=False,
+            direction=Transport.Direction.ARRIVAL,
+        )
+
+        with pytest.raises(ValidationError) as exc:
+            transport.full_clean()
+
+        assert "direction" in exc.value.message_dict
+
+    def test_main_transfer_requires_direction(self, main_transfer_factory):
+        """Test that main transfers must have a direction"""
+        from django.core.exceptions import ValidationError
+
+        transport = main_transfer_factory.build(direction=None)
+
+        with pytest.raises(ValidationError) as exc:
+            transport.full_clean()
+
+        assert "direction" in exc.value.message_dict
+
+    def test_main_transfer_day_none_validation(
+        self, main_transfer_factory, trip_factory
+    ):
+        """Test that main transfers cannot have a day assigned"""
+        from django.core.exceptions import ValidationError
+
+        trip = trip_factory()
+        day = trip.days.first()
+
+        transport = main_transfer_factory.build(
+            trip=trip,
+            day=day,
+            direction=Transport.Direction.ARRIVAL,
+        )
+
+        with pytest.raises(ValidationError) as exc:
+            transport.full_clean()
+
+        assert "day" in exc.value.message_dict
+
+    def test_main_transfer_validation_passes(self, main_transfer_factory):
+        """Test that main transfer validation passes for valid data"""
+        # This tests the happy path where no validation errors occur
+        transport = main_transfer_factory(direction=Transport.Direction.ARRIVAL)
+
+        # full_clean should pass without errors
+        transport.full_clean()
+
+        assert transport.pk is not None
+        assert transport.is_main_transfer is True
+        assert transport.day is None
+        assert transport.direction == Transport.Direction.ARRIVAL
+
+    def test_main_transfer_type_specific_data_flight(self, main_transfer_factory):
+        """Test storing flight-specific data"""
+        transport = main_transfer_factory(
+            type=Transport.Type.PLANE,
+            type_specific_data={
+                "flight_number": "AF1234",
+                "gate": "A12",
+                "terminal": "T1",
+                "checked_baggage": 2,
+                "company_link": "https://airfrance.com",
+            },
+        )
+
+        assert transport.flight_number == "AF1234"
+        assert transport.gate == "A12"
+        assert transport.terminal == "T1"
+        assert transport.checked_baggage == 2
+        assert transport.company_link == "https://airfrance.com"
+
+    def test_main_transfer_type_specific_data_train(self, main_transfer_factory):
+        """Test storing train-specific data"""
+        transport = main_transfer_factory(
+            type=Transport.Type.TRAIN,
+            type_specific_data={
+                "train_number": "FR9612",
+                "carriage": "7",
+                "seat": "42A",
+                "platform": "3",
+                "company_link": "https://trenitalia.com",
+            },
+        )
+
+        assert transport.train_number == "FR9612"
+        assert transport.carriage == "7"
+        assert transport.seat == "42A"
+        assert transport.platform == "3"
+        assert transport.company_link == "https://trenitalia.com"
+
+    def test_main_transfer_type_specific_data_car(self, main_transfer_factory):
+        """Test storing car-specific data"""
+        transport = main_transfer_factory(
+            type=Transport.Type.CAR,
+            type_specific_data={
+                "is_rental": True,
+                "license_plate": "AB123CD",
+                "car_type": "Sedan",
+                "rental_booking_reference": "RENT12345",
+                "company_link": "https://hertz.com",
+            },
+        )
+
+        assert transport.is_rental is True
+        assert transport.license_plate == "AB123CD"
+        assert transport.car_type == "Sedan"
+        assert transport.rental_booking_reference == "RENT12345"
+        assert transport.company_link == "https://hertz.com"
+
+    def test_main_transfer_type_specific_data_defaults(self, main_transfer_factory):
+        """Test that type_specific_data properties return defaults"""
+        transport = main_transfer_factory(type=Transport.Type.TAXI)
+
+        assert transport.flight_number == ""
+        assert transport.gate == ""
+        assert transport.terminal == ""
+        assert transport.checked_baggage == 0
+        assert transport.train_number == ""
+        assert transport.carriage == ""
+        assert transport.seat == ""
+        assert transport.platform == ""
+        assert transport.is_rental is False
+        assert transport.license_plate == ""
+        assert transport.car_type == ""
+        assert transport.rental_booking_reference == ""
+        assert transport.company_link == ""

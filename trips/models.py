@@ -2,6 +2,7 @@ from datetime import date, timedelta
 
 import geocoder
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
@@ -237,13 +238,13 @@ class Event(models.Model):
         MEAL = 3, _("Meal")
 
     day = models.ForeignKey(
-        Day, on_delete=models.SET_NULL, related_name="events", null=True
+        Day, on_delete=models.SET_NULL, related_name="events", null=True, blank=True
     )
     trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="all_events")
     name = models.CharField(max_length=100)
     start_time = models.TimeField()
     end_time = models.TimeField()
-    address = models.CharField(max_length=200)
+    address = models.CharField(max_length=200, blank=True)
     city = models.CharField(max_length=100, blank=True)
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
@@ -334,7 +335,31 @@ class Transport(Event):
         TAXI = 6, _("Taxi")
         OTHER = 7, _("Other")
 
+    class Direction(models.IntegerChoices):
+        ARRIVAL = 1, _("Arrival")
+        DEPARTURE = 2, _("Departure")
+
     type = models.IntegerField(choices=Type.choices, default=Type.CAR)
+
+    # Main transfer fields
+    is_main_transfer = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text="True if this is a main arrival/departure transfer",
+    )
+
+    direction = models.IntegerField(
+        choices=Direction.choices,
+        null=True,
+        blank=True,
+        help_text="Required for main transfers (arrival or departure)",
+    )
+
+    type_specific_data = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Type-specific fields: flight_number, train_number, rental_info, etc.",
+    )
 
     # Origin fields
     origin_city = models.CharField(max_length=100)
@@ -353,6 +378,62 @@ class Transport(Event):
     company = models.CharField(max_length=100, blank=True)
     ticket_url = models.URLField(max_length=255, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+    # Properties for type-specific fields (flight)
+    @property
+    def flight_number(self):
+        return self.type_specific_data.get("flight_number", "")
+
+    @property
+    def gate(self):
+        return self.type_specific_data.get("gate", "")
+
+    @property
+    def terminal(self):
+        return self.type_specific_data.get("terminal", "")
+
+    @property
+    def checked_baggage(self):
+        return self.type_specific_data.get("checked_baggage", 0)
+
+    # Properties for type-specific fields (train)
+    @property
+    def train_number(self):
+        return self.type_specific_data.get("train_number", "")
+
+    @property
+    def carriage(self):
+        return self.type_specific_data.get("carriage", "")
+
+    @property
+    def seat(self):
+        return self.type_specific_data.get("seat", "")
+
+    @property
+    def platform(self):
+        return self.type_specific_data.get("platform", "")
+
+    # Properties for type-specific fields (car)
+    @property
+    def is_rental(self):
+        return self.type_specific_data.get("is_rental", False)
+
+    @property
+    def license_plate(self):
+        return self.type_specific_data.get("license_plate", "")
+
+    @property
+    def car_type(self):
+        return self.type_specific_data.get("car_type", "")
+
+    @property
+    def rental_booking_reference(self):
+        return self.type_specific_data.get("rental_booking_reference", "")
+
+    # Properties for common fields
+    @property
+    def company_link(self):
+        return self.type_specific_data.get("company_link", "")
 
     @property
     def duration(self):
@@ -378,8 +459,53 @@ class Transport(Event):
 
         return end - start
 
+    def clean(self):
+        super().clean()
+
+        # MainTransfer MUST have day=None
+        if self.is_main_transfer and self.day is not None:
+            raise ValidationError(
+                {"day": _("Main transfers cannot be assigned to a specific day")}
+            )
+
+        # MainTransfer MUST have direction
+        if self.is_main_transfer and not self.direction:
+            raise ValidationError(
+                {
+                    "direction": _(
+                        "Main transfers must have a direction (arrival/departure)"
+                    )
+                }
+            )
+
+        # Normal transport should NOT have direction
+        if not self.is_main_transfer and self.direction:
+            raise ValidationError(
+                {"direction": _("Only main transfers can have a direction")}
+            )
+
+        # Only 1 MainTransfer per direction per trip
+        if self.is_main_transfer:
+            existing = Transport.objects.filter(
+                trip=self.trip, is_main_transfer=True, direction=self.direction
+            ).exclude(pk=self.pk)
+
+            if existing.exists():
+                raise ValidationError(
+                    {
+                        "direction": _(
+                            "A %(direction)s transfer already exists for this trip"
+                        )
+                        % {"direction": self.get_direction_display()}
+                    }
+                )
+
     def save(self, *args, **kwargs):
         """Geocode origin and destination addresses for displaying on the map"""
+        # Force day=None for main transfers
+        if self.is_main_transfer:
+            self.day = None
+
         old = type(self).objects.get(pk=self.pk) if self.pk else None
 
         # Geocode origin
@@ -435,6 +561,15 @@ class Transport(Event):
         return (
             f"{self.origin_city} → {self.destination_city} ({self.get_type_display()})"
         )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["trip", "direction"],
+                condition=models.Q(is_main_transfer=True),
+                name="unique_main_transfer_per_direction",
+            )
+        ]
 
 
 class Experience(Event):
