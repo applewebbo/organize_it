@@ -21,6 +21,7 @@ from trips.forms import (
     AddNoteToStayForm,
     EventChangeTimesForm,
     ExperienceForm,
+    MainTransferCombinedForm,
     MealForm,
     NoteForm,
     StayForm,
@@ -545,6 +546,108 @@ def stay_delete(request, pk):
         "show_dropdown": other_stays.count() > 1,  # Changed from len() to count()
     }
     return TemplateResponse(request, "trips/stay-delete.html", context)
+
+
+@login_required
+def add_main_transfer(request, trip_id):
+    """Create a new main transfer for the trip"""
+    trip = get_object_or_404(Trip, pk=trip_id, author=request.user)
+
+    if request.method == "POST":
+        form = MainTransferCombinedForm(request.POST, trip=trip)
+        if form.is_valid():
+            transfer = form.save(commit=False)
+            transfer.trip = trip
+            transfer.save()
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                _("Main transfer added successfully"),
+            )
+            return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+    else:
+        form = MainTransferCombinedForm(trip=trip)
+
+    context = {"form": form, "trip": trip}
+    return TemplateResponse(request, "trips/main-transfer-form.html", context)
+
+
+@login_required
+def edit_main_transfer(request, pk):
+    """Edit existing main transfer"""
+    from trips.models import Transport
+
+    transfer = get_object_or_404(
+        Transport,
+        pk=pk,
+        trip__author=request.user,
+        is_main_transfer=True,
+    )
+    trip = transfer.trip
+
+    if request.method == "POST":
+        form = MainTransferCombinedForm(request.POST, instance=transfer, trip=trip)
+        if form.is_valid():
+            form.save()
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                _("Main transfer updated successfully"),
+            )
+            return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+    else:
+        form = MainTransferCombinedForm(instance=transfer, trip=trip)
+
+    context = {"form": form, "trip": trip, "transfer": transfer, "is_edit": True}
+    return TemplateResponse(request, "trips/main-transfer-form.html", context)
+
+
+@login_required
+def delete_main_transfer(request, pk):
+    """Delete main transfer"""
+    from trips.models import Transport
+
+    transfer = get_object_or_404(
+        Transport,
+        pk=pk,
+        trip__author=request.user,
+        is_main_transfer=True,
+    )
+
+    transfer.delete()
+    messages.add_message(
+        request,
+        messages.SUCCESS,
+        _("Main transfer deleted successfully"),
+    )
+    return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+
+
+@login_required
+def get_transport_type_fields(request):
+    """HTMX endpoint: returns partial with type-specific fields"""
+    from trips.models import Transport
+
+    transport_type = request.POST.get("type") or request.GET.get("type")
+
+    if not transport_type:
+        return HttpResponse("")
+
+    transport_type = int(transport_type)
+    context = {"transport_type": transport_type}
+
+    # Select appropriate template
+    if transport_type == Transport.Type.PLANE:
+        template = "trips/partials/flight-fields.html"
+    elif transport_type == Transport.Type.TRAIN:
+        template = "trips/partials/train-fields.html"
+    elif transport_type == Transport.Type.CAR:
+        template = "trips/partials/car-fields.html"
+    else:
+        # Bus, Boat, Taxi, Other - only company_link
+        template = "trips/partials/generic-transport-fields.html"
+
+    return TemplateResponse(request, template, context)
 
 
 @login_required

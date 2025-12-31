@@ -1,0 +1,40 @@
+{% load i18n crispy_forms_tags %}
+
+<div class="modal-box">
+    <h3 class="mb-4 text-lg font-bold">
+        {% if is_edit %}
+            {% trans "Edit Main Transfer" %}
+        {% else %}
+            {% trans "Add Main Transfer" %}
+        {% endif %}
+    </h3>
+
+    <form method="post"
+          hx-post="{% if is_edit %}{% url 'trips:edit-main-transfer' pk=transfer.pk %}{% else %}{% url 'trips:add-main-transfer' trip_id=trip.pk %}{% endif %}"
+          hx-target="body">
+        {% csrf_token %}
+
+        <div class="space-y-4">
+            {% crispy form %}
+
+            <div id="type-specific-container"
+                 hx-get="{% url 'trips:transport-type-fields' %}"
+                 hx-trigger="change from:#id_type"
+                 hx-include="#id_type">
+            </div>
+        </div>
+
+        <div class="modal-action">
+            <button type="button" class="btn" onclick="document.getElementById('main-transfer-modal').close()">
+                {% trans "Cancel" %}
+            </button>
+            <button type="submit" class="btn btn-primary">
+                {% if is_edit %}
+                    {% trans "Update" %}
+                {% else %}
+                    {% trans "Add" %}
+                {% endif %}
+            </button>
+        </div>
+    </form>
+</div>

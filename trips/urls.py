@@ -28,6 +28,27 @@ htmx_urlpatterns = [
     path("stays/<int:pk>/modify", views.stay_modify, name="stay-modify"),
     path("stays/<int:pk>/delete", views.stay_delete, name="stay-delete"),
     path("stays/<int:stay_id>/enrich/", views.enrich_stay, name="enrich-stay"),
+    # MAIN TRANSFERS
+    path(
+        "trips/<int:trip_id>/main-transfer/create",
+        views.add_main_transfer,
+        name="add-main-transfer",
+    ),
+    path(
+        "main-transfers/<int:pk>/edit",
+        views.edit_main_transfer,
+        name="edit-main-transfer",
+    ),
+    path(
+        "main-transfers/<int:pk>/delete",
+        views.delete_main_transfer,
+        name="delete-main-transfer",
+    ),
+    path(
+        "transport-type-fields/",
+        views.get_transport_type_fields,
+        name="transport-type-fields",
+    ),
     path(
         "stays/<int:stay_id>/enrich/confirm/",
         views.confirm_enrich_stay,

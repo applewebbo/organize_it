@@ -11,6 +11,8 @@ from trips.forms import (
     EventChangeTimesForm,
     ExperienceForm,
     LinkForm,
+    MainTransferCombinedForm,
+    MainTransferForm,
     MealForm,
     NoteForm,
     StayForm,
@@ -666,3 +668,358 @@ class TestEventForm:
             "sunday",
         ]:
             assert form.initial[f"{day}_closed"]
+
+
+class TestMainTransferForm:
+    def test_form_initialization(self):
+        """Test MainTransferForm initializes correctly"""
+        trip = TripFactory()
+        form = MainTransferForm(trip=trip)
+
+        assert "direction" in form.fields
+        assert "type" in form.fields
+        assert "origin_city" in form.fields
+        assert "destination_city" in form.fields
+
+    def test_form_prepopulates_destination(self):
+        """Test form prepopulates destination with trip destination"""
+        trip = TripFactory(destination="Rome")
+        form = MainTransferForm(trip=trip)
+
+        assert form.fields["destination_city"].initial == "Rome"
+
+    def test_form_save_sets_main_transfer_flags(self):
+        """Test saving sets is_main_transfer and day=None"""
+        trip = TripFactory()
+        data = {
+            "type": 2,  # PLANE
+            "direction": 1,  # ARRIVAL
+            "origin_city": "Milan",
+            "origin_address": "Via Roma 1",
+            "destination_city": "Rome",
+            "destination_address": "Via del Corso 10",
+            "start_time": "10:00",
+            "end_time": "11:30",
+        }
+
+        form = MainTransferForm(data, trip=trip)
+        assert form.is_valid()
+
+        transfer = form.save(commit=False)
+        assert transfer.is_main_transfer is True
+        assert transfer.day is None
+        assert transfer.category == 1  # TRANSPORT
+
+    def test_form_requires_direction(self):
+        """Test direction field is required"""
+        trip = TripFactory()
+        data = {
+            "type": 2,
+            "origin_city": "Milan",
+            "destination_city": "Rome",
+            "start_time": "10:00",
+            "end_time": "11:30",
+        }
+
+        form = MainTransferForm(data, trip=trip)
+        assert not form.is_valid()
+        assert "direction" in form.errors
+
+
+class TestMainTransferCombinedForm:
+    def test_adds_flight_fields_for_plane(self):
+        """Test flight-specific fields are added for plane type"""
+        trip = TripFactory()
+        data = {
+            "type": "2",  # PLANE
+            "direction": "1",
+            "origin_city": "Milan",
+            "destination_city": "Rome",
+            "start_time": "10:00",
+            "end_time": "11:30",
+        }
+
+        form = MainTransferCombinedForm(data, trip=trip)
+
+        assert "specific_flight_number" in form.fields
+        assert "specific_gate" in form.fields
+        assert "specific_terminal" in form.fields
+        assert "specific_checked_baggage" in form.fields
+
+    def test_adds_train_fields_for_train(self):
+        """Test train-specific fields are added for train type"""
+        trip = TripFactory()
+        data = {
+            "type": "3",  # TRAIN
+            "direction": "2",
+            "origin_city": "Milan",
+            "destination_city": "Rome",
+            "start_time": "10:00",
+            "end_time": "11:30",
+        }
+
+        form = MainTransferCombinedForm(data, trip=trip)
+
+        assert "specific_train_number" in form.fields
+        assert "specific_carriage" in form.fields
+        assert "specific_seat" in form.fields
+        assert "specific_platform" in form.fields
+
+    def test_adds_car_fields_for_car(self):
+        """Test car-specific fields are added for car type"""
+        trip = TripFactory()
+        data = {
+            "type": "1",  # CAR
+            "direction": "1",
+            "origin_city": "Milan",
+            "destination_city": "Rome",
+            "start_time": "10:00",
+            "end_time": "11:30",
+        }
+
+        form = MainTransferCombinedForm(data, trip=trip)
+
+        assert "specific_is_rental" in form.fields
+        assert "specific_license_plate" in form.fields
+        assert "specific_car_type" in form.fields
+        assert "specific_rental_booking_reference" in form.fields
+
+    def test_saves_type_specific_data(self):
+        """Test type-specific data is saved to JSONField"""
+        trip = TripFactory()
+        data = {
+            "type": "2",  # PLANE
+            "direction": "1",
+            "origin_city": "Milan",
+            "destination_city": "Rome",
+            "start_time": "10:00",
+            "end_time": "11:30",
+            "specific_flight_number": "AZ1234",
+            "specific_gate": "A12",
+            "specific_terminal": "T1",
+            "specific_checked_baggage": "2",
+        }
+
+        form = MainTransferCombinedForm(data, trip=trip)
+        assert form.is_valid()
+
+        transfer = form.save(commit=False)
+        assert transfer.type_specific_data["flight_number"] == "AZ1234"
+        assert transfer.type_specific_data["gate"] == "A12"
+        assert transfer.type_specific_data["terminal"] == "T1"
+        assert transfer.type_specific_data["checked_baggage"] == 2
+
+    def test_ignores_empty_specific_fields(self):
+        """Test empty specific fields are not saved"""
+        trip = TripFactory()
+        data = {
+            "type": "2",
+            "direction": "1",
+            "origin_city": "Milan",
+            "destination_city": "Rome",
+            "start_time": "10:00",
+            "end_time": "11:30",
+            "specific_flight_number": "AZ1234",
+            "specific_gate": "",  # Empty
+            "specific_terminal": "",  # Empty
+        }
+
+        form = MainTransferCombinedForm(data, trip=trip)
+        assert form.is_valid()
+
+        transfer = form.save(commit=False)
+        assert "flight_number" in transfer.type_specific_data
+        assert "gate" not in transfer.type_specific_data
+        assert "terminal" not in transfer.type_specific_data
+
+    def test_edit_with_existing_data(self):
+        """Test editing transfer with existing type-specific data"""
+        trip = TripFactory()
+        from trips.models import Transport
+
+        # Create a transfer with existing data
+        transfer = Transport.objects.create(
+            trip=trip,
+            type=2,  # PLANE
+            direction=1,
+            is_main_transfer=True,
+            origin_city="Milan",
+            destination_city="Rome",
+            start_time="10:00",
+            end_time="11:30",
+            type_specific_data={
+                "flight_number": "AZ1234",
+                "gate": "A12",
+                "terminal": "T1",
+            },
+        )
+
+        # Edit the transfer
+        data = {
+            "type": "2",
+            "direction": "1",
+            "origin_city": "Milan",
+            "destination_city": "Rome",
+            "start_time": "10:00",
+            "end_time": "11:30",
+            "specific_flight_number": "AZ5678",  # Changed
+            "specific_gate": "B5",  # Changed
+        }
+
+        form = MainTransferCombinedForm(data, instance=transfer, trip=trip)
+        assert form.is_valid()
+
+        # Check that initial values were populated
+        assert "specific_flight_number" in form.fields
+        assert form.fields["specific_flight_number"].initial == "AZ1234"
+
+        # Save and verify updated data
+        updated_transfer = form.save(commit=False)
+        assert updated_transfer.type_specific_data["flight_number"] == "AZ5678"
+        assert updated_transfer.type_specific_data["gate"] == "B5"
+
+    def test_save_with_commit_true(self):
+        """Test saving with commit=True actually saves to database"""
+        trip = TripFactory()
+        data = {
+            "type": "2",
+            "direction": "1",
+            "origin_city": "Milan",
+            "destination_city": "Rome",
+            "start_time": "10:00",
+            "end_time": "11:30",
+        }
+
+        form = MainTransferForm(data, trip=trip)
+        assert form.is_valid()
+
+        transfer = form.save(commit=True)
+        assert transfer.pk is not None  # Saved to database
+
+        from trips.models import Transport
+
+        assert Transport.objects.filter(pk=transfer.pk).exists()
+
+    def test_edit_train_with_existing_data(self):
+        """Test editing train transfer with existing type-specific data"""
+        trip = TripFactory()
+        from trips.models import Transport
+
+        # Create a train transfer with existing data
+        transfer = Transport.objects.create(
+            trip=trip,
+            type=3,  # TRAIN
+            direction=1,
+            is_main_transfer=True,
+            origin_city="Milan",
+            destination_city="Rome",
+            start_time="10:00",
+            end_time="14:00",
+            type_specific_data={
+                "train_number": "FR9612",
+                "carriage": "7",
+                "seat": "42A",
+            },
+        )
+
+        # Edit the transfer
+        data = {
+            "type": "3",
+            "direction": "1",
+            "origin_city": "Milan",
+            "destination_city": "Rome",
+            "start_time": "10:00",
+            "end_time": "14:00",
+            "specific_train_number": "IC1234",  # Changed
+        }
+
+        form = MainTransferCombinedForm(data, instance=transfer, trip=trip)
+        assert form.is_valid()
+        updated_transfer = form.save(commit=False)
+        assert updated_transfer.type_specific_data["train_number"] == "IC1234"
+
+    def test_edit_car_with_existing_data(self):
+        """Test editing car transfer with existing type-specific data"""
+        trip = TripFactory()
+        from trips.models import Transport
+
+        # Create a car transfer with existing data
+        transfer = Transport.objects.create(
+            trip=trip,
+            type=1,  # CAR
+            direction=2,
+            is_main_transfer=True,
+            origin_city="Rome",
+            destination_city="Milan",
+            start_time="08:00",
+            end_time="12:00",
+            type_specific_data={
+                "license_plate": "AB123CD",
+                "car_type": "Sedan",
+            },
+        )
+
+        # Edit the transfer
+        data = {
+            "type": "1",
+            "direction": "2",
+            "origin_city": "Rome",
+            "destination_city": "Milan",
+            "start_time": "08:00",
+            "end_time": "12:00",
+            "specific_license_plate": "XY789ZW",  # Changed
+        }
+
+        form = MainTransferCombinedForm(data, instance=transfer, trip=trip)
+        assert form.is_valid()
+        updated_transfer = form.save(commit=False)
+        assert updated_transfer.type_specific_data["license_plate"] == "XY789ZW"
+
+    def test_no_specific_fields_for_other_transport(self):
+        """Test no specific fields added for BUS/BOAT/TAXI/OTHER"""
+        trip = TripFactory()
+
+        # Test with BUS type (5)
+        data = {
+            "type": "5",  # BUS - no specific fields
+            "direction": "1",
+            "origin_city": "Milan",
+            "destination_city": "Rome",
+            "start_time": "10:00",
+            "end_time": "14:00",
+        }
+
+        form = MainTransferCombinedForm(data, trip=trip)
+
+        # No specific fields should be added
+        assert "specific_flight_number" not in form.fields
+        assert "specific_train_number" not in form.fields
+        assert "specific_license_plate" not in form.fields
+
+        # Also test with no data (GET request) - transport_type will be None
+        form_empty = MainTransferCombinedForm(trip=trip)
+        assert "specific_flight_number" not in form_empty.fields
+
+        # Test with invalid type that doesn't match any condition
+        data_invalid_type = {
+            "type": "99",  # Invalid type
+            "direction": "1",
+            "origin_city": "Milan",
+            "destination_city": "Rome",
+            "start_time": "10:00",
+            "end_time": "14:00",
+        }
+        form_invalid = MainTransferCombinedForm(data_invalid_type, trip=trip)
+        assert "specific_flight_number" not in form_invalid.fields
+
+        # Test with empty type in POST data
+        data_empty_type = {
+            "type": "",  # Empty string - will fail the "if transport_type:" check
+            "direction": "1",
+            "origin_city": "Milan",
+            "destination_city": "Rome",
+            "start_time": "10:00",
+            "end_time": "14:00",
+        }
+        form_empty_type = MainTransferCombinedForm(data_empty_type, trip=trip)
+        assert "specific_flight_number" not in form_empty_type.fields

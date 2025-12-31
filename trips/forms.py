@@ -1118,15 +1118,22 @@ class MainTransferForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        trip = kwargs.pop("trip", None)
+        self.trip = kwargs.pop("trip", None)
         super().__init__(*args, **kwargs)
 
         # Prepopulate destination with trip destination
-        if trip and not self.instance.pk:
-            self.fields["destination_city"].initial = trip.destination
+        if self.trip and not self.instance.pk:
+            self.fields["destination_city"].initial = self.trip.destination
 
         self.helper = FormHelper()
         self.helper.form_tag = False
+
+    def clean(self):
+        cleaned_data = super().clean()
+        # Set is_main_transfer and trip before model validation runs
+        self.instance.is_main_transfer = True
+        self.instance.trip = self.trip
+        return cleaned_data
 
     def save(self, commit=True):
         instance = super().save(commit=False)

@@ -1,0 +1,60 @@
+{% load i18n %}
+
+<div id="type-specific-fields" class="space-y-4">
+    <div class="form-control">
+        <label class="label" for="id_specific_train_number">
+            <span class="label-text">{% trans "Train Number" %}</span>
+        </label>
+        <input type="text"
+               name="specific_train_number"
+               id="id_specific_train_number"
+               placeholder="FR9612"
+               class="input input-bordered input-sm" />
+    </div>
+
+    <div class="grid grid-cols-3 gap-4">
+        <div class="form-control">
+            <label class="label" for="id_specific_carriage">
+                <span class="label-text">{% trans "Carriage" %}</span>
+            </label>
+            <input type="text"
+                   name="specific_carriage"
+                   id="id_specific_carriage"
+                   placeholder="7"
+                   class="input input-bordered input-sm" />
+        </div>
+
+        <div class="form-control">
+            <label class="label" for="id_specific_seat">
+                <span class="label-text">{% trans "Seat" %}</span>
+            </label>
+            <input type="text"
+                   name="specific_seat"
+                   id="id_specific_seat"
+                   placeholder="42A"
+                   class="input input-bordered input-sm" />
+        </div>
+
+        <div class="form-control">
+            <label class="label" for="id_specific_platform">
+                <span class="label-text">{% trans "Platform" %}</span>
+            </label>
+            <input type="text"
+                   name="specific_platform"
+                   id="id_specific_platform"
+                   placeholder="3"
+                   class="input input-bordered input-sm" />
+        </div>
+    </div>
+
+    <div class="form-control">
+        <label class="label" for="id_specific_company_link">
+            <span class="label-text">{% trans "Train Company Website" %}</span>
+        </label>
+        <input type="url"
+               name="specific_company_link"
+               id="id_specific_company_link"
+               placeholder="https://..."
+               class="input input-bordered input-sm" />
+    </div>
+</div>
