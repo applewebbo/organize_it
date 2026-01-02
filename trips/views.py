@@ -92,6 +92,7 @@ def trip_detail(request, pk):
     Detail Page for the selected trip.
     Uses window functions to efficiently detect event overlaps within each day.
     """
+
     qs = Trip.objects.prefetch_related(
         Prefetch(
             "days__events",
@@ -105,6 +106,18 @@ def trip_detail(request, pk):
     trip = get_object_or_404(qs, pk=pk, author=request.user)
     unpaired_events = trip.all_events.filter(day__isnull=True)
 
+    # Get main transfers
+    arrival_transfer = (
+        trip.all_events.filter(transport__is_main_transfer=True, transport__direction=1)
+        .select_related("transport")
+        .first()
+    )
+    departure_transfer = (
+        trip.all_events.filter(transport__is_main_transfer=True, transport__direction=2)
+        .select_related("transport")
+        .first()
+    )
+
     # Check user preference for default view
     default_view = request.user.profile.default_map_view
     show_map = default_view == "map"
@@ -112,6 +125,8 @@ def trip_detail(request, pk):
     context = {
         "trip": trip,
         "unpaired_events": unpaired_events,
+        "arrival_transfer": arrival_transfer,
+        "departure_transfer": departure_transfer,
         "show_map": show_map,
     }
     if request.htmx:
@@ -553,8 +568,13 @@ def add_main_transfer(request, trip_id):
     """Create a new main transfer for the trip"""
     trip = get_object_or_404(Trip, pk=trip_id, author=request.user)
 
+    # Get direction from URL parameter (1=ARRIVAL, 2=DEPARTURE)
+    direction = request.GET.get("direction")
+    if direction:
+        direction = int(direction)
+
     if request.method == "POST":
-        form = MainTransferCombinedForm(request.POST, trip=trip)
+        form = MainTransferCombinedForm(request.POST, trip=trip, direction=direction)
         if form.is_valid():
             transfer = form.save(commit=False)
             transfer.trip = trip
@@ -562,11 +582,11 @@ def add_main_transfer(request, trip_id):
             messages.add_message(
                 request,
                 messages.SUCCESS,
-                _("Main transfer added successfully"),
+                _("Main trip added successfully"),
             )
             return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
     else:
-        form = MainTransferCombinedForm(trip=trip)
+        form = MainTransferCombinedForm(trip=trip, direction=direction)
 
     context = {"form": form, "trip": trip}
     return TemplateResponse(request, "trips/main-transfer-form.html", context)
@@ -592,7 +612,7 @@ def edit_main_transfer(request, pk):
             messages.add_message(
                 request,
                 messages.SUCCESS,
-                _("Main transfer updated successfully"),
+                _("Main trip updated successfully"),
             )
             return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
     else:
@@ -618,7 +638,7 @@ def delete_main_transfer(request, pk):
     messages.add_message(
         request,
         messages.SUCCESS,
-        _("Main transfer deleted successfully"),
+        _("Main trip deleted successfully"),
     )
     return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
 

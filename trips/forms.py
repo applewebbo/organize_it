@@ -1040,12 +1040,6 @@ class NoteForm(forms.ModelForm):
 class MainTransferForm(forms.ModelForm):
     """Base form for main transfers (arrival/departure)"""
 
-    direction = forms.ChoiceField(
-        choices=Transport.Direction.choices,
-        label=_("Direction"),
-        widget=forms.RadioSelect(),
-    )
-
     class Meta:
         model = Transport
         fields = [
@@ -1078,6 +1072,7 @@ class MainTransferForm(forms.ModelForm):
         }
         widgets = {
             "type": forms.Select(attrs={"class": "select select-primary"}),
+            "direction": forms.HiddenInput(),
             "origin_city": forms.TextInput(
                 attrs={"class": "input input-bordered", "placeholder": _("City")}
             ),
@@ -1119,7 +1114,12 @@ class MainTransferForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.trip = kwargs.pop("trip", None)
+        self.direction = kwargs.pop("direction", None)
         super().__init__(*args, **kwargs)
+
+        # Set initial direction if provided (from URL parameter)
+        if self.direction and not self.instance.pk:
+            self.fields["direction"].initial = self.direction
 
         # Prepopulate destination with trip destination
         if self.trip and not self.instance.pk:
