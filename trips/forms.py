@@ -11,7 +11,18 @@ from django.urls import reverse
 from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
 
-from .models import Day, Event, Experience, Link, Meal, Stay, Transport, Trip
+from .models import (
+    Day,
+    Event,
+    Experience,
+    Link,
+    MainTransfer,
+    Meal,
+    Stay,
+    Transport,
+    Trip,
+)
+from .utils import get_airport_by_iata, get_station_by_id
 
 
 def urlfields_assume_https(db_field, **kwargs):
@@ -1408,3 +1419,630 @@ class AddNoteToStayForm(forms.ModelForm):
                 css_class="sm:col-span-2",
             ),
         )
+
+
+# =============================================================================
+# MAIN TRANSFER FORMS (for trip arrival/departure)
+# =============================================================================
+
+
+class MainTransferBaseForm(forms.ModelForm):
+    """
+    Base form for MainTransfer - common fields for all transport types.
+    Must be extended by type-specific forms.
+    """
+
+    direction = forms.ChoiceField(
+        choices=MainTransfer.Direction.choices,
+        label=_("Direction"),
+        widget=forms.RadioSelect(attrs={"class": "radio radio-primary"}),
+    )
+
+    class Meta:
+        model = MainTransfer
+        fields = [
+            "direction",
+            "start_time",
+            "end_time",
+            "booking_reference",
+            "ticket_url",
+            "notes",
+        ]
+        widgets = {
+            "start_time": forms.TimeInput(
+                attrs={"type": "time", "class": "input input-bordered"}
+            ),
+            "end_time": forms.TimeInput(
+                attrs={"type": "time", "class": "input input-bordered"}
+            ),
+            "booking_reference": forms.TextInput(
+                attrs={
+                    "class": "input input-bordered",
+                    "placeholder": _("Booking reference"),
+                }
+            ),
+            "ticket_url": forms.URLInput(
+                attrs={"class": "input input-bordered", "placeholder": "https://..."}
+            ),
+            "notes": forms.Textarea(
+                attrs={"class": "textarea textarea-bordered", "rows": 3}
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.trip = kwargs.pop("trip", None)
+        super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+
+        if self.trip:
+            instance.trip = self.trip
+
+        # Save type-specific data in JSONField
+        type_specific_data = self.get_type_specific_data()
+        if type_specific_data:
+            instance.type_specific_data = type_specific_data
+
+        if commit:
+            instance.save()
+
+        return instance
+
+    def get_type_specific_data(self):
+        """
+        Override in child forms to populate type_specific_data.
+        Returns a dict with type-specific fields.
+        """
+        return {}
+
+
+class FlightMainTransferForm(MainTransferBaseForm):
+    """Form for flight main transfers with airport autocomplete"""
+
+    # Airport fields (autocomplete with CSV lookup)
+    origin_airport = forms.CharField(
+        label=_("Departure Airport"),
+        max_length=200,
+        widget=forms.TextInput(
+            attrs={
+                "class": "input input-bordered",
+                "placeholder": _("Search by name or IATA code (e.g., FCO, Rome)"),
+                "autocomplete": "off",
+                "data-autocomplete-type": "airport",
+            }
+        ),
+        help_text=_("Search for airport by name, city, or IATA code"),
+    )
+
+    origin_iata = forms.CharField(
+        max_length=10, required=False, widget=forms.HiddenInput()
+    )
+
+    destination_airport = forms.CharField(
+        label=_("Arrival Airport"),
+        max_length=200,
+        widget=forms.TextInput(
+            attrs={
+                "class": "input input-bordered",
+                "placeholder": _("Search by name or IATA code"),
+                "autocomplete": "off",
+                "data-autocomplete-type": "airport",
+            }
+        ),
+        help_text=_("Search for airport by name, city, or IATA code"),
+    )
+
+    destination_iata = forms.CharField(
+        max_length=10, required=False, widget=forms.HiddenInput()
+    )
+
+    # Flight-specific fields
+    company = forms.CharField(
+        max_length=100,
+        required=False,
+        label=_("Airline"),
+        widget=forms.TextInput(
+            attrs={"class": "input input-bordered", "placeholder": _("Airline name")}
+        ),
+    )
+
+    flight_number = forms.CharField(
+        max_length=20,
+        required=False,
+        label=_("Flight Number"),
+        widget=forms.TextInput(
+            attrs={"class": "input input-bordered", "placeholder": "AZ1234"}
+        ),
+    )
+
+    terminal = forms.CharField(
+        max_length=10,
+        required=False,
+        label=_("Terminal"),
+        widget=forms.TextInput(
+            attrs={"class": "input input-bordered", "placeholder": "T1"}
+        ),
+    )
+
+    company_website = forms.URLField(
+        required=False,
+        label=_("Airline Website"),
+        widget=forms.URLInput(
+            attrs={"class": "input input-bordered", "placeholder": "https://..."}
+        ),
+    )
+
+    class Meta(MainTransferBaseForm.Meta):
+        fields = MainTransferBaseForm.Meta.fields + [
+            "origin_airport",
+            "origin_iata",
+            "destination_airport",
+            "destination_iata",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Populate fields if editing
+        if self.instance and self.instance.pk:
+            self.fields["origin_airport"].initial = self.instance.origin_name
+            self.fields["origin_iata"].initial = self.instance.origin_code
+            self.fields["destination_airport"].initial = self.instance.destination_name
+            self.fields["destination_iata"].initial = self.instance.destination_code
+
+            # Populate type-specific fields
+            if self.instance.type_specific_data:
+                self.fields["company"].initial = self.instance.company
+                self.fields["flight_number"].initial = self.instance.flight_number
+                self.fields["terminal"].initial = self.instance.terminal
+                self.fields["company_website"].initial = self.instance.company_website
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        # Lookup coordinates from CSV
+        origin_iata = cleaned_data.get("origin_iata")
+        destination_iata = cleaned_data.get("destination_iata")
+
+        if origin_iata:
+            airport = get_airport_by_iata(origin_iata)
+            if airport:
+                # Store temporarily for save()
+                self._origin_coords = (airport["latitude"], airport["longitude"])
+            else:
+                raise forms.ValidationError("Invalid origin airport IATA code")
+
+        if destination_iata:
+            airport = get_airport_by_iata(destination_iata)
+            if airport:
+                self._destination_coords = (airport["latitude"], airport["longitude"])
+            else:
+                raise forms.ValidationError("Invalid destination airport IATA code")
+
+        return cleaned_data
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+
+        # Populate model fields
+        instance.type = MainTransfer.Type.PLANE
+        instance.origin_code = self.cleaned_data["origin_iata"]
+        instance.origin_name = self.cleaned_data["origin_airport"]
+        instance.destination_code = self.cleaned_data["destination_iata"]
+        instance.destination_name = self.cleaned_data["destination_airport"]
+
+        # Coordinates from CSV
+        if hasattr(self, "_origin_coords"):
+            instance.origin_latitude, instance.origin_longitude = self._origin_coords
+        if hasattr(self, "_destination_coords"):
+            (
+                instance.destination_latitude,
+                instance.destination_longitude,
+            ) = self._destination_coords
+
+        if commit:
+            instance.save()
+
+        return instance
+
+    def get_type_specific_data(self):
+        """Populate flight-specific fields in JSONField"""
+        data = {}
+
+        if self.cleaned_data.get("company"):
+            data["company"] = self.cleaned_data["company"]
+        if self.cleaned_data.get("flight_number"):
+            data["flight_number"] = self.cleaned_data["flight_number"]
+        if self.cleaned_data.get("terminal"):
+            data["terminal"] = self.cleaned_data["terminal"]
+        if self.cleaned_data.get("company_website"):
+            data["company_website"] = self.cleaned_data["company_website"]
+
+        return data
+
+
+class TrainMainTransferForm(MainTransferBaseForm):
+    """Form for train main transfers with station autocomplete"""
+
+    # Station fields (autocomplete with CSV lookup)
+    origin_station = forms.CharField(
+        label=_("Departure Station"),
+        max_length=200,
+        widget=forms.TextInput(
+            attrs={
+                "class": "input input-bordered",
+                "placeholder": _("Search by station name"),
+                "autocomplete": "off",
+                "data-autocomplete-type": "station",
+            }
+        ),
+        help_text=_("Search for train station by name"),
+    )
+
+    origin_station_id = forms.CharField(
+        max_length=20, required=False, widget=forms.HiddenInput()
+    )
+
+    destination_station = forms.CharField(
+        label=_("Arrival Station"),
+        max_length=200,
+        widget=forms.TextInput(
+            attrs={
+                "class": "input input-bordered",
+                "placeholder": _("Search by station name"),
+                "autocomplete": "off",
+                "data-autocomplete-type": "station",
+            }
+        ),
+        help_text=_("Search for train station by name"),
+    )
+
+    destination_station_id = forms.CharField(
+        max_length=20, required=False, widget=forms.HiddenInput()
+    )
+
+    # Train-specific fields
+    company = forms.CharField(
+        max_length=100,
+        required=False,
+        label=_("Train Operator"),
+        widget=forms.TextInput(
+            attrs={
+                "class": "input input-bordered",
+                "placeholder": _("Train operator name"),
+            }
+        ),
+    )
+
+    train_number = forms.CharField(
+        max_length=20,
+        required=False,
+        label=_("Train Number"),
+        widget=forms.TextInput(
+            attrs={"class": "input input-bordered", "placeholder": "FR9612"}
+        ),
+    )
+
+    carriage = forms.CharField(
+        max_length=10,
+        required=False,
+        label=_("Carriage"),
+        widget=forms.TextInput(
+            attrs={"class": "input input-bordered", "placeholder": "7"}
+        ),
+    )
+
+    seat = forms.CharField(
+        max_length=10,
+        required=False,
+        label=_("Seat"),
+        widget=forms.TextInput(
+            attrs={"class": "input input-bordered", "placeholder": "42A"}
+        ),
+    )
+
+    company_website = forms.URLField(
+        required=False,
+        label=_("Train Operator Website"),
+        widget=forms.URLInput(
+            attrs={"class": "input input-bordered", "placeholder": "https://..."}
+        ),
+    )
+
+    class Meta(MainTransferBaseForm.Meta):
+        fields = MainTransferBaseForm.Meta.fields + [
+            "origin_station",
+            "origin_station_id",
+            "destination_station",
+            "destination_station_id",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Populate fields if editing
+        if self.instance and self.instance.pk:
+            self.fields["origin_station"].initial = self.instance.origin_name
+            # Note: station_id is stored in origin_code field (reusing)
+            self.fields["origin_station_id"].initial = self.instance.origin_code
+            self.fields["destination_station"].initial = self.instance.destination_name
+            self.fields[
+                "destination_station_id"
+            ].initial = self.instance.destination_code
+
+            # Populate type-specific fields
+            if self.instance.type_specific_data:
+                self.fields["company"].initial = self.instance.company
+                self.fields["train_number"].initial = self.instance.train_number
+                self.fields["carriage"].initial = self.instance.carriage
+                self.fields["seat"].initial = self.instance.seat
+                self.fields["company_website"].initial = self.instance.company_website
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        # Lookup coordinates from CSV using station ID
+        origin_id = cleaned_data.get("origin_station_id")
+        destination_id = cleaned_data.get("destination_station_id")
+
+        if origin_id:
+            station = get_station_by_id(origin_id)
+            if station:
+                self._origin_coords = (station["latitude"], station["longitude"])
+            else:
+                raise forms.ValidationError("Invalid origin station ID")
+
+        if destination_id:
+            station = get_station_by_id(destination_id)
+            if station:
+                self._destination_coords = (station["latitude"], station["longitude"])
+            else:
+                raise forms.ValidationError("Invalid destination station ID")
+
+        return cleaned_data
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+
+        # Populate model fields
+        instance.type = MainTransfer.Type.TRAIN
+        # Note: Reusing origin_code/destination_code fields to store station IDs for trains
+        instance.origin_code = self.cleaned_data["origin_station_id"]
+        instance.origin_name = self.cleaned_data["origin_station"]
+        instance.destination_code = self.cleaned_data["destination_station_id"]
+        instance.destination_name = self.cleaned_data["destination_station"]
+
+        # Coordinates from CSV
+        if hasattr(self, "_origin_coords"):
+            instance.origin_latitude, instance.origin_longitude = self._origin_coords
+        if hasattr(self, "_destination_coords"):
+            (
+                instance.destination_latitude,
+                instance.destination_longitude,
+            ) = self._destination_coords
+
+        if commit:
+            instance.save()
+
+        return instance
+
+    def get_type_specific_data(self):
+        """Populate train-specific fields in JSONField"""
+        data = {}
+
+        if self.cleaned_data.get("company"):
+            data["company"] = self.cleaned_data["company"]
+        if self.cleaned_data.get("train_number"):
+            data["train_number"] = self.cleaned_data["train_number"]
+        if self.cleaned_data.get("carriage"):
+            data["carriage"] = self.cleaned_data["carriage"]
+        if self.cleaned_data.get("seat"):
+            data["seat"] = self.cleaned_data["seat"]
+        if self.cleaned_data.get("company_website"):
+            data["company_website"] = self.cleaned_data["company_website"]
+
+        return data
+
+
+class CarMainTransferForm(MainTransferBaseForm):
+    """Form for car main transfers with geocoding"""
+
+    # Address fields (geocoding like events)
+    origin_address = forms.CharField(
+        label=_("Departure Address"),
+        max_length=500,
+        widget=forms.TextInput(
+            attrs={
+                "class": "input input-bordered",
+                "placeholder": _("Full address (street, city, country)"),
+            }
+        ),
+        help_text=_("Full address for geocoding"),
+    )
+
+    destination_address = forms.CharField(
+        label=_("Arrival Address"),
+        max_length=500,
+        widget=forms.TextInput(
+            attrs={
+                "class": "input input-bordered",
+                "placeholder": _("Full address (street, city, country)"),
+            }
+        ),
+        help_text=_("Full address for geocoding"),
+    )
+
+    # Car-specific fields
+    company = forms.CharField(
+        max_length=100,
+        required=False,
+        label=_("Rental Company"),
+        widget=forms.TextInput(
+            attrs={
+                "class": "input input-bordered",
+                "placeholder": _("Rental company name (if applicable)"),
+            }
+        ),
+    )
+
+    is_rental = forms.BooleanField(
+        required=False,
+        label=_("Rental Car"),
+        widget=forms.CheckboxInput(attrs={"class": "checkbox checkbox-primary"}),
+    )
+
+    company_website = forms.URLField(
+        required=False,
+        label=_("Rental Company Website"),
+        widget=forms.URLInput(
+            attrs={"class": "input input-bordered", "placeholder": "https://..."}
+        ),
+    )
+
+    class Meta(MainTransferBaseForm.Meta):
+        fields = MainTransferBaseForm.Meta.fields + [
+            "origin_address",
+            "destination_address",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Populate fields if editing
+        if self.instance and self.instance.pk:
+            self.fields["origin_address"].initial = self.instance.origin_address
+            self.fields[
+                "destination_address"
+            ].initial = self.instance.destination_address
+
+            # Populate type-specific fields
+            if self.instance.type_specific_data:
+                self.fields["company"].initial = self.instance.company
+                self.fields["is_rental"].initial = self.instance.is_rental
+                self.fields["company_website"].initial = self.instance.company_website
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+
+        # Populate model fields
+        instance.type = MainTransfer.Type.CAR
+        instance.origin_address = self.cleaned_data["origin_address"]
+        instance.destination_address = self.cleaned_data["destination_address"]
+
+        # Geocoding will happen automatically in model save()
+
+        if commit:
+            instance.save()
+
+        return instance
+
+    def get_type_specific_data(self):
+        """Populate car-specific fields in JSONField"""
+        data = {}
+
+        if self.cleaned_data.get("company"):
+            data["company"] = self.cleaned_data["company"]
+        if self.cleaned_data.get("is_rental"):
+            data["is_rental"] = True
+        if self.cleaned_data.get("company_website"):
+            data["company_website"] = self.cleaned_data["company_website"]
+
+        return data
+
+
+class OtherMainTransferForm(MainTransferBaseForm):
+    """Form for other transport types (bus, boat, taxi, etc.) with geocoding"""
+
+    # Address fields (geocoding like events)
+    origin_address = forms.CharField(
+        label=_("Departure Location"),
+        max_length=500,
+        widget=forms.TextInput(
+            attrs={
+                "class": "input input-bordered",
+                "placeholder": _("Full address or location name"),
+            }
+        ),
+        help_text=_("Full address for geocoding"),
+    )
+
+    destination_address = forms.CharField(
+        label=_("Arrival Location"),
+        max_length=500,
+        widget=forms.TextInput(
+            attrs={
+                "class": "input input-bordered",
+                "placeholder": _("Full address or location name"),
+            }
+        ),
+        help_text=_("Full address for geocoding"),
+    )
+
+    # Generic fields
+    company = forms.CharField(
+        max_length=100,
+        required=False,
+        label=_("Transport Company"),
+        widget=forms.TextInput(
+            attrs={
+                "class": "input input-bordered",
+                "placeholder": _("Company name (if applicable)"),
+            }
+        ),
+    )
+
+    company_website = forms.URLField(
+        required=False,
+        label=_("Company Website"),
+        widget=forms.URLInput(
+            attrs={"class": "input input-bordered", "placeholder": "https://..."}
+        ),
+    )
+
+    class Meta(MainTransferBaseForm.Meta):
+        fields = MainTransferBaseForm.Meta.fields + [
+            "origin_address",
+            "destination_address",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Populate fields if editing
+        if self.instance and self.instance.pk:
+            self.fields["origin_address"].initial = self.instance.origin_address
+            self.fields[
+                "destination_address"
+            ].initial = self.instance.destination_address
+
+            # Populate type-specific fields
+            if self.instance.type_specific_data:
+                self.fields["company"].initial = self.instance.company
+                self.fields["company_website"].initial = self.instance.company_website
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+
+        # Populate model fields
+        instance.type = MainTransfer.Type.OTHER
+        instance.origin_address = self.cleaned_data["origin_address"]
+        instance.destination_address = self.cleaned_data["destination_address"]
+
+        # Geocoding will happen automatically in model save()
+
+        if commit:
+            instance.save()
+
+        return instance
+
+    def get_type_specific_data(self):
+        """Populate generic fields in JSONField"""
+        data = {}
+
+        if self.cleaned_data.get("company"):
+            data["company"] = self.cleaned_data["company"]
+        if self.cleaned_data.get("company_website"):
+            data["company_website"] = self.cleaned_data["company_website"]
+
+        return data
