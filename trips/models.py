@@ -184,6 +184,191 @@ def update_stay_days(sender, instance, **kwargs):
         )
 
 
+class MainTransfer(models.Model):
+    """
+    Main transfers (arrival/departure) for a trip.
+    Separate from daily Transport events.
+    """
+
+    class Type(models.IntegerChoices):
+        PLANE = 1, _("Plane")
+        TRAIN = 2, _("Train")
+        CAR = 3, _("Car")
+        OTHER = 4, _("Other")
+
+    class Direction(models.IntegerChoices):
+        ARRIVAL = 1, _("Arrival")
+        DEPARTURE = 2, _("Departure")
+
+    trip = models.ForeignKey(
+        Trip, on_delete=models.CASCADE, related_name="main_transfers"
+    )
+    type = models.IntegerField(
+        choices=Type.choices, help_text="Type of transport (plane, train, car, other)"
+    )
+    direction = models.IntegerField(
+        choices=Direction.choices,
+        help_text="Arrival (to destination) or Departure (from destination)",
+    )
+
+    # Location fields - two approaches:
+    # For PLANE: IATA code + airport name (from CSV)
+    # For TRAIN: station ID stored in origin_code + station name (from CSV)
+    origin_code = models.CharField(
+        max_length=10, blank=True, help_text="IATA code (plane) or station ID (train)"
+    )
+    origin_name = models.CharField(max_length=200, help_text="Airport/station name")
+    destination_code = models.CharField(
+        max_length=10, blank=True, help_text="IATA code (plane) or station ID (train)"
+    )
+    destination_name = models.CharField(
+        max_length=200, help_text="Airport/station name"
+    )
+
+    # For CAR/OTHER: address (with geocoding like events)
+    origin_address = models.CharField(
+        max_length=500, blank=True, help_text="Full address for car/other transport"
+    )
+    destination_address = models.CharField(
+        max_length=500, blank=True, help_text="Full address for car/other transport"
+    )
+
+    # Coordinates (populated from CSV or geocoding)
+    origin_latitude = models.FloatField(null=True, blank=True)
+    origin_longitude = models.FloatField(null=True, blank=True)
+    destination_latitude = models.FloatField(null=True, blank=True)
+    destination_longitude = models.FloatField(null=True, blank=True)
+
+    # Common fields
+    start_time = models.TimeField(help_text="Departure time")
+    end_time = models.TimeField(help_text="Arrival time")
+    booking_reference = models.CharField(
+        max_length=100, blank=True, help_text="Booking/reservation reference"
+    )
+    ticket_url = models.URLField(blank=True, help_text="Link to ticket or booking")
+    notes = models.TextField(blank=True, help_text="Additional notes")
+
+    # Type-specific data (JSONField for flexibility)
+    type_specific_data = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Type-specific fields: company, flight_number, train_number, etc.",
+    )
+
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "trips_main_transfer"
+        verbose_name = _("Main Transfer")
+        verbose_name_plural = _("Main Transfers")
+        ordering = ["direction", "start_time"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["trip", "direction"], name="unique_trip_maintransfer_direction"
+            )
+        ]
+        indexes = [
+            models.Index(fields=["trip", "direction"]),
+        ]
+
+    def __str__(self):
+        direction_str = (
+            "Arrival" if self.direction == self.Direction.ARRIVAL else "Departure"
+        )
+        return f"{self.trip.title} - {direction_str} ({self.get_type_display()})"
+
+    def clean(self):
+        """Custom validations"""
+        super().clean()
+
+        # Plane/Train MUST have origin/destination names
+        if self.type in [self.Type.PLANE, self.Type.TRAIN]:
+            if not self.origin_name or not self.destination_name:
+                raise ValidationError(
+                    {
+                        "origin_name": "Airport/station name required for plane/train",
+                        "destination_name": "Airport/station name required for plane/train",
+                    }
+                )
+
+        # Car/Other MUST have addresses
+        if self.type in [self.Type.CAR, self.Type.OTHER]:
+            if not self.origin_address or not self.destination_address:
+                raise ValidationError(
+                    {
+                        "origin_address": "Full address required for car/other transport",
+                        "destination_address": "Full address required for car/other transport",
+                    }
+                )
+
+    def save(self, *args, **kwargs):
+        """Override save for automatic geocoding (car/other only)"""
+
+        # Geocoding for CAR/OTHER (like events)
+        if self.type in [self.Type.CAR, self.Type.OTHER]:
+            # Origin geocoding
+            if self.origin_address and not (
+                self.origin_latitude and self.origin_longitude
+            ):
+                g = geocoder.mapbox(
+                    self.origin_address, access_token=settings.MAPBOX_ACCESS_TOKEN
+                )
+                if g.latlng:
+                    self.origin_latitude, self.origin_longitude = g.latlng
+
+            # Destination geocoding
+            if self.destination_address and not (
+                self.destination_latitude and self.destination_longitude
+            ):
+                g = geocoder.mapbox(
+                    self.destination_address, access_token=settings.MAPBOX_ACCESS_TOKEN
+                )
+                if g.latlng:
+                    self.destination_latitude, self.destination_longitude = g.latlng
+
+        super().save(*args, **kwargs)
+
+    # Properties for type-specific field access
+
+    # Common (all types)
+    @property
+    def company(self):
+        return self.type_specific_data.get("company", "")
+
+    @property
+    def company_website(self):
+        return self.type_specific_data.get("company_website", "")
+
+    # Flight specific
+    @property
+    def flight_number(self):
+        return self.type_specific_data.get("flight_number", "")
+
+    @property
+    def terminal(self):
+        return self.type_specific_data.get("terminal", "")
+
+    # Train specific
+    @property
+    def train_number(self):
+        return self.type_specific_data.get("train_number", "")
+
+    @property
+    def carriage(self):
+        return self.type_specific_data.get("carriage", "")
+
+    @property
+    def seat(self):
+        return self.type_specific_data.get("seat", "")
+
+    # Car specific
+    @property
+    def is_rental(self):
+        return self.type_specific_data.get("is_rental", False)
+
+
 class Day(models.Model):
     trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="days")
     stay = models.ForeignKey(
@@ -561,15 +746,6 @@ class Transport(Event):
         return (
             f"{self.origin_city} → {self.destination_city} ({self.get_type_display()})"
         )
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["trip", "direction"],
-                condition=models.Q(is_main_transfer=True),
-                name="unique_main_transfer_per_direction",
-            )
-        ]
 
 
 class Experience(Event):
