@@ -31,6 +31,8 @@ if (window.Alpine) {
         geocodeTimer: null,
         addressFilled: false,
         nameFilled: false,
+        airportFilled: false,
+        stationFilled: false,
         checkAndTrigger() {
             clearTimeout(this.geocodeTimer);
             if (this.$refs.name.value && this.$refs.city.value) {
@@ -49,6 +51,54 @@ if (window.Alpine) {
             setTimeout(() => {
                 this.nameFilled = false;
                 this.addressFilled = false;
+            }, 500);
+        },
+        setAirportFields(nameId, iataId) {
+            const name = document.getElementById(nameId)?.textContent || "";
+            const iata = document.getElementById(iataId)?.textContent || "";
+
+            // Find the airport input fields (could be origin or destination)
+            const originAirport = document.getElementById("id_origin_airport");
+            const originIata = document.getElementById("id_origin_iata");
+            const destAirport = document.getElementById("id_destination_airport");
+            const destIata = document.getElementById("id_destination_iata");
+
+            // Determine which field was being filled based on focus or empty state
+            if (originAirport && (!originAirport.value || document.activeElement === originAirport)) {
+                originAirport.value = name;
+                if (originIata) originIata.value = iata;
+            } else if (destAirport) {
+                destAirport.value = name;
+                if (destIata) destIata.value = iata;
+            }
+
+            this.airportFilled = true;
+            setTimeout(() => {
+                this.airportFilled = false;
+            }, 500);
+        },
+        setStationFields(nameId, stationIdElementId) {
+            const name = document.getElementById(nameId)?.textContent || "";
+            const stationId = document.getElementById(stationIdElementId)?.textContent || "";
+
+            // Find the station input fields (could be origin or destination)
+            const originStation = document.getElementById("id_origin_station");
+            const originStationId = document.getElementById("id_origin_station_id");
+            const destStation = document.getElementById("id_destination_station");
+            const destStationId = document.getElementById("id_destination_station_id");
+
+            // Determine which field was being filled based on focus or empty state
+            if (originStation && (!originStation.value || document.activeElement === originStation)) {
+                originStation.value = name;
+                if (originStationId) originStationId.value = stationId;
+            } else if (destStation) {
+                destStation.value = name;
+                if (destStationId) destStationId.value = stationId;
+            }
+
+            this.stationFilled = true;
+            setTimeout(() => {
+                this.stationFilled = false;
             }, 500);
         }
     }));

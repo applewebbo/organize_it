@@ -110,6 +110,8 @@ htmx_urlpatterns = [
     ),
     path("geocode-address/", views.geocode_address, name="geocode-address"),
     path("get-trip-addresses/", views.get_trip_addresses, name="get-trip-addresses"),
+    path("search-airports/", views.search_airports, name="search-airports"),
+    path("search-stations/", views.search_stations, name="search-stations"),
     path("days/<int:day_id>/map/", views.DayMapView.as_view(), name="day-map"),
     # IMAGE MANAGEMENT
     path("images/search/", views.search_trip_images, name="search-images"),

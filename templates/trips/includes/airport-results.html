@@ -1,0 +1,31 @@
+{% load i18n %}
+{% if found %}
+    <div class="mb-4 -mt-1">
+        <ul>
+            {% for airport in airports %}
+                <li class="flex gap-2 justify-between items-center py-2 px-3 mx-2 mb-2 text-sm rounded-lg border text-slate-600 bg-slate-50 border-slate-200">
+                    <div>
+                        <span id="airport-name-{{ forloop.counter }}" class="font-bold">{{ airport.name }}</span>
+                        <span class="text-xs text-slate-500">({{ airport.iata_code }})</span>
+                        &nbsp;<span id="airport-city-{{ forloop.counter }}" class="text-slate-500">{{ airport.city }}</span>
+                        <span id="airport-iata-{{ forloop.counter }}" class="hidden">{{ airport.iata_code }}</span>
+                    </div>
+                    <button type="button"
+                            class="btn btn-xs btn-ghost"
+                            @click="setAirportFields('airport-name-{{ forloop.counter }}', 'airport-iata-{{ forloop.counter }}')">
+                        <i class="ph-bold ph-plus-circle i-sm"></i>
+                    </button>
+                </li>
+            {% endfor %}
+        </ul>
+        <p class="flex gap-1 justify-end items-center px-3 my-1 mx-2 text-xs italic text-slate-400">
+            <i class="ph-bold ph-info i-xs"></i>{% trans 'Airport data from CSV database' %}
+        </p>
+    </div>
+{% else %}
+    <div class="mb-4 -mt-1">
+        <p class="py-2 px-3 mx-2 mb-2 text-sm text-red-500 rounded-lg border bg-slate-50 border-slate-200">
+            {% trans 'No airport found. Try searching by name, city, or IATA code.' %}
+        </p>
+    </div>
+{% endif %}

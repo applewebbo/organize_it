@@ -1646,3 +1646,72 @@ def search_trip_images(request):
         )
 
     return HttpResponse(status=405)
+
+
+# =============================================================================
+# MAIN TRANSFER VIEWS (arrival/departure transfers)
+# =============================================================================
+
+
+@login_required
+def search_airports(request):
+    """
+    HTMX endpoint for airport autocomplete.
+    Searches airports by name, city, or IATA code from CSV.
+    """
+    from trips.utils import search_airports as search_airports_util
+
+    if request.method == "POST":
+        query = request.POST.get("airport_query", "").strip()
+
+        if query and len(query) >= 2:
+            results = search_airports_util(query, limit=10)
+            if results:
+                return TemplateResponse(
+                    request,
+                    "trips/includes/airport-results.html",
+                    {
+                        "airports": results,
+                        "found": True,
+                    },
+                )
+
+        return TemplateResponse(
+            request, "trips/includes/airport-results.html", {"found": False}
+        )
+
+    return TemplateResponse(
+        request, "trips/includes/airport-results.html", {"found": False}
+    )
+
+
+@login_required
+def search_stations(request):
+    """
+    HTMX endpoint for train station autocomplete.
+    Searches stations by name or country from CSV.
+    """
+    from trips.utils import search_train_stations
+
+    if request.method == "POST":
+        query = request.POST.get("station_query", "").strip()
+
+        if query and len(query) >= 2:
+            results = search_train_stations(query, limit=10)
+            if results:
+                return TemplateResponse(
+                    request,
+                    "trips/includes/station-results.html",
+                    {
+                        "stations": results,
+                        "found": True,
+                    },
+                )
+
+        return TemplateResponse(
+            request, "trips/includes/station-results.html", {"found": False}
+        )
+
+    return TemplateResponse(
+        request, "trips/includes/station-results.html", {"found": False}
+    )
