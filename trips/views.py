@@ -19,17 +19,21 @@ from django.views.generic import View
 from accounts.models import Profile
 from trips.forms import (
     AddNoteToStayForm,
+    CarMainTransferForm,
     EventChangeTimesForm,
     ExperienceForm,
+    FlightMainTransferForm,
     MainTransferCombinedForm,
     MealForm,
     NoteForm,
+    OtherMainTransferForm,
     StayForm,
+    TrainMainTransferForm,
     TransportForm,
     TripDateUpdateForm,
     TripForm,
 )
-from trips.models import Day, Event, Stay, Trip
+from trips.models import Day, Event, MainTransfer, Stay, Trip
 from trips.utils import (
     annotate_event_overlaps,
     convert_google_opening_hours,
@@ -39,6 +43,8 @@ from trips.utils import (
     get_event_instance,
     get_trips,
     process_trip_image,
+    search_airports,
+    search_train_stations,
     search_unsplash_photos,
 )
 
@@ -1654,18 +1660,16 @@ def search_trip_images(request):
 
 
 @login_required
-def search_airports(request):
+def search_airports_view(request):
     """
     HTMX endpoint for airport autocomplete.
     Searches airports by name, city, or IATA code from CSV.
     """
-    from trips.utils import search_airports as search_airports_util
-
     if request.method == "POST":
         query = request.POST.get("airport_query", "").strip()
 
         if query and len(query) >= 2:
-            results = search_airports_util(query, limit=10)
+            results = search_airports(query, limit=10)
             if results:
                 return TemplateResponse(
                     request,
@@ -1691,8 +1695,6 @@ def search_stations(request):
     HTMX endpoint for train station autocomplete.
     Searches stations by name or country from CSV.
     """
-    from trips.utils import search_train_stations
-
     if request.method == "POST":
         query = request.POST.get("station_query", "").strip()
 
@@ -1715,3 +1717,175 @@ def search_stations(request):
     return TemplateResponse(
         request, "trips/includes/station-results.html", {"found": False}
     )
+
+
+@login_required
+def main_transfer_modal(request, trip_id):
+    """Entry point for main transfer modal. Opens with step 1 (type selection)."""
+    trip = get_object_or_404(Trip, pk=trip_id, author=request.user)
+
+    # Check existing transfers
+    arrival = MainTransfer.objects.filter(
+        trip=trip, direction=MainTransfer.Direction.ARRIVAL
+    ).first()
+    departure = MainTransfer.objects.filter(
+        trip=trip, direction=MainTransfer.Direction.DEPARTURE
+    ).first()
+
+    # Determine initial transport type
+    transport_type = arrival.type if arrival else MainTransfer.Type.PLANE
+
+    context = {
+        "trip": trip,
+        "arrival": arrival,
+        "departure": departure,
+        "transport_type": transport_type,
+        "is_edit": arrival is not None or departure is not None,
+    }
+
+    return TemplateResponse(request, "trips/main-transfer-modal.html", context)
+
+
+@login_required
+def main_transfer_step(request, trip_id):
+    """HTMX endpoint to load specific step of multi-step modal."""
+    trip = get_object_or_404(Trip, pk=trip_id, author=request.user)
+    step = request.GET.get("step", "type")
+    transport_type = int(request.GET.get("transport_type", MainTransfer.Type.PLANE))
+
+    # Form mapper
+    FORM_MAP = {
+        MainTransfer.Type.PLANE: FlightMainTransferForm,
+        MainTransfer.Type.TRAIN: TrainMainTransferForm,
+        MainTransfer.Type.CAR: CarMainTransferForm,
+        MainTransfer.Type.OTHER: OtherMainTransferForm,
+    }
+
+    if step == "type":
+        context = {"trip": trip, "transport_type": transport_type}
+        return TemplateResponse(
+            request, "trips/partials/main-transfer-type.html", context
+        )
+
+    elif step in ["arrival", "departure"]:
+        direction = (
+            MainTransfer.Direction.ARRIVAL
+            if step == "arrival"
+            else MainTransfer.Direction.DEPARTURE
+        )
+
+        instance = MainTransfer.objects.filter(trip=trip, direction=direction).first()
+        form_class = FORM_MAP.get(transport_type)
+        if not form_class:
+            return HttpResponse("Invalid transport type", status=400)
+
+        form = form_class(instance=instance, trip=trip, autocomplete=True)
+        form.initial["direction"] = direction
+
+        context = {
+            "trip": trip,
+            "form": form,
+            "step": step,
+            "transport_type": transport_type,
+            "direction": "arrival" if step == "arrival" else "departure",
+        }
+
+        template_map = {
+            MainTransfer.Type.PLANE: "trips/partials/main-transfer-flight.html",
+            MainTransfer.Type.TRAIN: "trips/partials/main-transfer-train.html",
+            MainTransfer.Type.CAR: "trips/partials/main-transfer-car.html",
+            MainTransfer.Type.OTHER: "trips/partials/main-transfer-other.html",
+        }
+
+        return TemplateResponse(request, template_map[transport_type], context)
+
+    return HttpResponse("Invalid step", status=400)
+
+
+@login_required
+def save_main_transfer(request, trip_id):
+    """Save main transfer (arrival or departure)."""
+    trip = get_object_or_404(Trip, pk=trip_id, author=request.user)
+
+    if request.method != "POST":
+        return HttpResponse(status=405)
+
+    # Get transport_type and direction from query params
+    transport_type = int(request.GET.get("transport_type", MainTransfer.Type.PLANE))
+    direction_param = request.GET.get("direction", "arrival")
+    direction = (
+        MainTransfer.Direction.ARRIVAL
+        if direction_param == "arrival"
+        else MainTransfer.Direction.DEPARTURE
+    )
+
+    FORM_MAP = {
+        MainTransfer.Type.PLANE: FlightMainTransferForm,
+        MainTransfer.Type.TRAIN: TrainMainTransferForm,
+        MainTransfer.Type.CAR: CarMainTransferForm,
+        MainTransfer.Type.OTHER: OtherMainTransferForm,
+    }
+
+    form_class = FORM_MAP.get(transport_type)
+    if not form_class:
+        messages.error(request, _("Invalid transport type"))
+        return HttpResponse(status=400)
+
+    instance = MainTransfer.objects.filter(trip=trip, direction=direction).first()
+    form = form_class(request.POST, instance=instance, trip=trip, autocomplete=False)
+
+    if form.is_valid():
+        transfer = form.save(commit=False)
+        transfer.trip = trip
+        transfer.type = transport_type
+        transfer.direction = direction
+        transfer.save()
+
+        # If we just saved arrival, load departure form
+        if direction == MainTransfer.Direction.ARRIVAL:
+            messages.success(request, _("Arrival saved! Now add your departure."))
+            # Create departure form
+            departure_instance = MainTransfer.objects.filter(
+                trip=trip, direction=MainTransfer.Direction.DEPARTURE
+            ).first()
+            departure_form = form_class(
+                instance=departure_instance, trip=trip, autocomplete=True
+            )
+            departure_form.initial["direction"] = MainTransfer.Direction.DEPARTURE
+
+            context = {
+                "trip": trip,
+                "form": departure_form,
+                "transport_type": transport_type,
+                "direction": "departure",
+            }
+
+            template_map = {
+                MainTransfer.Type.PLANE: "trips/partials/main-transfer-flight.html",
+                MainTransfer.Type.TRAIN: "trips/partials/main-transfer-train.html",
+                MainTransfer.Type.CAR: "trips/partials/main-transfer-car.html",
+                MainTransfer.Type.OTHER: "trips/partials/main-transfer-other.html",
+            }
+
+            return TemplateResponse(request, template_map[transport_type], context)
+        else:
+            # Departure saved - close modal and refresh trip
+            messages.success(request, _("Main transfers saved successfully!"))
+            return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+
+    # Return form with errors
+    context = {
+        "trip": trip,
+        "form": form,
+        "transport_type": transport_type,
+        "direction": direction_param,
+    }
+
+    template_map = {
+        MainTransfer.Type.PLANE: "trips/partials/main-transfer-flight.html",
+        MainTransfer.Type.TRAIN: "trips/partials/main-transfer-train.html",
+        MainTransfer.Type.CAR: "trips/partials/main-transfer-car.html",
+        MainTransfer.Type.OTHER: "trips/partials/main-transfer-other.html",
+    }
+
+    return TemplateResponse(request, template_map[transport_type], context)

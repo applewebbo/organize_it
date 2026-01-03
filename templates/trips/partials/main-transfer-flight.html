@@ -1,0 +1,103 @@
+{% load crispy_forms_tags i18n %}
+<form hx-post="{% url 'trips:save-main-transfer' trip.pk %}?transport_type=plane&direction={{ direction }}"
+      hx-target="#main-transfer-content"
+      hx-disabled-elt="#form-submit"
+      method="post"
+      x-data="autocompleteForm()">
+    <div class="grid gap-x-1 p-4 sm:grid-cols-4 sm:gap-x-2 md:p-5">
+        {% csrf_token %}
+        {{ form.media }}
+
+        <div class="mb-4 sm:col-span-4">
+            <h4 class="text-lg font-semibold text-gray-900 dark:text-white">
+                {% if direction == 'arrival' %}
+                    {% trans "Arrival Flight" %}
+                {% else %}
+                    {% trans "Departure Flight" %}
+                {% endif %}
+            </h4>
+        </div>
+
+        <!-- Flight number -->
+        <div class="sm:col-span-2">
+            {{ form.flight_number|as_crispy_field }}
+        </div>
+
+        <!-- Airline -->
+        <div class="sm:col-span-2">
+            {{ form.airline|as_crispy_field }}
+        </div>
+
+        <!-- Origin Airport -->
+        <div class="sm:col-span-4">
+            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                {% trans "Origin Airport" %}
+            </label>
+            {{ form.origin_airport|as_crispy_field }}
+            {{ form.origin_iata }}
+            <div id="origin-airport-results"></div>
+        </div>
+
+        <!-- Destination Airport -->
+        <div class="sm:col-span-4">
+            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                {% trans "Destination Airport" %}
+            </label>
+            {{ form.destination_airport|as_crispy_field }}
+            {{ form.destination_iata }}
+            <div id="destination-airport-results"></div>
+        </div>
+
+        <!-- Start time -->
+        <div class="sm:col-span-2">
+            {{ form.start_time|as_crispy_field }}
+        </div>
+
+        <!-- End time -->
+        <div class="sm:col-span-2">
+            {{ form.end_time|as_crispy_field }}
+        </div>
+
+        <!-- Booking reference -->
+        <div class="sm:col-span-2">
+            {{ form.booking_reference|as_crispy_field }}
+        </div>
+
+        <!-- Ticket URL -->
+        <div class="sm:col-span-2">
+            {{ form.ticket_url|as_crispy_field }}
+        </div>
+
+        <!-- Notes -->
+        <div class="sm:col-span-4">
+            {{ form.notes|as_crispy_field }}
+        </div>
+    </div>
+
+    <!-- Footer with navigation -->
+    <div class="flex justify-between items-center p-4 rounded-b border-t border-base-200">
+        <button type="button"
+                class="btn btn-soft"
+                hx-get="{% url 'trips:main-transfer-step' trip.pk %}?step=type&transport_type=plane"
+                hx-target="#main-transfer-content"
+                hx-swap="innerHTML"
+                @htmx:after-settle="currentStep = 'type'">
+            <i class="ph-bold ph-arrow-left"></i>
+            {% trans "Back" %}
+        </button>
+
+        <div class="flex gap-2">
+            {% if direction == 'arrival' %}
+                <button id="form-submit" class="btn btn-primary" type="submit">
+                    {% trans "Next: Departure" %}
+                    <i class="ph-bold ph-arrow-right"></i>
+                </button>
+            {% else %}
+                <button id="form-submit" class="btn btn-primary" type="submit">
+                    {% trans "Save" %}
+                    <i class="ph-bold ph-check"></i>
+                </button>
+            {% endif %}
+        </div>
+    </div>
+</form>

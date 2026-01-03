@@ -1,0 +1,52 @@
+{% load i18n %}
+<div x-data="{
+    currentStep: 'type',
+    transportType: '{{ transport_type }}',
+    direction: 'arrival'
+}">
+    <!-- Header -->
+    <div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+            {% if is_edit %}
+                {% trans "Edit Main Transfers" %}
+            {% else %}
+                {% trans "Add Main Transfers" %}
+            {% endif %}
+        </h3>
+        <button type="button"
+                class="inline-flex justify-center items-center w-8 h-8 text-sm text-gray-400 bg-transparent rounded-lg hover:text-gray-900 hover:bg-gray-200 ms-auto dark:hover:bg-gray-600 dark:hover:text-white"
+                x-on:click="openModal = false">
+            <svg class="w-3 h-3"
+                 aria-hidden="true"
+                 xmlns="http://www.w3.org/2000/svg"
+                 fill="none"
+                 viewBox="0 0 14 14">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+            </svg>
+            <span class="sr-only">{% trans "Close modal" %}</span>
+        </button>
+    </div>
+
+    <!-- Progress indicator -->
+    <div class="p-4 border-b border-base-200">
+        <ul class="w-full steps steps-horizontal">
+            <li class="step" :class="{ 'step-primary': currentStep !== 'type' }">
+                {% trans "Transport Type" %}
+            </li>
+            <li class="step" :class="{ 'step-primary': currentStep === 'departure' }">
+                {% trans "Arrival" %}
+            </li>
+            <li class="step" :class="{ 'step-primary': currentStep === 'departure' }">
+                {% trans "Departure" %}
+            </li>
+        </ul>
+    </div>
+
+    <!-- Modal content (swapped by HTMX) -->
+    <div id="main-transfer-content"
+         hx-get="{% url 'trips:main-transfer-step' trip.pk %}?step=type&transport_type={{ transport_type }}"
+         hx-trigger="load"
+         hx-swap="innerHTML">
+        <!-- Step content will be loaded here -->
+    </div>
+</div>
