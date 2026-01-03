@@ -1582,7 +1582,26 @@ class FlightMainTransferForm(MainTransferBaseForm):
         ]
 
     def __init__(self, *args, **kwargs):
+        autocomplete = kwargs.pop("autocomplete", True)
         super().__init__(*args, **kwargs)
+
+        # Add HTMX attributes for airport autocomplete (similar to EventForm geocode)
+        if autocomplete:
+            search_url = reverse("trips:search-airports")
+            origin_htmx_attrs = {
+                "hx-post": search_url,
+                "hx-trigger": "keyup changed delay:500ms",
+                "hx-target": "#origin-airport-results",
+                "hx-vals": '{"airport_query": "js:event.target.value"}',
+            }
+            dest_htmx_attrs = {
+                "hx-post": search_url,
+                "hx-trigger": "keyup changed delay:500ms",
+                "hx-target": "#destination-airport-results",
+                "hx-vals": '{"airport_query": "js:event.target.value"}',
+            }
+            self.fields["origin_airport"].widget.attrs.update(origin_htmx_attrs)
+            self.fields["destination_airport"].widget.attrs.update(dest_htmx_attrs)
 
         # Populate fields if editing
         if self.instance and self.instance.pk:
@@ -1759,7 +1778,26 @@ class TrainMainTransferForm(MainTransferBaseForm):
         ]
 
     def __init__(self, *args, **kwargs):
+        autocomplete = kwargs.pop("autocomplete", True)
         super().__init__(*args, **kwargs)
+
+        # Add HTMX attributes for station autocomplete (similar to EventForm geocode)
+        if autocomplete:
+            search_url = reverse("trips:search-stations")
+            origin_htmx_attrs = {
+                "hx-post": search_url,
+                "hx-trigger": "keyup changed delay:500ms",
+                "hx-target": "#origin-station-results",
+                "hx-vals": '{"station_query": "js:event.target.value"}',
+            }
+            dest_htmx_attrs = {
+                "hx-post": search_url,
+                "hx-trigger": "keyup changed delay:500ms",
+                "hx-target": "#destination-station-results",
+                "hx-vals": '{"station_query": "js:event.target.value"}',
+            }
+            self.fields["origin_station"].widget.attrs.update(origin_htmx_attrs)
+            self.fields["destination_station"].widget.attrs.update(dest_htmx_attrs)
 
         # Populate fields if editing
         if self.instance and self.instance.pk:
