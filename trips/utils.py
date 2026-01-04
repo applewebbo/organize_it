@@ -691,15 +691,23 @@ def load_train_stations():
     with open(csv_path, encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            stations.append(
-                {
-                    "id": row["id"],
-                    "name": row["name"],
-                    "country": row["country"],
-                    "latitude": float(row["latitude"]),
-                    "longitude": float(row["longitude"]),
-                }
-            )
+            # Skip stations without coordinates
+            if not row.get("latitude") or not row.get("longitude"):
+                continue
+
+            try:
+                stations.append(
+                    {
+                        "id": row["id"],
+                        "name": row["name"],
+                        "country": row["country"],
+                        "latitude": float(row["latitude"]),
+                        "longitude": float(row["longitude"]),
+                    }
+                )
+            except (ValueError, KeyError):
+                # Skip rows with invalid data
+                continue
 
     _STATIONS_CACHE = stations
     return stations

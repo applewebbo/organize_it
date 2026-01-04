@@ -113,16 +113,12 @@ def trip_detail(request, pk):
     unpaired_events = trip.all_events.filter(day__isnull=True)
 
     # Get main transfers
-    arrival_transfer = (
-        trip.all_events.filter(transport__is_main_transfer=True, transport__direction=1)
-        .select_related("transport")
-        .first()
-    )
-    departure_transfer = (
-        trip.all_events.filter(transport__is_main_transfer=True, transport__direction=2)
-        .select_related("transport")
-        .first()
-    )
+    arrival_transfer = MainTransfer.objects.filter(
+        trip=trip, direction=MainTransfer.Direction.ARRIVAL
+    ).first()
+    departure_transfer = MainTransfer.objects.filter(
+        trip=trip, direction=MainTransfer.Direction.DEPARTURE
+    ).first()
 
     # Check user preference for default view
     default_view = request.user.profile.default_map_view
@@ -600,51 +596,58 @@ def add_main_transfer(request, trip_id):
 
 @login_required
 def edit_main_transfer(request, pk):
-    """Edit existing main transfer"""
-    from trips.models import Transport
-
-    transfer = get_object_or_404(
-        Transport,
-        pk=pk,
-        trip__author=request.user,
-        is_main_transfer=True,
-    )
+    """Edit existing main transfer - opens modal with specific form"""
+    transfer = get_object_or_404(MainTransfer, pk=pk, trip__author=request.user)
     trip = transfer.trip
 
-    if request.method == "POST":
-        form = MainTransferCombinedForm(request.POST, instance=transfer, trip=trip)
-        if form.is_valid():
-            form.save()
-            messages.add_message(
-                request,
-                messages.SUCCESS,
-                _("Main trip updated successfully"),
-            )
-            return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
-    else:
-        form = MainTransferCombinedForm(instance=transfer, trip=trip)
+    # Open the modal directly to the edit step for this transfer
+    FORM_MAP = {
+        MainTransfer.Type.PLANE: FlightMainTransferForm,
+        MainTransfer.Type.TRAIN: TrainMainTransferForm,
+        MainTransfer.Type.CAR: CarMainTransferForm,
+        MainTransfer.Type.OTHER: OtherMainTransferForm,
+    }
 
-    context = {"form": form, "trip": trip, "transfer": transfer, "is_edit": True}
-    return TemplateResponse(request, "trips/main-transfer-form.html", context)
+    form_class = FORM_MAP.get(transfer.type)
+    if not form_class:
+        return HttpResponse("Invalid transport type", status=400)
+
+    form = form_class(instance=transfer, trip=trip, autocomplete=True)
+
+    direction_str = (
+        "arrival"
+        if transfer.direction == MainTransfer.Direction.ARRIVAL
+        else "departure"
+    )
+
+    context = {
+        "trip": trip,
+        "form": form,
+        "transport_type": transfer.type,
+        "direction": direction_str,
+        "is_edit": True,
+    }
+
+    template_map = {
+        MainTransfer.Type.PLANE: "trips/partials/main-transfer-flight.html",
+        MainTransfer.Type.TRAIN: "trips/partials/main-transfer-train.html",
+        MainTransfer.Type.CAR: "trips/partials/main-transfer-car.html",
+        MainTransfer.Type.OTHER: "trips/partials/main-transfer-other.html",
+    }
+
+    return TemplateResponse(request, template_map[transfer.type], context)
 
 
 @login_required
 def delete_main_transfer(request, pk):
     """Delete main transfer"""
-    from trips.models import Transport
-
-    transfer = get_object_or_404(
-        Transport,
-        pk=pk,
-        trip__author=request.user,
-        is_main_transfer=True,
-    )
+    transfer = get_object_or_404(MainTransfer, pk=pk, trip__author=request.user)
 
     transfer.delete()
     messages.add_message(
         request,
         messages.SUCCESS,
-        _("Main trip deleted successfully"),
+        _("Main transfer deleted successfully"),
     )
     return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
 
@@ -1751,7 +1754,16 @@ def main_transfer_step(request, trip_id):
     """HTMX endpoint to load specific step of multi-step modal."""
     trip = get_object_or_404(Trip, pk=trip_id, author=request.user)
     step = request.GET.get("step", "type")
-    transport_type = int(request.GET.get("transport_type", MainTransfer.Type.PLANE))
+
+    # Map string to transport type
+    TYPE_MAP = {
+        "plane": MainTransfer.Type.PLANE,
+        "train": MainTransfer.Type.TRAIN,
+        "car": MainTransfer.Type.CAR,
+        "other": MainTransfer.Type.OTHER,
+    }
+    transport_type_param = request.GET.get("transport_type", "plane")
+    transport_type = TYPE_MAP.get(transport_type_param, MainTransfer.Type.PLANE)
 
     # Form mapper
     FORM_MAP = {
@@ -1811,7 +1823,15 @@ def save_main_transfer(request, trip_id):
         return HttpResponse(status=405)
 
     # Get transport_type and direction from query params
-    transport_type = int(request.GET.get("transport_type", MainTransfer.Type.PLANE))
+    TYPE_MAP = {
+        "plane": MainTransfer.Type.PLANE,
+        "train": MainTransfer.Type.TRAIN,
+        "car": MainTransfer.Type.CAR,
+        "other": MainTransfer.Type.OTHER,
+    }
+    transport_type_param = request.GET.get("transport_type", "plane")
+    transport_type = TYPE_MAP.get(transport_type_param, MainTransfer.Type.PLANE)
+
     direction_param = request.GET.get("direction", "arrival")
     direction = (
         MainTransfer.Direction.ARRIVAL

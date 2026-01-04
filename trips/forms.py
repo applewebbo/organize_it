@@ -1592,13 +1592,13 @@ class FlightMainTransferForm(MainTransferBaseForm):
                 "hx-post": search_url,
                 "hx-trigger": "keyup changed delay:500ms",
                 "hx-target": "#origin-airport-results",
-                "hx-vals": '{"airport_query": "js:event.target.value"}',
+                "hx-vals": "js:{airport_query: event.target.value}",
             }
             dest_htmx_attrs = {
                 "hx-post": search_url,
                 "hx-trigger": "keyup changed delay:500ms",
                 "hx-target": "#destination-airport-results",
-                "hx-vals": '{"airport_query": "js:event.target.value"}',
+                "hx-vals": "js:{airport_query: event.target.value}",
             }
             self.fields["origin_airport"].widget.attrs.update(origin_htmx_attrs)
             self.fields["destination_airport"].widget.attrs.update(dest_htmx_attrs)
@@ -1788,13 +1788,13 @@ class TrainMainTransferForm(MainTransferBaseForm):
                 "hx-post": search_url,
                 "hx-trigger": "keyup changed delay:500ms",
                 "hx-target": "#origin-station-results",
-                "hx-vals": '{"station_query": "js:event.target.value"}',
+                "hx-vals": "js:{station_query: event.target.value}",
             }
             dest_htmx_attrs = {
                 "hx-post": search_url,
                 "hx-trigger": "keyup changed delay:500ms",
                 "hx-target": "#destination-station-results",
-                "hx-vals": '{"station_query": "js:event.target.value"}',
+                "hx-vals": "js:{station_query: event.target.value}",
             }
             self.fields["origin_station"].widget.attrs.update(origin_htmx_attrs)
             self.fields["destination_station"].widget.attrs.update(dest_htmx_attrs)

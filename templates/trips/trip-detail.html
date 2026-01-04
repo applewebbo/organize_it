@@ -156,15 +156,15 @@
                         {% if arrival_transfer %}
                         <div class="flex gap-1">
                             <button class="btn btn-xs btn-soft"
-                                    hx-get="{% url 'trips:edit-main-transfer' pk=arrival_transfer.transport.pk %}"
+                                    hx-get="{% url 'trips:edit-main-transfer' pk=arrival_transfer.pk %}"
                                     hx-target="#dialog"
                                     hx-swap="innerHTML"
                                     @click="$dispatch('open-modal'); document.activeElement.blur()">
                                 <i class="ph-bold ph-pencil-simple"></i>
                             </button>
                             <button class="btn btn-xs btn-error btn-soft"
-                                    hx-delete="{% url 'trips:delete-main-transfer' pk=arrival_transfer.transport.pk %}"
-                                    hx-confirm="{% trans 'Are you sure you want to delete this main trip?' %}">
+                                    hx-delete="{% url 'trips:delete-main-transfer' pk=arrival_transfer.pk %}"
+                                    hx-confirm="{% trans 'Are you sure you want to delete this main transfer?' %}">
                                 <i class="ph-bold ph-trash"></i>
                             </button>
                         </div>
@@ -172,15 +172,16 @@
                     </div>
                     {% if arrival_transfer %}
                     <div class="space-y-1 text-sm">
-                        <p><strong>{% trans "Type:" %}</strong> {{ arrival_transfer.transport.get_type_display }}</p>
-                        <p><strong>{% trans "From:" %}</strong> {{ arrival_transfer.transport.origin_city }}</p>
-                        <p><strong>{% trans "To:" %}</strong> {{ arrival_transfer.transport.destination_city }}</p>
-                        {% if arrival_transfer.start_time %}
+                        <p><strong>{% trans "Type:" %}</strong> {{ arrival_transfer.get_type_display }}</p>
+                        {% if arrival_transfer.type == 1 or arrival_transfer.type == 2 %}
+                        <p><strong>{% trans "From:" %}</strong> {{ arrival_transfer.origin_name }}</p>
+                        <p><strong>{% trans "To:" %}</strong> {{ arrival_transfer.destination_name }}</p>
+                        {% else %}
+                        <p><strong>{% trans "From:" %}</strong> {{ arrival_transfer.origin_address }}</p>
+                        <p><strong>{% trans "To:" %}</strong> {{ arrival_transfer.destination_address }}</p>
+                        {% endif %}
                         <p><strong>{% trans "Departure:" %}</strong> {{ arrival_transfer.start_time }}</p>
-                        {% endif %}
-                        {% if arrival_transfer.end_time %}
                         <p><strong>{% trans "Arrival:" %}</strong> {{ arrival_transfer.end_time }}</p>
-                        {% endif %}
                     </div>
                     {% else %}
                     <p class="text-sm text-base-content/60">{% trans "No arrival transfer added yet." %}</p>
@@ -193,15 +194,15 @@
                         {% if departure_transfer %}
                         <div class="flex gap-1">
                             <button class="btn btn-xs btn-soft"
-                                    hx-get="{% url 'trips:edit-main-transfer' pk=departure_transfer.transport.pk %}"
+                                    hx-get="{% url 'trips:edit-main-transfer' pk=departure_transfer.pk %}"
                                     hx-target="#dialog"
                                     hx-swap="innerHTML"
                                     @click="$dispatch('open-modal'); document.activeElement.blur()">
                                 <i class="ph-bold ph-pencil-simple"></i>
                             </button>
                             <button class="btn btn-xs btn-error btn-soft"
-                                    hx-delete="{% url 'trips:delete-main-transfer' pk=departure_transfer.transport.pk %}"
-                                    hx-confirm="{% trans 'Are you sure you want to delete this main trip?' %}">
+                                    hx-delete="{% url 'trips:delete-main-transfer' pk=departure_transfer.pk %}"
+                                    hx-confirm="{% trans 'Are you sure you want to delete this main transfer?' %}">
                                 <i class="ph-bold ph-trash"></i>
                             </button>
                         </div>
@@ -209,15 +210,16 @@
                     </div>
                     {% if departure_transfer %}
                     <div class="space-y-1 text-sm">
-                        <p><strong>{% trans "Type:" %}</strong> {{ departure_transfer.transport.get_type_display }}</p>
-                        <p><strong>{% trans "From:" %}</strong> {{ departure_transfer.transport.origin_city }}</p>
-                        <p><strong>{% trans "To:" %}</strong> {{ departure_transfer.transport.destination_city }}</p>
-                        {% if departure_transfer.start_time %}
+                        <p><strong>{% trans "Type:" %}</strong> {{ departure_transfer.get_type_display }}</p>
+                        {% if departure_transfer.type == 1 or departure_transfer.type == 2 %}
+                        <p><strong>{% trans "From:" %}</strong> {{ departure_transfer.origin_name }}</p>
+                        <p><strong>{% trans "To:" %}</strong> {{ departure_transfer.destination_name }}</p>
+                        {% else %}
+                        <p><strong>{% trans "From:" %}</strong> {{ departure_transfer.origin_address }}</p>
+                        <p><strong>{% trans "To:" %}</strong> {{ departure_transfer.destination_address }}</p>
+                        {% endif %}
                         <p><strong>{% trans "Departure:" %}</strong> {{ departure_transfer.start_time }}</p>
-                        {% endif %}
-                        {% if departure_transfer.end_time %}
                         <p><strong>{% trans "Arrival:" %}</strong> {{ departure_transfer.end_time }}</p>
-                        {% endif %}
                     </div>
                     {% else %}
                     <p class="text-sm text-base-content/60">{% trans "No departure transfer added yet." %}</p>
