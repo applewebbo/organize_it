@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-21 20:30+0100\n"
+"POT-Creation-Date: 2026-01-04 14:23+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,9 +26,10 @@ msgstr ""
 msgid "Last name"
 msgstr ""
 
-#: accounts/forms.py:42 accounts/models.py:77 trips/forms.py:336
-#: trips/forms.py:338 trips/forms.py:518 trips/forms.py:519 trips/forms.py:560
-#: trips/forms.py:834 trips/forms.py:835
+#: accounts/forms.py:42 accounts/models.py:77 trips/forms.py:338
+#: trips/forms.py:340 trips/forms.py:520 trips/forms.py:521 trips/forms.py:562
+#: trips/forms.py:836 trips/forms.py:837 trips/forms.py:1079
+#: trips/forms.py:1085
 msgid "City"
 msgstr ""
 
@@ -257,9 +258,14 @@ msgstr ""
 
 #: templates/account/profile.html:118 templates/trips/event-notes.html:30
 #: templates/trips/experience-create.html:45
-#: templates/trips/note-modify.html:26 templates/trips/stay-create.html:28
-#: templates/trips/stay-modify.html:19 templates/trips/stay-note-modify.html:26
-#: templates/trips/stay-notes.html:20 templates/trips/transport-create.html:66
+#: templates/trips/note-modify.html:26
+#: templates/trips/partials/main-transfer-car.html:81
+#: templates/trips/partials/main-transfer-flight.html:97
+#: templates/trips/partials/main-transfer-other.html:76
+#: templates/trips/partials/main-transfer-train.html:97
+#: templates/trips/stay-create.html:28 templates/trips/stay-modify.html:19
+#: templates/trips/stay-note-modify.html:26 templates/trips/stay-notes.html:20
+#: templates/trips/transport-create.html:66
 #: templates/trips/trip-dates-update.html:32
 msgid "Save"
 msgstr ""
@@ -295,15 +301,15 @@ msgstr ""
 msgid "Add event"
 msgstr ""
 
-#: templates/cotton/dropdown.html:18 trips/models.py:235
+#: templates/cotton/dropdown.html:18 trips/models.py:421
 msgid "Transport"
 msgstr ""
 
-#: templates/cotton/dropdown.html:24 trips/models.py:236
+#: templates/cotton/dropdown.html:24 trips/models.py:422
 msgid "Experience"
 msgstr ""
 
-#: templates/cotton/dropdown.html:30 trips/models.py:237
+#: templates/cotton/dropdown.html:30 trips/models.py:423
 msgid "Meal"
 msgstr ""
 
@@ -336,32 +342,32 @@ msgstr ""
 
 #: templates/includes/auth-index.html:18 templates/includes/auth-index.html:27
 #: templates/includes/auth-index.html:41 templates/includes/auth-index.html:51
-#: templates/trips/trip-detail.html:36 templates/trips/trip-detail.html:45
-#: templates/trips/trip-detail.html:61 templates/trips/trip-detail.html:71
+#: templates/trips/trip-detail.html:36 templates/trips/trip-detail.html:53
+#: templates/trips/trip-detail.html:69 templates/trips/trip-detail.html:88
 msgid "Modify trip dates"
 msgstr ""
 
-#: templates/includes/auth-index.html:44 templates/trips/trip-detail.html:64
+#: templates/includes/auth-index.html:44 templates/trips/trip-detail.html:72
 msgid "Edit trip"
 msgstr ""
 
-#: templates/includes/auth-index.html:53 templates/trips/trip-detail.html:73
+#: templates/includes/auth-index.html:53 templates/trips/trip-detail.html:90
 msgid "Edit Dates"
 msgstr ""
 
-#: templates/includes/auth-index.html:89 templates/trips/trip-detail.html:110
+#: templates/includes/auth-index.html:89 templates/trips/trip-detail.html:127
 msgid "Start Date:"
 msgstr ""
 
-#: templates/includes/auth-index.html:92 templates/trips/trip-detail.html:113
+#: templates/includes/auth-index.html:92 templates/trips/trip-detail.html:130
 msgid "End Date:"
 msgstr ""
 
-#: templates/includes/auth-index.html:97 templates/trips/trip-detail.html:118
+#: templates/includes/auth-index.html:97 templates/trips/trip-detail.html:135
 msgid "Destination:"
 msgstr ""
 
-#: templates/includes/auth-index.html:116 templates/trips/trip-detail.html:145
+#: templates/includes/auth-index.html:116 templates/trips/trip-detail.html:251
 msgid "Unpaired Events"
 msgstr ""
 
@@ -387,31 +393,31 @@ msgstr ""
 #: templates/trips/event-notes.html:33 templates/trips/includes/note.html:13
 #: templates/trips/note-modify.html:29 templates/trips/stay-detail.html:102
 #: templates/trips/stay-note-modify.html:33 templates/trips/stay-notes.html:23
-#: trips/forms.py:632
+#: trips/forms.py:634
 msgid "Close"
 msgstr ""
 
-#: templates/includes/navbar.html:22
+#: templates/includes/navbar.html:23
 msgid "Logout"
 msgstr ""
 
-#: templates/includes/navbar.html:26
+#: templates/includes/navbar.html:27
 msgid "Login"
 msgstr ""
 
-#: templates/includes/navbar.html:33
+#: templates/includes/navbar.html:34
 msgid "Open main menu"
 msgstr ""
 
-#: templates/includes/navbar.html:48 templates/includes/navbar.html:71
+#: templates/includes/navbar.html:49 templates/includes/navbar.html:72
 msgid "Trips"
 msgstr ""
 
-#: templates/includes/navbar.html:53
+#: templates/includes/navbar.html:54
 msgid "Settings"
 msgstr ""
 
-#: templates/includes/navbar.html:76
+#: templates/includes/navbar.html:77
 msgid "Profile"
 msgstr ""
 
@@ -447,6 +453,8 @@ msgstr ""
 
 #: templates/trips/event-enrich-preview.html:58
 #: templates/trips/experience-create.html:44
+#: templates/trips/main-transfer-form.html:30
+#: templates/trips/partials/main-transfer-type.html:67
 #: templates/trips/stay-create.html:31
 #: templates/trips/stay-enrich-preview.html:49
 #: templates/trips/stay-modify.html:18 templates/trips/transport-create.html:65
@@ -455,6 +463,10 @@ msgid "Cancel"
 msgstr ""
 
 #: templates/trips/event-enrich-preview.html:77
+#: templates/trips/partials/main-transfer-car.html:70
+#: templates/trips/partials/main-transfer-flight.html:86
+#: templates/trips/partials/main-transfer-other.html:65
+#: templates/trips/partials/main-transfer-train.html:86
 #: templates/trips/stay-enrich-preview.html:68
 msgid "Back"
 msgstr ""
@@ -467,8 +479,10 @@ msgstr ""
 msgid "Add Notes"
 msgstr ""
 
-#: templates/trips/event-notes.html:14 templates/trips/stay-detail.html:9
-#: templates/trips/stay-notes.html:8 templates/trips/trip-dates-update.html:15
+#: templates/trips/event-notes.html:14
+#: templates/trips/main-transfer-modal.html:26
+#: templates/trips/stay-detail.html:9 templates/trips/stay-notes.html:8
+#: templates/trips/trip-dates-update.html:15
 msgid "Close modal"
 msgstr ""
 
@@ -489,12 +503,20 @@ msgstr ""
 msgid "No address found."
 msgstr ""
 
+#: templates/trips/includes/airport-results.html:22
+msgid "Airport data from CSV database"
+msgstr ""
+
+#: templates/trips/includes/airport-results.html:28
+msgid "No airport found. Try searching by name, city, or IATA code."
+msgstr ""
+
 #: templates/trips/includes/day-list-content.html:13
 #: templates/trips/includes/day-list-content.html:60
 msgid "View or add stay notes"
 msgstr ""
 
-#: templates/trips/includes/day.html:10 trips/forms.py:926 trips/models.py:218
+#: templates/trips/includes/day.html:10 trips/forms.py:928 trips/models.py:404
 msgid "Day"
 msgstr ""
 
@@ -518,6 +540,14 @@ msgstr ""
 msgid "New"
 msgstr ""
 
+#: templates/trips/includes/station-results.html:21
+msgid "Station data from CSV database"
+msgstr ""
+
+#: templates/trips/includes/station-results.html:27
+msgid "No station found. Try searching by name or country."
+msgstr ""
+
 #: templates/trips/includes/stay-preview.html:7
 #: templates/trips/stay-detail.html:26
 msgid "from"
@@ -532,13 +562,14 @@ msgstr ""
 msgid "Booking Details"
 msgstr ""
 
-#: templates/trips/includes/transport-detail.html:36 trips/forms.py:342
-#: trips/forms.py:359
+#: templates/trips/includes/transport-detail.html:36 trips/forms.py:344
+#: trips/forms.py:361 trips/forms.py:1069 trips/forms.py:1097
 msgid "Company"
 msgstr ""
 
-#: templates/trips/includes/transport-detail.html:43 trips/forms.py:343
-#: trips/forms.py:361
+#: templates/trips/includes/transport-detail.html:43 trips/forms.py:345
+#: trips/forms.py:363 trips/forms.py:1070 trips/forms.py:1102
+#: trips/forms.py:1452
 msgid "Booking Reference"
 msgstr ""
 
@@ -546,7 +577,8 @@ msgstr ""
 msgid "View Ticket"
 msgstr ""
 
-#: templates/trips/includes/transport-detail.html:57 trips/forms.py:345
+#: templates/trips/includes/transport-detail.html:57 trips/forms.py:347
+#: trips/forms.py:1072
 msgid "Price"
 msgstr ""
 
@@ -556,6 +588,44 @@ msgstr ""
 
 #: templates/trips/includes/trip-address-results.html:30
 msgid "Experiences & Restaurants"
+msgstr ""
+
+#: templates/trips/main-transfer-form.html:6
+msgid "Edit Main Trip"
+msgstr ""
+
+#: templates/trips/main-transfer-form.html:8
+msgid "Add Main Trip"
+msgstr ""
+
+#: templates/trips/main-transfer-form.html:34
+msgid "Update"
+msgstr ""
+
+#: templates/trips/main-transfer-form.html:36
+msgid "Add"
+msgstr ""
+
+#: templates/trips/main-transfer-modal.html:11
+msgid "Edit Main Transfers"
+msgstr ""
+
+#: templates/trips/main-transfer-modal.html:13
+msgid "Add Main Transfers"
+msgstr ""
+
+#: templates/trips/main-transfer-modal.html:34 trips/forms.py:1073
+msgid "Transport Type"
+msgstr ""
+
+#: templates/trips/main-transfer-modal.html:37
+#: templates/trips/trip-detail.html:155 trips/models.py:200 trips/models.py:524
+msgid "Arrival"
+msgstr ""
+
+#: templates/trips/main-transfer-modal.html:40
+#: templates/trips/trip-detail.html:193 trips/models.py:201 trips/models.py:525
+msgid "Departure"
 msgstr ""
 
 #: templates/trips/meal-create.html:9
@@ -568,6 +638,167 @@ msgstr ""
 
 #: templates/trips/note-modify.html:8 templates/trips/stay-note-modify.html:8
 msgid "Modify notes"
+msgstr ""
+
+#: templates/trips/partials/car-fields.html:10 trips/forms.py:1260
+#: trips/forms.py:1920
+msgid "Rental Car"
+msgstr ""
+
+#: templates/trips/partials/car-fields.html:17 trips/forms.py:1266
+msgid "License Plate"
+msgstr ""
+
+#: templates/trips/partials/car-fields.html:28 trips/forms.py:1277
+msgid "Car Type"
+msgstr ""
+
+#: templates/trips/partials/car-fields.html:33
+msgid "Sedan, SUV, etc."
+msgstr ""
+
+#: templates/trips/partials/car-fields.html:40 trips/forms.py:1288
+msgid "Rental Booking Reference"
+msgstr ""
+
+#: templates/trips/partials/car-fields.html:45 trips/forms.py:1291
+msgid "Only if rental"
+msgstr ""
+
+#: templates/trips/partials/car-fields.html:51 trips/forms.py:1298
+#: trips/forms.py:1926
+msgid "Rental Company Website"
+msgstr ""
+
+#: templates/trips/partials/flight-fields.html:6 trips/forms.py:1161
+#: trips/forms.py:1544
+msgid "Flight Number"
+msgstr ""
+
+#: templates/trips/partials/flight-fields.html:18 trips/forms.py:1180
+#: trips/forms.py:1553
+msgid "Terminal"
+msgstr ""
+
+#: templates/trips/partials/flight-fields.html:29 trips/forms.py:1172
+msgid "Gate"
+msgstr ""
+
+#: templates/trips/partials/flight-fields.html:41 trips/forms.py:1188
+msgid "Checked Baggage"
+msgstr ""
+
+#: templates/trips/partials/flight-fields.html:53 trips/forms.py:1195
+#: trips/forms.py:1561
+msgid "Airline Website"
+msgstr ""
+
+#: templates/trips/partials/generic-transport-fields.html:6 trips/forms.py:2027
+msgid "Company Website"
+msgstr ""
+
+#: templates/trips/partials/main-transfer-car.html:13
+msgid "Arrival by Car"
+msgstr ""
+
+#: templates/trips/partials/main-transfer-car.html:15
+msgid "Departure by Car"
+msgstr ""
+
+#: templates/trips/partials/main-transfer-car.html:76
+#: templates/trips/partials/main-transfer-flight.html:92
+#: templates/trips/partials/main-transfer-other.html:71
+#: templates/trips/partials/main-transfer-train.html:92
+msgid "Next: Departure"
+msgstr ""
+
+#: templates/trips/partials/main-transfer-flight.html:14
+msgid "Arrival Flight"
+msgstr ""
+
+#: templates/trips/partials/main-transfer-flight.html:16
+msgid "Departure Flight"
+msgstr ""
+
+#: templates/trips/partials/main-transfer-flight.html:34
+msgid "Origin Airport"
+msgstr ""
+
+#: templates/trips/partials/main-transfer-flight.html:44
+msgid "Destination Airport"
+msgstr ""
+
+#: templates/trips/partials/main-transfer-other.html:13
+msgid "Arrival Transport"
+msgstr ""
+
+#: templates/trips/partials/main-transfer-other.html:15
+msgid "Departure Transport"
+msgstr ""
+
+#: templates/trips/partials/main-transfer-train.html:14
+msgid "Arrival Train"
+msgstr ""
+
+#: templates/trips/partials/main-transfer-train.html:16
+msgid "Departure Train"
+msgstr ""
+
+#: templates/trips/partials/main-transfer-train.html:34
+msgid "Origin Station"
+msgstr ""
+
+#: templates/trips/partials/main-transfer-train.html:44
+msgid "Destination Station"
+msgstr ""
+
+#: templates/trips/partials/main-transfer-type.html:4
+msgid ""
+"Select the type of transport you will use to reach and leave this "
+"destination."
+msgstr ""
+
+#: templates/trips/partials/main-transfer-type.html:18 trips/models.py:194
+#: trips/models.py:516
+msgid "Plane"
+msgstr ""
+
+#: templates/trips/partials/main-transfer-type.html:31 trips/models.py:195
+#: trips/models.py:517
+msgid "Train"
+msgstr ""
+
+#: templates/trips/partials/main-transfer-type.html:44 trips/models.py:196
+#: trips/models.py:515
+msgid "Car"
+msgstr ""
+
+#: templates/trips/partials/main-transfer-type.html:57 trips/models.py:197
+#: trips/models.py:521 trips/models.py:757
+msgid "Other"
+msgstr ""
+
+#: templates/trips/partials/train-fields.html:6 trips/forms.py:1211
+#: trips/forms.py:1731
+msgid "Train Number"
+msgstr ""
+
+#: templates/trips/partials/train-fields.html:18 trips/forms.py:1222
+#: trips/forms.py:1740
+msgid "Carriage"
+msgstr ""
+
+#: templates/trips/partials/train-fields.html:29 trips/forms.py:1230
+#: trips/forms.py:1749
+msgid "Seat"
+msgstr ""
+
+#: templates/trips/partials/train-fields.html:40 trips/forms.py:1238
+msgid "Platform"
+msgstr ""
+
+#: templates/trips/partials/train-fields.html:52 trips/forms.py:1245
+msgid "Train Company Website"
 msgstr ""
 
 #: templates/trips/stay-create.html:9
@@ -616,6 +847,49 @@ msgstr ""
 msgid "Unarchive"
 msgstr ""
 
+#: templates/trips/trip-detail.html:45 templates/trips/trip-detail.html:79
+msgid "Manage main transfers"
+msgstr ""
+
+#: templates/trips/trip-detail.html:81 templates/trips/trip-detail.html:149
+#: trips/models.py:265
+msgid "Main Transfers"
+msgstr ""
+
+#: templates/trips/trip-detail.html:167 templates/trips/trip-detail.html:205
+msgid "Are you sure you want to delete this main transfer?"
+msgstr ""
+
+#: templates/trips/trip-detail.html:175 templates/trips/trip-detail.html:213
+msgid "Type:"
+msgstr ""
+
+#: templates/trips/trip-detail.html:177 templates/trips/trip-detail.html:180
+#: templates/trips/trip-detail.html:215 templates/trips/trip-detail.html:218
+msgid "From:"
+msgstr ""
+
+#: templates/trips/trip-detail.html:178 templates/trips/trip-detail.html:181
+#: templates/trips/trip-detail.html:216 templates/trips/trip-detail.html:219
+msgid "To:"
+msgstr ""
+
+#: templates/trips/trip-detail.html:183 templates/trips/trip-detail.html:221
+msgid "Departure:"
+msgstr ""
+
+#: templates/trips/trip-detail.html:184 templates/trips/trip-detail.html:222
+msgid "Arrival:"
+msgstr ""
+
+#: templates/trips/trip-detail.html:187
+msgid "No arrival transfer added yet."
+msgstr ""
+
+#: templates/trips/trip-detail.html:225
+msgid "No departure transfer added yet."
+msgstr ""
+
 #: templates/trips/trip-list.html:4
 msgid "Trips List"
 msgstr ""
@@ -644,391 +918,531 @@ msgstr ""
 msgid "View"
 msgstr ""
 
-#: trips/forms.py:28
+#: trips/forms.py:30
 msgid "Title"
 msgstr ""
 
-#: trips/forms.py:30
+#: trips/forms.py:32
 msgid "Description"
 msgstr ""
 
-#: trips/forms.py:32 trips/forms.py:417
+#: trips/forms.py:34 trips/forms.py:419
 msgid "Destination"
 msgstr ""
 
-#: trips/forms.py:34 trips/forms.py:217
+#: trips/forms.py:36 trips/forms.py:219
 msgid "Start date"
 msgstr ""
 
-#: trips/forms.py:39 trips/forms.py:221
+#: trips/forms.py:41 trips/forms.py:223
 msgid "End date"
 msgstr ""
 
-#: trips/forms.py:109
+#: trips/forms.py:111
 msgid "Trip Image"
 msgstr ""
 
-#: trips/forms.py:150
+#: trips/forms.py:152
 msgid "Search Unsplash"
 msgstr ""
 
-#: trips/forms.py:159
+#: trips/forms.py:161
 msgid "Upload Image"
 msgstr ""
 
-#: trips/forms.py:167
+#: trips/forms.py:169
 msgid "Please fill in the destination field to search for images"
 msgstr ""
 
-#: trips/forms.py:198
+#: trips/forms.py:200
 msgid "End date must be after start date"
 msgstr ""
 
-#: trips/forms.py:204
+#: trips/forms.py:206
 msgid "Start date must be after today"
 msgstr ""
 
-#: trips/forms.py:211
+#: trips/forms.py:213
 msgid "Destination not found"
 msgstr ""
 
-#: trips/forms.py:337 trips/forms.py:339 trips/forms.py:352 trips/forms.py:356
-#: trips/forms.py:554 trips/forms.py:562 trips/forms.py:874 trips/forms.py:887
+#: trips/forms.py:339 trips/forms.py:341 trips/forms.py:354 trips/forms.py:358
+#: trips/forms.py:556 trips/forms.py:564 trips/forms.py:876 trips/forms.py:889
+#: trips/forms.py:1082 trips/forms.py:1088
 msgid "Address"
 msgstr ""
 
-#: trips/forms.py:340
+#: trips/forms.py:342 trips/forms.py:1067
 msgid "Departure Time"
 msgstr ""
 
-#: trips/forms.py:341
+#: trips/forms.py:343 trips/forms.py:1068
 msgid "Arrival Time"
 msgstr ""
 
-#: trips/forms.py:344 trips/forms.py:363
+#: trips/forms.py:346 trips/forms.py:365 trips/forms.py:1071
+#: trips/forms.py:1106
 msgid "Ticket URL"
 msgstr ""
 
-#: trips/forms.py:346 trips/forms.py:365 trips/forms.py:556 trips/forms.py:561
-#: trips/forms.py:873 trips/forms.py:886
+#: trips/forms.py:348 trips/forms.py:367 trips/forms.py:558 trips/forms.py:563
+#: trips/forms.py:875 trips/forms.py:888
 msgid "Website"
 msgstr ""
 
-#: trips/forms.py:347 trips/forms.py:785 trips/forms.py:803
+#: trips/forms.py:349 trips/forms.py:787 trips/forms.py:805
 msgid "Type"
 msgstr ""
 
-#: trips/forms.py:351
+#: trips/forms.py:353 trips/forms.py:1063
 msgid "Origin City"
 msgstr ""
 
-#: trips/forms.py:354
+#: trips/forms.py:356 trips/forms.py:1065
 msgid "Destination City"
 msgstr ""
 
-#: trips/forms.py:389
+#: trips/forms.py:391
 msgid "Origin"
 msgstr ""
 
-#: trips/forms.py:468
+#: trips/forms.py:470
 msgid "Booking Reference (optional)"
 msgstr ""
 
-#: trips/forms.py:505
+#: trips/forms.py:507
 msgid "Duration"
 msgstr ""
 
-#: trips/forms.py:511 trips/forms.py:512 trips/forms.py:559 trips/forms.py:827
-#: trips/forms.py:828 trips/forms.py:872 trips/forms.py:881
+#: trips/forms.py:513 trips/forms.py:514 trips/forms.py:561 trips/forms.py:829
+#: trips/forms.py:830 trips/forms.py:874 trips/forms.py:883
 msgid "Name"
 msgstr ""
 
-#: trips/forms.py:529 trips/forms.py:845
+#: trips/forms.py:531 trips/forms.py:847
 msgid ""
 "Enter a valid phone number (with or without international prefix, and at "
 "most 2 spaces)."
 msgstr ""
 
-#: trips/forms.py:534 trips/forms.py:850
+#: trips/forms.py:536 trips/forms.py:852
 msgid "Phone number can contain at most 2 spaces."
 msgstr ""
 
-#: trips/forms.py:537 trips/forms.py:538 trips/forms.py:853 trips/forms.py:854
-#: trips/forms.py:878 trips/forms.py:885
+#: trips/forms.py:539 trips/forms.py:540 trips/forms.py:855 trips/forms.py:856
+#: trips/forms.py:880 trips/forms.py:887
 msgid "Phone number"
 msgstr ""
 
-#: trips/forms.py:555
+#: trips/forms.py:557
 msgid "Start Time"
 msgstr ""
 
-#: trips/forms.py:608
+#: trips/forms.py:610
 msgid "Monday"
 msgstr ""
 
-#: trips/forms.py:609
+#: trips/forms.py:611
 msgid "Tuesday"
 msgstr ""
 
-#: trips/forms.py:610
+#: trips/forms.py:612
 msgid "Wednesday"
 msgstr ""
 
-#: trips/forms.py:611
+#: trips/forms.py:613
 msgid "Thursday"
 msgstr ""
 
-#: trips/forms.py:612
+#: trips/forms.py:614
 msgid "Friday"
 msgstr ""
 
-#: trips/forms.py:613
+#: trips/forms.py:615
 msgid "Saturday"
 msgstr ""
 
-#: trips/forms.py:614
+#: trips/forms.py:616
 msgid "Sunday"
 msgstr ""
 
-#: trips/forms.py:619 trips/forms.py:709
+#: trips/forms.py:621 trips/forms.py:711
 msgid "Closed"
 msgstr ""
 
-#: trips/forms.py:625
+#: trips/forms.py:627
 msgid "Open"
 msgstr ""
 
-#: trips/forms.py:698
+#: trips/forms.py:700
 msgid "Opening hours"
 msgstr ""
 
-#: trips/forms.py:821
+#: trips/forms.py:823
 msgid "Period of stay"
 msgstr ""
 
-#: trips/forms.py:882
+#: trips/forms.py:884
 msgid "Check-in"
 msgstr ""
 
-#: trips/forms.py:883
+#: trips/forms.py:885
 msgid "Check-out"
 msgstr ""
 
-#: trips/forms.py:884
+#: trips/forms.py:886
 msgid "Cancellation date"
 msgstr ""
 
-#: trips/models.py:18
-msgid "Not started"
+#: trips/forms.py:1064
+msgid "Origin Address"
+msgstr ""
+
+#: trips/forms.py:1066
+msgid "Destination Address"
+msgstr ""
+
+#: trips/forms.py:1428
+msgid "Direction"
+msgstr ""
+
+#: trips/forms.py:1496
+msgid "Departure Airport"
+msgstr ""
+
+#: trips/forms.py:1501
+msgid "Search by name or IATA code (e.g., FCO, Rome)"
+msgstr ""
+
+#: trips/forms.py:1506 trips/forms.py:1524
+msgid "Search for airport by name, city, or IATA code"
+msgstr ""
+
+#: trips/forms.py:1514
+msgid "Arrival Airport"
+msgstr ""
+
+#: trips/forms.py:1519
+msgid "Search by name or IATA code"
+msgstr ""
+
+#: trips/forms.py:1535
+msgid "Airline"
+msgstr ""
+
+#: trips/forms.py:1537
+msgid "Airline name"
+msgstr ""
+
+#: trips/forms.py:1680
+msgid "Departure Station"
+msgstr ""
+
+#: trips/forms.py:1685 trips/forms.py:1703
+msgid "Search by station name"
+msgstr ""
+
+#: trips/forms.py:1690 trips/forms.py:1708
+msgid "Search for train station by name"
+msgstr ""
+
+#: trips/forms.py:1698
+msgid "Arrival Station"
+msgstr ""
+
+#: trips/forms.py:1719
+msgid "Train Operator"
+msgstr ""
+
+#: trips/forms.py:1723
+msgid "Train operator name"
+msgstr ""
+
+#: trips/forms.py:1757
+msgid "Train Operator Website"
+msgstr ""
+
+#: trips/forms.py:1882
+msgid "Departure Address"
+msgstr ""
+
+#: trips/forms.py:1887 trips/forms.py:1899
+msgid "Full address (street, city, country)"
+msgstr ""
+
+#: trips/forms.py:1890 trips/forms.py:1902 trips/forms.py:1997
+#: trips/forms.py:2009
+msgid "Full address for geocoding"
+msgstr ""
+
+#: trips/forms.py:1894
+msgid "Arrival Address"
+msgstr ""
+
+#: trips/forms.py:1909
+msgid "Rental Company"
+msgstr ""
+
+#: trips/forms.py:1913
+msgid "Rental company name (if applicable)"
+msgstr ""
+
+#: trips/forms.py:1989
+msgid "Departure Location"
+msgstr ""
+
+#: trips/forms.py:1994 trips/forms.py:2006
+msgid "Full address or location name"
+msgstr ""
+
+#: trips/forms.py:2001
+msgid "Arrival Location"
+msgstr ""
+
+#: trips/forms.py:2016
+msgid "Transport Company"
+msgstr ""
+
+#: trips/forms.py:2020
+msgid "Company name (if applicable)"
 msgstr ""
 
 #: trips/models.py:19
-msgid "Impending"
+msgid "Not started"
 msgstr ""
 
 #: trips/models.py:20
-msgid "In progress"
+msgid "Impending"
 msgstr ""
 
 #: trips/models.py:21
-msgid "Completed"
+msgid "In progress"
 msgstr ""
 
 #: trips/models.py:22
+msgid "Completed"
+msgstr ""
+
+#: trips/models.py:23
 msgid "Archived"
 msgstr ""
 
-#: trips/models.py:329
-msgid "Car"
+#: trips/models.py:264
+msgid "Main Transfer"
 msgstr ""
 
-#: trips/models.py:330
-msgid "Plane"
-msgstr ""
-
-#: trips/models.py:331
-msgid "Train"
-msgstr ""
-
-#: trips/models.py:332
+#: trips/models.py:518
 msgid "Boat"
 msgstr ""
 
-#: trips/models.py:333
+#: trips/models.py:519
 msgid "Bus"
 msgstr ""
 
-#: trips/models.py:334
+#: trips/models.py:520
 msgid "Taxi"
 msgstr ""
 
-#: trips/models.py:335 trips/models.py:446
-msgid "Other"
+#: trips/models.py:653
+msgid "Main transfers cannot be assigned to a specific day"
 msgstr ""
 
-#: trips/models.py:442
+#: trips/models.py:661
+msgid "Main transfers must have a direction (arrival/departure)"
+msgstr ""
+
+#: trips/models.py:669
+msgid "Only main transfers can have a direction"
+msgstr ""
+
+#: trips/models.py:682
+#, python-format
+msgid "A %(direction)s transfer already exists for this trip"
+msgstr ""
+
+#: trips/models.py:753
 msgid "Museum"
 msgstr ""
 
-#: trips/models.py:443
+#: trips/models.py:754
 msgid "Park"
 msgstr ""
 
-#: trips/models.py:444
+#: trips/models.py:755
 msgid "Walk"
 msgstr ""
 
-#: trips/models.py:445
+#: trips/models.py:756
 msgid "Sport"
 msgstr ""
 
-#: trips/models.py:461
+#: trips/models.py:772
 msgid "Breakfast"
 msgstr ""
 
-#: trips/models.py:462
+#: trips/models.py:773
 msgid "Lunch"
 msgstr ""
 
-#: trips/models.py:463
+#: trips/models.py:774
 msgid "Dinner"
 msgstr ""
 
-#: trips/models.py:464
+#: trips/models.py:775
 msgid "Snack"
 msgstr ""
 
-#: trips/views.py:228
+#: trips/views.py:246
 #, python-format
 msgid "<strong>%(title)s</strong> added successfully"
 msgstr ""
 
-#: trips/views.py:248
+#: trips/views.py:266
 #, python-format
 msgid "<strong>%(title)s</strong> deleted successfully"
 msgstr ""
 
-#: trips/views.py:295
+#: trips/views.py:313
 #, python-format
 msgid "<strong>%(title)s</strong> updated successfully"
 msgstr ""
 
-#: trips/views.py:322
+#: trips/views.py:340
 #, python-format
 msgid "<strong>%(title)s</strong> archived successfully"
 msgstr ""
 
-#: trips/views.py:338
+#: trips/views.py:356
 #, python-format
 msgid "<strong>%(title)s</strong> unarchived successfully"
 msgstr ""
 
-#: trips/views.py:360
+#: trips/views.py:378
 msgid "Dates updated successfully"
 msgstr ""
 
-#: trips/views.py:385
+#: trips/views.py:403
 msgid "Transport added successfully"
 msgstr ""
 
-#: trips/views.py:408
+#: trips/views.py:426
 msgid "Experience added successfully"
 msgstr ""
 
-#: trips/views.py:431
+#: trips/views.py:449
 msgid "Meal added successfully"
 msgstr ""
 
-#: trips/views.py:453
+#: trips/views.py:471
 msgid "Stay added successfully"
 msgstr ""
 
-#: trips/views.py:538
+#: trips/views.py:556
 msgid "Stay deleted successfully"
 msgstr ""
 
-#: trips/views.py:572
-msgid "Event deleted successfully"
+#: trips/views.py:587
+msgid "Main trip added successfully"
 msgstr ""
 
-#: trips/views.py:591
-msgid "Event unpaired successfully"
-msgstr ""
-
-#: trips/views.py:611
-msgid "Event paired successfully"
+#: trips/views.py:650
+msgid "Main transfer deleted successfully"
 msgstr ""
 
 #: trips/views.py:704
+msgid "Event deleted successfully"
+msgstr ""
+
+#: trips/views.py:723
+msgid "Event unpaired successfully"
+msgstr ""
+
+#: trips/views.py:743
+msgid "Event paired successfully"
+msgstr ""
+
+#: trips/views.py:836
 msgid "Event times updated successfully"
 msgstr ""
 
-#: trips/views.py:737
+#: trips/views.py:869
 msgid "This event overlaps with another event"
 msgstr ""
 
-#: trips/views.py:758
+#: trips/views.py:890
 msgid "Events swapped successfully"
 msgstr ""
 
-#: trips/views.py:838
+#: trips/views.py:970
 msgid "Start date must be after today."
 msgstr ""
 
-#: trips/views.py:842
+#: trips/views.py:974
 msgid "Start date cannot be after end date."
 msgstr ""
 
-#: trips/views.py:1002 trips/views.py:1076
+#: trips/views.py:1134 trips/views.py:1208
 msgid "Note added successfully"
 msgstr ""
 
-#: trips/views.py:1023 trips/views.py:1102
+#: trips/views.py:1155 trips/views.py:1234
 msgid "Note updated successfully"
 msgstr ""
 
-#: trips/views.py:1042 trips/views.py:1123
+#: trips/views.py:1174 trips/views.py:1255
 msgid "Note deleted successfully"
 msgstr ""
 
-#: trips/views.py:1147
+#: trips/views.py:1279
 msgid "Stay must have a name and an address to be enriched."
 msgstr ""
 
-#: trips/views.py:1155 trips/views.py:1367
+#: trips/views.py:1287 trips/views.py:1499
 msgid "Google Places API key is not configured."
 msgstr ""
 
-#: trips/views.py:1177 trips/views.py:1389
+#: trips/views.py:1309 trips/views.py:1521
 msgid "Could not find a matching place."
 msgstr ""
 
-#: trips/views.py:1180 trips/views.py:1211 trips/views.py:1392
-#: trips/views.py:1423
+#: trips/views.py:1312 trips/views.py:1343 trips/views.py:1524
+#: trips/views.py:1555
 msgid "Google Places API request timed out."
 msgstr ""
 
-#: trips/views.py:1297
+#: trips/views.py:1429
 msgid "Stay enriched successfully!"
 msgstr ""
 
-#: trips/views.py:1357
+#: trips/views.py:1489
 msgid "Event must have a name and an address to be enriched."
 msgstr ""
 
-#: trips/views.py:1481
+#: trips/views.py:1613
 msgid "Event enriched successfully!"
 msgstr ""
 
-#: trips/views.py:1499
+#: trips/views.py:1631
 msgid "Please enter a destination first"
 msgstr ""
 
-#: trips/views.py:1509
+#: trips/views.py:1641
 msgid "Unsplash API error. Please try again later."
 msgstr ""
 
-#: trips/views.py:1516
+#: trips/views.py:1648
 #, python-brace-format
 msgid "No images found for '{query}'"
+msgstr ""
+
+#: trips/views.py:1851
+msgid "Invalid transport type"
+msgstr ""
+
+#: trips/views.py:1866
+msgid "Arrival saved! Now add your departure."
+msgstr ""
+
+#: trips/views.py:1893
+msgid "Main transfers saved successfully!"
 msgstr ""

@@ -842,48 +842,38 @@ class StayFactory(factory.django.DjangoModelFactory):
 
 class MainTransferFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = "trips.Transport"
+        model = "trips.MainTransfer"
 
-    # No day for main transfers
-    day = None
     trip = factory.SubFactory(TripFactory)
-    is_main_transfer = True
+    type = factory.Faker(
+        "random_element", elements=[1, 2, 3, 4]
+    )  # PLANE, TRAIN, CAR, OTHER
     direction = factory.Faker("random_element", elements=[1, 2])  # ARRIVAL or DEPARTURE
 
-    name = factory.LazyAttribute(
-        lambda obj: f"{obj.origin_city} → {obj.destination_city}"
-    )
-    start_time = factory.LazyFunction(lambda: time(10, 0))
-    end_time = factory.LazyFunction(lambda: time(12, 0))
-
-    # Parent Event fields
-    address = factory.LazyAttribute(lambda obj: obj.origin_city)
-    city = factory.LazyAttribute(lambda obj: obj.origin_city)
-    latitude = None
-    longitude = None
-
     # Origin fields
-    origin_city = factory.Faker("city", locale="it_IT")
+    origin_name = factory.Faker("city", locale="it_IT")
+    origin_code = factory.Faker(
+        "bothify", text="???", letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    )
     origin_address = factory.Faker("street_address", locale="it_IT")
     origin_latitude = factory.Faker("latitude")
     origin_longitude = factory.Faker("longitude")
 
     # Destination fields
-    destination_city = factory.LazyAttribute(lambda obj: obj.trip.destination)
+    destination_name = factory.LazyAttribute(lambda obj: obj.trip.destination)
+    destination_code = factory.Faker(
+        "bothify", text="???", letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    )
     destination_address = factory.Faker("street_address", locale="it_IT")
     destination_latitude = factory.Faker("latitude")
     destination_longitude = factory.Faker("longitude")
 
-    # Booking fields
+    # Time fields
+    start_time = factory.LazyFunction(lambda: time(10, 0))
+    end_time = factory.LazyFunction(lambda: time(12, 0))
+
+    # Optional fields
     booking_reference = factory.Faker("bothify", text="??#####")
-    company = factory.Faker("company", locale="it_IT")
     ticket_url = factory.Faker("url")
-    price = factory.Faker("pydecimal", left_digits=3, right_digits=2, positive=True)
-
-    type = factory.Faker(
-        "random_element", elements=[1, 2, 3]
-    )  # CAR, PLANE, TRAIN most common
-    category = 1
-
-    # Type-specific data (empty by default, can be overridden)
+    notes = ""
     type_specific_data = factory.Dict({})

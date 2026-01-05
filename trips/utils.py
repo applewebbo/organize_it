@@ -16,7 +16,7 @@ from django.http import Http404
 from PIL import Image
 
 from accounts.models import Profile
-from trips.models import Event, Trip
+from trips.models import Event, MainTransfer, Trip
 
 logger = logging.getLogger(__name__)
 
@@ -499,9 +499,15 @@ def process_trip_image(image_file, max_size_mb=2):
         return None
 
 
-def create_day_map(events_with_location, stay, next_day_stay):
+def create_day_map(events_with_location, stay, next_day_stay, day=None):
     """
     Create a map for a given day with events, stay, and next day stay.
+
+    Args:
+        events_with_location: QuerySet of events with coordinates
+        stay: Stay object for the current day
+        next_day_stay: Stay object for the next day (if different)
+        day: Optional Day object (for main transfer integration)
     """
     # Check if there's anything to show on the map
     if not events_with_location and (not stay or not stay.latitude):
@@ -537,6 +543,86 @@ def create_day_map(events_with_location, stay, next_day_stay):
             bounds["max_lon"] or next_day_stay.longitude, next_day_stay.longitude
         )
 
+    # Include main transfers if this is the first or last day
+    main_transfer_markers = []
+    if day:
+        trip = day.trip
+        total_days = trip.days.count()
+
+        # First day: include ARRIVAL transfer destination
+        if day.number == 1:
+            arrival = trip.main_transfers.filter(
+                direction=MainTransfer.Direction.ARRIVAL
+            ).first()
+
+            if (
+                arrival
+                and arrival.destination_latitude
+                and arrival.destination_longitude
+            ):
+                # Include in bounds
+                bounds["min_lat"] = min(
+                    bounds["min_lat"] or arrival.destination_latitude,
+                    arrival.destination_latitude,
+                )
+                bounds["max_lat"] = max(
+                    bounds["max_lat"] or arrival.destination_latitude,
+                    arrival.destination_latitude,
+                )
+                bounds["min_lon"] = min(
+                    bounds["min_lon"] or arrival.destination_longitude,
+                    arrival.destination_longitude,
+                )
+                bounds["max_lon"] = max(
+                    bounds["max_lon"] or arrival.destination_longitude,
+                    arrival.destination_longitude,
+                )
+
+                # Store for marker creation later
+                main_transfer_markers.append(
+                    {
+                        "lat": arrival.destination_latitude,
+                        "lon": arrival.destination_longitude,
+                        "name": arrival.destination_name,
+                        "type": "arrival",
+                    }
+                )
+
+        # Last day: include DEPARTURE transfer origin
+        if day.number == total_days:
+            departure = trip.main_transfers.filter(
+                direction=MainTransfer.Direction.DEPARTURE
+            ).first()
+
+            if departure and departure.origin_latitude and departure.origin_longitude:
+                # Include in bounds
+                bounds["min_lat"] = min(
+                    bounds["min_lat"] or departure.origin_latitude,
+                    departure.origin_latitude,
+                )
+                bounds["max_lat"] = max(
+                    bounds["max_lat"] or departure.origin_latitude,
+                    departure.origin_latitude,
+                )
+                bounds["min_lon"] = min(
+                    bounds["min_lon"] or departure.origin_longitude,
+                    departure.origin_longitude,
+                )
+                bounds["max_lon"] = max(
+                    bounds["max_lon"] or departure.origin_longitude,
+                    departure.origin_longitude,
+                )
+
+                # Store for marker creation later
+                main_transfer_markers.append(
+                    {
+                        "lat": departure.origin_latitude,
+                        "lon": departure.origin_longitude,
+                        "name": departure.origin_name,
+                        "type": "departure",
+                    }
+                )
+
     # Create a map
     m = folium.Map(
         tiles="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
@@ -557,6 +643,8 @@ def create_day_map(events_with_location, stay, next_day_stay):
     experience_icon = folium.Icon(prefix="fa", color="green", icon="images")
     meal_icon = folium.Icon(prefix="fa", color="orange", icon="utensils")
     stay_icon = folium.Icon(prefix="fa", color="blue", icon="bed")
+    arrival_icon = folium.Icon(prefix="fa", color="red", icon="plane-arrival")
+    departure_icon = folium.Icon(prefix="fa", color="darkred", icon="plane-departure")
 
     # Add markers for each event
     for event in events_with_location:
@@ -589,6 +677,18 @@ def create_day_map(events_with_location, stay, next_day_stay):
             popup=next_day_stay.name,
             tooltip=f"Next day: {next_day_stay.name}",
             icon=stay_icon,
+        ).add_to(m)
+
+    # Add markers for main transfers (arrival/departure)
+    for marker_data in main_transfer_markers:
+        icon = arrival_icon if marker_data["type"] == "arrival" else departure_icon
+        label = "Arrival" if marker_data["type"] == "arrival" else "Departure"
+
+        folium.Marker(
+            [marker_data["lat"], marker_data["lon"]],
+            popup=f"{label}: {marker_data['name']}",
+            tooltip=f"{label}: {marker_data['name']}",
+            icon=icon,
         ).add_to(m)
 
     return m._repr_html_()

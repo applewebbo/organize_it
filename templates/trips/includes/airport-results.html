@@ -9,10 +9,12 @@
                         <span class="text-xs text-slate-500">({{ airport.iata_code }})</span>
                         &nbsp;<span id="airport-city-{{ forloop.counter }}" class="text-slate-500">{{ airport.city }}</span>
                         <span id="airport-iata-{{ forloop.counter }}" class="hidden">{{ airport.iata_code }}</span>
+                        <span id="airport-latitude-{{ forloop.counter }}" class="hidden">{{ airport.latitude }}</span>
+                        <span id="airport-longitude-{{ forloop.counter }}" class="hidden">{{ airport.longitude }}</span>
                     </div>
                     <button type="button"
                             class="btn btn-xs btn-ghost"
-                            @click="setAirportFields('airport-name-{{ forloop.counter }}', 'airport-iata-{{ forloop.counter }}')">
+                            @click="setAirportFields('airport-name-{{ forloop.counter }}', 'airport-iata-{{ forloop.counter }}', 'airport-latitude-{{ forloop.counter }}', 'airport-longitude-{{ forloop.counter }}')">
                         <i class="ph-bold ph-plus-circle i-sm"></i>
                     </button>
                 </li>

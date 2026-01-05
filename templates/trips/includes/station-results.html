@@ -8,10 +8,12 @@
                         <span id="station-name-{{ forloop.counter }}" class="font-bold">{{ station.name }}</span>
                         &nbsp;<span class="text-slate-500">({{ station.country }})</span>
                         <span id="station-id-{{ forloop.counter }}" class="hidden">{{ station.id }}</span>
+                        <span id="station-latitude-{{ forloop.counter }}" class="hidden">{{ station.latitude }}</span>
+                        <span id="station-longitude-{{ forloop.counter }}" class="hidden">{{ station.longitude }}</span>
                     </div>
                     <button type="button"
                             class="btn btn-xs btn-ghost"
-                            @click="setStationFields('station-name-{{ forloop.counter }}', 'station-id-{{ forloop.counter }}')">
+                            @click="setStationFields('station-name-{{ forloop.counter }}', 'station-id-{{ forloop.counter }}', 'station-latitude-{{ forloop.counter }}', 'station-longitude-{{ forloop.counter }}')">
                         <i class="ph-bold ph-plus-circle i-sm"></i>
                     </button>
                 </li>

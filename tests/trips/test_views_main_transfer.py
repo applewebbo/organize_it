@@ -122,9 +122,9 @@ class TestMainTransferViews(TestCase):
             response = self.client.post(url)
 
             assert response.status_code == 204
-            from trips.models import Transport
+            from trips.models import MainTransfer
 
-            assert not Transport.objects.filter(pk=transfer.pk).exists()
+            assert not MainTransfer.objects.filter(pk=transfer.pk).exists()
 
     def test_delete_main_transfer_non_owner_404(self):
         """Test deleting main transfer by non-owner returns 404"""

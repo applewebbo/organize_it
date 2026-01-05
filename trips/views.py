@@ -193,7 +193,7 @@ def day_detail(request, pk):
             latitude__isnull=False, longitude__isnull=False
         )
 
-        map_obj = create_day_map(events_with_location, stay, next_day_stay)
+        map_obj = create_day_map(events_with_location, stay, next_day_stay, day=day)
         context["map"] = map_obj
         context["locations"] = locations
 
@@ -1464,7 +1464,9 @@ class DayMapView(View):
             latitude__isnull=False, longitude__isnull=False
         )
 
-        map = create_day_map(events_with_location, stay, next_day_stay)
+        map = create_day_map(
+            events_with_location, stay, next_day_stay, day=self.day_obj
+        )
 
         context = {"map": map, "day": self.day_obj, "locations": locations}
         return TemplateResponse(request, "trips/day-map.html", context)

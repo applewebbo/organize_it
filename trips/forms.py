@@ -22,7 +22,6 @@ from .models import (
     Transport,
     Trip,
 )
-from .utils import get_airport_by_iata, get_station_by_id
 
 
 def urlfields_assume_https(db_field, **kwargs):
@@ -1458,7 +1457,7 @@ class MainTransferBaseForm(forms.ModelForm):
             "booking_reference": forms.TextInput(
                 attrs={
                     "class": "input input-bordered",
-                    "placeholder": _("Booking reference"),
+                    "placeholder": _("Booking Reference"),
                 }
             ),
             "ticket_url": forms.URLInput(
@@ -1519,6 +1518,9 @@ class FlightMainTransferForm(MainTransferBaseForm):
         max_length=10, required=False, widget=forms.HiddenInput()
     )
 
+    origin_latitude = forms.FloatField(required=False, widget=forms.HiddenInput())
+    origin_longitude = forms.FloatField(required=False, widget=forms.HiddenInput())
+
     destination_airport = forms.CharField(
         label=_("Arrival Airport"),
         max_length=200,
@@ -1536,6 +1538,9 @@ class FlightMainTransferForm(MainTransferBaseForm):
     destination_iata = forms.CharField(
         max_length=10, required=False, widget=forms.HiddenInput()
     )
+
+    destination_latitude = forms.FloatField(required=False, widget=forms.HiddenInput())
+    destination_longitude = forms.FloatField(required=False, widget=forms.HiddenInput())
 
     # Flight-specific fields
     company = forms.CharField(
@@ -1577,8 +1582,12 @@ class FlightMainTransferForm(MainTransferBaseForm):
         fields = MainTransferBaseForm.Meta.fields + [
             "origin_airport",
             "origin_iata",
+            "origin_latitude",
+            "origin_longitude",
             "destination_airport",
             "destination_iata",
+            "destination_latitude",
+            "destination_longitude",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -1620,24 +1629,17 @@ class FlightMainTransferForm(MainTransferBaseForm):
     def clean(self):
         cleaned_data = super().clean()
 
-        # Lookup coordinates from CSV
-        origin_iata = cleaned_data.get("origin_iata")
-        destination_iata = cleaned_data.get("destination_iata")
+        # Use coordinate values from hidden fields (populated by autocomplete JS)
+        origin_lat = cleaned_data.get("origin_latitude")
+        origin_lon = cleaned_data.get("origin_longitude")
+        dest_lat = cleaned_data.get("destination_latitude")
+        dest_lon = cleaned_data.get("destination_longitude")
 
-        if origin_iata:
-            airport = get_airport_by_iata(origin_iata)
-            if airport:
-                # Store temporarily for save()
-                self._origin_coords = (airport["latitude"], airport["longitude"])
-            else:
-                raise forms.ValidationError("Invalid origin airport IATA code")
-
-        if destination_iata:
-            airport = get_airport_by_iata(destination_iata)
-            if airport:
-                self._destination_coords = (airport["latitude"], airport["longitude"])
-            else:
-                raise forms.ValidationError("Invalid destination airport IATA code")
+        # Store coordinates for save() method
+        if origin_lat and origin_lon:
+            self._origin_coords = (origin_lat, origin_lon)
+        if dest_lat and dest_lon:
+            self._destination_coords = (dest_lat, dest_lon)
 
         return cleaned_data
 
@@ -1703,6 +1705,9 @@ class TrainMainTransferForm(MainTransferBaseForm):
         max_length=20, required=False, widget=forms.HiddenInput()
     )
 
+    origin_latitude = forms.FloatField(required=False, widget=forms.HiddenInput())
+    origin_longitude = forms.FloatField(required=False, widget=forms.HiddenInput())
+
     destination_station = forms.CharField(
         label=_("Arrival Station"),
         max_length=200,
@@ -1720,6 +1725,9 @@ class TrainMainTransferForm(MainTransferBaseForm):
     destination_station_id = forms.CharField(
         max_length=20, required=False, widget=forms.HiddenInput()
     )
+
+    destination_latitude = forms.FloatField(required=False, widget=forms.HiddenInput())
+    destination_longitude = forms.FloatField(required=False, widget=forms.HiddenInput())
 
     # Train-specific fields
     company = forms.CharField(
@@ -1773,8 +1781,12 @@ class TrainMainTransferForm(MainTransferBaseForm):
         fields = MainTransferBaseForm.Meta.fields + [
             "origin_station",
             "origin_station_id",
+            "origin_latitude",
+            "origin_longitude",
             "destination_station",
             "destination_station_id",
+            "destination_latitude",
+            "destination_longitude",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -1820,23 +1832,17 @@ class TrainMainTransferForm(MainTransferBaseForm):
     def clean(self):
         cleaned_data = super().clean()
 
-        # Lookup coordinates from CSV using station ID
-        origin_id = cleaned_data.get("origin_station_id")
-        destination_id = cleaned_data.get("destination_station_id")
+        # Use coordinate values from hidden fields (populated by autocomplete JS)
+        origin_lat = cleaned_data.get("origin_latitude")
+        origin_lon = cleaned_data.get("origin_longitude")
+        dest_lat = cleaned_data.get("destination_latitude")
+        dest_lon = cleaned_data.get("destination_longitude")
 
-        if origin_id:
-            station = get_station_by_id(origin_id)
-            if station:
-                self._origin_coords = (station["latitude"], station["longitude"])
-            else:
-                raise forms.ValidationError("Invalid origin station ID")
-
-        if destination_id:
-            station = get_station_by_id(destination_id)
-            if station:
-                self._destination_coords = (station["latitude"], station["longitude"])
-            else:
-                raise forms.ValidationError("Invalid destination station ID")
+        # Store coordinates for save() method
+        if origin_lat and origin_lon:
+            self._origin_coords = (origin_lat, origin_lon)
+        if dest_lat and dest_lon:
+            self._destination_coords = (dest_lat, dest_lon)
 
         return cleaned_data
 
@@ -1945,6 +1951,7 @@ class CarMainTransferForm(MainTransferBaseForm):
         ]
 
     def __init__(self, *args, **kwargs):
+        kwargs.pop("autocomplete", None)  # Accept but ignore autocomplete parameter
         super().__init__(*args, **kwargs)
 
         # Populate fields if editing
@@ -2045,6 +2052,7 @@ class OtherMainTransferForm(MainTransferBaseForm):
         ]
 
     def __init__(self, *args, **kwargs):
+        kwargs.pop("autocomplete", None)  # Accept but ignore autocomplete parameter
         super().__init__(*args, **kwargs)
 
         # Populate fields if editing

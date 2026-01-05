@@ -717,52 +717,40 @@ class TestMainTransferModel:
         """Test MainTransferFactory creates valid main transfer"""
         transfer = main_transfer_factory()
 
-        assert transfer.is_main_transfer is True
-        assert transfer.direction in [
-            Transport.Direction.ARRIVAL,
-            Transport.Direction.DEPARTURE,
-        ]
-        assert transfer.day is None
         assert transfer.trip is not None
+        assert transfer.type in [1, 2, 3, 4]  # PLANE, TRAIN, CAR, OTHER
+        assert transfer.direction in [1, 2]  # ARRIVAL, DEPARTURE
+        assert transfer.origin_name
+        assert transfer.destination_name
 
-    def test_main_transfer_forces_day_none(self, main_transfer_factory, trip_factory):
-        """Test that main transfers always have day=None even if set"""
-        trip = trip_factory()
-        day = trip.days.first()
+    def test_main_transfer_has_no_day_field(self, main_transfer_factory):
+        """Test that MainTransfer model doesn't have a day field (separate model)"""
+        transfer = main_transfer_factory()
 
-        transport = main_transfer_factory(
-            trip=trip,
-            day=day,
-            direction=Transport.Direction.ARRIVAL,
-        )
-
-        transport.refresh_from_db()
-        assert transport.day is None
+        # MainTransfer is a separate model and doesn't have a day field
+        assert not hasattr(transfer, "day")
 
     def test_main_transfer_unique_direction_per_trip(self, main_transfer_factory):
         """Test that only one main transfer per direction allowed per trip"""
-        from django.core.exceptions import ValidationError
+        from django.db import IntegrityError
 
-        transfer1 = main_transfer_factory(direction=Transport.Direction.ARRIVAL)
+        from trips.models import MainTransfer
+
+        transfer1 = main_transfer_factory(direction=1)  # ARRIVAL
         trip = transfer1.trip
 
-        transport2 = Transport(
-            trip=trip,
-            name="Train to Paris",
-            start_time="14:00",
-            end_time="18:00",
-            type=Transport.Type.TRAIN,
-            origin_city="Roma",
-            destination_city="Paris",
-            is_main_transfer=True,
-            direction=Transport.Direction.ARRIVAL,
-        )
-
-        with pytest.raises(ValidationError) as exc:
-            transport2.full_clean()
-
-        assert "direction" in exc.value.message_dict
-        assert "Arrival" in str(exc.value.message_dict["direction"])
+        # Try to create another ARRIVAL transfer for the same trip
+        # Should fail due to unique constraint
+        with pytest.raises(IntegrityError):
+            MainTransfer.objects.create(
+                trip=trip,
+                type=1,  # PLANE
+                direction=1,  # ARRIVAL (duplicate)
+                origin_name="Roma",
+                destination_name="Paris",
+                start_time="14:00",
+                end_time="18:00",
+            )
 
     def test_main_transfer_different_directions_allowed(self, main_transfer_factory):
         """Test that arrival and departure transfers can coexist"""
