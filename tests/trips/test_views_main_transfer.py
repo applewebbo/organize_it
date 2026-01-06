@@ -62,33 +62,39 @@ class TestMainTransferViews(TestCase):
         """Test GET request to edit main transfer shows form"""
         user = self.make_user("user")
         trip = TripFactory(author=user)
-        transfer = MainTransferFactory(trip=trip, direction=1)
+        # Use type=1 (PLANE) to have predictable template
+        transfer = MainTransferFactory(trip=trip, direction=1, type=1)
         url = reverse("trips:edit-main-transfer", kwargs={"pk": transfer.pk})
 
         with self.login(user):
             response = self.client.get(url)
 
             assert response.status_code == 200
-            assertTemplateUsed(response, "trips/main-transfer-form.html")
-            assert response.context["transfer"] == transfer
+            assertTemplateUsed(response, "trips/partials/main-transfer-flight.html")
             assert response.context["is_edit"] is True
 
     def test_edit_main_transfer_post_valid(self):
         """Test POST request updates main transfer"""
         user = self.make_user("user")
         trip = TripFactory(author=user)
+        # Use type=2 (TRAIN) - must provide valid train form fields
         transfer = MainTransferFactory(trip=trip, direction=1, type=2)
         url = reverse("trips:edit-main-transfer", kwargs={"pk": transfer.pk})
 
         data = {
-            "type": 2,
             "direction": 1,
-            "origin_city": "Florence",  # Changed
-            "origin_address": "Airport",
-            "destination_city": trip.destination,
-            "destination_address": "Hotel",
+            "origin_station": "Florence Central Station",  # Changed
+            "origin_station_id": "12345",
+            "origin_latitude": "43.776",
+            "origin_longitude": "11.247",
+            "destination_station": "Rome Termini",
+            "destination_station_id": "67890",
+            "destination_latitude": "41.901",
+            "destination_longitude": "12.502",
             "start_time": "14:00",  # Changed
             "end_time": "15:30",
+            "company": "Trenitalia",
+            "train_number": "FR9612",
         }
 
         with self.login(user):
@@ -96,7 +102,7 @@ class TestMainTransferViews(TestCase):
 
             assert response.status_code == 204
             transfer.refresh_from_db()
-            assert transfer.origin_city == "Florence"
+            assert transfer.origin_name == "Florence Central Station"
             assert str(transfer.start_time) == "14:00:00"
 
     def test_edit_main_transfer_non_owner_404(self):
@@ -231,15 +237,15 @@ class TestMainTransferViews(TestCase):
         """Test editing with invalid data shows form with errors"""
         user = self.make_user("user")
         trip = TripFactory(author=user)
+        # Use type=2 (TRAIN) for predictable template
         transfer = MainTransferFactory(trip=trip, direction=1, type=2)
         url = reverse("trips:edit-main-transfer", kwargs={"pk": transfer.pk})
 
-        # Invalid data - empty origin_city
+        # Invalid data - missing required fields for train form
         data = {
-            "type": 2,
             "direction": 1,
-            "origin_city": "",  # Empty - should fail validation
-            "destination_city": "Rome",
+            "origin_station": "",  # Empty - should fail validation
+            "destination_station": "",  # Empty - should fail validation
             "start_time": "10:00",
             "end_time": "11:30",
         }
@@ -249,6 +255,6 @@ class TestMainTransferViews(TestCase):
 
             # Should return form with errors
             assert response.status_code == 200
-            assertTemplateUsed(response, "trips/main-transfer-form.html")
+            assertTemplateUsed(response, "trips/partials/main-transfer-train.html")
             assert "form" in response.context
             assert response.context["form"].errors

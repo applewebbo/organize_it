@@ -754,16 +754,18 @@ class TestMainTransferModel:
 
     def test_main_transfer_different_directions_allowed(self, main_transfer_factory):
         """Test that arrival and departure transfers can coexist"""
-        arrival = main_transfer_factory(direction=Transport.Direction.ARRIVAL)
+        from trips.models import MainTransfer
+
+        arrival = main_transfer_factory(direction=MainTransfer.Direction.ARRIVAL)
         trip = arrival.trip
         departure = main_transfer_factory(
             trip=trip,
-            direction=Transport.Direction.DEPARTURE,
+            direction=MainTransfer.Direction.DEPARTURE,
         )
 
-        assert arrival.direction == Transport.Direction.ARRIVAL
-        assert departure.direction == Transport.Direction.DEPARTURE
-        assert trip.all_events.filter(transport__is_main_transfer=True).count() == 2
+        assert arrival.direction == MainTransfer.Direction.ARRIVAL
+        assert departure.direction == MainTransfer.Direction.DEPARTURE
+        assert trip.main_transfers.count() == 2
 
     def test_normal_transport_cannot_have_direction(self, trip_factory):
         """Test that non-main transfers cannot have a direction"""
@@ -804,107 +806,108 @@ class TestMainTransferModel:
     def test_main_transfer_day_none_validation(
         self, main_transfer_factory, trip_factory
     ):
-        """Test that main transfers cannot have a day assigned"""
-        from django.core.exceptions import ValidationError
+        """Test that main transfers are separate from daily events (no day field)"""
+        from trips.models import MainTransfer
 
         trip = trip_factory()
-        day = trip.days.first()
 
-        transport = main_transfer_factory.build(
+        # MainTransfer does not have a 'day' field - it's a separate model
+        transfer = main_transfer_factory.build(
             trip=trip,
-            day=day,
-            direction=Transport.Direction.ARRIVAL,
+            direction=MainTransfer.Direction.ARRIVAL,
         )
 
-        with pytest.raises(ValidationError) as exc:
-            transport.full_clean()
-
-        assert "day" in exc.value.message_dict
+        # Should pass validation - no day field to validate
+        transfer.full_clean()
+        assert hasattr(transfer, "trip")
+        assert not hasattr(transfer, "day")  # MainTransfer has no day field
 
     def test_main_transfer_validation_passes(self, main_transfer_factory):
         """Test that main transfer validation passes for valid data"""
+        from trips.models import MainTransfer
+
         # This tests the happy path where no validation errors occur
-        transport = main_transfer_factory(direction=Transport.Direction.ARRIVAL)
+        transfer = main_transfer_factory(direction=MainTransfer.Direction.ARRIVAL)
 
         # full_clean should pass without errors
-        transport.full_clean()
+        transfer.full_clean()
 
-        assert transport.pk is not None
-        assert transport.is_main_transfer is True
-        assert transport.day is None
-        assert transport.direction == Transport.Direction.ARRIVAL
+        assert transfer.pk is not None
+        assert not hasattr(transfer, "day")  # MainTransfer has no day field
+        assert transfer.direction == MainTransfer.Direction.ARRIVAL
 
     def test_main_transfer_type_specific_data_flight(self, main_transfer_factory):
         """Test storing flight-specific data"""
-        transport = main_transfer_factory(
-            type=Transport.Type.PLANE,
+        from trips.models import MainTransfer
+
+        transfer = main_transfer_factory(
+            type=MainTransfer.Type.PLANE,
             type_specific_data={
                 "flight_number": "AF1234",
-                "gate": "A12",
                 "terminal": "T1",
-                "checked_baggage": 2,
-                "company_link": "https://airfrance.com",
+                "company": "Air France",
+                "company_website": "https://airfrance.com",
             },
         )
 
-        assert transport.flight_number == "AF1234"
-        assert transport.gate == "A12"
-        assert transport.terminal == "T1"
-        assert transport.checked_baggage == 2
-        assert transport.company_link == "https://airfrance.com"
+        assert transfer.flight_number == "AF1234"
+        assert transfer.terminal == "T1"
+        assert transfer.company == "Air France"
+        assert transfer.company_website == "https://airfrance.com"
 
     def test_main_transfer_type_specific_data_train(self, main_transfer_factory):
         """Test storing train-specific data"""
-        transport = main_transfer_factory(
-            type=Transport.Type.TRAIN,
+        from trips.models import MainTransfer
+
+        transfer = main_transfer_factory(
+            type=MainTransfer.Type.TRAIN,
             type_specific_data={
                 "train_number": "FR9612",
                 "carriage": "7",
                 "seat": "42A",
-                "platform": "3",
-                "company_link": "https://trenitalia.com",
+                "company": "Trenitalia",
+                "company_website": "https://trenitalia.com",
             },
         )
 
-        assert transport.train_number == "FR9612"
-        assert transport.carriage == "7"
-        assert transport.seat == "42A"
-        assert transport.platform == "3"
-        assert transport.company_link == "https://trenitalia.com"
+        assert transfer.train_number == "FR9612"
+        assert transfer.carriage == "7"
+        assert transfer.seat == "42A"
+        assert transfer.company == "Trenitalia"
+        assert transfer.company_website == "https://trenitalia.com"
 
     def test_main_transfer_type_specific_data_car(self, main_transfer_factory):
         """Test storing car-specific data"""
-        transport = main_transfer_factory(
-            type=Transport.Type.CAR,
+        from trips.models import MainTransfer
+
+        transfer = main_transfer_factory(
+            type=MainTransfer.Type.CAR,
             type_specific_data={
                 "is_rental": True,
-                "license_plate": "AB123CD",
-                "car_type": "Sedan",
-                "rental_booking_reference": "RENT12345",
-                "company_link": "https://hertz.com",
+                "company": "Hertz",
+                "company_website": "https://hertz.com",
             },
         )
 
-        assert transport.is_rental is True
-        assert transport.license_plate == "AB123CD"
-        assert transport.car_type == "Sedan"
-        assert transport.rental_booking_reference == "RENT12345"
-        assert transport.company_link == "https://hertz.com"
+        assert transfer.is_rental is True
+        assert transfer.company == "Hertz"
+        assert transfer.company_website == "https://hertz.com"
 
     def test_main_transfer_type_specific_data_defaults(self, main_transfer_factory):
         """Test that type_specific_data properties return defaults"""
-        transport = main_transfer_factory(type=Transport.Type.TAXI)
+        from trips.models import MainTransfer
 
-        assert transport.flight_number == ""
-        assert transport.gate == ""
-        assert transport.terminal == ""
-        assert transport.checked_baggage == 0
-        assert transport.train_number == ""
-        assert transport.carriage == ""
-        assert transport.seat == ""
-        assert transport.platform == ""
-        assert transport.is_rental is False
-        assert transport.license_plate == ""
-        assert transport.car_type == ""
-        assert transport.rental_booking_reference == ""
-        assert transport.company_link == ""
+        # Use OTHER type with empty type_specific_data
+        transfer = main_transfer_factory(
+            type=MainTransfer.Type.OTHER, type_specific_data={}
+        )
+
+        # Test default values for all properties
+        assert transfer.flight_number == ""
+        assert transfer.terminal == ""
+        assert transfer.train_number == ""
+        assert transfer.carriage == ""
+        assert transfer.seat == ""
+        assert transfer.is_rental is False
+        assert transfer.company == ""
+        assert transfer.company_website == ""

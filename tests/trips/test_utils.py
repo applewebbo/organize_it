@@ -3,6 +3,7 @@ from datetime import date, time
 from unittest.mock import MagicMock, patch
 
 import pytest
+import time_machine
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 
@@ -335,26 +336,28 @@ class TestGetTrips(TestCase):
         context = get_trips(self.user)
         self.assertIn(unpaired_event.event_ptr, context["unpaired_events"])
 
+    @time_machine.travel("2026-01-15")
     def test_get_trips_latest_in_progress(self):
         """Test latest trip is IN_PROGRESS trip when available."""
+        # With time frozen at 2026-01-15, create trips with specific statuses
         TripFactory(
             author=self.user,
             status=1,
-            start_date=date(2026, 1, 1),
-            end_date=date(2026, 1, 10),
-        )  # NOT_STARTED
+            start_date=date(2026, 3, 1),
+            end_date=date(2026, 3, 10),
+        )  # NOT_STARTED (in future)
         in_progress_trip = TripFactory(
             author=self.user,
             status=3,
-            start_date=date(2026, 2, 1),
-            end_date=date(2026, 2, 10),
-        )  # IN_PROGRESS
+            start_date=date(2026, 1, 10),
+            end_date=date(2026, 1, 20),
+        )  # IN_PROGRESS (includes today)
         TripFactory(
             author=self.user,
             status=2,
-            start_date=date(2026, 3, 1),
-            end_date=date(2026, 3, 10),
-        )  # IMPENDING
+            start_date=date(2026, 2, 1),
+            end_date=date(2026, 2, 10),
+        )  # IMPENDING (soon)
 
         context = get_trips(self.user)
         self.assertEqual(context["latest_trip"], in_progress_trip)

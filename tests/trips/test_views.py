@@ -8,6 +8,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 import requests
+import time_machine
 from django.contrib.messages import get_messages
 from django.core.cache import cache
 from django.test import override_settings
@@ -61,20 +62,22 @@ class HomeView(TestCase):
             or trip in response.context["other_trips"]
         )
 
+    @time_machine.travel("2026-01-15")
     def test_get_with_latest_trip(self):
         user = self.make_user("user")
+        # With time frozen at 2026-01-15, create trips with specific statuses
         trip1 = TripFactory(
             author=user,
             status=1,
-            start_date=date(2026, 1, 1),
-            end_date=date(2026, 1, 10),
-        )
+            start_date=date(2026, 3, 1),
+            end_date=date(2026, 3, 10),
+        )  # NOT_STARTED (in future)
         trip2 = TripFactory(
             author=user,
             status=3,
-            start_date=date(2026, 2, 1),
-            end_date=date(2026, 2, 10),
-        )  # IN_PROGRESS
+            start_date=date(2026, 1, 10),
+            end_date=date(2026, 1, 20),
+        )  # IN_PROGRESS (includes today)
 
         with self.login(user):
             response = self.get("trips:home")

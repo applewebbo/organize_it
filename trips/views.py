@@ -600,7 +600,7 @@ def edit_main_transfer(request, pk):
     transfer = get_object_or_404(MainTransfer, pk=pk, trip__author=request.user)
     trip = transfer.trip
 
-    # Open the modal directly to the edit step for this transfer
+    # Form class mapper
     FORM_MAP = {
         MainTransfer.Type.PLANE: FlightMainTransferForm,
         MainTransfer.Type.TRAIN: TrainMainTransferForm,
@@ -612,7 +612,21 @@ def edit_main_transfer(request, pk):
     if not form_class:
         return HttpResponse("Invalid transport type", status=400)
 
-    form = form_class(instance=transfer, trip=trip, autocomplete=True)
+    if request.method == "POST":
+        # Handle form submission
+        form = form_class(request.POST, instance=transfer, trip=trip, autocomplete=True)
+        if form.is_valid():
+            form.save()
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                _("Main transfer updated successfully"),
+            )
+            return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+        # If form is invalid, fall through to return form with errors
+    else:
+        # GET request - show form with existing data
+        form = form_class(instance=transfer, trip=trip, autocomplete=True)
 
     direction_str = (
         "arrival"
