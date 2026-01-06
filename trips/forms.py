@@ -1596,15 +1596,18 @@ class FlightMainTransferForm(MainTransferBaseForm):
 
         # Add HTMX attributes for airport autocomplete (similar to EventForm geocode)
         if autocomplete:
-            search_url = reverse("trips:search-airports")
+            search_url_origin = f"{reverse('trips:search-airports')}?field_type=origin"
+            search_url_dest = (
+                f"{reverse('trips:search-airports')}?field_type=destination"
+            )
             origin_htmx_attrs = {
-                "hx-post": search_url,
+                "hx-post": search_url_origin,
                 "hx-trigger": "keyup changed delay:500ms",
                 "hx-target": "#origin-airport-results",
                 "hx-vals": "js:{airport_query: event.target.value}",
             }
             dest_htmx_attrs = {
-                "hx-post": search_url,
+                "hx-post": search_url_dest,
                 "hx-trigger": "keyup changed delay:500ms",
                 "hx-target": "#destination-airport-results",
                 "hx-vals": "js:{airport_query: event.target.value}",
@@ -1795,15 +1798,18 @@ class TrainMainTransferForm(MainTransferBaseForm):
 
         # Add HTMX attributes for station autocomplete (similar to EventForm geocode)
         if autocomplete:
-            search_url = reverse("trips:search-stations")
+            search_url_origin = f"{reverse('trips:search-stations')}?field_type=origin"
+            search_url_dest = (
+                f"{reverse('trips:search-stations')}?field_type=destination"
+            )
             origin_htmx_attrs = {
-                "hx-post": search_url,
+                "hx-post": search_url_origin,
                 "hx-trigger": "keyup changed delay:500ms",
                 "hx-target": "#origin-station-results",
                 "hx-vals": "js:{station_query: event.target.value}",
             }
             dest_htmx_attrs = {
-                "hx-post": search_url,
+                "hx-post": search_url_dest,
                 "hx-trigger": "keyup changed delay:500ms",
                 "hx-target": "#destination-station-results",
                 "hx-vals": "js:{station_query: event.target.value}",

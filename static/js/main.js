@@ -53,30 +53,30 @@ if (window.Alpine) {
                 this.addressFilled = false;
             }, 500);
         },
-        setAirportFields(nameId, iataId, latId, lonId) {
+        setAirportFields(nameId, iataId, latId, lonId, fieldType = 'origin') {
             const name = document.getElementById(nameId)?.textContent || "";
             const iata = document.getElementById(iataId)?.textContent || "";
             const lat = document.getElementById(latId)?.textContent || "";
             const lon = document.getElementById(lonId)?.textContent || "";
 
-            // Find the airport input fields (could be origin or destination)
-            const originAirport = document.getElementById("id_origin_airport");
-            const originIata = document.getElementById("id_origin_iata");
-            const originLat = document.getElementById("id_origin_latitude");
-            const originLon = document.getElementById("id_origin_longitude");
-            const destAirport = document.getElementById("id_destination_airport");
-            const destIata = document.getElementById("id_destination_iata");
-            const destLat = document.getElementById("id_destination_latitude");
-            const destLon = document.getElementById("id_destination_longitude");
+            // Determine which fields to fill based on fieldType parameter
+            if (fieldType === 'origin') {
+                const originAirport = document.getElementById("id_origin_airport");
+                const originIata = document.getElementById("id_origin_iata");
+                const originLat = document.getElementById("id_origin_latitude");
+                const originLon = document.getElementById("id_origin_longitude");
 
-            // Determine which field was being filled based on focus or empty state
-            if (originAirport && (!originAirport.value || document.activeElement === originAirport)) {
-                originAirport.value = name;
+                if (originAirport) originAirport.value = name;
                 if (originIata) originIata.value = iata;
                 if (originLat) originLat.value = lat;
                 if (originLon) originLon.value = lon;
-            } else if (destAirport) {
-                destAirport.value = name;
+            } else {
+                const destAirport = document.getElementById("id_destination_airport");
+                const destIata = document.getElementById("id_destination_iata");
+                const destLat = document.getElementById("id_destination_latitude");
+                const destLon = document.getElementById("id_destination_longitude");
+
+                if (destAirport) destAirport.value = name;
                 if (destIata) destIata.value = iata;
                 if (destLat) destLat.value = lat;
                 if (destLon) destLon.value = lon;
@@ -87,30 +87,30 @@ if (window.Alpine) {
                 this.airportFilled = false;
             }, 500);
         },
-        setStationFields(nameId, stationIdElementId, latId, lonId) {
+        setStationFields(nameId, stationIdElementId, latId, lonId, fieldType = 'origin') {
             const name = document.getElementById(nameId)?.textContent || "";
             const stationId = document.getElementById(stationIdElementId)?.textContent || "";
             const lat = document.getElementById(latId)?.textContent || "";
             const lon = document.getElementById(lonId)?.textContent || "";
 
-            // Find the station input fields (could be origin or destination)
-            const originStation = document.getElementById("id_origin_station");
-            const originStationId = document.getElementById("id_origin_station_id");
-            const originLat = document.getElementById("id_origin_latitude");
-            const originLon = document.getElementById("id_origin_longitude");
-            const destStation = document.getElementById("id_destination_station");
-            const destStationId = document.getElementById("id_destination_station_id");
-            const destLat = document.getElementById("id_destination_latitude");
-            const destLon = document.getElementById("id_destination_longitude");
+            // Determine which fields to fill based on fieldType parameter
+            if (fieldType === 'origin') {
+                const originStation = document.getElementById("id_origin_station");
+                const originStationId = document.getElementById("id_origin_station_id");
+                const originLat = document.getElementById("id_origin_latitude");
+                const originLon = document.getElementById("id_origin_longitude");
 
-            // Determine which field was being filled based on focus or empty state
-            if (originStation && (!originStation.value || document.activeElement === originStation)) {
-                originStation.value = name;
+                if (originStation) originStation.value = name;
                 if (originStationId) originStationId.value = stationId;
                 if (originLat) originLat.value = lat;
                 if (originLon) originLon.value = lon;
-            } else if (destStation) {
-                destStation.value = name;
+            } else {
+                const destStation = document.getElementById("id_destination_station");
+                const destStationId = document.getElementById("id_destination_station_id");
+                const destLat = document.getElementById("id_destination_latitude");
+                const destLon = document.getElementById("id_destination_longitude");
+
+                if (destStation) destStation.value = name;
                 if (destStationId) destStationId.value = stationId;
                 if (destLat) destLat.value = lat;
                 if (destLon) destLon.value = lon;

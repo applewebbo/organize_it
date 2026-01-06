@@ -1686,6 +1686,9 @@ def search_airports_view(request):
     """
     if request.method == "POST":
         query = request.POST.get("airport_query", "").strip()
+        field_type = request.GET.get(
+            "field_type", request.POST.get("field_type", "origin")
+        )
 
         if query and len(query) >= 2:
             results = search_airports(query, limit=10)
@@ -1696,15 +1699,20 @@ def search_airports_view(request):
                     {
                         "airports": results,
                         "found": True,
+                        "field_type": field_type,
                     },
                 )
 
         return TemplateResponse(
-            request, "trips/includes/airport-results.html", {"found": False}
+            request,
+            "trips/includes/airport-results.html",
+            {"found": False, "field_type": field_type},
         )
 
     return TemplateResponse(
-        request, "trips/includes/airport-results.html", {"found": False}
+        request,
+        "trips/includes/airport-results.html",
+        {"found": False, "field_type": "origin"},
     )
 
 
@@ -1716,6 +1724,9 @@ def search_stations(request):
     """
     if request.method == "POST":
         query = request.POST.get("station_query", "").strip()
+        field_type = request.GET.get(
+            "field_type", request.POST.get("field_type", "origin")
+        )
 
         if query and len(query) >= 2:
             results = search_train_stations(query, limit=10)
@@ -1726,15 +1737,20 @@ def search_stations(request):
                     {
                         "stations": results,
                         "found": True,
+                        "field_type": field_type,
                     },
                 )
 
         return TemplateResponse(
-            request, "trips/includes/station-results.html", {"found": False}
+            request,
+            "trips/includes/station-results.html",
+            {"found": False, "field_type": field_type},
         )
 
     return TemplateResponse(
-        request, "trips/includes/station-results.html", {"found": False}
+        request,
+        "trips/includes/station-results.html",
+        {"found": False, "field_type": "origin"},
     )
 
 
