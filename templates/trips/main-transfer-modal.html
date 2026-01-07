@@ -33,7 +33,7 @@
             <li class="step" :class="{ 'step-primary': currentStep !== 'type' }">
                 {% trans "Transport Type" %}
             </li>
-            <li class="step" :class="{ 'step-primary': currentStep === 'departure' }">
+            <li class="step" :class="{ 'step-primary': currentStep === 'arrival' || currentStep === 'departure' }">
                 {% trans "Arrival" %}
             </li>
             <li class="step" :class="{ 'step-primary': currentStep === 'departure' }">

@@ -934,3 +934,262 @@ class TestImageProcessing(TestCase):
         # Should be resized to max width 1200
         self.assertLessEqual(processed_img.width, 1200)
         self.assertLessEqual(processed_img.height, 800)
+
+
+class TestCSVFunctions(TestCase):
+    """Test CSV loading and search functions for airports and stations"""
+
+    def test_load_airports(self):
+        """Test loading airports from CSV"""
+        from trips.utils import load_airports
+
+        airports = load_airports()
+
+        self.assertIsInstance(airports, list)
+        self.assertGreater(len(airports), 0)
+
+        # Check first airport structure
+        first_airport = airports[0]
+        self.assertIn("iata_code", first_airport)
+        self.assertIn("name", first_airport)
+        self.assertIn("city", first_airport)
+        self.assertIn("latitude", first_airport)
+        self.assertIn("longitude", first_airport)
+
+        # Test cache works (second call should use cache)
+        airports2 = load_airports()
+        self.assertIs(airports, airports2)  # Should be same object
+
+    def test_load_train_stations(self):
+        """Test loading train stations from CSV"""
+        from trips.utils import load_train_stations
+
+        stations = load_train_stations()
+
+        self.assertIsInstance(stations, list)
+        self.assertGreater(len(stations), 0)
+
+        # Check first station structure
+        first_station = stations[0]
+        self.assertIn("id", first_station)
+        self.assertIn("name", first_station)
+        self.assertIn("country", first_station)
+        self.assertIn("latitude", first_station)
+        self.assertIn("longitude", first_station)
+
+        # Test cache works
+        stations2 = load_train_stations()
+        self.assertIs(stations, stations2)
+
+    def test_search_airports_by_code(self):
+        """Test searching airports by IATA code"""
+        from trips.utils import search_airports
+
+        results = search_airports("FCO", limit=5)
+
+        self.assertIsInstance(results, list)
+        self.assertGreater(len(results), 0)
+        # Should find Rome Fiumicino
+        self.assertTrue(any("FCO" in r["iata_code"] for r in results))
+
+    def test_search_airports_by_city(self):
+        """Test searching airports by city name"""
+        from trips.utils import search_airports
+
+        results = search_airports("Rome", limit=5)
+
+        self.assertIsInstance(results, list)
+        self.assertGreater(len(results), 0)
+
+    def test_search_airports_limit(self):
+        """Test search airports respects limit"""
+        from trips.utils import search_airports
+
+        results = search_airports("a", limit=3)
+
+        self.assertLessEqual(len(results), 3)
+
+    def test_search_train_stations_by_name(self):
+        """Test searching train stations by name"""
+        from trips.utils import search_train_stations
+
+        results = search_train_stations("Barcelona", limit=5)
+
+        self.assertIsInstance(results, list)
+        self.assertGreater(len(results), 0)
+
+    def test_search_train_stations_by_country(self):
+        """Test searching train stations by country code"""
+        from trips.utils import search_train_stations
+
+        results = search_train_stations("ES", limit=5)
+
+        self.assertIsInstance(results, list)
+        self.assertGreater(len(results), 0)
+
+    def test_search_train_stations_limit(self):
+        """Test search train stations respects limit"""
+        from trips.utils import search_train_stations
+
+        results = search_train_stations("a", limit=2)
+
+        self.assertLessEqual(len(results), 2)
+
+    def test_get_airport_by_iata_found(self):
+        """Test getting specific airport by IATA code"""
+        from trips.utils import get_airport_by_iata
+
+        airport = get_airport_by_iata("FCO")
+
+        self.assertIsNotNone(airport)
+        self.assertEqual(airport["iata_code"], "FCO")
+        self.assertIn("Rome", airport["name"] + airport["city"])
+
+    def test_get_airport_by_iata_not_found(self):
+        """Test getting non-existent airport returns None"""
+        from trips.utils import get_airport_by_iata
+
+        airport = get_airport_by_iata("XXX")
+
+        self.assertIsNone(airport)
+
+    def test_get_station_by_id_found(self):
+        """Test getting specific station by ID"""
+        from trips.utils import get_station_by_id, load_train_stations
+
+        # Get first station ID from CSV
+        stations = load_train_stations()
+        first_id = stations[0]["id"]
+
+        station = get_station_by_id(first_id)
+
+        self.assertIsNotNone(station)
+        self.assertEqual(station["id"], first_id)
+
+    def test_get_station_by_id_not_found(self):
+        """Test getting non-existent station returns None"""
+        from trips.utils import get_station_by_id
+
+        station = get_station_by_id("999999")
+
+        self.assertIsNone(station)
+
+
+class TestMapWithMainTransfers(TestCase):
+    """Test create_day_map integration with main transfers"""
+
+    def test_create_day_map_with_arrival_transfer(self):
+        """Test map includes arrival transfer on first day"""
+        from trips.models import MainTransfer
+        from trips.utils import create_day_map
+
+        trip = TripFactory()
+        day1 = trip.days.first()
+
+        # Create a stay so the map gets generated
+        stay = StayFactory(day=day1, trip=trip)
+
+        # Create arrival transfer with coordinates
+        MainTransfer.objects.create(
+            trip=trip,
+            type=MainTransfer.Type.PLANE,
+            direction=MainTransfer.Direction.ARRIVAL,
+            origin_name="Rome Airport",
+            origin_code="FCO",
+            origin_latitude=41.8002,
+            origin_longitude=12.2389,
+            destination_name="Barcelona Airport",
+            destination_code="BCN",
+            destination_latitude=41.2971,
+            destination_longitude=2.0833,
+            start_time="10:00",
+            end_time="12:00",
+        )
+
+        # Create day map
+        day_map = create_day_map([], stay=stay, next_day_stay=None, day=day1)
+
+        self.assertIsNotNone(day_map)
+        # Map should include the arrival transfer destination
+
+    def test_create_day_map_with_departure_transfer(self):
+        """Test map includes departure transfer on last day"""
+        from trips.models import MainTransfer
+        from trips.utils import create_day_map
+
+        trip = TripFactory()
+        last_day = trip.days.last()
+
+        # Create a stay so the map gets generated
+        stay = StayFactory(day=last_day, trip=trip)
+
+        # Create departure transfer with coordinates
+        MainTransfer.objects.create(
+            trip=trip,
+            type=MainTransfer.Type.TRAIN,
+            direction=MainTransfer.Direction.DEPARTURE,
+            origin_name="Barcelona Station",
+            origin_code="BCN",
+            origin_latitude=41.3792,
+            origin_longitude=2.1404,
+            destination_name="Madrid Station",
+            destination_code="MAD",
+            destination_latitude=40.4168,
+            destination_longitude=-3.7038,
+            start_time="15:00",
+            end_time="18:00",
+        )
+
+        # Create day map for last day
+        day_map = create_day_map([], stay=stay, next_day_stay=None, day=last_day)
+
+        self.assertIsNotNone(day_map)
+        # Map should include the departure transfer origin
+
+    def test_create_day_map_with_both_transfers(self):
+        """Test map with both arrival and departure transfers"""
+        from trips.models import MainTransfer
+        from trips.utils import create_day_map
+
+        trip = TripFactory()
+        day1 = trip.days.first()
+        last_day = trip.days.last()
+
+        # Create stays so maps get generated
+        stay1 = StayFactory(day=day1, trip=trip)
+        stay_last = StayFactory(day=last_day, trip=trip)
+
+        # Create both transfers
+        MainTransfer.objects.create(
+            trip=trip,
+            type=MainTransfer.Type.PLANE,
+            direction=MainTransfer.Direction.ARRIVAL,
+            origin_name="Rome",
+            destination_name="Barcelona",
+            destination_latitude=41.2971,
+            destination_longitude=2.0833,
+            start_time="10:00",
+            end_time="12:00",
+        )
+
+        MainTransfer.objects.create(
+            trip=trip,
+            type=MainTransfer.Type.PLANE,
+            direction=MainTransfer.Direction.DEPARTURE,
+            origin_name="Barcelona",
+            origin_latitude=41.2971,
+            origin_longitude=2.0833,
+            destination_name="Rome",
+            start_time="18:00",
+            end_time="20:00",
+        )
+
+        # Test first day map
+        day1_map = create_day_map([], stay=stay1, next_day_stay=None, day=day1)
+        self.assertIsNotNone(day1_map)
+
+        # Test last day map
+        last_day_map = create_day_map(
+            [], stay=stay_last, next_day_stay=None, day=last_day
+        )
+        self.assertIsNotNone(last_day_map)

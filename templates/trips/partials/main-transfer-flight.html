@@ -1,12 +1,33 @@
 {% load crispy_forms_tags i18n %}
+<div x-init="currentStep = '{{ direction }}'">
 <form hx-post="{% url 'trips:save-main-transfer' trip.pk %}?transport_type=plane&direction={{ direction }}"
       hx-target="#main-transfer-content"
       hx-disabled-elt="#form-submit"
-      method="post"
-      x-data="autocompleteForm()">
+      method="post">
     <div class="grid gap-x-1 p-4 sm:grid-cols-4 sm:gap-x-2 md:p-5">
         {% csrf_token %}
         {{ form.media }}
+
+        {# Hidden fields #}
+        {{ form.direction }}
+        {{ form.origin_latitude }}
+        {{ form.origin_longitude }}
+        {{ form.destination_latitude }}
+        {{ form.destination_longitude }}
+
+        {# Form errors #}
+        {% if form.errors %}
+        <div class="mb-4 sm:col-span-4">
+            <div class="py-3 px-4 text-red-700 bg-red-100 rounded border border-red-400">
+                <strong>{% trans "Form validation errors:" %}</strong>
+                <ul class="mt-2 list-disc list-inside">
+                {% for field, errors in form.errors.items %}
+                    <li><strong>{{ field }}:</strong> {{ errors|join:", " }}</li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
 
         <div class="mb-4 sm:col-span-4">
             <h4 class="text-lg font-semibold text-gray-900 dark:text-white">
@@ -101,3 +122,4 @@
         </div>
     </div>
 </form>
+</div>
