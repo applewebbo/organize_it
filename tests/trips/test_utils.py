@@ -1035,6 +1035,15 @@ class TestCSVFunctions(TestCase):
 
         self.assertLessEqual(len(results), 2)
 
+    def test_search_train_stations_no_results(self):
+        """Test search train stations returns empty list when no match"""
+        from trips.utils import search_train_stations
+
+        results = search_train_stations("NONEXISTENT_STATION_12345", limit=10)
+
+        self.assertIsInstance(results, list)
+        self.assertEqual(len(results), 0)
+
     def test_get_airport_by_iata_found(self):
         """Test getting specific airport by IATA code"""
         from trips.utils import get_airport_by_iata
@@ -1080,14 +1089,14 @@ class TestMapWithMainTransfers(TestCase):
 
     def test_create_day_map_with_arrival_transfer(self):
         """Test map includes arrival transfer on first day"""
-        from trips.models import MainTransfer
+        from trips.models import Event, MainTransfer
         from trips.utils import create_day_map
 
         trip = TripFactory()
         day1 = trip.days.first()
 
         # Create a stay so the map gets generated
-        stay = StayFactory(day=day1, trip=trip)
+        stay = StayFactory(day=day1)
 
         # Create arrival transfer with coordinates
         MainTransfer.objects.create(
@@ -1107,21 +1116,23 @@ class TestMapWithMainTransfers(TestCase):
         )
 
         # Create day map
-        day_map = create_day_map([], stay=stay, next_day_stay=None, day=day1)
+        day_map = create_day_map(
+            Event.objects.none(), stay=stay, next_day_stay=None, day=day1
+        )
 
         self.assertIsNotNone(day_map)
         # Map should include the arrival transfer destination
 
     def test_create_day_map_with_departure_transfer(self):
         """Test map includes departure transfer on last day"""
-        from trips.models import MainTransfer
+        from trips.models import Event, MainTransfer
         from trips.utils import create_day_map
 
         trip = TripFactory()
         last_day = trip.days.last()
 
         # Create a stay so the map gets generated
-        stay = StayFactory(day=last_day, trip=trip)
+        stay = StayFactory(day=last_day)
 
         # Create departure transfer with coordinates
         MainTransfer.objects.create(
@@ -1141,14 +1152,16 @@ class TestMapWithMainTransfers(TestCase):
         )
 
         # Create day map for last day
-        day_map = create_day_map([], stay=stay, next_day_stay=None, day=last_day)
+        day_map = create_day_map(
+            Event.objects.none(), stay=stay, next_day_stay=None, day=last_day
+        )
 
         self.assertIsNotNone(day_map)
         # Map should include the departure transfer origin
 
     def test_create_day_map_with_both_transfers(self):
         """Test map with both arrival and departure transfers"""
-        from trips.models import MainTransfer
+        from trips.models import Event, MainTransfer
         from trips.utils import create_day_map
 
         trip = TripFactory()
@@ -1156,8 +1169,8 @@ class TestMapWithMainTransfers(TestCase):
         last_day = trip.days.last()
 
         # Create stays so maps get generated
-        stay1 = StayFactory(day=day1, trip=trip)
-        stay_last = StayFactory(day=last_day, trip=trip)
+        stay1 = StayFactory(day=day1)
+        stay_last = StayFactory(day=last_day)
 
         # Create both transfers
         MainTransfer.objects.create(
@@ -1185,11 +1198,13 @@ class TestMapWithMainTransfers(TestCase):
         )
 
         # Test first day map
-        day1_map = create_day_map([], stay=stay1, next_day_stay=None, day=day1)
+        day1_map = create_day_map(
+            Event.objects.none(), stay=stay1, next_day_stay=None, day=day1
+        )
         self.assertIsNotNone(day1_map)
 
         # Test last day map
         last_day_map = create_day_map(
-            [], stay=stay_last, next_day_stay=None, day=last_day
+            Event.objects.none(), stay=stay_last, next_day_stay=None, day=last_day
         )
         self.assertIsNotNone(last_day_map)
