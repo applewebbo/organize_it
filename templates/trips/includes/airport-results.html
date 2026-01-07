@@ -3,18 +3,19 @@
     <div class="mb-4 -mt-1">
         <ul>
             {% for airport in airports %}
-                <li class="flex gap-2 justify-between items-center py-2 px-3 mx-2 mb-2 text-sm rounded-lg border text-slate-600 bg-slate-50 border-slate-200">
+                <li class="flex gap-2 justify-between items-center py-2 px-3 mx-2 mb-2 text-sm rounded-lg border text-slate-600 bg-slate-50 border-slate-200"
+                    data-airport-name="{{ airport.name }}"
+                    data-airport-iata="{{ airport.iata_code }}"
+                    data-airport-lat="{{ airport.latitude }}"
+                    data-airport-lon="{{ airport.longitude }}">
                     <div>
-                        <span id="airport-name-{{ field_type|default:"origin" }}-{{ forloop.counter }}" class="font-bold">{{ airport.name }}</span>
+                        <span class="font-bold">{{ airport.name }}</span>
                         <span class="text-xs text-slate-500">({{ airport.iata_code }})</span>
-                        &nbsp;<span id="airport-city-{{ field_type|default:"origin" }}-{{ forloop.counter }}" class="text-slate-500">{{ airport.city }}</span>
-                        <span id="airport-iata-{{ field_type|default:"origin" }}-{{ forloop.counter }}" class="hidden">{{ airport.iata_code }}</span>
-                        <span id="airport-latitude-{{ field_type|default:"origin" }}-{{ forloop.counter }}" class="hidden">{{ airport.latitude }}</span>
-                        <span id="airport-longitude-{{ field_type|default:"origin" }}-{{ forloop.counter }}" class="hidden">{{ airport.longitude }}</span>
+                        &nbsp;<span class="text-slate-500">{{ airport.city }}</span>
                     </div>
                     <button type="button"
                             class="btn btn-xs btn-ghost"
-                            @click="setAirportFields('airport-name-{{ field_type|default:"origin" }}-{{ forloop.counter }}', 'airport-iata-{{ field_type|default:"origin" }}-{{ forloop.counter }}', 'airport-latitude-{{ field_type|default:"origin" }}-{{ forloop.counter }}', 'airport-longitude-{{ field_type|default:"origin" }}-{{ forloop.counter }}', '{{ field_type|default:"origin" }}')">
+                            onclick="event.stopPropagation(); event.preventDefault(); setAirportFieldsFromButton(this, '{{ field_type|default:"origin" }}')">
                         <i class="ph-bold ph-plus-circle i-sm"></i>
                     </button>
                 </li>

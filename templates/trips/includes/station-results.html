@@ -3,17 +3,18 @@
     <div class="mb-4 -mt-1">
         <ul>
             {% for station in stations %}
-                <li class="flex gap-2 justify-between items-center py-2 px-3 mx-2 mb-2 text-sm rounded-lg border text-slate-600 bg-slate-50 border-slate-200">
+                <li class="flex gap-2 justify-between items-center py-2 px-3 mx-2 mb-2 text-sm rounded-lg border text-slate-600 bg-slate-50 border-slate-200"
+                    data-station-name="{{ station.name }}"
+                    data-station-id="{{ station.id }}"
+                    data-station-lat="{{ station.latitude }}"
+                    data-station-lon="{{ station.longitude }}">
                     <div>
-                        <span id="station-name-{{ field_type|default:"origin" }}-{{ forloop.counter }}" class="font-bold">{{ station.name }}</span>
+                        <span class="font-bold">{{ station.name }}</span>
                         &nbsp;<span class="text-slate-500">({{ station.country }})</span>
-                        <span id="station-id-{{ field_type|default:"origin" }}-{{ forloop.counter }}" class="hidden">{{ station.id }}</span>
-                        <span id="station-latitude-{{ field_type|default:"origin" }}-{{ forloop.counter }}" class="hidden">{{ station.latitude }}</span>
-                        <span id="station-longitude-{{ field_type|default:"origin" }}-{{ forloop.counter }}" class="hidden">{{ station.longitude }}</span>
                     </div>
                     <button type="button"
                             class="btn btn-xs btn-ghost"
-                            @click="setStationFields('station-name-{{ field_type|default:"origin" }}-{{ forloop.counter }}', 'station-id-{{ field_type|default:"origin" }}-{{ forloop.counter }}', 'station-latitude-{{ field_type|default:"origin" }}-{{ forloop.counter }}', 'station-longitude-{{ field_type|default:"origin" }}-{{ forloop.counter }}', '{{ field_type|default:"origin" }}')">
+                            onclick="event.stopPropagation(); event.preventDefault(); setStationFieldsFromButton(this, '{{ field_type|default:"origin" }}')">
                         <i class="ph-bold ph-plus-circle i-sm"></i>
                     </button>
                 </li>

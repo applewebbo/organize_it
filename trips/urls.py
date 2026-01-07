@@ -45,6 +45,11 @@ htmx_urlpatterns = [
         name="delete-main-transfer",
     ),
     path(
+        "trips/<int:trip_id>/main-transfers-section",
+        views.main_transfers_section,
+        name="main-transfers-section",
+    ),
+    path(
         "transport-type-fields/",
         views.get_transport_type_fields,
         name="transport-type-fields",

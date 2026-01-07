@@ -667,6 +667,28 @@ def delete_main_transfer(request, pk):
 
 
 @login_required
+def main_transfers_section(request, trip_id):
+    """HTMX endpoint: returns main transfers section for trip detail page"""
+    trip = get_object_or_404(Trip, pk=trip_id, author=request.user)
+
+    # Get main transfers
+    arrival_transfer = MainTransfer.objects.filter(
+        trip=trip, direction=MainTransfer.Direction.ARRIVAL
+    ).first()
+    departure_transfer = MainTransfer.objects.filter(
+        trip=trip, direction=MainTransfer.Direction.DEPARTURE
+    ).first()
+
+    context = {
+        "trip": trip,
+        "arrival_transfer": arrival_transfer,
+        "departure_transfer": departure_transfer,
+    }
+
+    return TemplateResponse(request, "trips/includes/main-transfers.html", context)
+
+
+@login_required
 def get_transport_type_fields(request):
     """HTMX endpoint: returns partial with type-specific fields"""
     from trips.models import Transport
@@ -1922,8 +1944,25 @@ def save_main_transfer(request, trip_id):
             return TemplateResponse(request, template_map[transport_type], context)
         else:
             # Departure saved - close modal and refresh trip
-            messages.success(request, _("Main transfers saved successfully!"))
-            return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+            import json
+
+            message = str(_("Main transfers saved successfully!"))
+            # Trigger both tripModified and hide-modal events with success message
+            return HttpResponse(
+                status=204,
+                headers={
+                    "HX-Trigger": json.dumps(
+                        {
+                            "tripModified": {},
+                            "hide-modal": {},
+                            "showMessage": {
+                                "type": "success",
+                                "message": message,
+                            },
+                        }
+                    )
+                },
+            )
 
     # Return form with errors
     context = {

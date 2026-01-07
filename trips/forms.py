@@ -1434,7 +1434,7 @@ class MainTransferBaseForm(forms.ModelForm):
     direction = forms.ChoiceField(
         choices=MainTransfer.Direction.choices,
         label=_("Direction"),
-        widget=forms.RadioSelect(attrs={"class": "radio radio-primary"}),
+        widget=forms.HiddenInput(),
     )
 
     class Meta:
@@ -1602,15 +1602,15 @@ class FlightMainTransferForm(MainTransferBaseForm):
             )
             origin_htmx_attrs = {
                 "hx-post": search_url_origin,
-                "hx-trigger": "keyup changed delay:500ms",
+                "hx-trigger": "keyup delay:500ms",
                 "hx-target": "#origin-airport-results",
-                "hx-vals": "js:{airport_query: event.target.value}",
+                "hx-vals": "js:{airport_query: (event && event.target) ? event.target.value : this.value}",
             }
             dest_htmx_attrs = {
                 "hx-post": search_url_dest,
-                "hx-trigger": "keyup changed delay:500ms",
+                "hx-trigger": "keyup delay:500ms",
                 "hx-target": "#destination-airport-results",
-                "hx-vals": "js:{airport_query: event.target.value}",
+                "hx-vals": "js:{airport_query: (event && event.target) ? event.target.value : this.value}",
             }
             self.fields["origin_airport"].widget.attrs.update(origin_htmx_attrs)
             self.fields["destination_airport"].widget.attrs.update(dest_htmx_attrs)
@@ -1804,15 +1804,15 @@ class TrainMainTransferForm(MainTransferBaseForm):
             )
             origin_htmx_attrs = {
                 "hx-post": search_url_origin,
-                "hx-trigger": "keyup changed delay:500ms",
+                "hx-trigger": "keyup delay:500ms",
                 "hx-target": "#origin-station-results",
-                "hx-vals": "js:{station_query: event.target.value}",
+                "hx-vals": "js:{station_query: (event && event.target) ? event.target.value : this.value}",
             }
             dest_htmx_attrs = {
                 "hx-post": search_url_dest,
-                "hx-trigger": "keyup changed delay:500ms",
+                "hx-trigger": "keyup delay:500ms",
                 "hx-target": "#destination-station-results",
-                "hx-vals": "js:{station_query: event.target.value}",
+                "hx-vals": "js:{station_query: (event && event.target) ? event.target.value : this.value}",
             }
             self.fields["origin_station"].widget.attrs.update(origin_htmx_attrs)
             self.fields["destination_station"].widget.attrs.update(dest_htmx_attrs)
