@@ -258,3 +258,337 @@ class TestMainTransferViews(TestCase):
             assertTemplateUsed(response, "trips/partials/main-transfer-train.html")
             assert "form" in response.context
             assert response.context["form"].errors
+
+    def test_search_airports_post_with_results(self):
+        """Test searching for airports returns results"""
+        user = self.make_user("user")
+        url = reverse("trips:search-airports")
+
+        with self.login(user):
+            response = self.client.post(url, {"airport_query": "Milan"})
+
+            assert response.status_code == 200
+            assertTemplateUsed(response, "trips/includes/airport-results.html")
+            assert response.context["found"] is True
+            assert len(response.context["airports"]) > 0
+
+    def test_search_airports_post_no_results_short_query(self):
+        """Test searching for airports with query too short"""
+        user = self.make_user("user")
+        url = reverse("trips:search-airports")
+
+        with self.login(user):
+            response = self.client.post(url, {"airport_query": "X"})
+
+            assert response.status_code == 200
+            assertTemplateUsed(response, "trips/includes/airport-results.html")
+            assert response.context["found"] is False
+
+    def test_search_airports_post_no_matching_results(self):
+        """Test searching for airports with valid query but no matches"""
+        user = self.make_user("user")
+        url = reverse("trips:search-airports")
+
+        with self.login(user):
+            response = self.client.post(url, {"airport_query": "XYZ12345NotExist"})
+
+            assert response.status_code == 200
+            assertTemplateUsed(response, "trips/includes/airport-results.html")
+            assert response.context["found"] is False
+
+    def test_search_airports_get_returns_empty(self):
+        """Test GET request to search airports returns empty state"""
+        user = self.make_user("user")
+        url = reverse("trips:search-airports")
+
+        with self.login(user):
+            response = self.client.get(url)
+
+            assert response.status_code == 200
+            assertTemplateUsed(response, "trips/includes/airport-results.html")
+            assert response.context["found"] is False
+            assert response.context["field_type"] == "origin"
+
+    def test_search_stations_post_with_results(self):
+        """Test searching for train stations returns results"""
+        user = self.make_user("user")
+        url = reverse("trips:search-stations")
+
+        with self.login(user):
+            response = self.client.post(url, {"station_query": "Paris"})
+
+            assert response.status_code == 200
+            assertTemplateUsed(response, "trips/includes/station-results.html")
+            assert response.context["found"] is True
+            assert len(response.context["stations"]) > 0
+
+    def test_search_stations_post_no_results_short_query(self):
+        """Test searching for stations with query too short"""
+        user = self.make_user("user")
+        url = reverse("trips:search-stations")
+
+        with self.login(user):
+            response = self.client.post(url, {"station_query": "X"})
+
+            assert response.status_code == 200
+            assertTemplateUsed(response, "trips/includes/station-results.html")
+            assert response.context["found"] is False
+
+    def test_search_stations_post_no_matching_results(self):
+        """Test searching for stations with valid query but no matches"""
+        user = self.make_user("user")
+        url = reverse("trips:search-stations")
+
+        with self.login(user):
+            response = self.client.post(url, {"station_query": "XYZ12345NotExist"})
+
+            assert response.status_code == 200
+            assertTemplateUsed(response, "trips/includes/station-results.html")
+            assert response.context["found"] is False
+
+    def test_search_stations_get_returns_empty(self):
+        """Test GET request to search stations returns empty state"""
+        user = self.make_user("user")
+        url = reverse("trips:search-stations")
+
+        with self.login(user):
+            response = self.client.get(url)
+
+            assert response.status_code == 200
+            assertTemplateUsed(response, "trips/includes/station-results.html")
+            assert response.context["found"] is False
+            assert response.context["field_type"] == "origin"
+
+    def test_main_transfers_section(self):
+        """Test main transfers section view"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        arrival = MainTransferFactory(trip=trip, direction=1, type=1)
+        departure = MainTransferFactory(trip=trip, direction=2, type=1)
+        url = reverse("trips:main-transfers-section", kwargs={"trip_id": trip.pk})
+
+        with self.login(user):
+            response = self.client.get(url)
+
+            assert response.status_code == 200
+            assertTemplateUsed(response, "trips/includes/main-transfers.html")
+            assert response.context["trip"] == trip
+            assert response.context["arrival_transfer"] == arrival
+            assert response.context["departure_transfer"] == departure
+
+    def test_main_transfer_modal_no_transfers(self):
+        """Test main transfer modal with no existing transfers"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        url = reverse("trips:main-transfer-modal", kwargs={"trip_id": trip.pk})
+
+        with self.login(user):
+            response = self.client.get(url)
+
+            assert response.status_code == 200
+            assertTemplateUsed(response, "trips/main-transfer-modal.html")
+            assert response.context["trip"] == trip
+            assert response.context["arrival"] is None
+            assert response.context["departure"] is None
+            assert response.context["is_edit"] is False
+
+    def test_main_transfer_modal_with_transfers(self):
+        """Test main transfer modal with existing transfers"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        arrival = MainTransferFactory(trip=trip, direction=1, type=1)
+        url = reverse("trips:main-transfer-modal", kwargs={"trip_id": trip.pk})
+
+        with self.login(user):
+            response = self.client.get(url)
+
+            assert response.status_code == 200
+            assert response.context["arrival"] == arrival
+            assert response.context["is_edit"] is True
+
+    def test_main_transfer_step_type(self):
+        """Test main transfer step - type selection"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        url = reverse("trips:main-transfer-step", kwargs={"trip_id": trip.pk})
+
+        with self.login(user):
+            response = self.client.get(url, {"step": "type"})
+
+            assert response.status_code == 200
+            assertTemplateUsed(response, "trips/partials/main-transfer-type.html")
+            assert response.context["trip"] == trip
+
+    def test_main_transfer_step_arrival_plane(self):
+        """Test main transfer step - arrival with plane type"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        url = reverse("trips:main-transfer-step", kwargs={"trip_id": trip.pk})
+
+        with self.login(user):
+            response = self.client.get(
+                url, {"step": "arrival", "transport_type": "plane"}
+            )
+
+            assert response.status_code == 200
+            assertTemplateUsed(response, "trips/partials/main-transfer-flight.html")
+            assert response.context["trip"] == trip
+            assert response.context["direction"] == "arrival"
+
+    def test_main_transfer_step_departure_train(self):
+        """Test main transfer step - departure with train type"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        url = reverse("trips:main-transfer-step", kwargs={"trip_id": trip.pk})
+
+        with self.login(user):
+            response = self.client.get(
+                url, {"step": "departure", "transport_type": "train"}
+            )
+
+            assert response.status_code == 200
+            assertTemplateUsed(response, "trips/partials/main-transfer-train.html")
+            assert response.context["trip"] == trip
+            assert response.context["direction"] == "departure"
+
+    def test_main_transfer_step_invalid(self):
+        """Test main transfer step with invalid step"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        url = reverse("trips:main-transfer-step", kwargs={"trip_id": trip.pk})
+
+        with self.login(user):
+            response = self.client.get(url, {"step": "invalid"})
+
+            assert response.status_code == 400
+
+    def test_save_main_transfer_arrival(self):
+        """Test saving arrival transfer loads departure form"""
+        from trips.models import MainTransfer
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        url = reverse("trips:save-main-transfer", kwargs={"trip_id": trip.pk})
+
+        data = {
+            "direction": 1,  # ARRIVAL
+            "origin_airport": "Rome Fiumicino",
+            "origin_iata": "FCO",
+            "origin_latitude": "41.8003",
+            "origin_longitude": "12.2389",
+            "destination_airport": "Milan Malpensa",
+            "destination_iata": "MXP",
+            "destination_latitude": "45.6306",
+            "destination_longitude": "8.7281",
+            "start_time": "10:00",
+            "end_time": "11:30",
+            "flight_number": "AZ123",
+        }
+
+        with self.login(user):
+            response = self.client.post(
+                url, data, QUERY_STRING="transport_type=plane&direction=arrival"
+            )
+
+            # Should create transfer and show departure form
+            assert response.status_code == 200
+            assertTemplateUsed(response, "trips/partials/main-transfer-flight.html")
+            assert response.context["direction"] == "departure"
+            # Verify arrival was created
+            assert MainTransfer.objects.filter(
+                trip=trip, direction=MainTransfer.Direction.ARRIVAL
+            ).exists()
+
+    def test_save_main_transfer_departure(self):
+        """Test saving departure transfer closes modal"""
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        # Create arrival first
+        MainTransferFactory(trip=trip, direction=1, type=1)
+        url = reverse("trips:save-main-transfer", kwargs={"trip_id": trip.pk})
+
+        data = {
+            "direction": 2,  # DEPARTURE
+            "origin_airport": "Milan Malpensa",
+            "origin_iata": "MXP",
+            "origin_latitude": "45.6306",
+            "origin_longitude": "8.7281",
+            "destination_airport": "Rome Fiumicino",
+            "destination_iata": "FCO",
+            "destination_latitude": "41.8003",
+            "destination_longitude": "12.2389",
+            "start_time": "18:00",
+            "end_time": "19:30",
+            "flight_number": "AZ456",
+        }
+
+        with self.login(user):
+            response = self.client.post(
+                url, data, QUERY_STRING="transport_type=plane&direction=departure"
+            )
+
+            assert response.status_code == 204
+            assert "HX-Trigger" in response.headers
+
+    def test_save_main_transfer_invalid_method(self):
+        """Test save main transfer with GET returns 405"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        url = reverse("trips:save-main-transfer", kwargs={"trip_id": trip.pk})
+
+        with self.login(user):
+            response = self.client.get(url)
+
+            assert response.status_code == 405
+
+    def test_save_main_transfer_invalid_data(self):
+        """Test save main transfer with invalid form data"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        url = reverse("trips:save-main-transfer", kwargs={"trip_id": trip.pk})
+
+        # Missing required fields
+        data = {}
+
+        with self.login(user):
+            response = self.client.post(
+                url, data, QUERY_STRING="transport_type=plane&direction=arrival"
+            )
+
+            assert response.status_code == 200
+            assertTemplateUsed(response, "trips/partials/main-transfer-flight.html")
+            assert "form" in response.context
+            assert response.context["form"].errors
+
+    def test_add_main_transfer_with_direction(self):
+        """Test add main transfer with direction parameter"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        url = reverse("trips:add-main-transfer", kwargs={"trip_id": trip.pk})
+
+        with self.login(user):
+            response = self.client.get(url, {"direction": "1"})
+
+            assert response.status_code == 200
+            assertTemplateUsed(response, "trips/main-transfer-form.html")
+
+    def test_edit_main_transfer_invalid_type(self):
+        """Test edit main transfer with invalid type returns 400"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        # Create a transfer and then manually change type to invalid value
+        transfer = MainTransferFactory(trip=trip, direction=1, type=1)
+
+        # Manually set invalid type (not in FORM_MAP)
+        from trips.models import MainTransfer
+
+        MainTransfer.objects.filter(pk=transfer.pk).update(type=99)
+        transfer.refresh_from_db()
+
+        url = reverse("trips:edit-main-transfer", kwargs={"pk": transfer.pk})
+
+        with self.login(user):
+            response = self.client.get(url)
+
+            assert response.status_code == 400
