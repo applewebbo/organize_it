@@ -876,4 +876,4 @@ class MainTransferFactory(factory.django.DjangoModelFactory):
     booking_reference = factory.Faker("bothify", text="??#####")
     ticket_url = factory.Faker("url")
     notes = ""
-    type_specific_data = factory.Dict({})
+    type_specific_data = factory.LazyFunction(dict)

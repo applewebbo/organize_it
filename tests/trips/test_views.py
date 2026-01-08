@@ -31,17 +31,6 @@ from trips.utils import generate_cache_key, geocode_location
 
 pytestmark = pytest.mark.django_db
 
-mock_geocoder_response = Mock(latlng=(10.0, 20.0))
-invalid_mock_geocoder_response = Mock(latlng=None)
-
-
-@pytest.fixture
-def mocked_geocoder():
-    with patch(
-        "trips.models.geocoder.mapbox", return_value=mock_geocoder_response
-    ) as mocked_geocoder:
-        yield mocked_geocoder
-
 
 class HomeView(TestCase):
     def test_get(self):
