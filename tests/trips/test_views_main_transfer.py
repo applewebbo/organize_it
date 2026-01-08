@@ -572,23 +572,3 @@ class TestMainTransferViews(TestCase):
 
             assert response.status_code == 200
             assertTemplateUsed(response, "trips/main-transfer-form.html")
-
-    def test_edit_main_transfer_invalid_type(self):
-        """Test edit main transfer with invalid type returns 400"""
-        user = self.make_user("user")
-        trip = TripFactory(author=user)
-        # Create a transfer and then manually change type to invalid value
-        transfer = MainTransferFactory(trip=trip, direction=1, type=1)
-
-        # Manually set invalid type (not in FORM_MAP)
-        from trips.models import MainTransfer
-
-        MainTransfer.objects.filter(pk=transfer.pk).update(type=99)
-        transfer.refresh_from_db()
-
-        url = reverse("trips:edit-main-transfer", kwargs={"pk": transfer.pk})
-
-        with self.login(user):
-            response = self.client.get(url)
-
-            assert response.status_code == 400

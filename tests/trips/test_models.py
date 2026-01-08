@@ -1195,6 +1195,28 @@ class TestMainTransferModel:
 
         assert "destination_address" in exc.value.message_dict
 
+    def test_main_transfer_car_with_valid_addresses(self, trip_factory):
+        """Test that car transfers pass validation with both addresses"""
+        from trips.models import MainTransfer
+
+        trip = trip_factory()
+
+        transfer = MainTransfer(
+            trip=trip,
+            type=MainTransfer.Type.CAR,
+            direction=MainTransfer.Direction.ARRIVAL,
+            origin_name="Origin Location",
+            destination_name="Destination Location",
+            origin_address="Piazza Duomo, Milano",
+            destination_address="Via Roma 123, Milano",
+            start_time="10:00",
+            end_time="12:00",
+        )
+
+        # Should not raise ValidationError
+        transfer.full_clean()
+        assert transfer.type == MainTransfer.Type.CAR
+
     @patch("geocoder.mapbox")
     def test_main_transfer_car_geocoding_origin(self, mock_geocoder, trip_factory):
         """Test that car transfers geocode origin_address"""

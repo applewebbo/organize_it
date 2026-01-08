@@ -608,9 +608,7 @@ def edit_main_transfer(request, pk):
         MainTransfer.Type.OTHER: OtherMainTransferForm,
     }
 
-    form_class = FORM_MAP.get(transfer.type)
-    if not form_class:
-        return HttpResponse("Invalid transport type", status=400)
+    form_class = FORM_MAP[transfer.type]
 
     if request.method == "POST":
         # Handle form submission
@@ -1841,10 +1839,7 @@ def main_transfer_step(request, trip_id):
         )
 
         instance = MainTransfer.objects.filter(trip=trip, direction=direction).first()
-        form_class = FORM_MAP.get(transport_type)
-        if not form_class:
-            return HttpResponse("Invalid transport type", status=400)
-
+        form_class = FORM_MAP[transport_type]
         form = form_class(instance=instance, trip=trip, autocomplete=True)
         form.initial["direction"] = direction
 
@@ -1900,11 +1895,7 @@ def save_main_transfer(request, trip_id):
         MainTransfer.Type.OTHER: OtherMainTransferForm,
     }
 
-    form_class = FORM_MAP.get(transport_type)
-    if not form_class:
-        messages.error(request, _("Invalid transport type"))
-        return HttpResponse(status=400)
-
+    form_class = FORM_MAP[transport_type]
     instance = MainTransfer.objects.filter(trip=trip, direction=direction).first()
     form = form_class(request.POST, instance=instance, trip=trip, autocomplete=False)
 
