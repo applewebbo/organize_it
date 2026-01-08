@@ -559,6 +559,167 @@ class TestTransportModel:
         assert transport.destination_latitude is None
         assert transport.destination_longitude is None
 
+    def test_transport_flight_properties(self, trip_factory):
+        """Test flight-specific properties"""
+        trip = trip_factory()
+        day = trip.days.first()
+
+        transport = Transport.objects.create(
+            day=day,
+            name="Flight to Paris",
+            start_time="10:00",
+            end_time="12:00",
+            type=Transport.Type.PLANE,
+            origin_city="Roma",
+            destination_city="Paris",
+            type_specific_data={
+                "flight_number": "AF1234",
+                "gate": "B12",
+                "terminal": "2",
+                "checked_baggage": 2,
+            },
+        )
+
+        assert transport.flight_number == "AF1234"
+        assert transport.gate == "B12"
+        assert transport.terminal == "2"
+        assert transport.checked_baggage == 2
+
+    def test_transport_train_properties(self, trip_factory):
+        """Test train-specific properties"""
+        trip = trip_factory()
+        day = trip.days.first()
+
+        transport = Transport.objects.create(
+            day=day,
+            name="Train to Milano",
+            start_time="14:00",
+            end_time="16:00",
+            type=Transport.Type.TRAIN,
+            origin_city="Roma",
+            destination_city="Milano",
+            type_specific_data={
+                "train_number": "FR9612",
+                "carriage": "7",
+                "seat": "42A",
+                "platform": "8",
+            },
+        )
+
+        assert transport.train_number == "FR9612"
+        assert transport.carriage == "7"
+        assert transport.seat == "42A"
+        assert transport.platform == "8"
+
+    def test_transport_car_properties(self, trip_factory):
+        """Test car-specific properties"""
+        trip = trip_factory()
+        day = trip.days.first()
+
+        transport = Transport.objects.create(
+            day=day,
+            name="Rental car pickup",
+            start_time="09:00",
+            end_time="09:30",
+            type=Transport.Type.CAR,
+            origin_city="Milano",
+            destination_city="Milano",
+            type_specific_data={
+                "is_rental": True,
+                "license_plate": "AB123CD",
+                "car_type": "Fiat 500",
+                "rental_booking_reference": "RENT123456",
+            },
+        )
+
+        assert transport.is_rental is True
+        assert transport.license_plate == "AB123CD"
+        assert transport.car_type == "Fiat 500"
+        assert transport.rental_booking_reference == "RENT123456"
+
+    def test_transport_company_link_property(self, trip_factory):
+        """Test company_link property"""
+        trip = trip_factory()
+        day = trip.days.first()
+
+        transport = Transport.objects.create(
+            day=day,
+            name="Bus to airport",
+            start_time="08:00",
+            end_time="09:00",
+            type=Transport.Type.BUS,
+            origin_city="Milano",
+            destination_city="Malpensa",
+            type_specific_data={"company_link": "https://terravision.eu"},
+        )
+
+        assert transport.company_link == "https://terravision.eu"
+
+    def test_transport_main_transfer_cannot_have_day(self, trip_factory):
+        """Test that Transport with is_main_transfer=True cannot have a day"""
+        from django.core.exceptions import ValidationError
+
+        trip = trip_factory()
+        day = trip.days.first()
+
+        # Try to create a main transfer with a day assigned
+        transport = Transport(
+            trip=trip,
+            day=day,
+            name="Main arrival",
+            start_time="10:00",
+            end_time="12:00",
+            type=Transport.Type.PLANE,
+            origin_city="Roma",
+            destination_city="Paris",
+            is_main_transfer=True,
+            direction=Transport.Direction.ARRIVAL,
+        )
+
+        with pytest.raises(ValidationError) as exc:
+            transport.full_clean()
+
+        assert "day" in exc.value.message_dict
+
+    def test_transport_main_transfer_duplicate_direction(self, trip_factory):
+        """Test that Transport cannot have duplicate main transfers for same direction"""
+        from django.core.exceptions import ValidationError
+
+        trip = trip_factory()
+
+        # Create first arrival transfer
+        Transport.objects.create(
+            trip=trip,
+            day=None,
+            name="First arrival",
+            start_time="10:00",
+            end_time="12:00",
+            type=Transport.Type.PLANE,
+            origin_city="Roma",
+            destination_city="Paris",
+            is_main_transfer=True,
+            direction=Transport.Direction.ARRIVAL,
+        )
+
+        # Try to create second arrival transfer for same trip
+        transport2 = Transport(
+            trip=trip,
+            day=None,
+            name="Second arrival",
+            start_time="14:00",
+            end_time="16:00",
+            type=Transport.Type.TRAIN,
+            origin_city="London",
+            destination_city="Paris",
+            is_main_transfer=True,
+            direction=Transport.Direction.ARRIVAL,
+        )
+
+        with pytest.raises(ValidationError) as exc:
+            transport2.full_clean()
+
+        assert "direction" in exc.value.message_dict
+
 
 class TestExperienceModel:
     def test_factory(self, user_factory, trip_factory, experience_factory):
@@ -911,3 +1072,215 @@ class TestMainTransferModel:
         assert transfer.is_rental is False
         assert transfer.company == ""
         assert transfer.company_website == ""
+
+    def test_main_transfer_str(self, main_transfer_factory):
+        """Test MainTransfer __str__ method"""
+        from trips.models import MainTransfer
+
+        # Test arrival transfer
+        arrival = main_transfer_factory(
+            direction=MainTransfer.Direction.ARRIVAL, type=MainTransfer.Type.PLANE
+        )
+        str_repr = str(arrival)
+        assert arrival.trip.title in str_repr
+        assert "Arrival" in str_repr
+        assert "Plane" in str_repr
+
+        # Test departure transfer
+        departure = main_transfer_factory(
+            direction=MainTransfer.Direction.DEPARTURE, type=MainTransfer.Type.TRAIN
+        )
+        str_repr = str(departure)
+        assert departure.trip.title in str_repr
+        assert "Departure" in str_repr
+        assert "Train" in str_repr
+
+    def test_main_transfer_plane_requires_names(self, trip_factory):
+        """Test that plane transfers require origin and destination names"""
+        from django.core.exceptions import ValidationError
+
+        from trips.models import MainTransfer
+
+        trip = trip_factory()
+
+        # Test missing origin_name
+        transfer = MainTransfer(
+            trip=trip,
+            type=MainTransfer.Type.PLANE,
+            direction=MainTransfer.Direction.ARRIVAL,
+            origin_name="",
+            destination_name="Paris CDG",
+            start_time="10:00",
+            end_time="12:00",
+        )
+
+        with pytest.raises(ValidationError) as exc:
+            transfer.full_clean()
+
+        assert "origin_name" in exc.value.message_dict
+
+    def test_main_transfer_train_requires_names(self, trip_factory):
+        """Test that train transfers require origin and destination names"""
+        from django.core.exceptions import ValidationError
+
+        from trips.models import MainTransfer
+
+        trip = trip_factory()
+
+        # Test missing destination_name
+        transfer = MainTransfer(
+            trip=trip,
+            type=MainTransfer.Type.TRAIN,
+            direction=MainTransfer.Direction.DEPARTURE,
+            origin_name="Paris Gare du Nord",
+            destination_name="",
+            start_time="14:00",
+            end_time="16:00",
+        )
+
+        with pytest.raises(ValidationError) as exc:
+            transfer.full_clean()
+
+        assert "destination_name" in exc.value.message_dict
+
+    def test_main_transfer_car_requires_addresses(self, trip_factory):
+        """Test that car transfers require origin and destination addresses"""
+        from django.core.exceptions import ValidationError
+
+        from trips.models import MainTransfer
+
+        trip = trip_factory()
+
+        # Test missing origin_address
+        transfer = MainTransfer(
+            trip=trip,
+            type=MainTransfer.Type.CAR,
+            direction=MainTransfer.Direction.ARRIVAL,
+            origin_name="",
+            destination_name="",
+            origin_address="",
+            destination_address="Via Roma 123, Milano",
+            start_time="10:00",
+            end_time="12:00",
+        )
+
+        with pytest.raises(ValidationError) as exc:
+            transfer.full_clean()
+
+        assert "origin_address" in exc.value.message_dict
+
+    def test_main_transfer_other_requires_addresses(self, trip_factory):
+        """Test that other transfers require origin and destination addresses"""
+        from django.core.exceptions import ValidationError
+
+        from trips.models import MainTransfer
+
+        trip = trip_factory()
+
+        # Test missing destination_address
+        transfer = MainTransfer(
+            trip=trip,
+            type=MainTransfer.Type.OTHER,
+            direction=MainTransfer.Direction.DEPARTURE,
+            origin_name="",
+            destination_name="",
+            origin_address="Via Roma 123, Milano",
+            destination_address="",
+            start_time="14:00",
+            end_time="16:00",
+        )
+
+        with pytest.raises(ValidationError) as exc:
+            transfer.full_clean()
+
+        assert "destination_address" in exc.value.message_dict
+
+    @patch("geocoder.mapbox")
+    def test_main_transfer_car_geocoding_origin(self, mock_geocoder, trip_factory):
+        """Test that car transfers geocode origin_address"""
+        from trips.models import MainTransfer
+
+        mock_geocoder.return_value.latlng = [45.4642, 9.1900]  # Milan coords
+
+        trip = trip_factory()
+
+        transfer = MainTransfer.objects.create(
+            trip=trip,
+            type=MainTransfer.Type.CAR,
+            direction=MainTransfer.Direction.ARRIVAL,
+            origin_name="",
+            destination_name="",
+            origin_address="Piazza Duomo, Milano",
+            destination_address="Via Roma 123, Milano",
+            destination_latitude=45.4773,
+            destination_longitude=9.1815,
+            start_time="10:00",
+            end_time="12:00",
+        )
+
+        # Check that geocoding was called for origin
+        assert transfer.origin_latitude == 45.4642
+        assert transfer.origin_longitude == 9.1900
+        mock_geocoder.assert_called_with(
+            "Piazza Duomo, Milano", access_token=settings.MAPBOX_ACCESS_TOKEN
+        )
+
+    @patch("geocoder.mapbox")
+    def test_main_transfer_other_geocoding_destination(
+        self, mock_geocoder, trip_factory
+    ):
+        """Test that other transfers geocode destination_address"""
+        from trips.models import MainTransfer
+
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]  # Milan coords
+
+        trip = trip_factory()
+
+        transfer = MainTransfer.objects.create(
+            trip=trip,
+            type=MainTransfer.Type.OTHER,
+            direction=MainTransfer.Direction.DEPARTURE,
+            origin_name="",
+            destination_name="",
+            origin_address="Piazza Duomo, Milano",
+            origin_latitude=45.4642,
+            origin_longitude=9.1900,
+            destination_address="Via Roma 123, Milano",
+            start_time="14:00",
+            end_time="16:00",
+        )
+
+        # Check that geocoding was called for destination
+        assert transfer.destination_latitude == 45.4773
+        assert transfer.destination_longitude == 9.1815
+        mock_geocoder.assert_called_with(
+            "Via Roma 123, Milano", access_token=settings.MAPBOX_ACCESS_TOKEN
+        )
+
+    @patch("geocoder.mapbox")
+    def test_main_transfer_car_geocoding_failure(self, mock_geocoder, trip_factory):
+        """Test that car transfers handle geocoding failures gracefully"""
+        from trips.models import MainTransfer
+
+        # Mock geocoder to return None for latlng
+        mock_geocoder.return_value.latlng = None
+
+        trip = trip_factory()
+
+        transfer = MainTransfer.objects.create(
+            trip=trip,
+            type=MainTransfer.Type.CAR,
+            direction=MainTransfer.Direction.ARRIVAL,
+            origin_name="",
+            destination_name="",
+            origin_address="Invalid Address",
+            destination_address="Another Invalid Address",
+            start_time="10:00",
+            end_time="12:00",
+        )
+
+        # Coordinates should remain None when geocoding fails
+        assert transfer.origin_latitude is None
+        assert transfer.origin_longitude is None
+        assert transfer.destination_latitude is None
+        assert transfer.destination_longitude is None
