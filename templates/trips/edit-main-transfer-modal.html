@@ -3,11 +3,11 @@
     <!-- Header -->
     <div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
         <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-            {% if transport_type == 'plane' %}
+            {% if transport_type == 1 %}
                 {% trans "Edit Flight Transfer" %}
-            {% elif transport_type == 'train' %}
+            {% elif transport_type == 2 %}
                 {% trans "Edit Train Transfer" %}
-            {% elif transport_type == 'car' %}
+            {% elif transport_type == 3 %}
                 {% trans "Edit Car Transfer" %}
             {% else %}
                 {% trans "Edit Transfer" %}
@@ -29,13 +29,13 @@
     </div>
 
     <!-- Form content (no progress indicator, no wizard wrapper) -->
-    {% if transport_type == 'plane' %}
-        {% include "trips/partials/main-transfer-flight.html" with is_edit_modal=True %}
-    {% elif transport_type == 'train' %}
-        {% include "trips/partials/main-transfer-train.html" with is_edit_modal=True %}
-    {% elif transport_type == 'car' %}
-        {% include "trips/partials/main-transfer-car.html" with is_edit_modal=True %}
+    {% if transport_type == 1 %}
+        {% include "trips/partials/main-transfer-flight.html" %}
+    {% elif transport_type == 2 %}
+        {% include "trips/partials/main-transfer-train.html" %}
+    {% elif transport_type == 3 %}
+        {% include "trips/partials/main-transfer-car.html" %}
     {% else %}
-        {% include "trips/partials/main-transfer-other.html" with is_edit_modal=True %}
+        {% include "trips/partials/main-transfer-other.html" %}
     {% endif %}
 </div>
