@@ -129,6 +129,8 @@ def trip_detail(request, pk):
         "unpaired_events": unpaired_events,
         "arrival_transfer": arrival_transfer,
         "departure_transfer": departure_transfer,
+        "both_transfers_exist": arrival_transfer is not None
+        and departure_transfer is not None,
         "show_map": show_map,
     }
     if request.htmx:
@@ -638,16 +640,10 @@ def edit_main_transfer(request, pk):
         "transport_type": transfer.type,
         "direction": direction_str,
         "is_edit": True,
+        "is_edit_modal": True,
     }
 
-    template_map = {
-        MainTransfer.Type.PLANE: "trips/partials/main-transfer-flight.html",
-        MainTransfer.Type.TRAIN: "trips/partials/main-transfer-train.html",
-        MainTransfer.Type.CAR: "trips/partials/main-transfer-car.html",
-        MainTransfer.Type.OTHER: "trips/partials/main-transfer-other.html",
-    }
-
-    return TemplateResponse(request, template_map[transfer.type], context)
+    return TemplateResponse(request, "trips/edit-main-transfer-modal.html", context)
 
 
 @login_required
@@ -681,6 +677,8 @@ def main_transfers_section(request, trip_id):
         "trip": trip,
         "arrival_transfer": arrival_transfer,
         "departure_transfer": departure_transfer,
+        "both_transfers_exist": arrival_transfer is not None
+        and departure_transfer is not None,
     }
 
     return TemplateResponse(request, "trips/includes/main-transfers.html", context)
