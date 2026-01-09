@@ -617,12 +617,22 @@ def edit_main_transfer(request, pk):
         form = form_class(request.POST, instance=transfer, trip=trip, autocomplete=True)
         if form.is_valid():
             form.save()
-            messages.add_message(
-                request,
-                messages.SUCCESS,
-                _("Main transfer updated successfully"),
+            message = str(_("Main transfer updated successfully"))
+            return HttpResponse(
+                status=204,
+                headers={
+                    "HX-Trigger": json.dumps(
+                        {
+                            "tripModified": {},
+                            "hide-modal": {},
+                            "showMessage": {
+                                "type": "success",
+                                "message": message,
+                            },
+                        }
+                    )
+                },
             )
-            return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
         # If form is invalid, fall through to return form with errors
     else:
         # GET request - show form with existing data

@@ -1,7 +1,11 @@
 {% load crispy_forms_tags i18n %}
 <div x-init="currentStep = '{{ direction }}'">
-<form hx-post="{% url 'trips:save-main-transfer' trip.pk %}?transport_type=other&direction={{ direction }}"
+<form {% if is_edit_modal %}
+      hx-post="{% url 'trips:edit-main-transfer' form.instance.pk %}"
+      {% else %}
+      hx-post="{% url 'trips:save-main-transfer' trip.pk %}?transport_type=other&direction={{ direction }}"
       hx-target="#main-transfer-content"
+      {% endif %}
       hx-disabled-elt="#form-submit"
       method="post">
     <div class="grid gap-x-1 p-4 sm:grid-cols-4 sm:gap-x-2 md:p-5">
