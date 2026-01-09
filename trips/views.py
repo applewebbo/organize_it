@@ -1824,7 +1824,21 @@ def main_transfer_step(request, trip_id):
     }
 
     if step == "type":
-        context = {"trip": trip, "transport_type": transport_type}
+        context = {
+            "trip": trip,
+            "transport_type": transport_type,
+            "for_departure": False,
+        }
+        return TemplateResponse(
+            request, "trips/partials/main-transfer-type.html", context
+        )
+
+    elif step == "departure-type":
+        context = {
+            "trip": trip,
+            "transport_type": transport_type,
+            "for_departure": True,
+        }
         return TemplateResponse(
             request, "trips/partials/main-transfer-type.html", context
         )
@@ -1928,32 +1942,24 @@ def save_main_transfer(request, trip_id):
                     },
                 )
             else:
-                # Proceed to departure form
-                messages.success(request, _("Arrival saved! Now add your departure."))
-                # Create departure form
-                departure_instance = MainTransfer.objects.filter(
-                    trip=trip, direction=MainTransfer.Direction.DEPARTURE
-                ).first()
-                departure_form = form_class(
-                    instance=departure_instance, trip=trip, autocomplete=True
+                # Trigger event to load departure type selection step
+                message = str(
+                    _("Arrival saved! Now select your departure transport type.")
                 )
-                departure_form.initial["direction"] = MainTransfer.Direction.DEPARTURE
-
-                context = {
-                    "trip": trip,
-                    "form": departure_form,
-                    "transport_type": transport_type,
-                    "direction": "departure",
-                }
-
-                template_map = {
-                    MainTransfer.Type.PLANE: "trips/partials/main-transfer-flight.html",
-                    MainTransfer.Type.TRAIN: "trips/partials/main-transfer-train.html",
-                    MainTransfer.Type.CAR: "trips/partials/main-transfer-car.html",
-                    MainTransfer.Type.OTHER: "trips/partials/main-transfer-other.html",
-                }
-
-                return TemplateResponse(request, template_map[transport_type], context)
+                return HttpResponse(
+                    status=204,
+                    headers={
+                        "HX-Trigger": json.dumps(
+                            {
+                                "loadDepartureTypeStep": {},
+                                "showMessage": {
+                                    "type": "success",
+                                    "message": message,
+                                },
+                            }
+                        )
+                    },
+                )
         else:
             # Departure saved - close modal and refresh trip
             message = str(_("Main transfers saved successfully!"))

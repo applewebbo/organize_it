@@ -10,10 +10,10 @@
                 class="flex flex-col gap-2 justify-center items-center p-6 rounded-lg border transition-all hover:border-primary hover:bg-primary/5"
                 :class="{ 'border-primary bg-primary/10': transportType === 'plane' }"
                 @click="transportType = 'plane'"
-                hx-get="{% url 'trips:main-transfer-step' trip.pk %}?step=arrival&transport_type=plane"
+                hx-get="{% url 'trips:main-transfer-step' trip.pk %}?step={% if for_departure %}departure{% else %}arrival{% endif %}&transport_type=plane"
                 hx-target="#main-transfer-content"
                 hx-swap="innerHTML"
-                @htmx:after-settle="currentStep = 'arrival'">
+                @htmx:after-settle="currentStep = '{% if for_departure %}departure{% else %}arrival{% endif %}'">
             <i class="text-4xl ph-bold ph-airplane-takeoff text-primary"></i>
             <span class="font-semibold">{% trans "Plane" %}</span>
         </button>
@@ -23,10 +23,10 @@
                 class="flex flex-col gap-2 justify-center items-center p-6 rounded-lg border transition-all hover:border-primary hover:bg-primary/5"
                 :class="{ 'border-primary bg-primary/10': transportType === 'train' }"
                 @click="transportType = 'train'"
-                hx-get="{% url 'trips:main-transfer-step' trip.pk %}?step=arrival&transport_type=train"
+                hx-get="{% url 'trips:main-transfer-step' trip.pk %}?step={% if for_departure %}departure{% else %}arrival{% endif %}&transport_type=train"
                 hx-target="#main-transfer-content"
                 hx-swap="innerHTML"
-                @htmx:after-settle="currentStep = 'arrival'">
+                @htmx:after-settle="currentStep = '{% if for_departure %}departure{% else %}arrival{% endif %}'">
             <i class="text-4xl ph-bold ph-train text-primary"></i>
             <span class="font-semibold">{% trans "Train" %}</span>
         </button>
@@ -36,10 +36,10 @@
                 class="flex flex-col gap-2 justify-center items-center p-6 rounded-lg border transition-all hover:border-primary hover:bg-primary/5"
                 :class="{ 'border-primary bg-primary/10': transportType === 'car' }"
                 @click="transportType = 'car'"
-                hx-get="{% url 'trips:main-transfer-step' trip.pk %}?step=arrival&transport_type=car"
+                hx-get="{% url 'trips:main-transfer-step' trip.pk %}?step={% if for_departure %}departure{% else %}arrival{% endif %}&transport_type=car"
                 hx-target="#main-transfer-content"
                 hx-swap="innerHTML"
-                @htmx:after-settle="currentStep = 'arrival'">
+                @htmx:after-settle="currentStep = '{% if for_departure %}departure{% else %}arrival{% endif %}'">
             <i class="text-4xl ph-bold ph-car text-primary"></i>
             <span class="font-semibold">{% trans "Car" %}</span>
         </button>
@@ -49,10 +49,10 @@
                 class="flex flex-col gap-2 justify-center items-center p-6 rounded-lg border transition-all hover:border-primary hover:bg-primary/5"
                 :class="{ 'border-primary bg-primary/10': transportType === 'other' }"
                 @click="transportType = 'other'"
-                hx-get="{% url 'trips:main-transfer-step' trip.pk %}?step=arrival&transport_type=other"
+                hx-get="{% url 'trips:main-transfer-step' trip.pk %}?step={% if for_departure %}departure{% else %}arrival{% endif %}&transport_type=other"
                 hx-target="#main-transfer-content"
                 hx-swap="innerHTML"
-                @htmx:after-settle="currentStep = 'arrival'">
+                @htmx:after-settle="currentStep = '{% if for_departure %}departure{% else %}arrival{% endif %}'">
             <i class="text-4xl ph-bold ph-bus text-primary"></i>
             <span class="font-semibold">{% trans "Other" %}</span>
         </button>

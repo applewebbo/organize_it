@@ -3,7 +3,15 @@
     currentStep: 'type',
     transportType: '{{ transport_type }}',
     direction: 'arrival'
-}">
+}"
+     @load-departure-type-step.window="
+        htmx.ajax('GET', '{% url 'trips:main-transfer-step' trip.pk %}?step=departure-type', {
+            target: '#main-transfer-content',
+            swap: 'innerHTML'
+        }).then(() => {
+            currentStep = 'departure-type';
+        })
+     ">
     <!-- Header -->
     <div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
         <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
@@ -31,10 +39,13 @@
     <div class="p-4 border-b border-base-200">
         <ul class="w-full steps steps-horizontal">
             <li class="step" :class="{ 'step-primary': currentStep !== 'type' }">
-                {% trans "Transport Type" %}
+                {% trans "Type" %}
             </li>
-            <li class="step" :class="{ 'step-primary': currentStep === 'arrival' || currentStep === 'departure' }">
+            <li class="step" :class="{ 'step-primary': currentStep === 'arrival' || currentStep === 'departure-type' || currentStep === 'departure' }">
                 {% trans "Arrival" %}
+            </li>
+            <li class="step" :class="{ 'step-primary': currentStep === 'departure-type' || currentStep === 'departure' }">
+                {% trans "Departure Type" %}
             </li>
             <li class="step" :class="{ 'step-primary': currentStep === 'departure' }">
                 {% trans "Departure" %}
