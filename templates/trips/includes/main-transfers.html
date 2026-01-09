@@ -46,6 +46,15 @@
                             <span class="hidden sm:inline">{% trans "Delete" %}</span>
                         </button>
                     </div>
+                    {% else %}
+                    <button class="btn btn-sm btn-primary"
+                            hx-get="{% url 'trips:arrival-transfer-modal' trip.pk %}"
+                            hx-target="#dialog"
+                            hx-swap="innerHTML"
+                            @click="$dispatch('open-modal'); document.activeElement.blur()">
+                        <i class="ph-bold ph-plus"></i>
+                        {% trans "Add" %}
+                    </button>
                     {% endif %}
                 </div>
                 {% if arrival_transfer %}
@@ -100,6 +109,15 @@
                             <span class="hidden sm:inline">{% trans "Delete" %}</span>
                         </button>
                     </div>
+                    {% else %}
+                    <button class="btn btn-sm btn-primary"
+                            hx-get="{% url 'trips:departure-transfer-modal' trip.pk %}"
+                            hx-target="#dialog"
+                            hx-swap="innerHTML"
+                            @click="$dispatch('open-modal'); document.activeElement.blur()">
+                        <i class="ph-bold ph-plus"></i>
+                        {% trans "Add" %}
+                    </button>
                     {% endif %}
                 </div>
                 {% if departure_transfer %}

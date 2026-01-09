@@ -119,9 +119,14 @@ htmx_urlpatterns = [
     path("search-stations/", views.search_stations, name="search-stations"),
     # MAIN TRANSFER MODAL
     path(
-        "trips/<int:trip_id>/main-transfer/modal",
-        views.main_transfer_modal,
-        name="main-transfer-modal",
+        "trips/<int:trip_id>/arrival-transfer/modal",
+        views.arrival_transfer_modal,
+        name="arrival-transfer-modal",
+    ),
+    path(
+        "trips/<int:trip_id>/departure-transfer/modal",
+        views.departure_transfer_modal,
+        name="departure-transfer-modal",
     ),
     path(
         "trips/<int:trip_id>/main-transfer/step",

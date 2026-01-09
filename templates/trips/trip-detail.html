@@ -37,15 +37,6 @@
                             disabled>
                         <i class="ph-bold ph-pencil-simple i-md" aria-hidden="true"></i>
                     </button>
-                    <button class="btn btn-sm btn-soft{% if both_transfers_exist %} btn-disabled{% endif %}"
-                            hx-get="{% url 'trips:main-transfer-modal' trip.pk %}"
-                            hx-target="#dialog"
-                            hx-swap="innerHTML"
-                            @click="$dispatch('open-modal'); document.activeElement.blur()"
-                            aria-label="{% trans 'Manage main transfers' %}"
-                            {% if both_transfers_exist %}disabled title="{% trans 'Both transfers already exist. Edit or delete them to add new ones.' %}"{% endif %}>
-                        <i class="ph-bold ph-airplane-takeoff i-md" aria-hidden="true"></i>
-                    </button>
                     <button class="btn btn-sm btn-soft"
                             hx-get="{% url 'trips:trip-dates' trip.pk %}"
                             hx-target="#dialog"
@@ -71,16 +62,6 @@
                             disabled>
                         <i class="ph-bold ph-pencil-simple i-lg" aria-hidden="true"></i>
                         <span class="hidden sm:inline">{% trans 'Edit trip' %}</span>
-                    </button>
-                    <button class="btn btn-md btn-soft{% if both_transfers_exist %} btn-disabled{% endif %}"
-                            hx-get="{% url 'trips:main-transfer-modal' trip.pk %}"
-                            hx-target="#dialog"
-                            hx-swap="innerHTML"
-                            @click="$dispatch('open-modal'); document.activeElement.blur()"
-                            aria-label="{% trans 'Manage main transfers' %}"
-                            {% if both_transfers_exist %}disabled title="{% trans 'Both transfers already exist. Edit or delete them to add new ones.' %}"{% endif %}>
-                        <i class="ph-bold ph-airplane-takeoff i-lg" aria-hidden="true"></i>
-                        <span class="hidden sm:inline">{% trans 'Main Transfers' %}</span>
                     </button>
                     <button class="btn btn-md btn-soft"
                             hx-get="{% url 'trips:trip-dates' trip.pk %}"

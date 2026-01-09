@@ -376,35 +376,33 @@ class TestMainTransferViews(TestCase):
             assert response.context["arrival_transfer"] == arrival
             assert response.context["departure_transfer"] == departure
 
-    def test_main_transfer_modal_no_transfers(self):
-        """Test main transfer modal with no existing transfers"""
+    def test_arrival_transfer_modal(self):
+        """Test arrival transfer modal"""
         user = self.make_user("user")
         trip = TripFactory(author=user)
-        url = reverse("trips:main-transfer-modal", kwargs={"trip_id": trip.pk})
+        url = reverse("trips:arrival-transfer-modal", kwargs={"trip_id": trip.pk})
 
         with self.login(user):
             response = self.client.get(url)
 
             assert response.status_code == 200
-            assertTemplateUsed(response, "trips/main-transfer-modal.html")
+            assertTemplateUsed(response, "trips/arrival-transfer-modal.html")
             assert response.context["trip"] == trip
-            assert response.context["arrival"] is None
-            assert response.context["departure"] is None
-            assert response.context["is_edit"] is False
+            assert response.context["transport_type"] == 1  # PLANE default
 
-    def test_main_transfer_modal_with_transfers(self):
-        """Test main transfer modal with existing transfers"""
+    def test_departure_transfer_modal(self):
+        """Test departure transfer modal"""
         user = self.make_user("user")
         trip = TripFactory(author=user)
-        arrival = MainTransferFactory(trip=trip, direction=1, type=1)
-        url = reverse("trips:main-transfer-modal", kwargs={"trip_id": trip.pk})
+        url = reverse("trips:departure-transfer-modal", kwargs={"trip_id": trip.pk})
 
         with self.login(user):
             response = self.client.get(url)
 
             assert response.status_code == 200
-            assert response.context["arrival"] == arrival
-            assert response.context["is_edit"] is True
+            assertTemplateUsed(response, "trips/departure-transfer-modal.html")
+            assert response.context["trip"] == trip
+            assert response.context["transport_type"] == 1  # PLANE default
 
     def test_main_transfer_step_type(self):
         """Test main transfer step - type selection"""
@@ -427,7 +425,8 @@ class TestMainTransferViews(TestCase):
 
         with self.login(user):
             response = self.client.get(
-                url, {"step": "arrival", "transport_type": "plane"}
+                url,
+                {"step": "arrival", "transport_type": "plane", "direction": "arrival"},
             )
 
             assert response.status_code == 200
@@ -463,7 +462,7 @@ class TestMainTransferViews(TestCase):
             assert response.status_code == 400
 
     def test_save_main_transfer_arrival(self):
-        """Test saving arrival transfer loads departure form"""
+        """Test saving arrival transfer closes modal"""
         from trips.models import MainTransfer
 
         user = self.make_user("user")
@@ -490,10 +489,9 @@ class TestMainTransferViews(TestCase):
                 url, data, QUERY_STRING="transport_type=plane&direction=arrival"
             )
 
-            # Should create transfer and show departure form
-            assert response.status_code == 200
-            assertTemplateUsed(response, "trips/partials/main-transfer-flight.html")
-            assert response.context["direction"] == "departure"
+            # Should create transfer and close modal
+            assert response.status_code == 204
+            assert "HX-Trigger" in response.headers
             # Verify arrival was created
             assert MainTransfer.objects.filter(
                 trip=trip, direction=MainTransfer.Direction.ARRIVAL

@@ -1783,30 +1783,35 @@ def search_stations(request):
 
 
 @login_required
-def main_transfer_modal(request, trip_id):
-    """Entry point for main transfer modal. Opens with step 1 (type selection)."""
+def arrival_transfer_modal(request, trip_id):
+    """Entry point for arrival transfer modal (2-step wizard)."""
     trip = get_object_or_404(Trip, pk=trip_id, author=request.user)
 
-    # Check existing transfers
-    arrival = MainTransfer.objects.filter(
-        trip=trip, direction=MainTransfer.Direction.ARRIVAL
-    ).first()
-    departure = MainTransfer.objects.filter(
-        trip=trip, direction=MainTransfer.Direction.DEPARTURE
-    ).first()
-
-    # Determine initial transport type
-    transport_type = arrival.type if arrival else MainTransfer.Type.PLANE
+    # Default transport type to PLANE
+    transport_type = MainTransfer.Type.PLANE
 
     context = {
         "trip": trip,
-        "arrival": arrival,
-        "departure": departure,
         "transport_type": transport_type,
-        "is_edit": arrival is not None or departure is not None,
     }
 
-    return TemplateResponse(request, "trips/main-transfer-modal.html", context)
+    return TemplateResponse(request, "trips/arrival-transfer-modal.html", context)
+
+
+@login_required
+def departure_transfer_modal(request, trip_id):
+    """Entry point for departure transfer modal (2-step wizard)."""
+    trip = get_object_or_404(Trip, pk=trip_id, author=request.user)
+
+    # Default transport type to PLANE
+    transport_type = MainTransfer.Type.PLANE
+
+    context = {
+        "trip": trip,
+        "transport_type": transport_type,
+    }
+
+    return TemplateResponse(request, "trips/departure-transfer-modal.html", context)
 
 
 @login_required
@@ -1833,32 +1838,37 @@ def main_transfer_step(request, trip_id):
         MainTransfer.Type.OTHER: OtherMainTransferForm,
     }
 
-    if step == "type":
-        context = {
-            "trip": trip,
-            "transport_type": transport_type,
-            "for_departure": False,
-        }
-        return TemplateResponse(
-            request, "trips/partials/main-transfer-type.html", context
-        )
+    # Get direction from query param (for new separate modals)
+    direction_param = request.GET.get("direction", "")
 
-    elif step == "departure-type":
+    if step == "type":
+        # Determine if this is for departure based on direction parameter
+        for_departure = direction_param == "departure"
+
         context = {
             "trip": trip,
             "transport_type": transport_type,
-            "for_departure": True,
+            "for_departure": for_departure,
+            "direction": direction_param,
         }
         return TemplateResponse(
             request, "trips/partials/main-transfer-type.html", context
         )
 
     elif step in ["arrival", "departure"]:
-        direction = (
-            MainTransfer.Direction.ARRIVAL
-            if step == "arrival"
-            else MainTransfer.Direction.DEPARTURE
-        )
+        # Use direction from query param if present, otherwise infer from step
+        if direction_param:
+            direction = (
+                MainTransfer.Direction.ARRIVAL
+                if direction_param == "arrival"
+                else MainTransfer.Direction.DEPARTURE
+            )
+        else:
+            direction = (
+                MainTransfer.Direction.ARRIVAL
+                if step == "arrival"
+                else MainTransfer.Direction.DEPARTURE
+            )
 
         instance = MainTransfer.objects.filter(trip=trip, direction=direction).first()
         form_class = FORM_MAP[transport_type]
@@ -1928,67 +1938,23 @@ def save_main_transfer(request, trip_id):
         transfer.direction = direction
         transfer.save()
 
-        # Check if user pressed "Save Arrival Only"
-        save_only = request.POST.get("save_only") == "true"
-
-        # If we just saved arrival
-        if direction == MainTransfer.Direction.ARRIVAL:
-            if save_only:
-                # Close modal without proceeding to departure
-                message = str(_("Arrival transfer saved successfully"))
-                return HttpResponse(
-                    status=204,
-                    headers={
-                        "HX-Trigger": json.dumps(
-                            {
-                                "tripModified": {},
-                                "hide-modal": {},
-                                "showMessage": {
-                                    "type": "success",
-                                    "message": message,
-                                },
-                            }
-                        )
-                    },
+        # Always close modal and refresh trip
+        message = str(_("Transfer saved successfully!"))
+        return HttpResponse(
+            status=204,
+            headers={
+                "HX-Trigger": json.dumps(
+                    {
+                        "tripModified": {},
+                        "hide-modal": {},
+                        "showMessage": {
+                            "type": "success",
+                            "message": message,
+                        },
+                    }
                 )
-            else:
-                # Trigger event to load departure type selection step
-                message = str(
-                    _("Arrival saved! Now select your departure transport type.")
-                )
-                return HttpResponse(
-                    status=204,
-                    headers={
-                        "HX-Trigger": json.dumps(
-                            {
-                                "loadDepartureTypeStep": {},
-                                "showMessage": {
-                                    "type": "success",
-                                    "message": message,
-                                },
-                            }
-                        )
-                    },
-                )
-        else:
-            # Departure saved - close modal and refresh trip
-            message = str(_("Main transfers saved successfully!"))
-            # Trigger both tripModified and hide-modal events with success message
-            return HttpResponse(
-                status=204,
-                headers={
-                    "HX-Trigger": json.dumps(
-                        {
-                            "tripModified": {},
-                            "hide-modal": {},
-                            "showMessage": {
-                                "type": "success",
-                                "message": message,
-                            },
-                        }
-                    )
-                },
-            )
+            },
+        )
 
     # Return form with errors
     context = {

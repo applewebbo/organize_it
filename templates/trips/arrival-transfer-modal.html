@@ -1,25 +1,12 @@
 {% load i18n %}
 <div x-data="{
     currentStep: 'type',
-    transportType: '{{ transport_type }}',
-    direction: 'arrival'
-}"
-     @load-departure-type-step.window="
-        htmx.ajax('GET', '{% url 'trips:main-transfer-step' trip.pk %}?step=departure-type', {
-            target: '#main-transfer-content',
-            swap: 'innerHTML'
-        }).then(() => {
-            currentStep = 'departure-type';
-        })
-     ">
+    transportType: '{{ transport_type }}'
+}">
     <!-- Header -->
     <div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
         <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-            {% if is_edit %}
-                {% trans "Edit Main Transfers" %}
-            {% else %}
-                {% trans "Add Main Transfers" %}
-            {% endif %}
+            {% trans "Add Arrival Transfer" %}
         </h3>
         <button type="button"
                 class="inline-flex justify-center items-center w-8 h-8 text-sm text-gray-400 bg-transparent rounded-lg hover:text-gray-900 hover:bg-gray-200 ms-auto dark:hover:bg-gray-600 dark:hover:text-white"
@@ -41,21 +28,15 @@
             <li class="step" :class="{ 'step-primary': currentStep !== 'type' }">
                 {% trans "Type" %}
             </li>
-            <li class="step" :class="{ 'step-primary': currentStep === 'arrival' || currentStep === 'departure-type' || currentStep === 'departure' }">
-                {% trans "Arrival" %}
-            </li>
-            <li class="step" :class="{ 'step-primary': currentStep === 'departure-type' || currentStep === 'departure' }">
-                {% trans "Departure Type" %}
-            </li>
-            <li class="step" :class="{ 'step-primary': currentStep === 'departure' }">
-                {% trans "Departure" %}
+            <li class="step" :class="{ 'step-primary': currentStep === 'form' }">
+                {% trans "Details" %}
             </li>
         </ul>
     </div>
 
     <!-- Modal content (swapped by HTMX) -->
-    <div id="main-transfer-content"
-         hx-get="{% url 'trips:main-transfer-step' trip.pk %}?step=type&transport_type={{ transport_type }}"
+    <div id="arrival-transfer-content"
+         hx-get="{% url 'trips:main-transfer-step' trip.pk %}?step=type&direction=arrival&transport_type={{ transport_type }}"
          hx-trigger="load"
          hx-swap="innerHTML">
         <!-- Step content will be loaded here -->

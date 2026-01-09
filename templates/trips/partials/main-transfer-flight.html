@@ -4,7 +4,7 @@
       hx-post="{% url 'trips:edit-main-transfer' form.instance.pk %}"
       {% else %}
       hx-post="{% url 'trips:save-main-transfer' trip.pk %}?transport_type=plane&direction={{ direction }}"
-      hx-target="#main-transfer-content"
+      hx-target="#{% if direction %}{{ direction }}-transfer-content{% else %}main-transfer-content{% endif %}"
       {% endif %}
       hx-disabled-elt="#form-submit"
       method="post">
@@ -118,35 +118,18 @@
     <div class="flex justify-between items-center p-4 rounded-b border-t border-base-200">
         <button type="button"
                 class="btn btn-soft"
-                hx-get="{% url 'trips:main-transfer-step' trip.pk %}?step=type&transport_type=plane"
-                hx-target="#main-transfer-content"
+                hx-get="{% url 'trips:main-transfer-step' trip.pk %}?step=type&transport_type=plane{% if direction %}&direction={{ direction }}{% endif %}"
+                hx-target="#{% if direction %}{{ direction }}-transfer-content{% else %}main-transfer-content{% endif %}"
                 hx-swap="innerHTML"
                 @htmx:after-settle="currentStep = 'type'">
             <i class="ph-bold ph-arrow-left"></i>
             {% trans "Back" %}
         </button>
 
-        <div class="flex gap-2">
-            {% if direction == 'arrival' %}
-                <!-- Save Arrival Only button -->
-                <button type="submit"
-                        class="btn btn-ghost"
-                        name="save_only"
-                        value="true">
-                    {% trans "Save Arrival Only" %}
-                </button>
-                <!-- Next Departure button -->
-                <button id="form-submit" class="btn btn-primary" type="submit">
-                    {% trans "Next: Departure" %}
-                    <i class="ph-bold ph-arrow-right"></i>
-                </button>
-            {% else %}
-                <button id="form-submit" class="btn btn-primary" type="submit">
-                    {% trans "Save" %}
-                    <i class="ph-bold ph-check"></i>
-                </button>
-            {% endif %}
-        </div>
+        <button id="form-submit" class="btn btn-primary" type="submit">
+            {% trans "Save" %}
+            <i class="ph-bold ph-check"></i>
+        </button>
     </div>
     {% endif %}
 </form>
