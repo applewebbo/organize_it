@@ -1904,37 +1904,58 @@ def save_main_transfer(request, trip_id):
         transfer.direction = direction
         transfer.save()
 
-        # If we just saved arrival, load departure form
+        # Check if user pressed "Save Arrival Only"
+        save_only = request.POST.get("save_only") == "true"
+
+        # If we just saved arrival
         if direction == MainTransfer.Direction.ARRIVAL:
-            messages.success(request, _("Arrival saved! Now add your departure."))
-            # Create departure form
-            departure_instance = MainTransfer.objects.filter(
-                trip=trip, direction=MainTransfer.Direction.DEPARTURE
-            ).first()
-            departure_form = form_class(
-                instance=departure_instance, trip=trip, autocomplete=True
-            )
-            departure_form.initial["direction"] = MainTransfer.Direction.DEPARTURE
+            if save_only:
+                # Close modal without proceeding to departure
+                message = str(_("Arrival transfer saved successfully"))
+                return HttpResponse(
+                    status=204,
+                    headers={
+                        "HX-Trigger": json.dumps(
+                            {
+                                "tripModified": {},
+                                "hide-modal": {},
+                                "showMessage": {
+                                    "type": "success",
+                                    "message": message,
+                                },
+                            }
+                        )
+                    },
+                )
+            else:
+                # Proceed to departure form
+                messages.success(request, _("Arrival saved! Now add your departure."))
+                # Create departure form
+                departure_instance = MainTransfer.objects.filter(
+                    trip=trip, direction=MainTransfer.Direction.DEPARTURE
+                ).first()
+                departure_form = form_class(
+                    instance=departure_instance, trip=trip, autocomplete=True
+                )
+                departure_form.initial["direction"] = MainTransfer.Direction.DEPARTURE
 
-            context = {
-                "trip": trip,
-                "form": departure_form,
-                "transport_type": transport_type,
-                "direction": "departure",
-            }
+                context = {
+                    "trip": trip,
+                    "form": departure_form,
+                    "transport_type": transport_type,
+                    "direction": "departure",
+                }
 
-            template_map = {
-                MainTransfer.Type.PLANE: "trips/partials/main-transfer-flight.html",
-                MainTransfer.Type.TRAIN: "trips/partials/main-transfer-train.html",
-                MainTransfer.Type.CAR: "trips/partials/main-transfer-car.html",
-                MainTransfer.Type.OTHER: "trips/partials/main-transfer-other.html",
-            }
+                template_map = {
+                    MainTransfer.Type.PLANE: "trips/partials/main-transfer-flight.html",
+                    MainTransfer.Type.TRAIN: "trips/partials/main-transfer-train.html",
+                    MainTransfer.Type.CAR: "trips/partials/main-transfer-car.html",
+                    MainTransfer.Type.OTHER: "trips/partials/main-transfer-other.html",
+                }
 
-            return TemplateResponse(request, template_map[transport_type], context)
+                return TemplateResponse(request, template_map[transport_type], context)
         else:
             # Departure saved - close modal and refresh trip
-            import json
-
             message = str(_("Main transfers saved successfully!"))
             # Trigger both tripModified and hide-modal events with success message
             return HttpResponse(
