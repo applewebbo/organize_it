@@ -1629,6 +1629,33 @@ class FlightMainTransferForm(MainTransferBaseForm):
                 self.fields["terminal"].initial = self.instance.terminal
                 self.fields["company_website"].initial = self.instance.company_website
 
+        # Pre-fill from arrival if this is a new departure
+        if (
+            self.trip
+            and not self.instance.pk
+            and self.initial.get("direction") == MainTransfer.Direction.DEPARTURE
+        ):
+            arrival = MainTransfer.objects.filter(
+                trip=self.trip,
+                direction=MainTransfer.Direction.ARRIVAL,
+                type=MainTransfer.Type.PLANE,
+            ).first()
+
+            if arrival:
+                # Invert origin ↔ destination
+                self.fields["origin_airport"].initial = arrival.destination_name
+                self.fields["origin_iata"].initial = arrival.destination_code
+                self.fields["origin_latitude"].initial = arrival.destination_latitude
+                self.fields["origin_longitude"].initial = arrival.destination_longitude
+
+                self.fields["destination_airport"].initial = arrival.origin_name
+                self.fields["destination_iata"].initial = arrival.origin_code
+                self.fields["destination_latitude"].initial = arrival.origin_latitude
+                self.fields["destination_longitude"].initial = arrival.origin_longitude
+
+                # Set flag for message display
+                self.prefilled_from_arrival = True
+
     def clean(self):
         cleaned_data = super().clean()
 
@@ -1835,6 +1862,33 @@ class TrainMainTransferForm(MainTransferBaseForm):
                 self.fields["seat"].initial = self.instance.seat
                 self.fields["company_website"].initial = self.instance.company_website
 
+        # Pre-fill from arrival if this is a new departure
+        if (
+            self.trip
+            and not self.instance.pk
+            and self.initial.get("direction") == MainTransfer.Direction.DEPARTURE
+        ):
+            arrival = MainTransfer.objects.filter(
+                trip=self.trip,
+                direction=MainTransfer.Direction.ARRIVAL,
+                type=MainTransfer.Type.TRAIN,
+            ).first()
+
+            if arrival:
+                # Invert origin ↔ destination
+                self.fields["origin_station"].initial = arrival.destination_name
+                self.fields["origin_station_id"].initial = arrival.destination_code
+                self.fields["origin_latitude"].initial = arrival.destination_latitude
+                self.fields["origin_longitude"].initial = arrival.destination_longitude
+
+                self.fields["destination_station"].initial = arrival.origin_name
+                self.fields["destination_station_id"].initial = arrival.origin_code
+                self.fields["destination_latitude"].initial = arrival.origin_latitude
+                self.fields["destination_longitude"].initial = arrival.origin_longitude
+
+                # Set flag for message display
+                self.prefilled_from_arrival = True
+
     def clean(self):
         cleaned_data = super().clean()
 
@@ -1973,6 +2027,26 @@ class CarMainTransferForm(MainTransferBaseForm):
                 self.fields["is_rental"].initial = self.instance.is_rental
                 self.fields["company_website"].initial = self.instance.company_website
 
+        # Pre-fill from arrival if this is a new departure
+        if (
+            self.trip
+            and not self.instance.pk
+            and self.initial.get("direction") == MainTransfer.Direction.DEPARTURE
+        ):
+            arrival = MainTransfer.objects.filter(
+                trip=self.trip,
+                direction=MainTransfer.Direction.ARRIVAL,
+                type=MainTransfer.Type.CAR,
+            ).first()
+
+            if arrival:
+                # Invert origin ↔ destination
+                self.fields["origin_address"].initial = arrival.destination_address
+                self.fields["destination_address"].initial = arrival.origin_address
+
+                # Set flag for message display
+                self.prefilled_from_arrival = True
+
     def save(self, commit=True):
         instance = super().save(commit=False)
 
@@ -2072,6 +2146,26 @@ class OtherMainTransferForm(MainTransferBaseForm):
             if self.instance.type_specific_data:  # pragma: no cover
                 self.fields["company"].initial = self.instance.company
                 self.fields["company_website"].initial = self.instance.company_website
+
+        # Pre-fill from arrival if this is a new departure
+        if (
+            self.trip
+            and not self.instance.pk
+            and self.initial.get("direction") == MainTransfer.Direction.DEPARTURE
+        ):
+            arrival = MainTransfer.objects.filter(
+                trip=self.trip,
+                direction=MainTransfer.Direction.ARRIVAL,
+                type=MainTransfer.Type.OTHER,
+            ).first()
+
+            if arrival:
+                # Invert origin ↔ destination
+                self.fields["origin_address"].initial = arrival.destination_address
+                self.fields["destination_address"].initial = arrival.origin_address
+
+                # Set flag for message display
+                self.prefilled_from_arrival = True
 
     def save(self, commit=True):
         instance = super().save(commit=False)

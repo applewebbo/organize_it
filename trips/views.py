@@ -1872,8 +1872,15 @@ def main_transfer_step(request, trip_id):
 
         instance = MainTransfer.objects.filter(trip=trip, direction=direction).first()
         form_class = FORM_MAP[transport_type]
-        form = form_class(instance=instance, trip=trip, autocomplete=True)
-        form.initial["direction"] = direction
+        form = form_class(
+            instance=instance,
+            trip=trip,
+            autocomplete=True,
+            initial={"direction": direction},
+        )
+
+        # Check if form was pre-filled from arrival
+        prefilled = getattr(form, "prefilled_from_arrival", False)
 
         context = {
             "trip": trip,
@@ -1881,6 +1888,7 @@ def main_transfer_step(request, trip_id):
             "step": step,
             "transport_type": transport_type,
             "direction": "arrival" if step == "arrival" else "departure",
+            "prefilled_from_arrival": prefilled,
         }
 
         template_map = {
