@@ -585,6 +585,7 @@ def create_day_map(events_with_location, stay, next_day_stay, day=None):
                         "lon": arrival.destination_longitude,
                         "name": arrival.destination_name,
                         "type": "arrival",
+                        "transport_type": arrival.type,
                     }
                 )
 
@@ -620,6 +621,7 @@ def create_day_map(events_with_location, stay, next_day_stay, day=None):
                         "lon": departure.origin_longitude,
                         "name": departure.origin_name,
                         "type": "departure",
+                        "transport_type": departure.type,
                     }
                 )
 
@@ -643,8 +645,6 @@ def create_day_map(events_with_location, stay, next_day_stay, day=None):
     experience_icon = folium.Icon(prefix="fa", color="green", icon="images")
     meal_icon = folium.Icon(prefix="fa", color="orange", icon="utensils")
     stay_icon = folium.Icon(prefix="fa", color="blue", icon="bed")
-    arrival_icon = folium.Icon(prefix="fa", color="red", icon="plane-arrival")
-    departure_icon = folium.Icon(prefix="fa", color="darkred", icon="plane-departure")
 
     # Add markers for each event
     for event in events_with_location:
@@ -681,8 +681,20 @@ def create_day_map(events_with_location, stay, next_day_stay, day=None):
 
     # Add markers for main transfers (arrival/departure)
     for marker_data in main_transfer_markers:
-        icon = arrival_icon if marker_data["type"] == "arrival" else departure_icon
         label = "Arrival" if marker_data["type"] == "arrival" else "Departure"
+
+        # Choose icon based on transport type
+        transport_type = marker_data.get("transport_type")
+        if transport_type == MainTransfer.Type.PLANE:
+            icon_name = "plane"
+        elif transport_type == MainTransfer.Type.TRAIN:
+            icon_name = "train"
+        elif transport_type == MainTransfer.Type.CAR:
+            icon_name = "car"
+        else:  # OTHER
+            icon_name = "person-walking"
+
+        icon = folium.Icon(prefix="fa", color="red", icon=icon_name)
 
         folium.Marker(
             [marker_data["lat"], marker_data["lon"]],

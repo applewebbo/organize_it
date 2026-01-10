@@ -1208,3 +1208,59 @@ class TestMapWithMainTransfers(TestCase):
             Event.objects.none(), stay=stay_last, next_day_stay=None, day=last_day
         )
         self.assertIsNotNone(last_day_map)
+
+    def test_create_day_map_with_car_transfer(self):
+        """Test map includes car transfer with correct icon"""
+        from trips.models import Event, MainTransfer
+        from trips.utils import create_day_map
+
+        trip = TripFactory()
+        day1 = trip.days.first()
+        stay = StayFactory(day=day1)
+
+        # Create arrival transfer with CAR type
+        MainTransfer.objects.create(
+            trip=trip,
+            type=MainTransfer.Type.CAR,
+            direction=MainTransfer.Direction.ARRIVAL,
+            origin_name="Home",
+            destination_name="Hotel",
+            destination_latitude=41.2971,
+            destination_longitude=2.0833,
+            start_time="10:00",
+            end_time="12:00",
+        )
+
+        day_map = create_day_map(
+            Event.objects.none(), stay=stay, next_day_stay=None, day=day1
+        )
+        self.assertIsNotNone(day_map)
+        self.assertIn("car", day_map)
+
+    def test_create_day_map_with_other_transfer(self):
+        """Test map includes other transfer type with correct icon"""
+        from trips.models import Event, MainTransfer
+        from trips.utils import create_day_map
+
+        trip = TripFactory()
+        day1 = trip.days.first()
+        stay = StayFactory(day=day1)
+
+        # Create arrival transfer with OTHER type
+        MainTransfer.objects.create(
+            trip=trip,
+            type=MainTransfer.Type.OTHER,
+            direction=MainTransfer.Direction.ARRIVAL,
+            origin_name="Port",
+            destination_name="Hotel",
+            destination_latitude=41.2971,
+            destination_longitude=2.0833,
+            start_time="10:00",
+            end_time="12:00",
+        )
+
+        day_map = create_day_map(
+            Event.objects.none(), stay=stay, next_day_stay=None, day=day1
+        )
+        self.assertIsNotNone(day_map)
+        self.assertIn("person-walking", day_map)
