@@ -667,7 +667,7 @@ def delete_main_transfer(request, pk):
         messages.SUCCESS,
         _("Main transfer deleted successfully"),
     )
-    return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+    return HttpResponse(status=204, headers={"HX-Refresh": "true"})
 
 
 @login_required

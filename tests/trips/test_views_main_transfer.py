@@ -128,6 +128,7 @@ class TestMainTransferViews(TestCase):
             response = self.client.post(url)
 
             assert response.status_code == 204
+            assert response.headers.get("HX-Refresh") == "true"
             from trips.models import MainTransfer
 
             assert not MainTransfer.objects.filter(pk=transfer.pk).exists()
