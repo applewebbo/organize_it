@@ -154,6 +154,7 @@ def day_detail(request, pk):
             ),
         ),
         "stay",
+        "trip__main_transfers",
     ).select_related("trip__author")
 
     day = get_object_or_404(qs, pk=pk, trip__author=request.user)
@@ -181,11 +182,23 @@ def day_detail(request, pk):
         if next_day and next_day.stay and next_day.stay != stay:
             next_day_stay = next_day.stay
         is_last_day = not next_day
+        is_first_day = not prev_day
+
+        # Get MainTransfers for first and last day
+        arrival_transfer = None
+        departure_transfer = None
+        if is_first_day:
+            arrival_transfer = day.trip.main_transfers.filter(direction=1).first()
+        if is_last_day:
+            departure_transfer = day.trip.main_transfers.filter(direction=2).first()
+
         locations = {
             "stay": stay,
             "events": events,
             "next_day_stay": next_day_stay,
             "last_day": is_last_day,
+            "arrival_transfer": arrival_transfer,
+            "departure_transfer": departure_transfer,
         }
         if not (prev_day and prev_day.stay and prev_day.stay == stay):
             locations["first_day"] = True
@@ -1480,7 +1493,11 @@ def confirm_enrich_stay(request, stay_id):
 class DayMapView(View):
     @method_decorator(login_required, name="dispatch")
     def dispatch(self, request, day_id, *args, **kwargs):
-        self.day_obj = get_object_or_404(Day, pk=day_id, trip__author=request.user)
+        self.day_obj = get_object_or_404(
+            Day.objects.select_related("trip").prefetch_related("trip__main_transfers"),
+            pk=day_id,
+            trip__author=request.user,
+        )
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
@@ -1492,11 +1509,27 @@ class DayMapView(View):
         if next_day and next_day.stay and next_day.stay != stay:
             next_day_stay = next_day.stay
         is_last_day = not next_day
+        is_first_day = not prev_day
+
+        # Get MainTransfers for first and last day
+        arrival_transfer = None
+        departure_transfer = None
+        if is_first_day:
+            arrival_transfer = self.day_obj.trip.main_transfers.filter(
+                direction=1
+            ).first()
+        if is_last_day:
+            departure_transfer = self.day_obj.trip.main_transfers.filter(
+                direction=2
+            ).first()
+
         locations = {
             "stay": stay,
             "events": events,
             "next_day_stay": next_day_stay,
             "last_day": is_last_day,
+            "arrival_transfer": arrival_transfer,
+            "departure_transfer": departure_transfer,
         }
         if not (prev_day and prev_day.stay and prev_day.stay == stay):
             locations["first_day"] = True
