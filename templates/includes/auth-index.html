@@ -102,6 +102,11 @@
                     </div>
                 </div>
             </section>
+            <!-- Main Transfers Section -->
+            {% if trip.status != 5 %}
+            {% include 'trips/includes/main-transfers.html' %}
+            {% endif %}
+            <!-- END Main Transfers Section -->
             <!-- Days & Events Section -->
             <section id="days" class="flex flex-col gap-y-4 mb-8">
                 {% for day in trip.days.all %}

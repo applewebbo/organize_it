@@ -362,6 +362,7 @@ class TestGetTrips(TestCase):
         context = get_trips(self.user)
         self.assertEqual(context["latest_trip"], in_progress_trip)
 
+    @time_machine.travel("2025-12-28")
     def test_get_trips_latest_impending(self):
         """Test latest trip is IMPENDING with earliest start_date."""
         earliest_impending = TripFactory(
@@ -386,6 +387,7 @@ class TestGetTrips(TestCase):
         context = get_trips(self.user)
         self.assertEqual(context["latest_trip"].pk, earliest_impending.pk)
 
+    @time_machine.travel("2025-12-01")
     def test_get_trips_latest_by_status(self):
         """Test latest trip ordering by status when no IN_PROGRESS or IMPENDING."""
         not_started = TripFactory(
@@ -402,7 +404,7 @@ class TestGetTrips(TestCase):
         )  # COMPLETED
 
         context = get_trips(self.user)
-        self.assertEqual(context["latest_trip"], not_started)
+        self.assertEqual(context["latest_trip"].pk, not_started.pk)
 
     def test_get_trips_excludes_archived(self):
         """Test archived trips are excluded from latest and others."""
@@ -439,6 +441,7 @@ class TestGetTrips(TestCase):
         self.assertEqual(context["latest_trip"], trip)
         self.assertIn(unpaired_event.event_ptr, context["unpaired_events"])
 
+    @time_machine.travel("2026-01-05")
     def test_get_trips_other_trips_exclude_latest(self):
         """Test other_trips excludes the latest trip."""
         trip1 = TripFactory(
@@ -1128,11 +1131,17 @@ class TestMapWithMainTransfers(TestCase):
         from trips.models import Event, MainTransfer
         from trips.utils import create_day_map
 
-        trip = TripFactory()
+        trip = TripFactory(
+            start_date=date(2026, 1, 1), end_date=date(2026, 1, 3)
+        )  # 3 days trip
         last_day = trip.days.last()
 
+        # Verify last day number matches total days
+        total_days = trip.days.count()
+        self.assertEqual(last_day.number, total_days)
+
         # Create a stay so the map gets generated
-        stay = StayFactory(day=last_day)
+        stay = StayFactory(day=last_day, latitude=41.3792, longitude=2.1404)
 
         # Create departure transfer with coordinates
         MainTransfer.objects.create(
@@ -1157,7 +1166,46 @@ class TestMapWithMainTransfers(TestCase):
         )
 
         self.assertIsNotNone(day_map)
-        # Map should include the departure transfer origin
+        self.assertIn("Barcelona Station", day_map)
+        # Map should include the departure transfer origin marker
+
+    def test_create_day_map_with_departure_transfer_no_coordinates(self):
+        """Test map without departure transfer coordinates"""
+        from trips.models import Event, MainTransfer
+        from trips.utils import create_day_map
+
+        trip = TripFactory(
+            start_date=date(2026, 1, 1), end_date=date(2026, 1, 3)
+        )  # 3 days trip
+        last_day = trip.days.last()
+
+        # Create a stay so the map gets generated
+        stay = StayFactory(day=last_day, latitude=41.3792, longitude=2.1404)
+
+        # Create departure transfer WITHOUT coordinates
+        MainTransfer.objects.create(
+            trip=trip,
+            type=MainTransfer.Type.TRAIN,
+            direction=MainTransfer.Direction.DEPARTURE,
+            origin_name="Barcelona Station",
+            origin_code="BCN",
+            origin_latitude=None,
+            origin_longitude=None,
+            destination_name="Madrid Station",
+            destination_code="MAD",
+            destination_latitude=40.4168,
+            destination_longitude=-3.7038,
+            start_time="15:00",
+            end_time="18:00",
+        )
+
+        # Create day map for last day
+        day_map = create_day_map(
+            Event.objects.none(), stay=stay, next_day_stay=None, day=last_day
+        )
+
+        self.assertIsNotNone(day_map)
+        # Map should be created but without departure marker
 
     def test_create_day_map_with_both_transfers(self):
         """Test map with both arrival and departure transfers"""

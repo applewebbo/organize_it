@@ -69,6 +69,7 @@ def get_trips(user):
                     ),
                 ),
                 "days__stay",
+                "main_transfers",
             )
             .select_related("author")
             .get(pk=fav_trip.pk)
@@ -94,6 +95,7 @@ def get_trips(user):
                 ),
             ),
             "days__stay",
+            "main_transfers",
         ).select_related("author")
 
         # Priority: IN_PROGRESS > IMPENDING (by start_date) > others
