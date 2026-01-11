@@ -362,6 +362,7 @@ class TestGetTrips(TestCase):
         context = get_trips(self.user)
         self.assertEqual(context["latest_trip"], in_progress_trip)
 
+    @time_machine.travel("2025-12-28")
     def test_get_trips_latest_impending(self):
         """Test latest trip is IMPENDING with earliest start_date."""
         earliest_impending = TripFactory(
@@ -386,6 +387,7 @@ class TestGetTrips(TestCase):
         context = get_trips(self.user)
         self.assertEqual(context["latest_trip"].pk, earliest_impending.pk)
 
+    @time_machine.travel("2025-12-01")
     def test_get_trips_latest_by_status(self):
         """Test latest trip ordering by status when no IN_PROGRESS or IMPENDING."""
         not_started = TripFactory(
@@ -402,7 +404,7 @@ class TestGetTrips(TestCase):
         )  # COMPLETED
 
         context = get_trips(self.user)
-        self.assertEqual(context["latest_trip"], not_started)
+        self.assertEqual(context["latest_trip"].pk, not_started.pk)
 
     def test_get_trips_excludes_archived(self):
         """Test archived trips are excluded from latest and others."""
@@ -439,6 +441,7 @@ class TestGetTrips(TestCase):
         self.assertEqual(context["latest_trip"], trip)
         self.assertIn(unpaired_event.event_ptr, context["unpaired_events"])
 
+    @time_machine.travel("2026-01-05")
     def test_get_trips_other_trips_exclude_latest(self):
         """Test other_trips excludes the latest trip."""
         trip1 = TripFactory(

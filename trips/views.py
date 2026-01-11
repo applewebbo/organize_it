@@ -10,11 +10,9 @@ from django.db.models import Prefetch
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
-from django.utils.decorators import method_decorator
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
-from django.views.generic import View
 
 from accounts.models import Profile
 from trips.forms import (
@@ -1488,63 +1486,6 @@ def confirm_enrich_stay(request, stay_id):
     day_triggers = {f"dayModified{day.pk}": {} for day in stay.days.all()}
     response["HX-Trigger"] = json.dumps(day_triggers)
     return response
-
-
-class DayMapView(View):
-    @method_decorator(login_required, name="dispatch")
-    def dispatch(self, request, day_id, *args, **kwargs):
-        self.day_obj = get_object_or_404(
-            Day.objects.select_related("trip").prefetch_related("trip__main_transfers"),
-            pk=day_id,
-            trip__author=request.user,
-        )
-        return super().dispatch(request, *args, **kwargs)
-
-    def get(self, request, *args, **kwargs):
-        events = self.day_obj.events.exclude(category=1)
-        stay = self.day_obj.stay
-        next_day = self.day_obj.next_day
-        prev_day = self.day_obj.prev_day
-        next_day_stay = None
-        if next_day and next_day.stay and next_day.stay != stay:
-            next_day_stay = next_day.stay
-        is_last_day = not next_day
-        is_first_day = not prev_day
-
-        # Get MainTransfers for first and last day
-        arrival_transfer = None
-        departure_transfer = None
-        if is_first_day:
-            arrival_transfer = self.day_obj.trip.main_transfers.filter(
-                direction=1
-            ).first()
-        if is_last_day:
-            departure_transfer = self.day_obj.trip.main_transfers.filter(
-                direction=2
-            ).first()
-
-        locations = {
-            "stay": stay,
-            "events": events,
-            "next_day_stay": next_day_stay,
-            "last_day": is_last_day,
-            "arrival_transfer": arrival_transfer,
-            "departure_transfer": departure_transfer,
-        }
-        if not (prev_day and prev_day.stay and prev_day.stay == stay):
-            locations["first_day"] = True
-
-        # Filter out events without latitude or longitude
-        events_with_location = events.filter(
-            latitude__isnull=False, longitude__isnull=False
-        )
-
-        map = create_day_map(
-            events_with_location, stay, next_day_stay, day=self.day_obj
-        )
-
-        context = {"map": map, "day": self.day_obj, "locations": locations}
-        return TemplateResponse(request, "trips/day-map.html", context)
 
 
 @login_required

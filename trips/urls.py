@@ -138,7 +138,6 @@ htmx_urlpatterns = [
         views.save_main_transfer,
         name="save-main-transfer",
     ),
-    path("days/<int:day_id>/map/", views.DayMapView.as_view(), name="day-map"),
     # IMAGE MANAGEMENT
     path("images/search/", views.search_trip_images, name="search-images"),
 ]
