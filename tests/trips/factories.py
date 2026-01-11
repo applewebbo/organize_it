@@ -598,6 +598,180 @@ TRANSPORT_DESTINATIONS = {
     "Napoli": ["Pozzuoli", "Ercolano", "Pompei", "Sorrento"],
 }
 
+# MainTransfer locations (airports and stations for each city in PLACES)
+MAIN_TRANSFER_LOCATIONS = {
+    "Roma": {
+        "airports": [
+            {
+                "name": "Leonardo da Vinci–Fiumicino Airport",
+                "code": "FCO",
+                "address": "Via dell'Aeroporto di Fiumicino",
+                "latitude": 41.8002778,
+                "longitude": 12.2388889,
+            },
+            {
+                "name": "Ciampino–G. B. Pastine International Airport",
+                "code": "CIA",
+                "address": "Via Appia Nuova 1651",
+                "latitude": 41.7994,
+                "longitude": 12.5949,
+            },
+        ],
+        "stations": [
+            {
+                "name": "Roma Termini",
+                "code": "RMT",
+                "address": "Piazza dei Cinquecento",
+                "latitude": 41.9009,
+                "longitude": 12.5028,
+            },
+            {
+                "name": "Roma Tiburtina",
+                "code": "RTI",
+                "address": "Piazzale della Stazione Tiburtina",
+                "latitude": 41.9099,
+                "longitude": 12.5316,
+            },
+        ],
+    },
+    "Milano": {
+        "airports": [
+            {
+                "name": "Malpensa International Airport",
+                "code": "MXP",
+                "address": "Via Aeroporto",
+                "latitude": 45.6306,
+                "longitude": 8.72811,
+            },
+            {
+                "name": "Milano Linate Airport",
+                "code": "LIN",
+                "address": "Viale Enrico Forlanini",
+                "latitude": 45.445099,
+                "longitude": 9.27674,
+            },
+        ],
+        "stations": [
+            {
+                "name": "Milano Centrale",
+                "code": "MIL",
+                "address": "Piazza Duca d'Aosta 1",
+                "latitude": 45.4842,
+                "longitude": 9.2040,
+            },
+            {
+                "name": "Milano Porta Garibaldi",
+                "code": "MIG",
+                "address": "Piazza Freud",
+                "latitude": 45.4858,
+                "longitude": 9.1879,
+            },
+        ],
+    },
+    "Firenze": {
+        "airports": [
+            {
+                "name": "Peretola Airport",
+                "code": "FLR",
+                "address": "Via del Termine 11",
+                "latitude": 43.810001,
+                "longitude": 11.2051,
+            },
+        ],
+        "stations": [
+            {
+                "name": "Firenze Santa Maria Novella",
+                "code": "FIR",
+                "address": "Piazza della Stazione",
+                "latitude": 43.7766,
+                "longitude": 11.2478,
+            },
+            {
+                "name": "Firenze Campo di Marte",
+                "code": "FCM",
+                "address": "Viale Fanti",
+                "latitude": 43.7814,
+                "longitude": 11.2827,
+            },
+        ],
+    },
+    "Venezia": {
+        "airports": [
+            {
+                "name": "Venice Marco Polo Airport",
+                "code": "VCE",
+                "address": "Viale Galileo Galilei 30/1",
+                "latitude": 45.505299,
+                "longitude": 12.3519,
+            },
+        ],
+        "stations": [
+            {
+                "name": "Venezia Santa Lucia",
+                "code": "VEN",
+                "address": "Fondamenta Santa Lucia",
+                "latitude": 45.4410,
+                "longitude": 12.3207,
+            },
+            {
+                "name": "Venezia Mestre",
+                "code": "VEM",
+                "address": "Piazzale Favretti",
+                "latitude": 45.4786,
+                "longitude": 12.2329,
+            },
+        ],
+    },
+    "Napoli": {
+        "airports": [
+            {
+                "name": "Naples International Airport",
+                "code": "NAP",
+                "address": "Viale Umberto Maddalena",
+                "latitude": 40.886002,
+                "longitude": 14.2908,
+            },
+        ],
+        "stations": [
+            {
+                "name": "Napoli Centrale",
+                "code": "NAC",
+                "address": "Piazza Garibaldi",
+                "latitude": 40.8530,
+                "longitude": 14.2738,
+            },
+            {
+                "name": "Napoli Mergellina",
+                "code": "NAM",
+                "address": "Via Mergellina",
+                "latitude": 40.8270,
+                "longitude": 14.2145,
+            },
+        ],
+    },
+    # Bologna - external city for MainTransfers origin/destination
+    "Bologna": {
+        "airports": [
+            {
+                "name": "Bologna Guglielmo Marconi Airport",
+                "code": "BLQ",
+                "address": "Via del Triumvirato 84",
+                "latitude": 44.5354,
+                "longitude": 11.2887,
+            },
+        ],
+        "stations": [
+            {
+                "name": "Bologna Centrale",
+                "code": "BOL",
+                "address": "Piazza delle Medaglie d'Oro",
+                "latitude": 44.493681,
+                "longitude": 11.343169,
+            },
+        ],
+    },
+}
+
 
 class TripFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -843,6 +1017,7 @@ class StayFactory(factory.django.DjangoModelFactory):
 class MainTransferFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "trips.MainTransfer"
+        exclude = ("origin_place", "destination_place")
 
     trip = factory.SubFactory(TripFactory)
     type = factory.Faker(
@@ -850,23 +1025,67 @@ class MainTransferFactory(factory.django.DjangoModelFactory):
     )  # PLANE, TRAIN, CAR, OTHER
     direction = factory.Faker("random_element", elements=[1, 2])  # ARRIVAL or DEPARTURE
 
+    class Params:
+        # For ARRIVAL: origin from Bologna, destination in trip city
+        # For DEPARTURE: origin from trip city, destination in Bologna
+        origin_place = factory.LazyAttribute(
+            lambda o: random.choice(
+                MAIN_TRANSFER_LOCATIONS["Bologna"]["airports"]
+                if o.type == 1
+                else MAIN_TRANSFER_LOCATIONS["Bologna"]["stations"]
+                if o.type == 2
+                else MAIN_TRANSFER_LOCATIONS["Bologna"]["airports"]
+                + MAIN_TRANSFER_LOCATIONS["Bologna"]["stations"]
+            )
+            if o.direction == 1
+            else random.choice(
+                MAIN_TRANSFER_LOCATIONS[o.trip.destination]["airports"]
+                if o.type == 1
+                else MAIN_TRANSFER_LOCATIONS[o.trip.destination]["stations"]
+                if o.type == 2
+                else MAIN_TRANSFER_LOCATIONS[o.trip.destination]["airports"]
+                + MAIN_TRANSFER_LOCATIONS[o.trip.destination]["stations"]
+            )
+        )
+        destination_place = factory.LazyAttribute(
+            lambda o: random.choice(
+                MAIN_TRANSFER_LOCATIONS[o.trip.destination]["airports"]
+                if o.type == 1
+                else MAIN_TRANSFER_LOCATIONS[o.trip.destination]["stations"]
+                if o.type == 2
+                else MAIN_TRANSFER_LOCATIONS[o.trip.destination]["airports"]
+                + MAIN_TRANSFER_LOCATIONS[o.trip.destination]["stations"]
+            )
+            if o.direction == 1
+            else random.choice(
+                MAIN_TRANSFER_LOCATIONS["Bologna"]["airports"]
+                if o.type == 1
+                else MAIN_TRANSFER_LOCATIONS["Bologna"]["stations"]
+                if o.type == 2
+                else MAIN_TRANSFER_LOCATIONS["Bologna"]["airports"]
+                + MAIN_TRANSFER_LOCATIONS["Bologna"]["stations"]
+            )
+        )
+
     # Origin fields
-    origin_name = factory.Faker("city", locale="it_IT")
-    origin_code = factory.Faker(
-        "bothify", text="???", letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    )
-    origin_address = factory.Faker("street_address", locale="it_IT")
-    origin_latitude = factory.Faker("latitude")
-    origin_longitude = factory.Faker("longitude")
+    origin_name = factory.LazyAttribute(lambda o: o.origin_place["name"])
+    origin_code = factory.LazyAttribute(lambda o: o.origin_place["code"])
+    origin_address = factory.LazyAttribute(lambda o: o.origin_place["address"])
+    origin_latitude = factory.LazyAttribute(lambda o: o.origin_place["latitude"])
+    origin_longitude = factory.LazyAttribute(lambda o: o.origin_place["longitude"])
 
     # Destination fields
-    destination_name = factory.LazyAttribute(lambda obj: obj.trip.destination)
-    destination_code = factory.Faker(
-        "bothify", text="???", letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    destination_name = factory.LazyAttribute(lambda o: o.destination_place["name"])
+    destination_code = factory.LazyAttribute(lambda o: o.destination_place["code"])
+    destination_address = factory.LazyAttribute(
+        lambda o: o.destination_place["address"]
     )
-    destination_address = factory.Faker("street_address", locale="it_IT")
-    destination_latitude = factory.Faker("latitude")
-    destination_longitude = factory.Faker("longitude")
+    destination_latitude = factory.LazyAttribute(
+        lambda o: o.destination_place["latitude"]
+    )
+    destination_longitude = factory.LazyAttribute(
+        lambda o: o.destination_place["longitude"]
+    )
 
     # Time fields
     start_time = factory.LazyFunction(lambda: time(10, 0))
