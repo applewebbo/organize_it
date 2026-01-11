@@ -595,6 +595,49 @@ class DayDetailView(TestCase):
         assert "locations" in response.context
         assert response.context["locations"]["next_day_stay"] == stay2
 
+    def test_get_day_detail_map_with_departure_transfer(self):
+        """Test day detail map view includes departure transfer on last day"""
+        from trips.models import MainTransfer
+
+        user = self.make_user("user")
+        user.profile.default_map_view = "map"
+        user.profile.save()
+        trip = TripFactory(
+            author=user,
+            start_date=datetime.date.today(),
+            end_date=datetime.date.today() + datetime.timedelta(days=2),
+        )
+        last_day = trip.days.last()
+        stay = StayFactory(latitude=45.4773, longitude=9.1815)
+        last_day.stay = stay
+        last_day.save()
+
+        # Create departure transfer
+        departure = MainTransfer.objects.create(
+            trip=trip,
+            type=MainTransfer.Type.TRAIN,
+            direction=MainTransfer.Direction.DEPARTURE,
+            origin_name="Milano Centrale",
+            origin_code="MIL",
+            origin_latitude=45.4842,
+            origin_longitude=9.2040,
+            destination_name="Roma Termini",
+            destination_code="ROM",
+            destination_latitude=41.9009,
+            destination_longitude=12.5028,
+            start_time="15:00",
+            end_time="18:30",
+        )
+
+        with self.login(user):
+            response = self.get("trips:day-detail", pk=last_day.pk)
+
+        self.response_200(response)
+        assert response.context["show_map"] is True
+        assert "locations" in response.context
+        assert response.context["locations"]["departure_transfer"] == departure
+        assert response.context["locations"]["last_day"] is True
+
 
 class TestViewLogFile(TestCase):
     """

@@ -1131,11 +1131,17 @@ class TestMapWithMainTransfers(TestCase):
         from trips.models import Event, MainTransfer
         from trips.utils import create_day_map
 
-        trip = TripFactory()
+        trip = TripFactory(
+            start_date=date(2026, 1, 1), end_date=date(2026, 1, 3)
+        )  # 3 days trip
         last_day = trip.days.last()
 
+        # Verify last day number matches total days
+        total_days = trip.days.count()
+        self.assertEqual(last_day.number, total_days)
+
         # Create a stay so the map gets generated
-        stay = StayFactory(day=last_day)
+        stay = StayFactory(day=last_day, latitude=41.3792, longitude=2.1404)
 
         # Create departure transfer with coordinates
         MainTransfer.objects.create(
@@ -1160,7 +1166,46 @@ class TestMapWithMainTransfers(TestCase):
         )
 
         self.assertIsNotNone(day_map)
-        # Map should include the departure transfer origin
+        self.assertIn("Barcelona Station", day_map)
+        # Map should include the departure transfer origin marker
+
+    def test_create_day_map_with_departure_transfer_no_coordinates(self):
+        """Test map without departure transfer coordinates"""
+        from trips.models import Event, MainTransfer
+        from trips.utils import create_day_map
+
+        trip = TripFactory(
+            start_date=date(2026, 1, 1), end_date=date(2026, 1, 3)
+        )  # 3 days trip
+        last_day = trip.days.last()
+
+        # Create a stay so the map gets generated
+        stay = StayFactory(day=last_day, latitude=41.3792, longitude=2.1404)
+
+        # Create departure transfer WITHOUT coordinates
+        MainTransfer.objects.create(
+            trip=trip,
+            type=MainTransfer.Type.TRAIN,
+            direction=MainTransfer.Direction.DEPARTURE,
+            origin_name="Barcelona Station",
+            origin_code="BCN",
+            origin_latitude=None,
+            origin_longitude=None,
+            destination_name="Madrid Station",
+            destination_code="MAD",
+            destination_latitude=40.4168,
+            destination_longitude=-3.7038,
+            start_time="15:00",
+            end_time="18:00",
+        )
+
+        # Create day map for last day
+        day_map = create_day_map(
+            Event.objects.none(), stay=stay, next_day_stay=None, day=last_day
+        )
+
+        self.assertIsNotNone(day_map)
+        # Map should be created but without departure marker
 
     def test_create_day_map_with_both_transfers(self):
         """Test map with both arrival and departure transfers"""
