@@ -10,12 +10,13 @@ from tests.accounts.factories import UserFactory
 from tests.trips.factories import (
     PLACES,
     ExperienceFactory,
+    MainTransferFactory,
     MealFactory,
     StayFactory,
     TransportFactory,
     TripFactory,
 )
-from trips.models import Event, Stay, Trip
+from trips.models import Event, MainTransfer, Stay, Trip
 
 logger = logging.getLogger("task")
 
@@ -32,7 +33,7 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         self.stdout.write("Deleting old data...")
         User.objects.exclude(is_superuser=True).delete()
-        models = [Trip, Stay, Event]
+        models = [Trip, Stay, Event, MainTransfer]
         for model in models:
             model.objects.all().delete()
 
@@ -47,6 +48,32 @@ class Command(BaseCommand):
                     start_date=date.today() + timedelta(days=random.randint(1, 3)),
                     end_date=date.today() + timedelta(days=random.randint(4, 6)),
                 )
+
+                # Create MainTransfers for 50% of trips
+                if random.random() < 0.5:
+                    # Arrival MainTransfer
+                    MainTransferFactory(
+                        trip=trip,
+                        direction=1,
+                        start_time=time(
+                            random.randint(6, 12), random.randrange(0, 59, 15)
+                        ),
+                        end_time=time(
+                            random.randint(13, 18), random.randrange(0, 59, 15)
+                        ),
+                    )
+
+                    # Departure MainTransfer
+                    MainTransferFactory(
+                        trip=trip,
+                        direction=2,
+                        start_time=time(
+                            random.randint(14, 18), random.randrange(0, 59, 15)
+                        ),
+                        end_time=time(
+                            random.randint(19, 23), random.randrange(0, 59, 15)
+                        ),
+                    )
 
                 all_days = list(trip.days.all())
                 hotels_for_city = PLACES[trip.destination]["hotels"]
