@@ -178,9 +178,42 @@ def day_detail(request, pk):
         default_view = request.user.profile.default_map_view
         show_map = default_view == "map"
 
+    # Get SimpleTransfers for this day
+    simple_transfers = day.simple_transfers.select_related(
+        "from_event", "to_event"
+    ).all()
+
+    # Check if there's a StayTransfer from this day to the next
+    stay_transfer_out = None
+    if hasattr(day.stay, "transfer_from") if day.stay else False:
+        stay_transfer_out = day.stay.transfer_from
+
+    # Check if there's a StayTransfer to this day from the previous
+    stay_transfer_in = None
+    if hasattr(day.stay, "transfer_to") if day.stay else False:
+        stay_transfer_in = day.stay.transfer_to
+
+    # Check if can add StayTransfer (next day exists, both have stays, different stays)
+    can_add_stay_transfer = False
+    next_day = day.next_day
+    if (
+        next_day
+        and day.stay
+        and hasattr(next_day, "stay")
+        and next_day.stay
+        and day.stay != next_day.stay
+        and not stay_transfer_out
+    ):
+        can_add_stay_transfer = True
+
     context = {
         "day": day,
         "show_map": show_map,
+        "simple_transfers": simple_transfers,
+        "stay_transfer_out": stay_transfer_out,
+        "stay_transfer_in": stay_transfer_in,
+        "can_add_stay_transfer": can_add_stay_transfer,
+        "next_day": next_day,
     }
 
     # If map view is preferred, prepare map context
