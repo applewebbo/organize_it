@@ -25,13 +25,25 @@ from trips.forms import (
     MealForm,
     NoteForm,
     OtherMainTransferForm,
+    SimpleTransferCreateForm,
+    SimpleTransferEditForm,
     StayForm,
+    StayTransferCreateForm,
+    StayTransferEditForm,
     TrainMainTransferForm,
     TransportForm,
     TripDateUpdateForm,
     TripForm,
 )
-from trips.models import Day, Event, MainTransfer, Stay, Trip
+from trips.models import (
+    Day,
+    Event,
+    MainTransfer,
+    SimpleTransfer,
+    Stay,
+    StayTransfer,
+    Trip,
+)
 from trips.utils import (
     annotate_event_overlaps,
     convert_google_opening_hours,
@@ -39,6 +51,7 @@ from trips.utils import (
     download_unsplash_photo,
     geocode_location,
     get_event_instance,
+    get_next_events,
     get_trips,
     process_trip_image,
     search_airports,
@@ -578,6 +591,128 @@ def stay_delete(request, pk):
     return TemplateResponse(request, "trips/stay-delete.html", context)
 
 
+# ============================================================================
+# StayTransfer Views
+# ============================================================================
+
+
+@login_required
+def create_stay_transfer(request, from_day_id):
+    """
+    Create a StayTransfer between stays of consecutive days.
+    The from_stay and to_stay are auto-populated from the days.
+    """
+    from_day = get_object_or_404(Day, pk=from_day_id, trip__author=request.user)
+
+    # Get the next day
+    try:
+        to_day = Day.objects.get(
+            trip=from_day.trip, date=from_day.date + timedelta(days=1)
+        )
+    except Day.DoesNotExist:
+        messages.add_message(
+            request,
+            messages.ERROR,
+            _("No next day found for this stay"),
+        )
+        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+
+    # Check if both days have stays
+    if not hasattr(from_day, "stay") or not hasattr(to_day, "stay"):
+        messages.add_message(
+            request,
+            messages.ERROR,
+            _("Both days must have stays to create a transfer"),
+        )
+        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+
+    from_stay = from_day.stay
+    to_stay = to_day.stay
+
+    # Check if stays are different (can't transfer from/to same stay)
+    if from_stay == to_stay:
+        messages.add_message(
+            request,
+            messages.ERROR,
+            _("Cannot create transfer between the same stay"),
+        )
+        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+
+    form = StayTransferCreateForm(
+        request.POST or None,
+        initial={"from_stay": from_stay, "to_stay": to_stay},
+    )
+
+    if form.is_valid():
+        stay_transfer = form.save(commit=False)
+        stay_transfer.from_day = from_day
+        stay_transfer.to_day = to_day
+        stay_transfer.trip = from_day.trip
+        stay_transfer.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            _("Stay transfer created successfully"),
+        )
+        # Trigger both days to refresh
+        triggers = {f"dayModified{from_day.pk}": {}, f"dayModified{to_day.pk}": {}}
+        return HttpResponse(status=204, headers={"HX-Trigger": json.dumps(triggers)})
+
+    context = {
+        "form": form,
+        "from_day": from_day,
+        "to_day": to_day,
+        "from_stay": from_stay,
+        "to_stay": to_stay,
+    }
+    return TemplateResponse(request, "trips/stay-transfer-create.html", context)
+
+
+@login_required
+def edit_stay_transfer(request, pk):
+    """Edit an existing StayTransfer"""
+    qs = StayTransfer.objects.select_related(
+        "from_stay", "to_stay", "from_day__trip__author", "to_day", "trip"
+    )
+    stay_transfer = get_object_or_404(qs, pk=pk, trip__author=request.user)
+    form = StayTransferEditForm(request.POST or None, instance=stay_transfer)
+
+    if form.is_valid():
+        form.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            _("Stay transfer updated successfully"),
+        )
+        # Trigger both days to refresh
+        triggers = {
+            f"dayModified{stay_transfer.from_day.pk}": {},
+            f"dayModified{stay_transfer.to_day.pk}": {},
+        }
+        return HttpResponse(status=204, headers={"HX-Trigger": json.dumps(triggers)})
+
+    context = {"form": form, "stay_transfer": stay_transfer}
+    return TemplateResponse(request, "trips/stay-transfer-edit.html", context)
+
+
+@login_required
+def delete_stay_transfer(request, pk):
+    """Delete a StayTransfer"""
+    qs = StayTransfer.objects.select_related("from_day__trip__author", "to_day")
+    stay_transfer = get_object_or_404(qs, pk=pk, from_day__trip__author=request.user)
+    from_day_id = stay_transfer.from_day.pk
+    to_day_id = stay_transfer.to_day.pk
+    stay_transfer.delete()
+    messages.add_message(
+        request,
+        messages.SUCCESS,
+        _("Stay transfer deleted successfully"),
+    )
+    # Trigger both days to refresh
+    triggers = {f"dayModified{from_day_id}": {}, f"dayModified{to_day_id}": {}}
+    return HttpResponse(status=204, headers={"HX-Trigger": json.dumps(triggers)})
+
+
 @login_required
 def add_main_transfer(request, trip_id):
     """Create a new main transfer for the trip"""
@@ -815,6 +950,93 @@ def event_pair_choice(request, pk):
         "days": days,
     }
     return TemplateResponse(request, "trips/event-pair-choice.html", context)
+
+
+# ============================================================================
+# SimpleTransfer Views
+# ============================================================================
+
+
+@login_required
+def create_simple_transfer(request, day_id):
+    """Create a SimpleTransfer between two events on the same day"""
+    day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
+    form = SimpleTransferCreateForm(request.POST or None, day=day)
+
+    if form.is_valid():
+        simple_transfer = form.save(commit=False)
+        simple_transfer.day = day
+        simple_transfer.trip = day.trip
+        simple_transfer.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            _("Transfer created successfully"),
+        )
+        return HttpResponse(status=204, headers={"HX-Trigger": f"dayModified{day.pk}"})
+
+    context = {"form": form, "day": day}
+    return TemplateResponse(request, "trips/simple-transfer-create.html", context)
+
+
+@login_required
+def edit_simple_transfer(request, pk):
+    """Edit an existing SimpleTransfer"""
+    qs = SimpleTransfer.objects.select_related(
+        "from_event__trip__author", "to_event", "day", "trip"
+    )
+    simple_transfer = get_object_or_404(qs, pk=pk, trip__author=request.user)
+    form = SimpleTransferEditForm(request.POST or None, instance=simple_transfer)
+
+    if form.is_valid():
+        form.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            _("Transfer updated successfully"),
+        )
+        return HttpResponse(
+            status=204, headers={"HX-Trigger": f"dayModified{simple_transfer.day.pk}"}
+        )
+
+    context = {"form": form, "simple_transfer": simple_transfer}
+    return TemplateResponse(request, "trips/simple-transfer-edit.html", context)
+
+
+@login_required
+def delete_simple_transfer(request, pk):
+    """Delete a SimpleTransfer"""
+    qs = SimpleTransfer.objects.select_related("day__trip__author")
+    simple_transfer = get_object_or_404(qs, pk=pk, day__trip__author=request.user)
+    day_id = simple_transfer.day.pk
+    simple_transfer.delete()
+    messages.add_message(
+        request,
+        messages.SUCCESS,
+        _("Transfer deleted successfully"),
+    )
+    return HttpResponse(status=204, headers={"HX-Trigger": f"dayModified{day_id}"})
+
+
+@login_required
+def get_next_events_for_transfer(request, day_id):
+    """
+    HTMX view to filter to_event dropdown based on selected from_event.
+    Returns only events that occur after the selected from_event on the same day.
+    """
+    day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
+    from_event_id = request.GET.get("from_event")
+
+    if not from_event_id:
+        # Return all events if no from_event selected
+        events = Event.objects.filter(day=day).order_by("start_time")
+    else:
+        from_event = get_object_or_404(Event, pk=from_event_id, day=day)
+        # Use helper function to get next events
+        events = get_next_events(day, from_event)
+
+    context = {"events": events, "day": day}
+    return TemplateResponse(request, "trips/partials/to-event-options.html", context)
 
 
 @login_required

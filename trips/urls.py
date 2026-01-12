@@ -28,6 +28,22 @@ htmx_urlpatterns = [
     path("stays/<int:pk>/modify", views.stay_modify, name="stay-modify"),
     path("stays/<int:pk>/delete", views.stay_delete, name="stay-delete"),
     path("stays/<int:stay_id>/enrich/", views.enrich_stay, name="enrich-stay"),
+    # STAY TRANSFERS
+    path(
+        "stay-transfers/<int:from_day_id>/create",
+        views.create_stay_transfer,
+        name="create-stay-transfer",
+    ),
+    path(
+        "stay-transfers/<int:pk>/edit",
+        views.edit_stay_transfer,
+        name="edit-stay-transfer",
+    ),
+    path(
+        "stay-transfers/<int:pk>/delete",
+        views.delete_stay_transfer,
+        name="delete-stay-transfer",
+    ),
     # MAIN TRANSFERS
     path(
         "trips/<int:trip_id>/main-transfer/create",
@@ -89,6 +105,27 @@ htmx_urlpatterns = [
     path("events/<int:pk1>/swap/<int:pk2>/", views.event_swap, name="event-swap"),
     path(
         "events/<int:pk>/swap-choices", views.event_swap_modal, name="event-swap-modal"
+    ),
+    # SIMPLE TRANSFERS
+    path(
+        "simple-transfers/<int:day_id>/create",
+        views.create_simple_transfer,
+        name="create-simple-transfer",
+    ),
+    path(
+        "simple-transfers/<int:pk>/edit",
+        views.edit_simple_transfer,
+        name="edit-simple-transfer",
+    ),
+    path(
+        "simple-transfers/<int:pk>/delete",
+        views.delete_simple_transfer,
+        name="delete-simple-transfer",
+    ),
+    path(
+        "simple-transfers/<int:day_id>/next-events",
+        views.get_next_events_for_transfer,
+        name="get-next-events-for-transfer",
     ),
     path("days/<int:pk>/detail", views.day_detail, name="day-detail"),
     path("validate/dates/", views.validate_dates, name="validate-dates"),
