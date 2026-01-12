@@ -1,6 +1,16 @@
 from django.contrib import admin
 
-from .models import Day, Experience, Link, Meal, Stay, Transport, Trip
+from .models import (
+    Day,
+    Experience,
+    Link,
+    Meal,
+    SimpleTransfer,
+    Stay,
+    StayTransfer,
+    Transport,
+    Trip,
+)
 
 
 @admin.register(Trip)
@@ -19,6 +29,16 @@ class DayAdmin(admin.ModelAdmin):
 @admin.register(Transport)
 class TransportAdmin(admin.ModelAdmin):
     list_display = ["__str__"]
+
+
+@admin.register(SimpleTransfer)
+class SimpleTransferAdmin(admin.ModelAdmin):
+    list_display = ["__str__", "day", "transport_mode"]
+
+
+@admin.register(StayTransfer)
+class StayTransferAdmin(admin.ModelAdmin):
+    list_display = ["__str__", "from_day", "to_day", "transport_mode"]
 
 
 @admin.register(Experience)
