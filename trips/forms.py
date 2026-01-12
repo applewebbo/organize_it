@@ -18,7 +18,9 @@ from .models import (
     Link,
     MainTransfer,
     Meal,
+    SimpleTransfer,
     Stay,
+    StayTransfer,
     Transport,
     Trip,
 )
@@ -2192,3 +2194,299 @@ class OtherMainTransferForm(MainTransferBaseForm):
             data["company_website"] = self.cleaned_data["company_website"]
 
         return data
+
+
+# ============================================================================
+# SimpleTransfer Forms
+# ============================================================================
+
+
+class SimpleTransferCreateForm(forms.ModelForm):
+    """Form for creating a SimpleTransfer between events on the same day"""
+
+    class Meta:
+        model = SimpleTransfer
+        fields = ["from_event", "to_event", "transport_mode", "notes"]
+        labels = {
+            "from_event": _("From Event"),
+            "to_event": _("To Event"),
+            "transport_mode": _("Transport Mode"),
+            "notes": _("Notes"),
+        }
+        widgets = {
+            "from_event": forms.Select(),
+            "to_event": forms.Select(),
+            "transport_mode": forms.Select(),
+            "notes": forms.Textarea(attrs={"rows": 3, "placeholder": _("Notes")}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        day = kwargs.pop("day", None)
+        super().__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+
+        # Filter from_event and to_event to events of the current day
+        if day:
+            events_qs = Event.objects.filter(day=day).order_by("start_time")
+            self.fields["from_event"].queryset = events_qs
+            self.fields["to_event"].queryset = events_qs
+
+        self.fields["transport_mode"].choices = SimpleTransfer.TransportMode.choices
+
+        self.helper.layout = Layout(
+            Field("from_event"),
+            Field("to_event"),
+            Field("transport_mode"),
+            Field("notes"),
+        )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        from_event = cleaned_data.get("from_event")
+        to_event = cleaned_data.get("to_event")
+
+        if from_event and to_event:
+            # Check that events are different
+            if from_event == to_event:
+                raise ValidationError(
+                    _("From event and to event must be different events.")
+                )
+
+            # Check that events belong to the same day
+            if from_event.day != to_event.day:
+                raise ValidationError(_("Events must be on the same day."))
+
+            # Check that from_event doesn't already have an outgoing transfer
+            if hasattr(from_event, "transfer_from"):
+                raise ValidationError(
+                    _("The from event already has an outgoing transfer.")
+                )
+
+            # Check that to_event doesn't already have an incoming transfer
+            if hasattr(to_event, "transfer_to"):
+                raise ValidationError(
+                    _("The to event already has an incoming transfer.")
+                )
+
+        return cleaned_data
+
+
+class SimpleTransferEditForm(forms.ModelForm):
+    """Form for editing an existing SimpleTransfer"""
+
+    class Meta:
+        model = SimpleTransfer
+        fields = ["transport_mode", "departure_time", "estimated_duration", "notes"]
+        labels = {
+            "transport_mode": _("Transport Mode"),
+            "departure_time": _("Departure Time"),
+            "estimated_duration": _("Estimated Duration (minutes)"),
+            "notes": _("Notes"),
+        }
+        widgets = {
+            "transport_mode": forms.Select(),
+            "departure_time": forms.TimeInput(attrs={"type": "time"}),
+            "estimated_duration": forms.NumberInput(
+                attrs={"placeholder": _("Duration in minutes"), "min": 1}
+            ),
+            "notes": forms.Textarea(attrs={"rows": 3, "placeholder": _("Notes")}),
+        }
+        help_texts = {
+            "estimated_duration": _(
+                "Use the Google Maps link to estimate the travel duration"
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+
+        self.fields["transport_mode"].choices = SimpleTransfer.TransportMode.choices
+        self.fields["departure_time"].required = False
+        self.fields["estimated_duration"].required = False
+
+        # Build Google Maps link if coordinates are available
+        google_maps_link = ""
+        if self.instance and self.instance.google_maps_url:
+            google_maps_link = f"""
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">{_("Google Maps Route")}</span>
+                    </label>
+                    <a href="{self.instance.google_maps_url}" target="_blank" class="btn btn-sm btn-outline">
+                        <i class="ph ph-map-pin"></i> {_("Open in Google Maps")}
+                    </a>
+                </div>
+            """
+
+        self.helper.layout = Layout(
+            HTML(google_maps_link) if google_maps_link else HTML(""),
+            Field("transport_mode"),
+            Field("departure_time"),
+            Field("estimated_duration"),
+            Field("notes"),
+        )
+
+    def clean_estimated_duration(self):
+        """Convert minutes to timedelta"""
+        duration_minutes = self.cleaned_data.get("estimated_duration")
+        if duration_minutes:
+            return timedelta(minutes=duration_minutes)
+        return None
+
+    def save(self, commit=True):
+        """Override save to handle estimated_duration conversion"""
+        instance = super().save(commit=False)
+
+        # estimated_duration is already a timedelta from clean_estimated_duration
+        if commit:
+            instance.save()
+
+        return instance
+
+
+# ============================================================================
+# StayTransfer Forms
+# ============================================================================
+
+
+class StayTransferCreateForm(forms.ModelForm):
+    """Form for creating a StayTransfer between stays of consecutive days"""
+
+    class Meta:
+        model = StayTransfer
+        fields = ["from_stay", "to_stay", "transport_mode", "notes"]
+        labels = {
+            "from_stay": _("From Stay"),
+            "to_stay": _("To Stay"),
+            "transport_mode": _("Transport Mode"),
+            "notes": _("Notes"),
+        }
+        widgets = {
+            "from_stay": forms.HiddenInput(),
+            "to_stay": forms.HiddenInput(),
+            "transport_mode": forms.Select(),
+            "notes": forms.Textarea(attrs={"rows": 3, "placeholder": _("Notes")}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+
+        self.fields["transport_mode"].choices = StayTransfer.TransportMode.choices
+
+        self.helper.layout = Layout(
+            Field("from_stay"),
+            Field("to_stay"),
+            Field("transport_mode"),
+            Field("notes"),
+        )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        from_stay = cleaned_data.get("from_stay")
+        to_stay = cleaned_data.get("to_stay")
+
+        if from_stay and to_stay:
+            # Check that stays are different
+            if from_stay == to_stay:
+                raise ValidationError(_("From stay and to stay must be different."))
+
+            # Check that from_stay doesn't already have an outgoing transfer
+            if hasattr(from_stay, "transfer_from"):
+                raise ValidationError(
+                    _("The from stay already has an outgoing transfer.")
+                )
+
+            # Check that to_stay doesn't already have an incoming transfer
+            if hasattr(to_stay, "transfer_to"):
+                raise ValidationError(
+                    _("The to stay already has an incoming transfer.")
+                )
+
+            # Additional validation via model's clean method will be called on save
+            # (consecutive days check, same trip check, etc.)
+
+        return cleaned_data
+
+
+class StayTransferEditForm(forms.ModelForm):
+    """Form for editing an existing StayTransfer"""
+
+    class Meta:
+        model = StayTransfer
+        fields = ["transport_mode", "departure_time", "estimated_duration", "notes"]
+        labels = {
+            "transport_mode": _("Transport Mode"),
+            "departure_time": _("Departure Time"),
+            "estimated_duration": _("Estimated Duration (minutes)"),
+            "notes": _("Notes"),
+        }
+        widgets = {
+            "transport_mode": forms.Select(),
+            "departure_time": forms.TimeInput(attrs={"type": "time"}),
+            "estimated_duration": forms.NumberInput(
+                attrs={"placeholder": _("Duration in minutes"), "min": 1}
+            ),
+            "notes": forms.Textarea(attrs={"rows": 3, "placeholder": _("Notes")}),
+        }
+        help_texts = {
+            "estimated_duration": _(
+                "Use the Google Maps link to estimate the travel duration"
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+
+        self.fields["transport_mode"].choices = StayTransfer.TransportMode.choices
+        self.fields["departure_time"].required = False
+        self.fields["estimated_duration"].required = False
+
+        # Build Google Maps link if coordinates are available
+        google_maps_link = ""
+        if self.instance and self.instance.google_maps_url:
+            google_maps_link = f"""
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">{_("Google Maps Route")}</span>
+                    </label>
+                    <a href="{self.instance.google_maps_url}" target="_blank" class="btn btn-sm btn-outline">
+                        <i class="ph ph-map-pin"></i> {_("Open in Google Maps")}
+                    </a>
+                </div>
+            """
+
+        self.helper.layout = Layout(
+            HTML(google_maps_link) if google_maps_link else HTML(""),
+            Field("transport_mode"),
+            Field("departure_time"),
+            Field("estimated_duration"),
+            Field("notes"),
+        )
+
+    def clean_estimated_duration(self):
+        """Convert minutes to timedelta"""
+        duration_minutes = self.cleaned_data.get("estimated_duration")
+        if duration_minutes:
+            return timedelta(minutes=duration_minutes)
+        return None
+
+    def save(self, commit=True):
+        """Override save to handle estimated_duration conversion"""
+        instance = super().save(commit=False)
+
+        # estimated_duration is already a timedelta from clean_estimated_duration
+        if commit:
+            instance.save()
+
+        return instance
