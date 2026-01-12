@@ -5,7 +5,15 @@ from unittest.mock import patch
 import pytest
 from django.conf import settings
 
-from trips.models import Event, Experience, Meal, Stay, Transport
+from trips.models import (
+    Event,
+    Experience,
+    Meal,
+    SimpleTransfer,
+    Stay,
+    StayTransfer,
+    Transport,
+)
 
 pytestmark = pytest.mark.django_db
 
@@ -1296,3 +1304,273 @@ class TestMainTransferModel:
         assert transfer.origin_longitude is None
         assert transfer.destination_latitude is None
         assert transfer.destination_longitude is None
+
+
+class TestSimpleTransfer:
+    """Tests for SimpleTransfer model"""
+
+    def test_simple_transfer_creation(self, trip_factory, experience_factory):
+        """Test creating a SimpleTransfer between two events on same day"""
+        trip = trip_factory()
+        day = trip.days.first()
+        event1 = experience_factory(
+            trip=trip, day=day, start_time="10:00", end_time="11:00"
+        )
+        event2 = experience_factory(
+            trip=trip, day=day, start_time="12:00", end_time="13:00"
+        )
+
+        transfer = SimpleTransfer.objects.create(
+            from_event=event1, to_event=event2, transport_mode="car"
+        )
+
+        assert transfer.from_event == event1
+        assert transfer.to_event == event2
+        assert transfer.day == day
+        assert transfer.trip == trip
+        assert transfer.transport_mode == "car"
+        assert str(transfer) == f"{event1.name} → {event2.name}"
+
+    def test_simple_transfer_same_event_validation(
+        self, trip_factory, experience_factory
+    ):
+        """Test that transfer to same event fails"""
+        trip = trip_factory()
+        day = trip.days.first()
+        event = experience_factory(trip=trip, day=day)
+
+        from django.core.exceptions import ValidationError
+
+        transfer = SimpleTransfer(
+            from_event=event, to_event=event, transport_mode="car"
+        )
+
+        with pytest.raises(ValidationError) as exc_info:
+            transfer.full_clean()
+
+        assert "to_event" in exc_info.value.message_dict
+
+    def test_simple_transfer_different_days_validation(
+        self, trip_factory, experience_factory
+    ):
+        """Test that transfer between different days fails"""
+        trip = trip_factory()
+        days = list(trip.days.all())
+        event1 = experience_factory(trip=trip, day=days[0])
+        event2 = experience_factory(trip=trip, day=days[1])
+
+        from django.core.exceptions import ValidationError
+
+        transfer = SimpleTransfer(
+            from_event=event1, to_event=event2, transport_mode="car"
+        )
+
+        with pytest.raises(ValidationError) as exc_info:
+            transfer.full_clean()
+
+        assert "to_event" in exc_info.value.message_dict
+
+    def test_simple_transfer_properties(self, trip_factory, experience_factory):
+        """Test SimpleTransfer property methods"""
+        from datetime import time, timedelta
+
+        trip = trip_factory()
+        day = trip.days.first()
+        event1 = experience_factory(trip=trip, day=day)
+        event2 = experience_factory(trip=trip, day=day)
+
+        transfer = SimpleTransfer.objects.create(
+            from_event=event1,
+            to_event=event2,
+            transport_mode="car",
+            departure_time=time(10, 0),
+            estimated_duration=timedelta(hours=1, minutes=30),
+        )
+
+        assert transfer.from_location == event1.name
+        assert transfer.to_location == event2.name
+        assert transfer.from_coordinates == (event1.latitude, event1.longitude)
+        assert transfer.to_coordinates == (event2.latitude, event2.longitude)
+        assert transfer.arrival_time is not None
+        assert transfer.google_maps_url is not None
+        assert "google.com/maps" in transfer.google_maps_url
+
+    def test_simple_transfer_onetoone_constraint(
+        self, trip_factory, experience_factory
+    ):
+        """Test that OneToOne constraint prevents duplicate transfers"""
+        trip = trip_factory()
+        day = trip.days.first()
+        event1 = experience_factory(trip=trip, day=day)
+        event2 = experience_factory(trip=trip, day=day)
+        event3 = experience_factory(trip=trip, day=day)
+
+        from django.db import IntegrityError
+
+        # Create first transfer from event1
+        SimpleTransfer.objects.create(
+            from_event=event1, to_event=event2, transport_mode="car"
+        )
+
+        # Try to create another transfer FROM event1 (should fail - already has transfer_from)
+        with pytest.raises(IntegrityError):
+            SimpleTransfer.objects.create(
+                from_event=event1, to_event=event3, transport_mode="walk"
+            )
+
+
+class TestStayTransfer:
+    """Tests for StayTransfer model"""
+
+    def test_stay_transfer_creation(self, trip_factory, stay_factory):
+        """Test creating a StayTransfer between stays on consecutive days"""
+        trip = trip_factory()
+        days = list(trip.days.all())
+        stay1 = stay_factory(city=trip.destination)
+        stay2 = stay_factory(city=trip.destination)
+
+        # Assign stays to consecutive days
+        days[0].stay = stay1
+        days[0].save()
+        days[1].stay = stay2
+        days[1].save()
+
+        transfer = StayTransfer.objects.create(
+            from_stay=stay1, to_stay=stay2, transport_mode="car"
+        )
+
+        assert transfer.from_stay == stay1
+        assert transfer.to_stay == stay2
+        assert transfer.from_day == days[0]
+        assert transfer.to_day == days[1]
+        assert transfer.trip == trip
+        assert str(transfer) == f"{stay1.name} → {stay2.name}"
+
+    def test_stay_transfer_same_stay_validation(self, trip_factory, stay_factory):
+        """Test that transfer to same stay fails"""
+        trip = trip_factory()
+        day = trip.days.first()
+        stay = stay_factory(city=trip.destination)
+        day.stay = stay
+        day.save()
+
+        from django.core.exceptions import ValidationError
+
+        transfer = StayTransfer(from_stay=stay, to_stay=stay, transport_mode="car")
+
+        with pytest.raises(ValidationError) as exc_info:
+            transfer.full_clean()
+
+        assert "to_stay" in exc_info.value.message_dict
+
+    def test_stay_transfer_non_consecutive_days_validation(
+        self, trip_factory, stay_factory
+    ):
+        """Test that transfer between non-consecutive days fails"""
+        trip = trip_factory()
+        days = list(trip.days.all())
+        stay1 = stay_factory(city=trip.destination)
+        stay2 = stay_factory(city=trip.destination)
+
+        # Assign stays to non-consecutive days (0 and 2)
+        days[0].stay = stay1
+        days[0].save()
+        days[2].stay = stay2
+        days[2].save()
+
+        from django.core.exceptions import ValidationError
+
+        transfer = StayTransfer(
+            from_stay=stay1,
+            to_stay=stay2,
+            transport_mode="car",
+            from_day=days[0],
+            to_day=days[2],
+            trip=trip,
+        )
+
+        with pytest.raises(ValidationError) as exc_info:
+            transfer.full_clean()
+
+        assert "to_stay" in exc_info.value.message_dict
+
+    def test_stay_transfer_properties(self, trip_factory, stay_factory):
+        """Test StayTransfer property methods"""
+        from datetime import time, timedelta
+
+        trip = trip_factory()
+        days = list(trip.days.all())
+        stay1 = stay_factory(city=trip.destination)
+        stay2 = stay_factory(city=trip.destination)
+
+        days[0].stay = stay1
+        days[0].save()
+        days[1].stay = stay2
+        days[1].save()
+
+        transfer = StayTransfer.objects.create(
+            from_stay=stay1,
+            to_stay=stay2,
+            transport_mode="train",
+            departure_time=time(9, 0),
+            estimated_duration=timedelta(hours=2),
+        )
+
+        assert transfer.from_location == stay1.name
+        assert transfer.to_location == stay2.name
+        assert transfer.from_coordinates == (stay1.latitude, stay1.longitude)
+        assert transfer.to_coordinates == (stay2.latitude, stay2.longitude)
+        assert transfer.arrival_time is not None
+        assert transfer.google_maps_url is not None
+        assert "google.com/maps" in transfer.google_maps_url
+
+    def test_stay_transfer_onetoone_constraint(self, trip_factory, stay_factory):
+        """Test that OneToOne constraint prevents duplicate transfers"""
+        trip = trip_factory()
+        days = list(trip.days.all())
+        stay1 = stay_factory(city=trip.destination)
+        stay2 = stay_factory(city=trip.destination)
+        stay3 = stay_factory(city=trip.destination)
+
+        days[0].stay = stay1
+        days[0].save()
+        days[1].stay = stay2
+        days[1].save()
+        days[2].stay = stay3
+        days[2].save()
+
+        from django.db import IntegrityError
+
+        # Create first transfer from stay1
+        StayTransfer.objects.create(
+            from_stay=stay1, to_stay=stay2, transport_mode="car"
+        )
+
+        # Try to create another transfer FROM stay1 (should fail - already has transfer_from)
+        with pytest.raises(IntegrityError):
+            StayTransfer.objects.create(
+                from_stay=stay1, to_stay=stay3, transport_mode="train"
+            )
+
+    def test_stay_transfer_cascade_delete(self, trip_factory, stay_factory):
+        """Test that deleting a stay also deletes the transfer"""
+        trip = trip_factory()
+        days = list(trip.days.all())
+        stay1 = stay_factory(city=trip.destination)
+        stay2 = stay_factory(city=trip.destination)
+
+        days[0].stay = stay1
+        days[0].save()
+        days[1].stay = stay2
+        days[1].save()
+
+        transfer = StayTransfer.objects.create(
+            from_stay=stay1, to_stay=stay2, transport_mode="car"
+        )
+        transfer_id = transfer.id
+
+        # Delete from_stay
+        stay1.delete()
+
+        # Transfer should be deleted too (CASCADE)
+        assert not StayTransfer.objects.filter(id=transfer_id).exists()

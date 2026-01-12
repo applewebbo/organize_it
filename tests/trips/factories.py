@@ -1096,3 +1096,70 @@ class MainTransferFactory(factory.django.DjangoModelFactory):
     ticket_url = factory.Faker("url")
     notes = ""
     type_specific_data = factory.LazyFunction(dict)
+
+
+class SimpleTransferFactory(factory.django.DjangoModelFactory):
+    """Factory for SimpleTransfer (transfers between events on same day)"""
+
+    class Meta:
+        model = "trips.SimpleTransfer"
+
+    # Create two events on same day for testing
+    from_event = factory.SubFactory(ExperienceFactory)
+    to_event = factory.SubFactory(
+        ExperienceFactory,
+        trip=factory.SelfAttribute("..from_event.trip"),
+        day=factory.SelfAttribute("..from_event.day"),
+    )
+
+    # Auto-populated from events (will be set in save())
+    day = factory.SelfAttribute("from_event.day")
+    trip = factory.SelfAttribute("from_event.trip")
+
+    # Transfer details
+    transport_mode = factory.Faker(
+        "random_element", elements=["car", "train", "walk", "bus", "taxi"]
+    )
+    notes = factory.Maybe(
+        factory.Faker("pybool"),
+        factory.Faker("sentence", nb_words=6),
+        "",
+    )
+
+    # Optional time fields
+    departure_time = None
+    estimated_duration = None
+
+
+class StayTransferFactory(factory.django.DjangoModelFactory):
+    """Factory for StayTransfer (transfers between stays on consecutive days)"""
+
+    class Meta:
+        model = "trips.StayTransfer"
+
+    class Params:
+        # Create trip with consecutive days having different stays
+        trip = factory.SubFactory(TripFactory)
+
+    # Create two different stays
+    from_stay = factory.SubFactory(StayFactory)
+    to_stay = factory.SubFactory(StayFactory)
+
+    # Days must be consecutive (will be set via post_generation)
+    from_day = None
+    to_day = None
+    trip = factory.SelfAttribute("from_day.trip")
+
+    # Transfer details
+    transport_mode = factory.Faker(
+        "random_element", elements=["car", "train", "plane", "bus"]
+    )
+    notes = factory.Maybe(
+        factory.Faker("pybool"),
+        factory.Faker("sentence", nb_words=6),
+        "",
+    )
+
+    # Optional time fields
+    departure_time = None
+    estimated_duration = None
