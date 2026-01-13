@@ -752,14 +752,10 @@ class SimpleTransfer(models.Model):
     """Transfer between two events on the same day"""
 
     class TransportMode(models.TextChoices):
-        CAR = "car", _("Car")
-        TRAIN = "train", _("Train")
-        PLANE = "plane", _("Plane")
-        WALK = "walk", _("Walk")
-        BUS = "bus", _("Bus")
-        BOAT = "boat", _("Boat")
-        TAXI = "taxi", _("Taxi")
-        OTHER = "other", _("Other")
+        DRIVING = "driving", _("Driving")
+        WALKING = "walking", _("Walking")
+        BICYCLING = "bicycling", _("Bicycling")
+        TRANSIT = "transit", _("Transit")
 
     # 1-to-1 relationships (max 1 transfer in/out per event)
     from_event = models.OneToOneField(
@@ -779,7 +775,7 @@ class SimpleTransfer(models.Model):
 
     # Transfer details
     transport_mode = models.CharField(
-        max_length=50, choices=TransportMode.choices, default=TransportMode.CAR
+        max_length=50, choices=TransportMode.choices, default=TransportMode.DRIVING
     )
     notes = models.TextField(blank=True)
 
@@ -897,14 +893,10 @@ class StayTransfer(models.Model):
     """Transfer between stays on consecutive days (when different)"""
 
     class TransportMode(models.TextChoices):
-        CAR = "car", _("Car")
-        TRAIN = "train", _("Train")
-        PLANE = "plane", _("Plane")
-        WALK = "walk", _("Walk")
-        BUS = "bus", _("Bus")
-        BOAT = "boat", _("Boat")
-        TAXI = "taxi", _("Taxi")
-        OTHER = "other", _("Other")
+        DRIVING = "driving", _("Driving")
+        WALKING = "walking", _("Walking")
+        BICYCLING = "bicycling", _("Bicycling")
+        TRANSIT = "transit", _("Transit")
 
     # 1-to-1 relationships (max 1 transfer in/out per stay)
     from_stay = models.OneToOneField(
@@ -927,7 +919,7 @@ class StayTransfer(models.Model):
 
     # Transfer details
     transport_mode = models.CharField(
-        max_length=50, choices=TransportMode.choices, default=TransportMode.CAR
+        max_length=50, choices=TransportMode.choices, default=TransportMode.DRIVING
     )
     notes = models.TextField(blank=True)
 
