@@ -2202,73 +2202,73 @@ class OtherMainTransferForm(MainTransferBaseForm):
 
 
 class SimpleTransferCreateForm(forms.ModelForm):
-    """Form for creating a SimpleTransfer between events on the same day"""
+    """Form for creating a SimpleTransfer between events on the same day (auto-populates from/to events)"""
 
     class Meta:
         model = SimpleTransfer
-        fields = ["from_event", "to_event", "transport_mode", "notes"]
+        fields = ["transport_mode", "notes"]
         labels = {
-            "from_event": _("From Event"),
-            "to_event": _("To Event"),
             "transport_mode": _("Transport Mode"),
             "notes": _("Notes"),
         }
         widgets = {
-            "from_event": forms.Select(),
-            "to_event": forms.Select(),
             "transport_mode": forms.Select(),
             "notes": forms.Textarea(attrs={"rows": 3, "placeholder": _("Notes")}),
         }
 
     def __init__(self, *args, **kwargs):
-        day = kwargs.pop("day", None)
+        self.from_event = kwargs.pop("from_event", None)
+        self.to_event = kwargs.pop("to_event", None)
+
+        # Create instance with from_event and to_event already set to avoid validation errors
+        if "instance" not in kwargs and self.from_event and self.to_event:
+            kwargs["instance"] = SimpleTransfer(
+                from_event=self.from_event, to_event=self.to_event
+            )
+
         super().__init__(*args, **kwargs)
 
         self.helper = FormHelper()
         self.helper.form_tag = False
 
-        # Filter from_event and to_event to events of the current day
-        if day:
-            events_qs = Event.objects.filter(day=day).order_by("start_time")
-            self.fields["from_event"].queryset = events_qs
-            self.fields["to_event"].queryset = events_qs
-
         self.fields["transport_mode"].choices = SimpleTransfer.TransportMode.choices
 
         self.helper.layout = Layout(
-            Field("from_event"),
-            Field("to_event"),
             Field("transport_mode"),
             Field("notes"),
         )
 
     def clean(self):
         cleaned_data = super().clean()
-        from_event = cleaned_data.get("from_event")
-        to_event = cleaned_data.get("to_event")
 
-        if from_event and to_event:
+        if self.from_event and self.to_event:
             # Check that events are different
-            if from_event == to_event:
+            if self.from_event == self.to_event:
                 raise ValidationError(
                     _("From event and to event must be different events.")
                 )
 
             # Check that events belong to the same day
-            if from_event.day != to_event.day:
+            if self.from_event.day != self.to_event.day:
                 raise ValidationError(_("Events must be on the same day."))
 
-            # Check that from_event doesn't already have an outgoing transfer
-            if hasattr(from_event, "transfer_from"):
-                raise ValidationError(
-                    _("The from event already has an outgoing transfer.")
-                )
+            # Check that from_event doesn't already have an outgoing transfer (excluding current instance)
+            if hasattr(self.from_event, "transfer_from"):
+                existing_transfer = self.from_event.transfer_from
+                # Only raise error if it's a different object (not the one we're creating/editing)
+                if existing_transfer is not self.instance:
+                    raise ValidationError(
+                        _("The from event already has an outgoing transfer.")
+                    )
 
-            # Check that to_event doesn't already have an incoming transfer
-            if hasattr(to_event, "transfer_to"):
-                raise ValidationError(
-                    _("The to event already has an incoming transfer.")
-                )
+            # Check that to_event doesn't already have an incoming transfer (excluding current instance)
+            if hasattr(self.to_event, "transfer_to"):
+                existing_transfer = self.to_event.transfer_to
+                # Only raise error if it's a different object (not the one we're creating/editing)
+                if existing_transfer is not self.instance:
+                    raise ValidationError(
+                        _("The to event already has an incoming transfer.")
+                    )
 
         return cleaned_data
 

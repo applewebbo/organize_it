@@ -108,7 +108,7 @@ htmx_urlpatterns = [
     ),
     # SIMPLE TRANSFERS
     path(
-        "simple-transfers/<int:day_id>/create",
+        "simple-transfers/from-event/<int:from_event_pk>/create",
         views.create_simple_transfer,
         name="create-simple-transfer",
     ),

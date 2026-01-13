@@ -1,5 +1,5 @@
 {% load i18n %}
-<div class="py-3 px-3 sm:px-6 rounded-lg border {{ border_color }} {{ bg_color }} relative">
+<div class="py-3 px-3 sm:px-6 rounded-lg border {{ border_color }} {{ bg_color }}">
     <div class="flex items-start mb-3">
         <div class="{{ icon_color }} bg-slate-50 dark:bg-slate-700 mt-1 p-1 sm:p-1.5 rounded-md border-2 {{ border_color }} ">
             <i class="ph-bold ph-{{ icon }} i-sm sm:i-lg"></i>
@@ -21,9 +21,9 @@
         </div>
     </div>
     {% if event.day.trip.status != 5 %}
-    <div class="flex absolute top-0 right-2 flex-col gap-1 justify-end mt-4 me-2"
+    <div class="flex flex-row gap-2 justify-end mt-2 me-2"
          x-data>
-        <button class="relative btn btn-xs btn-soft {{ border_color }} {{ bg_color }} dark:hover:bg-slate-900/10 hover:bg-white/50"
+        <button class="relative btn btn-sm btn-soft {{ border_color }} {{ bg_color }} dark:hover:bg-slate-900/10 hover:bg-white/50"
                 hx-get="{% url 'trips:event-notes' event.pk %}"
                 @click="$dispatch('open-modal'); document.activeElement.blur()"
                 hx-target="#dialog"
@@ -32,7 +32,7 @@
             <i class="ph-bold ph-paperclip i-sm {{ icon_color }}" aria-hidden="true"></i>
             <span class="absolute size-2.5 text-xs font-bold text-white {% if event.notes %}bg-slate-400 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
         </button>
-        <button class="btn btn-xs btn-soft {{ border_color }} {{ bg_color }} dark:hover:bg-slate-900/10 hover:bg-white/50"
+        <button class="btn btn-sm btn-soft {{ border_color }} {{ bg_color }} dark:hover:bg-slate-900/10 hover:bg-white/50"
                 hx-get="{% url 'trips:event-swap-modal' event.pk %}"
                 @click="$dispatch('open-modal'); document.activeElement.blur()"
                 hx-target="#dialog"
@@ -40,6 +40,18 @@
                 aria-label="{% trans 'Swap event times' %}">
             <i class="ph-bold ph-arrows-down-up i-sm {{ icon_color }}" aria-hidden="true"></i>
         </button>
+        {% if not transfer_from %}
+            <button class="btn btn-sm btn-soft {{ border_color }} {{ bg_color }} dark:hover:bg-slate-900/10 hover:bg-white/50"
+                    hx-get="{% url 'trips:create-simple-transfer' event.pk %}"
+                    @click="$dispatch('open-modal'); document.activeElement.blur()"
+                    hx-target="#dialog"
+                    hx-swap="innerHTML"
+                    aria-label="{% trans 'Add transfer to next event' %}">
+                <i class="ph-bold ph-plus i-xs {{ icon_color }}" aria-hidden="true"></i>
+                <span class="hidden sm:inline {{ icon_color }}">{% trans 'Transfer' %}</span>
+                <i class="ph-bold ph-path i-sm {{ icon_color }} sm:hidden" aria-hidden="true"></i>
+            </button>
+        {% endif %}
     </div>
     {% endif %}
 </div>

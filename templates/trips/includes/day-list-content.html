@@ -2,25 +2,166 @@
 <div id="stay-info" class="mt-4" x-data>
     {% if day.stay %}
         {% with next_day=day|next_day %}
-        {# Check if we need 3-column layout (stay + transfer + next stay) #}
-        {% if next_day and next_day.stay and day.stay != next_day.stay %}
-            {# 3-column layout: Stay N | Transfer | Stay N+1 #}
-            <div class="flex gap-2 items-stretch">
-                {# Column 1: Current Stay (40% width) #}
-                <div class="flex-[2]">
-                    <div class="flex relative items-center py-3 px-4 h-full rounded-lg border border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-100/30">
-                        {% if day.trip.status != 5 %}
-                        <div class="absolute right-1 bottom-2 mt-4 text-right sm:top-0 me-2" x-data>
-                            <button class="relative btn btn-xs btn-soft border-slate-300 bg-slate-100 dark:bg-slate-200/20 dark:border-slate-700 dark:hover:bg-slate-900/10 hover:bg-white/50"
-                                    hx-get="{% url 'trips:stay-notes' day.stay.pk %}"
-                                    @click="$dispatch('open-modal'); document.activeElement.blur()"
-                                    hx-target="#dialog"
-                                    hx-swap="innerHTML"
-                                    aria-label="{% trans 'View or add stay notes' %}">
-                                <i class="ph-bold ph-paperclip i-sm text-slate-500 dark:text-slate-200" aria-hidden="true"></i>
-                                <span class="absolute size-2.5 text-xs font-bold text-white {% if day.stay.notes %}bg-slate-400 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
-                            </button>
+            {# Check if we need 3-column layout (stay + transfer + next stay) #}
+            {% if next_day and next_day.stay and day.stay != next_day.stay %}
+                {# 3-column layout: Stay N | Transfer | Stay N+1 #}
+                <div class="flex gap-2 items-stretch">
+                    {# Column 1: Current Stay (40% width) #}
+                    <div class="flex-[2]">
+                        <div class="flex relative items-center py-3 px-4 h-full rounded-lg border border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-100/30">
+                            {% if day.trip.status != 5 %}
+                                <div class="absolute right-1 bottom-2 mt-4 text-right sm:top-0 me-2"
+                                     x-data>
+                                    <button class="relative btn btn-xs btn-soft border-slate-300 bg-slate-100 dark:bg-slate-200/20 dark:border-slate-700 dark:hover:bg-slate-900/10 hover:bg-white/50"
+                                            hx-get="{% url 'trips:stay-notes' day.stay.pk %}"
+                                            @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                            hx-target="#dialog"
+                                            hx-swap="innerHTML"
+                                            aria-label="{% trans 'View or add stay notes' %}">
+                                        <i class="ph-bold ph-paperclip i-sm text-slate-500 dark:text-slate-200"
+                                           aria-hidden="true"></i>
+                                        <span class="absolute size-2.5 text-xs font-bold text-white {% if day.stay.notes %}bg-slate-400 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
+                                    </button>
+                                </div>
+                            {% endif %}
+                            <div class="p-1.5 mt-1 bg-white rounded-md border-2 text-slate-500 border-slate-300 dark:text-slate-300 dark:bg-slate-700 dark:border-slate-700">
+                                <i class="text-xl ph-bold ph-bed align-sub" aria-hidden="true"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h2 class="text-lg font-semibold text-slate-500 dark:text-slate-200">
+                                    {% if day.trip.status != 5 %}
+                                        <a hx-get="{% url 'trips:stay-detail' day.stay.pk %}"
+                                           hx-target="#dialog"
+                                           hx-swap="innerHTML"
+                                           @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                           class="link">{{ day.stay.name }}</a>
+                                    {% else %}
+                                        {{ day.stay.name }}
+                                    {% endif %}
+                                </h2>
+                                {% if day|is_first_day_of_trip and day.stay.check_in %}
+                                    <div class="stay-in">
+                                        <i class="ph-bold ph-info me-1.5" aria-hidden="true"></i>
+                                        Check-in: {{ day.stay.check_in|time:"H:i" }}
+                                    </div>
+                                {% endif %}
+                                {% if day.stay.check_out %}
+                                    <div class="stay-out">
+                                        <i class="ph-bold ph-info me-1.5" aria-hidden="true"></i>
+                                        Check-out: {{ day.stay.check_out|time:"H:i" }}
+                                    </div>
+                                {% endif %}
+                            </div>
                         </div>
+                    </div>
+                    {# Column 2: Transfer (20% width - half of the others) #}
+                    <div class="flex flex-col justify-center flex-[1]">
+                        {% if stay_transfer_out %}
+                            {# Existing transfer - show details with edit/delete buttons #}
+                            <div class="flex flex-col justify-center items-center py-3 px-2 h-full bg-blue-50 rounded-lg border-2 border-blue-400 border-dashed dark:border-blue-600 dark:bg-blue-900/20">
+                                <i class="mb-1 text-2xl text-blue-500 dark:text-blue-300 ph-bold ph-arrow-right"
+                                   aria-hidden="true"></i>
+                                <div class="mb-2 text-xs text-center text-blue-600 dark:text-blue-400">
+                                    <i class="ph ph-{{ stay_transfer_out.transport_mode }}"
+                                       aria-hidden="true"></i>
+                                    {{ stay_transfer_out.get_transport_mode_display }}
+                                    {% if stay_transfer_out.departure_time %}<div>{{ stay_transfer_out.departure_time|time:"H:i" }}</div>{% endif %}
+                                </div>
+                                {% if day.trip.status != 5 %}
+                                    <div class="flex gap-1">
+                                        <button class="btn btn-xs btn-circle btn-soft"
+                                                hx-get="{% url 'trips:edit-stay-transfer' stay_transfer_out.pk %}"
+                                                @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                                hx-target="#dialog"
+                                                hx-swap="innerHTML"
+                                                aria-label="{% trans 'Edit transfer' %}">
+                                            <i class="ph-bold ph-pencil-simple" aria-hidden="true"></i>
+                                        </button>
+                                        <button class="btn btn-xs btn-circle btn-soft btn-error"
+                                                hx-delete="{% url 'trips:delete-stay-transfer' stay_transfer_out.pk %}"
+                                                hx-confirm="{% trans 'Are you sure you want to delete this transfer?' %}"
+                                                aria-label="{% trans 'Delete transfer' %}">
+                                            <i class="ph-bold ph-trash" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            {# No transfer yet - show add button #}
+                            <div class="flex flex-col justify-center items-center py-3 px-2 h-full bg-gray-50 rounded-lg border-2 border-gray-300 border-dashed dark:border-gray-600 dark:bg-gray-800/30">
+                                <button class="btn btn-sm btn-circle btn-soft btn-primary"
+                                        hx-get="{% url 'trips:create-stay-transfer' day.pk %}"
+                                        @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                        hx-target="#dialog"
+                                        hx-swap="innerHTML"
+                                        aria-label="{% trans 'Add transfer' %}">
+                                    <i class="ph-bold ph-plus-circle i-lg" aria-hidden="true"></i>
+                                </button>
+                                <span class="mt-1 text-xs text-center text-gray-600 dark:text-gray-400">{% trans 'Add' %}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    {# Column 3: Next Stay (40% width) #}
+                    <div class="flex-[2]">
+                        <div class="flex relative items-center py-3 px-4 h-full rounded-lg border border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-100/30">
+                            {% if day.trip.status != 5 %}
+                                <div class="absolute right-1 bottom-2 mt-4 text-right sm:top-0 me-2"
+                                     x-data>
+                                    <button class="relative btn btn-xs btn-soft border-slate-300 bg-slate-100 dark:bg-slate-200/20 dark:border-slate-700 dark:hover:bg-slate-900/10 hover:bg-white/50"
+                                            hx-get="{% url 'trips:stay-notes' next_day.stay.pk %}"
+                                            @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                            hx-target="#dialog"
+                                            hx-swap="innerHTML"
+                                            aria-label="{% trans 'View or add stay notes' %}">
+                                        <i class="ph-bold ph-paperclip i-sm text-slate-500 dark:text-slate-200"
+                                           aria-hidden="true"></i>
+                                        <span class="absolute size-2.5 text-xs font-bold text-white {% if next_day.stay.notes %}bg-slate-400 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
+                                    </button>
+                                </div>
+                            {% endif %}
+                            <div class="p-1.5 bg-white rounded-md border-2 text-slate-500 border-slate-300 dark:text-slate-300 dark:bg-slate-700 dark:border-slate-700">
+                                <i class="text-xl ph-bold ph-bed align-sub" aria-hidden="true"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h2 class="text-lg font-semibold text-slate-500 dark:text-slate-200">
+                                    {% if day.trip.status != 5 %}
+                                        <a hx-get="{% url 'trips:stay-detail' next_day.stay.pk %}"
+                                           hx-target="#dialog"
+                                           hx-swap="innerHTML"
+                                           @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                           class="link">{{ next_day.stay.name }}</a>
+                                    {% else %}
+                                        {{ next_day.stay.name }}
+                                    {% endif %}
+                                </h2>
+                                {% if next_day.stay.check_in %}
+                                    <div class="stay-in">
+                                        <i class="ph-bold ph-info me-1.5"></i>
+                                        Check-in: {{ next_day.stay.check_in|time:"H:i" }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                {# Simple layout - just current stay (no next day or same stay) #}
+                <ul class="grid grid-cols-1 gap-y-2 gap-x-4 md:grid-cols-2">
+                    <li class="flex relative items-center py-3 px-4 rounded-lg border border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-100/30">
+                        {% if day.trip.status != 5 %}
+                            <div class="absolute right-1 bottom-2 mt-4 text-right sm:top-0 me-2"
+                                 x-data>
+                                <button class="relative btn btn-xs btn-soft border-slate-300 bg-slate-100 dark:bg-slate-200/20 dark:border-slate-700 dark:hover:bg-slate-900/10 hover:bg-white/50"
+                                        hx-get="{% url 'trips:stay-notes' day.stay.pk %}"
+                                        @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                        hx-target="#dialog"
+                                        hx-swap="innerHTML"
+                                        aria-label="{% trans 'View or add stay notes' %}">
+                                    <i class="ph-bold ph-paperclip i-sm text-slate-500 dark:text-slate-200"
+                                       aria-hidden="true"></i>
+                                    <span class="absolute size-2.5 text-xs font-bold text-white {% if day.stay.notes %}bg-slate-400 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
+                                </button>
+                            </div>
                         {% endif %}
                         <div class="p-1.5 mt-1 bg-white rounded-md border-2 text-slate-500 border-slate-300 dark:text-slate-300 dark:bg-slate-700 dark:border-slate-700">
                             <i class="text-xl ph-bold ph-bed align-sub" aria-hidden="true"></i>
@@ -28,13 +169,13 @@
                         <div class="ms-3">
                             <h2 class="text-lg font-semibold text-slate-500 dark:text-slate-200">
                                 {% if day.trip.status != 5 %}
-                                <a hx-get="{% url 'trips:stay-detail' day.stay.pk %}"
-                                hx-target="#dialog"
-                                hx-swap="innerHTML"
-                                @click="$dispatch('open-modal'); document.activeElement.blur()"
-                                class="link">{{ day.stay.name }}</a>
+                                    <a hx-get="{% url 'trips:stay-detail' day.stay.pk %}"
+                                       hx-target="#dialog"
+                                       hx-swap="innerHTML"
+                                       @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                       class="link">{{ day.stay.name }}</a>
                                 {% else %}
-                                {{ day.stay.name }}
+                                    {{ day.stay.name }}
                                 {% endif %}
                             </h2>
                             {% if day|is_first_day_of_trip and day.stay.check_in %}
@@ -43,157 +184,19 @@
                                     Check-in: {{ day.stay.check_in|time:"H:i" }}
                                 </div>
                             {% endif %}
-                            {% if day.stay.check_out %}
+                            {% if day.stay.check_out and not next_day %}
                                 <div class="stay-out">
                                     <i class="ph-bold ph-info me-1.5" aria-hidden="true"></i>
                                     Check-out: {{ day.stay.check_out|time:"H:i" }}
                                 </div>
                             {% endif %}
                         </div>
-                    </div>
-                </div>
-
-                {# Column 2: Transfer (20% width - half of the others) #}
-                <div class="flex flex-col justify-center flex-[1]">
-                    {% if stay_transfer_out %}
-                        {# Existing transfer - show details with edit/delete buttons #}
-                        <div class="flex flex-col justify-center items-center py-3 px-2 h-full bg-blue-50 rounded-lg border-2 border-blue-400 border-dashed dark:border-blue-600 dark:bg-blue-900/20">
-                            <i class="mb-1 text-2xl text-blue-500 dark:text-blue-300 ph-bold ph-arrow-right" aria-hidden="true"></i>
-                            <div class="mb-2 text-xs text-center text-blue-600 dark:text-blue-400">
-                                <i class="ph ph-{{ stay_transfer_out.transport_mode }}" aria-hidden="true"></i>
-                                {{ stay_transfer_out.get_transport_mode_display }}
-                                {% if stay_transfer_out.departure_time %}
-                                    <div>{{ stay_transfer_out.departure_time|time:"H:i" }}</div>
-                                {% endif %}
-                            </div>
-                            {% if day.trip.status != 5 %}
-                            <div class="flex gap-1">
-                                <button class="btn btn-xs btn-circle btn-soft"
-                                        hx-get="{% url 'trips:edit-stay-transfer' stay_transfer_out.pk %}"
-                                        @click="$dispatch('open-modal'); document.activeElement.blur()"
-                                        hx-target="#dialog"
-                                        hx-swap="innerHTML"
-                                        aria-label="{% trans 'Edit transfer' %}">
-                                    <i class="ph-bold ph-pencil-simple" aria-hidden="true"></i>
-                                </button>
-                                <button class="btn btn-xs btn-circle btn-soft btn-error"
-                                        hx-delete="{% url 'trips:delete-stay-transfer' stay_transfer_out.pk %}"
-                                        hx-confirm="{% trans 'Are you sure you want to delete this transfer?' %}"
-                                        aria-label="{% trans 'Delete transfer' %}">
-                                    <i class="ph-bold ph-trash" aria-hidden="true"></i>
-                                </button>
-                            </div>
-                            {% endif %}
-                        </div>
-                    {% else %}
-                        {# No transfer yet - show add button #}
-                        <div class="flex flex-col justify-center items-center py-3 px-2 h-full bg-gray-50 rounded-lg border-2 border-gray-300 border-dashed dark:border-gray-600 dark:bg-gray-800/30">
-                            <button class="btn btn-sm btn-circle btn-soft btn-primary"
-                                    hx-get="{% url 'trips:create-stay-transfer' day.pk %}"
-                                    @click="$dispatch('open-modal'); document.activeElement.blur()"
-                                    hx-target="#dialog"
-                                    hx-swap="innerHTML"
-                                    aria-label="{% trans 'Add transfer' %}">
-                                <i class="ph-bold ph-plus-circle i-lg" aria-hidden="true"></i>
-                            </button>
-                            <span class="mt-1 text-xs text-center text-gray-600 dark:text-gray-400">{% trans 'Add' %}</span>
-                        </div>
-                    {% endif %}
-                </div>
-
-                {# Column 3: Next Stay (40% width) #}
-                <div class="flex-[2]">
-                    <div class="flex relative items-center py-3 px-4 h-full rounded-lg border border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-100/30">
-                        {% if day.trip.status != 5 %}
-                        <div class="absolute right-1 bottom-2 mt-4 text-right sm:top-0 me-2" x-data>
-                            <button class="relative btn btn-xs btn-soft border-slate-300 bg-slate-100 dark:bg-slate-200/20 dark:border-slate-700 dark:hover:bg-slate-900/10 hover:bg-white/50"
-                                    hx-get="{% url 'trips:stay-notes' next_day.stay.pk %}"
-                                    @click="$dispatch('open-modal'); document.activeElement.blur()"
-                                    hx-target="#dialog"
-                                    hx-swap="innerHTML"
-                                    aria-label="{% trans 'View or add stay notes' %}">
-                                <i class="ph-bold ph-paperclip i-sm text-slate-500 dark:text-slate-200" aria-hidden="true"></i>
-                                <span class="absolute size-2.5 text-xs font-bold text-white {% if next_day.stay.notes %}bg-slate-400 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
-                            </button>
-                        </div>
-                        {% endif %}
-                        <div class="p-1.5 bg-white rounded-md border-2 text-slate-500 border-slate-300 dark:text-slate-300 dark:bg-slate-700 dark:border-slate-700">
-                            <i class="text-xl ph-bold ph-bed align-sub" aria-hidden="true"></i>
-                        </div>
-                        <div class="ms-3">
-                            <h2 class="text-lg font-semibold text-slate-500 dark:text-slate-200">
-                                {% if day.trip.status != 5 %}
-                                <a hx-get="{% url 'trips:stay-detail' next_day.stay.pk %}"
-                                hx-target="#dialog"
-                                hx-swap="innerHTML"
-                                @click="$dispatch('open-modal'); document.activeElement.blur()"
-                                class="link">{{ next_day.stay.name }}</a>
-                                {% else %}
-                                {{ next_day.stay.name }}
-                                {% endif %}
-                            </h2>
-                            {% if next_day.stay.check_in %}
-                                <div class="stay-in">
-                                    <i class="ph-bold ph-info me-1.5"></i>
-                                    Check-in: {{ next_day.stay.check_in|time:"H:i" }}
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% else %}
-            {# Simple layout - just current stay (no next day or same stay) #}
-            <ul class="grid grid-cols-1 gap-y-2 gap-x-4 md:grid-cols-2">
-                <li class="flex relative items-center py-3 px-4 rounded-lg border border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-100/30">
-                    {% if day.trip.status != 5 %}
-                    <div class="absolute right-1 bottom-2 mt-4 text-right sm:top-0 me-2" x-data>
-                        <button class="relative btn btn-xs btn-soft border-slate-300 bg-slate-100 dark:bg-slate-200/20 dark:border-slate-700 dark:hover:bg-slate-900/10 hover:bg-white/50"
-                                hx-get="{% url 'trips:stay-notes' day.stay.pk %}"
-                                @click="$dispatch('open-modal'); document.activeElement.blur()"
-                                hx-target="#dialog"
-                                hx-swap="innerHTML"
-                                aria-label="{% trans 'View or add stay notes' %}">
-                            <i class="ph-bold ph-paperclip i-sm text-slate-500 dark:text-slate-200" aria-hidden="true"></i>
-                            <span class="absolute size-2.5 text-xs font-bold text-white {% if day.stay.notes %}bg-slate-400 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
-                        </button>
-                    </div>
-                    {% endif %}
-                    <div class="p-1.5 mt-1 bg-white rounded-md border-2 text-slate-500 border-slate-300 dark:text-slate-300 dark:bg-slate-700 dark:border-slate-700">
-                        <i class="text-xl ph-bold ph-bed align-sub" aria-hidden="true"></i>
-                    </div>
-                    <div class="ms-3">
-                        <h2 class="text-lg font-semibold text-slate-500 dark:text-slate-200">
-                            {% if day.trip.status != 5 %}
-                            <a hx-get="{% url 'trips:stay-detail' day.stay.pk %}"
-                            hx-target="#dialog"
-                            hx-swap="innerHTML"
-                            @click="$dispatch('open-modal'); document.activeElement.blur()"
-                            class="link">{{ day.stay.name }}</a>
-                            {% else %}
-                            {{ day.stay.name }}
-                            {% endif %}
-                        </h2>
-                        {% if day|is_first_day_of_trip and day.stay.check_in %}
-                            <div class="stay-in">
-                                <i class="ph-bold ph-info me-1.5" aria-hidden="true"></i>
-                                Check-in: {{ day.stay.check_in|time:"H:i" }}
-                            </div>
-                        {% endif %}
-                        {% if day.stay.check_out and not next_day %}
-                            <div class="stay-out">
-                                <i class="ph-bold ph-info me-1.5" aria-hidden="true"></i>
-                                Check-out: {{ day.stay.check_out|time:"H:i" }
-                            </div>
-                        {% endif %}
-                    </div>
-                </li>
-            </ul>
-        {% endif %}
+                    </li>
+                </ul>
+            {% endif %}
         {% endwith %}
     {% endif %}
 </div>
-
 {% if day.events.all and day.stay %}<div class="divider"></div>{% endif %}
 <ul id="events-list-{{ day.pk }}"
     class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 grid-col">
@@ -204,68 +207,68 @@
             hx-trigger="eventModified{{ event.pk }} from:body"
             hx-target="#event-{{ event.pk }}"
             hx-swap="outerHTML">
-            <c-event :event="event" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}">
+            <c-event :event="event" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}" transfer_from="{{ event.transfer_from }}">
             <div class="flex items-center" x-data>
                 {% if event.has_overlap %}
                     <div class="px-1 font-semibold rounded-sm me-1.5 text-error bg-slate-50 dark:bg-slate-700">!!</div>
                 {% endif %}
                 {% if day.trip.status != 5 %}
-                <a href="#"
-                   class="flex items-center"
-                   x-data="{ showIcon: false }"
-                   @mouseenter="showIcon = true"
-                   @mouseleave="showIcon = false"
-                   hx-get="{% url 'trips:event-change-times' event.pk %}"
-                   @click="$dispatch('open-modal'); document.activeElement.blur()"
-                   hx-target="#dialog"
-                   hx-swap="innerHTML">
-                    {{ event.start_time|time:"H:i" }}&nbsp;-&nbsp;{{ event.end_time|time:"H:i" }}
-                    <i x-show="showIcon" class="ph-bold ph-pencil-simple ms-2 align-sub"></i>
-                </a>
+                    <a href="#"
+                       class="flex items-center"
+                       x-data="{ showIcon: false }"
+                       @mouseenter="showIcon = true"
+                       @mouseleave="showIcon = false"
+                       hx-get="{% url 'trips:event-change-times' event.pk %}"
+                       @click="$dispatch('open-modal'); document.activeElement.blur()"
+                       hx-target="#dialog"
+                       hx-swap="innerHTML">
+                        {{ event.start_time|time:"H:i" }}&nbsp;-&nbsp;{{ event.end_time|time:"H:i" }}
+                        <i x-show="showIcon" class="ph-bold ph-pencil-simple ms-2 align-sub"></i>
+                    </a>
                 {% else %}
-                <span>{{ event.start_time|time:"H:i" }}&nbsp;-&nbsp;{{ event.end_time|time:"H:i" }}</span>
+                    <span>{{ event.start_time|time:"H:i" }}&nbsp;-&nbsp;{{ event.end_time|time:"H:i" }}</span>
                 {% endif %}
             </div>
             {# SimpleTransfer indicator/button #}
             {% if day.trip.status != 5 %}
-            <div class="flex gap-2 items-center mt-2">
-                {% with transfer_from=event.transfer_from|default:None %}
-                {% if transfer_from %}
-                    {# Event has outgoing transfer #}
-                    <div class="flex gap-1 items-center py-1 px-2 text-sm text-blue-700 bg-blue-100 rounded-md dark:text-blue-300 dark:bg-blue-900/30">
-                        <i class="ph-bold ph-arrow-right i-sm" aria-hidden="true"></i>
-                        <span>→ {{ transfer_from.to_event.name|truncatechars:15 }}</span>
-                        <button class="btn btn-xs btn-circle btn-ghost"
-                                hx-get="{% url 'trips:edit-simple-transfer' transfer_from.pk %}"
-                                @click="$dispatch('open-modal'); document.activeElement.blur()"
-                                hx-target="#dialog"
-                                hx-swap="innerHTML"
-                                aria-label="{% trans 'Edit transfer' %}">
-                            <i class="ph-bold ph-pencil-simple" aria-hidden="true"></i>
-                        </button>
-                        <button class="btn btn-xs btn-circle btn-ghost text-error"
-                                hx-delete="{% url 'trips:delete-simple-transfer' transfer_from.pk %}"
-                                hx-confirm="{% trans 'Delete this transfer?' %}"
-                                aria-label="{% trans 'Delete transfer' %}">
-                            <i class="ph-bold ph-x" aria-hidden="true"></i>
-                        </button>
-                    </div>
-                {% else %}
-                    {# No outgoing transfer - show add button #}
-                    <button class="btn btn-xs btn-soft btn-primary"
-                            hx-get="{% url 'trips:create-simple-transfer' day.pk %}"
-                            @click="$dispatch('open-modal'); document.activeElement.blur()"
-                            hx-target="#dialog"
-                            hx-swap="innerHTML">
-                        <i class="ph-bold ph-plus-circle i-xs" aria-hidden="true"></i>
-                        {% trans 'Add transfer' %}
-                    </button>
-                {% endif %}
+                <div class="flex gap-2 items-center mt-2">
+                    {% with transfer_from=event.transfer_from|default:None %}
+                        {% if transfer_from %}
+                            {# Event has outgoing transfer #}
+                            <div class="flex gap-1 items-center py-1 px-2 text-sm text-blue-700 bg-blue-100 rounded-md dark:text-blue-300 dark:bg-blue-900/30">
+                                <i class="ph-bold ph-arrow-right i-sm" aria-hidden="true"></i>
+                                <span>→ {{ transfer_from.to_event.name|truncatechars:15 }}</span>
+                                <button class="btn btn-xs btn-circle btn-ghost"
+                                        hx-get="{% url 'trips:edit-simple-transfer' transfer_from.pk %}"
+                                        @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                        hx-target="#dialog"
+                                        hx-swap="innerHTML"
+                                        aria-label="{% trans 'Edit transfer' %}">
+                                    <i class="ph-bold ph-pencil-simple" aria-hidden="true"></i>
+                                </button>
+                                <button class="btn btn-xs btn-circle btn-ghost text-error"
+                                        hx-delete="{% url 'trips:delete-simple-transfer' transfer_from.pk %}"
+                                        hx-confirm="{% trans 'Delete this transfer?' %}"
+                                        aria-label="{% trans 'Delete transfer' %}">
+                                    <i class="ph-bold ph-x" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        {% else %}
+                            {% comment %} {# No outgoing transfer - show add button #}
+                                                <button class="btn btn-xs btn-soft btn-primary"
+                                                        hx-get="{% url 'trips:create-simple-transfer' day.pk %}"
+                                                        @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                                        hx-target="#dialog"
+                                                        hx-swap="innerHTML">
+                                                <i class="ph-bold ph-plus-circle i-xs" aria-hidden="true"></i>
+                                                {% trans 'Add transfer' %}
+                        </button> {% endcomment %}
+                    {% endif %}
                 {% endwith %}
             </div>
-            {% endif %}
-            </c-event>
-        </li>
-        {% endpartialdef single_event %}
-    {% endfor %}
+        {% endif %}
+        </c-event>
+    </li>
+{% endpartialdef single_event %}
+{% endfor %}
 </ul>

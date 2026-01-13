@@ -991,13 +991,41 @@ def event_pair_choice(request, pk):
 
 
 @login_required
-def create_simple_transfer(request, day_id):
-    """Create a SimpleTransfer between two events on the same day"""
-    day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
-    form = SimpleTransferCreateForm(request.POST or None, day=day)
+def create_simple_transfer(request, from_event_pk):
+    """Create a SimpleTransfer from an event to the next event on the same day"""
+    from_event = get_object_or_404(Event, pk=from_event_pk, trip__author=request.user)
+
+    if not from_event.day:
+        messages.add_message(
+            request,
+            messages.ERROR,
+            _("Event must be assigned to a day to create a transfer"),
+        )
+        return HttpResponse(status=204, headers={"HX-Refresh": "true"})
+
+    day = from_event.day
+
+    # Get next events
+    next_events = get_next_events(day, from_event)
+
+    if not next_events.exists():
+        messages.add_message(
+            request,
+            messages.ERROR,
+            _("No next event found for this transfer"),
+        )
+        return HttpResponse(status=204, headers={"HX-Refresh": "true"})
+
+    # Get the first next event
+    to_event = next_events.first()
+
+    form = SimpleTransferCreateForm(
+        request.POST or None, from_event=from_event, to_event=to_event
+    )
 
     if form.is_valid():
         simple_transfer = form.save(commit=False)
+        # from_event and to_event are already set by the form's __init__
         simple_transfer.day = day
         simple_transfer.trip = day.trip
         simple_transfer.save()
@@ -1008,7 +1036,7 @@ def create_simple_transfer(request, day_id):
         )
         return HttpResponse(status=204, headers={"HX-Trigger": f"dayModified{day.pk}"})
 
-    context = {"form": form, "day": day}
+    context = {"form": form, "day": day, "from_event": from_event, "to_event": to_event}
     return TemplateResponse(request, "trips/simple-transfer-create.html", context)
 
 
