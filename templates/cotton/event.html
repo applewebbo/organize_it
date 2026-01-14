@@ -1,5 +1,6 @@
 {% load i18n %}
-<div class="py-3 px-3 sm:px-6 rounded-lg border {{ border_color }} {{ bg_color }}">
+<div class="flex flex-col h-full rounded-lg border {{ border_color }} {{ bg_color }} overflow-hidden">
+    <div class="flex-grow py-3 px-3 sm:px-6">
     <div class="flex items-start mb-3">
         <div class="{{ icon_color }} bg-slate-50 dark:bg-slate-700 mt-1 p-1 sm:p-1.5 rounded-md border-2 {{ border_color }} ">
             <i class="ph-bold ph-{{ icon }} i-sm sm:i-lg"></i>
@@ -53,5 +54,41 @@
             </button>
         {% endif %}
     </div>
+    {% endif %}
+    </div>
+    {# SimpleTransfer display at bottom of card #}
+    {% if transfer_from %}
+        {% with mode=transfer_from.transport_mode %}
+        <div class="flex items-center justify-between py-2 px-3 sm:px-4 {{ bg_color }} bg-blend-darken" style="background-color: rgba(0,0,0,0.08);">
+            <div class="flex items-center gap-2 {{ icon_color }}">
+                <i class="ph-bold i-sm
+                    {% if mode == 'driving' %}ph-car{% endif %}
+                    {% if mode == 'walking' %}ph-person-simple-walk{% endif %}
+                    {% if mode == 'bicycling' %}ph-bicycle{% endif %}
+                    {% if mode == 'transit' %}ph-train{% endif %}" aria-hidden="true"></i>
+                <i class="ph-bold ph-arrow-right i-sm" aria-hidden="true"></i>
+                <span class="text-sm font-medium truncate max-w-32 sm:max-w-48">{{ transfer_from.to_event.name }}</span>
+            </div>
+            {% if event.day.trip.status != 5 %}
+            <div class="flex gap-1 items-center" x-data>
+                {% if transfer_from.google_maps_url %}
+                <a href="{{ transfer_from.google_maps_url }}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="btn btn-xs btn-circle btn-ghost {{ icon_color }} hover:bg-black/10"
+                   aria-label="{% trans 'Open in Google Maps' %}">
+                    <i class="ph-bold ph-map-trifold i-sm" aria-hidden="true"></i>
+                </a>
+                {% endif %}
+                <button class="btn btn-xs btn-circle btn-ghost text-error hover:bg-black/10"
+                        hx-delete="{% url 'trips:delete-simple-transfer' transfer_from.pk %}"
+                        hx-confirm="{% trans 'Delete this transfer?' %}"
+                        aria-label="{% trans 'Delete transfer' %}">
+                    <i class="ph-bold ph-trash i-sm" aria-hidden="true"></i>
+                </button>
+            </div>
+            {% endif %}
+        </div>
+        {% endwith %}
     {% endif %}
 </div>

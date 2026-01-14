@@ -203,11 +203,12 @@
     {% for event in day.events.all %}
         {% partialdef single_event inline %}
         <li id="event-{{ event.pk }}"
+            class="h-full"
             hx-get="{% url 'trips:single-event' event.pk %}"
             hx-trigger="eventModified{{ event.pk }} from:body"
             hx-target="#event-{{ event.pk }}"
             hx-swap="outerHTML">
-            <c-event :event="event" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}" transfer_from="{{ event.transfer_from }}">
+            <c-event :event="event" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}" :transfer_from="event.transfer_from">
             <div class="flex items-center" x-data>
                 {% if event.has_overlap %}
                     <div class="px-1 font-semibold rounded-sm me-1.5 text-error bg-slate-50 dark:bg-slate-700">!!</div>
@@ -229,44 +230,6 @@
                     <span>{{ event.start_time|time:"H:i" }}&nbsp;-&nbsp;{{ event.end_time|time:"H:i" }}</span>
                 {% endif %}
             </div>
-            {# SimpleTransfer indicator/button #}
-            {% if day.trip.status != 5 %}
-                <div class="flex gap-2 items-center mt-2">
-                    {% with transfer_from=event.transfer_from|default:None %}
-                        {% if transfer_from %}
-                            {# Event has outgoing transfer #}
-                            <div class="flex gap-1 items-center py-1 px-2 text-sm text-blue-700 bg-blue-100 rounded-md dark:text-blue-300 dark:bg-blue-900/30">
-                                <i class="ph-bold ph-arrow-right i-sm" aria-hidden="true"></i>
-                                <span>→ {{ transfer_from.to_event.name|truncatechars:15 }}</span>
-                                <button class="btn btn-xs btn-circle btn-ghost"
-                                        hx-get="{% url 'trips:edit-simple-transfer' transfer_from.pk %}"
-                                        @click="$dispatch('open-modal'); document.activeElement.blur()"
-                                        hx-target="#dialog"
-                                        hx-swap="innerHTML"
-                                        aria-label="{% trans 'Edit transfer' %}">
-                                    <i class="ph-bold ph-pencil-simple" aria-hidden="true"></i>
-                                </button>
-                                <button class="btn btn-xs btn-circle btn-ghost text-error"
-                                        hx-delete="{% url 'trips:delete-simple-transfer' transfer_from.pk %}"
-                                        hx-confirm="{% trans 'Delete this transfer?' %}"
-                                        aria-label="{% trans 'Delete transfer' %}">
-                                    <i class="ph-bold ph-x" aria-hidden="true"></i>
-                                </button>
-                            </div>
-                        {% else %}
-                            {% comment %} {# No outgoing transfer - show add button #}
-                                                <button class="btn btn-xs btn-soft btn-primary"
-                                                        hx-get="{% url 'trips:create-simple-transfer' day.pk %}"
-                                                        @click="$dispatch('open-modal'); document.activeElement.blur()"
-                                                        hx-target="#dialog"
-                                                        hx-swap="innerHTML">
-                                                <i class="ph-bold ph-plus-circle i-xs" aria-hidden="true"></i>
-                                                {% trans 'Add transfer' %}
-                        </button> {% endcomment %}
-                    {% endif %}
-                {% endwith %}
-            </div>
-        {% endif %}
         </c-event>
     </li>
 {% endpartialdef single_event %}
