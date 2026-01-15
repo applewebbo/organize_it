@@ -983,7 +983,7 @@ class StayTransfer(models.Model):
 
     @property
     def google_maps_url(self):
-        """Generate Google Maps URL from coordinates"""
+        """Generate Google Maps URL from coordinates with travel mode"""
         from_lat, from_lng = self.from_coordinates
         to_lat, to_lng = self.to_coordinates
 
@@ -992,6 +992,7 @@ class StayTransfer(models.Model):
                 f"https://www.google.com/maps/dir/?api=1"
                 f"&origin={from_lat},{from_lng}"
                 f"&destination={to_lat},{to_lng}"
+                f"&travelmode={self.transport_mode}"
             )
         return None
 
