@@ -13,17 +13,20 @@
             <span class="sr-only">Close modal</span>
         </button>
     </div>
-    <div class="grid gap-x-1 p-4 sm:grid-cols-4 sm:gap-x-2 md:p-5">
+    <div class="grid gap-x-1 p-4 sm:grid-cols-2 sm:gap-x-2 md:p-5">
         {% csrf_token %}
         <!-- Transfer route info -->
         <div class="col-span-full p-3 mb-4 rounded-lg bg-base-200">
-            <div class="flex gap-2 items-center">
-                <span class="font-medium">{{ from_event.name }}</span>
-                <i class="ph-bold ph-arrow-right"></i>
-                <span class="font-medium">{{ to_event.name }}</span>
-            </div>
-            <div class="mt-1 text-sm text-base-content/70">
-                {% trans 'Transfer from' %} {{ from_event.end_time|time:"H:i" }} {% trans 'to' %} {{ to_event.start_time|time:"H:i" }}
+            <div class="flex gap-2 justify-center items-center sm:gap-3">
+                <div class="flex flex-col justify-center text-center">
+                    <span class="font-medium">{{ from_event.name }}</span>
+                    <span class="text-sm text-base-content/70">{{ from_event.start_time|time:"H:i" }} - {{ from_event.end_time|time:"H:i" }}</span>
+                </div>
+                <i class="px-4 ph-bold ph-arrow-right"></i>
+                <div class="flex flex-col justify-center text-center">
+                    <span class="font-medium">{{ to_event.name }}</span>
+                    <span class="text-sm text-base-content/70">{{ to_event.start_time|time:"H:i" }} - {{ to_event.end_time|time:"H:i" }}</span>
+                </div>
             </div>
         </div>
         {% crispy form %}

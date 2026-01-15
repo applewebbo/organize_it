@@ -673,11 +673,13 @@ def create_stay_transfer(request, from_day_id):
 
     form = StayTransferCreateForm(
         request.POST or None,
-        initial={"from_stay": from_stay, "to_stay": to_stay},
+        from_stay=from_stay,
+        to_stay=to_stay,
     )
 
     if form.is_valid():
         stay_transfer = form.save(commit=False)
+        # from_stay and to_event are already set by the form's __init__
         stay_transfer.from_day = from_day
         stay_transfer.to_day = to_day
         stay_transfer.trip = from_day.trip

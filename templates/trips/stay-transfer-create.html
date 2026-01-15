@@ -13,14 +13,22 @@
             <span class="sr-only">Close modal</span>
         </button>
     </div>
-    <div class="p-4 md:p-5">
-        <div class="mb-4">
-            <p class="text-sm text-gray-600 dark:text-gray-400">
-                {% trans 'Creating transfer from' %} <strong>{{ from_stay.name }}</strong> ({{ from_day.date }})
-                {% trans 'to' %} <strong>{{ to_stay.name }}</strong> ({{ to_day.date }})
-            </p>
-        </div>
+    <div class="grid gap-x-1 p-4 sm:grid-cols-2 sm:gap-x-2 md:p-5">
         {% csrf_token %}
+        <!-- Transfer route info -->
+        <div class="col-span-full p-3 mb-4 rounded-lg bg-base-200">
+            <div class="flex gap-2 justify-center items-center sm:gap-3">
+                <div class="flex flex-col justify-center text-center">
+                    <span class="font-medium">{{ from_stay.name }}</span>
+                    <span class="text-sm text-base-content/70">{% if from_stay.check_out %}Check-out: {{ from_stay.check_out|time:"H:i" }}{% else %}{{ from_day.date }}{% endif %}</span>
+                </div>
+                <i class="px-4 ph-bold ph-arrow-right"></i>
+                <div class="flex flex-col justify-center text-center">
+                    <span class="font-medium">{{ to_stay.name }}</span>
+                    <span class="text-sm text-base-content/70">{% if to_stay.check_in %}Check-in: {{ to_stay.check_in|time:"H:i" }}{% else %}{{ to_day.date }}{% endif %}</span>
+                </div>
+            </div>
+        </div>
         {% crispy form %}
     </div>
     <div class="flex justify-end items-center p-4 md:p-5">

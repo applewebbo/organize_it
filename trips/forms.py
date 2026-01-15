@@ -2234,8 +2234,8 @@ class SimpleTransferCreateForm(forms.ModelForm):
         self.fields["transport_mode"].choices = SimpleTransfer.TransportMode.choices
 
         self.helper.layout = Layout(
-            Field("transport_mode"),
-            Field("notes"),
+            Field("transport_mode", wrapper_class="col-span-full"),
+            Field("notes", wrapper_class="col-span-full"),
         )
 
     def clean(self):
@@ -2253,22 +2253,23 @@ class SimpleTransferCreateForm(forms.ModelForm):
                 raise ValidationError(_("Events must be on the same day."))
 
             # Check that from_event doesn't already have an outgoing transfer (excluding current instance)
-            if hasattr(self.from_event, "transfer_from"):
-                existing_transfer = self.from_event.transfer_from
-                # Only raise error if it's a different object (not the one we're creating/editing)
-                if existing_transfer is not self.instance:
-                    raise ValidationError(
-                        _("The from event already has an outgoing transfer.")
-                    )
+            # Use explicit DB query to avoid Django's reverse relation caching issues
+            from_qs = SimpleTransfer.objects.filter(from_event=self.from_event)
+            if self.instance.pk:
+                from_qs = from_qs.exclude(pk=self.instance.pk)
+            if from_qs.exists():
+                raise ValidationError(
+                    _("The from event already has an outgoing transfer.")
+                )
 
             # Check that to_event doesn't already have an incoming transfer (excluding current instance)
-            if hasattr(self.to_event, "transfer_to"):
-                existing_transfer = self.to_event.transfer_to
-                # Only raise error if it's a different object (not the one we're creating/editing)
-                if existing_transfer is not self.instance:
-                    raise ValidationError(
-                        _("The to event already has an incoming transfer.")
-                    )
+            to_qs = SimpleTransfer.objects.filter(to_event=self.to_event)
+            if self.instance.pk:
+                to_qs = to_qs.exclude(pk=self.instance.pk)
+            if to_qs.exists():
+                raise ValidationError(
+                    _("The to event already has an incoming transfer.")
+                )
 
         return cleaned_data
 
@@ -2355,25 +2356,30 @@ class SimpleTransferEditForm(forms.ModelForm):
 
 
 class StayTransferCreateForm(forms.ModelForm):
-    """Form for creating a StayTransfer between stays of consecutive days"""
+    """Form for creating a StayTransfer between stays of consecutive days (auto-populates from/to stays)"""
 
     class Meta:
         model = StayTransfer
-        fields = ["from_stay", "to_stay", "transport_mode", "notes"]
+        fields = ["transport_mode", "notes"]
         labels = {
-            "from_stay": _("From Stay"),
-            "to_stay": _("To Stay"),
             "transport_mode": _("Transport Mode"),
             "notes": _("Notes"),
         }
         widgets = {
-            "from_stay": forms.HiddenInput(),
-            "to_stay": forms.HiddenInput(),
             "transport_mode": forms.Select(),
             "notes": forms.Textarea(attrs={"rows": 3, "placeholder": _("Notes")}),
         }
 
     def __init__(self, *args, **kwargs):
+        self.from_stay = kwargs.pop("from_stay", None)
+        self.to_stay = kwargs.pop("to_stay", None)
+
+        # Create instance with from_stay and to_stay already set to avoid validation errors
+        if "instance" not in kwargs and self.from_stay and self.to_stay:
+            kwargs["instance"] = StayTransfer(
+                from_stay=self.from_stay, to_stay=self.to_stay
+            )
+
         super().__init__(*args, **kwargs)
 
         self.helper = FormHelper()
@@ -2382,36 +2388,36 @@ class StayTransferCreateForm(forms.ModelForm):
         self.fields["transport_mode"].choices = StayTransfer.TransportMode.choices
 
         self.helper.layout = Layout(
-            Field("from_stay"),
-            Field("to_stay"),
-            Field("transport_mode"),
-            Field("notes"),
+            Field("transport_mode", wrapper_class="col-span-full"),
+            Field("notes", wrapper_class="col-span-full"),
         )
 
     def clean(self):
         cleaned_data = super().clean()
-        from_stay = cleaned_data.get("from_stay")
-        to_stay = cleaned_data.get("to_stay")
 
-        if from_stay and to_stay:
+        if self.from_stay and self.to_stay:
             # Check that stays are different
-            if from_stay == to_stay:
+            if self.from_stay == self.to_stay:
                 raise ValidationError(_("From stay and to stay must be different."))
 
-            # Check that from_stay doesn't already have an outgoing transfer
-            if hasattr(from_stay, "transfer_from"):
+            # Check that from_stay doesn't already have an outgoing transfer (excluding current instance)
+            # Use explicit DB query to avoid Django's reverse relation caching issues
+            from_qs = StayTransfer.objects.filter(from_stay=self.from_stay)
+            if self.instance.pk:
+                from_qs = from_qs.exclude(pk=self.instance.pk)
+            if from_qs.exists():
                 raise ValidationError(
                     _("The from stay already has an outgoing transfer.")
                 )
 
-            # Check that to_stay doesn't already have an incoming transfer
-            if hasattr(to_stay, "transfer_to"):
+            # Check that to_stay doesn't already have an incoming transfer (excluding current instance)
+            to_qs = StayTransfer.objects.filter(to_stay=self.to_stay)
+            if self.instance.pk:
+                to_qs = to_qs.exclude(pk=self.instance.pk)
+            if to_qs.exists():
                 raise ValidationError(
                     _("The to stay already has an incoming transfer.")
                 )
-
-            # Additional validation via model's clean method will be called on save
-            # (consecutive days check, same trip check, etc.)
 
         return cleaned_data
 
