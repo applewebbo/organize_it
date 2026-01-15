@@ -79,6 +79,16 @@ def next_day(day):
 
 
 @register.filter
+def prev_day(day):
+    days = list(day.trip.days.all())
+    try:
+        current_index = days.index(day)
+        return days[current_index - 1] if current_index > 0 else None
+    except (ValueError, IndexError):
+        return None
+
+
+@register.filter
 def is_last_day(day):
     try:
         days = list(day.trip.days.all())
