@@ -184,14 +184,15 @@ def day_detail(request, pk):
     ).all()
 
     # Check if there's a StayTransfer from this day to the next
-    stay_transfer_out = None
-    if hasattr(day.stay, "transfer_from") if day.stay else False:
-        stay_transfer_out = day.stay.transfer_from
+    # Use explicit DB query to avoid Django's reverse relation caching issues
+    stay_transfer_out = (
+        StayTransfer.objects.filter(from_stay=day.stay).first() if day.stay else None
+    )
 
     # Check if there's a StayTransfer to this day from the previous
-    stay_transfer_in = None
-    if hasattr(day.stay, "transfer_to") if day.stay else False:
-        stay_transfer_in = day.stay.transfer_to
+    stay_transfer_in = (
+        StayTransfer.objects.filter(to_stay=day.stay).first() if day.stay else None
+    )
 
     # Check if can add StayTransfer (next day exists, both have stays, different stays)
     can_add_stay_transfer = False
@@ -634,15 +635,14 @@ def create_stay_transfer(request, from_day_id):
     """
     Create a StayTransfer between stays of consecutive days.
     The from_stay and to_stay are auto-populated from the days.
+    The button to create a transfer only appears on the last day of a stay
+    (where next_day has a different stay), so next_day is the correct to_day.
     """
     from_day = get_object_or_404(Day, pk=from_day_id, trip__author=request.user)
 
-    # Get the next day
-    try:
-        to_day = Day.objects.get(
-            trip=from_day.trip, date=from_day.date + timedelta(days=1)
-        )
-    except Day.DoesNotExist:
+    # Get the next day - the button only appears when next_day exists and has different stay
+    to_day = from_day.next_day
+    if not to_day:
         messages.add_message(
             request,
             messages.ERROR,
@@ -651,7 +651,7 @@ def create_stay_transfer(request, from_day_id):
         return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
 
     # Check if both days have stays
-    if not hasattr(from_day, "stay") or not hasattr(to_day, "stay"):
+    if not from_day.stay or not to_day.stay:
         messages.add_message(
             request,
             messages.ERROR,
@@ -743,9 +743,11 @@ def delete_stay_transfer(request, pk):
         messages.SUCCESS,
         _("Stay transfer deleted successfully"),
     )
-    # Trigger both days to refresh
-    triggers = {f"dayModified{from_day_id}": {}, f"dayModified{to_day_id}": {}}
-    return HttpResponse(status=204, headers={"HX-Trigger": json.dumps(triggers)})
+    # Trigger refresh of both days to update their UI
+    return HttpResponse(
+        status=204,
+        headers={"HX-Trigger": f"dayModified{from_day_id}, dayModified{to_day_id}"},
+    )
 
 
 @login_required
