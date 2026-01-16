@@ -42,9 +42,10 @@
                         </div>
                     </div>
                     {# Bottom section: StayTransfer info (with dark bg) OR action buttons (no dark bg) #}
-                    {% if next_day and next_day.stay and day.stay != next_day.stay and stay_transfer_out %}
+                    {% with transfer_out=day|stay_transfer_out %}
+                    {% if next_day and next_day.stay and day.stay != next_day.stay and transfer_out %}
                         {# Transfer exists - show with dark background #}
-                        {% with mode=stay_transfer_out.transport_mode %}
+                        {% with mode=transfer_out.transport_mode %}
                         <div class="flex justify-between items-center py-2 px-3 sm:px-4 bg-slate-200/60 dark:bg-slate-800/40">
                             <div class="flex gap-2 items-center text-slate-600 dark:text-slate-300">
                                 <i class="ph-bold i-sm
@@ -57,8 +58,8 @@
                             </div>
                             {% if day.trip.status != 5 %}
                             <div class="flex gap-1 items-center" x-data>
-                                {% if stay_transfer_out.google_maps_url %}
-                                <a href="{{ stay_transfer_out.google_maps_url }}"
+                                {% if transfer_out.google_maps_url %}
+                                <a href="{{ transfer_out.google_maps_url }}"
                                    target="_blank"
                                    rel="noopener noreferrer"
                                    class="btn btn-xs btn-circle btn-ghost text-slate-600 dark:text-slate-300 hover:bg-black/10"
@@ -67,7 +68,7 @@
                                 </a>
                                 {% endif %}
                                 <button class="btn btn-xs btn-circle btn-ghost text-error hover:bg-black/10"
-                                        hx-delete="{% url 'trips:delete-stay-transfer' stay_transfer_out.pk %}"
+                                        hx-delete="{% url 'trips:delete-stay-transfer' transfer_out.pk %}"
                                         hx-confirm="{% trans 'Delete this transfer?' %}"
                                         aria-label="{% trans 'Delete transfer' %}">
                                     <i class="ph-bold ph-trash i-sm" aria-hidden="true"></i>
@@ -85,7 +86,7 @@
                             {% endif %}
                         </div>
                         {% endwith %}
-                    {% elif day.trip.status != 5 %}
+                    {% elif day.trip.status != 5 and not transfer_out %}
                         {# No transfer - show action buttons without dark background #}
                         <div class="flex gap-2 justify-end items-center py-2 px-3 sm:px-4" x-data>
                             {% if next_day and next_day.stay and day.stay != next_day.stay %}
@@ -111,6 +112,7 @@
                             </button>
                         </div>
                     {% endif %}
+                    {% endwith %}
                 </li>
                 {# Next day stay (if different from current) #}
                 {% if next_day and next_day.stay and day.stay != next_day.stay %}

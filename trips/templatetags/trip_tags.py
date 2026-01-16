@@ -5,8 +5,25 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.html import format_html, format_html_join
 
 from trips.data.phone_prefixes import ITALIAN_PREFIXES
+from trips.models import StayTransfer
 
 register = template.Library()
+
+
+@register.filter
+def stay_transfer_out(day):
+    """Get the StayTransfer from this day's stay (if any)"""
+    if not day.stay:
+        return None
+    return StayTransfer.objects.filter(from_stay=day.stay).first()
+
+
+@register.filter
+def stay_transfer_in(day):
+    """Get the StayTransfer to this day's stay (if any)"""
+    if not day.stay:
+        return None
+    return StayTransfer.objects.filter(to_stay=day.stay).first()
 
 
 @register.filter
