@@ -4,20 +4,37 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('trips', '0002_simpletransfer_staytransfer'),
+        ("trips", "0002_simpletransfer_staytransfer"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='simpletransfer',
-            name='transport_mode',
-            field=models.CharField(choices=[('driving', 'Driving'), ('walking', 'Walking'), ('bicycling', 'Bicycling'), ('transit', 'Transit')], default='driving', max_length=50),
+            model_name="simpletransfer",
+            name="transport_mode",
+            field=models.CharField(
+                choices=[
+                    ("driving", "Driving"),
+                    ("walking", "Walking"),
+                    ("bicycling", "Bicycling"),
+                    ("transit", "Transit"),
+                ],
+                default="driving",
+                max_length=50,
+            ),
         ),
         migrations.AlterField(
-            model_name='staytransfer',
-            name='transport_mode',
-            field=models.CharField(choices=[('driving', 'Driving'), ('walking', 'Walking'), ('bicycling', 'Bicycling'), ('transit', 'Transit')], default='driving', max_length=50),
+            model_name="staytransfer",
+            name="transport_mode",
+            field=models.CharField(
+                choices=[
+                    ("driving", "Driving"),
+                    ("walking", "Walking"),
+                    ("bicycling", "Bicycling"),
+                    ("transit", "Transit"),
+                ],
+                default="driving",
+                max_length=50,
+            ),
         ),
     ]

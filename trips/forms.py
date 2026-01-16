@@ -2280,25 +2280,14 @@ class SimpleTransferEditForm(forms.ModelForm):
 
     class Meta:
         model = SimpleTransfer
-        fields = ["transport_mode", "departure_time", "estimated_duration", "notes"]
+        fields = ["transport_mode", "notes"]
         labels = {
             "transport_mode": _("Transport Mode"),
-            "departure_time": _("Departure Time"),
-            "estimated_duration": _("Estimated Duration (minutes)"),
             "notes": _("Notes"),
         }
         widgets = {
-            "transport_mode": forms.Select(),
-            "departure_time": forms.TimeInput(attrs={"type": "time"}),
-            "estimated_duration": forms.NumberInput(
-                attrs={"placeholder": _("Duration in minutes"), "min": 1}
-            ),
+            "transport_mode": TransportModeRadioSelect(),
             "notes": forms.Textarea(attrs={"rows": 3, "placeholder": _("Notes")}),
-        }
-        help_texts = {
-            "estimated_duration": _(
-                "Use the Google Maps link to estimate the travel duration"
-            ),
         }
 
     def __init__(self, *args, **kwargs):
@@ -2308,47 +2297,11 @@ class SimpleTransferEditForm(forms.ModelForm):
         self.helper.form_tag = False
 
         self.fields["transport_mode"].choices = SimpleTransfer.TransportMode.choices
-        self.fields["departure_time"].required = False
-        self.fields["estimated_duration"].required = False
-
-        # Build Google Maps link if coordinates are available
-        google_maps_link = ""
-        if self.instance and self.instance.google_maps_url:
-            google_maps_link = f"""
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text">{_("Google Maps Route")}</span>
-                    </label>
-                    <a href="{self.instance.google_maps_url}" target="_blank" class="btn btn-sm btn-outline">
-                        <i class="ph ph-map-pin"></i> {_("Open in Google Maps")}
-                    </a>
-                </div>
-            """
 
         self.helper.layout = Layout(
-            HTML(google_maps_link) if google_maps_link else HTML(""),
-            Field("transport_mode"),
-            Field("departure_time"),
-            Field("estimated_duration"),
-            Field("notes"),
+            Field("transport_mode", wrapper_class="col-span-full"),
+            Field("notes", wrapper_class="col-span-full"),
         )
-
-    def clean_estimated_duration(self):
-        """Convert minutes to timedelta"""
-        duration_minutes = self.cleaned_data.get("estimated_duration")
-        if duration_minutes:
-            return timedelta(minutes=duration_minutes)
-        return None
-
-    def save(self, commit=True):
-        """Override save to handle estimated_duration conversion"""
-        instance = super().save(commit=False)
-
-        # estimated_duration is already a timedelta from clean_estimated_duration
-        if commit:
-            instance.save()
-
-        return instance
 
 
 # ============================================================================
@@ -2428,25 +2381,14 @@ class StayTransferEditForm(forms.ModelForm):
 
     class Meta:
         model = StayTransfer
-        fields = ["transport_mode", "departure_time", "estimated_duration", "notes"]
+        fields = ["transport_mode", "notes"]
         labels = {
             "transport_mode": _("Transport Mode"),
-            "departure_time": _("Departure Time"),
-            "estimated_duration": _("Estimated Duration (minutes)"),
             "notes": _("Notes"),
         }
         widgets = {
-            "transport_mode": forms.Select(),
-            "departure_time": forms.TimeInput(attrs={"type": "time"}),
-            "estimated_duration": forms.NumberInput(
-                attrs={"placeholder": _("Duration in minutes"), "min": 1}
-            ),
+            "transport_mode": TransportModeRadioSelect(),
             "notes": forms.Textarea(attrs={"rows": 3, "placeholder": _("Notes")}),
-        }
-        help_texts = {
-            "estimated_duration": _(
-                "Use the Google Maps link to estimate the travel duration"
-            ),
         }
 
     def __init__(self, *args, **kwargs):
@@ -2456,37 +2398,11 @@ class StayTransferEditForm(forms.ModelForm):
         self.helper.form_tag = False
 
         self.fields["transport_mode"].choices = StayTransfer.TransportMode.choices
-        self.fields["departure_time"].required = False
-        self.fields["estimated_duration"].required = False
-
-        # Build Google Maps link if coordinates are available
-        google_maps_link = ""
-        if self.instance and self.instance.google_maps_url:
-            google_maps_link = f"""
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text">{_("Google Maps Route")}</span>
-                    </label>
-                    <a href="{self.instance.google_maps_url}" target="_blank" class="btn btn-sm btn-outline">
-                        <i class="ph ph-map-pin"></i> {_("Open in Google Maps")}
-                    </a>
-                </div>
-            """
 
         self.helper.layout = Layout(
-            HTML(google_maps_link) if google_maps_link else HTML(""),
-            Field("transport_mode"),
-            Field("departure_time"),
-            Field("estimated_duration"),
-            Field("notes"),
+            Field("transport_mode", wrapper_class="col-span-full"),
+            Field("notes", wrapper_class="col-span-full"),
         )
-
-    def clean_estimated_duration(self):
-        """Convert minutes to timedelta"""
-        duration_minutes = self.cleaned_data.get("estimated_duration")
-        if duration_minutes:
-            return timedelta(minutes=duration_minutes)
-        return None
 
     def save(self, commit=True):
         """Override save to handle estimated_duration conversion"""

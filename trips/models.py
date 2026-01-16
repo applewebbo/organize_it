@@ -779,10 +779,6 @@ class SimpleTransfer(models.Model):
     )
     notes = models.TextField(blank=True)
 
-    # Optional time fields
-    departure_time = models.TimeField(blank=True, null=True)
-    estimated_duration = models.DurationField(blank=True, null=True)
-
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -824,17 +820,6 @@ class SimpleTransfer(models.Model):
     def to_coordinates(self):
         """Get to_event coordinates as tuple"""
         return (self.to_event.latitude, self.to_event.longitude)
-
-    @property
-    def arrival_time(self):
-        """Calculate arrival time if departure_time and estimated_duration present"""
-        if self.departure_time and self.estimated_duration:
-            from datetime import datetime
-
-            start = datetime.combine(datetime.today(), self.departure_time)
-            arrival = start + self.estimated_duration
-            return arrival.time()
-        return None
 
     @property
     def google_maps_url(self):

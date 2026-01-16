@@ -4,8 +4,9 @@
         {% with next_day=day|next_day %}
             <ul class="grid grid-cols-1 gap-y-2 gap-x-4 sm:grid-cols-2">
                 {# Current day stay #}
-                <li class="flex flex-col rounded-lg border border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-100/30">
-                    <div class="flex items-center py-3 px-4">
+                {% with transfer_out=day|stay_transfer_out %}
+                <li class="flex overflow-hidden flex-col rounded-lg border border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-100/30">
+                    <div class="flex-grow flex items-center pt-3 {% if transfer_out %}pb-3{% else %}py-3{% endif %} px-4">
                         <div class="p-1.5 mt-1 bg-white rounded-md border-2 text-slate-500 border-slate-300 dark:text-slate-300 dark:bg-slate-700 dark:border-slate-700">
                             <i class="text-xl ph-bold ph-bed align-sub" aria-hidden="true"></i>
                         </div>
@@ -42,7 +43,6 @@
                         </div>
                     </div>
                     {# Bottom section: StayTransfer info (with dark bg) OR action buttons (no dark bg) #}
-                    {% with transfer_out=day|stay_transfer_out %}
                     {% if next_day and next_day.stay and day.stay != next_day.stay and transfer_out %}
                         {# Transfer exists - show with dark background #}
                         {% with mode=transfer_out.transport_mode %}
@@ -67,6 +67,14 @@
                                     <i class="ph-bold ph-map-trifold i-sm" aria-hidden="true"></i>
                                 </a>
                                 {% endif %}
+                                <button class="btn btn-xs btn-circle btn-ghost text-slate-600 dark:text-slate-300 hover:bg-black/10"
+                                        hx-get="{% url 'trips:edit-stay-transfer' transfer_out.pk %}"
+                                        @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                        hx-target="#dialog"
+                                        hx-swap="innerHTML"
+                                        aria-label="{% trans 'Edit transfer' %}">
+                                    <i class="ph-bold ph-pencil-simple i-sm" aria-hidden="true"></i>
+                                </button>
                                 <button class="btn btn-xs btn-circle btn-ghost text-error hover:bg-black/10"
                                         hx-delete="{% url 'trips:delete-stay-transfer' transfer_out.pk %}"
                                         hx-confirm="{% trans 'Delete this transfer?' %}"
@@ -112,8 +120,8 @@
                             </button>
                         </div>
                     {% endif %}
-                    {% endwith %}
                 </li>
+                {% endwith %}
                 {# Next day stay (if different from current) #}
                 {% if next_day and next_day.stay and day.stay != next_day.stay %}
                 <li class="flex flex-col rounded-lg border border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-100/30">

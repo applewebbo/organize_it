@@ -80,6 +80,14 @@
                     <i class="ph-bold ph-map-trifold i-sm" aria-hidden="true"></i>
                 </a>
                 {% endif %}
+                <button class="btn btn-xs btn-circle btn-ghost {{ icon_color }} hover:bg-black/10"
+                        hx-get="{% url 'trips:edit-simple-transfer' transfer_from.pk %}"
+                        @click="$dispatch('open-modal'); document.activeElement.blur()"
+                        hx-target="#dialog"
+                        hx-swap="innerHTML"
+                        aria-label="{% trans 'Edit transfer' %}">
+                    <i class="ph-bold ph-pencil-simple i-sm" aria-hidden="true"></i>
+                </button>
                 <button class="btn btn-xs btn-circle btn-ghost text-error hover:bg-black/10"
                         hx-delete="{% url 'trips:delete-simple-transfer' transfer_from.pk %}"
                         hx-confirm="{% trans 'Delete this transfer?' %}"
