@@ -1,6 +1,6 @@
 {% load i18n %}
 <div class="flex flex-col h-full rounded-lg border {{ border_color }} {{ bg_color }} overflow-hidden">
-    <div class="flex-grow py-3 px-3 sm:px-6">
+    <div class="flex-grow py-3 px-2 sm:px-4">
     <div class="flex items-start mb-3">
         <div class="{{ icon_color }} bg-slate-50 dark:bg-slate-700 mt-1 p-1 sm:p-1.5 rounded-md border-2 {{ border_color }} ">
             <i class="ph-bold ph-{{ icon }} i-sm sm:i-lg"></i>
@@ -48,9 +48,7 @@
                     hx-target="#dialog"
                     hx-swap="innerHTML"
                     aria-label="{% trans 'Add transfer to next event' %}">
-                <i class="ph-bold ph-plus i-xs {{ icon_color }}" aria-hidden="true"></i>
-                <span class="hidden sm:inline {{ icon_color }}">{% trans 'Transfer' %}</span>
-                <i class="ph-bold ph-path i-sm {{ icon_color }} sm:hidden" aria-hidden="true"></i>
+                <i class="ph-bold ph-path i-sm {{ icon_color }}" aria-hidden="true"></i>
             </button>
         {% endif %}
     </div>

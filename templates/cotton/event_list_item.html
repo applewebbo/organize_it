@@ -1,44 +1,59 @@
 {% load i18n %}
-<li class="flex gap-2 items-center py-1 mb-2 list-row">
-    <div class="flex gap-2 items-center grow">
-        {% if icon == 'fork-knife' %}
-            <i class="ph-bold ph-{{ icon }} i-sm text-yellow-500" aria-hidden="true"></i>
+<li class="flex flex-col mb-1 list-row">
+    <div class="flex gap-2 items-center">
+        <div class="flex gap-2 items-center grow">
+            {% if icon == 'fork-knife' %}
+                <i class="ph-bold ph-{{ icon }} i-sm text-yellow-500" aria-hidden="true"></i>
+            {% else %}
+                <i class="ph-bold ph-{{ icon }} i-sm text-green-500" aria-hidden="true"></i>
+            {% endif %}
+        <a class="link"
+           href="{% url 'trips:event-detail' event.pk %}"
+           hx-get="{% url 'trips:event-detail' event.pk %}"
+           @click="$dispatch('open-modal'); document.activeElement.blur()"
+           hx-target="#dialog"
+           hx-swap="innerHTML">{{ event.name }}</a>&nbsp;<span class="badge badge-sm badge-outline badge-info">{{ event.start_time }}</span></div>
+        {% if not transfer_from %}
+            <button class="btn btn-xs btn-outline"
+                hx-get="{% url 'trips:create-simple-transfer' event.pk %}"
+                @click="$dispatch('open-modal'); document.activeElement.blur()"
+                hx-target="#dialog"
+                hx-swap="innerHTML"
+                aria-label="{% trans 'Add transfer to next event' %}">
+                <i class="ph-bold ph-path i-sm" aria-hidden="true"></i>
+            </button>
         {% else %}
-            <i class="ph-bold ph-{{ icon }} i-sm text-green-500" aria-hidden="true"></i>
+            <button class="relative btn btn-xs btn-outline"
+                hx-get="{% url 'trips:edit-simple-transfer' transfer_from.pk %}"
+                @click="$dispatch('open-modal'); document.activeElement.blur()"
+                hx-target="#dialog"
+                hx-swap="innerHTML"
+                aria-label="{% trans 'Edit transfer' %}">
+                <i class="ph-bold ph-path i-sm" aria-hidden="true"></i>
+                <span class="absolute -top-1 rounded-full size-2.5 bg-slate-400 -end-1"></span>
+            </button>
         {% endif %}
-    <a class="link"
-       href="{% url 'trips:event-detail' event.pk %}"
-       hx-get="{% url 'trips:event-detail' event.pk %}"
-       @click="$dispatch('open-modal'); document.activeElement.blur()"
-       hx-target="#dialog"
-       hx-swap="innerHTML">{{ event.name }}</a>&nbsp;<span class="badge badge-sm badge-outline badge-info">{{ event.start_time }}</span></div>
-    {% if not transfer_from %}
-        <button class="btn btn-xs btn-outline"
-            hx-get="{% url 'trips:create-simple-transfer' event.pk %}"
-            @click="$dispatch('open-modal'); document.activeElement.blur()"
-            hx-target="#dialog"
-            hx-swap="innerHTML"
-            aria-label="{% trans 'Add transfer to next event' %}">
-            <i class="ph-bold ph-path i-sm" aria-hidden="true"></i>
-        </button>
-    {% else %}
         <button class="relative btn btn-xs btn-outline"
-            hx-get="{% url 'trips:edit-simple-transfer' transfer_from.pk %}"
+            hx-get="{% url 'trips:event-notes' event.pk %}"
             @click="$dispatch('open-modal'); document.activeElement.blur()"
             hx-target="#dialog"
             hx-swap="innerHTML"
-            aria-label="{% trans 'Edit transfer' %}">
-            <i class="ph-bold ph-path i-sm" aria-hidden="true"></i>
-            <span class="absolute -top-1 rounded-full size-2.5 bg-slate-400 -end-1"></span>
+            aria-label="{% trans 'View or add notes' %}">
+            <i class="ph-bold ph-paperclip i-sm" aria-hidden="true"></i>
+            <span class="absolute size-2.5 text-xs font-bold text-white {% if event.notes %}bg-slate-400 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
         </button>
+    </div>
+    {% if transfer_from %}
+        {% with mode=transfer_from.transport_mode %}
+        <div class="flex gap-2 items-center -mt-1 text-sm ps-5 text-slate-500 dark:text-slate-400">
+            <i class="ph-bold i-sm
+                {% if mode == 'driving' %}ph-car{% endif %}
+                {% if mode == 'walking' %}ph-person-simple-walk{% endif %}
+                {% if mode == 'bicycling' %}ph-bicycle{% endif %}
+                {% if mode == 'transit' %}ph-train{% endif %}" aria-hidden="true"></i>
+            <i class="ph-bold ph-arrow-right i-xs" aria-hidden="true"></i>
+            <span class="truncate">{{ transfer_from.to_event.name }}</span>
+        </div>
+        {% endwith %}
     {% endif %}
-    <button class="relative btn btn-xs btn-outline"
-        hx-get="{% url 'trips:event-notes' event.pk %}"
-        @click="$dispatch('open-modal'); document.activeElement.blur()"
-        hx-target="#dialog"
-        hx-swap="innerHTML"
-        aria-label="{% trans 'View or add notes' %}">
-        <i class="ph-bold ph-paperclip i-sm" aria-hidden="true"></i>
-        <span class="absolute size-2.5 text-xs font-bold text-white {% if event.notes %}bg-slate-400 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
-    </button>
 </li>
