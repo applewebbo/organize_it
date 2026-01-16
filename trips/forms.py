@@ -24,6 +24,7 @@ from .models import (
     Transport,
     Trip,
 )
+from .widgets import TransportModeRadioSelect
 
 
 def urlfields_assume_https(db_field, **kwargs):
@@ -2212,7 +2213,7 @@ class SimpleTransferCreateForm(forms.ModelForm):
             "notes": _("Notes"),
         }
         widgets = {
-            "transport_mode": forms.Select(),
+            "transport_mode": TransportModeRadioSelect(),
             "notes": forms.Textarea(attrs={"rows": 3, "placeholder": _("Notes")}),
         }
 
@@ -2366,7 +2367,7 @@ class StayTransferCreateForm(forms.ModelForm):
             "notes": _("Notes"),
         }
         widgets = {
-            "transport_mode": forms.Select(),
+            "transport_mode": TransportModeRadioSelect(),
             "notes": forms.Textarea(attrs={"rows": 3, "placeholder": _("Notes")}),
         }
 
