@@ -45,10 +45,19 @@
             {% endif %}
         </div>
     </div>
-    <div class="flex justify-end items-center p-4 md:p-5">
+    <div class="flex justify-between items-center p-4 md:p-5">
         <button type="button"
-                x-on:click="openModal = false"
-                class="mr-2 btn btn-outline btn-error">{% trans 'Cancel' %}</button>
-        <button id="form-submit" class="btn btn-outline btn-primary" type="submit">{% trans 'Save' %}</button>
+                class="btn btn-error btn-outline"
+                hx-delete="{% url 'trips:delete-simple-transfer' simple_transfer.pk %}"
+                hx-confirm="{% trans 'Delete this transfer?' %}">
+            <i class="ph-bold ph-trash i-sm"></i>
+            {% trans 'Delete' %}
+        </button>
+        <div class="flex gap-2">
+            <button type="button"
+                    x-on:click="openModal = false"
+                    class="btn btn-outline">{% trans 'Cancel' %}</button>
+            <button id="form-submit" class="btn btn-primary" type="submit">{% trans 'Save' %}</button>
+        </div>
     </div>
 </form>

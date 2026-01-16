@@ -160,9 +160,9 @@ def day_detail(request, pk):
     qs = Day.objects.prefetch_related(
         Prefetch(
             "events",
-            queryset=annotate_event_overlaps(Event.objects.all()).order_by(
-                "start_time"
-            ),
+            queryset=annotate_event_overlaps(
+                Event.objects.prefetch_related("transfer_from__to_event")
+            ).order_by("start_time"),
         ),
         "stay",
         "trip__main_transfers",
@@ -244,6 +244,9 @@ def day_detail(request, pk):
             "last_day": is_last_day,
             "arrival_transfer": arrival_transfer,
             "departure_transfer": departure_transfer,
+            "can_add_stay_transfer": can_add_stay_transfer,
+            "stay_transfer_out": stay_transfer_out,
+            "day": day,
         }
         if not (prev_day and prev_day.stay and prev_day.stay == stay):
             locations["first_day"] = True

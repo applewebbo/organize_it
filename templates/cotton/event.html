@@ -88,12 +88,6 @@
                         aria-label="{% trans 'Edit transfer' %}">
                     <i class="ph-bold ph-pencil-simple i-sm" aria-hidden="true"></i>
                 </button>
-                <button class="btn btn-xs btn-circle btn-ghost text-error hover:bg-black/10"
-                        hx-delete="{% url 'trips:delete-simple-transfer' transfer_from.pk %}"
-                        hx-confirm="{% trans 'Delete this transfer?' %}"
-                        aria-label="{% trans 'Delete transfer' %}">
-                    <i class="ph-bold ph-trash i-sm" aria-hidden="true"></i>
-                </button>
             </div>
             {% endif %}
         </div>

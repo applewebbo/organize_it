@@ -1372,7 +1372,6 @@ class TestSimpleTransfer:
 
     def test_simple_transfer_properties(self, trip_factory, experience_factory):
         """Test SimpleTransfer property methods"""
-        from datetime import time, timedelta
 
         trip = trip_factory()
         day = trip.days.first()
@@ -1382,16 +1381,13 @@ class TestSimpleTransfer:
         transfer = SimpleTransfer.objects.create(
             from_event=event1,
             to_event=event2,
-            transport_mode="car",
-            departure_time=time(10, 0),
-            estimated_duration=timedelta(hours=1, minutes=30),
+            transport_mode="driving",
         )
 
         assert transfer.from_location == event1.name
         assert transfer.to_location == event2.name
         assert transfer.from_coordinates == (event1.latitude, event1.longitude)
         assert transfer.to_coordinates == (event2.latitude, event2.longitude)
-        assert transfer.arrival_time is not None
         assert transfer.google_maps_url is not None
         assert "google.com/maps" in transfer.google_maps_url
 

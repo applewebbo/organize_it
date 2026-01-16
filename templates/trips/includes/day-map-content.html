@@ -61,18 +61,38 @@
                                 <span class="badge badge-sm badge-outline badge-error">{{ locations.stay.check_out|time:"H:i" }}</span>
                             {% endif %}
                         </div>
-                        <button class="relative btn btn-xs btn-outline ms-3"
+                        {% if locations.can_add_stay_transfer %}
+                            <button class="btn btn-xs btn-outline"
+                                    hx-get="{% url 'trips:create-stay-transfer' locations.day.pk %}"
+                                    @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                    hx-target="#dialog"
+                                    hx-swap="innerHTML"
+                                    aria-label="{% trans 'Add transfer to next stay' %}">
+                                <i class="ph-bold ph-path i-sm"></i>
+                            </button>
+                        {% elif locations.stay_transfer_out %}
+                            <button class="relative btn btn-xs btn-outline"
+                                    hx-get="{% url 'trips:edit-stay-transfer' locations.stay_transfer_out.pk %}"
+                                    @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                    hx-target="#dialog"
+                                    hx-swap="innerHTML"
+                                    aria-label="{% trans 'Edit transfer' %}">
+                                <i class="ph-bold ph-path i-sm"></i>
+                                <span class="absolute -top-1 rounded-full size-2.5 bg-slate-400 -end-1"></span>
+                            </button>
+                        {% endif %}
+                        <button class="relative btn btn-xs btn-outline"
                                 hx-get="{% url 'trips:stay-notes' locations.stay.pk %}"
                                 @click="$dispatch('open-modal'); document.activeElement.blur()"
                                 hx-target="#dialog"
                                 hx-swap="innerHTML">
                             <i class="ph-bold ph-paperclip i-sm"></i>
-                            <span class="absolute size-2.5 text-xs font-bold text-white {% if event.notes %}bg-slate-400 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
+                            <span class="absolute size-2.5 text-xs font-bold text-white {% if locations.stay.notes %}bg-slate-400 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
                         </button>
                     </li>
                 {% endif %}
                 {% for event in locations.events %}
-                    <c-event-list-item :event="event" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}"></c-event-list-item>
+                    <c-event-list-item :event="event" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}" :transfer_from="event.transfer_from"></c-event-list-item>
                 {% endfor %}
                 {% if locations.next_day_stay %}
                     <li class="flex gap-2 items-center py-1 mb-2 list-row">

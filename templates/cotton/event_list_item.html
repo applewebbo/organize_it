@@ -12,7 +12,27 @@
        @click="$dispatch('open-modal'); document.activeElement.blur()"
        hx-target="#dialog"
        hx-swap="innerHTML">{{ event.name }}</a>&nbsp;<span class="badge badge-sm badge-outline badge-info">{{ event.start_time }}</span></div>
-    <button class="relative btn btn-xs btn-outline ms-3"
+    {% if not transfer_from %}
+        <button class="btn btn-xs btn-outline"
+            hx-get="{% url 'trips:create-simple-transfer' event.pk %}"
+            @click="$dispatch('open-modal'); document.activeElement.blur()"
+            hx-target="#dialog"
+            hx-swap="innerHTML"
+            aria-label="{% trans 'Add transfer to next event' %}">
+            <i class="ph-bold ph-path i-sm" aria-hidden="true"></i>
+        </button>
+    {% else %}
+        <button class="relative btn btn-xs btn-outline"
+            hx-get="{% url 'trips:edit-simple-transfer' transfer_from.pk %}"
+            @click="$dispatch('open-modal'); document.activeElement.blur()"
+            hx-target="#dialog"
+            hx-swap="innerHTML"
+            aria-label="{% trans 'Edit transfer' %}">
+            <i class="ph-bold ph-path i-sm" aria-hidden="true"></i>
+            <span class="absolute -top-1 rounded-full size-2.5 bg-slate-400 -end-1"></span>
+        </button>
+    {% endif %}
+    <button class="relative btn btn-xs btn-outline"
         hx-get="{% url 'trips:event-notes' event.pk %}"
         @click="$dispatch('open-modal'); document.activeElement.blur()"
         hx-target="#dialog"

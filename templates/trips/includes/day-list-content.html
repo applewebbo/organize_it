@@ -75,12 +75,6 @@
                                         aria-label="{% trans 'Edit transfer' %}">
                                     <i class="ph-bold ph-pencil-simple i-sm" aria-hidden="true"></i>
                                 </button>
-                                <button class="btn btn-xs btn-circle btn-ghost text-error hover:bg-black/10"
-                                        hx-delete="{% url 'trips:delete-stay-transfer' transfer_out.pk %}"
-                                        hx-confirm="{% trans 'Delete this transfer?' %}"
-                                        aria-label="{% trans 'Delete transfer' %}">
-                                    <i class="ph-bold ph-trash i-sm" aria-hidden="true"></i>
-                                </button>
                                 <button class="relative btn btn-xs btn-circle btn-ghost text-slate-600 dark:text-slate-300 hover:bg-black/10"
                                         hx-get="{% url 'trips:stay-notes' day.stay.pk %}"
                                         @click="$dispatch('open-modal'); document.activeElement.blur()"

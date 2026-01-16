@@ -1126,10 +1126,6 @@ class SimpleTransferFactory(factory.django.DjangoModelFactory):
         "",
     )
 
-    # Optional time fields
-    departure_time = None
-    estimated_duration = None
-
 
 class StayTransferFactory(factory.django.DjangoModelFactory):
     """Factory for StayTransfer (transfers between stays on consecutive days)"""
