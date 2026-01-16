@@ -1030,13 +1030,13 @@ class StayTransfer(models.Model):
 
     def save(self, *args, **kwargs):
         """Auto-populate days and trip from stays"""
-        # Get first day for from_stay
+        # Get last day for from_stay (departure day - last day of the stay)
         if self.from_stay.days.exists():
-            self.from_day = self.from_stay.days.first()
+            self.from_day = self.from_stay.days.order_by("date").last()
 
-        # Get first day for to_stay
+        # Get first day for to_stay (arrival day - first day of the stay)
         if self.to_stay.days.exists():
-            self.to_day = self.to_stay.days.first()
+            self.to_day = self.to_stay.days.order_by("date").first()
 
         # Set trip from from_day
         if hasattr(self, "from_day"):
