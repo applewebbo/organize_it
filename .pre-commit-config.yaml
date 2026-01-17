@@ -6,47 +6,44 @@ repos:
   - id: end-of-file-fixer
   - id: check-yaml
   - id: check-added-large-files
+
 - repo: https://github.com/asottile/pyupgrade
   rev: v3.21.2
   hooks:
   - id: pyupgrade
-    args:
-    - --py313-plus
+    args: [--py314-plus]
+
 - repo: https://github.com/adamchainz/django-upgrade
   rev: 1.29.1
   hooks:
   - id: django-upgrade
     args: [--target-version, '6.0']
-# - repo: https://github.com/djlint/djLint
-#   rev: v1.36.4
-#   hooks:
-#   - id: djlint-reformat-django
-#   - id: djlint-django
-#     exclude: templates/tailwind/field.html
-- repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.14.11
+
+  # -------------------------
+  # FORMATTERS (before)
+  # -------------------------
+- repo: https://github.com/djlint/djLint
+  rev: v1.36.4
   hooks:
-  - id: ruff
-    args: [--fix, --exit-non-zero-on-fix]
-  - id: ruff-format
-- repo: https://github.com/PyCQA/bandit
-  rev: 1.9.2
-  hooks:
-  - id: bandit
-    args:
-    - -c
-    - pyproject.toml
-    additional_dependencies: [toml==0.10.2]
+  - id: djlint-reformat-django
+    files: ^templates/.*\.html$
+    exclude: ^templates/tailwind/field\.html$
+
 - repo: local
   hooks:
   - id: rustywind
     name: rustywind Tailwind CSS class linter
     language: node
-    additional_dependencies:
-    - rustywind@latest
+    additional_dependencies: [rustywind@latest]
     entry: rustywind
     args: [--write]
     types_or: [html]
+
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.14.13
+  hooks:
+  - id: ruff-format
+
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
   rev: v2.16.0
   hooks:
@@ -54,3 +51,26 @@ repos:
     args: [--autofix]
   - id: pretty-format-yaml
     args: [--autofix, --indent, '2']
+
+  # -------------------------
+  # LINTERS (after)
+  # -------------------------
+- repo: https://github.com/djlint/djLint
+  rev: v1.36.4
+  hooks:
+  - id: djlint-django
+    files: ^templates/.*\.html$
+    exclude: ^templates/tailwind/field\.html$
+
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.14.13
+  hooks:
+  - id: ruff
+    args: [--fix, --exit-non-zero-on-fix]
+
+- repo: https://github.com/PyCQA/bandit
+  rev: 1.9.2
+  hooks:
+  - id: bandit
+    args: [-c, pyproject.toml]
+    additional_dependencies: [toml==0.10.2]
