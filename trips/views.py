@@ -185,8 +185,13 @@ def day_detail(request, pk):
 
     # Check if there's a StayTransfer from this day to the next
     # Use explicit DB query to avoid Django's reverse relation caching issues
+    # Only show transfer_out on the last day of the stay (when next day has different stay)
+    next_day = day.next_day
+    is_last_day_of_stay = not next_day or not next_day.stay or next_day.stay != day.stay
     stay_transfer_out = (
-        StayTransfer.objects.filter(from_stay=day.stay).first() if day.stay else None
+        StayTransfer.objects.filter(from_stay=day.stay).first()
+        if day.stay and is_last_day_of_stay
+        else None
     )
 
     # Check if there's a StayTransfer to this day from the previous
@@ -196,7 +201,6 @@ def day_detail(request, pk):
 
     # Check if can add StayTransfer (next day exists, both have stays, different stays)
     can_add_stay_transfer = False
-    next_day = day.next_day
     if (
         next_day
         and day.stay

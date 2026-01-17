@@ -12,8 +12,14 @@ register = template.Library()
 
 @register.filter
 def stay_transfer_out(day):
-    """Get the StayTransfer from this day's stay (if any)"""
+    """Get the StayTransfer from this day's stay (if any).
+    Only returns the transfer if this is the last day of the stay.
+    """
     if not day.stay:
+        return None
+    # Only show transfer on the last day of the stay
+    next_day = day.next_day
+    if next_day and next_day.stay and next_day.stay == day.stay:
         return None
     return StayTransfer.objects.filter(from_stay=day.stay).first()
 
