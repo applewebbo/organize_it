@@ -8,7 +8,6 @@ from tests.trips.factories import (
     MainTransferFactory,
     MealFactory,
     StayFactory,
-    TransportFactory,
     TripFactory,
 )
 
@@ -17,7 +16,6 @@ register(UserFactory)
 register(LinkFactory)
 register(MealFactory)
 register(StayFactory)
-register(TransportFactory)
 register(ExperienceFactory)
 register(EventFactory)
 register(MainTransferFactory)

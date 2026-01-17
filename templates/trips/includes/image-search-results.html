@@ -1,32 +1,29 @@
 {% load static %}
-
 {% if error %}
     <div class="alert alert-error alert-soft">
         <i class="ph-bold ph-warning-circle"></i>
         <span>{{ error }}</span>
     </div>
 {% elif photos %}
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-3" x-data="{ selectedId: '' }">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-3"
+         x-data="{ selectedId: '' }">
         {% for photo in photos %}
             <div class="overflow-hidden relative rounded-lg shadow-lg cursor-pointer group"
                  @click="selectedId = '{{ photo.id }}'; document.getElementById('id_selected_photo_id').value = '{{ photo.id }}'"
                  :class="selectedId === '{{ photo.id }}' ? 'ring-4 ring-primary' : ''">
-
                 <!-- Image -->
                 <img src="{{ photo.urls.small }}"
                      alt="{{ photo.alt_description }}"
                      class="object-cover w-full h-48 transition-transform duration-200 group-hover:scale-110">
-
                 <!-- Overlay with photographer credit -->
                 <div class="flex absolute inset-0 flex-col justify-end p-3 bg-gradient-to-t to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100 from-black/70">
                     <p class="text-sm text-white">
                         Photo by <a href="{{ photo.user.profile }}"
-                                    target="_blank"
-                                    class="underline"
-                                    @click.stop>{{ photo.user.name }}</a>
+    target="_blank"
+    class="underline"
+    @click.stop>{{ photo.user.name }}</a>
                     </p>
                 </div>
-
                 <!-- Selection indicator -->
                 <div class="absolute top-2 right-2"
                      :class="selectedId === '{{ photo.id }}' ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'">
@@ -38,7 +35,6 @@
             </div>
         {% endfor %}
     </div>
-
     <p class="mt-4 text-xs text-center text-base-content/60">
         Click an image to select it for your trip, then save the form
     </p>

@@ -93,15 +93,12 @@
                         </div>
                         {% if locations.stay_transfer_out %}
                             {% with mode=locations.stay_transfer_out.transport_mode %}
-                            <div class="flex gap-2 items-center -mt-1 text-sm ps-5 text-slate-500 dark:text-slate-400">
-                                <i class="ph-bold i-sm
-                                    {% if mode == 'driving' %}ph-car{% endif %}
-                                    {% if mode == 'walking' %}ph-person-simple-walk{% endif %}
-                                    {% if mode == 'bicycling' %}ph-bicycle{% endif %}
-                                    {% if mode == 'transit' %}ph-train{% endif %}" aria-hidden="true"></i>
-                                <i class="ph-bold ph-arrow-right i-xs" aria-hidden="true"></i>
-                                <span class="truncate">{{ locations.next_day_stay.name }}</span>
-                            </div>
+                                <div class="flex gap-2 items-center -mt-1 text-sm ps-5 text-slate-500 dark:text-slate-400">
+                                    <i class="ph-bold i-sm {% if mode == 'driving' %}ph-car{% endif %} {% if mode == 'walking' %}ph-person-simple-walk{% endif %} {% if mode == 'bicycling' %}ph-bicycle{% endif %} {% if mode == 'transit' %}ph-train{% endif %}"
+                                       aria-hidden="true"></i>
+                                    <i class="ph-bold ph-arrow-right i-xs" aria-hidden="true"></i>
+                                    <span class="truncate">{{ locations.next_day_stay.name }}</span>
+                                </div>
                             {% endwith %}
                         {% endif %}
                     </li>

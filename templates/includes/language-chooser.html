@@ -1,17 +1,17 @@
 {% load i18n %}
 <div class="flex items-center">
-<label for="language-select" class="sr-only">Choose your language:</label>
-<i class="ph-bold ph-translate i-sm me-1"></i>
-{% get_current_language as current_language %}
-<select id="language-select"
-        name="language"
-        class="block p-1 w-full text-sm rounded-md md:p-1.5 dark:placeholder-gray-400 bg-slate-200 text-slate-900 dark:bg-slate-700 dark:text-slate-50"
-        hx-post="{% url 'set_language' %}"
-        hx-trigger="change"
-        hx-swap="none"
-        hx-headers='{"HX-Request": "true"}'
-        hx-on::after-request="window.location.reload()">
-    <option value="en" {% if current_language == "en" %}selected{% endif %}>ENG</option>
-    <option value="it" {% if current_language == "it" %}selected{% endif %}>ITA</option>
-</select>
+    <label for="language-select" class="sr-only">Choose your language:</label>
+    <i class="ph-bold ph-translate i-sm me-1"></i>
+    {% get_current_language as current_language %}
+    <select id="language-select"
+            name="language"
+            class="block p-1 w-full text-sm rounded-md md:p-1.5 dark:placeholder-gray-400 bg-slate-200 text-slate-900 dark:bg-slate-700 dark:text-slate-50"
+            hx-post="{% url 'set_language' %}"
+            hx-trigger="change"
+            hx-swap="none"
+            hx-headers='{"HX-Request": "true"}'
+            hx-on::after-request="window.location.reload()">
+        <option value="en" {% if current_language == "en" %}selected{% endif %}>ENG</option>
+        <option value="it" {% if current_language == "it" %}selected{% endif %}>ITA</option>
+    </select>
 </div>

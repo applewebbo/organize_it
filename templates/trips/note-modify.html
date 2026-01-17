@@ -23,7 +23,9 @@
         {% csrf_token %}
         {% crispy form %}
         <div class="flex gap-2 justify-end items-center sm:col-span-2">
-            <button id="form-submit" class="btn btn-sm btn-soft btn-primary" type="submit">{% trans 'Save' %}</button>
+            <button id="form-submit"
+                    class="btn btn-sm btn-soft btn-primary"
+                    type="submit">{% trans 'Save' %}</button>
             <button type="button"
                     x-on:click="openModal = false"
                     class="btn btn-sm btn-soft">{% trans 'Close' %}</button>

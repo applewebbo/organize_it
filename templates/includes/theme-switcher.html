@@ -1,19 +1,17 @@
 {% load i18n %}
-<div class="flex items-center" x-data="themeSwitcher({{ user.profile.use_system_theme|yesno:'true,false' }})">
+<div class="flex items-center"
+     x-data="themeSwitcher({{ user.profile.use_system_theme|yesno:'true,false' }})">
     <label class="swap swap-rotate">
         <input type="checkbox"
                class="theme-controller"
                x-model="isDark"
                @change="toggleTheme()" />
-
         <!-- Sun icon for light mode -->
         <i class="ph-bold ph-sun swap-off i-sm"></i>
-
         <!-- Moon icon for dark mode -->
         <i class="ph-bold ph-moon swap-on i-sm"></i>
     </label>
 </div>
-
 <script>
 function themeSwitcher(useSystemTheme) {
     return {

@@ -21,7 +21,6 @@ from trips.forms import (
     EventChangeTimesForm,
     ExperienceForm,
     FlightMainTransferForm,
-    MainTransferCombinedForm,
     MealForm,
     NoteForm,
     OtherMainTransferForm,
@@ -31,7 +30,6 @@ from trips.forms import (
     StayTransferCreateForm,
     StayTransferEditForm,
     TrainMainTransferForm,
-    TransportForm,
     TripDateUpdateForm,
     TripForm,
 )
@@ -454,27 +452,6 @@ def trip_dates_update(request, pk):
 
 
 @login_required
-def add_transport(request, day_id):
-    day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
-    unpaired_experiences = Event.objects.filter(
-        day__isnull=True, trip=day.trip, category=1
-    )
-    form = TransportForm(request.POST or None, trip=day.trip)
-    if form.is_valid():
-        transport = form.save(commit=False)
-        transport.day = day
-        transport.save()
-        messages.add_message(
-            request,
-            messages.SUCCESS,
-            _("Transport added successfully"),
-        )
-        return HttpResponse(status=204, headers={"HX-Trigger": f"dayModified{day.pk}"})
-    context = {"form": form, "day": day, "unpaired_experiences": unpaired_experiences}
-    return TemplateResponse(request, "trips/transport-create.html", context)
-
-
-@login_required
 def add_experience(request, day_id):
     day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
     unpaired_experiences = Event.objects.filter(
@@ -758,35 +735,6 @@ def delete_stay_transfer(request, pk):
 
 
 @login_required
-def add_main_transfer(request, trip_id):
-    """Create a new main transfer for the trip"""
-    trip = get_object_or_404(Trip, pk=trip_id, author=request.user)
-
-    # Get direction from URL parameter (1=ARRIVAL, 2=DEPARTURE)
-    direction = request.GET.get("direction")
-    if direction:
-        direction = int(direction)
-
-    if request.method == "POST":
-        form = MainTransferCombinedForm(request.POST, trip=trip, direction=direction)
-        if form.is_valid():
-            transfer = form.save(commit=False)
-            transfer.trip = trip
-            transfer.save()
-            messages.add_message(
-                request,
-                messages.SUCCESS,
-                _("Main trip added successfully"),
-            )
-            return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
-    else:
-        form = MainTransferCombinedForm(trip=trip, direction=direction)
-
-    context = {"form": form, "trip": trip}
-    return TemplateResponse(request, "trips/main-transfer-form.html", context)
-
-
-@login_required
 def edit_main_transfer(request, pk):
     """Edit existing main transfer - opens modal with specific form"""
     transfer = get_object_or_404(MainTransfer, pk=pk, trip__author=request.user)
@@ -882,33 +830,6 @@ def main_transfers_section(request, trip_id):
     }
 
     return TemplateResponse(request, "trips/includes/main-transfers.html", context)
-
-
-@login_required
-def get_transport_type_fields(request):
-    """HTMX endpoint: returns partial with type-specific fields"""
-    from trips.models import Transport
-
-    transport_type = request.POST.get("type") or request.GET.get("type")
-
-    if not transport_type:
-        return HttpResponse("")
-
-    transport_type = int(transport_type)
-    context = {"transport_type": transport_type}
-
-    # Select appropriate template
-    if transport_type == Transport.Type.PLANE:
-        template = "trips/partials/flight-fields.html"
-    elif transport_type == Transport.Type.TRAIN:
-        template = "trips/partials/train-fields.html"
-    elif transport_type == Transport.Type.CAR:
-        template = "trips/partials/car-fields.html"
-    else:
-        # Bus, Boat, Taxi, Other - only company_link
-        template = "trips/partials/generic-transport-fields.html"
-
-    return TemplateResponse(request, template, context)
 
 
 @login_required
@@ -1117,7 +1038,7 @@ def event_detail(request, pk):
     Detail Page for the selected event.
     Uses window functions to efficiently detect event overlaps within the day.
     """
-    qs = Event.objects.select_related("trip__author", "transport", "experience", "meal")
+    qs = Event.objects.select_related("trip__author", "experience", "meal")
     event = get_object_or_404(qs, pk=pk, trip__author=request.user)
 
     event = get_event_instance(event)
@@ -1132,25 +1053,20 @@ def event_detail(request, pk):
 def event_modify(request, pk):
     """
     Modify an event based on its category.
-    For Transport/Experience/Meal events, loads the specific instance to access model-specific fields.
+    For Experience/Meal events, loads the specific instance to access model-specific fields.
     """
-    qs = Event.objects.select_related("day__trip", "transport", "experience", "meal")
+    qs = Event.objects.select_related("day__trip", "experience", "meal")
     event = get_object_or_404(qs, pk=pk, day__trip__author=request.user)
 
     event = get_event_instance(event)
 
     # Select form class based on event category
     event_form = {
-        1: TransportForm,  # Transport
         2: ExperienceForm,  # Experience
         3: MealForm,  # Meal
     }.get(event.category)
 
-    # Pass trip parameter for TransportForm
-    if event.category == 1:  # Transport
-        form = event_form(request.POST or None, instance=event, trip=event.day.trip)
-    else:
-        form = event_form(request.POST or None, instance=event)
+    form = event_form(request.POST or None, instance=event)
     if form.is_valid():
         form.save()
         context = {
@@ -1400,10 +1316,9 @@ def get_trip_addresses(request):
                     }
                 )
 
-            # Get addresses from events (exclude Transport events - category=1)
+            # Get addresses from events
             events = (
                 Event.objects.filter(trip=trip)
-                .exclude(category=1)
                 .exclude(address="")
                 .exclude(city="")
                 .order_by("name")
@@ -1792,7 +1707,7 @@ def enrich_event(request, event_id):
     - Use Place ID to get details (website, phone, opening hours).
     - Return preview for user confirmation.
     """
-    qs = Event.objects.select_related("trip__author", "transport", "experience", "meal")
+    qs = Event.objects.select_related("trip__author", "experience", "meal")
     event = get_object_or_404(qs, pk=event_id, trip__author=request.user)
     context = {}
 
@@ -1890,7 +1805,7 @@ def confirm_enrich_event(request, event_id):
     Confirm and save enriched event data.
     Receives enriched data from the preview and saves it to the database.
     """
-    qs = Event.objects.select_related("trip__author", "transport", "experience", "meal")
+    qs = Event.objects.select_related("trip__author", "experience", "meal")
     event = get_object_or_404(qs, pk=event_id, trip__author=request.user)
 
     # Get enriched data from POST parameters

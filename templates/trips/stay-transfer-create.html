@@ -20,12 +20,24 @@
             <div class="flex gap-2 justify-center items-center sm:gap-3">
                 <div class="flex flex-col justify-center text-center">
                     <span class="font-medium">{{ from_stay.name }}</span>
-                    <span class="text-sm text-base-content/70">{% if from_stay.check_out %}Check-out: {{ from_stay.check_out|time:"H:i" }}{% else %}{{ from_day.date }}{% endif %}</span>
+                    <span class="text-sm text-base-content/70">
+                        {% if from_stay.check_out %}
+                            Check-out: {{ from_stay.check_out|time:"H:i" }}
+                        {% else %}
+                            {{ from_day.date }}
+                        {% endif %}
+                    </span>
                 </div>
                 <i class="px-4 ph-bold ph-arrow-right"></i>
                 <div class="flex flex-col justify-center text-center">
                     <span class="font-medium">{{ to_stay.name }}</span>
-                    <span class="text-sm text-base-content/70">{% if to_stay.check_in %}Check-in: {{ to_stay.check_in|time:"H:i" }}{% else %}{{ to_day.date }}{% endif %}</span>
+                    <span class="text-sm text-base-content/70">
+                        {% if to_stay.check_in %}
+                            Check-in: {{ to_stay.check_in|time:"H:i" }}
+                        {% else %}
+                            {{ to_day.date }}
+                        {% endif %}
+                    </span>
                 </div>
             </div>
         </div>
@@ -36,13 +48,14 @@
                 <div class="mt-1 text-sm text-error">{{ form.transport_mode.errors }}</div>
             {% endif %}
         </div>
-
         <div class="col-span-full mb-4">
             <label for="{{ form.notes.id_for_label }}" class="block mb-2 font-medium">{{ form.notes.label }}</label>
-            <textarea name="{{ form.notes.name }}" id="{{ form.notes.id_for_label }}" rows="3" class="w-full textarea textarea-bordered" placeholder="{% trans 'Notes' %}">{{ form.notes.value|default:'' }}</textarea>
-            {% if form.notes.errors %}
-                <div class="mt-1 text-sm text-error">{{ form.notes.errors }}</div>
-            {% endif %}
+            <textarea name="{{ form.notes.name }}"
+                      id="{{ form.notes.id_for_label }}"
+                      rows="3"
+                      class="w-full textarea textarea-bordered"
+                      placeholder="{% trans 'Notes' %}">{{ form.notes.value|default:'' }}</textarea>
+            {% if form.notes.errors %}<div class="mt-1 text-sm text-error">{{ form.notes.errors }}</div>{% endif %}
         </div>
     </div>
     <div class="flex justify-end items-center p-4 md:p-5">

@@ -2,14 +2,16 @@
 <ul class="leading-10">
     {# Route: Origin → Destination #}
     <li class="flex gap-2 items-center">
-        <i class="ph-bold ph-map-pin i-md text-base-content/60" aria-hidden="true"></i>
+        <i class="ph-bold ph-map-pin i-md text-base-content/60"
+           aria-hidden="true"></i>
         <span>
-            {{ event.origin_city }}{% if event.origin_address %}, {{ event.origin_address }}{% endif %}
+            {{ event.origin_city }}
+            {% if event.origin_address %}, {{ event.origin_address }}{% endif %}
             <i class="mx-1 ph-bold ph-arrow-right" aria-hidden="true"></i>
-            {{ event.destination_city }}{% if event.destination_address %}, {{ event.destination_address }}{% endif %}
+            {{ event.destination_city }}
+            {% if event.destination_address %}, {{ event.destination_address }}{% endif %}
         </span>
     </li>
-
     {# Time and Duration #}
     <li class="flex gap-2 items-center">
         <i class="ph-bold ph-clock i-md text-base-content/60" aria-hidden="true"></i>
@@ -22,48 +24,51 @@
             {% endif %}
         </span>
     </li>
-
     {# Booking Details Section #}
     {% if event.company or event.booking_reference or event.ticket_url or event.price %}
         <li class="mt-2">
             <div class="my-1 divider"></div>
             <span class="text-sm font-semibold text-base-content/80">{% trans "Booking Details" %}</span>
         </li>
-
         {% if event.company %}
             <li class="flex gap-2 items-center">
-                <i class="ph-bold ph-buildings i-md text-base-content/60" aria-hidden="true"></i>
+                <i class="ph-bold ph-buildings i-md text-base-content/60"
+                   aria-hidden="true"></i>
                 <span><span class="text-base-content/60">{% trans "Company" %}:</span> {{ event.company }}</span>
             </li>
         {% endif %}
-
         {% if event.booking_reference %}
             <li class="flex gap-2 items-center">
-                <i class="ph-bold ph-ticket i-md text-base-content/60" aria-hidden="true"></i>
+                <i class="ph-bold ph-ticket i-md text-base-content/60"
+                   aria-hidden="true"></i>
                 <span><span class="text-base-content/60">{% trans "Booking Reference" %}:</span> {{ event.booking_reference }}</span>
             </li>
         {% endif %}
-
         {% if event.ticket_url %}
             <li class="flex gap-2 items-center">
                 <i class="ph-bold ph-link i-md text-base-content/60" aria-hidden="true"></i>
-                <a href="{{ event.ticket_url }}" class="link" target="_blank" rel="noopener">{% trans "View Ticket" %}</a>
+                <a href="{{ event.ticket_url }}"
+                   class="link"
+                   target="_blank"
+                   rel="noopener">{% trans "View Ticket" %}</a>
             </li>
         {% endif %}
-
         {% if event.price %}
             <li class="flex gap-2 items-center">
-                <i class="ph-bold ph-currency-dollar i-md text-base-content/60" aria-hidden="true"></i>
+                <i class="ph-bold ph-currency-dollar i-md text-base-content/60"
+                   aria-hidden="true"></i>
                 <span><span class="text-base-content/60">{% trans "Price" %}:</span> €{{ event.price }}</span>
             </li>
         {% endif %}
     {% endif %}
-
     {# Website (if present) #}
     {% if event.website %}
         <li class="flex gap-2 items-center {% if event.company or event.booking_reference or event.ticket_url or event.price %}mt-2{% endif %}">
             <i class="ph-bold ph-globe i-md text-base-content/60" aria-hidden="true"></i>
-            <a href="{{ event.website }}" class="link" target="_blank" rel="noopener">{{ event.website }}</a>
+            <a href="{{ event.website }}"
+               class="link"
+               target="_blank"
+               rel="noopener">{{ event.website }}</a>
         </li>
     {% endif %}
 </ul>

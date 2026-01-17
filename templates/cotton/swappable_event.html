@@ -4,8 +4,6 @@
    hx-confirm="Are you sure you want to swap {{ selected_event.name }} with {{ event.name }}?">
     <div class="py-3 px-6 rounded-lg border {{ border_color }} {{ bg_color }}">
         <h2 class="text-xl font-semibold">{{ event.name }}</h2>
-        <p>
-            {{ event.start_time|date:"H:i" }} - {{ event.end_time|date:"H:i" }}
-        </p>
+        <p>{{ event.start_time|date:"H:i" }} - {{ event.end_time|date:"H:i" }}</p>
     </div>
 </a>

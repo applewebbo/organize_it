@@ -150,7 +150,6 @@ def is_first_day_of_trip(day):
 @register.filter
 def event_icon(event):
     icons = {
-        1: "car-profile",  # Transport
         2: "images",  # Experience
         3: "fork-knife",  # Meal
     }
@@ -160,7 +159,6 @@ def event_icon(event):
 @register.filter
 def event_bg_color(event):
     colors = {
-        1: "bg-tr-blue-100 dark:bg-tr-blue-100/30",  # Transport
         2: "bg-exp-green-100 dark:bg-exp-green-100/30",  # Experience
         3: "bg-meal-yellow-100 dark:bg-meal-yellow-100/30",  # Meal
     }
@@ -170,7 +168,6 @@ def event_bg_color(event):
 @register.filter
 def event_border_color(event):
     colors = {
-        1: "border-tr-blue-300 dark:border-tr-blue-700",  # Transport
         2: "border-exp-green-300 dark:border-exp-green-700",  # Experience
         3: "border-meal-yellow-300 dark:border-meal-yellow-700",  # Meal
     }
@@ -180,7 +177,6 @@ def event_border_color(event):
 @register.filter
 def event_icon_color(event):
     colors = {
-        1: "text-tr-blue-700 dark:text-tr-blue-300",  # Transport
         2: "text-exp-green-700 dark:text-exp-green-300",  # Experience
         3: "text-meal-yellow-700 dark:text-meal-yellow-300",  # Meal
     }
@@ -243,21 +239,8 @@ def format_duration(duration):
 @register.filter
 def event_type_icon(event):
     """Return the appropriate Phosphor icon class based on event category and type"""
-    # Transport icons (category == 1)
-    if event.category == 1:
-        transport_icons = {
-            1: "ph-car",  # CAR
-            2: "ph-airplane",  # PLANE
-            3: "ph-train",  # TRAIN
-            4: "ph-boat",  # BOAT
-            5: "ph-bus",  # BUS
-            6: "ph-taxi",  # TAXI
-            7: "ph-question",  # OTHER
-        }
-        return transport_icons.get(event.type, "ph-question")
-
     # Experience icons (category == 2)
-    elif event.category == 2:
+    if event.category == 2:
         experience_icons = {
             1: "ph-bank",  # MUSEUM
             2: "ph-tree",  # PARK

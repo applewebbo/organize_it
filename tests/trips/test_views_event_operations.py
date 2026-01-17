@@ -9,7 +9,6 @@ from tests.trips.factories import (
     EventFactory,
     ExperienceFactory,
     MealFactory,
-    TransportFactory,
     TripFactory,
 )
 
@@ -165,20 +164,6 @@ class TestEventSwapModal(TestCase):
 
 class TestEventDetail(TestCase):
     """Test cases for event detail view"""
-
-    def test_get_transport_detail(self):
-        """Test successful retrieval of transport event detail"""
-        user = self.make_user("user")
-        trip = TripFactory(author=user)
-        day = trip.days.first()
-        transport = TransportFactory(day=day)
-
-        with self.login(user):
-            response = self.get("trips:event-detail", pk=transport.pk)
-
-        self.response_200(response)
-        assertTemplateUsed(response, "trips/event-detail.html")
-        assert response.context["event"] == transport
 
     def test_get_experience_detail(self):
         """Test successful retrieval of experience event detail"""

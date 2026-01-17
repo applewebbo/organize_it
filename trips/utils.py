@@ -744,9 +744,7 @@ def get_event_instance(event):
     """
     Get the specific event instance based on its category.
     """
-    if event.category == 1:  # Transport
-        return event.transport
-    elif event.category == 2:  # Experience
+    if event.category == 2:  # Experience
         return event.experience
     elif event.category == 3:  # Meal
         return event.meal

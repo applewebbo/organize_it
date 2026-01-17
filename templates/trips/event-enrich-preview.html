@@ -19,7 +19,6 @@
                 <i class="text-xl ph-bold ph-info"></i>
                 <span>{% trans 'Review the enriched data below. New information is highlighted in green.' %}</span>
             </div>
-
             {% partialdef 'event-preview' inline %}
             <div class="grid gap-1 sm:gap-2">
                 {% if event.category == 2 %}
@@ -28,54 +27,55 @@
                     {% include 'trips/includes/meal-preview.html' %}
                 {% endif %}
             </div>
-            {% endpartialdef 'event-preview' %}
-        </div>
-
-        <div class="flex gap-2 justify-end items-center p-4 px-8 rounded-b border-t md:p-5 border-base-300">
-            <form hx-post="{% url 'trips:confirm-enrich-event' event.id %}"
-                  hx-target="#dialog"
-                  hx-swap="innerHTML">
-                {% csrf_token %}
-                <input type="hidden" name="place_id" value="{{ enriched_data.place_id }}">
-                <input type="hidden" name="website" value="{{ enriched_data.website }}">
-                <input type="hidden" name="phone_number" value="{{ enriched_data.phone_number }}">
-                {% if enriched_data.opening_hours_json %}
-                <input type="hidden" name="opening_hours" value="{{ enriched_data.opening_hours_json }}">
-                {% endif %}
-
-                <div class="flex gap-2">
-                    <button type="submit"
-                            class="btn btn-success btn-soft">
-                        <i class="text-xl ph-bold ph-check"></i>
-                        <span>{% trans 'Accept' %}</span>
-                    </button>
-                    <button type="button"
-                            hx-get="{% url 'trips:event-detail' event.pk %}"
-                            hx-target="#dialog"
-                            hx-swap="innerHTML"
-                            class="btn btn-error btn-soft">
-                        <i class="text-xl ph-bold ph-x"></i>
-                        <span>{% trans 'Cancel' %}</span>
-                    </button>
-                </div>
-            </form>
-        </div>
-    {% elif error_message %}
-        <div class="p-4 md:p-5">
-            <div role="alert" class="alert alert-error alert-soft">
-                <i class="text-xl ph-bold ph-warning"></i>
-                <span>{{ error_message }}</span>
+        {% endpartialdef 'event-preview' %}
+    </div>
+    <div class="flex gap-2 justify-end items-center p-4 px-8 rounded-b border-t md:p-5 border-base-300">
+        <form hx-post="{% url 'trips:confirm-enrich-event' event.id %}"
+              hx-target="#dialog"
+              hx-swap="innerHTML">
+            {% csrf_token %}
+            <input type="hidden" name="place_id" value="{{ enriched_data.place_id }}">
+            <input type="hidden" name="website" value="{{ enriched_data.website }}">
+            <input type="hidden"
+                   name="phone_number"
+                   value="{{ enriched_data.phone_number }}">
+            {% if enriched_data.opening_hours_json %}
+                <input type="hidden"
+                       name="opening_hours"
+                       value="{{ enriched_data.opening_hours_json }}">
+            {% endif %}
+            <div class="flex gap-2">
+                <button type="submit" class="btn btn-success btn-soft">
+                    <i class="text-xl ph-bold ph-check"></i>
+                    <span>{% trans 'Accept' %}</span>
+                </button>
+                <button type="button"
+                        hx-get="{% url 'trips:event-detail' event.pk %}"
+                        hx-target="#dialog"
+                        hx-swap="innerHTML"
+                        class="btn btn-error btn-soft">
+                    <i class="text-xl ph-bold ph-x"></i>
+                    <span>{% trans 'Cancel' %}</span>
+                </button>
             </div>
+        </form>
+    </div>
+{% elif error_message %}
+    <div class="p-4 md:p-5">
+        <div role="alert" class="alert alert-error alert-soft">
+            <i class="text-xl ph-bold ph-warning"></i>
+            <span>{{ error_message }}</span>
         </div>
-        <div class="flex gap-2 justify-end items-center p-4 px-8 rounded-b border-t md:p-5 border-base-300">
-            <button type="button"
-                    hx-get="{% url 'trips:event-detail' event.pk %}"
-                    hx-target="#dialog"
-                    hx-swap="innerHTML"
-                    class="btn btn-soft btn-neutral">
-                <i class="text-xl ph-bold ph-arrow-left"></i>
-                <span>{% trans 'Back' %}</span>
-            </button>
-        </div>
-    {% endif %}
+    </div>
+    <div class="flex gap-2 justify-end items-center p-4 px-8 rounded-b border-t md:p-5 border-base-300">
+        <button type="button"
+                hx-get="{% url 'trips:event-detail' event.pk %}"
+                hx-target="#dialog"
+                hx-swap="innerHTML"
+                class="btn btn-soft btn-neutral">
+            <i class="text-xl ph-bold ph-arrow-left"></i>
+            <span>{% trans 'Back' %}</span>
+        </button>
+    </div>
+{% endif %}
 </div>

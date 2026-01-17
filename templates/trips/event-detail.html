@@ -43,9 +43,9 @@
                 <div role="alert"
                      class="mt-4 alert alert-success alert-soft"
                      x-cloak
-                    x-data="{ show: true }"
-                    x-show="show"
-                    x-init="setTimeout(() => show = false, 4000)">{{ success_message }}</div>
+                     x-data="{ show: true }"
+                     x-show="show"
+                     x-init="setTimeout(() => show = false, 4000)">{{ success_message }}</div>
             {% endif %}
         </div>
     {% endpartialdef 'event-detail' %}

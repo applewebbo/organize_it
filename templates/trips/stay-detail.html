@@ -17,67 +17,67 @@
                 <span class="loading loading-bars loading-lg text-primary"></span>
             </div>
         </div>
-    <div class="grid gap-1 p-4 sm:gap-2 md:p-5">
-        <ul class="leading-10">
-            <li class="flex gap-2 items-center">
-                <i class="ph-bold ph-map-pin i-md text-base-content/60"></i>{{ stay.address }}
-            </li>
-            <li class="flex gap-2 items-center">
-                <i class="ph-bold ph-sign-in i-md text-base-content/60"></i>{{ first_day.date|date:"SHORT_DATE_FORMAT" }} {% trans 'from' %} {{ stay.check_in|time:"H:i" }}
-            </li>
-            <li class="flex gap-2 items-center">
-                <i class="ph-bold ph-sign-out i-md text-base-content/60"></i>{{ last_day.date|date:"SHORT_DATE_FORMAT" }} {% trans 'before' %} {{ stay.check_out|time:"H:i" }}
-            </li>
-            {% if stay.website %}
+        <div class="grid gap-1 p-4 sm:gap-2 md:p-5">
+            <ul class="leading-10">
                 <li class="flex gap-2 items-center">
-                    <i class="ph-bold ph-browser i-md text-base-content/60"></i><a href="{{ stay.website }}" class="link">{{ stay.website|truncatechars:38 }}</a>
+                    <i class="ph-bold ph-map-pin i-md text-base-content/60"></i>{{ stay.address }}
                 </li>
-            {% endif %}
-            {% if stay.phone_number %}
                 <li class="flex gap-2 items-center">
-                    <i class="ph-bold ph-phone i-md text-base-content/60"></i>{{ stay.phone_number|phone_format }}
+                    <i class="ph-bold ph-sign-in i-md text-base-content/60"></i>{{ first_day.date|date:"SHORT_DATE_FORMAT" }} {% trans 'from' %} {{ stay.check_in|time:"H:i" }}
                 </li>
-            {% endif %}
-            {% if stay.opening_hours %}
                 <li class="flex gap-2 items-center">
-                    <i class="ph-bold ph-door-open i-md text-base-content/60"></i>{{ stay.opening_hours|format_opening_hours }}
+                    <i class="ph-bold ph-sign-out i-md text-base-content/60"></i>{{ last_day.date|date:"SHORT_DATE_FORMAT" }} {% trans 'before' %} {{ stay.check_out|time:"H:i" }}
                 </li>
-            {% endif %}
-            {% if stay.cancellation_date %}
-                <li class="flex gap-2 items-center">
-                    <i class="ph-bold ph-calendar-x i-md text-base-content/60"></i>
+                {% if stay.website %}
+                    <li class="flex gap-2 items-center">
+                        <i class="ph-bold ph-browser i-md text-base-content/60"></i><a href="{{ stay.website }}" class="link">{{ stay.website|truncatechars:38 }}</a>
+                    </li>
+                {% endif %}
+                {% if stay.phone_number %}
+                    <li class="flex gap-2 items-center">
+                        <i class="ph-bold ph-phone i-md text-base-content/60"></i>{{ stay.phone_number|phone_format }}
+                    </li>
+                {% endif %}
+                {% if stay.opening_hours %}
+                    <li class="flex gap-2 items-center">
+                        <i class="ph-bold ph-door-open i-md text-base-content/60"></i>{{ stay.opening_hours|format_opening_hours }}
+                    </li>
+                {% endif %}
+                {% if stay.cancellation_date %}
+                    <li class="flex gap-2 items-center">
+                        <i class="ph-bold ph-calendar-x i-md text-base-content/60"></i>
                         {{ stay.cancellation_date }}
-                </li>
+                    </li>
+                {% endif %}
+            </ul>
+            {% if error_message %}
+                <div role="alert"
+                     class="mt-4 alert alert-error alert-soft"
+                     x-cloak
+                     x-data="{ show: true }"
+                     x-show="show"
+                     x-init="setTimeout(() => show = false, 4000)">{{ error_message }}</div>
+            {% elif success_message %}
+                <div role="alert"
+                     class="mt-4 alert alert-success alert-soft"
+                     x-cloak
+                     x-data="{ show: true }"
+                     x-show="show"
+                     x-init="setTimeout(() => show = false, 4000)">{{ success_message }}</div>
             {% endif %}
-        </ul>
-        {% if error_message %}
-            <div role="alert"
-                    class="mt-4 alert alert-error alert-soft"
-                    x-cloak
-                    x-data="{ show: true }"
-                    x-show="show"
-                    x-init="setTimeout(() => show = false, 4000)">{{ error_message }}</div>
-        {% elif success_message %}
-            <div role="alert"
-                    class="mt-4 alert alert-success alert-soft"
-                    x-cloak
-                x-data="{ show: true }"
-                x-show="show"
-                x-init="setTimeout(() => show = false, 4000)">{{ success_message }}</div>
-        {% endif %}
-    </div>
+        </div>
     </div>
     <div class="flex justify-end items-center p-4 px-8 rounded-b md:p-5">
         {% if not stay.enriched %}
-        <button type="button"
-                class="ms-2 btn btn-secondary btn-soft"
-                hx-post="{% url 'trips:enrich-stay' stay.id %}"
-                hx-indicator="#enrich-overlay"
-                hx-swap="innerHTML"
-                hx-target="#dialog">
-            <i class="text-xl sm:hidden ph-bold ph-list-plus"></i>
-            <span class="hidden sm:inline">{% trans 'Enrich' %}</span>
-        </button>
+            <button type="button"
+                    class="ms-2 btn btn-secondary btn-soft"
+                    hx-post="{% url 'trips:enrich-stay' stay.id %}"
+                    hx-indicator="#enrich-overlay"
+                    hx-swap="innerHTML"
+                    hx-target="#dialog">
+                <i class="text-xl sm:hidden ph-bold ph-list-plus"></i>
+                <span class="hidden sm:inline">{% trans 'Enrich' %}</span>
+            </button>
         {% endif %}
         <button type="button"
                 class="ms-2 btn btn-success btn-soft"

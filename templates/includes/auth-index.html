@@ -67,13 +67,11 @@
                                  class="object-cover w-full h-full"
                                  loading="eager">
                         {% endif %}
-
                         {% if trip.needs_attribution %}
                             <div class="absolute bottom-3 left-3 py-1 px-2 text-xs text-white rounded bg-black/50">
                                 {{ trip.get_attribution_text }}
                             </div>
                         {% endif %}
-
                         <!-- Status Badge on Image -->
                         <div class="absolute right-3 bottom-3">
                             <span class="badge badge-secondary badge-sm md:badge-lg">{{ trip.get_status_display }}</span>
@@ -85,7 +83,8 @@
                             <div class="flex flex-col gap-y-2 md:flex-row md:gap-y-0 md:gap-x-4 lg:gap-x-6">
                                 <!-- Dates Row -->
                                 <div class="flex gap-1.5 items-center">
-                                    <i class="sm:hidden ph-bold ph-calendar-blank text-base-content/60" aria-hidden="true"></i>
+                                    <i class="sm:hidden ph-bold ph-calendar-blank text-base-content/60"
+                                       aria-hidden="true"></i>
                                     <span class="hidden md:inline">{% trans "Start Date:" %}&nbsp;</span><strong>{{ trip.start_date|date:"d F" }}</strong>
                                     <span class="sm:hidden">&nbsp;-&nbsp;</span>
                                     <span class="hidden md:inline">&nbsp;&nbsp;</span>
@@ -93,7 +92,8 @@
                                 </div>
                                 <!-- Destination Row -->
                                 <div class="flex gap-1.5 items-center">
-                                    <i class="sm:hidden ph-bold ph-path text-base-content/60" aria-hidden="true"></i>
+                                    <i class="sm:hidden ph-bold ph-path text-base-content/60"
+                                       aria-hidden="true"></i>
                                     <span class="hidden md:inline">{% trans "Destination:" %}&nbsp;</span><strong>{{ trip.destination }}</strong>
                                 </div>
                             </div>
@@ -104,7 +104,7 @@
             </section>
             <!-- Main Transfers Section -->
             {% if trip.status != 5 %}
-            {% include 'trips/includes/main-transfers.html' %}
+                {% include 'trips/includes/main-transfers.html' %}
             {% endif %}
             <!-- END Main Transfers Section -->
             <!-- Days & Events Section -->

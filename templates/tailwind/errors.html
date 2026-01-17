@@ -1,14 +1,12 @@
 {% if form.non_field_errors %}
-  <div class="mb-4 w-full">
-    {% if form_error_title %}
-      <div class="py-2 px-4 font-bold text-white bg-red-500 rounded-t">
-        {{ form_error_title }}
-      </div>
-    {% endif %}
-    <div class="py-3 px-4 text-red-700 bg-red-100 rounded-b border border-red-400">
-      <ul>
-        {{ form.non_field_errors|unordered_list }}
-      </ul>
+    <div class="mb-4 w-full">
+        {% if form_error_title %}
+            <div class="py-2 px-4 font-bold text-white bg-red-500 rounded-t">{{ form_error_title }}</div>
+        {% endif %}
+        <div class="py-3 px-4 text-red-700 bg-red-100 rounded-b border border-red-400">
+            <ul>
+                {{ form.non_field_errors|unordered_list }}
+            </ul>
+        </div>
     </div>
-  </div>
 {% endif %}

@@ -12,7 +12,8 @@
     {% if enriched_data.website %}
         <li class="flex gap-2 items-center py-1 px-2 rounded bg-success/10">
             <i class="ph-bold ph-browser i-md text-success"></i>
-            <a href="{{ enriched_data.website }}" class="font-semibold link text-success">{{ enriched_data.website|truncatechars:38 }}</a>
+            <a href="{{ enriched_data.website }}"
+               class="font-semibold link text-success">{{ enriched_data.website|truncatechars:38 }}</a>
             <span class="ml-auto badge badge-success badge-xs">{% trans 'New' %}</span>
         </li>
     {% elif stay.website %}
@@ -45,7 +46,7 @@
     {% if stay.cancellation_date %}
         <li class="flex gap-2 items-center">
             <i class="ph-bold ph-calendar-x i-md text-base-content/60"></i>
-                {{ stay.cancellation_date }}
+            {{ stay.cancellation_date }}
         </li>
     {% endif %}
 </ul>

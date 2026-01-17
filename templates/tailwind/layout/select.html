@@ -2,10 +2,14 @@
 <div class="relative">
     {% if field.label and form_show_labels %}
         <label for="{{ field.id_for_label }}" class="label">
-            <span class="label-text">{{ field.label|safe }}{% if field.field.required %}<span class="asteriskField">*</span>{% endif %}</span>
+            <span class="label-text">{{ field.label|safe }}
+                {% if field.field.required %}<span class="asteriskField">*</span>{% endif %}
+            </span>
         </label>
     {% endif %}
-    <select class="select select-bordered w-full {% if field.errors %}select-error{% endif %}" name="{{ field.html_name }}" {{ field|build_attrs }}>
+    <select class="select select-bordered w-full {% if field.errors %}select-error{% endif %}"
+            name="{{ field.html_name }}"
+            {{ field|build_attrs }}>
         {% for group, options, index in field|optgroups %}
             {% if group %}<optgroup label="{{ group }}">{% endif %}
                 {% for option in options %}

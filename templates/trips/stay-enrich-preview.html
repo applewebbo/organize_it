@@ -16,12 +16,8 @@
                 <i class="text-xl ph-bold ph-info"></i>
                 <span>{% trans 'Review the enriched data below. New information is highlighted in green.' %}</span>
             </div>
-
-            <div class="grid gap-1 sm:gap-2">
-                {% include 'trips/includes/stay-preview.html' %}
-            </div>
+            <div class="grid gap-1 sm:gap-2">{% include 'trips/includes/stay-preview.html' %}</div>
         </div>
-
         <div class="flex gap-2 justify-end items-center p-4 px-8 rounded-b border-t md:p-5 border-base-300">
             <form hx-post="{% url 'trips:confirm-enrich-stay' stay.id %}"
                   hx-target="#dialog"
@@ -29,14 +25,16 @@
                 {% csrf_token %}
                 <input type="hidden" name="place_id" value="{{ enriched_data.place_id }}">
                 <input type="hidden" name="website" value="{{ enriched_data.website }}">
-                <input type="hidden" name="phone_number" value="{{ enriched_data.phone_number }}">
+                <input type="hidden"
+                       name="phone_number"
+                       value="{{ enriched_data.phone_number }}">
                 {% if enriched_data.opening_hours_json %}
-                <input type="hidden" name="opening_hours" value="{{ enriched_data.opening_hours_json }}">
+                    <input type="hidden"
+                           name="opening_hours"
+                           value="{{ enriched_data.opening_hours_json }}">
                 {% endif %}
-
                 <div class="flex gap-2">
-                    <button type="submit"
-                            class="btn btn-success btn-soft">
+                    <button type="submit" class="btn btn-success btn-soft">
                         <i class="text-xl ph-bold ph-check"></i>
                         <span>{% trans 'Accept' %}</span>
                     </button>

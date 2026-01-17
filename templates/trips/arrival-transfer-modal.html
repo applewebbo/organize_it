@@ -1,13 +1,8 @@
 {% load i18n %}
-<div x-data="{
-    currentStep: 'type',
-    transportType: '{{ transport_type }}'
-}">
+<div x-data="{ currentStep: 'type', transportType: '{{ transport_type }}' }">
     <!-- Header -->
     <div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
-        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-            {% trans "Add Arrival Transfer" %}
-        </h3>
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% trans "Add Arrival Transfer" %}</h3>
         <button type="button"
                 class="inline-flex justify-center items-center w-8 h-8 text-sm text-gray-400 bg-transparent rounded-lg hover:text-gray-900 hover:bg-gray-200 ms-auto dark:hover:bg-gray-600 dark:hover:text-white"
                 x-on:click="openModal = false">
@@ -21,19 +16,13 @@
             <span class="sr-only">{% trans "Close modal" %}</span>
         </button>
     </div>
-
     <!-- Progress indicator -->
     <div class="p-4 border-b border-base-200">
         <ul class="w-full steps steps-horizontal">
-            <li class="step" :class="{ 'step-primary': currentStep !== 'type' }">
-                {% trans "Type" %}
-            </li>
-            <li class="step" :class="{ 'step-primary': currentStep === 'form' }">
-                {% trans "Details" %}
-            </li>
+            <li class="step" :class="{ 'step-primary': currentStep !== 'type' }">{% trans "Type" %}</li>
+            <li class="step" :class="{ 'step-primary': currentStep === 'form' }">{% trans "Details" %}</li>
         </ul>
     </div>
-
     <!-- Modal content (swapped by HTMX) -->
     <div id="arrival-transfer-content"
          hx-get="{% url 'trips:main-transfer-step' trip.pk %}?step=type&direction=arrival&transport_type={{ transport_type }}"

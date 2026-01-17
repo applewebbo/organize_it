@@ -5,7 +5,6 @@ from tests.trips.factories import (
     ExperienceFactory,
     MealFactory,
     StayFactory,
-    TransportFactory,
     TripFactory,
 )
 from trips.templatetags.trip_tags import (
@@ -143,7 +142,6 @@ class TestEventFormatting:
     @pytest.mark.parametrize(
         "category,expected_icon",
         [
-            (1, "car-profile"),
             (2, "images"),
             (3, "fork-knife"),
             (99, "question-mark-circle"),
@@ -157,7 +155,6 @@ class TestEventFormatting:
     @pytest.mark.parametrize(
         "category,expected_class",
         [
-            (1, "bg-tr-blue-100 dark:bg-tr-blue-100/30"),
             (2, "bg-exp-green-100 dark:bg-exp-green-100/30"),
             (3, "bg-meal-yellow-100 dark:bg-meal-yellow-100/30"),
             (99, "bg-gray-100"),
@@ -171,7 +168,6 @@ class TestEventFormatting:
     @pytest.mark.parametrize(
         "category,expected_class",
         [
-            (1, "border-tr-blue-300 dark:border-tr-blue-700"),
             (2, "border-exp-green-300 dark:border-exp-green-700"),
             (3, "border-meal-yellow-300 dark:border-meal-yellow-700"),
             (99, "border-gray-300"),
@@ -185,7 +181,6 @@ class TestEventFormatting:
     @pytest.mark.parametrize(
         "category,expected_class",
         [
-            (1, "text-tr-blue-700 dark:text-tr-blue-300"),
             (2, "text-exp-green-700 dark:text-exp-green-300"),
             (3, "text-meal-yellow-700 dark:text-meal-yellow-300"),
             (99, "text-base-content"),
@@ -195,24 +190,6 @@ class TestEventFormatting:
         """Test event_icon_color returns correct icon color"""
         event = EventFactory(category=category)
         assert event_icon_color(event) == expected_class
-
-    @pytest.mark.parametrize(
-        "event_type,expected_icon",
-        [
-            (1, "ph-car"),  # CAR
-            (2, "ph-airplane"),  # PLANE
-            (3, "ph-train"),  # TRAIN
-            (4, "ph-boat"),  # BOAT
-            (5, "ph-bus"),  # BUS
-            (6, "ph-taxi"),  # TAXI
-            (7, "ph-question"),  # OTHER
-        ],
-    )
-    def test_event_type_icon_transport(self, event_type, expected_icon):
-        """Test event_type_icon returns correct icon for transport types"""
-        trip = TripFactory()
-        transport = TransportFactory(trip=trip, type=event_type)
-        assert event_type_icon(transport) == expected_icon
 
     @pytest.mark.parametrize(
         "event_type,expected_icon",
@@ -249,12 +226,6 @@ class TestEventFormatting:
         """Test event_type_icon returns default icon for unknown category"""
         event = EventFactory(category=99)
         assert event_type_icon(event) == "ph-question"
-
-    def test_event_type_icon_unknown_transport_type(self):
-        """Test event_type_icon returns default icon for unknown transport type"""
-        trip = TripFactory()
-        transport = TransportFactory(trip=trip, type=99)
-        assert event_type_icon(transport) == "ph-question"
 
     def test_event_type_icon_unknown_experience_type(self):
         """Test event_type_icon returns default icon for unknown experience type"""

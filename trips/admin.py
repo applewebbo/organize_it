@@ -8,7 +8,6 @@ from .models import (
     SimpleTransfer,
     Stay,
     StayTransfer,
-    Transport,
     Trip,
 )
 
@@ -24,11 +23,6 @@ admin.site.register(Link)
 @admin.register(Day)
 class DayAdmin(admin.ModelAdmin):
     list_display = ["__str__", "trip", "date"]
-
-
-@admin.register(Transport)
-class TransportAdmin(admin.ModelAdmin):
-    list_display = ["__str__"]
 
 
 @admin.register(SimpleTransfer)

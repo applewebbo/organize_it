@@ -19,7 +19,6 @@ htmx_urlpatterns = [
     path("trips/<int:pk>/archive", views.trip_archive, name="trip-archive"),
     path("trips/<int:pk>/unarchive", views.trip_unarchive, name="trip-unarchive"),
     path("trips/<int:pk>/dates", views.trip_dates_update, name="trip-dates"),
-    path("transports/<int:day_id>/create", views.add_transport, name="add-transport"),
     path(
         "experiences/<int:day_id>/create", views.add_experience, name="add-experience"
     ),
@@ -46,11 +45,6 @@ htmx_urlpatterns = [
     ),
     # MAIN TRANSFERS
     path(
-        "trips/<int:trip_id>/main-transfer/create",
-        views.add_main_transfer,
-        name="add-main-transfer",
-    ),
-    path(
         "main-transfers/<int:pk>/edit",
         views.edit_main_transfer,
         name="edit-main-transfer",
@@ -64,11 +58,6 @@ htmx_urlpatterns = [
         "trips/<int:trip_id>/main-transfers-section",
         views.main_transfers_section,
         name="main-transfers-section",
-    ),
-    path(
-        "transport-type-fields/",
-        views.get_transport_type_fields,
-        name="transport-type-fields",
     ),
     path(
         "stays/<int:stay_id>/enrich/confirm/",

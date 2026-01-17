@@ -9,57 +9,11 @@ from tests.trips.factories import (
     EventFactory,
     ExperienceFactory,
     MealFactory,
-    TransportFactory,
     TripFactory,
 )
-from trips.forms import ExperienceForm, MealForm, TransportForm
+from trips.forms import ExperienceForm, MealForm
 
 pytestmark = pytest.mark.django_db
-
-
-class AddTransportView(TestCase):
-    @patch("geocoder.mapbox")
-    def test_post(self, mock_geocoder):
-        mock_geocoder.return_value.ok = True
-        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
-
-        user = self.make_user("user")
-        trip = TripFactory(author=user)
-        day = trip.days.first()
-        data = {
-            "type": 1,
-            "origin_city": "Milan",
-            "origin_address": "Central Station",
-            "destination_city": "Rome",
-            "destination_address": "Termini",
-            "start_time": "10:00",
-            "end_time": "12:00",
-            "company": "Trenitalia",
-            "website": "https://example.com",
-        }
-
-        with self.login(user):
-            response = self.post("trips:add-transport", day_id=day.pk, data=data)
-
-        self.response_204(response)
-        message = list(get_messages(response.wsgi_request))[0].message
-        assert message == "Transport added successfully"
-        assert day.events.count() == 1
-
-    def test_post_with_invalid_data(self):
-        user = self.make_user("user")
-        trip = TripFactory(author=user)
-        day = trip.days.first()
-        data = {
-            "type": 1,
-        }
-
-        with self.login(user):
-            response = self.post("trips:add-transport", day_id=day.pk, data=data)
-
-        self.response_200(response)
-        assertTemplateUsed(response, "trips/transport-create.html")
-        assert day.events.count() == 0
 
 
 class AddExperienceView(TestCase):
@@ -248,19 +202,6 @@ class EventModalView(TestCase):
 
 
 class EventModifyView(TestCase):
-    def test_get_transport(self):
-        user = self.make_user("user")
-        trip = TripFactory(author=user)
-        day = trip.days.first()
-        event = TransportFactory(day=day)  # Transport
-
-        with self.login(user):
-            response = self.get("trips:event-modify", pk=event.pk)
-
-        self.response_200(response)
-        assertTemplateUsed(response, "trips/event-modify.html")
-        assert isinstance(response.context["form"], TransportForm)
-
     def test_get_experience(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)
@@ -305,56 +246,3 @@ class EventModifyView(TestCase):
             response = self.get("trips:event-modify", pk=event.pk)
 
         self.response_404(response)
-
-    @patch("geocoder.mapbox")
-    def test_post_transport(self, mock_geocoder):
-        mock_geocoder.return_value.ok = True
-        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
-
-        user = self.make_user("user")
-        trip = TripFactory(author=user)
-        day = trip.days.first()
-        event = TransportFactory(day=day)  # Transport
-        data = {
-            "origin_city": "Milan",
-            "origin_address": "Piazza Duomo",
-            "destination_city": "Rome",
-            "destination_address": "Termini Station",
-            "start_time": "10:00",
-            "end_time": "12:00",
-            "company": "Trenitalia",
-            "booking_reference": "TR123",
-            "ticket_url": "https://example.com",
-            "price": "50.00",
-            "website": "https://example.com",
-            "type": 1,
-        }
-
-        with self.login(user):
-            response = self.post("trips:event-modify", pk=event.pk, data=data)
-
-        self.response_200(response)
-        event.refresh_from_db()
-        assert event.name == "Milan → Rome"
-        assert event.origin_city == "Milan"
-        assert event.destination_city == "Rome"
-        assert event.company == "Trenitalia"
-        assert event.booking_reference == "TR123"
-
-    def test_post_with_invalid_data(self):
-        user = self.make_user("user")
-        trip = TripFactory(author=user)
-        day = trip.days.first()
-        event = TransportFactory(day=day)  # Transport
-        original_name = event.name
-        data = {
-            "name": "",  # Invalid: name is required
-        }
-
-        with self.login(user):
-            response = self.post("trips:event-modify", pk=event.pk, data=data)
-
-        self.response_200(response)
-        assertTemplateUsed(response, "trips/event-modify.html")
-        event.refresh_from_db()
-        assert event.name == original_name  # Check that name wasn't changed

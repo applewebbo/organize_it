@@ -261,17 +261,10 @@ def test_trip_creation():
         destination="Paris",
         start_date=date(2024, 6, 1),
     )
-
-    # Build transport data
-    transport_data = build_transport_data(
-        origin_city="Milan",
-        destination_city="Rome",
-    )
 ```
 
 **Available builders:**
 - `build_trip_data(**kwargs)` - Trip form data
-- `build_transport_data(**kwargs)` - Transport event data
 - `build_experience_data(**kwargs)` - Experience event data
 - `build_meal_data(**kwargs)` - Meal event data
 - `build_stay_data(**kwargs)` - Stay form data

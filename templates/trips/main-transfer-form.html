@@ -1,5 +1,4 @@
 {% load i18n crispy_forms_tags %}
-
 <div class="p-6" x-data>
     <h3 class="mb-4 text-lg font-bold">
         {% if is_edit %}
@@ -8,27 +7,20 @@
             {% trans "Add Main Trip" %}
         {% endif %}
     </h3>
-
     <form method="post"
           hx-post="{% if is_edit %}{% url 'trips:edit-main-transfer' pk=transfer.pk %}{% else %}{% url 'trips:add-main-transfer' trip_id=trip.pk %}{% endif %}"
           hx-target="body"
           @htmx:after-request="if(event.detail.successful) $dispatch('hide-modal')">
         {% csrf_token %}
-
         <div class="space-y-4">
             {% crispy form %}
-
             <div id="type-specific-container"
                  hx-get="{% url 'trips:transport-type-fields' %}"
                  hx-trigger="change from:#id_type"
-                 hx-include="#id_type">
-            </div>
+                 hx-include="#id_type"></div>
         </div>
-
         <div class="flex gap-2 justify-end mt-6">
-            <button type="button" class="btn" @click="$dispatch('hide-modal')">
-                {% trans "Cancel" %}
-            </button>
+            <button type="button" class="btn" @click="$dispatch('hide-modal')">{% trans "Cancel" %}</button>
             <button type="submit" class="btn btn-primary">
                 {% if is_edit %}
                     {% trans "Update" %}

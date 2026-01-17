@@ -1,42 +1,37 @@
 {% load crispy_forms_tags i18n %}
 <div x-init="currentStep = '{{ direction }}'">
-<form {% if is_edit_modal %}
-      hx-post="{% url 'trips:edit-main-transfer' form.instance.pk %}"
-      {% else %}
-      hx-post="{% url 'trips:save-main-transfer' trip.pk %}?transport_type=car&direction={{ direction }}"
-      hx-target="#{% if direction %}{{ direction }}-transfer-content{% else %}main-transfer-content{% endif %}"
-      {% endif %}
-      hx-disabled-elt="#form-submit"
-      method="post">
+    <form {# djlint:off #}{% if is_edit_modal %} hx-post="{% url 'trips:edit-main-transfer' form.instance.pk %}" {% else %} hx-post="{% url 'trips:save-main-transfer' trip.pk %}?transport_type=car&direction={{ direction }}" hx-target="#{% if direction %}{{ direction }}-transfer-content{% else %}main-transfer-content{% endif %}
+          "
+    {% endif %}{# djlint:on #}
+    hx-disabled-elt="#form-submit"
+    method="post">
     <div class="grid gap-x-1 p-4 sm:grid-cols-4 sm:gap-x-2 md:p-5">
         {% csrf_token %}
         {{ form.media }}
-
         {# Hidden fields #}
         {{ form.direction }}
-
         {# Form errors #}
         {% if form.errors %}
-        <div class="mb-4 sm:col-span-4">
-            <div class="py-3 px-4 text-red-700 bg-red-100 rounded border border-red-400">
-                <strong>{% trans "Form validation errors:" %}</strong>
-                <ul class="mt-2 list-disc list-inside">
-                {% for field, errors in form.errors.items %}
-                    <li><strong>{{ field }}:</strong> {{ errors|join:", " }}</li>
-                {% endfor %}
-                </ul>
+            <div class="mb-4 sm:col-span-4">
+                <div class="py-3 px-4 text-red-700 bg-red-100 rounded border border-red-400">
+                    <strong>{% trans "Form validation errors:" %}</strong>
+                    <ul class="mt-2 list-disc list-inside">
+                        {% for field, errors in form.errors.items %}
+                            <li>
+                                <strong>{{ field }}:</strong> {{ errors|join:", " }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
-        </div>
         {% endif %}
-
         {# Pre-fill notification #}
         {% if prefilled_from_arrival %}
-        <div class="mb-4 sm:col-span-4 alert alert-info">
-            <i class="ph ph-info"></i>
-            <span>{% trans "Fields pre-filled from arrival journey. You can modify them if needed." %}</span>
-        </div>
+            <div class="mb-4 sm:col-span-4 alert alert-info">
+                <i class="ph ph-info"></i>
+                <span>{% trans "Fields pre-filled from arrival journey. You can modify them if needed." %}</span>
+            </div>
         {% endif %}
-
         <div class="mb-4 sm:col-span-4">
             <h4 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {% if direction == 'arrival' %}
@@ -46,80 +41,52 @@
                 {% endif %}
             </h4>
         </div>
-
         <!-- Origin address -->
-        <div class="sm:col-span-4">
-            {{ form.origin_address|as_crispy_field }}
-        </div>
-
+        <div class="sm:col-span-4">{{ form.origin_address|as_crispy_field }}</div>
         <!-- Destination address -->
-        <div class="sm:col-span-4">
-            {{ form.destination_address|as_crispy_field }}
-        </div>
-
+        <div class="sm:col-span-4">{{ form.destination_address|as_crispy_field }}</div>
         <!-- Start time -->
-        <div class="sm:col-span-2">
-            {{ form.start_time|as_crispy_field }}
-        </div>
-
+        <div class="sm:col-span-2">{{ form.start_time|as_crispy_field }}</div>
         <!-- End time -->
-        <div class="sm:col-span-2">
-            {{ form.end_time|as_crispy_field }}
-        </div>
-
+        <div class="sm:col-span-2">{{ form.end_time|as_crispy_field }}</div>
         <!-- Rental company -->
-        <div class="sm:col-span-2">
-            {{ form.company|as_crispy_field }}
-        </div>
-
+        <div class="sm:col-span-2">{{ form.company|as_crispy_field }}</div>
         <!-- Booking reference -->
-        <div class="sm:col-span-2">
-            {{ form.booking_reference|as_crispy_field }}
-        </div>
-
+        <div class="sm:col-span-2">{{ form.booking_reference|as_crispy_field }}</div>
         <!-- Ticket URL -->
-        <div class="sm:col-span-4">
-            {{ form.ticket_url|as_crispy_field }}
-        </div>
-
+        <div class="sm:col-span-4">{{ form.ticket_url|as_crispy_field }}</div>
         <!-- Notes -->
-        <div class="sm:col-span-4">
-            {{ form.notes|as_crispy_field }}
-        </div>
+        <div class="sm:col-span-4">{{ form.notes|as_crispy_field }}</div>
     </div>
-
     <!-- Footer with navigation -->
     {% if is_edit_modal %}
-    <!-- Edit modal footer: simple Cancel + Save -->
-    <div class="flex gap-2 justify-end items-center p-4 rounded-b border-t border-base-200">
-        <button type="button"
-                class="btn btn-outline btn-neutral"
-                x-on:click="openModal = false">
-            {% trans "Cancel" %}
-        </button>
-        <button id="form-submit" class="btn btn-primary" type="submit">
-            {% trans "Save" %}
-            <i class="ph-bold ph-check"></i>
-        </button>
-    </div>
+        <!-- Edit modal footer: simple Cancel + Save -->
+        <div class="flex gap-2 justify-end items-center p-4 rounded-b border-t border-base-200">
+            <button type="button"
+                    class="btn btn-outline btn-neutral"
+                    x-on:click="openModal = false">{% trans "Cancel" %}</button>
+            <button id="form-submit" class="btn btn-primary" type="submit">
+                {% trans "Save" %}
+                <i class="ph-bold ph-check"></i>
+            </button>
+        </div>
     {% else %}
-    <!-- Wizard footer: Back + Next/Save -->
-    <div class="flex justify-between items-center p-4 rounded-b border-t border-base-200">
-        <button type="button"
-                class="btn btn-soft"
-                hx-get="{% url 'trips:main-transfer-step' trip.pk %}?step=type&transport_type=car{% if direction %}&direction={{ direction }}{% endif %}"
-                hx-target="#{% if direction %}{{ direction }}-transfer-content{% else %}main-transfer-content{% endif %}"
-                hx-swap="innerHTML"
-                @htmx:after-settle="currentStep = 'type'">
-            <i class="ph-bold ph-arrow-left"></i>
-            {% trans "Back" %}
-        </button>
-
-        <button id="form-submit" class="btn btn-primary" type="submit">
-            {% trans "Save" %}
-            <i class="ph-bold ph-check"></i>
-        </button>
-    </div>
+        <!-- Wizard footer: Back + Next/Save -->
+        <div class="flex justify-between items-center p-4 rounded-b border-t border-base-200">
+            <button type="button"
+                    class="btn btn-soft"
+                    hx-get="{% url 'trips:main-transfer-step' trip.pk %}?step=type&transport_type=car{% if direction %}&direction={{ direction }}{% endif %}"
+                    hx-target="#{% if direction %}{{ direction }}-transfer-content{% else %}main-transfer-content{% endif %}"
+                    hx-swap="innerHTML"
+                    @htmx:after-settle="currentStep = 'type'">
+                <i class="ph-bold ph-arrow-left"></i>
+                {% trans "Back" %}
+            </button>
+            <button id="form-submit" class="btn btn-primary" type="submit">
+                {% trans "Save" %}
+                <i class="ph-bold ph-check"></i>
+            </button>
+        </div>
     {% endif %}
 </form>
 </div>

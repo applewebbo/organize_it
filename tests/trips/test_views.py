@@ -17,7 +17,6 @@ from tests.trips.factories import (
     EventFactory,
     ExperienceFactory,
     StayFactory,
-    TransportFactory,
     TripFactory,
 )
 
@@ -1002,38 +1001,6 @@ class TestGetTripAddresses(TestCase):
         # Should return empty content when not found
         content = response.content.decode().strip()
         assert content == "" or "No addresses found" in content
-
-    def test_get_trip_addresses_excludes_transports(self):
-        """Test that Transport events are excluded from suggestions."""
-        user = self.make_user("user")
-        trip = TripFactory(author=user)
-        day = trip.days.first()
-
-        # Add an Experience
-        ExperienceFactory(
-            day=day, trip=trip, name="Museum Visit", address="123 Art St", city="Roma"
-        )
-
-        # Add a Transport (should be excluded)
-        transport = TransportFactory(
-            day=day,
-            trip=trip,
-            origin_city="Roma",
-            origin_address="456 Station Rd",
-        )
-
-        with self.login(user):
-            response = self.post(
-                "trips:get-trip-addresses",
-                data={"trip_id": trip.pk, "field_type": "origin"},
-            )
-
-        self.response_200(response)
-        content = str(response.content)
-        # Experience should be in results
-        assert "Museum Visit" in content
-        # Transport should NOT be in results
-        assert transport.name not in content
 
     def test_get_trip_addresses_all_events_shown(self):
         """Test that all events are shown without pagination."""

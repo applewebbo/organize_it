@@ -13,7 +13,6 @@ from tests.trips.factories import (
     MainTransferFactory,
     MealFactory,
     StayFactory,
-    TransportFactory,
     TripFactory,
 )
 from trips.models import Event, MainTransfer, Stay, Trip
@@ -99,23 +98,6 @@ class Command(BaseCommand):
                     stay.days.set(all_days)
 
                 for day in trip.days.all():
-                    # Create transport
-                    if random.random() < 0.3:
-                        start_time = time(
-                            random.randint(8, 14), random.randrange(0, 59, 15)
-                        )
-                        end_time = (
-                            datetime.combine(day.date, start_time)
-                            + timedelta(hours=random.randint(1, 4))
-                        ).time()
-                        # TransportFactory automatically sets origin_city and destination_city
-                        TransportFactory.create(
-                            day=day,
-                            trip=trip,
-                            start_time=start_time,
-                            end_time=end_time,
-                        )
-
                     # Create meals
                     restaurants_for_city = PLACES[trip.destination]["restaurants"]
                     if len(restaurants_for_city) >= 2:

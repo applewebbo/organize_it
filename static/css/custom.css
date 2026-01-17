@@ -98,3 +98,7 @@ select ~ .pointer-events-none {
 [data-theme="dark"] .body-pattern {
   background-color: rgb(51 65 85); /* slate-700 */
 }
+
+.transfer-footer-overlay {
+  background-color: rgba(0, 0, 0, 0.08);
+}

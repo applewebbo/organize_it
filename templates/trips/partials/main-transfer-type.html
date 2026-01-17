@@ -3,7 +3,6 @@
     <p class="mb-4 text-sm text-slate-600 dark:text-slate-300">
         {% trans "Select the type of transport for this transfer." %}
     </p>
-
     <div class="grid grid-cols-2 gap-4">
         <!-- Plane -->
         <button type="button"
@@ -17,7 +16,6 @@
             <i class="text-4xl ph-bold ph-airplane-takeoff text-primary"></i>
             <span class="font-semibold">{% trans "Plane" %}</span>
         </button>
-
         <!-- Train -->
         <button type="button"
                 class="flex flex-col gap-2 justify-center items-center p-6 rounded-lg border transition-all hover:border-primary hover:bg-primary/5"
@@ -30,7 +28,6 @@
             <i class="text-4xl ph-bold ph-train text-primary"></i>
             <span class="font-semibold">{% trans "Train" %}</span>
         </button>
-
         <!-- Car -->
         <button type="button"
                 class="flex flex-col gap-2 justify-center items-center p-6 rounded-lg border transition-all hover:border-primary hover:bg-primary/5"
@@ -43,7 +40,6 @@
             <i class="text-4xl ph-bold ph-car text-primary"></i>
             <span class="font-semibold">{% trans "Car" %}</span>
         </button>
-
         <!-- Other -->
         <button type="button"
                 class="flex flex-col gap-2 justify-center items-center p-6 rounded-lg border transition-all hover:border-primary hover:bg-primary/5"
@@ -58,12 +54,7 @@
         </button>
     </div>
 </div>
-
 <!-- Footer -->
 <div class="flex justify-between items-center p-4 rounded-b border-t border-base-200">
-    <button type="button"
-            x-on:click="openModal = false"
-            class="btn btn-soft">
-        {% trans "Cancel" %}
-    </button>
+    <button type="button" x-on:click="openModal = false" class="btn btn-soft">{% trans "Cancel" %}</button>
 </div>

@@ -1,21 +1,21 @@
 <li>
     {% if event.trip.status != 5 %}
-    <button class="flex items-center gap-2 {{ bg_color }} border-2 {{ border_color }} py-3 px-4 rounded-lg cursor-pointer"
-            hx-get="{% url 'trips:event-pair-choice' event.pk %}"
-            hx-target="#dialog"
-            hx-swap="innerHTML"
-            @click="$dispatch('open-modal'); document.activeElement.blur()">
-        <div class="{{ icon_color }} bg-slate-50 dark:bg-slate-700 mt-1 p-1 sm:p-1.5 rounded-md border-2 {{ border_color }} ">
-            <i class="ph-bold ph-{{ icon }} i-sm sm:i-lg"></i>
-        </div>
-        <span class="font-semibold text-base {{ icon_color }}">{{ event.name }}</span>
-    </button>
+        <button class="flex items-center gap-2 {{ bg_color }} border-2 {{ border_color }} py-3 px-4 rounded-lg cursor-pointer"
+                hx-get="{% url 'trips:event-pair-choice' event.pk %}"
+                hx-target="#dialog"
+                hx-swap="innerHTML"
+                @click="$dispatch('open-modal'); document.activeElement.blur()">
+            <div class="{{ icon_color }} bg-slate-50 dark:bg-slate-700 mt-1 p-1 sm:p-1.5 rounded-md border-2 {{ border_color }} ">
+                <i class="ph-bold ph-{{ icon }} i-sm sm:i-lg"></i>
+            </div>
+            <span class="font-semibold text-base {{ icon_color }}">{{ event.name }}</span>
+        </button>
     {% else %}
-    <div class="flex items-center gap-2 {{ bg_color }} border-2 {{ border_color }} py-3 px-4 rounded-lg">
-        <div class="{{ icon_color }} bg-slate-50 dark:bg-slate-700 mt-1 p-1 sm:p-1.5 rounded-md border-2 {{ border_color }} ">
-            <i class="ph-bold ph-{{ icon }} i-sm sm:i-lg"></i>
+        <div class="flex items-center gap-2 {{ bg_color }} border-2 {{ border_color }} py-3 px-4 rounded-lg">
+            <div class="{{ icon_color }} bg-slate-50 dark:bg-slate-700 mt-1 p-1 sm:p-1.5 rounded-md border-2 {{ border_color }} ">
+                <i class="ph-bold ph-{{ icon }} i-sm sm:i-lg"></i>
+            </div>
+            <span class="font-semibold text-base {{ icon_color }}">{{ event.name }}</span>
         </div>
-        <span class="font-semibold text-base {{ icon_color }}">{{ event.name }}</span>
-    </div>
     {% endif %}
 </li>

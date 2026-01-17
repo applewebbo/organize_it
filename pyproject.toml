@@ -68,6 +68,7 @@ omit = ['*/node_modules/*', '*/venv/*', '*/migrations/*', '*/tests/*', '*/test_*
 
 [tool.djlint]
 ignore = "T002,H006"
+profile = "django"
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "core.settings"

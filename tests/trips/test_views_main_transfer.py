@@ -11,53 +11,6 @@ pytestmark = pytest.mark.django_db
 class TestMainTransferViews(TestCase):
     """Tests for main transfer CRUD views"""
 
-    def test_add_main_transfer_get(self):
-        """Test GET request to add main transfer shows form"""
-        user = self.make_user("user")
-        trip = TripFactory(author=user)
-        url = reverse("trips:add-main-transfer", kwargs={"trip_id": trip.pk})
-
-        with self.login(user):
-            response = self.client.get(url)
-
-            assert response.status_code == 200
-            assertTemplateUsed(response, "trips/main-transfer-form.html")
-            assert "form" in response.context
-            assert response.context["trip"] == trip
-
-    def test_add_main_transfer_post_valid(self):
-        """Test POST request creates main transfer"""
-        user = self.make_user("user")
-        trip = TripFactory(author=user)
-        url = reverse("trips:add-main-transfer", kwargs={"trip_id": trip.pk})
-
-        data = {
-            "type": 2,  # PLANE
-            "direction": 1,  # ARRIVAL
-            "origin_city": "Milan",
-            "origin_address": "Malpensa Airport",
-            "destination_city": trip.destination,
-            "destination_address": "Hotel Roma",
-            "start_time": "10:00",
-            "end_time": "11:30",
-        }
-
-        with self.login(user):
-            response = self.client.post(url, data)
-
-            assert response.status_code == 204
-            assert response.headers.get("HX-Trigger") == "tripModified"
-
-            # Verify transfer was created
-            from trips.models import Transport
-
-            transfer = Transport.objects.filter(
-                trip=trip, is_main_transfer=True
-            ).first()
-            assert transfer is not None
-            assert transfer.direction == 1
-            assert transfer.day is None
-
     def test_edit_main_transfer_get(self):
         """Test GET request to edit main transfer shows form"""
         user = self.make_user("user")
@@ -144,95 +97,6 @@ class TestMainTransferViews(TestCase):
             response = self.client.post(url)
 
             assert response.status_code == 404
-
-    def test_get_transport_type_fields_plane(self):
-        """Test getting plane-specific fields partial"""
-        user = self.make_user("user")
-        url = reverse("trips:transport-type-fields")
-
-        with self.login(user):
-            response = self.client.get(url, {"type": "2"})  # PLANE
-
-            assert response.status_code == 200
-            assertTemplateUsed(response, "trips/partials/flight-fields.html")
-            content = response.content.decode()
-            assert "flight_number" in content
-            assert "gate" in content
-            assert "terminal" in content
-
-    def test_get_transport_type_fields_train(self):
-        """Test getting train-specific fields partial"""
-        user = self.make_user("user")
-        url = reverse("trips:transport-type-fields")
-
-        with self.login(user):
-            response = self.client.post(url, {"type": "3"})  # TRAIN
-
-            assert response.status_code == 200
-            assertTemplateUsed(response, "trips/partials/train-fields.html")
-            content = response.content.decode()
-            assert "train_number" in content
-            assert "carriage" in content
-            assert "seat" in content
-
-    def test_get_transport_type_fields_car(self):
-        """Test getting car-specific fields partial"""
-        user = self.make_user("user")
-        url = reverse("trips:transport-type-fields")
-
-        with self.login(user):
-            response = self.client.get(url, {"type": "1"})  # CAR
-
-            assert response.status_code == 200
-            assertTemplateUsed(response, "trips/partials/car-fields.html")
-            content = response.content.decode()
-            assert "license_plate" in content
-            assert "car_type" in content
-            assert "is_rental" in content
-
-    def test_get_transport_type_fields_generic(self):
-        """Test getting generic fields for other transport types"""
-        user = self.make_user("user")
-        url = reverse("trips:transport-type-fields")
-
-        with self.login(user):
-            response = self.client.get(url, {"type": "5"})  # BUS
-
-            assert response.status_code == 200
-            assertTemplateUsed(response, "trips/partials/generic-transport-fields.html")
-
-    def test_get_transport_type_fields_no_type(self):
-        """Test getting fields without type returns empty"""
-        user = self.make_user("user")
-        url = reverse("trips:transport-type-fields")
-
-        with self.login(user):
-            response = self.client.get(url)
-
-            assert response.status_code == 200
-            assert response.content == b""
-
-    def test_add_main_transfer_post_invalid(self):
-        """Test POST with invalid data shows form with errors"""
-        user = self.make_user("user")
-        trip = TripFactory(author=user)
-        url = reverse("trips:add-main-transfer", kwargs={"trip_id": trip.pk})
-
-        # Missing required fields
-        data = {
-            "type": 2,
-            "direction": 1,
-            # Missing origin_city, destination_city, times
-        }
-
-        with self.login(user):
-            response = self.client.post(url, data)
-
-            # Should return form with errors, not 204
-            assert response.status_code == 200
-            assertTemplateUsed(response, "trips/main-transfer-form.html")
-            assert "form" in response.context
-            assert response.context["form"].errors
 
     def test_edit_main_transfer_post_invalid(self):
         """Test editing with invalid data shows form with errors"""
@@ -559,15 +423,3 @@ class TestMainTransferViews(TestCase):
             assertTemplateUsed(response, "trips/partials/main-transfer-flight.html")
             assert "form" in response.context
             assert response.context["form"].errors
-
-    def test_add_main_transfer_with_direction(self):
-        """Test add main transfer with direction parameter"""
-        user = self.make_user("user")
-        trip = TripFactory(author=user)
-        url = reverse("trips:add-main-transfer", kwargs={"trip_id": trip.pk})
-
-        with self.login(user):
-            response = self.client.get(url, {"direction": "1"})
-
-            assert response.status_code == 200
-            assertTemplateUsed(response, "trips/main-transfer-form.html")
