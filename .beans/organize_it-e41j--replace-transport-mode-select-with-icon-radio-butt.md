@@ -1,10 +1,11 @@
 ---
 # organize_it-e41j
 title: Replace transport_mode select with icon radio buttons
-status: in-progress
+status: completed
 type: feature
+priority: normal
 created_at: 2026-01-15T14:43:52Z
-updated_at: 2026-01-15T14:43:52Z
+updated_at: 2026-01-18T19:52:26Z
 ---
 
 ## Description

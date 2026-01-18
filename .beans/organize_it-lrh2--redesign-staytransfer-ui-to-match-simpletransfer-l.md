@@ -1,10 +1,11 @@
 ---
 # organize_it-lrh2
 title: 'Redesign StayTransfer UI to match SimpleTransfer layout (for #226)'
-status: in-progress
+status: completed
 type: task
+priority: normal
 created_at: 2026-01-15T06:48:36Z
-updated_at: 2026-01-15T06:48:36Z
+updated_at: 2026-01-18T19:52:26Z
 ---
 
 Ripristinare il layout dello StayTransfer per renderlo simile al SimpleTransfer:

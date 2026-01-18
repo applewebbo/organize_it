@@ -1,10 +1,11 @@
 ---
 # organize_it-2rgh
 title: Rimozione completa del modello Transport
-status: in-progress
+status: completed
 type: task
+priority: normal
 created_at: 2026-01-17T07:26:20Z
-updated_at: 2026-01-17T07:26:20Z
+updated_at: 2026-01-18T19:52:26Z
 ---
 
 Rimuovere il modello Transport (sottoclasse di Event per trasporti giornalieri) mantenendo MainTransfer intatto.
