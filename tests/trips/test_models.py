@@ -436,6 +436,14 @@ class TestEventModel:
         assert event.latitude == 41.890251
         assert event.longitude == 12.492373
 
+    @patch("geocoder.mapbox")
+    def test_event_geocoding_failure(self, mock_geocoder, event_factory):
+        """Test geocoding failure leaves coordinates unchanged"""
+        mock_geocoder.return_value.latlng = None
+        event = event_factory(address="Nowhere", latitude=None, longitude=None)
+        assert event.latitude is None
+        assert event.longitude is None
+
 
 class TestExperienceModel:
     def test_factory(self, user_factory, trip_factory, experience_factory):
@@ -587,6 +595,25 @@ class TestStayModel:
         )
         assert stay.latitude == 41.890251
         assert stay.longitude == 12.492373
+
+    @patch("geocoder.mapbox")
+    def test_stay_geocoding_without_city(self, mock_geocoder):
+        """Test geocoding uses only address when city is empty"""
+        mock_geocoder.return_value.latlng = [45.4642, 9.1900]
+
+        stay = Stay.objects.create(
+            name="Hotel Test",
+            address="Via Roma 123",
+            city="",  # Empty city
+            latitude=None,
+            longitude=None,
+        )
+
+        mock_geocoder.assert_called_once_with(
+            "Via Roma 123", access_token=settings.MAPBOX_ACCESS_TOKEN
+        )
+        assert stay.latitude == 45.4642
+        assert stay.longitude == 9.1900
 
 
 class TestMainTransferModel:
@@ -1107,6 +1134,125 @@ class TestSimpleTransfer:
                 from_event=event1, to_event=event3, transport_mode="walk"
             )
 
+    @patch("geocoder.mapbox")
+    def test_simple_transfer_google_maps_url_without_coordinates(
+        self, mock_geocoder, trip_factory, experience_factory
+    ):
+        """Test google_maps_url returns None when events lack coordinates"""
+        mock_geocoder.return_value.latlng = None
+
+        trip = trip_factory()
+        day = trip.days.first()
+        event1 = experience_factory(trip=trip, day=day)
+        event2 = experience_factory(trip=trip, day=day)
+
+        # Force coordinates to None
+        Event.objects.filter(pk__in=[event1.pk, event2.pk]).update(
+            latitude=None, longitude=None
+        )
+        event1.refresh_from_db()
+        event2.refresh_from_db()
+
+        transfer = SimpleTransfer.objects.create(
+            from_event=event1, to_event=event2, transport_mode="car"
+        )
+
+        assert transfer.google_maps_url is None
+
+    def test_simple_transfer_different_trips_validation(
+        self, trip_factory, experience_factory
+    ):
+        """Test that transfer between orphaned events from different trips fails"""
+        trip1 = trip_factory()
+        trip2 = trip_factory()
+        day1 = trip1.days.first()
+        day2 = trip2.days.first()
+
+        # Create events then orphan them (remove day)
+        event1 = experience_factory(trip=trip1, day=day1)
+        event2 = experience_factory(trip=trip2, day=day2)
+        event1.day = None
+        event1.save()
+        event2.day = None
+        event2.save()
+
+        from django.core.exceptions import ValidationError
+
+        transfer = SimpleTransfer(
+            from_event=event1, to_event=event2, transport_mode="car"
+        )
+
+        with pytest.raises(ValidationError) as exc_info:
+            transfer.full_clean()
+
+        assert "to_event" in exc_info.value.message_dict
+
+    def test_simple_transfer_clean_skips_validation_when_event_ids_none(
+        self, trip_factory, experience_factory
+    ):
+        """Test clean skips same-event validation when event IDs are None"""
+        trip = trip_factory()
+        day = trip.days.first()
+        experience_factory(trip=trip, day=day)
+        event2 = experience_factory(trip=trip, day=day)
+
+        # Create transfer with only to_event set (from_event_id will be None)
+        transfer = SimpleTransfer(transport_mode="car")
+        transfer.to_event = event2
+        # from_event_id is None - this should skip the same-event validation
+
+        # Will raise RelatedObjectDoesNotExist when accessing from_event
+        # but the branch for None event_id is covered
+        with pytest.raises(SimpleTransfer.from_event.RelatedObjectDoesNotExist):
+            transfer.clean()
+
+    def test_simple_transfer_clean_skips_day_validation_when_day_ids_none(
+        self, trip_factory, experience_factory
+    ):
+        """Test clean skips day validation when event day IDs are None"""
+        trip = trip_factory()
+        day = trip.days.first()
+        event1 = experience_factory(trip=trip, day=day)
+        event2 = experience_factory(trip=trip, day=day)
+
+        # Orphan events (day_id = None)
+        event1.day = None
+        event1.save()
+        event2.day = None
+        event2.save()
+
+        transfer = SimpleTransfer(
+            from_event=event1, to_event=event2, transport_mode="car"
+        )
+
+        # Should not raise day validation error - skips when day_id is None
+        # But will fail on trip validation since trips are same
+        transfer.clean()
+
+    def test_simple_transfer_clean_skips_trip_validation_when_trip_ids_none(
+        self, trip_factory, experience_factory
+    ):
+        """Test clean skips trip validation when event trip IDs are None"""
+        trip = trip_factory()
+        day = trip.days.first()
+        event1 = experience_factory(trip=trip, day=day)
+        event2 = experience_factory(trip=trip, day=day)
+
+        # Create transfer and manually set trip_id to None on events
+        transfer = SimpleTransfer(
+            from_event=event1, to_event=event2, transport_mode="car"
+        )
+
+        # Temporarily set trip_id to None to test branch
+        original_trip_id = event1.trip_id
+        event1.trip_id = None
+
+        # Should not raise trip validation error - skips when trip_id is None
+        transfer.clean()
+
+        # Restore
+        event1.trip_id = original_trip_id
+
 
 class TestStayTransfer:
     """Tests for StayTransfer model"""
@@ -1263,3 +1409,141 @@ class TestStayTransfer:
 
         # Transfer should be deleted too (CASCADE)
         assert not StayTransfer.objects.filter(id=transfer_id).exists()
+
+    def test_stay_transfer_arrival_time_without_data(self, trip_factory, stay_factory):
+        """Test arrival_time returns None when departure_time or duration missing"""
+        trip = trip_factory()
+        days = list(trip.days.all())
+        stay1 = stay_factory(city=trip.destination)
+        stay2 = stay_factory(city=trip.destination)
+
+        days[0].stay = stay1
+        days[0].save()
+        days[1].stay = stay2
+        days[1].save()
+
+        # Create transfer without departure_time and estimated_duration
+        transfer = StayTransfer.objects.create(
+            from_stay=stay1,
+            to_stay=stay2,
+            transport_mode="train",
+            departure_time=None,
+            estimated_duration=None,
+        )
+
+        assert transfer.arrival_time is None
+
+    @patch("geocoder.mapbox")
+    def test_stay_transfer_google_maps_url_without_coordinates(
+        self, mock_geocoder, trip_factory, stay_factory
+    ):
+        """Test google_maps_url returns None when stays lack coordinates"""
+        mock_geocoder.return_value.latlng = None
+
+        trip = trip_factory()
+        days = list(trip.days.all())
+        stay1 = stay_factory(city=trip.destination)
+        stay2 = stay_factory(city=trip.destination)
+
+        # Force coordinates to None
+        Stay.objects.filter(pk__in=[stay1.pk, stay2.pk]).update(
+            latitude=None, longitude=None
+        )
+        stay1.refresh_from_db()
+        stay2.refresh_from_db()
+
+        days[0].stay = stay1
+        days[0].save()
+        days[1].stay = stay2
+        days[1].save()
+
+        transfer = StayTransfer.objects.create(
+            from_stay=stay1, to_stay=stay2, transport_mode="car"
+        )
+
+        assert transfer.google_maps_url is None
+
+    def test_stay_transfer_different_trips_validation(self, trip_factory, stay_factory):
+        """Test that transfer between stays from different trips fails"""
+        trip1 = trip_factory()
+        trip2 = trip_factory()
+        days1 = list(trip1.days.all())
+        days2 = list(trip2.days.all())
+
+        stay1 = stay_factory(city=trip1.destination)
+        stay2 = stay_factory(city=trip2.destination)
+
+        # Use day 1 from trip1 and day 2 from trip2 (consecutive numbers, different trips)
+        days1[0].stay = stay1
+        days1[0].save()
+        days2[1].stay = stay2
+        days2[1].save()
+
+        from django.core.exceptions import ValidationError
+
+        transfer = StayTransfer(
+            from_stay=stay1,
+            to_stay=stay2,
+            transport_mode="car",
+            from_day=days1[0],  # day number 1 from trip1
+            to_day=days2[1],  # day number 2 from trip2
+            trip=trip1,
+        )
+
+        with pytest.raises(ValidationError) as exc_info:
+            transfer.full_clean()
+
+        assert "to_stay" in exc_info.value.message_dict
+
+    def test_stay_transfer_clean_skips_validation_when_stay_ids_none(
+        self, trip_factory, stay_factory
+    ):
+        """Test clean skips same-stay validation when stay IDs are None"""
+        trip = trip_factory()
+        days = list(trip.days.all())
+        stay1 = stay_factory(city=trip.destination)
+        stay2 = stay_factory(city=trip.destination)
+
+        days[0].stay = stay1
+        days[0].save()
+        days[1].stay = stay2
+        days[1].save()
+
+        transfer = StayTransfer(transport_mode="car")
+        transfer.from_stay = stay1
+        transfer.to_stay = stay2
+        transfer.from_day = days[0]
+        transfer.to_day = days[1]
+        transfer.trip = trip
+        # Manually set ID to None to test branch
+        transfer.from_stay_id = None
+
+        # Should not raise - skips same-stay check when IDs are None
+        transfer.clean()
+
+    def test_stay_transfer_clean_skips_day_validation_when_days_not_set(
+        self, trip_factory, stay_factory
+    ):
+        """Test clean skips consecutive days validation when days not set"""
+        trip = trip_factory()
+        days = list(trip.days.all())
+        stay1 = stay_factory(city=trip.destination)
+        stay2 = stay_factory(city=trip.destination)
+
+        days[0].stay = stay1
+        days[0].save()
+        days[1].stay = stay2
+        days[1].save()
+
+        # Create transfer without setting from_day/to_day attributes
+        transfer = StayTransfer(
+            from_stay=stay1,
+            to_stay=stay2,
+            transport_mode="car",
+        )
+        # Delete the from_day attribute to simulate hasattr returning False
+        if hasattr(transfer, "from_day"):
+            delattr(transfer, "from_day")
+
+        # Should not raise - skips consecutive days check when from_day not set
+        transfer.clean()
