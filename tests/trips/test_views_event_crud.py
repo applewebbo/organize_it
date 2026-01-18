@@ -246,3 +246,53 @@ class EventModifyView(TestCase):
             response = self.get("trips:event-modify", pk=event.pk)
 
         self.response_404(response)
+
+    @patch("geocoder.mapbox")
+    def test_post_experience(self, mock_geocoder):
+        """Test POST to modify an experience event"""
+        mock_geocoder.return_value.ok = True
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = ExperienceFactory(day=day, name="Original Name")
+
+        data = {
+            "name": "Updated Name",
+            "type": event.type,
+            "address": event.address,
+            "start_time": "10:00",
+            "duration": "60",
+        }
+
+        with self.login(user):
+            response = self.post("trips:event-modify", pk=event.pk, data=data)
+
+        self.response_200(response)
+        event.refresh_from_db()
+        assert event.name == "Updated Name"
+
+    @patch("geocoder.mapbox")
+    def test_post_meal(self, mock_geocoder):
+        """Test POST to modify a meal event"""
+        mock_geocoder.return_value.ok = True
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        event = MealFactory(day=day, name="Original Meal")
+
+        data = {
+            "name": "Updated Meal",
+            "type": event.type,
+            "address": event.address,
+            "start_time": "12:00",
+            "duration": "90",
+        }
+
+        with self.login(user):
+            response = self.post("trips:event-modify", pk=event.pk, data=data)
+
+        self.response_200(response)
+        event.refresh_from_db()
+        assert event.name == "Updated Meal"
