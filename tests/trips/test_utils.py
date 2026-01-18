@@ -16,16 +16,23 @@ from tests.trips.factories import (
 )
 from trips.utils import (
     annotate_event_overlaps,
+    can_add_simple_transfer,
+    can_add_stay_transfer,
     convert_google_opening_hours,
     create_day_map,
     download_unsplash_photo,
     generate_cache_key,
     geocode_location,
+    get_day_simple_transfers,
+    get_day_stay_transfers,
+    get_next_day_stay,
+    get_next_events,
     get_trips,
     process_trip_image,
     rate_limit_check,
     search_unsplash_photos,
     select_best_result,
+    validate_stay_transfer,
 )
 
 
@@ -1312,3 +1319,275 @@ class TestMapWithMainTransfers(TestCase):
         )
         self.assertIsNotNone(day_map)
         self.assertIn("person-walking", day_map)
+
+
+class TestSimpleTransferUtils(TestCase):
+    """Tests for SimpleTransfer utility functions"""
+
+    def test_get_simple_transfers_for_day(self):
+        """Test getting simple transfers for a day"""
+        from trips.models import SimpleTransfer
+
+        trip = TripFactory()
+        day = trip.days.first()
+        event1 = EventFactory(trip=trip, day=day, start_time="10:00", end_time="11:00")
+        event2 = EventFactory(trip=trip, day=day, start_time="14:00", end_time="15:00")
+
+        transfer = SimpleTransfer.objects.create(
+            from_event=event1, to_event=event2, transport_mode="driving"
+        )
+
+        transfers = get_day_simple_transfers(day)
+        self.assertEqual(transfers.count(), 1)
+        self.assertEqual(transfers.first(), transfer)
+
+    def test_get_next_events_with_from_event(self):
+        """Test get_next_events filters events after from_event"""
+        trip = TripFactory()
+        day = trip.days.first()
+        event1 = EventFactory(trip=trip, day=day, start_time="10:00", end_time="11:00")
+        event2 = EventFactory(trip=trip, day=day, start_time="14:00", end_time="15:00")
+        event3 = EventFactory(trip=trip, day=day, start_time="16:00", end_time="17:00")
+
+        next_events = get_next_events(day, event1)
+        self.assertEqual(next_events.count(), 2)
+        self.assertIn(event2, next_events)
+        self.assertIn(event3, next_events)
+
+    def test_get_next_events_without_from_event(self):
+        """Test get_next_events returns all events when no from_event"""
+        trip = TripFactory()
+        day = trip.days.first()
+        EventFactory(trip=trip, day=day, start_time="10:00", end_time="11:00")
+        EventFactory(trip=trip, day=day, start_time="14:00", end_time="15:00")
+
+        next_events = get_next_events(day, None)
+        self.assertEqual(next_events.count(), 2)
+
+    def test_can_add_simple_transfer_true(self):
+        """Test can_add_simple_transfer returns True for valid event"""
+        trip = TripFactory()
+        day = trip.days.first()
+        event = EventFactory(trip=trip, day=day)
+
+        self.assertTrue(can_add_simple_transfer(event))
+
+    def test_can_add_simple_transfer_false_already_has_transfer(self):
+        """Test can_add_simple_transfer returns False when event has transfer"""
+        from trips.models import SimpleTransfer
+
+        trip = TripFactory()
+        day = trip.days.first()
+        event1 = EventFactory(trip=trip, day=day, start_time="10:00", end_time="11:00")
+        event2 = EventFactory(trip=trip, day=day, start_time="14:00", end_time="15:00")
+
+        SimpleTransfer.objects.create(
+            from_event=event1, to_event=event2, transport_mode="driving"
+        )
+
+        self.assertFalse(can_add_simple_transfer(event1))
+
+    def test_can_add_simple_transfer_false_no_event(self):
+        """Test can_add_simple_transfer returns False for None"""
+        self.assertFalse(can_add_simple_transfer(None))
+
+
+class TestStayTransferUtils(TestCase):
+    """Tests for StayTransfer utility functions"""
+
+    def test_get_day_stay_transfers(self):
+        """Test getting stay transfers for a day"""
+        from trips.models import StayTransfer
+
+        trip = TripFactory()
+        days = list(trip.days.all())
+        stay1 = StayFactory()
+        stay2 = StayFactory()
+
+        days[0].stay = stay1
+        days[0].save()
+        days[1].stay = stay2
+        days[1].save()
+
+        transfer = StayTransfer.objects.create(
+            from_stay=stay1, to_stay=stay2, transport_mode="driving"
+        )
+
+        transfers = get_day_stay_transfers(days[0])
+        self.assertEqual(transfers.count(), 1)
+        self.assertEqual(transfers.first(), transfer)
+
+    def test_get_next_day_stay_exists(self):
+        """Test get_next_day_stay returns stay when next day has one"""
+        trip = TripFactory()
+        days = list(trip.days.all())
+        stay = StayFactory()
+
+        days[1].stay = stay
+        days[1].save()
+
+        result = get_next_day_stay(days[0])
+        self.assertEqual(result, stay)
+
+    def test_get_next_day_stay_no_next_day(self):
+        """Test get_next_day_stay returns None for last day"""
+        trip = TripFactory()
+        days = list(trip.days.all())
+
+        result = get_next_day_stay(days[-1])
+        self.assertIsNone(result)
+
+    def test_can_add_stay_transfer_true(self):
+        """Test can_add_stay_transfer returns True for valid setup"""
+        trip = TripFactory()
+        days = list(trip.days.all())
+        stay1 = StayFactory()
+        stay2 = StayFactory()
+
+        days[0].stay = stay1
+        days[0].save()
+        days[1].stay = stay2
+        days[1].save()
+
+        self.assertTrue(can_add_stay_transfer(days[0]))
+
+    def test_can_add_stay_transfer_false_no_stay(self):
+        """Test can_add_stay_transfer returns False when day has no stay"""
+        trip = TripFactory()
+        day = trip.days.first()
+
+        self.assertFalse(can_add_stay_transfer(day))
+
+    def test_can_add_stay_transfer_false_no_next_day(self):
+        """Test can_add_stay_transfer returns False for last day"""
+        trip = TripFactory()
+        days = list(trip.days.all())
+        stay = StayFactory()
+
+        days[-1].stay = stay
+        days[-1].save()
+
+        self.assertFalse(can_add_stay_transfer(days[-1]))
+
+    def test_can_add_stay_transfer_false_next_day_no_stay(self):
+        """Test can_add_stay_transfer returns False when next day has no stay"""
+        trip = TripFactory()
+        days = list(trip.days.all())
+        stay = StayFactory()
+
+        days[0].stay = stay
+        days[0].save()
+        # days[1] has no stay
+
+        self.assertFalse(can_add_stay_transfer(days[0]))
+
+    def test_can_add_stay_transfer_false_same_stay(self):
+        """Test can_add_stay_transfer returns False when both days have same stay"""
+        trip = TripFactory()
+        days = list(trip.days.all())
+        stay = StayFactory()
+
+        days[0].stay = stay
+        days[0].save()
+        days[1].stay = stay
+        days[1].save()
+
+        self.assertFalse(can_add_stay_transfer(days[0]))
+
+    def test_can_add_stay_transfer_false_already_has_transfer(self):
+        """Test can_add_stay_transfer returns False when transfer exists"""
+        from trips.models import StayTransfer
+
+        trip = TripFactory()
+        days = list(trip.days.all())
+        stay1 = StayFactory()
+        stay2 = StayFactory()
+
+        days[0].stay = stay1
+        days[0].save()
+        days[1].stay = stay2
+        days[1].save()
+
+        StayTransfer.objects.create(
+            from_stay=stay1, to_stay=stay2, transport_mode="driving"
+        )
+
+        self.assertFalse(can_add_stay_transfer(days[0]))
+
+    def test_validate_stay_transfer_valid(self):
+        """Test validate_stay_transfer for valid transfer"""
+        trip = TripFactory()
+        days = list(trip.days.all())
+        stay1 = StayFactory()
+        stay2 = StayFactory()
+
+        days[0].stay = stay1
+        days[0].save()
+        days[1].stay = stay2
+        days[1].save()
+
+        is_valid, error = validate_stay_transfer(stay1, stay2)
+        self.assertTrue(is_valid)
+        self.assertIsNone(error)
+
+    def test_validate_stay_transfer_missing_stays(self):
+        """Test validate_stay_transfer with missing stays"""
+        is_valid, error = validate_stay_transfer(None, None)
+        self.assertFalse(is_valid)
+        self.assertEqual(error, "Both stays are required")
+
+    def test_validate_stay_transfer_same_stay(self):
+        """Test validate_stay_transfer with same stay"""
+        trip = TripFactory()
+        day = trip.days.first()
+        stay = StayFactory()
+
+        day.stay = stay
+        day.save()
+
+        is_valid, error = validate_stay_transfer(stay, stay)
+        self.assertFalse(is_valid)
+        self.assertEqual(error, "Cannot create transfer to the same stay")
+
+    def test_validate_stay_transfer_no_days(self):
+        """Test validate_stay_transfer with stays not assigned to days"""
+        stay1 = StayFactory()
+        stay2 = StayFactory()
+
+        is_valid, error = validate_stay_transfer(stay1, stay2)
+        self.assertFalse(is_valid)
+        self.assertEqual(error, "Both stays must be assigned to days")
+
+    def test_validate_stay_transfer_different_trips(self):
+        """Test validate_stay_transfer with stays from different trips"""
+        trip1 = TripFactory()
+        trip2 = TripFactory()
+        stay1 = StayFactory()
+        stay2 = StayFactory()
+
+        day1 = trip1.days.first()
+        day1.stay = stay1
+        day1.save()
+        day2 = trip2.days.first()
+        day2.stay = stay2
+        day2.save()
+
+        is_valid, error = validate_stay_transfer(stay1, stay2)
+        self.assertFalse(is_valid)
+        self.assertEqual(error, "Stays must belong to the same trip")
+
+    def test_validate_stay_transfer_non_consecutive_days(self):
+        """Test validate_stay_transfer with non-consecutive days"""
+        trip = TripFactory()
+        days = list(trip.days.all())
+        stay1 = StayFactory()
+        stay2 = StayFactory()
+
+        days[0].stay = stay1
+        days[0].save()
+        days[2].stay = stay2  # Skip day 1
+        days[2].save()
+
+        is_valid, error = validate_stay_transfer(stay1, stay2)
+        self.assertFalse(is_valid)
+        self.assertEqual(error, "Stays must be on consecutive days (day N and day N+1)")

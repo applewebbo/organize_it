@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from urllib.parse import quote
 
 import geocoder
 from django.conf import settings
@@ -583,15 +584,15 @@ class SimpleTransfer(models.Model):
 
     @property
     def google_maps_url(self):
-        """Generate Google Maps URL from coordinates with travel mode"""
-        from_lat, from_lng = self.from_coordinates
-        to_lat, to_lng = self.to_coordinates
+        """Generate Google Maps URL from addresses with travel mode"""
+        from_address = self.from_event.address
+        to_address = self.to_event.address
 
-        if all([from_lat, from_lng, to_lat, to_lng]):
+        if from_address and to_address:
             return (
                 f"https://www.google.com/maps/dir/?api=1"
-                f"&origin={from_lat},{from_lng}"
-                f"&destination={to_lat},{to_lng}"
+                f"&origin={quote(from_address)}"
+                f"&destination={quote(to_address)}"
                 f"&travelmode={self.transport_mode}"
             )
         return None
@@ -603,35 +604,24 @@ class SimpleTransfer(models.Model):
         # Check from_event != to_event
         if self.from_event_id and self.to_event_id:
             if self.from_event_id == self.to_event_id:
-                raise ValidationError(
-                    {"to_event": _("Cannot create transfer to the same event")}
-                )
+                raise ValidationError(_("Cannot create transfer to the same event"))
 
         # Check same day
         if self.from_event.day_id and self.to_event.day_id:
             if self.from_event.day_id != self.to_event.day_id:
                 raise ValidationError(
-                    {
-                        "to_event": _(
-                            "Both events must be on the same day for SimpleTransfer"
-                        )
-                    }
+                    _("Both events must be on the same day for SimpleTransfer")
                 )
 
         # Check same trip
         if self.from_event.trip_id and self.to_event.trip_id:
             if self.from_event.trip_id != self.to_event.trip_id:
-                raise ValidationError(
-                    {"to_event": _("Both events must belong to the same trip")}
-                )
+                raise ValidationError(_("Both events must belong to the same trip"))
 
     def save(self, *args, **kwargs):
         """Auto-populate day and trip from events"""
-        if self.from_event.day_id:
-            self.day_id = self.from_event.day_id
-        if self.from_event.trip_id:
-            self.trip_id = self.from_event.trip_id
-
+        self.day = self.from_event.day
+        self.trip = self.from_event.trip
         super().save(*args, **kwargs)
 
 
@@ -728,15 +718,15 @@ class StayTransfer(models.Model):
 
     @property
     def google_maps_url(self):
-        """Generate Google Maps URL from coordinates with travel mode"""
-        from_lat, from_lng = self.from_coordinates
-        to_lat, to_lng = self.to_coordinates
+        """Generate Google Maps URL from addresses with travel mode"""
+        from_address = self.from_stay.address
+        to_address = self.to_stay.address
 
-        if all([from_lat, from_lng, to_lat, to_lng]):
+        if from_address and to_address:
             return (
                 f"https://www.google.com/maps/dir/?api=1"
-                f"&origin={from_lat},{from_lng}"
-                f"&destination={to_lat},{to_lng}"
+                f"&origin={quote(from_address)}"
+                f"&destination={quote(to_address)}"
                 f"&travelmode={self.transport_mode}"
             )
         return None
@@ -748,9 +738,7 @@ class StayTransfer(models.Model):
         # Check from_stay != to_stay
         if self.from_stay_id and self.to_stay_id:
             if self.from_stay_id == self.to_stay_id:
-                raise ValidationError(
-                    {"to_stay": _("Cannot create transfer to the same stay")}
-                )
+                raise ValidationError(_("Cannot create transfer to the same stay"))
 
         # Check consecutive days
         if hasattr(self, "from_day") and hasattr(self, "to_day"):
@@ -759,34 +747,22 @@ class StayTransfer(models.Model):
 
             if to_day_num != from_day_num + 1:
                 raise ValidationError(
-                    {
-                        "to_stay": _(
-                            "Stays must be on consecutive days (day N and day N+1)"
-                        )
-                    }
+                    _("Stays must be on consecutive days (day N and day N+1)")
                 )
 
         # Check same trip
         if hasattr(self, "from_day") and hasattr(self, "to_day"):
             if self.from_day.trip_id != self.to_day.trip_id:
-                raise ValidationError(
-                    {"to_stay": _("Both stays must belong to the same trip")}
-                )
+                raise ValidationError(_("Both stays must belong to the same trip"))
 
     def save(self, *args, **kwargs):
         """Auto-populate days and trip from stays"""
         # Get last day for from_stay (departure day - last day of the stay)
-        if self.from_stay.days.exists():
-            self.from_day = self.from_stay.days.order_by("date").last()
-
+        self.from_day = self.from_stay.days.order_by("date").last()
         # Get first day for to_stay (arrival day - first day of the stay)
-        if self.to_stay.days.exists():
-            self.to_day = self.to_stay.days.order_by("date").first()
-
+        self.to_day = self.to_stay.days.order_by("date").first()
         # Set trip from from_day
-        if hasattr(self, "from_day"):
-            self.trip_id = self.from_day.trip_id
-
+        self.trip = self.from_day.trip
         super().save(*args, **kwargs)
 
 

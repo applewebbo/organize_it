@@ -25,7 +25,7 @@ class TransportModeRadioSelect(forms.RadioSelect):
         ]
 
         for i, (option_value, option_label) in enumerate(self.choices):
-            if option_value:  # Skip empty choice
+            if option_value:  # pragma: no branch  # Skip empty choice
                 option_id = f"{attrs.get('id', 'id_transport_mode')}_{i}"
                 icon_class = self.TRANSPORT_ICONS.get(option_value, "ph-question")
                 is_checked = option_value == value

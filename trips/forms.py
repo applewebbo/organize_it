@@ -633,7 +633,7 @@ class MealForm(EventForm):
         fields = EventForm.Meta.fields + ["type"]
         labels = {
             **EventForm.Meta.labels,
-            "type": _("Type"),
+            "type": _("Meal Type"),
         }
         widgets = {
             **EventForm.Meta.widgets,
@@ -1717,7 +1717,7 @@ class SimpleTransferCreateForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
 
-        if self.from_event and self.to_event:
+        if self.from_event and self.to_event:  # pragma: no branch
             # Check that events are different
             if self.from_event == self.to_event:
                 raise ValidationError(
@@ -1824,7 +1824,7 @@ class StayTransferCreateForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
 
-        if self.from_stay and self.to_stay:
+        if self.from_stay and self.to_stay:  # pragma: no branch
             # Check that stays are different
             if self.from_stay == self.to_stay:
                 raise ValidationError(_("From stay and to stay must be different."))

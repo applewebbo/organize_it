@@ -1062,13 +1062,13 @@ class TestSimpleTransfer:
         from django.core.exceptions import ValidationError
 
         transfer = SimpleTransfer(
-            from_event=event, to_event=event, transport_mode="car"
+            from_event=event, to_event=event, transport_mode="driving"
         )
 
         with pytest.raises(ValidationError) as exc_info:
             transfer.full_clean()
 
-        assert "to_event" in exc_info.value.message_dict
+        assert "Cannot create transfer to the same event" in str(exc_info.value)
 
     def test_simple_transfer_different_days_validation(
         self, trip_factory, experience_factory
@@ -1082,13 +1082,13 @@ class TestSimpleTransfer:
         from django.core.exceptions import ValidationError
 
         transfer = SimpleTransfer(
-            from_event=event1, to_event=event2, transport_mode="car"
+            from_event=event1, to_event=event2, transport_mode="driving"
         )
 
         with pytest.raises(ValidationError) as exc_info:
             transfer.full_clean()
 
-        assert "to_event" in exc_info.value.message_dict
+        assert "Both events must be on the same day" in str(exc_info.value)
 
     def test_simple_transfer_properties(self, trip_factory, experience_factory):
         """Test SimpleTransfer property methods"""
@@ -1135,10 +1135,10 @@ class TestSimpleTransfer:
             )
 
     @patch("geocoder.mapbox")
-    def test_simple_transfer_google_maps_url_without_coordinates(
+    def test_simple_transfer_google_maps_url_without_addresses(
         self, mock_geocoder, trip_factory, experience_factory
     ):
-        """Test google_maps_url returns None when events lack coordinates"""
+        """Test google_maps_url returns None when events lack addresses"""
         mock_geocoder.return_value.latlng = None
 
         trip = trip_factory()
@@ -1146,10 +1146,8 @@ class TestSimpleTransfer:
         event1 = experience_factory(trip=trip, day=day)
         event2 = experience_factory(trip=trip, day=day)
 
-        # Force coordinates to None
-        Event.objects.filter(pk__in=[event1.pk, event2.pk]).update(
-            latitude=None, longitude=None
-        )
+        # Force addresses to empty
+        Event.objects.filter(pk__in=[event1.pk, event2.pk]).update(address="")
         event1.refresh_from_db()
         event2.refresh_from_db()
 
@@ -1179,13 +1177,13 @@ class TestSimpleTransfer:
         from django.core.exceptions import ValidationError
 
         transfer = SimpleTransfer(
-            from_event=event1, to_event=event2, transport_mode="car"
+            from_event=event1, to_event=event2, transport_mode="driving"
         )
 
         with pytest.raises(ValidationError) as exc_info:
             transfer.full_clean()
 
-        assert "to_event" in exc_info.value.message_dict
+        assert "Both events must belong to the same trip" in str(exc_info.value)
 
     def test_simple_transfer_clean_skips_validation_when_event_ids_none(
         self, trip_factory, experience_factory
@@ -1291,12 +1289,12 @@ class TestStayTransfer:
 
         from django.core.exceptions import ValidationError
 
-        transfer = StayTransfer(from_stay=stay, to_stay=stay, transport_mode="car")
+        transfer = StayTransfer(from_stay=stay, to_stay=stay, transport_mode="driving")
 
         with pytest.raises(ValidationError) as exc_info:
             transfer.full_clean()
 
-        assert "to_stay" in exc_info.value.message_dict
+        assert "Cannot create transfer to the same stay" in str(exc_info.value)
 
     def test_stay_transfer_non_consecutive_days_validation(
         self, trip_factory, stay_factory
@@ -1318,7 +1316,7 @@ class TestStayTransfer:
         transfer = StayTransfer(
             from_stay=stay1,
             to_stay=stay2,
-            transport_mode="car",
+            transport_mode="driving",
             from_day=days[0],
             to_day=days[2],
             trip=trip,
@@ -1327,7 +1325,7 @@ class TestStayTransfer:
         with pytest.raises(ValidationError) as exc_info:
             transfer.full_clean()
 
-        assert "to_stay" in exc_info.value.message_dict
+        assert "Stays must be on consecutive days" in str(exc_info.value)
 
     def test_stay_transfer_properties(self, trip_factory, stay_factory):
         """Test StayTransfer property methods"""
@@ -1434,10 +1432,10 @@ class TestStayTransfer:
         assert transfer.arrival_time is None
 
     @patch("geocoder.mapbox")
-    def test_stay_transfer_google_maps_url_without_coordinates(
+    def test_stay_transfer_google_maps_url_without_addresses(
         self, mock_geocoder, trip_factory, stay_factory
     ):
-        """Test google_maps_url returns None when stays lack coordinates"""
+        """Test google_maps_url returns None when stays lack addresses"""
         mock_geocoder.return_value.latlng = None
 
         trip = trip_factory()
@@ -1445,10 +1443,8 @@ class TestStayTransfer:
         stay1 = stay_factory(city=trip.destination)
         stay2 = stay_factory(city=trip.destination)
 
-        # Force coordinates to None
-        Stay.objects.filter(pk__in=[stay1.pk, stay2.pk]).update(
-            latitude=None, longitude=None
-        )
+        # Force addresses to empty
+        Stay.objects.filter(pk__in=[stay1.pk, stay2.pk]).update(address="")
         stay1.refresh_from_db()
         stay2.refresh_from_db()
 
@@ -1484,7 +1480,7 @@ class TestStayTransfer:
         transfer = StayTransfer(
             from_stay=stay1,
             to_stay=stay2,
-            transport_mode="car",
+            transport_mode="driving",
             from_day=days1[0],  # day number 1 from trip1
             to_day=days2[1],  # day number 2 from trip2
             trip=trip1,
@@ -1493,7 +1489,7 @@ class TestStayTransfer:
         with pytest.raises(ValidationError) as exc_info:
             transfer.full_clean()
 
-        assert "to_stay" in exc_info.value.message_dict
+        assert "Both stays must belong to the same trip" in str(exc_info.value)
 
     def test_stay_transfer_clean_skips_validation_when_stay_ids_none(
         self, trip_factory, stay_factory
