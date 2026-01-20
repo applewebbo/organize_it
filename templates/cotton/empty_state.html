@@ -1,0 +1,23 @@
+{% load i18n static %}
+<div class="flex flex-col justify-center items-center py-16 px-4 text-center">
+    <!-- Illustrative Icon -->
+    <div class="mb-6">
+        <img src="{% static 'img/worldwide.png' %}"
+             alt="{% trans 'Travel illustration' %}"
+             class="w-32 h-32 md:w-40 md:h-40">
+    </div>
+    <!-- Welcoming Headline -->
+    <h1 class="mb-4 text-3xl font-bold tracking-tight md:text-4xl text-base-content">
+        {% trans "Ready for your next adventure?" %}
+    </h1>
+    <!-- Encouraging Subtext -->
+    <p class="mb-8 max-w-xl text-lg md:text-xl text-base-content/70">
+        {% trans "Start planning your perfect trip. Organize stays, experiences, meals and transfers all in one place." %}
+    </p>
+    <!-- Prominent CTA Button -->
+    <a href="{% url 'trips:trip-create' %}"
+       class="gap-2 btn btn-primary btn-lg">
+        <i class="ph-bold ph-plus-circle i-lg" aria-hidden="true"></i>
+        <span>{% trans "Create Your First Trip" %}</span>
+    </a>
+</div>

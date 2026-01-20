@@ -140,6 +140,50 @@ class HomeView(TestCase):
 
         self.response_200(response)
 
+    def test_get_authenticated_user_without_trips_shows_empty_state(self):
+        """Test that authenticated user without trips sees empty state and quick guide"""
+        user = self.make_user("user")
+
+        with self.login(user):
+            response = self.get("trips:home")
+
+        self.response_200(response)
+        # Verify context shows no trips
+        assert response.context["latest_trip"] is None
+        assert response.context["fav_trip"] is None
+        assert len(response.context["other_trips"]) == 0
+
+        # Verify empty state content is present
+        content = response.content.decode()
+        assert (
+            "Ready for your next adventure?" in content
+            or "Pronto per la tua prossima avventura?" in content
+        )
+        assert (
+            "Create Your First Trip" in content
+            or "Crea il Tuo Primo Viaggio" in content
+        )
+
+        # Verify quick guide sections are present
+        assert "How It Works" in content or "Come Funziona" in content
+        assert "Trips" in content or "Viaggi" in content
+        assert "Days" in content or "Giorni" in content
+        assert "Stays" in content or "Soggiorni" in content
+        assert "Experiences" in content or "Esperienze" in content
+        assert "Meals" in content or "Pasti" in content
+
+    def test_empty_state_cta_button_redirects_to_trip_creation(self):
+        """Test that the CTA button in empty state links to trip creation"""
+        user = self.make_user("user")
+
+        with self.login(user):
+            response = self.get("trips:home")
+
+        self.response_200(response)
+        content = response.content.decode()
+        trip_create_url = reverse("trips:trip-create")
+        assert trip_create_url in content
+
 
 class TripListView(TestCase):
     def test_get(self):

@@ -1,0 +1,111 @@
+{% load i18n %}
+<div class="mx-auto mt-12 mb-8 max-w-6xl">
+    <!-- Header -->
+    <div class="mb-6 text-center">
+        <h2 class="mb-2 text-2xl font-semibold tracking-tight md:text-3xl">{% trans "How It Works" %}</h2>
+        <p class="text-base-content/70">{% trans "Learn about the key concepts to start organizing your perfect trip." %}</p>
+    </div>
+    <!-- Cards Grid -->
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <!-- Card: Trips -->
+        <div class="shadow card card-border bg-base-100">
+            <div class="card-body">
+                <div class="flex gap-3 items-center mb-3">
+                    <div class="flex justify-center items-center w-12 h-12 rounded-lg bg-primary/10">
+                        <i class="ph-bold ph-suitcase-rolling text-primary i-xl"
+                           aria-hidden="true"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold">{% trans "Trips" %}</h3>
+                </div>
+                <p class="text-sm text-base-content/80">
+                    {% trans "A trip is your main container for organizing a journey. Each trip has a destination, dates, and can include multiple days of activities." %}
+                </p>
+            </div>
+        </div>
+        <!-- Card: Days -->
+        <div class="shadow card card-border bg-base-100">
+            <div class="card-body">
+                <div class="flex gap-3 items-center mb-3">
+                    <div class="flex justify-center items-center w-12 h-12 rounded-lg bg-secondary/10">
+                        <i class="ph-bold ph-calendar text-secondary i-xl" aria-hidden="true"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold">{% trans "Days" %}</h3>
+                </div>
+                <p class="text-sm text-base-content/80">
+                    {% trans "Days are automatically generated based on your trip dates. Each day can contain multiple events like experiences, meals, and transfers." %}
+                </p>
+            </div>
+        </div>
+        <!-- Card: Stays -->
+        <div class="shadow card card-border bg-base-100">
+            <div class="card-body">
+                <div class="flex gap-3 items-center mb-3">
+                    <div class="flex justify-center items-center w-12 h-12 rounded-lg bg-accent/10">
+                        <i class="ph-bold ph-bed text-accent i-xl" aria-hidden="true"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold">{% trans "Stays" %}</h3>
+                </div>
+                <p class="text-sm text-base-content/80">
+                    {% trans "Stays are your accommodations during the trip. Add hotels, apartments, hostels, or any place where you'll be staying." %}
+                </p>
+            </div>
+        </div>
+        <!-- Card: Experiences -->
+        <div class="shadow card card-border bg-base-100">
+            <div class="card-body">
+                <div class="flex gap-3 items-center mb-3">
+                    <div class="flex justify-center items-center w-12 h-12 rounded-lg bg-success/10">
+                        <i class="ph-bold ph-compass text-success i-xl" aria-hidden="true"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold">{% trans "Experiences" %}</h3>
+                </div>
+                <p class="text-sm text-base-content/80">
+                    {% trans "Experiences are activities, tours, museums, walks, and any memorable moment during your trip." %}
+                </p>
+            </div>
+        </div>
+        <!-- Card: Meals -->
+        <div class="shadow card card-border bg-base-100">
+            <div class="card-body">
+                <div class="flex gap-3 items-center mb-3">
+                    <div class="flex justify-center items-center w-12 h-12 rounded-lg bg-warning/10">
+                        <i class="ph-bold ph-fork-knife text-warning i-xl" aria-hidden="true"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold">{% trans "Meals" %}</h3>
+                </div>
+                <p class="text-sm text-base-content/80">
+                    {% trans "Meals help you plan where to eat during your trip. Add restaurants, cafes, street food spots, or any dining experience." %}
+                </p>
+            </div>
+        </div>
+        <!-- Card: Main Transfers -->
+        <div class="shadow card card-border bg-base-100">
+            <div class="card-body">
+                <div class="flex gap-3 items-center mb-3">
+                    <div class="flex justify-center items-center w-12 h-12 rounded-lg bg-info/10">
+                        <i class="ph-bold ph-airplane-in-flight text-info i-xl"
+                           aria-hidden="true"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold">{% trans "Main Transfers" %}</h3>
+                </div>
+                <p class="text-sm text-base-content/80">
+                    {% trans "Main transfers are your arrival and departure journeys. Add flight, train, or other transport details to reach your destination and return home." %}
+                </p>
+            </div>
+        </div>
+        <!-- Card: Inter-Stay & Event Transfers -->
+        <div class="shadow card card-border bg-base-100">
+            <div class="card-body">
+                <div class="flex gap-3 items-center mb-3">
+                    <div class="flex justify-center items-center w-12 h-12 rounded-lg bg-purple-500/10">
+                        <i class="text-purple-500 ph-bold ph-path i-xl" aria-hidden="true"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold">{% trans "Local Transfers" %}</h3>
+                </div>
+                <p class="text-sm text-base-content/80">
+                    {% trans "Local transfers help you move between accommodations and events during your trip. Add transfers between stays or between daily activities." %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

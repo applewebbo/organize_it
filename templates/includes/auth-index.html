@@ -160,6 +160,9 @@
             </section>
         {% endif %}
     {% else %}
-        <p>{% trans 'You have no trips yet!' %}</p>
+        <!-- Empty State: No trips yet -->
+        <c-empty-state />
+        <!-- Quick Guide -->
+        <c-quick-guide />
     {% endif %}
 </div>
