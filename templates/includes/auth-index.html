@@ -159,10 +159,29 @@
                 </div>
             </section>
         {% endif %}
+        <!-- Toggle Guide Button for users with trips -->
+        <div class="flex justify-center mb-6">
+            <button class="gap-2 btn btn-sm btn-ghost"
+                    hx-post="{% url 'trips:toggle-guide' %}"
+                    hx-swap="none"
+                    hx-on::after-request="location.reload()"
+                    aria-label="{% trans 'Toggle guide visibility' %}">
+                <i class="ph-bold ph-question i-md" aria-hidden="true"></i>
+                <span>
+                    {% if show_guide %}
+                        {% trans 'Hide Guide' %}
+                    {% else %}
+                        {% trans 'Show Guide' %}
+                    {% endif %}
+                </span>
+            </button>
+        </div>
+        <!-- Quick Guide (shown if user toggles it on) -->
+        {% if show_guide %}<c-quick-guide />{% endif %}
     {% else %}
         <!-- Empty State: No trips yet -->
         <c-empty-state />
-        <!-- Quick Guide -->
+        <!-- Quick Guide (always shown for users without trips) -->
         <c-quick-guide />
     {% endif %}
 </div>

@@ -64,7 +64,18 @@ def home(request):
     if request.user.is_authenticated:
         if Profile.objects.filter(user=request.user).exists():
             context = get_trips(request.user)
+            # Check if user wants to see the guide (default: hidden for users with trips)
+            context["show_guide"] = request.session.get("show_guide", False)
     return TemplateResponse(request, "trips/index.html", context)
+
+
+@login_required
+def toggle_guide(request):
+    """Toggle the visibility of the quick guide in home page"""
+    if request.method == "POST":
+        current_state = request.session.get("show_guide", False)
+        request.session["show_guide"] = not current_state
+    return HttpResponse(status=204)
 
 
 @login_required

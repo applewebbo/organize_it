@@ -184,6 +184,85 @@ class HomeView(TestCase):
         trip_create_url = reverse("trips:trip-create")
         assert trip_create_url in content
 
+    def test_authenticated_user_with_trips_hides_guide_by_default(self):
+        """Test that guide is hidden by default for users with trips"""
+        user = self.make_user("user")
+        TripFactory(author=user)
+
+        with self.login(user):
+            response = self.get("trips:home")
+
+        self.response_200(response)
+        assert response.context["show_guide"] is False
+        content = response.content.decode()
+        # Guide should not be visible
+        assert "How It Works" not in content and "Come Funziona" not in content
+
+    def test_toggle_guide_view(self):
+        """Test that toggle guide view changes session state"""
+        user = self.make_user("user")
+        TripFactory(author=user)
+
+        with self.login(user):
+            # Initially guide is hidden (False)
+            session = self.client.session
+            assert session.get("show_guide", False) is False
+
+            # Toggle to show guide
+            response = self.post("trips:toggle-guide")
+            self.response_204(response)
+
+            # Check session state changed
+            session = self.client.session
+            assert session.get("show_guide") is True
+
+            # Toggle again to hide guide
+            response = self.post("trips:toggle-guide")
+            self.response_204(response)
+
+            # Check session state changed back
+            session = self.client.session
+            assert session.get("show_guide") is False
+
+    def test_guide_visibility_respects_session_state(self):
+        """Test that guide visibility changes based on session state"""
+        user = self.make_user("user")
+        TripFactory(author=user)
+
+        with self.login(user):
+            # Set session to show guide
+            session = self.client.session
+            session["show_guide"] = True
+            session.save()
+
+            # Get home page
+            response = self.get("trips:home")
+
+            self.response_200(response)
+            assert response.context["show_guide"] is True
+            content = response.content.decode()
+            # Guide should be visible
+            assert "How It Works" in content or "Come Funziona" in content
+
+    def test_toggle_guide_with_get_request(self):
+        """Test that toggle guide with GET request returns 204 without changing state"""
+        user = self.make_user("user")
+        TripFactory(author=user)
+
+        with self.login(user):
+            # Set initial state
+            session = self.client.session
+            session["show_guide"] = False
+            session.save()
+
+            # GET request should return 204 but not change state
+            response = self.get("trips:toggle-guide")
+            self.response_204(response)
+
+            # State should remain unchanged
+            session = self.client.session
+            assert session.get("show_guide", False) is False
+
 
 class TripListView(TestCase):
     def test_get(self):

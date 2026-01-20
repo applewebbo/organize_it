@@ -1,11 +1,11 @@
 ---
 # organize_it-pl6o
 title: Home Page for authenticated user without trips
-status: in-progress
+status: completed
 type: feature
 priority: normal
 created_at: 2026-01-19T13:20:35Z
-updated_at: 2026-01-20T06:35:21Z
+updated_at: 2026-01-20T07:27:00Z
 parent: organize_it-oor7
 ---
 
@@ -52,14 +52,14 @@ The current implementation shows a simple message: "You have no trips yet!" when
 - [x] Ensure proper responsive design (mobile-first)
 
 ### Phase 4: Add Documentation Link
-- [ ] Decide where to host deeper documentation (GitHub wiki, separate docs page, or inline)
-- [ ] Add a "Learn more" or "Read documentation" link in the quick guide
-- [ ] If needed, create a simple documentation page template
+- [x] Decide where to host deeper documentation (GitHub wiki, separate docs page, or inline)
+- [x] Add a "Learn more" or "Read documentation" link in the quick guide
+- [x] If needed, create a simple documentation page template
 
 ### Phase 5: Add Quick Guide Toggle for Users with Trips
-- [ ] Add an optional "Show Guide" button in the home page for users who already have trips
-- [ ] Store user preference (show/hide guide) - consider using session or Profile model
-- [ ] Ensure guide can be dismissed and re-shown
+- [x] Add an optional "Show Guide" button in the home page for users who already have trips
+- [x] Store user preference (show/hide guide) - consider using session or Profile model
+- [x] Ensure guide can be dismissed and re-shown
 
 ### Phase 6: Testing
 - [x] Write tests for the home page empty state rendering
