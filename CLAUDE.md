@@ -22,6 +22,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 git checkout -b feature/descriptive-name
 
 # 3. Make changes and commit frequently
+# IMPORTANT: Always run just lint BEFORE git add to avoid pre-commit hook conflicts
+just lint
 git add <files>
 git commit -m "descriptive message (for #123)"
 
@@ -40,6 +42,11 @@ just ftest
 # 8. Push to remote
 git push origin main
 ```
+
+**Why run `just lint` before `git add`?**
+- `just lint` runs formatters (djlint, rustywind) that modify files in the working directory
+- If you `git add` first and then commit, pre-commit hooks will format the staged files again, causing the commit to fail
+- Running `just lint` first ensures files are already formatted when you stage them
 
 ### Commit Message Guidelines
 
