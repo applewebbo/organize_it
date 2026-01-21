@@ -12,8 +12,8 @@ Completare il setup e la pubblicazione della documentazione MkDocs su Read the D
 ## Checklist
 
 ### Preparazione Repository
-- [ ] Push del branch 2026.3 su GitHub
-- [ ] Verifica che tutti i commit siano presenti sul remote
+- [x] Push del branch 2026.3 su GitHub
+- [x] Verifica che tutti i commit siano presenti sul remote
 
 ### Setup Read the Docs (da fare manualmente)
 - [ ] Registrarsi/accedere su https://readthedocs.org
