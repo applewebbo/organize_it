@@ -16,6 +16,11 @@ dev = [
   "ruff>=0.9.6",
   "time-machine>=3.2.0"
 ]
+docs = [
+  "mkdocs>=1.5",
+  "mkdocs-material>=9.5",
+  "mkdocs-static-i18n>=1.2.0"
+]
 
 [project]
 dependencies = [

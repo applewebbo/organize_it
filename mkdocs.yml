@@ -1,0 +1,102 @@
+site_name: Organize It Documentation
+site_url: https://organize-it.readthedocs.io
+repo_url: https://github.com/applewebbo/organize_it
+repo_name: organize_it
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  language: en
+  palette:
+  - scheme: default
+    primary: indigo
+    accent: indigo
+    toggle:
+      icon: material/brightness-7
+      name: Switch to dark mode
+  - scheme: slate
+    primary: indigo
+    accent: indigo
+    toggle:
+      icon: material/brightness-4
+      name: Switch to light mode
+  features:
+  - navigation.tabs
+  - navigation.sections
+  - navigation.top
+  - navigation.tracking
+  - search.suggest
+  - search.highlight
+  - content.code.copy
+  - content.action.edit
+
+plugins:
+- search
+- i18n:
+    docs_structure: folder
+    fallback_to_default: true
+    reconfigure_material: true
+    reconfigure_search: true
+    languages:
+    - locale: en
+      default: true
+      name: English
+      build: true
+      nav_translations:
+        Home: Home
+        Getting Started: Getting Started
+        Installation: Installation
+        Quick Start: Quick Start
+        Your First Trip: Your First Trip
+        User Guide: User Guide
+        Trips: Trips
+        Days: Days
+        Stays: Stays
+        Experiences: Experiences
+        Meals: Meals
+        Transfers: Transfers
+        FAQ: FAQ
+    - locale: it
+      name: Italiano
+      build: true
+      nav_translations:
+        Home: Home
+        Getting Started: Per Iniziare
+        Installation: Installazione
+        Quick Start: Guida Rapida
+        Your First Trip: Il Tuo Primo Viaggio
+        User Guide: Guida Utente
+        Trips: Viaggi
+        Days: Giorni
+        Stays: Alloggi
+        Experiences: Esperienze
+        Meals: Pasti
+        Transfers: Trasferimenti
+        FAQ: Domande Frequenti
+
+nav:
+- Home: index.md
+- Getting Started:
+  - Installation: getting-started/installation.md
+  - Quick Start: getting-started/quick-start.md
+  - Your First Trip: getting-started/first-trip.md
+- User Guide:
+  - Trips: user-guide/trips.md
+  - Days: user-guide/days.md
+  - Stays: user-guide/stays.md
+  - Experiences: user-guide/experiences.md
+  - Meals: user-guide/meals.md
+  - Transfers: user-guide/transfers.md
+- FAQ: faq.md
+
+markdown_extensions:
+- admonition
+- pymdownx.details
+- pymdownx.superfences
+- pymdownx.tabbed:
+    alternate_style: true
+- attr_list
+- md_in_html
+- pymdownx.emoji:
+    emoji_index: !!python/name:material.extensions.emoji.twemoji
+    emoji_generator: !!python/name:material.extensions.emoji.to_svg
