@@ -138,11 +138,11 @@ secure:
 @docs-serve:
     echo "Starting MkDocs development server..."
     echo "Documentation will be available at http://127.0.0.1:8000"
-    uv run --extra docs mkdocs serve
+    uv run --group docs mkdocs serve
 
 # Build documentation for production
 [group('docs')]
 @docs-build:
     echo "Building documentation..."
-    uv run --extra docs mkdocs build
+    uv run --group docs mkdocs build
     echo "Documentation built in site/ directory"
