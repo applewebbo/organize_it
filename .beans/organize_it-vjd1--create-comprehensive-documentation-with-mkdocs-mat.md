@@ -146,7 +146,7 @@ Provide comprehensive documentation for users including:
 ### Phase 10: Maintenance Plan
 - [x] Document how to update documentation (added to CLAUDE.md)
 - [x] Add note in CLAUDE.md about documentation updates
-- [ ] Set reminder to review docs quarterly for accuracy
+- [x] Add instruction to remind user when UI changes require doc updates
 
 ## Example mkdocs.yml Configuration
 

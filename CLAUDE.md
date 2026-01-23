@@ -115,6 +115,8 @@ All commands use `just` (justfile). Never use `pip` - always use `uv`.
 3. Commit and push to trigger ReadTheDocs rebuild
 4. Screenshots are in `docs/assets/screenshots/`
 
+**IMPORTANT:** When making substantial UI changes, remind the user to update the documentation screenshots and content accordingly.
+
 ## Architecture
 
 ### Models Architecture
