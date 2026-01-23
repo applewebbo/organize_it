@@ -102,6 +102,19 @@ All commands use `just` (justfile). Never use `pip` - always use `uv`.
 ### Code Quality
 - `just lint` - Run ruff linting, formatting, and pre-commit hooks
 
+### Documentation
+- `just docs-serve` - Serve documentation locally at http://localhost:8001
+- `just docs-build` - Build documentation to `site/` directory
+- Documentation source files are in `docs/` directory (EN and IT)
+- Documentation is hosted on ReadTheDocs: https://organize-it.readthedocs.io
+- Auto-builds on push to main branch
+
+**Updating Documentation:**
+1. Edit markdown files in `docs/en/` (English) or `docs/it/` (Italian)
+2. Test locally with `just docs-serve`
+3. Commit and push to trigger ReadTheDocs rebuild
+4. Screenshots are in `docs/assets/screenshots/`
+
 ## Architecture
 
 ### Models Architecture
