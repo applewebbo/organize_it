@@ -32,6 +32,9 @@ Il tuo viaggio DA la destinazione alla fine del viaggio.
 - Treno da Barcellona a Parigi
 - Guida da casa vacanza verso casa
 
+![Form Trasferimento](../../assets/screenshots/transfer-form.png)
+*Il form di creazione trasferimento*
+
 ### Creare un Trasferimento Principale
 
 1. Naviga al viaggio

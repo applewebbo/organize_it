@@ -16,11 +16,17 @@ A **Trip** is a container for all your travel planning. Each trip includes:
 
 ## Creating a Trip
 
+![Trip List](../../assets/screenshots/home-trips-list.png)
+*Your trip list on the homepage*
+
 ### From the Homepage
 
 1. Click **Create New Trip** button
 2. Fill in the trip details
 3. Click **Save**
+
+![Trip Creation Form](../../assets/screenshots/trip-create-form.png)
+*The trip creation form*
 
 ### Trip Details
 
@@ -224,6 +230,9 @@ Useful links to add:
 - **Open**: Click the URL to visit in a new tab
 
 ## Trip Overview Page
+
+![Trip Detail](../../assets/screenshots/trip-detail.png)
+*The trip detail page*
 
 The trip detail page shows:
 

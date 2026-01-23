@@ -74,6 +74,9 @@ La data viene visualizzata insieme al numero del giorno per chiarezza.
 
 ### Eventi in un Giorno
 
+![Dettaglio Giorno](../../assets/screenshots/day-detail.png)
+*Un giorno con i suoi eventi nella vista timeline*
+
 Ogni giorno può contenere più eventi:
 
 - **Esperienze**: Musei, tour, passeggiate, attrazioni

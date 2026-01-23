@@ -29,6 +29,9 @@ Un **Alloggio** è una sistemazione che copre uno o più giorni consecutivi nel 
 3. Compila i dettagli
 4. Salva
 
+![Form Alloggio](../../assets/screenshots/stay-form.png)
+*Il form di creazione alloggio*
+
 ## Campi Alloggio
 
 ### Campi Obbligatori

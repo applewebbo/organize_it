@@ -31,6 +31,9 @@ Un'**Esperienza** è qualsiasi attività pianificata durante il viaggio, come:
 3. Completa il modulo
 4. Salva
 
+![Form Esperienza](../../assets/screenshots/experience-form.png)
+*Il form di creazione esperienza*
+
 ## Campi Esperienza
 
 ### Campi Obbligatori

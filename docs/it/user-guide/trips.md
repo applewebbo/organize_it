@@ -16,11 +16,17 @@ Un **Viaggio** è un contenitore per tutta la tua pianificazione di viaggio. Ogn
 
 ## Creare un Viaggio
 
+![Lista Viaggi](../../assets/screenshots/home-trips-list.png)
+*La lista dei tuoi viaggi nella homepage*
+
 ### Dalla Homepage
 
 1. Clicca il pulsante **Crea Nuovo Viaggio**
 2. Compila i dettagli del viaggio
 3. Clicca **Salva**
+
+![Form Creazione Viaggio](../../assets/screenshots/trip-create-form.png)
+*Il form di creazione viaggio*
 
 ### Dettagli del Viaggio
 

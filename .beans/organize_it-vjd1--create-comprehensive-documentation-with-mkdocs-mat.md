@@ -5,7 +5,7 @@ status: in-progress
 type: task
 priority: normal
 created_at: 2026-01-20T07:33:00Z
-updated_at: 2026-01-21T06:39:35Z
+updated_at: 2026-01-23T08:29:09Z
 parent: oor7
 ---
 
@@ -106,19 +106,18 @@ Provide comprehensive documentation for users including:
   - Technical (browser support, mobile, offline)
 
 ### Phase 6: Visual Assets
-- [ ] Take screenshots of key features:
-  - Empty state / welcome screen
-  - Trip creation form
-  - Trip detail view
-  - Day view with events
-  - Stay form
-  - Experience form
-  - Meal form
-  - Transfer forms
-  - Event detail modal
-- [ ] Optimize images (compress, resize)
-- [ ] Add images to docs/assets/
-- [ ] Reference images in documentation with proper captions
+- [x] Take screenshots of key features:
+  - Trip list (home-trips-list.png)
+  - Trip creation form (trip-create-form.png)
+  - Trip detail view (trip-detail.png)
+  - Day view with events (day-detail.png)
+  - Stay form (stay-form.png)
+  - Experience form (experience-form.png)
+  - Meal form (meal-form.png)
+  - Transfer form (transfer-form.png)
+  - Event detail modal (event-detail-modal.png)
+- [x] Add images to docs/assets/screenshots/
+- [x] Reference images in documentation with proper captions
 
 ### Phase 7: ReadTheDocs Setup
 - [ ] Create account on readthedocs.org (if not exists)

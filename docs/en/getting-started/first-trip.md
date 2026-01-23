@@ -31,6 +31,9 @@ From the homepage, click the **Create New Trip** button.
 
 ### 1.2 Fill in Trip Details
 
+![Trip Creation Form](../../assets/screenshots/trip-create-form.png)
+*The trip creation form*
+
 Enter the following information:
 
 - **Name**: "Rome Weekend Getaway"
@@ -61,6 +64,9 @@ Click **Save** to create your trip.
 !!! success
     Your trip is now created! Notice that 3 days (Friday, Saturday, Sunday) have been automatically generated.
 
+![Trip Detail View](../../assets/screenshots/trip-detail.png)
+*Your trip with automatically generated days*
+
 ## Step 2: Add Your Accommodation
 
 ### 2.1 Navigate to the First Day
@@ -68,6 +74,9 @@ Click **Save** to create your trip.
 Click on **Day 1 (Friday, March 14)** to open the day view.
 
 ### 2.2 Create a Stay
+
+![Stay Form](../../assets/screenshots/stay-form.png)
+*The stay creation form*
 
 1. Click **Add Stay**
 2. Fill in the stay details:
@@ -131,6 +140,9 @@ If you have a Google Places API key configured:
 
 ### 4.1 Friday Afternoon - Colosseum Visit
 
+![Experience Form](../../assets/screenshots/experience-form.png)
+*The experience creation form*
+
 1. Click **Add Experience**
 2. Fill in details:
    - **Name**: "Colosseum Tour"
@@ -188,6 +200,9 @@ If you have a Google Places API key configured:
 ## Step 5: Add Meals
 
 ### 5.1 Friday Dinner
+
+![Meal Form](../../assets/screenshots/meal-form.png)
+*The meal creation form*
 
 1. Navigate to **Day 1 (Friday)**
 2. Click **Add Meal**
@@ -281,6 +296,9 @@ If you have a Google Places API key configured:
 
 ### 7.1 View the Complete Trip
 
+![Day Detail View](../../assets/screenshots/day-detail.png)
+*A day with all its events*
+
 1. Click on the trip name to go back to the trip overview
 2. You should now see:
    - 3 days with automatically generated dates
@@ -306,6 +324,9 @@ Click on any day to see:
 ## Step 8: Make Edits and Adjustments
 
 ### 8.1 Edit an Event
+
+![Event Detail Modal](../../assets/screenshots/event-detail-modal.png)
+*Event detail modal with edit options*
 
 1. Click on any event card
 2. Click the **Edit** button

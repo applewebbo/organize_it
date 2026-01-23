@@ -123,6 +123,9 @@ When viewing a day, you can:
 
 ## Events Within Days
 
+![Day Detail](../../assets/screenshots/day-detail.png)
+*A day with its events in timeline view*
+
 ### Timeline View
 
 Events are displayed in chronological order:
