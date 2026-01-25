@@ -1,10 +1,11 @@
 ---
 # organize_it-qpd5
 title: Improve main transfer connection UI
-status: in-progress
+status: completed
 type: feature
+priority: normal
 created_at: 2026-01-25T15:10:43Z
-updated_at: 2026-01-25T15:10:43Z
+updated_at: 2026-01-25T15:12:37Z
 ---
 
 Modify the UI of transfers shown in arrival and departure sections:
