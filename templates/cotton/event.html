@@ -41,7 +41,7 @@
                     <i class="ph-bold ph-arrows-down-up i-sm {{ icon_color }}"
                        aria-hidden="true"></i>
                 </button>
-                {% if not transfer_from %}
+                {% if not transfer_from and event.has_next_event %}
                     <button class="btn btn-sm btn-soft {{ border_color }} {{ bg_color }} dark:hover:bg-slate-900/10 hover:bg-white/50"
                             hx-get="{% url 'trips:create-simple-transfer' event.pk %}"
                             @click="$dispatch('open-modal'); document.activeElement.blur()"

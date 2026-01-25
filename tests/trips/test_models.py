@@ -444,6 +444,38 @@ class TestEventModel:
         assert event.latitude is None
         assert event.longitude is None
 
+    def test_has_next_event_with_next_event(self, trip_factory, experience_factory):
+        """Test has_next_event returns True when there is a later event"""
+        trip = trip_factory()
+        day = trip.days.first()
+        event1 = experience_factory(
+            trip=trip, day=day, start_time="10:00", end_time="11:00"
+        )
+        experience_factory(trip=trip, day=day, start_time="14:00", end_time="15:00")
+
+        assert event1.has_next_event() is True
+
+    def test_has_next_event_without_next_event(self, trip_factory, experience_factory):
+        """Test has_next_event returns False when there is no later event"""
+        trip = trip_factory()
+        day = trip.days.first()
+        event = experience_factory(
+            trip=trip, day=day, start_time="23:00", end_time="23:59"
+        )
+
+        assert event.has_next_event() is False
+
+    def test_has_next_event_without_day(self, trip_factory, experience_factory):
+        """Test has_next_event returns False when event has no day"""
+        trip = trip_factory()
+        day = trip.days.first()
+        event = experience_factory(trip=trip, day=day)
+        # Remove day while keeping trip
+        event.day = None
+        event.save()
+
+        assert event.has_next_event() is False
+
 
 class TestExperienceModel:
     def test_factory(self, user_factory, trip_factory, experience_factory):

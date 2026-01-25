@@ -498,6 +498,18 @@ class Event(models.Model):
         self.save()
         other_event.save()
 
+    def has_next_event(self):
+        """
+        Check if there is a next event on the same day (later start time).
+        Used to determine if a simple transfer can be created.
+        """
+        if not self.day or not self.start_time:
+            return False
+
+        return Event.objects.filter(
+            day=self.day, start_time__gt=self.start_time
+        ).exists()
+
 
 @receiver(pre_save, sender=Event)
 def update_event_trip(sender, instance, **kwargs):
