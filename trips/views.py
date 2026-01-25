@@ -1043,6 +1043,205 @@ def get_next_events_for_transfer(request, day_id):
     return TemplateResponse(request, "trips/partials/to-event-options.html", context)
 
 
+# ============================================================================
+# MainTransferConnection Views
+# ============================================================================
+
+
+@login_required
+def main_transfer_connection_modal(request, main_transfer_pk):
+    """Show modal with event/stay options for creating a main transfer connection"""
+    from trips.models import MainTransfer, MainTransferConnection
+
+    main_transfer = get_object_or_404(
+        MainTransfer, pk=main_transfer_pk, trip__author=request.user
+    )
+
+    # Check if connection already exists
+    existing_connection = None
+    try:
+        existing_connection = main_transfer.connection
+    except MainTransferConnection.DoesNotExist:
+        pass
+
+    trip = main_transfer.trip
+
+    # Determine available options based on direction
+    if main_transfer.direction == MainTransfer.Direction.ARRIVAL:
+        # For ARRIVAL: first day's stay and first event
+        first_day = trip.days.first()
+        available_stay = first_day.stay if first_day else None
+        available_event = (
+            first_day.events.order_by("start_time").first() if first_day else None
+        )
+    else:
+        # For DEPARTURE: last day's stay and last event
+        last_day = trip.days.last()
+        available_stay = last_day.stay if last_day else None
+        available_event = (
+            last_day.events.order_by("start_time").last() if last_day else None
+        )
+
+    context = {
+        "main_transfer": main_transfer,
+        "existing_connection": existing_connection,
+        "available_stay": available_stay,
+        "available_event": available_event,
+    }
+    return TemplateResponse(
+        request, "trips/main-transfer-connection-modal.html", context
+    )
+
+
+@login_required
+def create_main_transfer_connection(request, main_transfer_pk, destination_type):
+    """Create a MainTransferConnection to event or stay"""
+    from trips.models import MainTransfer
+
+    main_transfer = get_object_or_404(
+        MainTransfer, pk=main_transfer_pk, trip__author=request.user
+    )
+
+    # Check if connection already exists
+    if hasattr(main_transfer, "connection"):
+        messages.add_message(
+            request,
+            messages.ERROR,
+            _("A connection already exists for this main transfer"),
+        )
+        return HttpResponse(status=204, headers={"HX-Refresh": "true"})
+
+    trip = main_transfer.trip
+
+    # Get the destination based on type and direction
+    if destination_type not in ["event", "stay"]:
+        messages.add_message(
+            request,
+            messages.ERROR,
+            _("Invalid destination type"),
+        )
+        return HttpResponse(status=204, headers={"HX-Refresh": "true"})
+
+    # Determine the destination object
+    if main_transfer.direction == MainTransfer.Direction.ARRIVAL:
+        first_day = trip.days.first()
+        if not first_day:
+            messages.add_message(
+                request,
+                messages.ERROR,
+                _("No days available in this trip"),
+            )
+            return HttpResponse(status=204, headers={"HX-Refresh": "true"})
+
+        if destination_type == "stay":
+            destination = first_day.stay
+        else:
+            destination = first_day.events.order_by("start_time").first()
+    else:
+        # DEPARTURE
+        last_day = trip.days.last()
+        if not last_day:
+            messages.add_message(
+                request,
+                messages.ERROR,
+                _("No days available in this trip"),
+            )
+            return HttpResponse(status=204, headers={"HX-Refresh": "true"})
+
+        if destination_type == "stay":
+            destination = last_day.stay
+        else:
+            destination = last_day.events.order_by("start_time").last()
+
+    if not destination:
+        messages.add_message(
+            request,
+            messages.ERROR,
+            _(f"No {destination_type} available for this connection"),
+        )
+        return HttpResponse(status=204, headers={"HX-Refresh": "true"})
+
+    # Create form
+    from trips.forms import MainTransferConnectionForm
+
+    form = MainTransferConnectionForm(
+        request.POST or None,
+        main_transfer=main_transfer,
+        destination=destination,
+        destination_type=destination_type,
+    )
+
+    if form.is_valid():
+        connection = form.save(commit=False)
+        connection.main_transfer = main_transfer
+        if destination_type == "event":
+            connection.event = destination
+        else:
+            connection.stay = destination
+        connection.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            _("Connection created successfully"),
+        )
+        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+
+    context = {
+        "form": form,
+        "main_transfer": main_transfer,
+        "destination": destination,
+        "destination_type": destination_type,
+    }
+    return TemplateResponse(
+        request, "trips/main-transfer-connection-create.html", context
+    )
+
+
+@login_required
+def edit_main_transfer_connection(request, pk):
+    """Edit an existing MainTransferConnection"""
+    from trips.models import MainTransferConnection
+
+    qs = MainTransferConnection.objects.select_related(
+        "main_transfer__trip__author", "event", "stay"
+    )
+    connection = get_object_or_404(qs, pk=pk, main_transfer__trip__author=request.user)
+
+    from trips.forms import MainTransferConnectionEditForm
+
+    form = MainTransferConnectionEditForm(request.POST or None, instance=connection)
+
+    if form.is_valid():
+        form.save()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            _("Connection updated successfully"),
+        )
+        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+
+    context = {"form": form, "connection": connection}
+    return TemplateResponse(
+        request, "trips/main-transfer-connection-edit.html", context
+    )
+
+
+@login_required
+def delete_main_transfer_connection(request, pk):
+    """Delete a MainTransferConnection"""
+    from trips.models import MainTransferConnection
+
+    qs = MainTransferConnection.objects.select_related("main_transfer__trip__author")
+    connection = get_object_or_404(qs, pk=pk, main_transfer__trip__author=request.user)
+    connection.delete()
+    messages.add_message(
+        request,
+        messages.SUCCESS,
+        _("Connection deleted successfully"),
+    )
+    return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
+
+
 @login_required
 def event_detail(request, pk):
     """

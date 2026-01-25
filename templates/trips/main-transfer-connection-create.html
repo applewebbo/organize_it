@@ -1,0 +1,99 @@
+{% load i18n %}
+<form hx-post="{{ request.path }}"
+      hx-target="#dialog"
+      hx-disabled-elt="#form-submit"
+      class="modal-content"
+      method="post">
+    <div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+            {% if main_transfer.direction == 1 %}
+                {% trans 'Create Connection from Arrival' %}
+            {% else %}
+                {% trans 'Create Connection to Departure' %}
+            {% endif %}
+        </h3>
+        <button type="button"
+                class="inline-flex justify-center items-center w-8 h-8 text-sm text-gray-400 bg-transparent rounded-lg hover:text-gray-900 hover:bg-gray-200 ms-auto dark:hover:bg-gray-600 dark:hover:text-white"
+                x-on:click="openModal = false">
+            <i class="ph-bold ph-x i-md"></i>
+            <span class="sr-only">Close modal</span>
+        </button>
+    </div>
+    <div class="grid gap-x-1 p-4 sm:grid-cols-2 sm:gap-x-2 md:p-5">
+        {% csrf_token %}
+        <!-- Transfer route info -->
+        <div class="col-span-full p-3 mb-4 rounded-lg bg-base-200">
+            <div class="flex gap-2 justify-center items-center sm:gap-3">
+                {% if main_transfer.direction == 1 %}
+                    {# ARRIVAL: from main_transfer destination to event/stay #}
+                    <div class="flex flex-col justify-center text-center">
+                        <span class="font-medium">
+                            {% if main_transfer.type == 1 or main_transfer.type == 2 %}
+                                {{ main_transfer.destination_name }}
+                            {% else %}
+                                {{ main_transfer.destination_address }}
+                            {% endif %}
+                        </span>
+                        <span class="text-sm text-base-content/70">{% trans 'Arrival Point' %}</span>
+                    </div>
+                    <i class="px-4 ph-bold ph-arrow-right"></i>
+                    <div class="flex flex-col justify-center text-center">
+                        <span class="font-medium">{{ destination.name }}</span>
+                        <span class="text-sm text-base-content/70">
+                            {% if destination_type == 'event' %}
+                                {{ destination.start_time|time:"H:i" }}
+                            {% else %}
+                                {% trans 'Stay' %}
+                            {% endif %}
+                        </span>
+                    </div>
+                {% else %}
+                    {# DEPARTURE: from event/stay to main_transfer origin #}
+                    <div class="flex flex-col justify-center text-center">
+                        <span class="font-medium">{{ destination.name }}</span>
+                        <span class="text-sm text-base-content/70">
+                            {% if destination_type == 'event' %}
+                                {{ destination.start_time|time:"H:i" }}
+                            {% else %}
+                                {% trans 'Stay' %}
+                            {% endif %}
+                        </span>
+                    </div>
+                    <i class="px-4 ph-bold ph-arrow-right"></i>
+                    <div class="flex flex-col justify-center text-center">
+                        <span class="font-medium">
+                            {% if main_transfer.type == 1 or main_transfer.type == 2 %}
+                                {{ main_transfer.origin_name }}
+                            {% else %}
+                                {{ main_transfer.origin_address }}
+                            {% endif %}
+                        </span>
+                        <span class="text-sm text-base-content/70">{% trans 'Departure Point' %}</span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-span-full mb-4">
+            <label class="block mb-2 font-medium">{{ form.transport_mode.label }}</label>
+            {{ form.transport_mode }}
+            {% if form.transport_mode.errors %}
+                <div class="mt-1 text-sm text-error">{{ form.transport_mode.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="col-span-full mb-4">
+            <label for="{{ form.notes.id_for_label }}" class="block mb-2 font-medium">{{ form.notes.label }}</label>
+            <textarea name="{{ form.notes.name }}"
+                      id="{{ form.notes.id_for_label }}"
+                      rows="3"
+                      class="w-full textarea textarea-bordered"
+                      placeholder="{% trans 'Notes' %}">{{ form.notes.value|default:'' }}</textarea>
+            {% if form.notes.errors %}<div class="mt-1 text-sm text-error">{{ form.notes.errors }}</div>{% endif %}
+        </div>
+    </div>
+    <div class="flex justify-end items-center p-4 md:p-5">
+        <button type="button"
+                x-on:click="openModal = false"
+                class="mr-2 btn btn-outline btn-error">{% trans 'Cancel' %}</button>
+        <button id="form-submit" class="btn btn-outline btn-primary" type="submit">{% trans 'Save' %}</button>
+    </div>
+</form>

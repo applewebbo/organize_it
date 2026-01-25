@@ -117,6 +117,27 @@ htmx_urlpatterns = [
         views.get_next_events_for_transfer,
         name="get-next-events-for-transfer",
     ),
+    # MAIN TRANSFER CONNECTIONS
+    path(
+        "main-transfer-connections/<int:main_transfer_pk>/modal",
+        views.main_transfer_connection_modal,
+        name="main-transfer-connection-modal",
+    ),
+    path(
+        "main-transfer-connections/<int:main_transfer_pk>/create/<str:destination_type>",
+        views.create_main_transfer_connection,
+        name="create-main-transfer-connection",
+    ),
+    path(
+        "main-transfer-connections/<int:pk>/edit",
+        views.edit_main_transfer_connection,
+        name="edit-main-transfer-connection",
+    ),
+    path(
+        "main-transfer-connections/<int:pk>/delete",
+        views.delete_main_transfer_connection,
+        name="delete-main-transfer-connection",
+    ),
     path("days/<int:pk>/detail", views.day_detail, name="day-detail"),
     path("validate/dates/", views.validate_dates, name="validate-dates"),
     # NOTES

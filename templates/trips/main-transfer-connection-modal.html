@@ -1,0 +1,104 @@
+{% load i18n %}
+<div class="modal-content">
+    <div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+            {% if main_transfer.direction == 1 %}
+                {% trans 'Connection from Arrival' %}
+            {% else %}
+                {% trans 'Connection to Departure' %}
+            {% endif %}
+        </h3>
+        <button type="button"
+                class="inline-flex justify-center items-center w-8 h-8 text-sm text-gray-400 bg-transparent rounded-lg hover:text-gray-900 hover:bg-gray-200 ms-auto dark:hover:bg-gray-600 dark:hover:text-white"
+                x-on:click="openModal = false">
+            <i class="ph-bold ph-x i-md"></i>
+            <span class="sr-only">Close modal</span>
+        </button>
+    </div>
+    <div class="p-4 md:p-5">
+        {% if existing_connection %}
+            {# Connection exists - show edit/delete options #}
+            <div class="p-3 mb-4 rounded-lg bg-base-200">
+                <div class="flex gap-2 items-center mb-2">
+                    <i class="ph-bold ph-check-circle i-lg text-success"></i>
+                    <span class="font-medium">{% trans 'Connection Active' %}</span>
+                </div>
+                <div class="text-sm text-base-content/70">
+                    <p>{{ existing_connection.from_location }} → {{ existing_connection.to_location }}</p>
+                    <p>{% trans 'Mode:' %} {{ existing_connection.get_transport_mode_display }}</p>
+                </div>
+            </div>
+            <div class="flex gap-2 justify-end">
+                <button hx-get="{% url 'trips:edit-main-transfer-connection' existing_connection.pk %}"
+                        hx-target="#dialog"
+                        hx-swap="innerHTML"
+                        class="btn btn-outline btn-primary">
+                    <i class="ph-bold ph-pencil-simple"></i>
+                    {% trans 'Edit' %}
+                </button>
+                <button hx-delete="{% url 'trips:delete-main-transfer-connection' existing_connection.pk %}"
+                        hx-confirm="{% trans 'Are you sure you want to delete this connection?' %}"
+                        class="btn btn-outline btn-error">
+                    <i class="ph-bold ph-trash"></i>
+                    {% trans 'Delete' %}
+                </button>
+            </div>
+        {% else %}
+            {# No connection - show options to create #}
+            {% if not available_stay and not available_event %}
+                <div class="p-4 rounded-lg bg-base-200">
+                    <p class="text-base-content/70">
+                        {% if main_transfer.direction == 1 %}
+                            {% trans 'No events or stays available on the first day. Please create an event or stay first, then you can add a connection from your arrival transfer.' %}
+                        {% else %}
+                            {% trans 'No events or stays available on the last day. Please create an event or stay first, then you can add a connection to your departure transfer.' %}
+                        {% endif %}
+                    </p>
+                </div>
+            {% else %}
+                <p class="mb-4 text-base-content/70">
+                    {% if main_transfer.direction == 1 %}
+                        {% trans 'Select the destination for your arrival connection:' %}
+                    {% else %}
+                        {% trans 'Select the origin for your departure connection:' %}
+                    {% endif %}
+                </p>
+                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    {% if available_stay %}
+                        <button hx-get="{% url 'trips:create-main-transfer-connection' main_transfer.pk 'stay' %}"
+                                hx-target="#dialog"
+                                hx-swap="innerHTML"
+                                class="p-4 text-left rounded-lg border-2 transition-colors border-base-300 hover:border-primary">
+                            <div class="flex gap-3 items-center mb-2">
+                                <i class="ph-bold ph-bed i-xl text-slate-500"></i>
+                                <span class="font-medium">{{ available_stay.name }}</span>
+                            </div>
+                            <div class="text-sm text-base-content/70">
+                                {% if available_stay.address %}{{ available_stay.address }}{% endif %}
+                            </div>
+                        </button>
+                    {% endif %}
+                    {% if available_event %}
+                        <button hx-get="{% url 'trips:create-main-transfer-connection' main_transfer.pk 'event' %}"
+                                hx-target="#dialog"
+                                hx-swap="innerHTML"
+                                class="p-4 text-left rounded-lg border-2 transition-colors border-base-300 hover:border-primary">
+                            <div class="flex gap-3 items-center mb-2">
+                                {% if available_event.category == 2 %}
+                                    <i class="text-green-500 ph-bold ph-binoculars i-xl"></i>
+                                {% else %}
+                                    <i class="text-yellow-500 ph-bold ph-fork-knife i-xl"></i>
+                                {% endif %}
+                                <span class="font-medium">{{ available_event.name }}</span>
+                            </div>
+                            <div class="text-sm text-base-content/70">
+                                {% if available_event.start_time %}{{ available_event.start_time|time:"H:i" }}{% endif %}
+                                {% if available_event.address %}- {{ available_event.address }}{% endif %}
+                            </div>
+                        </button>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>

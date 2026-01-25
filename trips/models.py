@@ -778,6 +778,145 @@ class StayTransfer(models.Model):
         super().save(*args, **kwargs)
 
 
+class MainTransferConnection(models.Model):
+    """
+    Connection between a MainTransfer and the first/last event or stay.
+    - For ARRIVAL: transfer goes FROM main_transfer destination TO event/stay
+    - For DEPARTURE: transfer goes FROM event/stay TO main_transfer origin
+    Direction is determined by main_transfer.direction field.
+    """
+
+    main_transfer = models.OneToOneField(
+        MainTransfer, on_delete=models.CASCADE, related_name="connection"
+    )
+    event = models.ForeignKey(
+        Event, on_delete=models.CASCADE, null=True, blank=True, related_name="+"
+    )
+    stay = models.ForeignKey(
+        Stay, on_delete=models.CASCADE, null=True, blank=True, related_name="+"
+    )
+
+    transport_mode = models.CharField(
+        max_length=50,
+        choices=SimpleTransfer.TransportMode.choices,
+        default=SimpleTransfer.TransportMode.DRIVING,
+    )
+    notes = models.TextField(blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "trips_main_transfer_connection"
+        verbose_name = _("Main Transfer Connection")
+        verbose_name_plural = _("Main Transfer Connections")
+        constraints = [
+            models.CheckConstraint(
+                condition=(
+                    models.Q(event__isnull=False, stay__isnull=True)
+                    | models.Q(event__isnull=True, stay__isnull=False)
+                ),
+                name="main_transfer_connection_one_destination",
+            )
+        ]
+
+    def __str__(self):
+        destination = self.event.name if self.event else self.stay.name
+        direction = self.main_transfer.get_direction_display()
+        return f"{direction} Connection → {destination}"
+
+    @property
+    def destination_type(self):
+        """Returns 'event' or 'stay' to identify destination type"""
+        return "event" if self.event else "stay"
+
+    @property
+    def destination(self):
+        """Returns the actual event or stay object"""
+        return self.event if self.event else self.stay
+
+    @property
+    def from_location(self):
+        """Get origin location based on direction"""
+        if self.main_transfer.direction == MainTransfer.Direction.ARRIVAL:
+            # ARRIVAL: from main_transfer destination to event/stay
+            return (
+                self.main_transfer.destination_name
+                or self.main_transfer.destination_address
+            )
+        else:
+            # DEPARTURE: from event/stay to main_transfer origin
+            return self.event.name if self.event else self.stay.name
+
+    @property
+    def to_location(self):
+        """Get destination location based on direction"""
+        if self.main_transfer.direction == MainTransfer.Direction.ARRIVAL:
+            # ARRIVAL: from main_transfer destination to event/stay
+            return self.event.name if self.event else self.stay.name
+        else:
+            # DEPARTURE: from event/stay to main_transfer origin
+            return self.main_transfer.origin_name or self.main_transfer.origin_address
+
+    @property
+    def from_coordinates(self):
+        """Get origin coordinates based on direction"""
+        if self.main_transfer.direction == MainTransfer.Direction.ARRIVAL:
+            return (
+                self.main_transfer.destination_latitude,
+                self.main_transfer.destination_longitude,
+            )
+        else:
+            if self.event:
+                return (self.event.latitude, self.event.longitude)
+            else:
+                return (self.stay.latitude, self.stay.longitude)
+
+    @property
+    def to_coordinates(self):
+        """Get destination coordinates based on direction"""
+        if self.main_transfer.direction == MainTransfer.Direction.ARRIVAL:
+            if self.event:
+                return (self.event.latitude, self.event.longitude)
+            else:
+                return (self.stay.latitude, self.stay.longitude)
+        else:
+            return (
+                self.main_transfer.origin_latitude,
+                self.main_transfer.origin_longitude,
+            )
+
+    @property
+    def google_maps_url(self):
+        """Generate Google Maps URL from addresses with travel mode"""
+        from_coords = self.from_coordinates
+        to_coords = self.to_coordinates
+
+        if from_coords and to_coords and all(from_coords) and all(to_coords):
+            return (
+                f"https://www.google.com/maps/dir/?api=1"
+                f"&origin={from_coords[0]},{from_coords[1]}"
+                f"&destination={to_coords[0]},{to_coords[1]}"
+                f"&travelmode={self.transport_mode}"
+            )
+        return None
+
+    def clean(self):
+        """Validate MainTransferConnection constraints"""
+        super().clean()
+
+        # Exactly one of event or stay must be set (enforced by DB constraint)
+        if not self.event_id and not self.stay_id:
+            raise ValidationError(
+                _("Either event or stay must be set for the connection")
+            )
+
+        if self.event_id and self.stay_id:
+            raise ValidationError(
+                _("Cannot set both event and stay - choose only one destination")
+            )
+
+
 class Experience(Event):
     class Type(models.IntegerChoices):
         MUSEUM = 1, _("Museum")

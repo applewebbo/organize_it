@@ -17,6 +17,7 @@ from .models import (
     Experience,
     Link,
     MainTransfer,
+    MainTransferConnection,
     Meal,
     SimpleTransfer,
     Stay,
@@ -1888,3 +1889,81 @@ class StayTransferEditForm(forms.ModelForm):
             instance.save()
 
         return instance
+
+
+# ============================================================================
+# MainTransferConnection Forms
+# ============================================================================
+
+
+class MainTransferConnectionForm(forms.ModelForm):
+    """Form for creating a MainTransferConnection (auto-populates main_transfer and destination)"""
+
+    class Meta:
+        model = MainTransferConnection
+        fields = ["transport_mode", "notes"]
+        labels = {
+            "transport_mode": _("Transport Mode"),
+            "notes": _("Notes"),
+        }
+        widgets = {
+            "transport_mode": TransportModeRadioSelect(),
+            "notes": forms.Textarea(attrs={"rows": 3, "placeholder": _("Notes")}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.main_transfer = kwargs.pop("main_transfer", None)
+        self.destination = kwargs.pop("destination", None)
+        self.destination_type = kwargs.pop("destination_type", None)
+
+        # Create instance with main_transfer and destination already set to avoid validation errors
+        if "instance" not in kwargs and self.main_transfer and self.destination:
+            if self.destination_type == "event":
+                kwargs["instance"] = MainTransferConnection(
+                    main_transfer=self.main_transfer, event=self.destination
+                )
+            else:
+                kwargs["instance"] = MainTransferConnection(
+                    main_transfer=self.main_transfer, stay=self.destination
+                )
+
+        super().__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+
+        self.fields["transport_mode"].choices = SimpleTransfer.TransportMode.choices
+
+        self.helper.layout = Layout(
+            Field("transport_mode", wrapper_class="col-span-full"),
+            Field("notes", wrapper_class="col-span-full"),
+        )
+
+
+class MainTransferConnectionEditForm(forms.ModelForm):
+    """Form for editing an existing MainTransferConnection"""
+
+    class Meta:
+        model = MainTransferConnection
+        fields = ["transport_mode", "notes"]
+        labels = {
+            "transport_mode": _("Transport Mode"),
+            "notes": _("Notes"),
+        }
+        widgets = {
+            "transport_mode": TransportModeRadioSelect(),
+            "notes": forms.Textarea(attrs={"rows": 3, "placeholder": _("Notes")}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+
+        self.fields["transport_mode"].choices = SimpleTransfer.TransportMode.choices
+
+        self.helper.layout = Layout(
+            Field("transport_mode", wrapper_class="col-span-full"),
+            Field("notes", wrapper_class="col-span-full"),
+        )
