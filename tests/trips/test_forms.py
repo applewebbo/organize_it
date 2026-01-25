@@ -5,7 +5,12 @@ import pytest
 from django.utils.translation import activate
 
 from tests.test import TestCase
-from tests.trips.factories import MainTransferFactory, TripFactory
+from tests.trips.factories import (
+    ExperienceFactory,
+    MainTransferFactory,
+    StayFactory,
+    TripFactory,
+)
 from trips.forms import (
     AddNoteToStayForm,
     EventChangeTimesForm,
@@ -1438,3 +1443,90 @@ class TestOtherMainTransferForm:
         # Check fields are NOT pre-filled
         assert form.fields["origin_address"].initial is None
         assert not hasattr(form, "prefilled_from_arrival")
+
+
+class TestMainTransferConnectionForm:
+    """Tests for MainTransferConnectionForm"""
+
+    def test_form_creates_instance_with_event(self):
+        """Test form creates instance with event when not provided"""
+        from trips.forms import MainTransferConnectionForm
+        from trips.models import MainTransfer
+
+        trip = TripFactory()
+        main_transfer = MainTransferFactory(
+            trip=trip, direction=MainTransfer.Direction.ARRIVAL
+        )
+        first_day = trip.days.first()
+        event = ExperienceFactory(trip=trip, day=first_day)
+
+        form = MainTransferConnectionForm(
+            main_transfer=main_transfer,
+            destination=event,
+            destination_type="event",
+        )
+
+        # Instance should be created in __init__
+        assert form.instance is not None
+        assert form.instance.main_transfer == main_transfer
+        assert form.instance.event == event
+        assert form.instance.stay is None
+
+    def test_form_creates_instance_with_stay(self):
+        """Test form creates instance with stay when not provided"""
+        from trips.forms import MainTransferConnectionForm
+        from trips.models import MainTransfer
+
+        trip = TripFactory()
+        main_transfer = MainTransferFactory(
+            trip=trip, direction=MainTransfer.Direction.ARRIVAL
+        )
+        first_day = trip.days.first()
+        stay = StayFactory()
+        first_day.stay = stay
+        first_day.save()
+
+        form = MainTransferConnectionForm(
+            main_transfer=main_transfer,
+            destination=stay,
+            destination_type="stay",
+        )
+
+        # Instance should be created in __init__
+        assert form.instance is not None
+        assert form.instance.main_transfer == main_transfer
+        assert form.instance.stay == stay
+        assert form.instance.event is None
+
+    def test_form_preserves_existing_instance(self):
+        """Test form preserves instance when already provided"""
+        from trips.forms import MainTransferConnectionForm
+        from trips.models import MainTransfer, MainTransferConnection
+
+        trip = TripFactory()
+        main_transfer = MainTransferFactory(
+            trip=trip, direction=MainTransfer.Direction.ARRIVAL
+        )
+        first_day = trip.days.first()
+        event = ExperienceFactory(trip=trip, day=first_day)
+
+        # Create existing connection
+        existing_connection = MainTransferConnection(
+            main_transfer=main_transfer,
+            event=event,
+            transport_mode="walking",
+            notes="Existing note",
+        )
+
+        # Pass instance to form
+        form = MainTransferConnectionForm(
+            instance=existing_connection,
+            main_transfer=main_transfer,
+            destination=event,
+            destination_type="event",
+        )
+
+        # Should preserve the existing instance
+        assert form.instance == existing_connection
+        assert form.instance.notes == "Existing note"
+        assert form.instance.transport_mode == "walking"

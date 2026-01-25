@@ -1,11 +1,11 @@
 ---
 # organize_it-el8f
 title: Add transfer from main transfer arrival to first event/stay
-status: in-progress
+status: completed
 type: feature
 priority: normal
 created_at: 2026-01-25T06:50:52Z
-updated_at: 2026-01-25T07:04:19Z
+updated_at: 2026-01-25T15:04:56Z
 ---
 
 Add the ability to add a transfer from main transfer arrival/departure location to first/last event or stay.
@@ -26,7 +26,7 @@ Using a single model `MainTransferConnection` that works for both ARRIVAL and DE
 - [x] Create modal templates for selecting event/stay destination
 - [x] Update main-transfers.html to show connection status and add/edit buttons
 - [x] Add URL patterns
-- [ ] Add tests for model and views
-- [ ] Update bean checklist as completed
+- [x] Add tests for model and views
+- [x] Update bean checklist as completed
 
 Related to #230

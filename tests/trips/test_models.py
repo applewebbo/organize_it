@@ -1575,3 +1575,345 @@ class TestStayTransfer:
 
         # Should not raise - skips consecutive days check when from_day not set
         transfer.clean()
+
+
+class TestMainTransferConnection:
+    """Tests for MainTransferConnection model"""
+
+    def test_arrival_connection_to_event_creation(
+        self, trip_factory, main_transfer_factory, experience_factory
+    ):
+        """Test creating an arrival connection to an event"""
+        from trips.models import MainTransfer, MainTransferConnection
+
+        trip = trip_factory()
+        main_transfer = main_transfer_factory(
+            trip=trip, direction=MainTransfer.Direction.ARRIVAL
+        )
+        first_day = trip.days.first()
+        event = experience_factory(trip=trip, day=first_day)
+
+        connection = MainTransferConnection.objects.create(
+            main_transfer=main_transfer, event=event, transport_mode="driving"
+        )
+
+        assert connection.main_transfer == main_transfer
+        assert connection.event == event
+        assert connection.stay is None
+        assert connection.transport_mode == "driving"
+        assert connection.destination_type == "event"
+        assert connection.destination == event
+
+    def test_arrival_connection_to_stay_creation(
+        self, trip_factory, main_transfer_factory, stay_factory
+    ):
+        """Test creating an arrival connection to a stay"""
+        from trips.models import MainTransfer, MainTransferConnection
+
+        trip = trip_factory()
+        main_transfer = main_transfer_factory(
+            trip=trip, direction=MainTransfer.Direction.ARRIVAL
+        )
+        first_day = trip.days.first()
+        stay = stay_factory()
+        first_day.stay = stay
+        first_day.save()
+
+        connection = MainTransferConnection.objects.create(
+            main_transfer=main_transfer, stay=stay, transport_mode="transit"
+        )
+
+        assert connection.main_transfer == main_transfer
+        assert connection.stay == stay
+        assert connection.event is None
+        assert connection.transport_mode == "transit"
+        assert connection.destination_type == "stay"
+        assert connection.destination == stay
+
+    def test_departure_connection_to_event_creation(
+        self, trip_factory, main_transfer_factory, experience_factory
+    ):
+        """Test creating a departure connection from an event"""
+        from trips.models import MainTransfer, MainTransferConnection
+
+        trip = trip_factory()
+        main_transfer = main_transfer_factory(
+            trip=trip, direction=MainTransfer.Direction.DEPARTURE
+        )
+        last_day = trip.days.last()
+        event = experience_factory(trip=trip, day=last_day)
+
+        connection = MainTransferConnection.objects.create(
+            main_transfer=main_transfer, event=event, transport_mode="driving"
+        )
+
+        assert connection.main_transfer == main_transfer
+        assert connection.event == event
+        assert connection.stay is None
+
+    def test_connection_onetoone_constraint(
+        self, trip_factory, main_transfer_factory, experience_factory
+    ):
+        """Test that OneToOne constraint prevents duplicate connections"""
+        from django.db import IntegrityError
+
+        from trips.models import MainTransfer, MainTransferConnection
+
+        trip = trip_factory()
+        main_transfer = main_transfer_factory(
+            trip=trip, direction=MainTransfer.Direction.ARRIVAL
+        )
+        first_day = trip.days.first()
+        event1 = experience_factory(trip=trip, day=first_day)
+        event2 = experience_factory(trip=trip, day=first_day)
+
+        # Create first connection
+        MainTransferConnection.objects.create(
+            main_transfer=main_transfer, event=event1, transport_mode="driving"
+        )
+
+        # Try to create another connection for the same main_transfer (should fail)
+        with pytest.raises(IntegrityError):
+            MainTransferConnection.objects.create(
+                main_transfer=main_transfer, event=event2, transport_mode="walking"
+            )
+
+    def test_connection_validation_no_destination(
+        self, trip_factory, main_transfer_factory
+    ):
+        """Test that connection requires either event or stay"""
+        from django.core.exceptions import ValidationError
+
+        from trips.models import MainTransfer, MainTransferConnection
+
+        trip = trip_factory()
+        main_transfer = main_transfer_factory(
+            trip=trip, direction=MainTransfer.Direction.ARRIVAL
+        )
+
+        connection = MainTransferConnection(
+            main_transfer=main_transfer, transport_mode="driving"
+        )
+
+        with pytest.raises(ValidationError) as exc_info:
+            connection.full_clean()
+
+        assert "Either event or stay must be set" in str(exc_info.value)
+
+    def test_connection_validation_both_destinations(
+        self, trip_factory, main_transfer_factory, experience_factory, stay_factory
+    ):
+        """Test that connection cannot have both event and stay"""
+        from django.core.exceptions import ValidationError
+
+        from trips.models import MainTransfer, MainTransferConnection
+
+        trip = trip_factory()
+        main_transfer = main_transfer_factory(
+            trip=trip, direction=MainTransfer.Direction.ARRIVAL
+        )
+        first_day = trip.days.first()
+        event = experience_factory(trip=trip, day=first_day)
+        stay = stay_factory()
+
+        connection = MainTransferConnection(
+            main_transfer=main_transfer,
+            event=event,
+            stay=stay,
+            transport_mode="driving",
+        )
+
+        with pytest.raises(ValidationError) as exc_info:
+            connection.full_clean()
+
+        assert "Cannot set both event and stay" in str(exc_info.value)
+
+    def test_arrival_connection_properties(
+        self, trip_factory, main_transfer_factory, experience_factory
+    ):
+        """Test properties for arrival connection"""
+        from trips.models import MainTransfer, MainTransferConnection
+
+        trip = trip_factory()
+        main_transfer = main_transfer_factory(
+            trip=trip,
+            direction=MainTransfer.Direction.ARRIVAL,
+            destination_name="JFK Airport",
+            destination_latitude=40.6413,
+            destination_longitude=-73.7781,
+        )
+        first_day = trip.days.first()
+        event = experience_factory(
+            trip=trip, day=first_day, latitude=40.7580, longitude=-73.9855
+        )
+
+        connection = MainTransferConnection.objects.create(
+            main_transfer=main_transfer, event=event, transport_mode="driving"
+        )
+
+        # For ARRIVAL: from main_transfer destination to event
+        assert connection.from_location == "JFK Airport"
+        assert connection.to_location == event.name
+        assert connection.from_coordinates == (40.6413, -73.7781)
+        assert connection.to_coordinates == (40.7580, -73.9855)
+
+    def test_arrival_connection_properties_with_stay(
+        self, trip_factory, main_transfer_factory, stay_factory
+    ):
+        """Test properties for arrival connection to stay"""
+        from trips.models import MainTransfer, MainTransferConnection
+
+        trip = trip_factory()
+        main_transfer = main_transfer_factory(
+            trip=trip,
+            direction=MainTransfer.Direction.ARRIVAL,
+            destination_name="JFK Airport",
+            destination_latitude=40.6413,
+            destination_longitude=-73.7781,
+        )
+        first_day = trip.days.first()
+        stay = stay_factory(latitude=40.7580, longitude=-73.9855)
+        first_day.stay = stay
+        first_day.save()
+
+        connection = MainTransferConnection.objects.create(
+            main_transfer=main_transfer, stay=stay, transport_mode="driving"
+        )
+
+        # For ARRIVAL: from main_transfer destination to stay
+        assert connection.from_location == "JFK Airport"
+        assert connection.to_location == stay.name
+        assert connection.from_coordinates == (40.6413, -73.7781)
+        assert connection.to_coordinates == (40.7580, -73.9855)
+
+    def test_departure_connection_properties(
+        self, trip_factory, main_transfer_factory, experience_factory
+    ):
+        """Test properties for departure connection"""
+        from trips.models import MainTransfer, MainTransferConnection
+
+        trip = trip_factory()
+        main_transfer = main_transfer_factory(
+            trip=trip,
+            direction=MainTransfer.Direction.DEPARTURE,
+            origin_name="JFK Airport",
+            origin_latitude=40.6413,
+            origin_longitude=-73.7781,
+        )
+        last_day = trip.days.last()
+        event = experience_factory(
+            trip=trip, day=last_day, latitude=40.7580, longitude=-73.9855
+        )
+
+        connection = MainTransferConnection.objects.create(
+            main_transfer=main_transfer, event=event, transport_mode="driving"
+        )
+
+        # For DEPARTURE: from event to main_transfer origin
+        assert connection.from_location == event.name
+        assert connection.to_location == "JFK Airport"
+        assert connection.from_coordinates == (40.7580, -73.9855)
+        assert connection.to_coordinates == (40.6413, -73.7781)
+
+    def test_departure_connection_properties_with_stay(
+        self, trip_factory, main_transfer_factory, stay_factory
+    ):
+        """Test properties for departure connection from stay"""
+        from trips.models import MainTransfer, MainTransferConnection
+
+        trip = trip_factory()
+        main_transfer = main_transfer_factory(
+            trip=trip,
+            direction=MainTransfer.Direction.DEPARTURE,
+            origin_name="JFK Airport",
+            origin_latitude=40.6413,
+            origin_longitude=-73.7781,
+        )
+        last_day = trip.days.last()
+        stay = stay_factory(latitude=40.7580, longitude=-73.9855)
+        last_day.stay = stay
+        last_day.save()
+
+        connection = MainTransferConnection.objects.create(
+            main_transfer=main_transfer, stay=stay, transport_mode="driving"
+        )
+
+        # For DEPARTURE: from stay to main_transfer origin
+        assert connection.from_location == stay.name
+        assert connection.to_location == "JFK Airport"
+        assert connection.from_coordinates == (40.7580, -73.9855)
+        assert connection.to_coordinates == (40.6413, -73.7781)
+
+    def test_connection_google_maps_url(
+        self, trip_factory, main_transfer_factory, experience_factory
+    ):
+        """Test google_maps_url generation"""
+        from trips.models import MainTransfer, MainTransferConnection
+
+        trip = trip_factory()
+        main_transfer = main_transfer_factory(
+            trip=trip,
+            direction=MainTransfer.Direction.ARRIVAL,
+            destination_latitude=40.6413,
+            destination_longitude=-73.7781,
+        )
+        first_day = trip.days.first()
+        event = experience_factory(
+            trip=trip, day=first_day, latitude=40.7580, longitude=-73.9855
+        )
+
+        connection = MainTransferConnection.objects.create(
+            main_transfer=main_transfer, event=event, transport_mode="driving"
+        )
+
+        assert connection.google_maps_url is not None
+        assert "google.com/maps" in connection.google_maps_url
+        assert "40.6413,-73.7781" in connection.google_maps_url
+        assert "40.758,-73.9855" in connection.google_maps_url
+        assert "travelmode=driving" in connection.google_maps_url
+
+    def test_connection_google_maps_url_without_coordinates(
+        self, trip_factory, main_transfer_factory, experience_factory
+    ):
+        """Test google_maps_url returns None when coordinates missing"""
+        from trips.models import Event, MainTransfer, MainTransferConnection
+
+        trip = trip_factory()
+        main_transfer = main_transfer_factory(
+            trip=trip,
+            direction=MainTransfer.Direction.ARRIVAL,
+            destination_latitude=None,
+            destination_longitude=None,
+        )
+        first_day = trip.days.first()
+        event = experience_factory(trip=trip, day=first_day)
+        # Remove coordinates using update to bypass geocoding signal
+        Event.objects.filter(pk=event.pk).update(latitude=None, longitude=None)
+        event.refresh_from_db()
+
+        connection = MainTransferConnection.objects.create(
+            main_transfer=main_transfer, event=event, transport_mode="driving"
+        )
+
+        assert connection.google_maps_url is None
+
+    def test_connection_str_method(
+        self, trip_factory, main_transfer_factory, experience_factory
+    ):
+        """Test __str__ method"""
+        from trips.models import MainTransfer, MainTransferConnection
+
+        trip = trip_factory()
+        main_transfer = main_transfer_factory(
+            trip=trip, direction=MainTransfer.Direction.ARRIVAL
+        )
+        first_day = trip.days.first()
+        event = experience_factory(trip=trip, day=first_day)
+
+        connection = MainTransferConnection.objects.create(
+            main_transfer=main_transfer, event=event, transport_mode="driving"
+        )
+
+        str_repr = str(connection)
+        assert "Arrival Connection" in str_repr
+        assert event.name in str_repr
