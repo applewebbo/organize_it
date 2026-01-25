@@ -99,6 +99,7 @@
                                         @click="$dispatch('open-modal'); document.activeElement.blur()"
                                         title="{% trans 'Edit connection' %}">
                                     <i class="ph-bold ph-pencil-simple"></i>
+                                    <span class="hidden sm:inline">{% trans "Edit" %}</span>
                                 </button>
                             </div>
                         {% else %}
@@ -208,6 +209,7 @@
                                         @click="$dispatch('open-modal'); document.activeElement.blur()"
                                         title="{% trans 'Edit connection' %}">
                                     <i class="ph-bold ph-pencil-simple"></i>
+                                    <span class="hidden sm:inline">{% trans "Edit" %}</span>
                                 </button>
                             </div>
                         {% else %}
