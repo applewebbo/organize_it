@@ -86,9 +86,10 @@
                         {% if arrival_transfer.connection %}
                             <div class="flex gap-2 justify-between items-center">
                                 <div class="flex gap-2 items-center text-sm">
-                                    <div class="badge badge-success badge-sm">
-                                        <i class="ph-bold ph-path i-sm"></i>
-                                    </div>
+                                    {% with mode=arrival_transfer.connection.transport_mode %}
+                                        <i class="ph-bold i-sm {% if mode == 'driving' %}ph-car{% endif %} {% if mode == 'walking' %}ph-person-simple-walk{% endif %} {% if mode == 'bicycling' %}ph-bicycle{% endif %} {% if mode == 'transit' %}ph-train{% endif %}"
+                                           aria-hidden="true"></i>
+                                    {% endwith %}
                                     <span>→ {{ arrival_transfer.connection.destination.name }}</span>
                                 </div>
                                 <button class="btn btn-xs btn-soft"
@@ -101,14 +102,17 @@
                                 </button>
                             </div>
                         {% else %}
-                            <button class="w-full btn btn-xs btn-outline"
-                                    hx-get="{% url 'trips:main-transfer-connection-modal' arrival_transfer.pk %}"
-                                    hx-target="#dialog"
-                                    hx-swap="innerHTML"
-                                    @click="$dispatch('open-modal'); document.activeElement.blur()">
-                                <i class="ph-bold ph-path i-sm"></i>
-                                {% trans "Add connection" %}
-                            </button>
+                            <div class="flex justify-end">
+                                <button class="btn btn-xs btn-soft"
+                                        hx-get="{% url 'trips:main-transfer-connection-modal' arrival_transfer.pk %}"
+                                        hx-target="#dialog"
+                                        hx-swap="innerHTML"
+                                        @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                        title="{% trans 'Add connection' %}">
+                                    <i class="ph-bold ph-path i-sm"></i>
+                                    <span class="hidden sm:inline">{% trans "Add connection" %}</span>
+                                </button>
+                            </div>
                         {% endif %}
                     </div>
                 {% else %}
@@ -191,9 +195,10 @@
                         {% if departure_transfer.connection %}
                             <div class="flex gap-2 justify-between items-center">
                                 <div class="flex gap-2 items-center text-sm">
-                                    <div class="badge badge-success badge-sm">
-                                        <i class="ph-bold ph-path i-sm"></i>
-                                    </div>
+                                    {% with mode=departure_transfer.connection.transport_mode %}
+                                        <i class="ph-bold i-sm {% if mode == 'driving' %}ph-car{% endif %} {% if mode == 'walking' %}ph-person-simple-walk{% endif %} {% if mode == 'bicycling' %}ph-bicycle{% endif %} {% if mode == 'transit' %}ph-train{% endif %}"
+                                           aria-hidden="true"></i>
+                                    {% endwith %}
                                     <span>{{ departure_transfer.connection.destination.name }} →</span>
                                 </div>
                                 <button class="btn btn-xs btn-soft"
@@ -206,14 +211,17 @@
                                 </button>
                             </div>
                         {% else %}
-                            <button class="w-full btn btn-xs btn-outline"
-                                    hx-get="{% url 'trips:main-transfer-connection-modal' departure_transfer.pk %}"
-                                    hx-target="#dialog"
-                                    hx-swap="innerHTML"
-                                    @click="$dispatch('open-modal'); document.activeElement.blur()">
-                                <i class="ph-bold ph-path i-sm"></i>
-                                {% trans "Add connection" %}
-                            </button>
+                            <div class="flex justify-end">
+                                <button class="btn btn-xs btn-soft"
+                                        hx-get="{% url 'trips:main-transfer-connection-modal' departure_transfer.pk %}"
+                                        hx-target="#dialog"
+                                        hx-swap="innerHTML"
+                                        @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                        title="{% trans 'Add connection' %}">
+                                    <i class="ph-bold ph-path i-sm"></i>
+                                    <span class="hidden sm:inline">{% trans "Add connection" %}</span>
+                                </button>
+                            </div>
                         {% endif %}
                     </div>
                 {% else %}
