@@ -150,6 +150,211 @@ Ora Arrivo: 16:00
 Note: Viaggio 6 ore. Sosta pranzo a metà strada. Restituzione noleggio in aeroporto.
 ```
 
+## Connessioni Trasferimenti Principali
+
+Dopo l'arrivo a destinazione (aeroporto, stazione) o prima della partenza, devi spostarti da/verso il tuo primo/ultimo evento o alloggio. Le Connessioni Trasferimenti Principali semplificano questo creando un collegamento rapido tra il tuo trasferimento principale e la prima/ultima destinazione.
+
+### Cos'è una Connessione Trasferimento Principale?
+
+Una **Connessione Trasferimento Principale** è un tipo speciale di trasferimento che collega:
+
+1. **Per Arrivo**: Destinazione trasferimento principale → Primo evento o alloggio
+2. **Per Partenza**: Ultimo evento o alloggio → Origine trasferimento principale
+
+Questo ti aiuta a pianificare "l'ultimo miglio" del tuo arrivo e il "primo miglio" della tua partenza.
+
+### Quando Usare le Connessioni Trasferimenti Principali
+
+**Connessione Arrivo** - Crea quando:
+- Devi spostarti da aeroporto/stazione al tuo primo hotel
+- Vuoi andare direttamente dall'arrivo alla tua prima attività
+- Hai bisogno di tracciare il trasporto dal punto di arrivo alla prima destinazione
+
+**Connessione Partenza** - Crea quando:
+- Devi spostarti dal tuo ultimo hotel all'aeroporto/stazione
+- La tua ultima attività non è vicina al punto di partenza
+- Vuoi pianificare il viaggio verso il tuo trasporto di partenza
+
+**Scenari Esempio**:
+
+```
+Arrivo:
+Aeroporto Roma Fiumicino → Hotel Forum Roma (primo alloggio)
+- Connessione: Treno + Metro, 45 minuti
+
+Partenza:
+Hotel Brunelleschi (ultimo alloggio) → Stazione Firenze SMN
+- Connessione: A piedi, 15 minuti
+```
+
+### Creare una Connessione Trasferimento Principale
+
+1. Naviga al viaggio
+2. Assicurati di aver creato:
+   - Un trasferimento principale (arrivo o partenza)
+   - Almeno un evento o alloggio
+3. Nella sezione **Trasferimenti Principali**, trova il tuo arrivo/partenza
+4. Clicca sul pulsante **Aggiungi Connessione**
+5. Seleziona destinazione (evento o alloggio)
+6. Scegli modalità trasporto
+7. Aggiungi note opzionali
+8. Salva
+
+### Campi Connessione Trasferimento Principale
+
+**Modalità Trasporto**
+- Come stai viaggiando da/verso il trasferimento principale
+- Opzioni:
+  - **Guida** - Taxi, auto a noleggio, Uber
+  - **A piedi** - Brevi distanze a piedi
+  - **Bicicletta** - Bici, noleggio e-scooter
+  - **Mezzi Pubblici** - Metro, bus, treno, navetta
+
+**Note** (Opzionale)
+- Dettagli aggiuntivi sulla connessione
+- Esempio: "Treno Airport Express per Termini, poi Metro Linea B per Colosseo. Totale: 45 min. Treno ogni 15 min."
+
+### Esempi Connessione Trasferimento Principale
+
+#### Arrivo - Aeroporto a Hotel
+
+```
+Trasferimento Principale: Volo BA500 (LHR → FCO)
+Destinazione: Hotel Forum Roma (primo alloggio)
+
+Connessione:
+Modalità Trasporto: Mezzi Pubblici
+Note: Treno Leonardo Express per Roma Termini (32 min, €14).
+      Metro Linea B da Termini a Colosseo (8 min).
+      Camminata a hotel (5 min).
+      Viaggio totale: ~45 minuti
+      Treno ogni 15 min, 6:23 - 23:23
+```
+
+#### Arrivo - Aeroporto a Prima Attività
+
+```
+Trasferimento Principale: Volo AF1234 (CDG → FCO)
+Destinazione: Tour Colosseo (primo evento, 14:00)
+
+Connessione:
+Modalità Trasporto: Guida
+Note: Taxi prenotato da Fiumicino al Colosseo.
+      Tariffa fissa €48. Autista: Marco +39 123 456 7890
+      Viaggio: ~40 minuti (dipende dal traffico)
+      Punto incontro: Arrivi Terminal 3
+```
+
+#### Partenza - Hotel ad Aeroporto
+
+```
+Ultimo Alloggio: Hotel Brunelleschi (Firenze)
+Trasferimento Principale: Volo per Londra (partenza 16:00)
+
+Connessione:
+Modalità Trasporto: A piedi
+Note: Camminata 15 minuti da hotel a stazione Firenze SMN.
+      Poi taxi per aeroporto (20 min, ~€25-30)
+      Parcheggio taxi fuori entrata principale stazione
+      Permetti 1 ora totale per connessione
+```
+
+#### Partenza - Ultima Attività a Stazione
+
+```
+Ultimo Evento: Pranzo d'addio alla Trattoria Mario (12:00)
+Trasferimento Principale: Treno per Milano (partenza 15:30)
+
+Connessione:
+Modalità Trasporto: A piedi
+Note: Camminata 20 minuti da ristorante a Firenze SMN.
+      Percorso panoramico attraverso mercato San Lorenzo
+      Arriva in stazione entro le 15:00 per check-in
+```
+
+### Gestire le Connessioni
+
+**Modificare una Connessione**:
+1. Clicca sulla connessione nella sezione Trasferimenti Principali
+2. Modifica modalità trasporto o note
+3. Salva
+
+**Eliminare una Connessione**:
+1. Clicca **Modifica** sulla connessione
+2. Clicca **Elimina**
+3. Conferma eliminazione
+
+**Cambiare Destinazione**:
+- Elimina la connessione esistente
+- Crea una nuova connessione con destinazione diversa
+
+### Best Practice
+
+**Per Connessioni Arrivo**:
+
+✅ **Permetti sempre tempo extra**:
+- Voli internazionali: 90-120 min per dogana + bagagli
+- Voli domestici: 45-60 min per ritiro bagagli
+- Treni: 15-30 min per uscire dalla stazione
+- Aggiungi 30% extra per ritardi/non familiarità
+
+✅ **Considera i bagagli**:
+- Camminare con valigie? Mantienilo breve (<15 min)
+- Bagagli pesanti? Scegli taxi/Uber invece di mezzi pubblici
+- Più valigie? Prenota il trasporto in anticipo
+
+✅ **Ricerca opzioni trasporto**:
+- Verifica se disponibili navette aeroporto/stazione
+- Confronta: taxi vs. mezzi pubblici vs. auto a noleggio
+- Nota orari operativi (arrivi notturni?)
+
+**Per Connessioni Partenza**:
+
+✅ **Lavora a ritroso dall'ora partenza**:
+```
+Partenza volo: 16:00
+Arrivo raccomandato: 13:00 (3h prima volo intl)
+Durata connessione: 45 min (hotel ad aeroporto)
+Devi lasciare hotel entro: 12:15 (con margine)
+```
+
+✅ **Pianifica per caso peggiore**:
+- Ritardi traffico (ora di punta mattina/sera)
+- Perdersi o prendere direzione sbagliata
+- Attesa taxi/trasporto
+- Aggiungi 50% margine per partenze
+
+✅ **Verifica disponibilità trasporto**:
+- La metro è operativa abbastanza presto?
+- Il taxi è disponibile a quell'ora?
+- Dovresti prenotare in anticipo?
+
+**Contenuto Note**:
+
+Includi nelle note connessione:
+- Numeri esatti linea/percorso (Metro Linea B, Bus 64)
+- Durata per ogni segmento
+- Prezzi biglietti
+- Orari operativi/frequenza
+- Opzioni alternative se principale fallisce
+- Numeri contatto per trasporto prenotato
+- Punti incontro/luoghi ritiro
+
+### Suggerimenti
+
+!!! tip "Non Complicare Troppo"
+    Crea connessioni solo se richiedono pianificazione. Se prendi un taxi da aeroporto a hotel, una semplice nota nel trasferimento principale può bastare.
+
+!!! tip "Primo Alloggio vs. Primo Evento"
+    Solitamente connetti al tuo primo **alloggio** (sistemazione). Connetti al primo **evento** solo se vai direttamente a un'attività prima del check-in.
+
+!!! tip "Usa per Connessioni Complesse"
+    Più utile quando la connessione coinvolge:
+    - Più modalità trasporto (treno + metro + camminata)
+    - Prenotazione richiesta
+    - Vincoli temporali specifici
+    - Percorsi non familiari in città straniere
+
 ## Trasferimenti tra Alloggi
 
 Spostamento tra diverse sistemazioni durante il tuo viaggio.

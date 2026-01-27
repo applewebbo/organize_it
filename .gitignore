@@ -159,3 +159,6 @@ media/
 #  CLAUDE
 .claude/plans/
 .claude/settings.local.json
+
+# QWEN
+.qwen/

@@ -150,6 +150,211 @@ Arrival Time: 16:00
 Notes: 6-hour drive. Stop for lunch halfway. Return rental at airport.
 ```
 
+## Main Transfer Connections
+
+After you arrive at your destination (airport, train station) or before departing, you need to get from/to your first/last event or accommodation. Main Transfer Connections simplify this by creating a quick link between your main transfer and your first/last destination.
+
+### What is a Main Transfer Connection?
+
+A **Main Transfer Connection** is a special type of transfer that links:
+
+1. **For Arrival**: Main transfer destination → First event or stay
+2. **For Departure**: Last event or stay → Main transfer origin
+
+This helps you plan the "last mile" of your arrival and the "first mile" of your departure.
+
+### When to Use Main Transfer Connections
+
+**Arrival Connection** - Create when:
+- You need to get from airport/station to your first hotel
+- You want to go directly from arrival to your first activity
+- You need to track transport from arrival point to first destination
+
+**Departure Connection** - Create when:
+- You need to get from your last hotel to the airport/station
+- Your last activity is not near the departure point
+- You want to plan the journey to your departure transport
+
+**Example Scenarios**:
+
+```
+Arrival:
+Rome Fiumicino Airport → Hotel Forum Roma (first stay)
+- Connection: Train + Metro, 45 minutes
+
+Departure:
+Hotel Brunelleschi (last stay) → Florence SMN Station
+- Connection: Walking, 15 minutes
+```
+
+### Creating a Main Transfer Connection
+
+1. Navigate to the trip
+2. Ensure you have created:
+   - A main transfer (arrival or departure)
+   - At least one event or stay
+3. In the **Main Transfers** section, find your arrival/departure
+4. Click **Add Connection** button
+5. Select destination (event or stay)
+6. Choose transport mode
+7. Add optional notes
+8. Save
+
+### Main Transfer Connection Fields
+
+**Transport Mode**
+- How you're traveling from/to the main transfer
+- Options:
+  - **Driving** - Taxi, rental car, Uber
+  - **Walking** - Short distances on foot
+  - **Bicycling** - Bike, e-scooter rental
+  - **Transit** - Metro, bus, train, shuttle
+
+**Notes** (Optional)
+- Additional details about the connection
+- Example: "Airport Express train to Termini, then Metro Line B to Colosseo. Total: 45 min. Train every 15 min."
+
+### Main Transfer Connection Examples
+
+#### Arrival - Airport to Hotel
+
+```
+Main Transfer: Flight BA500 (LHR → FCO)
+Destination: Hotel Forum Roma (first stay)
+
+Connection:
+Transport Mode: Transit
+Notes: Leonardo Express train to Roma Termini (32 min, €14).
+       Metro Line B from Termini to Colosseo (8 min).
+       Walk to hotel (5 min).
+       Total journey: ~45 minutes
+       Train runs every 15 min, 6:23 AM - 11:23 PM
+```
+
+#### Arrival - Airport to First Activity
+
+```
+Main Transfer: Flight AF1234 (CDG → FCO)
+Destination: Colosseum Tour (first event, 2:00 PM)
+
+Connection:
+Transport Mode: Driving
+Notes: Pre-booked taxi from Fiumicino to Colosseum.
+       Fixed rate €48. Driver: Marco +39 123 456 7890
+       Journey: ~40 minutes (traffic dependent)
+       Meeting point: Arrivals Terminal 3
+```
+
+#### Departure - Hotel to Airport
+
+```
+Last Stay: Hotel Brunelleschi (Florence)
+Main Transfer: Flight to London (departure 4:00 PM)
+
+Connection:
+Transport Mode: Walking
+Notes: 15-minute walk from hotel to Firenze SMN station.
+       Then taxi to airport (20 min, ~€25-30)
+       Taxi stand outside main station entrance
+       Allow 1 hour total for connection
+```
+
+#### Departure - Last Activity to Station
+
+```
+Last Event: Farewell Lunch at Trattoria Mario (12:00 PM)
+Main Transfer: Train to Milan (departure 3:30 PM)
+
+Connection:
+Transport Mode: Walking
+Notes: 20-minute walk from restaurant to Firenze SMN.
+       Scenic route through San Lorenzo market
+       Arrive station by 3:00 PM for check-in
+```
+
+### Managing Connections
+
+**Editing a Connection**:
+1. Click on the connection in the Main Transfers section
+2. Modify transport mode or notes
+3. Save
+
+**Deleting a Connection**:
+1. Click **Edit** on the connection
+2. Click **Delete**
+3. Confirm deletion
+
+**Changing Destination**:
+- Delete the existing connection
+- Create a new connection with different destination
+
+### Best Practices
+
+**For Arrival Connections**:
+
+✅ **Always allow buffer time**:
+- International flights: 90-120 min for customs + baggage
+- Domestic flights: 45-60 min for baggage claim
+- Trains: 15-30 min to exit station
+- Add 30% extra for delays/unfamiliarity
+
+✅ **Consider luggage**:
+- Walking with bags? Keep it short (<15 min)
+- Heavy luggage? Choose taxi/Uber over public transit
+- Multiple bags? Pre-book transport
+
+✅ **Research transport options**:
+- Check if airport/station shuttles available
+- Compare: taxi vs. public transit vs. rental car
+- Note operating hours (late night arrivals?)
+
+**For Departure Connections**:
+
+✅ **Work backwards from departure time**:
+```
+Flight departure: 4:00 PM
+Recommended arrival: 1:00 PM (3h before intl flight)
+Connection duration: 45 min (hotel to airport)
+Must leave hotel by: 12:15 PM (with buffer)
+```
+
+✅ **Plan for worst case**:
+- Traffic delays (morning/evening rush hour)
+- Getting lost or taking wrong turn
+- Waiting for taxi/transport
+- Add 50% buffer for departures
+
+✅ **Verify transport availability**:
+- Does metro run early enough?
+- Is taxi available at that hour?
+- Should you pre-book?
+
+**Notes Content**:
+
+Include in connection notes:
+- Exact route/line numbers (Metro Line B, Bus 64)
+- Duration for each segment
+- Ticket prices
+- Operating hours/frequency
+- Backup options if primary fails
+- Contact numbers for pre-booked transport
+- Meeting points/pickup locations
+
+### Tips
+
+!!! tip "Don't Overthink It"
+    Only create connections if they require planning. If you're taking a taxi from airport to hotel, a simple note in the main transfer may be enough.
+
+!!! tip "First Stay vs. First Event"
+    Usually connect to your first **stay** (accommodation). Only connect to first **event** if you're going directly to an activity before checking in.
+
+!!! tip "Use for Complex Connections"
+    Most useful when the connection involves:
+    - Multiple transport modes (train + metro + walk)
+    - Pre-booking required
+    - Specific timing constraints
+    - Unfamiliar routes in foreign cities
+
 ## Stay Transfers
 
 Movement between different accommodations during your trip.
