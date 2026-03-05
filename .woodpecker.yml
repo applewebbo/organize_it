@@ -14,5 +14,6 @@ steps:
   environment:
     SECRET_KEY: test-secret-key-for-ci
     ENVIRONMENT: test
+    UV_LINK_MODE: copy
     MAPBOX_ACCESS_TOKEN:
       from_secret: MAPBOX_ACCESS_TOKEN
