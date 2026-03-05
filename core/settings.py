@@ -26,6 +26,7 @@ env = environ.Env(
 
 SECRET_KEY = env("SECRET_KEY")
 ENVIRONMENT = env("ENVIRONMENT", default="prod")
+APP_VERSION = "2026.3.2"
 
 DEBUG = env.bool("DEBUG")
 
@@ -100,6 +101,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "core.context_processors.app_version",
             ],
             "builtins": [
                 "django_cotton.templatetags.cotton",
