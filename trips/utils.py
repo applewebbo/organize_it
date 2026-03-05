@@ -817,7 +817,7 @@ def load_train_stations():
                         "longitude": float(row["longitude"]),
                     }
                 )
-            except (ValueError, KeyError):
+            except ValueError, KeyError:
                 # Skip rows with invalid data
                 continue
 

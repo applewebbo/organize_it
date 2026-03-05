@@ -387,7 +387,7 @@ class Day(models.Model):
         try:
             current_index = days.index(self)
             return days[current_index + 1] if current_index + 1 < len(days) else None
-        except (ValueError, IndexError):
+        except ValueError, IndexError:
             return None
 
     @property
@@ -397,7 +397,7 @@ class Day(models.Model):
         try:
             current_index = days.index(self)
             return days[current_index - 1] if current_index > 0 else None
-        except (ValueError, IndexError):
+        except ValueError, IndexError:
             return None
 
     def __str__(self) -> str:

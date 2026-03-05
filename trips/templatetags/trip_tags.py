@@ -97,7 +97,7 @@ def next_day(day):
     try:
         current_index = days.index(day)
         return days[current_index + 1] if current_index + 1 < len(days) else None
-    except (ValueError, IndexError):
+    except ValueError, IndexError:
         return None
 
 
@@ -107,7 +107,7 @@ def prev_day(day):
     try:
         current_index = days.index(day)
         return days[current_index - 1] if current_index > 0 else None
-    except (ValueError, IndexError):
+    except ValueError, IndexError:
         return None
 
 
@@ -117,7 +117,7 @@ def is_last_day(day):
         days = list(day.trip.days.all())
         current_index = days.index(day)
         return current_index == len(days) - 1
-    except (ValueError, IndexError, ObjectDoesNotExist):
+    except ValueError, IndexError, ObjectDoesNotExist:
         return False
 
 

@@ -756,8 +756,8 @@ class StayForm(forms.ModelForm):
         layout_fields.append(Field("name", wrapper_class="sm:col-span-2"))
         layout_fields.append(Field("city", wrapper_class="sm:col-span-2"))
         self.fields["apply_to_days"].queryset = Day.objects.filter(trip=trip)
-        self.fields["apply_to_days"].label_from_instance = (
-            lambda obj: f"{_('Day')} {obj.number}"
+        self.fields["apply_to_days"].label_from_instance = lambda obj: (
+            f"{_('Day')} {obj.number}"
         )
         # Only set initial values if we're editing an existing stay
         if self.instance.pk:

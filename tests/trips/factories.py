@@ -942,41 +942,45 @@ class MainTransferFactory(factory.django.DjangoModelFactory):
         # For ARRIVAL: origin from Bologna, destination in trip city
         # For DEPARTURE: origin from trip city, destination in Bologna
         origin_place = factory.LazyAttribute(
-            lambda o: random.choice(
-                MAIN_TRANSFER_LOCATIONS["Bologna"]["airports"]
-                if o.type == 1
-                else MAIN_TRANSFER_LOCATIONS["Bologna"]["stations"]
-                if o.type == 2
-                else MAIN_TRANSFER_LOCATIONS["Bologna"]["airports"]
-                + MAIN_TRANSFER_LOCATIONS["Bologna"]["stations"]
-            )
-            if o.direction == 1
-            else random.choice(
-                MAIN_TRANSFER_LOCATIONS[o.trip.destination]["airports"]
-                if o.type == 1
-                else MAIN_TRANSFER_LOCATIONS[o.trip.destination]["stations"]
-                if o.type == 2
-                else MAIN_TRANSFER_LOCATIONS[o.trip.destination]["airports"]
-                + MAIN_TRANSFER_LOCATIONS[o.trip.destination]["stations"]
+            lambda o: (
+                random.choice(
+                    MAIN_TRANSFER_LOCATIONS["Bologna"]["airports"]
+                    if o.type == 1
+                    else MAIN_TRANSFER_LOCATIONS["Bologna"]["stations"]
+                    if o.type == 2
+                    else MAIN_TRANSFER_LOCATIONS["Bologna"]["airports"]
+                    + MAIN_TRANSFER_LOCATIONS["Bologna"]["stations"]
+                )
+                if o.direction == 1
+                else random.choice(
+                    MAIN_TRANSFER_LOCATIONS[o.trip.destination]["airports"]
+                    if o.type == 1
+                    else MAIN_TRANSFER_LOCATIONS[o.trip.destination]["stations"]
+                    if o.type == 2
+                    else MAIN_TRANSFER_LOCATIONS[o.trip.destination]["airports"]
+                    + MAIN_TRANSFER_LOCATIONS[o.trip.destination]["stations"]
+                )
             )
         )
         destination_place = factory.LazyAttribute(
-            lambda o: random.choice(
-                MAIN_TRANSFER_LOCATIONS[o.trip.destination]["airports"]
-                if o.type == 1
-                else MAIN_TRANSFER_LOCATIONS[o.trip.destination]["stations"]
-                if o.type == 2
-                else MAIN_TRANSFER_LOCATIONS[o.trip.destination]["airports"]
-                + MAIN_TRANSFER_LOCATIONS[o.trip.destination]["stations"]
-            )
-            if o.direction == 1
-            else random.choice(
-                MAIN_TRANSFER_LOCATIONS["Bologna"]["airports"]
-                if o.type == 1
-                else MAIN_TRANSFER_LOCATIONS["Bologna"]["stations"]
-                if o.type == 2
-                else MAIN_TRANSFER_LOCATIONS["Bologna"]["airports"]
-                + MAIN_TRANSFER_LOCATIONS["Bologna"]["stations"]
+            lambda o: (
+                random.choice(
+                    MAIN_TRANSFER_LOCATIONS[o.trip.destination]["airports"]
+                    if o.type == 1
+                    else MAIN_TRANSFER_LOCATIONS[o.trip.destination]["stations"]
+                    if o.type == 2
+                    else MAIN_TRANSFER_LOCATIONS[o.trip.destination]["airports"]
+                    + MAIN_TRANSFER_LOCATIONS[o.trip.destination]["stations"]
+                )
+                if o.direction == 1
+                else random.choice(
+                    MAIN_TRANSFER_LOCATIONS["Bologna"]["airports"]
+                    if o.type == 1
+                    else MAIN_TRANSFER_LOCATIONS["Bologna"]["stations"]
+                    if o.type == 2
+                    else MAIN_TRANSFER_LOCATIONS["Bologna"]["airports"]
+                    + MAIN_TRANSFER_LOCATIONS["Bologna"]["stations"]
+                )
             )
         )
 
