@@ -5,7 +5,7 @@ status: draft
 type: feature
 priority: normal
 created_at: 2026-01-27T14:14:45Z
-updated_at: 2026-03-05T14:09:43Z
+updated_at: 2026-03-05T14:14:42Z
 ---
 
 Allow users to share trips with others via magic links that provide view-only access without requiring login.
@@ -217,4 +217,4 @@ def share_link_create(request, trip_id):
 ## Dependencies
 No new dependencies required - uses Django built-in UUID field and standard patterns.
 
-## Note\n\nVerrà implementato nella release 2026.4
+## Note\n\nScheduled for release 2026.4
