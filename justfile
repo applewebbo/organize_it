@@ -163,6 +163,23 @@ issue-close number:
 issue-reopen number:
     ./bin/codeberg reopen {{number}}
 
+# Create a label if it doesn't exist (color optional, default blue)
+[group('codeberg')]
+label-create name color="#0075ca":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    TOKEN=$(grep "^CODEBERG_API_TOKEN=" .env | cut -d'=' -f2 | tr -d '"' | tr -d "'")
+    EXISTING=$(curl -s "https://codeberg.org/api/v1/repos/webbografico/organize_it/labels" \
+      -H "Authorization: token ${TOKEN}" | jq -r '.[] | select(.name == "{{name}}") | .id')
+    if [ -n "$EXISTING" ]; then
+        echo "✓ Label '{{name}}' already exists (id: ${EXISTING})"
+    else
+        curl -s -X POST "https://codeberg.org/api/v1/repos/webbografico/organize_it/labels" \
+          -H "Authorization: token ${TOKEN}" \
+          -H "Content-Type: application/json" \
+          -d '{"name":"{{name}}","color":"{{color}}"}' | jq -r '"✓ Label \(.name) created (id: \(.id))"'
+    fi
+
 # Add labels to issue (space-separated)
 [group('codeberg')]
 issue-label number *labels:

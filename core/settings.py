@@ -352,15 +352,7 @@ if ENVIRONMENT == "dev":
         "orm": "default",  # Use Django ORM in development for simplicity
         "catch_up": False,
         "save_limit": 250,  # Keep last 250 successful tasks
-        "error_reporter": {},  # Can add custom error reporting
-        "schedule": [
-            {
-                "func": "trips.tasks.check_trips_status",
-                "name": "Check Trips Status",
-                "schedule_type": "H",  # Hourly for testing in dev
-                "repeats": -1,  # Infinite
-            },
-        ],
+        "error_reporter": {},
     }
 
 # PRODUCTION SPECIFIC SETTINGS
@@ -399,7 +391,7 @@ elif ENVIRONMENT == "prod":
         "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     }
 
-    # DJANGO-Q configuration for production with Redis
+    # DJANGO-Q configuration for production (ORM broker)
     Q_CLUSTER = {
         "name": "organize_it",
         "workers": env.int("Q_CLUSTER_WORKERS", default=4),
@@ -412,34 +404,6 @@ elif ENVIRONMENT == "prod":
         "catch_up": False,
         "save_limit": 250,
         "error_reporter": {},
-        "redis": {
-            "host": env("REDIS_HOST", default="localhost"),
-            "port": env.int("REDIS_PORT", default=6379),
-            "db": env.int("REDIS_DB", default=0),
-            "password": env("REDIS_PASSWORD", default=""),
-        },
-        "schedule": [
-            {
-                "func": "trips.tasks.check_trips_status",
-                "name": "Check Trips Status",
-                "schedule_type": "C",  # Cron
-                "cron": "0 3 * * *",  # Every day at 3 AM
-                "repeats": -1,
-            },
-            {
-                "func": "trips.tasks.cleanup_old_sessions",
-                "name": "Cleanup Old Sessions",
-                "schedule_type": "W",  # Weekly
-                "repeats": -1,
-            },
-            {
-                "func": "trips.tasks.backup_database",
-                "name": "Database Backup",
-                "schedule_type": "C",  # Cron
-                "cron": "0 2 * * 0",  # Every Sunday at 2 AM
-                "repeats": -1,
-            },
-        ],
     }
 
     # Redis cache configuration
