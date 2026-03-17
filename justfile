@@ -84,7 +84,7 @@ makemessages:
 @tasks:
     uv run python manage.py qcluster
 
-# Test Docker locally before deploy on Caprover
+# Test Docker locally before deploy on Coolify
 [group('development')]
 @docker-test:
     docker build -t organize-it:test .
