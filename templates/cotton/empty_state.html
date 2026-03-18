@@ -15,9 +15,13 @@
         {% trans "Start planning your perfect trip. Organize stays, experiences, meals and transfers all in one place." %}
     </p>
     <!-- Prominent CTA Button -->
-    <a href="{% url 'trips:trip-create' %}"
-       class="gap-2 btn btn-primary btn-lg">
+    <button x-data
+            hx-get="{% url 'trips:trip-create' %}"
+            hx-target="#dialog"
+            hx-swap="innerHTML"
+            @click="$dispatch('open-modal')"
+            class="gap-2 btn btn-primary btn-lg">
         <i class="ph-bold ph-plus-circle i-lg" aria-hidden="true"></i>
         <span>{% trans "Create Your First Trip" %}</span>
-    </a>
+    </button>
 </div>
