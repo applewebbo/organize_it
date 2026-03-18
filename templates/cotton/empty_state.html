@@ -16,7 +16,7 @@
     </p>
     <!-- Prominent CTA Button -->
     <button x-data
-            hx-get="{% url 'trips:trip-create' %}"
+            hx-get="{% url 'trips:trip-create' %}?next=list"
             hx-target="#dialog"
             hx-swap="innerHTML"
             @click="$dispatch('open-modal')"

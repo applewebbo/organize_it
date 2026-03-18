@@ -1,5 +1,5 @@
 {% load crispy_forms_tags i18n %}
-<form hx-post="{{ request.path }}"
+<form hx-post="{{ request.get_full_path }}"
       hx-target="#dialog"
       method="post"
       enctype="multipart/form-data"

@@ -10,6 +10,7 @@ from django.db.models import Prefetch
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
+from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
@@ -322,6 +323,10 @@ def trip_create(request):
                 _("<strong>%(title)s</strong> added successfully")
                 % {"title": trip.title},
             )
+            if request.GET.get("next") == "list":
+                return HttpResponse(
+                    status=204, headers={"HX-Redirect": reverse("trips:trip-list")}
+                )
             return HttpResponse(status=204, headers={"HX-Trigger": "tripSaved"})
         context = {"form": form}
         return TemplateResponse(request, "trips/trip-create.html", context)

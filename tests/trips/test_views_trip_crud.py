@@ -45,6 +45,27 @@ class TripCreateView(TestCase):
         assert message == f"<strong>{trip.title}</strong> added successfully"
         assert Trip.objects.filter(author=user).count() == 1
 
+    @patch("geocoder.mapbox")
+    def test_post_with_next_redirects_to_list(self, mock_geocoder):
+        mock_geocoder.return_value.ok = True
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
+        user = self.make_user("user")
+        data = {
+            "title": "Trip to Paris",
+            "destination": "Novara",
+            "description": "A trip to Paris",
+            "start_date": datetime.date.today(),
+            "end_date": datetime.date.today() + datetime.timedelta(days=3),
+        }
+
+        with self.login(user):
+            response = self.client.post(
+                self.reverse("trips:trip-create") + "?next=list", data=data
+            )
+
+        self.response_204(response)
+        assert response.headers.get("HX-Redirect") == self.reverse("trips:trip-list")
+
     def test_post_with_invalid_start_date(self):
         user = self.make_user("user")
         data = {
