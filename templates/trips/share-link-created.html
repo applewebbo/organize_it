@@ -1,35 +1,47 @@
 {% load i18n %}
-<div id="share-modal-content" class="p-4 md:p-6">
-    <div class="mb-4 alert alert-success alert-soft">
-        <i class="ph-bold ph-check-circle i-md"></i>
-        <span>{% trans "Share link created!" %}</span>
-    </div>
-    <label class="font-medium label">{% trans "Share this link" %}</label>
-    <div class="flex gap-2 mt-1">
-        <input id="share-link-url"
-               type="text"
-               class="flex-1 input input-bordered input-sm"
-               value="{{ request.scheme }}://{{ request.get_host }}{{ link.get_absolute_url }}"
-               readonly>
-        <button class="btn btn-primary btn-sm"
-                onclick="navigator.clipboard.writeText(document.getElementById('share-link-url').value)">
-            <i class="ph-bold ph-copy"></i>
+<div id="share-modal-content">
+    <div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% trans "Share trip" %}</h3>
+        <button type="button"
+                class="btn btn-ghost btn-circle btn-sm"
+                x-on:click="openModal = false">
+            <i class="text-xl ph-bold ph-x"></i>
+            <span class="sr-only">{% trans "Close modal" %}</span>
         </button>
     </div>
-    {% if link.expires_at %}
-        <p class="mt-1 text-xs text-base-content/60">
-            {% blocktrans with date=link.expires_at|date:"SHORT_DATE_FORMAT" %}Expires on {{ date }}{% endblocktrans %}
-        </p>
-    {% else %}
-        <p class="mt-1 text-xs text-base-content/60">{% trans "Never expires" %}</p>
-    {% endif %}
-    <div class="flex justify-end mt-4">
-        <button class="btn btn-ghost btn-sm"
-                hx-get="{% url 'trips:share-link-create' trip.id %}"
-                hx-target="#share-modal-content"
-                hx-swap="outerHTML">
-            <i class="ph-bold ph-plus"></i>
-            {% trans "Create another" %}
-        </button>
+    <div class="p-4 md:p-6">
+        <div class="mb-4 alert alert-success alert-soft">
+            <i class="ph-bold ph-check-circle i-md"></i>
+            <span>{% trans "Share link created!" %}</span>
+        </div>
+        <label class="font-medium label">{% trans "Share this link" %}</label>
+        <div x-data="{ copied: false }" class="flex gap-2 mt-1">
+            <input id="share-link-url"
+                   type="text"
+                   class="flex-1 input input-bordered input-sm"
+                   value="{{ request.scheme }}://{{ request.get_host }}{{ link.get_absolute_url }}"
+                   readonly>
+            <button class="btn btn-sm"
+                    :class="copied ? 'btn-success' : 'btn-primary'"
+                    @click="navigator.clipboard.writeText($el.previousElementSibling.value); copied = true; setTimeout(() => copied = false, 2000)">
+                <i class="ph-bold" :class="copied ? 'ph-check' : 'ph-copy'"></i>
+            </button>
+        </div>
+        {% if link.expires_at %}
+            <p class="mt-1 text-xs text-base-content/60">
+                {% blocktrans with date=link.expires_at|date:"SHORT_DATE_FORMAT" %}Expires on {{ date }}{% endblocktrans %}
+            </p>
+        {% else %}
+            <p class="mt-1 text-xs text-base-content/60">{% trans "Never expires" %}</p>
+        {% endif %}
+        <div class="flex justify-end mt-4">
+            <button class="btn btn-ghost btn-sm"
+                    hx-get="{% url 'trips:share-link-create' trip.id %}"
+                    hx-target="#share-modal-content"
+                    hx-swap="outerHTML">
+                <i class="ph-bold ph-plus"></i>
+                {% trans "Create another" %}
+            </button>
+        </div>
     </div>
 </div>

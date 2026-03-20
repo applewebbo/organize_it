@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-20 11:26+0100\n"
+"POT-Creation-Date: 2026-03-20 11:34+0100\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -932,7 +932,8 @@ msgstr "Questo link è stato revocato"
 
 #: templates/trips/link-revoked.html:10
 msgid "The sharing link you followed has been deactivated by the owner."
-msgstr "Il link di condivisione che hai seguito è stato disattivato dal proprietario."
+msgstr ""
+"Il link di condivisione che hai seguito è stato disattivato dal proprietario."
 
 #: templates/trips/main-transfer-connection-create.html:10
 msgid "Create Connection from Arrival"
@@ -1134,16 +1135,16 @@ msgstr "Link di condivisione creato!"
 msgid "Share this link"
 msgstr "Condividi questo link"
 
-#: templates/trips/share-link-created.html:21
+#: templates/trips/share-link-created.html:22
 #, python-format
 msgid "Expires on %(date)s"
 msgstr "Scade il %(date)s"
 
-#: templates/trips/share-link-created.html:24 trips/forms.py:1978
+#: templates/trips/share-link-created.html:25 trips/forms.py:1978
 msgid "Never expires"
 msgstr "Non scade mai"
 
-#: templates/trips/share-link-created.html:32
+#: templates/trips/share-link-created.html:33
 msgid "Create another"
 msgstr "Crea un altro"
 
@@ -1185,11 +1186,15 @@ msgstr "Link attivi"
 msgid "exp. %(date)s"
 msgstr "scad. %(date)s"
 
-#: templates/trips/share-link-modal.html:33
+#: templates/trips/share-link-modal.html:35
+msgid "Copied!"
+msgstr "Copiato!"
+
+#: templates/trips/share-link-modal.html:35
 msgid "Copy link"
 msgstr "Copia link"
 
-#: templates/trips/share-link-modal.html:38
+#: templates/trips/share-link-modal.html:40
 msgid "Revoke"
 msgstr "Revoca"
 
