@@ -225,6 +225,20 @@ class TestShareLinkCreateView:
         assert response.status_code == 200
         assertTemplateUsed(response, "trips/share-link-modal.html")
 
+    def test_get_includes_existing_links_in_context(
+        self, client, user_factory, trip_factory
+    ):
+        user = user_factory()
+        trip = trip_factory(author=user)
+        ShareLink.objects.create(trip=trip, created_by=user, label="existing")
+        client.force_login(user)
+
+        response = client.get(
+            reverse("trips:share-link-create", kwargs={"trip_id": trip.id}),
+        )
+
+        assert len(response.context["links"]) == 1
+
     def test_invalid_form_rerenders_modal(self, client, user_factory, trip_factory):
         user = user_factory()
         trip = trip_factory(author=user)

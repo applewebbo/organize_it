@@ -1,13 +1,50 @@
 {% load i18n crispy_forms_tags %}
-<div class="p-4 md:p-6">
+<div id="share-modal-content" class="p-4 md:p-6">
     <h3 class="mb-4 text-lg font-semibold">{% trans "Share trip" %}</h3>
     <form hx-post="{% url 'trips:share-link-create' trip.id %}"
-          hx-target="this"
+          hx-target="#share-modal-content"
           hx-swap="outerHTML">
         {% csrf_token %}
         {% crispy form %}
         <div class="flex gap-2 justify-end mt-4">
-            <button type="submit" class="btn btn-primary">{% trans "Generate link" %}</button>
+            <button type="submit" class="btn btn-primary btn-sm">
+                <i class="ph-bold ph-link-simple"></i>
+                {% trans "Generate link" %}
+            </button>
         </div>
     </form>
+    {% if links %}
+        <div class="mt-6">
+            <h4 class="mb-2 text-sm font-semibold text-base-content/70">{% trans "Active links" %}</h4>
+            <ul id="share-links-list" class="flex flex-col gap-2">
+                {% for link in links %}
+                    <li id="share-link-{{ link.id }}"
+                        class="flex gap-2 justify-between items-center p-2 rounded-lg border border-base-300">
+                        <span class="text-sm truncate text-base-content/70">
+                            {{ link.label|default:"–" }}
+                            {% if link.expires_at %}
+                                <span class="ml-1 text-xs text-base-content/40">
+                                    ({% blocktrans with date=link.expires_at|date:"SHORT_DATE_FORMAT" %}exp. {{ date }}{% endblocktrans %})
+                                </span>
+                            {% endif %}
+                        </span>
+                        <div class="flex gap-1 shrink-0">
+                            <button class="btn btn-xs btn-ghost"
+                                    title="{% trans 'Copy link' %}"
+                                    onclick="navigator.clipboard.writeText('{{ request.scheme }}://{{ request.get_host }}{{ link.get_absolute_url }}')">
+                                <i class="ph-bold ph-copy"></i>
+                            </button>
+                            <button class="btn btn-xs btn-error btn-soft"
+                                    title="{% trans 'Revoke' %}"
+                                    hx-post="{% url 'trips:share-link-revoke' link.id %}"
+                                    hx-target="#share-link-{{ link.id }}"
+                                    hx-swap="outerHTML">
+                                <i class="ph-bold ph-x"></i>
+                            </button>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
 </div>

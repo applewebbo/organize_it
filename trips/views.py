@@ -2430,10 +2430,11 @@ def share_link_create(request, trip_id):
     else:
         form = ShareLinkCreateForm()
 
+    links = trip.share_links.filter(is_active=True).order_by("-created_at")
     return TemplateResponse(
         request,
         "trips/share-link-modal.html",
-        {"form": form, "trip": trip},
+        {"form": form, "trip": trip, "links": links},
     )
 
 
