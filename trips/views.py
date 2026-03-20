@@ -2454,4 +2454,15 @@ def share_link_revoke(request, link_id):
     link = get_object_or_404(ShareLink, id=link_id, trip__author=request.user)
     link.is_active = False
     link.save(update_fields=["is_active"])
-    return HttpResponse("")
+    trip = link.trip
+    links = trip.share_links.filter(is_active=True).order_by("-created_at")
+    return TemplateResponse(
+        request,
+        "trips/share-link-modal.html",
+        {
+            "form": ShareLinkCreateForm(),
+            "trip": trip,
+            "links": links,
+            "created_link": None,
+        },
+    )

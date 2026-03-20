@@ -11,7 +11,12 @@
     </div>
     <div class="p-4 md:p-6">
         {% if created_link %}
-            <div x-data="{ copied: false }"
+            <div x-data="{ show: true, copied: false }"
+                 x-show="show"
+                 x-transition:leave="transition ease-in duration-300"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 x-init=" setTimeout(() => show = false, 10000); document.addEventListener('htmx:afterSwap', () => show = false, { once: true }); "
                  class="flex gap-2 items-center p-3 mb-4 rounded-lg border border-success bg-success/10">
                 <input type="text"
                        class="flex-1 text-sm bg-transparent border-none outline-none"
@@ -63,7 +68,7 @@
                                 <button class="btn btn-xs btn-error btn-soft"
                                         title="{% trans 'Revoke' %}"
                                         hx-post="{% url 'trips:share-link-revoke' link.id %}"
-                                        hx-target="#share-link-{{ link.id }}"
+                                        hx-target="#share-modal-content"
                                         hx-swap="outerHTML">
                                     <i class="ph-bold ph-x"></i>
                                 </button>
