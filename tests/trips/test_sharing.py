@@ -79,6 +79,19 @@ class TestShareLinkModel:
         link = ShareLink.objects.create(trip=trip, created_by=user)
         assert link.permission_level == ShareLink.PermissionLevel.VIEW
 
+    def test_display_label_uses_label_when_set(self, user_factory, trip_factory):
+        user = user_factory()
+        trip = trip_factory(author=user)
+        link = ShareLink.objects.create(trip=trip, created_by=user, label="My label")
+        assert link.display_label == "My label"
+
+    def test_display_label_falls_back_to_created_at(self, user_factory, trip_factory):
+        user = user_factory()
+        trip = trip_factory(author=user)
+        link = ShareLink.objects.create(trip=trip, created_by=user, label="")
+        expected = link.created_at.strftime("%d/%m/%Y %H:%M")
+        assert link.display_label == expected
+
 
 class TestSharedTripDetailView:
     def test_valid_token_shows_trip(self, client, user_factory, trip_factory):
@@ -151,7 +164,9 @@ class TestShareLinkCreateView:
         )
 
         assert response.status_code == 200
+        assertTemplateUsed(response, "trips/share-link-modal.html")
         assert ShareLink.objects.filter(trip=trip).count() == 1
+        assert response.context["created_link"] is not None
 
     def test_non_owner_cannot_create_link(self, client, user_factory, trip_factory):
         owner = user_factory()
@@ -295,7 +310,7 @@ class TestShareLinkRevokeView:
             reverse("trips:share-link-revoke", kwargs={"link_id": link.id})
         )
 
-        assert response.status_code == 204
+        assert response.status_code == 200
         link.refresh_from_db()
         assert link.is_active is False
 

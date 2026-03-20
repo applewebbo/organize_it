@@ -991,5 +991,9 @@ class ShareLink(models.Model):
             return False
         return True
 
+    @property
+    def display_label(self) -> str:
+        return self.label if self.label else self.created_at.strftime("%d/%m/%Y %H:%M")
+
     def get_absolute_url(self) -> str:
         return reverse("trips:shared-trip", kwargs={"token": self.id})

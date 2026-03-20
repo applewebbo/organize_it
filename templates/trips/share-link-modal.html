@@ -10,6 +10,21 @@
         </button>
     </div>
     <div class="p-4 md:p-6">
+        {% if created_link %}
+            <div x-data="{ copied: false }"
+                 class="flex gap-2 items-center p-3 mb-4 rounded-lg border border-success bg-success/10">
+                <input type="text"
+                       class="flex-1 text-sm bg-transparent border-none outline-none"
+                       value="{{ request.scheme }}://{{ request.get_host }}{{ created_link.get_absolute_url }}"
+                       readonly>
+                <button class="btn btn-xs shrink-0"
+                        :class="copied ? 'btn-success' : 'btn-ghost'"
+                        :title="copied ? '{% trans "Copied!" %}' : '{% trans "Copy link" %}'"
+                        @click="navigator.clipboard.writeText($el.previousElementSibling.value); copied = true; setTimeout(() => copied = false, 2000)">
+                    <i class="ph-bold" :class="copied ? 'ph-check' : 'ph-copy'"></i>
+                </button>
+            </div>
+        {% endif %}
         <form hx-post="{% url 'trips:share-link-create' trip.id %}"
               hx-target="#share-modal-content"
               hx-swap="outerHTML">
@@ -30,7 +45,7 @@
                         <li id="share-link-{{ link.id }}"
                             class="flex gap-2 justify-between items-center p-2 rounded-lg border border-base-300">
                             <span class="text-sm truncate text-base-content/70">
-                                {{ link.label|default:"–" }}
+                                {{ link.display_label }}
                                 {% if link.expires_at %}
                                     <span class="ml-1 text-xs text-base-content/40">
                                         ({% blocktrans with date=link.expires_at|date:"SHORT_DATE_FORMAT" %}exp. {{ date }}{% endblocktrans %})

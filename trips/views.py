@@ -2418,15 +2418,12 @@ def share_link_create(request, trip_id):
     """Create a new share link for a trip (owner only)."""
     trip = get_object_or_404(Trip, id=trip_id, author=request.user)
 
+    created_link = None
     if request.method == "POST":
         form = ShareLinkCreateForm(request.POST)
         if form.is_valid():
-            link = form.save(trip=trip, created_by=request.user)
-            return TemplateResponse(
-                request,
-                "trips/share-link-created.html",
-                {"link": link, "trip": trip},
-            )
+            created_link = form.save(trip=trip, created_by=request.user)
+            form = ShareLinkCreateForm()
     else:
         form = ShareLinkCreateForm()
 
@@ -2434,7 +2431,7 @@ def share_link_create(request, trip_id):
     return TemplateResponse(
         request,
         "trips/share-link-modal.html",
-        {"form": form, "trip": trip, "links": links},
+        {"form": form, "trip": trip, "links": links, "created_link": created_link},
     )
 
 
@@ -2457,4 +2454,4 @@ def share_link_revoke(request, link_id):
     link = get_object_or_404(ShareLink, id=link_id, trip__author=request.user)
     link.is_active = False
     link.save(update_fields=["is_active"])
-    return HttpResponse(status=204)
+    return HttpResponse("")
