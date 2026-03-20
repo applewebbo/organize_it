@@ -22,33 +22,20 @@
                        class="flex-1 text-sm bg-transparent border-none outline-none"
                        value="{{ request.scheme }}://{{ request.get_host }}{{ created_link.get_absolute_url }}"
                        readonly>
-                <button class="btn btn-xs shrink-0"
-                        :class="copied ? 'btn-success' : 'btn-ghost'"
+                <button class="btn btn-xs btn-soft shrink-0"
+                        :class="copied ? 'btn-success' : 'btn-success'"
                         :title="copied ? '{% trans "Copied!" %}' : '{% trans "Copy link" %}'"
                         @click="navigator.clipboard.writeText($el.previousElementSibling.value); copied = true; setTimeout(() => copied = false, 2000)">
                     <i class="ph-bold" :class="copied ? 'ph-check' : 'ph-copy'"></i>
                 </button>
             </div>
         {% endif %}
-        <form hx-post="{% url 'trips:share-link-create' trip.id %}"
-              hx-target="#share-modal-content"
-              hx-swap="outerHTML">
-            {% csrf_token %}
-            {% crispy form %}
-            <div class="flex gap-2 justify-end mt-4">
-                <button type="submit" class="btn btn-primary btn-sm">
-                    <i class="ph-bold ph-link-simple"></i>
-                    {% trans "Generate link" %}
-                </button>
-            </div>
-        </form>
         {% if links %}
-            <div class="mt-6">
+            <div class="mb-4">
                 <h4 class="mb-2 text-sm font-semibold text-base-content/70">{% trans "Active links" %}</h4>
-                <ul id="share-links-list" class="flex flex-col gap-2">
+                <ul class="flex flex-col gap-2">
                     {% for link in links %}
-                        <li id="share-link-{{ link.id }}"
-                            class="flex gap-2 justify-between items-center p-2 rounded-lg border border-base-300">
+                        <li class="flex gap-2 justify-between items-center p-2 rounded-lg border border-base-300">
                             <span class="text-sm truncate text-base-content/70">
                                 {{ link.display_label }}
                                 {% if link.expires_at %}
@@ -59,8 +46,8 @@
                             </span>
                             <div class="flex gap-1 shrink-0">
                                 <button x-data="{ copied: false }"
-                                        class="btn btn-xs"
-                                        :class="copied ? 'btn-success' : 'btn-ghost'"
+                                        class="btn btn-xs btn-success btn-soft"
+                                        :class="copied ? 'btn-success' : 'btn-success'"
                                         :title="copied ? '{% trans "Copied!" %}' : '{% trans "Copy link" %}'"
                                         @click="navigator.clipboard.writeText('{{ request.scheme }}://{{ request.get_host }}{{ link.get_absolute_url }}'); copied = true; setTimeout(() => copied = false, 2000)">
                                     <i class="ph-bold" :class="copied ? 'ph-check' : 'ph-copy'"></i>
@@ -77,6 +64,38 @@
                     {% endfor %}
                 </ul>
             </div>
+            <div x-data="{ open: false }" class="pt-4 border-t border-base-300">
+                <button type="button"
+                        class="w-full btn btn-sm btn-neutral btn-soft"
+                        @click="open = !open">{% trans "Generate new link" %}</button>
+                <div x-show="open" x-transition class="mt-3">
+                    <form hx-post="{% url 'trips:share-link-create' trip.id %}"
+                          hx-target="#share-modal-content"
+                          hx-swap="outerHTML">
+                        {% csrf_token %}
+                        {% crispy form %}
+                        <div class="flex gap-2 justify-end mt-4">
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <i class="ph-bold ph-link-simple"></i>
+                                {% trans "Generate link" %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        {% else %}
+            <form hx-post="{% url 'trips:share-link-create' trip.id %}"
+                  hx-target="#share-modal-content"
+                  hx-swap="outerHTML">
+                {% csrf_token %}
+                {% crispy form %}
+                <div class="flex gap-2 justify-end mt-4">
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <i class="ph-bold ph-link-simple"></i>
+                        {% trans "Generate link" %}
+                    </button>
+                </div>
+            </form>
         {% endif %}
     </div>
 </div>

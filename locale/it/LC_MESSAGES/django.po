@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-20 11:34+0100\n"
+"POT-Creation-Date: 2026-03-20 11:53+0100\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -624,7 +624,9 @@ msgstr "Aggiungi trasferimento di andata"
 #: templates/trips/arrival-transfer-modal.html:16
 #: templates/trips/departure-transfer-modal.html:16
 #: templates/trips/edit-main-transfer-modal.html:27
-#: templates/trips/event-notes.html:14 templates/trips/stay-detail.html:9
+#: templates/trips/event-notes.html:14
+#: templates/trips/share-link-created.html:9
+#: templates/trips/share-link-modal.html:9 templates/trips/stay-detail.html:9
 #: templates/trips/stay-notes.html:14 templates/trips/trip-dates-update.html:15
 msgid "Close modal"
 msgstr "Chiudi la finestra"
@@ -1127,24 +1129,30 @@ msgstr "Altro"
 msgid "Select destination event"
 msgstr "Per favore seleziona il campo destinazione"
 
-#: templates/trips/share-link-created.html:5
+#: templates/trips/share-link-created.html:4
+#: templates/trips/share-link-modal.html:4 templates/trips/trip-detail.html:53
+#: templates/trips/trip-detail.html:88
+msgid "Share trip"
+msgstr "Condividi viaggio"
+
+#: templates/trips/share-link-created.html:15
 msgid "Share link created!"
 msgstr "Link di condivisione creato!"
 
-#: templates/trips/share-link-created.html:7
+#: templates/trips/share-link-created.html:17
 msgid "Share this link"
 msgstr "Condividi questo link"
 
-#: templates/trips/share-link-created.html:22
+#: templates/trips/share-link-created.html:32
 #, python-format
 msgid "Expires on %(date)s"
 msgstr "Scade il %(date)s"
 
-#: templates/trips/share-link-created.html:25 trips/forms.py:1978
+#: templates/trips/share-link-created.html:35 trips/forms.py:1978
 msgid "Never expires"
 msgstr "Non scade mai"
 
-#: templates/trips/share-link-created.html:33
+#: templates/trips/share-link-created.html:43
 msgid "Create another"
 msgstr "Crea un altro"
 
@@ -1168,35 +1176,37 @@ msgstr "Mai"
 msgid "No active share links."
 msgstr "Nessun link di condivisione attivo."
 
-#: templates/trips/share-link-modal.html:3 templates/trips/trip-detail.html:53
-#: templates/trips/trip-detail.html:88
-msgid "Share trip"
-msgstr "Condividi viaggio"
+#: templates/trips/share-link-modal.html:27
+#: templates/trips/share-link-modal.html:51
+msgid "Copied!"
+msgstr "Copiato!"
 
-#: templates/trips/share-link-modal.html:12
-msgid "Generate link"
-msgstr "Genera link"
+#: templates/trips/share-link-modal.html:27
+#: templates/trips/share-link-modal.html:51
+msgid "Copy link"
+msgstr "Copia link"
 
-#: templates/trips/share-link-modal.html:18
+#: templates/trips/share-link-modal.html:35
 msgid "Active links"
 msgstr "Link attivi"
 
-#: templates/trips/share-link-modal.html:27
+#: templates/trips/share-link-modal.html:43
 #, python-format
 msgid "exp. %(date)s"
 msgstr "scad. %(date)s"
 
-#: templates/trips/share-link-modal.html:35
-msgid "Copied!"
-msgstr "Copiato!"
-
-#: templates/trips/share-link-modal.html:35
-msgid "Copy link"
-msgstr "Copia link"
-
-#: templates/trips/share-link-modal.html:40
+#: templates/trips/share-link-modal.html:56
 msgid "Revoke"
 msgstr "Revoca"
+
+#: templates/trips/share-link-modal.html:72
+msgid "Generate new link"
+msgstr "Genera nuovo link"
+
+#: templates/trips/share-link-modal.html:85
+#: templates/trips/share-link-modal.html:100
+msgid "Generate link"
+msgstr "Genera link"
 
 #: templates/trips/shared-trip-detail.html:9
 msgid "Shared view – read only"
