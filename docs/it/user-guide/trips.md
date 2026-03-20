@@ -296,6 +296,45 @@ Aggiungi contesto che ti aiuta a ricordare lo scopo del viaggio:
 4. **1 settimana prima**: Finalizza i programmi giornalieri
 5. **Durante il viaggio**: Contrassegna eventi come completati, aggiungi note
 
+## Condividere un Viaggio
+
+Puoi condividere qualsiasi viaggio con amici, familiari o compagni di viaggio tramite un **magic link** — non è necessario un account per visualizzarlo.
+
+### Come Funziona la Condivisione
+
+1. Apri la pagina di dettaglio del viaggio
+2. Clicca il pulsante **Condividi** (in alto a destra nell'intestazione del viaggio)
+3. Scegli una scadenza (7 giorni, 30 giorni, 90 giorni, o mai)
+4. Aggiungi opzionalmente un'etichetta per identificare il link
+5. Clicca **Genera link**
+6. Copia il link e condividilo
+
+Il destinatario può vedere il viaggio completo (giorni, eventi, alloggi) in modalità **sola lettura** senza accedere.
+
+### Opzioni di Scadenza
+
+| Opzione | Descrizione |
+|---------|-------------|
+| 7 giorni | Il link scade dopo una settimana |
+| 30 giorni | Il link scade dopo un mese |
+| 90 giorni | Il link scade dopo tre mesi |
+| Non scade mai | Il link rimane attivo finché non viene revocato manualmente |
+
+### Gestire i Link di Condivisione
+
+Dalla modale di condivisione puoi vedere tutti i link attivi e:
+
+- **Copia**: Clicca il pulsante copia per copiare il link negli appunti
+- **Revoca**: Clicca il pulsante × per disattivare immediatamente il link
+
+I link revocati non possono essere riattivati. Crea un nuovo link se necessario.
+
+### Sicurezza
+
+- I link utilizzano token UUID crittograficamente sicuri (128-bit)
+- Le viste condivise sono strettamente in **sola lettura** — i visitatori non possono modificare il viaggio
+- Controlli la scadenza e puoi revocare in qualsiasi momento
+
 ## Domande Frequenti
 
 ### Posso avere viaggi senza date?
@@ -308,7 +347,7 @@ Attualmente non c'è una funzione di duplicazione. Devi creare un nuovo viaggio 
 
 ### Posso condividere viaggi con altri?
 
-Non ancora. La condivisione viaggi è pianificata per una versione futura. (Richiesta funzionalità: #XX)
+Sì! Usa il pulsante **Condividi** nella pagina di dettaglio del viaggio per generare un magic link. I destinatari possono visualizzare il viaggio completo in sola lettura senza bisogno di un account. Vedi [Condividere un Viaggio](#condividere-un-viaggio) per i dettagli.
 
 ### Quanti viaggi posso creare?
 

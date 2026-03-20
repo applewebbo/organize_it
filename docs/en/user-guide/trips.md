@@ -299,6 +299,45 @@ Add context that helps you remember the trip's purpose:
 4. **1 week before**: Finalize daily schedules
 5. **During trip**: Mark events as complete, add notes
 
+## Sharing a Trip
+
+You can share any trip with friends, family, or travel companions via a **magic link** — no account required to view.
+
+### How Sharing Works
+
+1. Open the trip detail page
+2. Click the **Share** button (top right of the trip header)
+3. Choose an expiration (7 days, 30 days, 90 days, or never)
+4. Optionally add a label to identify the link
+5. Click **Generate link**
+6. Copy the link and share it
+
+The recipient can view the full trip (days, events, stays) in **read-only mode** without logging in.
+
+### Expiration Options
+
+| Option | Description |
+|--------|-------------|
+| 7 days | Link expires after one week |
+| 30 days | Link expires after one month |
+| 90 days | Link expires after three months |
+| Never expires | Link remains active until manually revoked |
+
+### Managing Share Links
+
+From the Share modal you can see all active links and:
+
+- **Copy**: Click the copy button to copy the link to clipboard
+- **Revoke**: Click the × button to immediately deactivate the link
+
+Revoked links cannot be reactivated. Create a new link if needed.
+
+### Security
+
+- Links use cryptographically secure UUID tokens (128-bit)
+- Shared views are strictly **read-only** — visitors cannot modify the trip
+- You control expiration and can revoke at any time
+
 ## Frequently Asked Questions
 
 ### Can I have trips without dates?
@@ -311,7 +350,7 @@ Currently, there's no duplicate feature. You need to create a new trip and manua
 
 ### Can I share trips with others?
 
-Not yet. Trip sharing is planned for a future release. (Feature request: #XX)
+Yes! Use the **Share** button on the trip detail page to generate a magic link. Recipients can view the full trip in read-only mode without needing an account. See [Sharing a Trip](#sharing-a-trip) for details.
 
 ### How many trips can I create?
 
