@@ -188,6 +188,21 @@ htmx_urlpatterns = [
     ),
     # IMAGE MANAGEMENT
     path("images/search/", views.search_trip_images, name="search-images"),
+    # SHARING
+    path(
+        "trips/<int:trip_id>/share/create/",
+        views.share_link_create,
+        name="share-link-create",
+    ),
+    path("trips/<int:trip_id>/share/", views.share_link_list, name="share-link-list"),
+    path(
+        "share-link/<uuid:link_id>/revoke/",
+        views.share_link_revoke,
+        name="share-link-revoke",
+    ),
 ]
 
 urlpatterns += htmx_urlpatterns
+urlpatterns += [
+    path("share/<uuid:token>/", views.shared_trip_detail, name="shared-trip"),
+]

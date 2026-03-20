@@ -19,6 +19,7 @@ from .models import (
     MainTransfer,
     MainTransferConnection,
     Meal,
+    ShareLink,
     SimpleTransfer,
     Stay,
     StayTransfer,
@@ -1966,4 +1967,49 @@ class MainTransferConnectionEditForm(forms.ModelForm):
         self.helper.layout = Layout(
             Field("transport_mode", wrapper_class="col-span-full"),
             Field("notes", wrapper_class="col-span-full"),
+        )
+
+
+class ShareLinkCreateForm(forms.Form):
+    EXPIRATION_CHOICES = [
+        (7, _("7 days")),
+        (30, _("30 days")),
+        (90, _("90 days")),
+        (0, _("Never expires")),
+    ]
+
+    label = forms.CharField(
+        max_length=100,
+        required=False,
+        label=_("Label"),
+        help_text=_("Optional label to identify this link"),
+    )
+    expiration_days = forms.ChoiceField(
+        choices=EXPIRATION_CHOICES,
+        initial=30,
+        label=_("Expires after"),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Field("label", wrapper_class="col-span-full"),
+            Field("expiration_days", wrapper_class="col-span-full"),
+        )
+
+    def save(self, trip, created_by):
+        from django.utils import timezone as tz
+
+        label = self.cleaned_data["label"]
+        expiration_days = int(self.cleaned_data["expiration_days"])
+        expires_at = (
+            tz.now() + timedelta(days=expiration_days) if expiration_days > 0 else None
+        )
+        return ShareLink.objects.create(
+            trip=trip,
+            created_by=created_by,
+            label=label,
+            expires_at=expires_at,
         )

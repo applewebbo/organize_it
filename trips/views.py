@@ -25,6 +25,7 @@ from trips.forms import (
     MealForm,
     NoteForm,
     OtherMainTransferForm,
+    ShareLinkCreateForm,
     SimpleTransferCreateForm,
     SimpleTransferEditForm,
     StayForm,
@@ -38,6 +39,7 @@ from trips.models import (
     Day,
     Event,
     MainTransfer,
+    ShareLink,
     SimpleTransfer,
     Stay,
     StayTransfer,
@@ -2378,3 +2380,80 @@ def save_main_transfer(request, trip_id):
     }
 
     return TemplateResponse(request, template_map[transport_type], context)
+
+
+# ── SHARING VIEWS ─────────────────────────────────────────────────────────────
+
+
+def shared_trip_detail(request, token):
+    """Public read-only view for a shared trip. No login required."""
+    link = get_object_or_404(ShareLink, id=token)
+
+    if not link.is_valid:
+        if link.expires_at:
+            return TemplateResponse(request, "trips/link-expired.html", status=410)
+        return TemplateResponse(request, "trips/link-revoked.html", status=410)
+
+    days = link.trip.days.prefetch_related(
+        Prefetch(
+            "events",
+            queryset=annotate_event_overlaps(Event.objects.all()).order_by(
+                "start_time"
+            ),
+        ),
+        "stay",
+    ).order_by("date")
+
+    context = {
+        "trip": link.trip,
+        "days": days,
+        "is_shared_view": True,
+        "permission_level": link.permission_level,
+    }
+    return TemplateResponse(request, "trips/shared-trip-detail.html", context)
+
+
+@login_required
+def share_link_create(request, trip_id):
+    """Create a new share link for a trip (owner only)."""
+    trip = get_object_or_404(Trip, id=trip_id, author=request.user)
+
+    if request.method == "POST":
+        form = ShareLinkCreateForm(request.POST)
+        if form.is_valid():
+            link = form.save(trip=trip, created_by=request.user)
+            return TemplateResponse(
+                request,
+                "trips/share-link-created.html",
+                {"link": link, "trip": trip},
+            )
+    else:
+        form = ShareLinkCreateForm()
+
+    return TemplateResponse(
+        request,
+        "trips/share-link-modal.html",
+        {"form": form, "trip": trip},
+    )
+
+
+@login_required
+def share_link_list(request, trip_id):
+    """List active share links for a trip (owner only)."""
+    trip = get_object_or_404(Trip, id=trip_id, author=request.user)
+    links = trip.share_links.filter(is_active=True).order_by("-created_at")
+    return TemplateResponse(
+        request,
+        "trips/share-link-list.html",
+        {"trip": trip, "links": links},
+    )
+
+
+@login_required
+@require_http_methods(["POST"])
+def share_link_revoke(request, link_id):
+    """Deactivate a share link (owner only)."""
+    link = get_object_or_404(ShareLink, id=link_id, trip__author=request.user)
+    link.is_active = False
+    link.save(update_fields=["is_active"])
+    return HttpResponse(status=204)

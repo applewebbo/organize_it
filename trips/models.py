@@ -1,3 +1,4 @@
+import uuid
 from datetime import date, timedelta
 from urllib.parse import quote
 
@@ -7,6 +8,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
+from django.urls import reverse
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 
@@ -952,3 +955,41 @@ class Meal(Event):
         """autosave category for meal"""
         self.category = self.Category.MEAL
         return super().save(*args, **kwargs)
+
+
+class ShareLink(models.Model):
+    class PermissionLevel(models.TextChoices):
+        VIEW = "view", _("View only")
+        EDIT = "edit", _("Can edit")
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    trip = models.ForeignKey(
+        "Trip", on_delete=models.CASCADE, related_name="share_links"
+    )
+    permission_level = models.CharField(
+        max_length=10,
+        choices=PermissionLevel.choices,
+        default=PermissionLevel.VIEW,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    expires_at = models.DateTimeField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    label = models.CharField(max_length=100, blank=True)
+
+    class Meta:
+        ordering = ("-created_at",)
+
+    def __str__(self) -> str:
+        return f"Share link for {self.trip.title}"
+
+    @property
+    def is_valid(self) -> bool:
+        if not self.is_active:
+            return False
+        if self.expires_at and timezone.now() > self.expires_at:
+            return False
+        return True
+
+    def get_absolute_url(self) -> str:
+        return reverse("trips:shared-trip", kwargs={"token": self.id})

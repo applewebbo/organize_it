@@ -1,0 +1,26 @@
+{% load i18n %}
+<div class="p-4 md:p-6">
+    <div class="mb-4 alert alert-success alert-soft">
+        <i class="ph-bold ph-check-circle i-md"></i>
+        <span>{% trans "Share link created successfully!" %}</span>
+    </div>
+    <label class="font-medium label">{% trans "Share this link" %}</label>
+    <div class="flex gap-2 mt-1">
+        <input id="share-link-url"
+               type="text"
+               class="flex-1 input input-bordered"
+               value="{{ request.scheme }}://{{ request.get_host }}{{ link.get_absolute_url }}"
+               readonly>
+        <button class="btn btn-primary"
+                onclick="navigator.clipboard.writeText(document.getElementById('share-link-url').value)">
+            <i class="ph-bold ph-copy"></i>
+        </button>
+    </div>
+    {% if link.expires_at %}
+        <p class="mt-2 text-sm text-base-content/60">
+            {% blocktrans with date=link.expires_at|date:"SHORT_DATE_FORMAT" %}Expires on {{ date }}{% endblocktrans %}
+        </p>
+    {% else %}
+        <p class="mt-2 text-sm text-base-content/60">{% trans "Never expires" %}</p>
+    {% endif %}
+</div>

@@ -1,0 +1,43 @@
+{% load i18n %}
+<div class="p-4 md:p-6">
+    <h3 class="mb-4 text-lg font-semibold">{% trans "Active share links" %}</h3>
+    {% if links %}
+        <table class="table w-full">
+            <thead>
+                <tr>
+                    <th>{% trans "Label" %}</th>
+                    <th>{% trans "Expires" %}</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for link in links %}
+                    <tr>
+                        <td>{{ link.label|default:"–" }}</td>
+                        <td>
+                            {% if link.expires_at %}
+                                {{ link.expires_at|date:"SHORT_DATE_FORMAT" }}
+                            {% else %}
+                                {% trans "Never" %}
+                            {% endif %}
+                        </td>
+                        <td class="flex gap-2">
+                            <button class="btn btn-xs btn-ghost"
+                                    onclick="navigator.clipboard.writeText('{{ request.scheme }}://{{ request.get_host }}{{ link.get_absolute_url }}')">
+                                <i class="ph-bold ph-copy"></i>
+                            </button>
+                            <button class="btn btn-xs btn-error btn-soft"
+                                    hx-post="{% url 'trips:share-link-revoke' link.id %}"
+                                    hx-target="closest tr"
+                                    hx-swap="outerHTML">
+                                <i class="ph-bold ph-x"></i>
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="text-base-content/50">{% trans "No active share links." %}</p>
+    {% endif %}
+</div>

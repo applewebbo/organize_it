@@ -1,0 +1,13 @@
+{% load i18n crispy_forms_tags %}
+<div class="p-4 md:p-6">
+    <h3 class="mb-4 text-lg font-semibold">{% trans "Share trip" %}</h3>
+    <form hx-post="{% url 'trips:share-link-create' trip.id %}"
+          hx-target="this"
+          hx-swap="outerHTML">
+        {% csrf_token %}
+        {% crispy form %}
+        <div class="flex gap-2 justify-end mt-4">
+            <button type="submit" class="btn btn-primary">{% trans "Generate link" %}</button>
+        </div>
+    </form>
+</div>
