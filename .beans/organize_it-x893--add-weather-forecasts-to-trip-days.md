@@ -1,11 +1,11 @@
 ---
 # organize_it-x893
 title: Add weather forecasts to trip days
-status: in-progress
+status: completed
 type: feature
 priority: normal
 created_at: 2026-03-21T12:35:06Z
-updated_at: 2026-03-21T13:51:09Z
+updated_at: 2026-03-21T19:35:02Z
 ---
 
 Add weather forecast data to trip days for IMPENDING and IN_PROGRESS trips.
@@ -32,13 +32,26 @@ Add weather forecast data to trip days for IMPENDING and IN_PROGRESS trips.
 - [x] Add weather badge to trip-list.html
 
 ### Phase 4 — Shared View
-- [ ] Include weather data in shared_trip_detail context
+- [x] Include weather data in shared_trip_detail context
 
 ### Phase 5 — Tests (TDD)
-- [ ] Save Open-Meteo fixture JSON in tests/fixtures/
-- [ ] Test parse_weather_response with fixture
-- [ ] Test get_coordinates_for_day (all fallbacks)
-- [ ] Test WMO_CODE_MAP completeness
-- [ ] Test fetch_weather_for_active_trips filters by status
-- [ ] Test weather widget shown/hidden based on trip status
-- [ ] Test shared view includes weather
+- [x] Save Open-Meteo fixture JSON in tests/fixtures/ (replaced with dynamic conftest fixture)
+- [x] Test parse_weather_response with fixture
+- [x] Test get_coordinates_for_day (all fallbacks)
+- [x] Test WMO_CODE_MAP completeness
+- [x] Test fetch_weather_for_active_trips filters by status
+- [x] Test weather widget shown/hidden based on trip status
+- [x] Test shared view includes weather
+
+## Summary of Changes
+
+Implemented full weather forecast feature using Open-Meteo API (issue #237):
+
+- New fields on `Day`: `weather_data` (JSONField) + `weather_fetched_at`
+- `trips/weather.py`: `fetch_raw_weather`, `parse_weather_response`, `get_coordinates_for_day`, `fetch_weather_for_day`, `fetch_weather_for_trip`, WMO_CODE_MAP (28 codes → Phosphor icons)
+- Background task `fetch_weather_for_active_trips` scheduled every 6h via migration
+- Template tags: `weather_widget`, `weather_summary`, `trip_day_one_weather`
+- Templates: weather widget in day cards, summary banner in trip header, badge in trip list
+- Weather shown in shared (magic link) view
+- pytest-httpx for HTTP boundary testing (no code mocking)
+- 710 tests, 100% coverage

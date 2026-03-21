@@ -274,13 +274,15 @@ def weather_summary(trip):
     """Render a weather summary banner for the trip header."""
     days = trip.days.all()
     counts = {}
+    day_list = []
     has_data = False
     for day in days:
         if day.weather_data:
             has_data = True
             icon = day.weather_data.get("weather_icon", "ph-cloud")
             counts[icon] = counts.get(icon, 0) + 1
-    return {"weather_counts": counts, "has_data": has_data}
+            day_list.append({"date": day.date, "icon": icon})
+    return {"weather_counts": counts, "day_list": day_list, "has_data": has_data}
 
 
 @register.simple_tag

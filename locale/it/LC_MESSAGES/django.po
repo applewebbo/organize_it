@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-20 11:53+0100\n"
+"POT-Creation-Date: 2026-03-21 20:53+0100\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -340,11 +340,11 @@ msgstr ""
 msgid "Add event"
 msgstr "Aggiungi evento"
 
-#: templates/cotton/dropdown.html:20 trips/models.py:424
+#: templates/cotton/dropdown.html:20 trips/models.py:426
 msgid "Experience"
 msgstr "Esperienza"
 
-#: templates/cotton/dropdown.html:29 trips/models.py:425
+#: templates/cotton/dropdown.html:29 trips/models.py:427
 msgid "Meal"
 msgstr "Pasto"
 
@@ -554,7 +554,7 @@ msgstr "Data di fine:"
 msgid "Destination:"
 msgstr "Destinazione:"
 
-#: templates/includes/auth-index.html:121 templates/trips/trip-detail.html:166
+#: templates/includes/auth-index.html:121 templates/trips/trip-detail.html:169
 msgid "Unpaired Events"
 msgstr "Eventi non abbinati"
 
@@ -569,7 +569,7 @@ msgstr "Altri Viaggi"
 #: templates/trips/includes/main-transfers.html:212
 #: templates/trips/includes/note.html:8
 #: templates/trips/main-transfer-connection-modal.html:37
-#: templates/trips/stay-detail.html:88 templates/trips/trip-list.html:72
+#: templates/trips/stay-detail.html:88 templates/trips/trip-list.html:104
 msgid "Edit"
 msgstr "Modifica"
 
@@ -673,8 +673,8 @@ msgstr "Arricchisci"
 #: templates/trips/main-transfer-connection-modal.html:44
 #: templates/trips/simple-transfer-edit.html:55
 #: templates/trips/stay-detail.html:96 templates/trips/stay-note-modify.html:32
-#: templates/trips/stay-transfer-edit.html:67 templates/trips/trip-list.html:69
-#: templates/trips/trip-list.html:144
+#: templates/trips/stay-transfer-edit.html:67 templates/trips/trip-list.html:90
+#: templates/trips/trip-list.html:177
 msgid "Delete"
 msgstr "Elimina"
 
@@ -770,7 +770,7 @@ msgstr "Nessun evento da mostrare sulla mappa per il giorno selezionato"
 
 #: templates/trips/includes/day.html:10
 #: templates/trips/shared-trip-detail.html:26 trips/forms.py:761
-#: trips/models.py:407
+#: trips/models.py:409
 msgid "Day"
 msgstr "Giorno"
 
@@ -1121,7 +1121,7 @@ msgid "Car"
 msgstr "Automobile"
 
 #: templates/trips/partials/main-transfer-type.html:53 trips/models.py:200
-#: trips/models.py:929
+#: trips/models.py:931
 msgid "Other"
 msgstr "Altro"
 
@@ -1199,12 +1199,12 @@ msgstr "scad. %(date)s"
 msgid "Revoke"
 msgstr "Revoca"
 
-#: templates/trips/share-link-modal.html:72
+#: templates/trips/share-link-modal.html:70
 msgid "Generate new link"
 msgstr "Genera nuovo link"
 
-#: templates/trips/share-link-modal.html:85
-#: templates/trips/share-link-modal.html:100
+#: templates/trips/share-link-modal.html:80
+#: templates/trips/share-link-modal.html:95
 msgid "Generate link"
 msgstr "Genera link"
 
@@ -1212,11 +1212,11 @@ msgstr "Genera link"
 msgid "Shared view – read only"
 msgstr "Vista condivisa – solo lettura"
 
-#: templates/trips/shared-trip-detail.html:49
+#: templates/trips/shared-trip-detail.html:50
 msgid "No events for this day."
 msgstr "Nessun evento per questo giorno."
 
-#: templates/trips/shared-trip-detail.html:53
+#: templates/trips/shared-trip-detail.html:54
 msgid "No days planned yet."
 msgstr "Nessun giorno pianificato."
 
@@ -1273,11 +1273,11 @@ msgstr ""
 msgid "This trip is archived and cannot be modified."
 msgstr "Questo viaggio è stato archiviato e non può essere modificato."
 
-#: templates/trips/trip-detail.html:16 templates/trips/trip-list.html:140
+#: templates/trips/trip-detail.html:16 templates/trips/trip-list.html:173
 msgid "Unarchive"
 msgstr "Riapri"
 
-#: templates/trips/trip-detail.html:90
+#: templates/trips/trip-detail.html:90 templates/trips/trip-list.html:99
 msgid "Share"
 msgstr "Condividi"
 
@@ -1289,25 +1289,33 @@ msgstr "Lista dei Viaggi"
 msgid "My Trips"
 msgstr "Viaggi Personali"
 
-#: templates/trips/trip-list.html:59
+#: templates/trips/trip-list.html:61
 msgid "Modify Dates"
 msgstr "Modifica date"
 
-#: templates/trips/trip-list.html:65
+#: templates/trips/trip-list.html:67
+msgid "Weather forecast"
+msgstr "Previsioni meteo"
+
+#: templates/trips/trip-list.html:84
 msgid "Archive"
 msgstr "Archivia"
 
-#: templates/trips/trip-list.html:85 templates/trips/trip-list.html:98
+#: templates/trips/trip-list.html:118 templates/trips/trip-list.html:131
 msgid "Create a new trip"
 msgstr "Crea un nuovo viaggio"
 
-#: templates/trips/trip-list.html:108
+#: templates/trips/trip-list.html:141
 msgid "Archived Trips"
 msgstr "Viaggi Archiviati"
 
-#: templates/trips/trip-list.html:147
+#: templates/trips/trip-list.html:180
 msgid "View"
 msgstr "Vedi"
+
+#: templates/trips/weather-widget.html:22
+msgid "Forecast unavailable"
+msgstr ""
 
 #: trips/forms.py:42
 msgid "Title"
@@ -1674,124 +1682,124 @@ msgstr "Archiviata"
 msgid "Main Transfer"
 msgstr "Trasferimento principale"
 
-#: trips/models.py:531 trips/models.py:647
+#: trips/models.py:533 trips/models.py:649
 msgid "Driving"
 msgstr "Auto"
 
-#: trips/models.py:532 trips/models.py:648
+#: trips/models.py:534 trips/models.py:650
 msgid "Walking"
 msgstr "A piedi"
 
-#: trips/models.py:533 trips/models.py:649
+#: trips/models.py:535 trips/models.py:651
 msgid "Bicycling"
 msgstr "Bicicletta"
 
-#: trips/models.py:534 trips/models.py:650
+#: trips/models.py:536 trips/models.py:652
 msgid "Transit"
 msgstr "Mezzi pubblici"
 
-#: trips/models.py:563
+#: trips/models.py:565
 msgid "Simple Transfer"
 msgstr "Trasferimento giornaliero"
 
-#: trips/models.py:564
+#: trips/models.py:566
 msgid "Simple Transfers"
 msgstr "Trasferimenti giornalieri"
 
-#: trips/models.py:622
+#: trips/models.py:624
 msgid "Cannot create transfer to the same event"
 msgstr "Non è possibile creare trasferimenti verso lo stesso evento"
 
-#: trips/models.py:628
+#: trips/models.py:630
 msgid "Both events must be on the same day for SimpleTransfer"
 msgstr ""
 "Entrambi gli eventi devono avvenire nello stesso giorno per creare un "
 "trasferimento"
 
-#: trips/models.py:634
+#: trips/models.py:636
 msgid "Both events must belong to the same trip"
 msgstr "Entrambi gli eventi devono appartenere allo stesso viaggio"
 
-#: trips/models.py:686
+#: trips/models.py:688
 msgid "Stay Transfer"
 msgstr "Trasferimento"
 
-#: trips/models.py:687
+#: trips/models.py:689
 msgid "Stay Transfers"
 msgstr "Trasferimenti"
 
-#: trips/models.py:756
+#: trips/models.py:758
 msgid "Cannot create transfer to the same stay"
 msgstr "Non è possibile creare trasferimenti verso lo stesso soggiorno"
 
-#: trips/models.py:765
+#: trips/models.py:767
 msgid "Stays must be on consecutive days (day N and day N+1)"
 msgstr ""
 "I soggiorni devono essere in giorni consecutivi (giorno N e giorno N+1)"
 
-#: trips/models.py:771
+#: trips/models.py:773
 msgid "Both stays must belong to the same trip"
 msgstr "Entrambi i soggiorni devono appartenere allo stesso viaggio"
 
-#: trips/models.py:814
+#: trips/models.py:816
 msgid "Main Transfer Connection"
 msgstr "Trasferimento principale"
 
-#: trips/models.py:815
+#: trips/models.py:817
 msgid "Main Transfer Connections"
 msgstr "Trasferimenti principali"
 
-#: trips/models.py:914
+#: trips/models.py:916
 msgid "Either event or stay must be set for the connection"
 msgstr ""
 "Almeno un evento oppure un soggiorno deve essere selezionato per il "
 "trasferimento"
 
-#: trips/models.py:919
+#: trips/models.py:921
 msgid "Cannot set both event and stay - choose only one destination"
 msgstr ""
 "Non è possibile selezionare contemporaneamente un evento e un soggiorno - "
 "per favore scegli una destinazione sola"
 
-#: trips/models.py:925
+#: trips/models.py:927
 msgid "Museum"
 msgstr "Museo"
 
-#: trips/models.py:926
+#: trips/models.py:928
 msgid "Park"
 msgstr "Parco"
 
-#: trips/models.py:927
+#: trips/models.py:929
 msgid "Walk"
 msgstr "Passeggiata"
 
-#: trips/models.py:928
+#: trips/models.py:930
 msgid "Sport"
 msgstr "Attività sportiva"
 
-#: trips/models.py:944
+#: trips/models.py:946
 msgid "Breakfast"
 msgstr "Colazione"
 
-#: trips/models.py:945
+#: trips/models.py:947
 msgid "Lunch"
 msgstr "Pranzo"
 
-#: trips/models.py:946
+#: trips/models.py:948
 msgid "Dinner"
 msgstr "Cena"
 
-#: trips/models.py:947
+#: trips/models.py:949
 msgid "Snack"
 msgstr "Spuntino"
 
-#: trips/models.py:962
+#: trips/models.py:964
 #, fuzzy
 #| msgid "View list"
 msgid "View only"
 msgstr "Vedi lista"
 
-#: trips/models.py:963
+#: trips/models.py:965
 msgid "Can edit"
 msgstr ""
 

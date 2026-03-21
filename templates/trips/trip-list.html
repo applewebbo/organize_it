@@ -42,16 +42,7 @@
                                 {% endif %}
                             </figure>
                             <div class="card-body">
-                                {% trip_day_one_weather trip as day_weather %}
-                                <div class="flex gap-2 items-center">
-                                    <span class="badge badge-outline badge-secondary">{{ trip.get_status_display }}</span>
-                                    {% if trip.status == 2 and day_weather %}
-                                        <span class="flex gap-1 items-center text-xs text-base-content/60">
-                                            <i class="ph-bold {{ day_weather.weather_icon }}"></i>
-                                            {{ day_weather.temperature_max|floatformat:0 }}°
-                                        </span>
-                                    {% endif %}
-                                </div>
+                                <span class="badge badge-outline badge-secondary">{{ trip.get_status_display }}</span>
                                 <h2 class="card-title">{{ trip.title }}</h2>
                                 <div x-data class="flex items-center">
                                     <span>
@@ -70,7 +61,21 @@
                                         <span class="hidden sm:inline">{% trans 'Modify Dates' %}</span>
                                     </a>
                                 </div>
-                                <p class="mb-3 italic text-base-content/80">{{ trip.description }}</p>
+                                {% if trip.status == 2 or trip.status == 3 %}
+                                    {% trip_day_one_weather trip as day_weather %}
+                                    <div class="flex gap-2 items-center text-sm">
+                                        <span class="font-medium text-base-content/60">{% trans "Weather forecast" %}:</span>
+                                        {% if day_weather %}
+                                            <span class="flex gap-1 items-center">
+                                                <i class="ph-bold {{ day_weather.weather_icon }}"></i>
+                                                {{ day_weather.temperature_max|floatformat:0 }}° / {{ day_weather.temperature_min|floatformat:0 }}°
+                                            </span>
+                                        {% else %}
+                                            <span class="text-base-content/40">n/d</span>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                                <p class="italic text-base-content/80">{{ trip.description }}</p>
                                 <div class="justify-end text-right">
                                     <button class="btn btn-sm btn-warning btn-soft me-2"
                                             hx-get="{% url 'trips:trip-archive' trip.id %}"

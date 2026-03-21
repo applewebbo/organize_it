@@ -162,7 +162,7 @@
 </div>
 {% if day.events.all and day.stay %}<div class="divider"></div>{% endif %}
 {% if day.trip.status == 2 or day.trip.status == 3 %}
-    {% weather_widget day %}
+    <div class="mb-4">{% weather_widget day %}</div>
 {% endif %}
 <ul id="events-list-{{ day.pk }}"
     class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 grid-col">

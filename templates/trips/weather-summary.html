@@ -1,10 +1,20 @@
 {% load i18n %}
 {% if has_data %}
-    <div class="flex flex-wrap gap-3 items-center mt-3 text-sm text-base-content/60">
+    {# Mobile: aggregate counts #}
+    <div class="flex flex-wrap gap-3 items-center mt-3 text-sm font-semibold sm:hidden text-base-content">
         {% for icon, count in weather_counts.items %}
             <span class="flex gap-1 items-center">
                 <i class="ph-bold {{ icon }} text-base"></i>
                 {{ count }}d
+            </span>
+        {% endfor %}
+    </div>
+    {# sm+: per-day icon + date #}
+    <div class="hidden flex-wrap gap-y-1 gap-x-6 items-center mt-3 text-sm font-semibold sm:flex text-base-content">
+        {% for entry in day_list %}
+            <span class="flex gap-1 items-center">
+                <i class="ph-bold {{ entry.icon }} text-base"></i>
+                {{ entry.date|date:"j/n" }}
             </span>
         {% endfor %}
     </div>
