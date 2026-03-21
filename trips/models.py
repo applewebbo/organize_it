@@ -379,6 +379,8 @@ class Day(models.Model):
     )
     number = models.PositiveSmallIntegerField()
     date = models.DateField()
+    weather_data = models.JSONField(null=True, blank=True)
+    weather_fetched_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ["number"]
