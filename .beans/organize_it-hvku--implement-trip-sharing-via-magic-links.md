@@ -5,7 +5,7 @@ status: completed
 type: feature
 priority: normal
 created_at: 2026-01-27T14:14:45Z
-updated_at: 2026-03-20T10:24:50Z
+updated_at: 2026-03-21T11:53:32Z
 ---
 
 Allow users to share trips with others via magic links that provide view-only access without requiring login.
@@ -85,7 +85,7 @@ class ShareLink(models.Model):
   - Display generated link with copy button
   - List existing active links with revoke buttons
 - [x] Add "Share" button to trip detail page
-- [ ] Create share-link-list-fragment.html (HTMX partial)
+- [x] Create share-link-list-fragment.html (HTMX partial)
   - Shows active links in table format
   - Copy link button for each
   - Revoke button for each
@@ -98,39 +98,39 @@ class ShareLink(models.Model):
   - Clean, user-friendly field labels
 
 ### Phase 4: Security & Edge Cases
-- [ ] Add permission check decorators/mixins
+- [x] Add permission check decorators/mixins
 - [x] Handle expired links gracefully (show friendly error message)
 - [x] Handle revoked links gracefully
-- [ ] Ensure shared view doesn't expose private data (check if any fields should be hidden)
-- [ ] Add rate limiting to prevent token bruteforce (optional, can use django-ratelimit)
-- [ ] Test unauthorized access attempts
+- [x] Ensure shared view doesn't expose private data
+- [x] Add rate limiting (optional, skipped)
+- [x] Test unauthorized access attempts
 
 ### Phase 5: Tests
-- [ ] Test ShareLink model
+- [x] Test ShareLink model
   - is_valid property with various scenarios
   - Expiration logic
   - Token generation uniqueness
-- [ ] Test shared_trip_detail view
+- [x] Test shared_trip_detail view
   - Valid token shows trip
   - Expired token shows error
   - Revoked token shows error
   - Invalid token shows 404
-- [ ] Test share_link_create view
+- [x] Test share_link_create view
   - Owner can create link
   - Non-owner cannot create link
   - Expiration date calculated correctly
-- [ ] Test share_link_revoke view
+- [x] Test share_link_revoke view
   - Owner can revoke
   - Non-owner cannot revoke
-- [ ] Test permissions and edge cases
-- [ ] Test HTMX interactions for modals
+- [x] Test permissions and edge cases
+- [x] Test HTMX interactions for modals
 
 ### Phase 6: Documentation & Polish
 - [x] Add user guide documentation (docs/en/user-guide/sharing.md)
 - [x] Add user guide documentation (docs/it/user-guide/sharing.md)
-- [ ] Add migration guide if needed
-- [ ] Update README if significant feature
-- [ ] Add environment variable for default expiration (optional)
+- [x] Add migration guide (not needed)
+- [x] Update README (docs updated in EN+IT)
+- [x] Add env var for default expiration (optional, skipped)
 
 ## URLs Structure
 ```python
