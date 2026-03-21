@@ -1,10 +1,11 @@
 ---
 # organize_it-mjzh
 title: Add transfer from last event/stay to main transfer departure
-status: todo
+status: scrapped
 type: feature
+priority: normal
 created_at: 2026-01-25T06:50:56Z
-updated_at: 2026-01-25T06:50:56Z
+updated_at: 2026-03-21T12:09:00Z
 ---
 
 Add the ability to add a transfer from the last event or last stay of the last day to the main transfer departure location.
@@ -19,3 +20,7 @@ Before departing via main transfer (e.g., flight), users need to get from their 
 - [ ] Add/update tests
 
 Related to #230
+
+## Reasons for Scrapping
+
+Issue #230 is already closed and the functionality is present in the app. Bean created in duplicate.
