@@ -9,6 +9,7 @@ from django.core import management
 from django.utils import timezone
 
 from trips.models import Trip
+from trips.weather import fetch_weather_for_trip
 
 logger = logging.getLogger("task")
 
@@ -138,4 +139,32 @@ def backup_database():
 
     except Exception as e:
         logger.error(f"Error in backup_database task: {e}", exc_info=True)
+        raise
+
+
+def fetch_weather_for_active_trips():
+    """
+    Fetch and cache weather forecasts for all IMPENDING and IN_PROGRESS trips.
+
+    Runs every 6 hours via django-q2 schedule.
+
+    Returns:
+        str: Summary of trips processed
+    """
+    try:
+        logger.info("Starting fetch_weather_for_active_trips task")
+        trips = Trip.objects.filter(
+            status__in=[Trip.Status.IMPENDING, Trip.Status.IN_PROGRESS]
+        )
+        count = trips.count()
+        for trip in trips:
+            fetch_weather_for_trip(trip)
+            logger.debug(f"Weather fetched for trip '{trip.title}'")
+        result_msg = f"Weather fetched for {count} trip(s)"
+        logger.info(f"fetch_weather_for_active_trips completed: {result_msg}")
+        return result_msg
+    except Exception as e:
+        logger.error(
+            f"Error in fetch_weather_for_active_trips task: {e}", exc_info=True
+        )
         raise
