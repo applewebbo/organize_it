@@ -23,27 +23,31 @@
                         <div class="overflow-hidden shadow card card-border bg-base-100"
                              id="{{ trip.id }}">
                             <!-- Trip Image Header -->
-                            <figure class="relative w-full h-48">
-                                {% if trip.get_image_url %}
-                                    <img src="{{ trip.get_image_url }}"
-                                         alt="{{ trip.title }}"
-                                         class="object-cover w-full h-full"
-                                         loading="lazy">
-                                {% else %}
-                                    <img src=" {% static 'img/trip_generic.jpg' %} "
-                                         alt="{{ trip.title }}"
-                                         class="object-cover w-full h-full"
-                                         loading="lazy">
-                                {% endif %}
-                                {% if trip.needs_attribution %}
-                                    <div class="absolute right-1 bottom-1 py-1 px-2 text-xs text-white rounded bg-black/50">
-                                        {{ trip.get_attribution_text }}
-                                    </div>
-                                {% endif %}
-                            </figure>
+                            <a href="{% url 'trips:trip-detail' trip.id %}">
+                                <figure class="relative w-full h-48">
+                                    {% if trip.get_image_url %}
+                                        <img src="{{ trip.get_image_url }}"
+                                             alt="{{ trip.title }}"
+                                             class="object-cover w-full h-full"
+                                             loading="lazy">
+                                    {% else %}
+                                        <img src=" {% static 'img/trip_generic.jpg' %} "
+                                             alt="{{ trip.title }}"
+                                             class="object-cover w-full h-full"
+                                             loading="lazy">
+                                    {% endif %}
+                                    {% if trip.needs_attribution %}
+                                        <div class="absolute right-1 bottom-1 py-1 px-2 text-xs text-white rounded bg-black/50">
+                                            {{ trip.get_attribution_text }}
+                                        </div>
+                                    {% endif %}
+                                </figure>
+                            </a>
                             <div class="card-body">
                                 <span class="badge badge-outline badge-secondary">{{ trip.get_status_display }}</span>
-                                <h2 class="card-title">{{ trip.title }}</h2>
+                                <h2 class="card-title">
+                                    <a href="{% url 'trips:trip-detail' trip.id %}">{{ trip.title }}</a>
+                                </h2>
                                 <div x-data class="flex items-center">
                                     <span>
                                         {% if trip.start_date and trip.end_date %}
