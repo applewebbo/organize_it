@@ -1,5 +1,5 @@
 {% extends "base-simplified.html" %}
-{% load i18n %}
+{% load i18n trip_tags %}
 {% block page_title %}
     {{ trip.title }}
 {% endblock page_title %}
@@ -31,6 +31,7 @@
                     {% if day.stay.address %}, {{ day.stay.address }}{% endif %}
                 </div>
             {% endif %}
+            {% weather_widget day %}
             {% for event in day.events.all %}
                 <div class="p-3 mb-2 rounded-lg border border-base-300 bg-base-100">
                     <div class="flex gap-2 items-center">

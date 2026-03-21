@@ -341,3 +341,39 @@ class TestShareLinkRevokeView:
         assert response.status_code == 302
         link.refresh_from_db()
         assert link.is_active is True
+
+
+class TestSharedTripWeather:
+    def test_shared_view_shows_weather_widget(self, client, user_factory, trip_factory):
+        owner = user_factory()
+        trip = trip_factory(author=owner)
+        # Add weather data to first day
+        day = trip.days.first()
+        day.weather_data = {
+            "temperature_max": 22.0,
+            "temperature_min": 12.0,
+            "precipitation_sum": 0.0,
+            "wind_speed_max": 15.0,
+            "weather_code": 0,
+            "weather_icon": "ph-sun",
+            "weather_label": "Clear sky",
+        }
+        day.save()
+        link = ShareLink.objects.create(trip=trip, created_by=owner)
+
+        response = client.get(reverse("trips:shared-trip", kwargs={"token": link.id}))
+
+        assert response.status_code == 200
+        assert b"ph-sun" in response.content
+
+    def test_shared_view_shows_unavailable_badge_without_weather(
+        self, client, user_factory, trip_factory
+    ):
+        owner = user_factory()
+        trip = trip_factory(author=owner)
+        link = ShareLink.objects.create(trip=trip, created_by=owner)
+
+        response = client.get(reverse("trips:shared-trip", kwargs={"token": link.id}))
+
+        assert response.status_code == 200
+        assert b"Forecast unavailable" in response.content
