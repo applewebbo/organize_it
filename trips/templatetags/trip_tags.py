@@ -261,3 +261,32 @@ def event_type_icon(event):
         return meal_icons.get(event.type, "ph-fork-knife")
 
     return "ph-question"
+
+
+@register.inclusion_tag("trips/weather-widget.html")
+def weather_widget(day):
+    """Render the weather widget for a day card."""
+    return {"weather": day.weather_data}
+
+
+@register.inclusion_tag("trips/weather-summary.html")
+def weather_summary(trip):
+    """Render a weather summary banner for the trip header."""
+    days = trip.days.all()
+    counts = {}
+    has_data = False
+    for day in days:
+        if day.weather_data:
+            has_data = True
+            icon = day.weather_data.get("weather_icon", "ph-cloud")
+            counts[icon] = counts.get(icon, 0) + 1
+    return {"weather_counts": counts, "has_data": has_data}
+
+
+@register.simple_tag
+def trip_day_one_weather(trip):
+    """Return weather_data for the first day of a trip (for list badge)."""
+    first_day = trip.days.order_by("number").first()
+    if first_day:
+        return first_day.weather_data
+    return None

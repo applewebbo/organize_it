@@ -572,3 +572,95 @@ class TestIsLastDayEdgeCases:
         day.trip = original_trip
 
         assert result is False
+
+
+class TestWeatherTags:
+    pytestmark = pytest.mark.django_db
+
+    def test_weather_widget_with_data(self, trip_factory, user_factory):
+        from django.template import Context, Template
+
+        user = user_factory()
+        trip = trip_factory(author=user)
+        day = trip.days.first()
+        day.weather_data = {
+            "temperature_max": 22.0,
+            "temperature_min": 12.0,
+            "precipitation_sum": 0.0,
+            "wind_speed_max": 15.0,
+            "weather_code": 0,
+            "weather_icon": "ph-sun",
+            "weather_label": "Clear sky",
+        }
+        day.save()
+        t = Template("{% load trip_tags %}{% weather_widget day %}")
+        result = t.render(Context({"day": day}))
+        assert "22" in result
+        assert "ph-sun" in result
+
+    def test_weather_widget_without_data(self, trip_factory, user_factory):
+        from django.template import Context, Template
+
+        user = user_factory()
+        trip = trip_factory(author=user)
+        day = trip.days.first()
+        t = Template("{% load trip_tags %}{% weather_widget day %}")
+        result = t.render(Context({"day": day}))
+        assert "Forecast unavailable" in result
+
+    def test_weather_summary_with_data(self, trip_factory, user_factory):
+        from django.template import Context, Template
+
+        user = user_factory()
+        trip = trip_factory(author=user)
+        day = trip.days.first()
+        day.weather_data = {
+            "weather_icon": "ph-sun",
+            "temperature_max": 22.0,
+            "temperature_min": 12.0,
+        }
+        day.save()
+        t = Template("{% load trip_tags %}{% weather_summary trip %}")
+        result = t.render(Context({"trip": trip}))
+        assert "ph-sun" in result
+
+    def test_weather_summary_without_data(self, trip_factory, user_factory):
+        from django.template import Context, Template
+
+        user = user_factory()
+        trip = trip_factory(author=user)
+        t = Template("{% load trip_tags %}{% weather_summary trip %}")
+        result = t.render(Context({"trip": trip}))
+        # No weather data → nothing rendered
+        assert "ph-" not in result
+
+    def test_trip_day_one_weather_with_data(self, trip_factory, user_factory):
+        from django.template import Context, Template
+
+        user = user_factory()
+        trip = trip_factory(author=user)
+        day = trip.days.order_by("number").first()
+        day.weather_data = {"weather_icon": "ph-sun", "temperature_max": 20.0}
+        day.save()
+        t = Template(
+            "{% load trip_tags %}{% trip_day_one_weather trip as w %}{{ w.weather_icon }}"
+        )
+        result = t.render(Context({"trip": trip}))
+        assert "ph-sun" in result
+
+    def test_trip_day_one_weather_no_days(self, user_factory):
+        from django.template import Context, Template
+
+        from trips.models import Trip
+
+        user = user_factory()
+        trip = Trip.objects.create(
+            author=user,
+            title="No Days Trip",
+            destination="Nowhere",
+            start_date=None,
+            end_date=None,
+        )
+        t = Template("{% load trip_tags %}{% trip_day_one_weather trip as w %}{{ w }}")
+        result = t.render(Context({"trip": trip}))
+        assert result.strip() == "None"

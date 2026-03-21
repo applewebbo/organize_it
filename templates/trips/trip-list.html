@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n static %}
+{% load i18n static trip_tags %}
 {% block page_title %}
     {% trans "Trips List" %}
 {% endblock page_title %}
@@ -42,7 +42,16 @@
                                 {% endif %}
                             </figure>
                             <div class="card-body">
-                                <span class="badge badge-outline badge-secondary">{{ trip.get_status_display }}</span>
+                                {% trip_day_one_weather trip as day_weather %}
+                                <div class="flex gap-2 items-center">
+                                    <span class="badge badge-outline badge-secondary">{{ trip.get_status_display }}</span>
+                                    {% if trip.status == 2 and day_weather %}
+                                        <span class="flex gap-1 items-center text-xs text-base-content/60">
+                                            <i class="ph-bold {{ day_weather.weather_icon }}"></i>
+                                            {{ day_weather.temperature_max|floatformat:0 }}°
+                                        </span>
+                                    {% endif %}
+                                </div>
                                 <h2 class="card-title">{{ trip.title }}</h2>
                                 <div x-data class="flex items-center">
                                     <span>

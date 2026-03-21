@@ -1,0 +1,11 @@
+{% load i18n %}
+{% if has_data %}
+    <div class="flex flex-wrap gap-3 items-center mt-3 text-sm text-base-content/60">
+        {% for icon, count in weather_counts.items %}
+            <span class="flex gap-1 items-center">
+                <i class="ph-bold {{ icon }} text-base"></i>
+                {{ count }}d
+            </span>
+        {% endfor %}
+    </div>
+{% endif %}
