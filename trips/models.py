@@ -243,13 +243,13 @@ class MainTransfer(models.Model):
     destination_longitude = models.FloatField(null=True, blank=True)
 
     # Common fields
-    start_time = models.TimeField(help_text="Departure time")
-    end_time = models.TimeField(help_text="Arrival time")
+    start_time = models.TimeField(help_text=_("Departure time"))
+    end_time = models.TimeField(help_text=_("Arrival time"))
     booking_reference = models.CharField(
-        max_length=100, blank=True, help_text="Booking/reservation reference"
+        max_length=100, blank=True, help_text=_("Booking/reservation reference")
     )
-    ticket_url = models.URLField(blank=True, help_text="Link to ticket or booking")
-    notes = models.TextField(blank=True, help_text="Additional notes")
+    ticket_url = models.URLField(blank=True, help_text=_("Link to ticket or booking"))
+    notes = models.TextField(blank=True, help_text=_("Additional notes"))
 
     # Type-specific data (JSONField for flexibility)
     type_specific_data = models.JSONField(

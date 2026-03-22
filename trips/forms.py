@@ -800,11 +800,11 @@ class StayForm(forms.ModelForm):
 
 class EventChangeTimesForm(forms.ModelForm):
     start_time = forms.TimeField(
-        label="Start Time",
+        label=_("Start Time"),
         widget=forms.TimeInput(attrs={"type": "time"}),
     )
     end_time = forms.TimeField(
-        label="End Time",
+        label=_("End Time"),
         widget=forms.TimeInput(attrs={"type": "time"}),
     )
 
@@ -844,8 +844,8 @@ class NoteForm(forms.ModelForm):
     """
 
     notes = forms.CharField(
-        label="Notes",
-        widget=forms.Textarea(attrs={"placeholder": "Add notes..."}),
+        label=_("Notes"),
+        widget=forms.Textarea(attrs={"placeholder": _("Add notes...")}),
         required=True,
     )
 
@@ -875,8 +875,8 @@ class AddNoteToStayForm(forms.ModelForm):
     """
 
     notes = forms.CharField(
-        label="Notes",
-        widget=forms.Textarea(attrs={"placeholder": "Add notes..."}),
+        label=_("Notes"),
+        widget=forms.Textarea(attrs={"placeholder": _("Add notes...")}),
         required=True,
     )
 
@@ -927,6 +927,20 @@ class MainTransferBaseForm(forms.ModelForm):
             "ticket_url",
             "notes",
         ]
+        labels = {
+            "start_time": _("Departure Time"),
+            "end_time": _("Arrival Time"),
+            "booking_reference": _("Booking Reference"),
+            "ticket_url": _("Ticket URL"),
+            "notes": _("Notes"),
+        }
+        help_texts = {
+            "start_time": "",
+            "end_time": "",
+            "booking_reference": "",
+            "ticket_url": "",
+            "notes": "",
+        }
         widgets = {
             "start_time": forms.TimeInput(
                 attrs={"type": "time", "class": "input input-bordered"}
