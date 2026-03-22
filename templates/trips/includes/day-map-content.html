@@ -2,7 +2,10 @@
 <div class="container py-4 px-0 mx-auto xl:px-6">
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {% if map %}
-            <div class="map-container">{{ map|safe }}</div>
+            <div>
+                <div class="map-container">{{ map|safe }}</div>
+                {% weather_widget locations.day %}
+            </div>
         {% else %}
             <div class="my-4 md:my-5 alert alert-info alert-soft">
                 <i class="ph-bold ph-info i-md text-info"></i>
