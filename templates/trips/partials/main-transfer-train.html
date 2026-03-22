@@ -51,14 +51,12 @@
         <div class="sm:col-span-2">{{ form.company|as_crispy_field }}</div>
         <!-- Origin Station -->
         <div class="sm:col-span-4">
-            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "Origin Station" %}</label>
             {{ form.origin_station|as_crispy_field }}
             {{ form.origin_station_id }}
             <div id="origin-station-results"></div>
         </div>
         <!-- Destination Station -->
         <div class="sm:col-span-4">
-            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "Destination Station" %}</label>
             {{ form.destination_station|as_crispy_field }}
             {{ form.destination_station_id }}
             <div id="destination-station-results"></div>

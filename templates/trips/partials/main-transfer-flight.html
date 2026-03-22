@@ -51,14 +51,12 @@
         <div class="sm:col-span-2">{{ form.company|as_crispy_field }}</div>
         <!-- Origin Airport -->
         <div class="sm:col-span-4">
-            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "Origin Airport" %}</label>
             {{ form.origin_airport|as_crispy_field }}
             {{ form.origin_iata }}
             <div id="origin-airport-results"></div>
         </div>
         <!-- Destination Airport -->
         <div class="sm:col-span-4">
-            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "Destination Airport" %}</label>
             {{ form.destination_airport|as_crispy_field }}
             {{ form.destination_iata }}
             <div id="destination-airport-results"></div>
