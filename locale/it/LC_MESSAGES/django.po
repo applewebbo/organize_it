@@ -1315,7 +1315,7 @@ msgstr "Vedi"
 
 #: templates/trips/weather-widget.html:22
 msgid "Forecast unavailable"
-msgstr ""
+msgstr "Previsioni non disponibili"
 
 #: trips/forms.py:42
 msgid "Title"
@@ -1794,14 +1794,12 @@ msgid "Snack"
 msgstr "Spuntino"
 
 #: trips/models.py:964
-#, fuzzy
-#| msgid "View list"
 msgid "View only"
-msgstr "Vedi lista"
+msgstr "Solo visualizzazione"
 
 #: trips/models.py:965
 msgid "Can edit"
-msgstr ""
+msgstr "Può modificare"
 
 #: trips/views.py:325
 #, python-format
