@@ -923,11 +923,13 @@ class TestTrainMainTransferForm:
         assert form.fields["destination_station_id"].initial == "MILANO"
         # Removed fields are no longer in the form
         assert "company" not in form.fields
-        assert "train_number" not in form.fields
         assert "carriage" not in form.fields
         assert "seat" not in form.fields
         assert "booking_reference" not in form.fields
         assert "ticket_url" not in form.fields
+        # train_number is optional (for viaggiatreno lookup)
+        assert "train_number" in form.fields
+        assert form.fields["train_number"].initial is None
 
     def test_save_with_coordinates(self):
         """Test save method with coordinate data"""
@@ -958,7 +960,7 @@ class TestTrainMainTransferForm:
         assert transfer.destination_longitude == 9.2050
 
     def test_get_type_specific_data(self):
-        """Test train form returns empty type_specific_data (fields removed)"""
+        """Test train form returns empty dict when no train number provided"""
         from trips.forms import TrainMainTransferForm
 
         trip = TripFactory()
@@ -977,6 +979,50 @@ class TestTrainMainTransferForm:
 
         data = form.get_type_specific_data()
         assert data == {}
+
+    def test_get_type_specific_data_with_train_number(self):
+        """Test train form includes train_number when provided"""
+        from trips.forms import TrainMainTransferForm
+
+        trip = TripFactory()
+        form_data = {
+            "direction": "1",
+            "start_time": "10:00",
+            "end_time": "13:30",
+            "origin_station": "Roma Termini",
+            "origin_station_id": "ROMA",
+            "destination_station": "Milano Centrale",
+            "destination_station_id": "MILANO",
+            "train_number": "2822",
+        }
+
+        form = TrainMainTransferForm(form_data, trip=trip)
+        assert form.is_valid()
+
+        data = form.get_type_specific_data()
+        assert data == {"train_number": "2822"}
+
+    def test_populate_train_number_from_instance(self):
+        """Test form populates train_number initial from instance type_specific_data"""
+        from trips.forms import TrainMainTransferForm
+        from trips.models import MainTransfer
+
+        trip = TripFactory()
+        transfer = MainTransfer.objects.create(
+            trip=trip,
+            type=MainTransfer.Type.TRAIN,
+            direction=1,
+            origin_code="ROMA",
+            origin_name="Roma Termini",
+            destination_code="MILANO",
+            destination_name="Milano Centrale",
+            start_time="10:00",
+            end_time="13:30",
+            type_specific_data={"train_number": "FR9619"},
+        )
+
+        form = TrainMainTransferForm(instance=transfer, trip=trip)
+        assert form.fields["train_number"].initial == "FR9619"
 
     def test_save_with_commit_true(self):
         """Test TrainMainTransferForm save with commit=True"""

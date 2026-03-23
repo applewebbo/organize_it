@@ -1253,6 +1253,18 @@ class TrainMainTransferForm(MainTransferBaseForm):
     destination_latitude = forms.FloatField(required=False, widget=forms.HiddenInput())
     destination_longitude = forms.FloatField(required=False, widget=forms.HiddenInput())
 
+    train_number = forms.CharField(
+        max_length=20,
+        required=False,
+        label=_("Train Number"),
+        widget=forms.TextInput(
+            attrs={"class": "input input-bordered", "placeholder": "FR9612"}
+        ),
+        help_text=_(
+            "Optional. If provided, enables direct train status lookup on Viaggiatreno."
+        ),
+    )
+
     class Meta(MainTransferBaseForm.Meta):
         fields = MainTransferBaseForm.Meta.fields + [
             "origin_station",
@@ -1303,6 +1315,8 @@ class TrainMainTransferForm(MainTransferBaseForm):
             self.fields[
                 "destination_station_id"
             ].initial = self.instance.destination_code
+            if self.instance.type_specific_data:
+                self.fields["train_number"].initial = self.instance.train_number
 
         # Pre-fill from arrival if this is a new departure
         if (
@@ -1374,7 +1388,10 @@ class TrainMainTransferForm(MainTransferBaseForm):
         return instance
 
     def get_type_specific_data(self):
-        return {}
+        data = {}
+        if self.cleaned_data.get("train_number"):
+            data["train_number"] = self.cleaned_data["train_number"]
+        return data
 
 
 class CarMainTransferForm(MainTransferBaseForm):

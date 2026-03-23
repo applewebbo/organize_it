@@ -81,6 +81,24 @@
                             <strong>{% trans "Arrival:" %}</strong> {{ arrival_transfer.end_time }}
                         </p>
                     </div>
+                    {# Train status button #}
+                    {% if arrival_transfer.type == 2 %}
+                        {% with travel_day=trip.start_date %}
+                            <div class="pt-2 mt-2">
+                                <a href="{% url 'trips:train-status-redirect' arrival_transfer.pk %}"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="w-full btn btn-xs {% if today == travel_day %}btn-outline{% else %}btn-disabled{% endif %}">
+                                    <i class="ph-bold ph-train-simple"></i>
+                                    {% if arrival_transfer.train_number %}
+                                        {% trans "Train status" %}
+                                    {% else %}
+                                        {% trans "Station departures" %}
+                                    {% endif %}
+                                </a>
+                            </div>
+                        {% endwith %}
+                    {% endif %}
                     {# Connection to first event/stay #}
                     <div class="pt-3 mt-3 border-t border-base-300">
                         {% if arrival_transfer.connection %}
@@ -191,6 +209,24 @@
                             <strong>{% trans "Arrival:" %}</strong> {{ departure_transfer.end_time }}
                         </p>
                     </div>
+                    {# Train status button #}
+                    {% if departure_transfer.type == 2 %}
+                        {% with travel_day=trip.end_date %}
+                            <div class="pt-2 mt-2">
+                                <a href="{% url 'trips:train-status-redirect' departure_transfer.pk %}"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="w-full btn btn-xs {% if today == travel_day %}btn-outline{% else %}btn-disabled{% endif %}">
+                                    <i class="ph-bold ph-train-simple"></i>
+                                    {% if departure_transfer.train_number %}
+                                        {% trans "Train status" %}
+                                    {% else %}
+                                        {% trans "Station departures" %}
+                                    {% endif %}
+                                </a>
+                            </div>
+                        {% endwith %}
+                    {% endif %}
                     {# Connection from last event/stay #}
                     <div class="pt-3 mt-3 border-t border-base-300">
                         {% if departure_transfer.connection %}

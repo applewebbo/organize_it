@@ -1,4 +1,5 @@
 import json
+import logging
 from datetime import date, timedelta
 
 import requests
@@ -8,7 +9,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import transaction
 from django.db.models import Prefetch
 from django.http import Http404, HttpResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.html import format_html
@@ -59,6 +60,8 @@ from trips.utils import (
     search_train_stations,
     search_unsplash_photos,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def home(request):
@@ -827,6 +830,70 @@ def delete_main_transfer(request, pk):
 
 
 @login_required
+def train_status_redirect(request, pk):
+    """Redirect to viaggiatreno for train status (specific train or station board)."""
+    transfer = get_object_or_404(
+        MainTransfer, pk=pk, trip__author=request.user, type=MainTransfer.Type.TRAIN
+    )
+
+    base = (
+        "http://www.viaggiatreno.it/infomobilitamobile/pages/cercaTreno/cercaTreno.jsp"
+    )
+    train_number = transfer.train_number
+
+    if train_number:
+        # Specific train: look up origin station id and datapartenza
+        try:
+            resp = requests.get(
+                f"http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno"
+                f"/cercaNumeroTrenoTrenoAutocomplete/{train_number}",
+                timeout=5,
+            )
+            if resp.ok and resp.text:
+                # Format: "2822 - MILANO CENTRALE - 23/03/26|2822-S01700-1774220400000"
+                token = resp.text.strip().split("|")[-1]  # "2822-S01700-1774220400000"
+                parts = token.split("-")
+                if len(parts) == 3:
+                    _, origine, datapartenza = parts
+                    return redirect(
+                        f"{base}?treno={train_number}&origine={origine}&datapartenza={datapartenza}"
+                    )
+        except Exception as exc:
+            logger.warning(
+                "Viaggiatreno train lookup failed for %s: %s", train_number, exc
+            )
+
+    # Fallback: station departure board
+    station_name = transfer.origin_name
+    first_word = station_name.split()[0] if station_name else ""
+    try:
+        resp = requests.get(
+            f"http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno"
+            f"/cercaStazione/{first_word}",
+            timeout=5,
+        )
+        if resp.ok:
+            stations = resp.json()
+            # Find best match by normalized name
+            match = next(
+                (s for s in stations if s["nomeLungo"].upper() == station_name.upper()),
+                stations[0] if stations else None,
+            )
+            if match:
+                from urllib.parse import quote as urlquote
+
+                nome = urlquote(match["nomeLungo"])
+                return redirect(f"{base}?cod={match['id']}&nome={nome}")
+    except Exception as exc:
+        logger.warning(
+            "Viaggiatreno station lookup failed for %s: %s", station_name, exc
+        )
+
+    # Last resort: viaggiatreno homepage
+    return redirect("http://www.viaggiatreno.it/infomobilitamobile/pages/home/home.jsp")
+
+
+@login_required
 def main_transfers_section(request, trip_id):
     """HTMX endpoint: returns main transfers section for trip detail page"""
     trip = get_object_or_404(Trip, pk=trip_id, author=request.user)
@@ -845,6 +912,7 @@ def main_transfers_section(request, trip_id):
         "departure_transfer": departure_transfer,
         "both_transfers_exist": arrival_transfer is not None
         and departure_transfer is not None,
+        "today": date.today(),
     }
 
     return TemplateResponse(request, "trips/includes/main-transfers.html", context)

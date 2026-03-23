@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertTemplateUsed
@@ -421,3 +423,198 @@ class TestMainTransferViews(TestCase):
             assertTemplateUsed(response, "trips/partials/main-transfer-flight.html")
             assert "form" in response.context
             assert response.context["form"].errors
+
+
+class TestTrainStatusRedirect(TestCase):
+    """Tests for train_status_redirect view"""
+
+    def test_non_owner_returns_404(self):
+        """Test 404 for non-owner"""
+        user = self.make_user("owner")
+        other = self.make_user("other")
+        transfer = MainTransferFactory(trip__author=user, type=2)
+        url = reverse("trips:train-status-redirect", kwargs={"pk": transfer.pk})
+        with self.login(other):
+            response = self.client.get(url)
+        assert response.status_code == 404
+
+    def test_non_train_type_returns_404(self):
+        """Test 404 for non-train transfer"""
+        user = self.make_user("user")
+        transfer = MainTransferFactory(trip__author=user, type=1)  # PLANE
+        url = reverse("trips:train-status-redirect", kwargs={"pk": transfer.pk})
+        with self.login(user):
+            response = self.client.get(url)
+        assert response.status_code == 404
+
+    def test_with_train_number_success(self):
+        """Redirect to specific train status page when train number matches"""
+        user = self.make_user("user")
+        transfer = MainTransferFactory(
+            trip__author=user,
+            type=2,
+            origin_name="ROMA TERMINI",
+            type_specific_data={"train_number": "2822"},
+        )
+        url = reverse("trips:train-status-redirect", kwargs={"pk": transfer.pk})
+        mock_resp = MagicMock()
+        mock_resp.ok = True
+        mock_resp.text = "2822 - ROMA TERMINI - 23/03/26|2822-S00219-1774220400000"
+        with patch("trips.views.requests.get", return_value=mock_resp):
+            with self.login(user):
+                response = self.client.get(url)
+        assert response.status_code == 302
+        assert "treno=2822" in response["Location"]
+        assert "origine=S00219" in response["Location"]
+
+    def test_with_train_number_bad_response_falls_to_station(self):
+        """Falls back to station board when train API returns bad format"""
+        user = self.make_user("user")
+        transfer = MainTransferFactory(
+            trip__author=user,
+            type=2,
+            origin_name="ROMA TERMINI",
+            type_specific_data={"train_number": "9999"},
+        )
+        url = reverse("trips:train-status-redirect", kwargs={"pk": transfer.pk})
+
+        train_resp = MagicMock()
+        train_resp.ok = True
+        train_resp.text = "badformat"  # No "|" separator with 3 parts
+
+        station_resp = MagicMock()
+        station_resp.ok = True
+        station_resp.json.return_value = [{"id": "S00219", "nomeLungo": "ROMA TERMINI"}]
+
+        with patch("trips.views.requests.get", side_effect=[train_resp, station_resp]):
+            with self.login(user):
+                response = self.client.get(url)
+        assert response.status_code == 302
+        assert "cod=S00219" in response["Location"]
+
+    def test_with_train_number_exception_falls_to_station(self):
+        """Falls back to station board when train API raises exception"""
+        user = self.make_user("user")
+        transfer = MainTransferFactory(
+            trip__author=user,
+            type=2,
+            origin_name="ROMA TERMINI",
+            type_specific_data={"train_number": "2822"},
+        )
+        url = reverse("trips:train-status-redirect", kwargs={"pk": transfer.pk})
+
+        station_resp = MagicMock()
+        station_resp.ok = True
+        station_resp.json.return_value = [{"id": "S00219", "nomeLungo": "ROMA TERMINI"}]
+
+        with patch(
+            "trips.views.requests.get", side_effect=[Exception("timeout"), station_resp]
+        ):
+            with self.login(user):
+                response = self.client.get(url)
+        assert response.status_code == 302
+        assert "cod=S00219" in response["Location"]
+
+    def test_without_train_number_station_board(self):
+        """Redirect to station departure board when no train number"""
+        user = self.make_user("user")
+        transfer = MainTransferFactory(
+            trip__author=user,
+            type=2,
+            origin_name="ROMA TERMINI",
+            type_specific_data={},
+        )
+        url = reverse("trips:train-status-redirect", kwargs={"pk": transfer.pk})
+
+        station_resp = MagicMock()
+        station_resp.ok = True
+        station_resp.json.return_value = [{"id": "S00219", "nomeLungo": "ROMA TERMINI"}]
+
+        with patch("trips.views.requests.get", return_value=station_resp):
+            with self.login(user):
+                response = self.client.get(url)
+        assert response.status_code == 302
+        assert "cod=S00219" in response["Location"]
+
+    def test_station_api_exception_fallback_homepage(self):
+        """Falls back to viaggiatreno homepage when station API fails"""
+        user = self.make_user("user")
+        transfer = MainTransferFactory(
+            trip__author=user,
+            type=2,
+            origin_name="ROMA TERMINI",
+            type_specific_data={},
+        )
+        url = reverse("trips:train-status-redirect", kwargs={"pk": transfer.pk})
+
+        with patch("trips.views.requests.get", side_effect=Exception("timeout")):
+            with self.login(user):
+                response = self.client.get(url)
+        assert response.status_code == 302
+        assert "home.jsp" in response["Location"]
+
+    def test_station_api_empty_list_fallback_homepage(self):
+        """Falls back to viaggiatreno homepage when station API returns empty list"""
+        user = self.make_user("user")
+        transfer = MainTransferFactory(
+            trip__author=user,
+            type=2,
+            origin_name="ROMA TERMINI",
+            type_specific_data={},
+        )
+        url = reverse("trips:train-status-redirect", kwargs={"pk": transfer.pk})
+
+        station_resp = MagicMock()
+        station_resp.ok = True
+        station_resp.json.return_value = []
+
+        with patch("trips.views.requests.get", return_value=station_resp):
+            with self.login(user):
+                response = self.client.get(url)
+        assert response.status_code == 302
+        assert "home.jsp" in response["Location"]
+
+    def test_with_train_number_empty_text_falls_to_station(self):
+        """Falls back to station board when train API returns empty text"""
+        user = self.make_user("user")
+        transfer = MainTransferFactory(
+            trip__author=user,
+            type=2,
+            origin_name="ROMA TERMINI",
+            type_specific_data={"train_number": "2822"},
+        )
+        url = reverse("trips:train-status-redirect", kwargs={"pk": transfer.pk})
+
+        train_resp = MagicMock()
+        train_resp.ok = True
+        train_resp.text = ""  # Empty text → skip to station fallback
+
+        station_resp = MagicMock()
+        station_resp.ok = True
+        station_resp.json.return_value = [{"id": "S00219", "nomeLungo": "ROMA TERMINI"}]
+
+        with patch("trips.views.requests.get", side_effect=[train_resp, station_resp]):
+            with self.login(user):
+                response = self.client.get(url)
+        assert response.status_code == 302
+        assert "cod=S00219" in response["Location"]
+
+    def test_station_api_not_ok_fallback_homepage(self):
+        """Falls back to homepage when station API returns non-ok response"""
+        user = self.make_user("user")
+        transfer = MainTransferFactory(
+            trip__author=user,
+            type=2,
+            origin_name="ROMA TERMINI",
+            type_specific_data={},
+        )
+        url = reverse("trips:train-status-redirect", kwargs={"pk": transfer.pk})
+
+        station_resp = MagicMock()
+        station_resp.ok = False  # Not ok → skip to homepage
+
+        with patch("trips.views.requests.get", return_value=station_resp):
+            with self.login(user):
+                response = self.client.get(url)
+        assert response.status_code == 302
+        assert "home.jsp" in response["Location"]
