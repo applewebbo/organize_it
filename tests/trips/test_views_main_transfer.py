@@ -46,8 +46,6 @@ class TestMainTransferViews(TestCase):
             "destination_longitude": "12.502",
             "start_time": "14:00",  # Changed
             "end_time": "15:30",
-            "company": "Trenitalia",
-            "train_number": "FR9612",
         }
 
         with self.login(user):

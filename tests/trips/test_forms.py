@@ -900,7 +900,7 @@ class TestTrainMainTransferForm:
 
         trip = TripFactory()
 
-        # Create a train transfer with type-specific data
+        # Create a train transfer
         transfer = MainTransfer.objects.create(
             trip=trip,
             type=MainTransfer.Type.TRAIN,
@@ -911,28 +911,23 @@ class TestTrainMainTransferForm:
             destination_name="Milano Centrale",
             start_time="10:00",
             end_time="13:30",
-            type_specific_data={
-                "company": "Trenitalia",
-                "train_number": "FR9612",
-                "carriage": "7",
-                "seat": "42A",
-                "company_website": "https://trenitalia.com",
-            },
         )
 
         # Initialize form with instance
         form = TrainMainTransferForm(instance=transfer, trip=trip)
 
-        # Check that fields are populated
+        # Check that station fields are populated
         assert form.fields["origin_station"].initial == "Roma Termini"
         assert form.fields["origin_station_id"].initial == "ROMA"
         assert form.fields["destination_station"].initial == "Milano Centrale"
         assert form.fields["destination_station_id"].initial == "MILANO"
-        assert form.fields["company"].initial == "Trenitalia"
-        assert form.fields["train_number"].initial == "FR9612"
-        assert form.fields["carriage"].initial == "7"
-        assert form.fields["seat"].initial == "42A"
-        assert form.fields["company_website"].initial == "https://trenitalia.com"
+        # Removed fields are no longer in the form
+        assert "company" not in form.fields
+        assert "train_number" not in form.fields
+        assert "carriage" not in form.fields
+        assert "seat" not in form.fields
+        assert "booking_reference" not in form.fields
+        assert "ticket_url" not in form.fields
 
     def test_save_with_coordinates(self):
         """Test save method with coordinate data"""
@@ -963,7 +958,7 @@ class TestTrainMainTransferForm:
         assert transfer.destination_longitude == 9.2050
 
     def test_get_type_specific_data(self):
-        """Test train-specific data is extracted correctly"""
+        """Test train form returns empty type_specific_data (fields removed)"""
         from trips.forms import TrainMainTransferForm
 
         trip = TripFactory()
@@ -975,52 +970,13 @@ class TestTrainMainTransferForm:
             "origin_station_id": "ROMA",
             "destination_station": "Milano Centrale",
             "destination_station_id": "MILANO",
-            "company": "Trenitalia",
-            "train_number": "FR9612",
-            "carriage": "7",
-            "seat": "42A",
-            "company_website": "https://trenitalia.com",
         }
 
         form = TrainMainTransferForm(form_data, trip=trip)
         assert form.is_valid()
 
         data = form.get_type_specific_data()
-        assert data["company"] == "Trenitalia"
-        assert data["train_number"] == "FR9612"
-        assert data["carriage"] == "7"
-        assert data["seat"] == "42A"
-        assert data["company_website"] == "https://trenitalia.com"
-
-    def test_get_type_specific_data_with_empty_fields(self):
-        """Test train-specific data excludes empty fields"""
-        from trips.forms import TrainMainTransferForm
-
-        trip = TripFactory()
-        form_data = {
-            "direction": "1",
-            "start_time": "10:00",
-            "end_time": "13:30",
-            "origin_station": "Roma Termini",
-            "origin_station_id": "ROMA",
-            "destination_station": "Milano Centrale",
-            "destination_station_id": "MILANO",
-            "company": "",  # Empty
-            "train_number": "FR9612",
-            "carriage": "",  # Empty
-            "seat": "",  # Empty
-            "company_website": "",  # Empty
-        }
-
-        form = TrainMainTransferForm(form_data, trip=trip)
-        assert form.is_valid()
-
-        data = form.get_type_specific_data()
-        assert "company" not in data
-        assert data["train_number"] == "FR9612"
-        assert "carriage" not in data
-        assert "seat" not in data
-        assert "company_website" not in data
+        assert data == {}
 
     def test_save_with_commit_true(self):
         """Test TrainMainTransferForm save with commit=True"""

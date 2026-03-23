@@ -1253,54 +1253,6 @@ class TrainMainTransferForm(MainTransferBaseForm):
     destination_latitude = forms.FloatField(required=False, widget=forms.HiddenInput())
     destination_longitude = forms.FloatField(required=False, widget=forms.HiddenInput())
 
-    # Train-specific fields
-    company = forms.CharField(
-        max_length=100,
-        required=False,
-        label=_("Train Operator"),
-        widget=forms.TextInput(
-            attrs={
-                "class": "input input-bordered",
-                "placeholder": _("Train operator name"),
-            }
-        ),
-    )
-
-    train_number = forms.CharField(
-        max_length=20,
-        required=False,
-        label=_("Train Number"),
-        widget=forms.TextInput(
-            attrs={"class": "input input-bordered", "placeholder": "FR9612"}
-        ),
-    )
-
-    carriage = forms.CharField(
-        max_length=10,
-        required=False,
-        label=_("Carriage"),
-        widget=forms.TextInput(
-            attrs={"class": "input input-bordered", "placeholder": "7"}
-        ),
-    )
-
-    seat = forms.CharField(
-        max_length=10,
-        required=False,
-        label=_("Seat"),
-        widget=forms.TextInput(
-            attrs={"class": "input input-bordered", "placeholder": "42A"}
-        ),
-    )
-
-    company_website = forms.URLField(
-        required=False,
-        label=_("Train Operator Website"),
-        widget=forms.URLInput(
-            attrs={"class": "input input-bordered", "placeholder": "https://..."}
-        ),
-    )
-
     class Meta(MainTransferBaseForm.Meta):
         fields = MainTransferBaseForm.Meta.fields + [
             "origin_station",
@@ -1316,6 +1268,10 @@ class TrainMainTransferForm(MainTransferBaseForm):
     def __init__(self, *args, **kwargs):
         autocomplete = kwargs.pop("autocomplete", True)
         super().__init__(*args, **kwargs)
+
+        # Remove fields not applicable to train transfers
+        del self.fields["booking_reference"]
+        del self.fields["ticket_url"]
 
         # Add HTMX attributes for station autocomplete (similar to EventForm geocode)
         if autocomplete:
@@ -1347,14 +1303,6 @@ class TrainMainTransferForm(MainTransferBaseForm):
             self.fields[
                 "destination_station_id"
             ].initial = self.instance.destination_code
-
-            # Populate type-specific fields
-            if self.instance.type_specific_data:
-                self.fields["company"].initial = self.instance.company
-                self.fields["train_number"].initial = self.instance.train_number
-                self.fields["carriage"].initial = self.instance.carriage
-                self.fields["seat"].initial = self.instance.seat
-                self.fields["company_website"].initial = self.instance.company_website
 
         # Pre-fill from arrival if this is a new departure
         if (
@@ -1426,21 +1374,7 @@ class TrainMainTransferForm(MainTransferBaseForm):
         return instance
 
     def get_type_specific_data(self):
-        """Populate train-specific fields in JSONField"""
-        data = {}
-
-        if self.cleaned_data.get("company"):
-            data["company"] = self.cleaned_data["company"]
-        if self.cleaned_data.get("train_number"):
-            data["train_number"] = self.cleaned_data["train_number"]
-        if self.cleaned_data.get("carriage"):
-            data["carriage"] = self.cleaned_data["carriage"]
-        if self.cleaned_data.get("seat"):
-            data["seat"] = self.cleaned_data["seat"]
-        if self.cleaned_data.get("company_website"):
-            data["company_website"] = self.cleaned_data["company_website"]
-
-        return data
+        return {}
 
 
 class CarMainTransferForm(MainTransferBaseForm):
