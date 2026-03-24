@@ -99,6 +99,24 @@
                             </div>
                         {% endwith %}
                     {% endif %}
+                    {# Flight status button #}
+                    {% if arrival_transfer.type == 1 %}
+                        {% with travel_day=trip.start_date flight_active=arrival_transfer.flight_number|default:arrival_origin_icao %}
+                            <div class="pt-2 mt-2">
+                                <a href="{% url 'trips:flight-status-redirect' arrival_transfer.pk %}"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="w-full btn btn-xs {% if today == travel_day and flight_active %}btn-outline{% else %}btn-disabled{% endif %}">
+                                    <i class="ph-bold ph-airplane"></i>
+                                    {% if arrival_transfer.flight_number %}
+                                        {% trans "Flight status" %}
+                                    {% else %}
+                                        {% trans "Airport departures" %}
+                                    {% endif %}
+                                </a>
+                            </div>
+                        {% endwith %}
+                    {% endif %}
                     {# Connection to first event/stay #}
                     <div class="pt-3 mt-3 border-t border-base-300">
                         {% if arrival_transfer.connection %}
@@ -222,6 +240,24 @@
                                         {% trans "Train status" %}
                                     {% else %}
                                         {% trans "Station departures" %}
+                                    {% endif %}
+                                </a>
+                            </div>
+                        {% endwith %}
+                    {% endif %}
+                    {# Flight status button #}
+                    {% if departure_transfer.type == 1 %}
+                        {% with travel_day=trip.end_date flight_active=departure_transfer.flight_number|default:departure_origin_icao %}
+                            <div class="pt-2 mt-2">
+                                <a href="{% url 'trips:flight-status-redirect' departure_transfer.pk %}"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="w-full btn btn-xs {% if today == travel_day and flight_active %}btn-outline{% else %}btn-disabled{% endif %}">
+                                    <i class="ph-bold ph-airplane"></i>
+                                    {% if departure_transfer.flight_number %}
+                                        {% trans "Flight status" %}
+                                    {% else %}
+                                        {% trans "Airport departures" %}
                                     {% endif %}
                                 </a>
                             </div>

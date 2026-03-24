@@ -61,6 +61,11 @@ htmx_urlpatterns = [
         name="train-status-redirect",
     ),
     path(
+        "main-transfers/<int:pk>/flight-status",
+        views.flight_status_redirect,
+        name="flight-status-redirect",
+    ),
+    path(
         "trips/<int:trip_id>/main-transfers-section",
         views.main_transfers_section,
         name="main-transfers-section",

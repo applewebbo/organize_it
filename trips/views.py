@@ -52,6 +52,7 @@ from trips.utils import (
     create_day_map,
     download_unsplash_photo,
     geocode_location,
+    get_airport_by_iata,
     get_event_instance,
     get_next_events,
     get_trips,
@@ -62,6 +63,14 @@ from trips.utils import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def _get_flight_origin_icao(transfer):
+    """Return ICAO code for origin airport of a flight transfer, or empty string."""
+    if transfer and transfer.type == MainTransfer.Type.PLANE and transfer.origin_code:
+        airport = get_airport_by_iata(transfer.origin_code)
+        return airport.get("icao_code", "") if airport else ""
+    return ""
 
 
 def home(request):
@@ -158,6 +167,9 @@ def trip_detail(request, pk):
         "both_transfers_exist": arrival_transfer is not None
         and departure_transfer is not None,
         "show_map": show_map,
+        "today": date.today(),
+        "arrival_origin_icao": _get_flight_origin_icao(arrival_transfer),
+        "departure_origin_icao": _get_flight_origin_icao(departure_transfer),
     }
     if request.htmx:
         template = "trips/trip-detail.html#days"
@@ -894,6 +906,29 @@ def train_status_redirect(request, pk):
 
 
 @login_required
+def flight_status_redirect(request, pk):
+    """Redirect to FlightAware for flight status (specific flight or airport board)."""
+    transfer = get_object_or_404(
+        MainTransfer, pk=pk, trip__author=request.user, type=MainTransfer.Type.PLANE
+    )
+
+    flight_number = transfer.flight_number
+    if flight_number:
+        return redirect(f"https://it.flightaware.com/live/flight/{flight_number}")
+
+    # Fallback: airport departure/arrival board via ICAO code
+    iata_code = transfer.origin_code
+    if iata_code:
+        airport = get_airport_by_iata(iata_code)
+        if airport and airport.get("icao_code"):
+            return redirect(
+                f"https://it.flightaware.com/live/airport/{airport['icao_code']}"
+            )
+
+    return redirect("https://it.flightaware.com")
+
+
+@login_required
 def main_transfers_section(request, trip_id):
     """HTMX endpoint: returns main transfers section for trip detail page"""
     trip = get_object_or_404(Trip, pk=trip_id, author=request.user)
@@ -913,6 +948,8 @@ def main_transfers_section(request, trip_id):
         "both_transfers_exist": arrival_transfer is not None
         and departure_transfer is not None,
         "today": date.today(),
+        "arrival_origin_icao": _get_flight_origin_icao(arrival_transfer),
+        "departure_origin_icao": _get_flight_origin_icao(departure_transfer),
     }
 
     return TemplateResponse(request, "trips/includes/main-transfers.html", context)

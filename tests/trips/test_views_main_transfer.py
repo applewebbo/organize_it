@@ -618,3 +618,86 @@ class TestTrainStatusRedirect(TestCase):
                 response = self.client.get(url)
         assert response.status_code == 302
         assert "home.jsp" in response["Location"]
+
+
+class TestFlightStatusRedirect(TestCase):
+    """Tests for flight_status_redirect view"""
+
+    def test_non_owner_returns_404(self):
+        """Test 404 for non-owner"""
+        user = self.make_user("owner")
+        other = self.make_user("other")
+        transfer = MainTransferFactory(trip__author=user, type=1)
+        url = reverse("trips:flight-status-redirect", kwargs={"pk": transfer.pk})
+        with self.login(other):
+            response = self.client.get(url)
+        assert response.status_code == 404
+
+    def test_non_plane_type_returns_404(self):
+        """Test 404 for non-plane transfer"""
+        user = self.make_user("user")
+        transfer = MainTransferFactory(trip__author=user, type=2)  # TRAIN
+        url = reverse("trips:flight-status-redirect", kwargs={"pk": transfer.pk})
+        with self.login(user):
+            response = self.client.get(url)
+        assert response.status_code == 404
+
+    def test_with_flight_number_redirects_to_flight_page(self):
+        """Redirect to specific flight status page when flight number is set"""
+        user = self.make_user("user")
+        transfer = MainTransferFactory(
+            trip__author=user,
+            type=1,
+            origin_code="MXP",
+            type_specific_data={"flight_number": "AZ1234"},
+        )
+        url = reverse("trips:flight-status-redirect", kwargs={"pk": transfer.pk})
+        with self.login(user):
+            response = self.client.get(url)
+        assert response.status_code == 302
+        assert response["Location"] == "https://it.flightaware.com/live/flight/AZ1234"
+
+    def test_without_flight_number_with_icao_redirects_to_airport(self):
+        """Redirect to airport board when no flight number but ICAO available"""
+        user = self.make_user("user")
+        transfer = MainTransferFactory(
+            trip__author=user,
+            type=1,
+            origin_code="MXP",  # MXP → LIMC in CSV
+            type_specific_data={},
+        )
+        url = reverse("trips:flight-status-redirect", kwargs={"pk": transfer.pk})
+        with self.login(user):
+            response = self.client.get(url)
+        assert response.status_code == 302
+        assert response["Location"] == "https://it.flightaware.com/live/airport/LIMC"
+
+    def test_without_flight_number_no_icao_redirects_to_homepage(self):
+        """Redirect to FlightAware homepage when no flight number and no ICAO"""
+        user = self.make_user("user")
+        transfer = MainTransferFactory(
+            trip__author=user,
+            type=1,
+            origin_code="XXXX",  # Unknown IATA → no ICAO
+            type_specific_data={},
+        )
+        url = reverse("trips:flight-status-redirect", kwargs={"pk": transfer.pk})
+        with self.login(user):
+            response = self.client.get(url)
+        assert response.status_code == 302
+        assert response["Location"] == "https://it.flightaware.com"
+
+    def test_without_flight_number_no_origin_code_redirects_to_homepage(self):
+        """Redirect to FlightAware homepage when no origin code at all"""
+        user = self.make_user("user")
+        transfer = MainTransferFactory(
+            trip__author=user,
+            type=1,
+            origin_code="",
+            type_specific_data={},
+        )
+        url = reverse("trips:flight-status-redirect", kwargs={"pk": transfer.pk})
+        with self.login(user):
+            response = self.client.get(url)
+        assert response.status_code == 302
+        assert response["Location"] == "https://it.flightaware.com"

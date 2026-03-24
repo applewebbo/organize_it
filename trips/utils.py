@@ -760,7 +760,7 @@ _STATIONS_CACHE = None
 def load_airports():
     """
     Load airports from CSV (with cache).
-    Returns list of airport dicts with: iata_code, name, city, latitude, longitude
+    Returns list of airport dicts with: iata_code, icao_code, name, city, latitude, longitude
     """
     global _AIRPORTS_CACHE
 
@@ -776,6 +776,7 @@ def load_airports():
             airports.append(
                 {
                     "iata_code": row["iata_code"],
+                    "icao_code": row.get("icao_code", ""),
                     "name": row["name"],
                     "city": row["city"],
                     "latitude": float(row["latitude"]),
