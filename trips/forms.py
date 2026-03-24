@@ -1037,15 +1037,6 @@ class FlightMainTransferForm(MainTransferBaseForm):
     destination_longitude = forms.FloatField(required=False, widget=forms.HiddenInput())
 
     # Flight-specific fields
-    company = forms.CharField(
-        max_length=100,
-        required=False,
-        label=_("Airline"),
-        widget=forms.TextInput(
-            attrs={"class": "input input-bordered", "placeholder": _("Airline name")}
-        ),
-    )
-
     flight_number = forms.CharField(
         max_length=20,
         required=False,
@@ -1061,14 +1052,6 @@ class FlightMainTransferForm(MainTransferBaseForm):
         label=_("Terminal"),
         widget=forms.TextInput(
             attrs={"class": "input input-bordered", "placeholder": "T1"}
-        ),
-    )
-
-    company_website = forms.URLField(
-        required=False,
-        label=_("Airline Website"),
-        widget=forms.URLInput(
-            attrs={"class": "input input-bordered", "placeholder": "https://..."}
         ),
     )
 
@@ -1109,6 +1092,10 @@ class FlightMainTransferForm(MainTransferBaseForm):
             self.fields["origin_airport"].widget.attrs.update(origin_htmx_attrs)
             self.fields["destination_airport"].widget.attrs.update(dest_htmx_attrs)
 
+        # Remove fields not applicable to flight transfers
+        del self.fields["booking_reference"]
+        del self.fields["ticket_url"]
+
         # Populate fields if editing
         if self.instance and self.instance.pk:
             self.fields["origin_airport"].initial = self.instance.origin_name
@@ -1118,10 +1105,8 @@ class FlightMainTransferForm(MainTransferBaseForm):
 
             # Populate type-specific fields
             if self.instance.type_specific_data:
-                self.fields["company"].initial = self.instance.company
                 self.fields["flight_number"].initial = self.instance.flight_number
                 self.fields["terminal"].initial = self.instance.terminal
-                self.fields["company_website"].initial = self.instance.company_website
 
         # Pre-fill from arrival if this is a new departure
         if (
@@ -1195,14 +1180,10 @@ class FlightMainTransferForm(MainTransferBaseForm):
         """Populate flight-specific fields in JSONField"""
         data = {}
 
-        if self.cleaned_data.get("company"):
-            data["company"] = self.cleaned_data["company"]
         if self.cleaned_data.get("flight_number"):
             data["flight_number"] = self.cleaned_data["flight_number"]
         if self.cleaned_data.get("terminal"):
             data["terminal"] = self.cleaned_data["terminal"]
-        if self.cleaned_data.get("company_website"):
-            data["company_website"] = self.cleaned_data["company_website"]
 
         return data
 

@@ -664,10 +664,8 @@ class TestFlightMainTransferForm:
             start_time="10:00",
             end_time="11:30",
             type_specific_data={
-                "company": "Alitalia",
                 "flight_number": "AZ1234",
                 "terminal": "T1",
-                "company_website": "https://alitalia.com",
             },
         )
 
@@ -679,10 +677,13 @@ class TestFlightMainTransferForm:
         assert form.fields["origin_iata"].initial == "FCO"
         assert form.fields["destination_airport"].initial == "Milan Malpensa Airport"
         assert form.fields["destination_iata"].initial == "MXP"
-        assert form.fields["company"].initial == "Alitalia"
         assert form.fields["flight_number"].initial == "AZ1234"
         assert form.fields["terminal"].initial == "T1"
-        assert form.fields["company_website"].initial == "https://alitalia.com"
+        # Removed fields are no longer in the form
+        assert "company" not in form.fields
+        assert "company_website" not in form.fields
+        assert "booking_reference" not in form.fields
+        assert "ticket_url" not in form.fields
 
     def test_save_with_coordinates(self):
         """Test save method with coordinate data"""
@@ -725,20 +726,18 @@ class TestFlightMainTransferForm:
             "origin_iata": "FCO",
             "destination_airport": "Milan",
             "destination_iata": "MXP",
-            "company": "Alitalia",
             "flight_number": "AZ1234",
             "terminal": "T1",
-            "company_website": "https://alitalia.com",
         }
 
         form = FlightMainTransferForm(form_data, trip=trip)
         assert form.is_valid()
 
         data = form.get_type_specific_data()
-        assert data["company"] == "Alitalia"
         assert data["flight_number"] == "AZ1234"
         assert data["terminal"] == "T1"
-        assert data["company_website"] == "https://alitalia.com"
+        assert "company" not in data
+        assert "company_website" not in data
 
     def test_get_type_specific_data_with_empty_fields(self):
         """Test flight-specific data excludes empty fields"""
@@ -753,20 +752,16 @@ class TestFlightMainTransferForm:
             "origin_iata": "FCO",
             "destination_airport": "Milan",
             "destination_iata": "MXP",
-            "company": "",  # Empty
             "flight_number": "AZ1234",
             "terminal": "",  # Empty
-            "company_website": "",  # Empty
         }
 
         form = FlightMainTransferForm(form_data, trip=trip)
         assert form.is_valid()
 
         data = form.get_type_specific_data()
-        assert "company" not in data
         assert data["flight_number"] == "AZ1234"
         assert "terminal" not in data
-        assert "company_website" not in data
 
     def test_save_with_commit_true(self):
         """Test FlightMainTransferForm save with commit=True"""

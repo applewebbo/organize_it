@@ -47,8 +47,8 @@
         </div>
         <!-- Flight number -->
         <div class="sm:col-span-2">{{ form.flight_number|as_crispy_field }}</div>
-        <!-- Airline -->
-        <div class="sm:col-span-2">{{ form.company|as_crispy_field }}</div>
+        <!-- Terminal -->
+        <div class="sm:col-span-2">{{ form.terminal|as_crispy_field }}</div>
         <!-- Origin Airport -->
         <div class="sm:col-span-4">
             {{ form.origin_airport|as_crispy_field }}
@@ -65,10 +65,6 @@
         <div class="sm:col-span-2">{{ form.start_time|as_crispy_field }}</div>
         <!-- End time -->
         <div class="sm:col-span-2">{{ form.end_time|as_crispy_field }}</div>
-        <!-- Booking reference -->
-        <div class="sm:col-span-2">{{ form.booking_reference|as_crispy_field }}</div>
-        <!-- Ticket URL -->
-        <div class="sm:col-span-2">{{ form.ticket_url|as_crispy_field }}</div>
         <!-- Notes -->
         <div class="sm:col-span-4">{{ form.notes|as_crispy_field }}</div>
     </div>
