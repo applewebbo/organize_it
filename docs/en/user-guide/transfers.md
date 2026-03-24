@@ -82,11 +82,11 @@ Your journey FROM the destination at the end of the trip.
 
 #### Optional Fields
 
-**Booking Reference**
+**Booking Reference** *(flights, car, other only)*
 - Confirmation number
 - Example: "BA123456", "EUROSTAR-2025-0314"
 
-**Ticket URL**
+**Ticket URL** *(flights, car, other only)*
 - Link to e-ticket or booking
 - Example: "https://www.airline.com/tickets/ABC123"
 
@@ -94,11 +94,14 @@ Your journey FROM the destination at the end of the trip.
 - Additional details
 - Example: "Seat 12A. Check-in opens 24h before. Baggage: 1x23kg included."
 
+**Train Number** *(trains only, optional)*
+- The train service number (e.g., "FR9619", "2822")
+- Used to check live train status via viaggiatreno on the day of travel
+- If left empty, the train status button will show the departure board for the origin station instead
+
 **Type-Specific Data** (JSON field for flexibility)
 - Flight number (e.g., "BA500")
 - Airline/company name
-- Train number
-- Platform information
 - Terminal details
 
 ### Main Transfer Examples
@@ -130,13 +133,12 @@ Origin: Gare de Lyon (Paris)
 Destination: Milano Centrale (Milan)
 Departure Time: 14:15
 Arrival Time: 21:25
-Booking Reference: THELLO-2025-0314
-Notes: Thello night train. Sleeper cabin #12. Platform 3.
-Type-Specific Data:
-  - train_number: TH9426
-  - company: Thello
-  - cabin: 12
+Train Number: 9426 (optional, for live status check)
+Notes: Night train. Sleeper cabin #12. Platform 3.
 ```
+
+!!! tip "Searching for tickets"
+    Use the **Search on Trainline** and **Search on Trenitalia** buttons in the train form to open the respective booking sites in a new tab.
 
 #### Car Departure
 
@@ -149,6 +151,39 @@ Departure Time: 10:00
 Arrival Time: 16:00
 Notes: 6-hour drive. Stop for lunch halfway. Return rental at airport.
 ```
+
+### Train Transfer Features
+
+#### Booking Search Buttons
+
+The train transfer form includes two quick-access buttons:
+
+- **Search on Trainline** - Opens [trainline.com](https://www.thetrainline.com/it) in a new tab
+- **Search on Trenitalia** - Opens [trenitalia.com](https://www.trenitalia.com) in a new tab
+
+These buttons are always visible in the form and open in a new tab so you don't lose your work.
+
+#### Train Status Button
+
+Each train transfer card shows a **Train status** (or **Station departures**) button in the detail view.
+
+**When is the button active?**
+
+The button is only active on the **day of travel**:
+
+- **Arrival transfer** → active on the trip start date
+- **Departure transfer** → active on the trip end date
+
+On all other days the button is greyed out. This is intentional: live train information is only meaningful on the actual travel day.
+
+**What does the button show?**
+
+| Train number set? | Button label | Opens |
+|---|---|---|
+| Yes | Train status | Live status page for that specific train on viaggiatreno |
+| No | Station departures | Departure board for the origin station on viaggiatreno |
+
+The redirect uses the [viaggiatreno](http://www.viaggiatreno.it) mobile site. An internet connection is required at travel time.
 
 ## Main Transfer Connections
 
@@ -639,8 +674,8 @@ Confirmation: BA123456
 
 **For trains, include**:
 ```
-Company: Trenitalia
 Train: Freccia Rossa #9352
+Train Number: 9352 (fill in the dedicated field for live status)
 Platform: TBD (check 20 min before)
 Seat: Coach 5, Seat 22A
 Booking: TRENITALIA-123456

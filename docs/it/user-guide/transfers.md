@@ -82,11 +82,11 @@ Il tuo viaggio DA la destinazione alla fine del viaggio.
 
 #### Campi Opzionali
 
-**Riferimento Prenotazione**
+**Riferimento Prenotazione** *(solo voli, auto, altro)*
 - Numero di conferma
 - Esempio: "BA123456", "EUROSTAR-2025-0314"
 
-**URL Biglietto**
+**URL Biglietto** *(solo voli, auto, altro)*
 - Link a e-ticket o prenotazione
 - Esempio: "https://www.airline.com/tickets/ABC123"
 
@@ -94,11 +94,14 @@ Il tuo viaggio DA la destinazione alla fine del viaggio.
 - Dettagli aggiuntivi
 - Esempio: "Posto 12A. Check-in apre 24h prima. Bagaglio: 1x23kg incluso."
 
+**Numero Treno** *(solo treni, opzionale)*
+- Il numero del servizio ferroviario (es. "FR9619", "2822")
+- Usato per verificare lo stato del treno in tempo reale tramite viaggiatreno nel giorno del viaggio
+- Se lasciato vuoto, il bottone stato treno mostrerà le partenze dalla stazione di origine
+
 **Dati Specifici per Tipo** (campo JSON per flessibilità)
 - Numero volo (es. "BA500")
 - Nome compagnia aerea
-- Numero treno
-- Informazioni binario
 - Dettagli terminal
 
 ### Esempi Trasferimento Principale
@@ -130,13 +133,12 @@ Origine: Gare de Lyon (Parigi)
 Destinazione: Milano Centrale (Milano)
 Ora Partenza: 14:15
 Ora Arrivo: 21:25
-Riferimento Prenotazione: THELLO-2025-0314
-Note: Treno notte Thello. Cabina letto #12. Binario 3.
-Dati Specifici per Tipo:
-  - numero_treno: TH9426
-  - compagnia: Thello
-  - cabina: 12
+Numero Treno: 9426 (opzionale, per controllo stato in tempo reale)
+Note: Treno notte. Cabina letto #12. Binario 3.
 ```
+
+!!! tip "Cercare i biglietti"
+    Usa i bottoni **Cerca su Trainline** e **Cerca su Trenitalia** nel form treno per aprire i rispettivi siti di prenotazione in una nuova scheda.
 
 #### Partenza con Auto
 
@@ -149,6 +151,39 @@ Ora Partenza: 10:00
 Ora Arrivo: 16:00
 Note: Viaggio 6 ore. Sosta pranzo a metà strada. Restituzione noleggio in aeroporto.
 ```
+
+### Funzionalità Trasferimenti Treno
+
+#### Bottoni di Ricerca Biglietti
+
+Il form per i trasferimenti in treno include due bottoni di accesso rapido:
+
+- **Cerca su Trainline** - Apre [trainline.com](https://www.thetrainline.com/it) in una nuova scheda
+- **Cerca su Trenitalia** - Apre [trenitalia.com](https://www.trenitalia.com) in una nuova scheda
+
+I bottoni sono sempre visibili nel form e aprono in una nuova scheda per non perdere i dati inseriti.
+
+#### Bottone Stato Treno
+
+Ogni card di dettaglio per i trasferimenti in treno mostra un bottone **Stato treno** (o **Partenze dalla stazione**).
+
+**Quando è attivo il bottone?**
+
+Il bottone è attivo solo nel **giorno del viaggio**:
+
+- **Trasferimento di arrivo** → attivo nella data di inizio viaggio
+- **Trasferimento di partenza** → attivo nella data di fine viaggio
+
+In tutti gli altri giorni il bottone è disattivato. Questo è intenzionale: le informazioni in tempo reale sul treno sono utili solo nel giorno effettivo del viaggio.
+
+**Cosa mostra il bottone?**
+
+| Numero treno impostato? | Etichetta bottone | Apre |
+|---|---|---|
+| Sì | Stato treno | Pagina stato in tempo reale per quel treno specifico su viaggiatreno |
+| No | Partenze dalla stazione | Tabellone partenze dalla stazione di origine su viaggiatreno |
+
+Il redirect usa il sito mobile di [viaggiatreno](http://www.viaggiatreno.it). È richiesta una connessione internet al momento del viaggio.
 
 ## Connessioni Trasferimenti Principali
 
@@ -639,8 +674,8 @@ Conferma: BA123456
 
 **Per treni, includi**:
 ```
-Compagnia: Trenitalia
 Treno: Freccia Rossa #9352
+Numero Treno: 9352 (compila il campo dedicato per lo stato in tempo reale)
 Binario: TBD (controlla 20 min prima)
 Posto: Carrozza 5, Posto 22A
 Prenotazione: TRENITALIA-123456
