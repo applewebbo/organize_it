@@ -358,14 +358,6 @@ class MainTransfer(models.Model):
     def train_number(self):
         return self.type_specific_data.get("train_number", "")
 
-    @property
-    def carriage(self):
-        return self.type_specific_data.get("carriage", "")
-
-    @property
-    def seat(self):
-        return self.type_specific_data.get("seat", "")
-
     # Car specific
     @property
     def is_rental(self):

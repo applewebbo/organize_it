@@ -774,16 +774,12 @@ class TestMainTransferModel:
             type=MainTransfer.Type.TRAIN,
             type_specific_data={
                 "train_number": "FR9612",
-                "carriage": "7",
-                "seat": "42A",
                 "company": "Trenitalia",
                 "company_website": "https://trenitalia.com",
             },
         )
 
         assert transfer.train_number == "FR9612"
-        assert transfer.carriage == "7"
-        assert transfer.seat == "42A"
         assert transfer.company == "Trenitalia"
         assert transfer.company_website == "https://trenitalia.com"
 
@@ -817,8 +813,6 @@ class TestMainTransferModel:
         assert transfer.flight_number == ""
         assert transfer.terminal == ""
         assert transfer.train_number == ""
-        assert transfer.carriage == ""
-        assert transfer.seat == ""
         assert transfer.is_rental is False
         assert transfer.company == ""
         assert transfer.company_website == ""
