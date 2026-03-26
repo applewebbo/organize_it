@@ -139,6 +139,20 @@ wheels = [
 ]
 
 [[package]]
+dependencies = [
+  {name = "certifi"},
+  {name = "six"},
+  {name = "urllib3"}
+]
+name = "cloudinary"
+sdist = {url = "https://files.pythonhosted.org/packages/32/35/938a4cc3b5ac386184a8ea50e357cdbb4239c2744fc8c652c461674447e6/cloudinary-1.44.1.tar.gz", hash = "sha256:62d4374b79d5476de2a86cb6a1da709a5429e02aef474bfc5d99f3e38a1a62ff", size = 188225, upload-time = "2025-06-17T16:31:33.279Z"}
+source = {registry = "https://pypi.org/simple"}
+version = "1.44.1"
+wheels = [
+  {url = "https://files.pythonhosted.org/packages/86/f0/518d151d3dfc009940947fe9b26cdf9f6e2fb9e4a29c12fe5b5ebe8aad65/cloudinary-1.44.1-py3-none-any.whl", hash = "sha256:b4785031179a5ec7010f46665e5c8fad2cae022c18405546f01d257e02f78b1c", size = 147808, upload-time = "2025-06-17T16:31:32.188Z"}
+]
+
+[[package]]
 name = "colorama"
 sdist = {url = "https://files.pythonhosted.org/packages/d8/53/6f443c9a4a8358a93a6792e2acffb9d9d5cb0a5cfd8802644b7b1c9a02e4/colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44", size = 27697, upload-time = "2022-10-25T02:36:22.414Z"}
 source = {registry = "https://pypi.org/simple"}
@@ -980,6 +994,7 @@ wheels = [
 
 [[package]]
 dependencies = [
+  {name = "cloudinary"},
   {name = "crispy-tailwind"},
   {name = "croniter"},
   {name = "dj-database-url"},
@@ -1041,6 +1056,7 @@ docs = [
 
 [package.metadata]
 requires-dist = [
+  {name = "cloudinary", specifier = ">=1.44.1"},
   {name = "crispy-tailwind", specifier = ">=1.0.3"},
   {name = "croniter", specifier = ">=6.0.0"},
   {name = "dj-database-url", specifier = ">=2.2.0"},

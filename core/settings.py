@@ -385,9 +385,11 @@ elif ENVIRONMENT == "prod":
     }
 
     # Override storages for production
-    # Use FileSystemStorage for media files (for #199)
     STORAGES["default"] = {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "BACKEND": "storages.backends.cloudinary.CloudinaryStorage",
+        "OPTIONS": {
+            "folder": "organize-it",
+        },
     }
     STORAGES["staticfiles"] = {
         "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
