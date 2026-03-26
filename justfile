@@ -212,11 +212,17 @@ release-show tag:
       -H "Authorization: token ${TOKEN}" | \
       jq -r '"\nTag: \(.tag_name)\nName: \(.name)\nPublished: \(.published_at)\nDraft: \(.draft)\nPrerelease: \(.prerelease)\n\nURL: \(.html_url)\n\nBody:\n\(.body)\n"'
 
-# Create a new release (auto-creates tag, pushes it, and generates notes from commits)
+# Create a new release (creates tag, pushes main+tag, creates Codeberg release via fgj)
+# Pass notes_file to use custom rich notes; omit for auto-generated notes from commits
 [group('codeberg')]
-release-create tag previous_tag="" draft="false" prerelease="false":
+release-create tag previous_tag="" notes_file="" draft="false" prerelease="false":
     #!/usr/bin/env bash
     set -euo pipefail
+
+    # Push main to origin
+    echo "📤 Pushing main to origin..."
+    git push origin main
+    echo "✓ main pushed to origin"
 
     # Check if tag already exists locally
     if git rev-parse "{{tag}}" >/dev/null 2>&1; then
@@ -227,74 +233,73 @@ release-create tag previous_tag="" draft="false" prerelease="false":
         echo "✓ Tag {{tag}} created"
     fi
 
-    # Push tag to origin
+    # Push tag to origin (use refs/tags/ to avoid branch/tag ambiguity)
     echo "📤 Pushing tag {{tag}} to origin..."
-    if git push origin "{{tag}}" 2>&1 | grep -q "already exists"; then
-        echo "✓ Tag {{tag}} already exists on remote"
+    git push origin "refs/tags/{{tag}}"
+    echo "✓ Tag {{tag}} pushed to origin"
+
+    # Determine notes file
+    if [ "{{notes_file}}" != "" ]; then
+        NOTES_FILE="{{notes_file}}"
+        echo "📄 Using provided notes file: ${NOTES_FILE}"
     else
-        echo "✓ Tag {{tag}} pushed to origin"
+        # Auto-generate notes to a temp file
+        NOTES_FILE=$(mktemp /tmp/release-notes-XXXXXX.md)
+
+        # Determine previous tag if not provided
+        if [ "{{previous_tag}}" = "" ]; then
+            PREV_TAG=$(git tag --sort=-version:refname | grep -v "{{tag}}" | head -1)
+        else
+            PREV_TAG="{{previous_tag}}"
+        fi
+
+        echo "🔍 Generating release notes (comparing with ${PREV_TAG})..."
+        COMMITS=$(git log ${PREV_TAG}..{{tag}} --pretty=format:"- %s" --reverse 2>/dev/null || echo "- Initial release")
+
+        FEATURES=$(echo "$COMMITS" | grep -E "^- (✨|feat)" || true)
+        FIXES=$(echo "$COMMITS" | grep -E "^- (🐛|fix)" || true)
+        CHORES=$(echo "$COMMITS" | grep -E "^- (🔧|chore|📦|build|🎨)" || true)
+        TESTS=$(echo "$COMMITS" | grep -E "^- (🧪|test|✅)" || true)
+        DOCS=$(echo "$COMMITS" | grep -E "^- (📚|docs)" || true)
+
+        {
+            echo "## What's New in {{tag}}"
+            echo ""
+            if [ -n "$FEATURES" ]; then
+                echo "### 🚀 Features"
+                echo "$FEATURES"
+                echo ""
+            fi
+            if [ -n "$FIXES" ]; then
+                echo "### 🐛 Bug Fixes"
+                echo "$FIXES"
+                echo ""
+            fi
+            if [ -n "$CHORES" ]; then
+                echo "### 🛠️ Maintenance"
+                echo "$CHORES"
+                echo ""
+            fi
+            if [ -n "$TESTS" ]; then
+                echo "### 🧪 Testing"
+                echo "$TESTS"
+                echo ""
+            fi
+            if [ -n "$DOCS" ]; then
+                echo "### 📖 Documentation"
+                echo "$DOCS"
+                echo ""
+            fi
+            echo "### 📖 Full Changelog"
+            echo "https://codeberg.org/webbografico/organize_it/compare/${PREV_TAG}...{{tag}}"
+        } > "$NOTES_FILE"
     fi
 
-    # Get token
-    TOKEN=$(grep "^CODEBERG_API_TOKEN=" .env | cut -d'=' -f2 | tr -d '"' | tr -d "'")
-
-    # Determine previous tag if not provided
-    if [ "{{previous_tag}}" = "" ]; then
-        PREV_TAG=$(git tag --sort=-version:refname | grep -v "{{tag}}" | head -1)
-    else
-        PREV_TAG="{{previous_tag}}"
-    fi
-
-    echo "🔍 Generating release notes (comparing with ${PREV_TAG})..."
-
-    # Generate release notes from commits
-    COMMITS=$(git log ${PREV_TAG}..{{tag}} --pretty=format:"- %s" --reverse 2>/dev/null || echo "- Initial release")
-
-    # Parse commits into categories
-    FEATURES=$(echo "$COMMITS" | grep -E "^- (✨|feat)" || true)
-    FIXES=$(echo "$COMMITS" | grep -E "^- (🐛|fix)" || true)
-    CHORES=$(echo "$COMMITS" | grep -E "^- (🔧|chore|📦|build|🎨)" || true)
-    TESTS=$(echo "$COMMITS" | grep -E "^- (🧪|test|✅)" || true)
-    DOCS=$(echo "$COMMITS" | grep -E "^- (📚|docs)" || true)
-
-    # Build release body
-    NL=$'\n'
-    BODY="## What's New in {{tag}}${NL}${NL}"
-
-    if [ -n "$FEATURES" ]; then
-        BODY+="### 🚀 Features${NL}$FEATURES${NL}${NL}"
-    fi
-
-    if [ -n "$FIXES" ]; then
-        BODY+="### 🐛 Bug Fixes${NL}$FIXES${NL}${NL}"
-    fi
-
-    if [ -n "$CHORES" ]; then
-        BODY+="### 🛠️ Maintenance${NL}$CHORES${NL}${NL}"
-    fi
-
-    if [ -n "$TESTS" ]; then
-        BODY+="### 🧪 Testing${NL}$TESTS${NL}${NL}"
-    fi
-
-    if [ -n "$DOCS" ]; then
-        BODY+="### 📖 Documentation${NL}$DOCS${NL}${NL}"
-    fi
-
-    BODY+="### 📖 Full Changelog${NL}https://codeberg.org/webbografico/organize_it/compare/${PREV_TAG}...{{tag}}"
-
-    # Create release via API
+    # Create release via fgj
     echo "🚀 Creating release on Codeberg..."
-    curl -s -X POST "https://codeberg.org/api/v1/repos/webbografico/organize_it/releases" \
-      -H "Authorization: token ${TOKEN}" \
-      -H "Content-Type: application/json" \
-      -d "$(jq -n \
-        --arg tag "{{tag}}" \
-        --arg body "$BODY" \
-        --argjson draft {{draft}} \
-        --argjson prerelease {{prerelease}} \
-        '{tag_name: $tag, name: $tag, body: $body, draft: $draft, prerelease: $prerelease}'
-      )" | jq -r '"\n✓ Release created!\nURL: \(.html_url)\n"'
+    fgj release create "{{tag}}" --repo webbografico/organize_it --title "{{tag}}" --notes-file "$NOTES_FILE"
+    echo ""
+    echo "✓ Release {{tag}} created!"
 
 
 ##########################################################################
