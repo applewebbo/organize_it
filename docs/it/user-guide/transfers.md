@@ -82,13 +82,13 @@ Il tuo viaggio DA la destinazione alla fine del viaggio.
 
 #### Campi Opzionali
 
-**Riferimento Prenotazione** *(solo voli, auto, altro)*
+**Riferimento Prenotazione** *(solo auto, altro)*
 - Numero di conferma
-- Esempio: "BA123456", "EUROSTAR-2025-0314"
+- Esempio: "EUROSTAR-2025-0314"
 
-**URL Biglietto** *(solo voli, auto, altro)*
+**URL Biglietto** *(solo auto, altro)*
 - Link a e-ticket o prenotazione
-- Esempio: "https://www.airline.com/tickets/ABC123"
+- Esempio: "https://www.rentalcar.com/booking/ABC123"
 
 **Note**
 - Dettagli aggiuntivi
@@ -99,10 +99,13 @@ Il tuo viaggio DA la destinazione alla fine del viaggio.
 - Usato per verificare lo stato del treno in tempo reale tramite viaggiatreno nel giorno del viaggio
 - Se lasciato vuoto, il bottone stato treno mostrerà le partenze dalla stazione di origine
 
+**Numero Volo** *(solo voli, opzionale)*
+- Il numero del volo (es. "BA500", "AZ610")
+- Usato per verificare lo stato del volo in tempo reale tramite FlightAware nel giorno del viaggio
+
 **Dati Specifici per Tipo** (campo JSON per flessibilità)
-- Numero volo (es. "BA500")
-- Nome compagnia aerea
 - Dettagli terminal
+- Qualsiasi altra informazione specifica del trasporto
 
 ### Esempi Trasferimento Principale
 
@@ -115,12 +118,9 @@ Origine: LHR (London Heathrow)
 Destinazione: FCO (Roma Fiumicino)
 Ora Partenza: 08:00
 Ora Arrivo: 11:30
-Riferimento Prenotazione: BA123456
-Note: British Airways BA500. Posto 12A. Terminal 5.
-      Check-in online 24h prima. Bagaglio 1x23kg incluso.
+Numero Volo: BA500
+Note: Posto 12A. Terminal 5. Check-in online 24h prima. Bagaglio 1x23kg incluso.
 Dati Specifici per Tipo:
-  - numero_volo: BA500
-  - compagnia_aerea: British Airways
   - terminal: 5
 ```
 
@@ -151,6 +151,30 @@ Ora Partenza: 10:00
 Ora Arrivo: 16:00
 Note: Viaggio 6 ore. Sosta pranzo a metà strada. Restituzione noleggio in aeroporto.
 ```
+
+### Funzionalità Trasferimenti Volo
+
+#### Bottone Stato Volo
+
+Ogni card di dettaglio per i trasferimenti aerei mostra un bottone **Stato volo** nella vista dettaglio.
+
+**Quando è attivo il bottone?**
+
+Il bottone è attivo solo nel **giorno del viaggio**:
+
+- **Trasferimento di arrivo** → attivo nella data di inizio viaggio
+- **Trasferimento di partenza** → attivo nella data di fine viaggio
+
+In tutti gli altri giorni il bottone è disattivato.
+
+**Cosa mostra il bottone?**
+
+| Numero volo impostato? | Etichetta bottone | Apre |
+|---|---|---|
+| Sì | Stato volo | Pagina stato in tempo reale per quel volo specifico su FlightAware |
+| No | Bottone nascosto | — |
+
+Il redirect apre [FlightAware](https://www.flightaware.com) con il numero volo specifico. È richiesta una connessione internet al momento del viaggio.
 
 ### Funzionalità Trasferimenti Treno
 
@@ -623,19 +647,19 @@ I trasferimenti con dati posizione appaiono su:
 
 ✅ **Includi sempre**:
 - Trasferimenti arrivo e partenza
-- Conferme prenotazioni
 - Orari partenza e arrivo
+- Numero volo/treno (per stato in tempo reale)
 - Requisiti check-in
 - Franchigie bagaglio
 
 **Esempio checklist**:
 ```
 ✓ Volo prenotato
+✓ Numero volo registrato (per stato FlightAware)
 ✓ Posti selezionati
 ✓ Promemoria check-in online (24h prima)
 ✓ Regole bagaglio annotate
 ✓ Parcheggio aeroporto/trasporto organizzato
-✓ Numeri conferma registrati
 ```
 
 ### Tempo Extra
@@ -663,13 +687,11 @@ Lascia tempo adeguato tra:
 
 **Per voli, includi**:
 ```
-Compagnia: British Airways
-Volo: BA500
+Volo: BA500 (compila il campo dedicato per lo stato in tempo reale)
 Partenza: Terminal 5, Gate apre 1h prima
 Posto: 12A (finestrino)
 Bagaglio: 1x23kg registrato, 1x10kg mano
 Check-in: Online 24h prima
-Conferma: BA123456
 ```
 
 **Per treni, includi**:
@@ -779,7 +801,7 @@ Includi nelle note trasferimento partenza o crea evento separato.
 ### Posso allegare biglietti/conferme?
 
 Attualmente, no allegati file diretti. Opzioni:
-- Aggiungi **URL Biglietto** per e-ticket
+- Aggiungi **URL Biglietto** *(trasferimenti auto e altro)* per e-ticket
 - Usa sezione **Link** viaggio per pagine prenotazione
 - Memorizza numeri conferma nelle note
 

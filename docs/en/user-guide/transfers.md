@@ -82,13 +82,13 @@ Your journey FROM the destination at the end of the trip.
 
 #### Optional Fields
 
-**Booking Reference** *(flights, car, other only)*
+**Booking Reference** *(car, other only)*
 - Confirmation number
-- Example: "BA123456", "EUROSTAR-2025-0314"
+- Example: "EUROSTAR-2025-0314"
 
-**Ticket URL** *(flights, car, other only)*
+**Ticket URL** *(car, other only)*
 - Link to e-ticket or booking
-- Example: "https://www.airline.com/tickets/ABC123"
+- Example: "https://www.rentalcar.com/booking/ABC123"
 
 **Notes**
 - Additional details
@@ -99,10 +99,13 @@ Your journey FROM the destination at the end of the trip.
 - Used to check live train status via viaggiatreno on the day of travel
 - If left empty, the train status button will show the departure board for the origin station instead
 
+**Flight Number** *(flights only, optional)*
+- The flight number (e.g., "BA500", "AZ610")
+- Used to check live flight status via FlightAware on the day of travel
+
 **Type-Specific Data** (JSON field for flexibility)
-- Flight number (e.g., "BA500")
-- Airline/company name
 - Terminal details
+- Any other transport-specific information
 
 ### Main Transfer Examples
 
@@ -115,12 +118,9 @@ Origin: LHR (London Heathrow)
 Destination: FCO (Rome Fiumicino)
 Departure Time: 08:00
 Arrival Time: 11:30
-Booking Reference: BA123456
-Notes: British Airways BA500. Seat 12A. Terminal 5.
-      Check-in online 24h before. 1x23kg baggage included.
+Flight Number: BA500
+Notes: Seat 12A. Terminal 5. Check-in online 24h before. 1x23kg baggage included.
 Type-Specific Data:
-  - flight_number: BA500
-  - airline: British Airways
   - terminal: 5
 ```
 
@@ -151,6 +151,30 @@ Departure Time: 10:00
 Arrival Time: 16:00
 Notes: 6-hour drive. Stop for lunch halfway. Return rental at airport.
 ```
+
+### Flight Transfer Features
+
+#### Flight Status Button
+
+Each flight transfer card shows a **Flight status** button in the detail view.
+
+**When is the button active?**
+
+The button is only active on the **day of travel**:
+
+- **Arrival transfer** → active on the trip start date
+- **Departure transfer** → active on the trip end date
+
+On all other days the button is greyed out.
+
+**What does the button show?**
+
+| Flight number set? | Button label | Opens |
+|---|---|---|
+| Yes | Flight status | Live status page for that specific flight on FlightAware |
+| No | Button hidden | — |
+
+The redirect opens [FlightAware](https://www.flightaware.com) with the specific flight number. An internet connection is required at travel time.
 
 ### Train Transfer Features
 
@@ -623,19 +647,19 @@ Transfers with location data appear on:
 
 ✅ **Always include**:
 - Arrival and departure transfers
-- Booking confirmations
 - Departure and arrival times
+- Flight/train number (for live status lookup)
 - Check-in requirements
 - Baggage allowances
 
 **Example checklist**:
 ```
 ✓ Flight booked
+✓ Flight number recorded (for FlightAware status)
 ✓ Seats selected
 ✓ Online check-in reminder (24h before)
 ✓ Baggage rules noted
 ✓ Airport parking/transport arranged
-✓ Confirmation numbers recorded
 ```
 
 ### Buffer Time
@@ -663,13 +687,11 @@ Leave adequate time between:
 
 **For flights, include**:
 ```
-Airline: British Airways
-Flight: BA500
+Flight: BA500 (fill in the dedicated field for live status)
 Departure: Terminal 5, Gate opens 1h before
 Seat: 12A (window)
 Baggage: 1x23kg checked, 1x10kg carry-on
 Check-in: Online 24h before
-Confirmation: BA123456
 ```
 
 **For trains, include**:
@@ -779,7 +801,7 @@ Include in departure transfer notes or create separate event.
 ### Can I attach tickets/confirmations?
 
 Currently, no direct file attachments. Options:
-- Add **Ticket URL** for e-tickets
+- Add **Ticket URL** *(car and other transfers)* for e-tickets
 - Use trip **Links** section for booking pages
 - Store confirmation numbers in notes
 
