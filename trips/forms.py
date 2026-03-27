@@ -923,22 +923,16 @@ class MainTransferBaseForm(forms.ModelForm):
             "direction",
             "start_time",
             "end_time",
-            "booking_reference",
-            "ticket_url",
             "notes",
         ]
         labels = {
             "start_time": _("Departure Time"),
             "end_time": _("Arrival Time"),
-            "booking_reference": _("Booking Reference"),
-            "ticket_url": _("Ticket URL"),
             "notes": _("Notes"),
         }
         help_texts = {
             "start_time": "",
             "end_time": "",
-            "booking_reference": "",
-            "ticket_url": "",
             "notes": "",
         }
         widgets = {
@@ -948,15 +942,6 @@ class MainTransferBaseForm(forms.ModelForm):
             "end_time": forms.TimeInput(
                 attrs={"type": "time", "class": "input input-bordered"}
             ),
-            "booking_reference": forms.TextInput(
-                attrs={
-                    "class": "input input-bordered",
-                    "placeholder": _("Booking Reference"),
-                }
-            ),
-            "ticket_url": forms.URLInput(
-                attrs={"class": "input input-bordered", "placeholder": "https://..."}
-            ),
             "notes": forms.Textarea(
                 attrs={"class": "textarea textarea-bordered", "rows": 3}
             ),
@@ -964,6 +949,7 @@ class MainTransferBaseForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.trip = kwargs.pop("trip", None)
+        kwargs.pop("home_address", None)  # Consumed by car/other subforms; ignored here
         super().__init__(*args, **kwargs)
 
     def save(self, commit=True):
@@ -1091,10 +1077,6 @@ class FlightMainTransferForm(MainTransferBaseForm):
             }
             self.fields["origin_airport"].widget.attrs.update(origin_htmx_attrs)
             self.fields["destination_airport"].widget.attrs.update(dest_htmx_attrs)
-
-        # Remove fields not applicable to flight transfers
-        del self.fields["booking_reference"]
-        del self.fields["ticket_url"]
 
         # Populate fields if editing
         if self.instance and self.instance.pk:
@@ -1262,10 +1244,6 @@ class TrainMainTransferForm(MainTransferBaseForm):
         autocomplete = kwargs.pop("autocomplete", True)
         super().__init__(*args, **kwargs)
 
-        # Remove fields not applicable to train transfers
-        del self.fields["booking_reference"]
-        del self.fields["ticket_url"]
-
         # Add HTMX attributes for station autocomplete (similar to EventForm geocode)
         if autocomplete:
             search_url_origin = f"{reverse('trips:search-stations')}?field_type=origin"
@@ -1378,9 +1356,8 @@ class TrainMainTransferForm(MainTransferBaseForm):
 class CarMainTransferForm(MainTransferBaseForm):
     """Form for car main transfers with geocoding"""
 
-    # Address fields (geocoding like events)
     origin_address = forms.CharField(
-        label=_("Departure Address"),
+        label=_("Departure Location"),
         max_length=500,
         widget=forms.TextInput(
             attrs={
@@ -1392,7 +1369,7 @@ class CarMainTransferForm(MainTransferBaseForm):
     )
 
     destination_address = forms.CharField(
-        label=_("Arrival Address"),
+        label=_("Arrival Location"),
         max_length=500,
         widget=forms.TextInput(
             attrs={
@@ -1403,33 +1380,6 @@ class CarMainTransferForm(MainTransferBaseForm):
         help_text=_("Full address for geocoding"),
     )
 
-    # Car-specific fields
-    company = forms.CharField(
-        max_length=100,
-        required=False,
-        label=_("Rental Company"),
-        widget=forms.TextInput(
-            attrs={
-                "class": "input input-bordered",
-                "placeholder": _("Rental company name (if applicable)"),
-            }
-        ),
-    )
-
-    is_rental = forms.BooleanField(
-        required=False,
-        label=_("Rental Car"),
-        widget=forms.CheckboxInput(attrs={"class": "checkbox checkbox-primary"}),
-    )
-
-    company_website = forms.URLField(
-        required=False,
-        label=_("Rental Company Website"),
-        widget=forms.URLInput(
-            attrs={"class": "input input-bordered", "placeholder": "https://..."}
-        ),
-    )
-
     class Meta(MainTransferBaseForm.Meta):
         fields = MainTransferBaseForm.Meta.fields + [
             "origin_address",
@@ -1437,7 +1387,8 @@ class CarMainTransferForm(MainTransferBaseForm):
         ]
 
     def __init__(self, *args, **kwargs):
-        kwargs.pop("autocomplete", None)  # Accept but ignore autocomplete parameter
+        kwargs.pop("autocomplete", None)
+        home_address = kwargs.pop("home_address", "")
         super().__init__(*args, **kwargs)
 
         # Populate fields if editing
@@ -1446,60 +1397,37 @@ class CarMainTransferForm(MainTransferBaseForm):
             self.fields[
                 "destination_address"
             ].initial = self.instance.destination_address
+        else:
+            # Pre-fill origin with home address for arrival, destination for departure
+            direction = self.initial.get("direction")
+            if home_address:
+                if direction == MainTransfer.Direction.ARRIVAL:
+                    self.fields["origin_address"].initial = home_address
+                elif direction == MainTransfer.Direction.DEPARTURE:
+                    self.fields["destination_address"].initial = home_address
 
-            # Populate type-specific fields
-            if self.instance.type_specific_data:  # pragma: no cover
-                self.fields["company"].initial = self.instance.company
-                self.fields["is_rental"].initial = self.instance.is_rental
-                self.fields["company_website"].initial = self.instance.company_website
-
-        # Pre-fill from arrival if this is a new departure
-        if (
-            self.trip
-            and not self.instance.pk
-            and self.initial.get("direction") == MainTransfer.Direction.DEPARTURE
-        ):
-            arrival = MainTransfer.objects.filter(
-                trip=self.trip,
-                direction=MainTransfer.Direction.ARRIVAL,
-                type=MainTransfer.Type.CAR,
-            ).first()
-
-            if arrival:
-                # Invert origin ↔ destination
-                self.fields["origin_address"].initial = arrival.destination_address
-                self.fields["destination_address"].initial = arrival.origin_address
-
-                # Set flag for message display
-                self.prefilled_from_arrival = True
+            # Pre-fill from arrival if this is a new departure
+            if self.trip and direction == MainTransfer.Direction.DEPARTURE:
+                arrival = MainTransfer.objects.filter(
+                    trip=self.trip,
+                    direction=MainTransfer.Direction.ARRIVAL,
+                    type=MainTransfer.Type.CAR,
+                ).first()
+                if arrival:
+                    self.fields["origin_address"].initial = arrival.destination_address
+                    self.fields["destination_address"].initial = arrival.origin_address
+                    self.prefilled_from_arrival = True
 
     def save(self, commit=True):
         instance = super().save(commit=False)
-
-        # Populate model fields
         instance.type = MainTransfer.Type.CAR
         instance.origin_address = self.cleaned_data["origin_address"]
         instance.destination_address = self.cleaned_data["destination_address"]
-
-        # Geocoding will happen automatically in model save()
 
         if commit:  # pragma: no cover
             instance.save()
 
         return instance
-
-    def get_type_specific_data(self):
-        """Populate car-specific fields in JSONField"""
-        data = {}
-
-        if self.cleaned_data.get("company"):  # pragma: no cover
-            data["company"] = self.cleaned_data["company"]
-        if self.cleaned_data.get("is_rental"):  # pragma: no cover
-            data["is_rental"] = True
-        if self.cleaned_data.get("company_website"):  # pragma: no cover
-            data["company_website"] = self.cleaned_data["company_website"]
-
-        return data
 
 
 class OtherMainTransferForm(MainTransferBaseForm):
@@ -1530,27 +1458,6 @@ class OtherMainTransferForm(MainTransferBaseForm):
         help_text=_("Full address for geocoding"),
     )
 
-    # Generic fields
-    company = forms.CharField(
-        max_length=100,
-        required=False,
-        label=_("Transport Company"),
-        widget=forms.TextInput(
-            attrs={
-                "class": "input input-bordered",
-                "placeholder": _("Company name (if applicable)"),
-            }
-        ),
-    )
-
-    company_website = forms.URLField(
-        required=False,
-        label=_("Company Website"),
-        widget=forms.URLInput(
-            attrs={"class": "input input-bordered", "placeholder": "https://..."}
-        ),
-    )
-
     class Meta(MainTransferBaseForm.Meta):
         fields = MainTransferBaseForm.Meta.fields + [
             "origin_address",
@@ -1558,66 +1465,44 @@ class OtherMainTransferForm(MainTransferBaseForm):
         ]
 
     def __init__(self, *args, **kwargs):
-        kwargs.pop("autocomplete", None)  # Accept but ignore autocomplete parameter
+        kwargs.pop("autocomplete", None)
+        home_address = kwargs.pop("home_address", "")
         super().__init__(*args, **kwargs)
 
-        # Populate fields if editing
         if self.instance and self.instance.pk:
             self.fields["origin_address"].initial = self.instance.origin_address
             self.fields[
                 "destination_address"
             ].initial = self.instance.destination_address
+        else:
+            direction = self.initial.get("direction")
+            if home_address:
+                if direction == MainTransfer.Direction.ARRIVAL:
+                    self.fields["origin_address"].initial = home_address
+                elif direction == MainTransfer.Direction.DEPARTURE:
+                    self.fields["destination_address"].initial = home_address
 
-            # Populate type-specific fields
-            if self.instance.type_specific_data:  # pragma: no cover
-                self.fields["company"].initial = self.instance.company
-                self.fields["company_website"].initial = self.instance.company_website
-
-        # Pre-fill from arrival if this is a new departure
-        if (
-            self.trip
-            and not self.instance.pk
-            and self.initial.get("direction") == MainTransfer.Direction.DEPARTURE
-        ):
-            arrival = MainTransfer.objects.filter(
-                trip=self.trip,
-                direction=MainTransfer.Direction.ARRIVAL,
-                type=MainTransfer.Type.OTHER,
-            ).first()
-
-            if arrival:
-                # Invert origin ↔ destination
-                self.fields["origin_address"].initial = arrival.destination_address
-                self.fields["destination_address"].initial = arrival.origin_address
-
-                # Set flag for message display
-                self.prefilled_from_arrival = True
+            if self.trip and direction == MainTransfer.Direction.DEPARTURE:
+                arrival = MainTransfer.objects.filter(
+                    trip=self.trip,
+                    direction=MainTransfer.Direction.ARRIVAL,
+                    type=MainTransfer.Type.OTHER,
+                ).first()
+                if arrival:
+                    self.fields["origin_address"].initial = arrival.destination_address
+                    self.fields["destination_address"].initial = arrival.origin_address
+                    self.prefilled_from_arrival = True
 
     def save(self, commit=True):
         instance = super().save(commit=False)
-
-        # Populate model fields
         instance.type = MainTransfer.Type.OTHER
         instance.origin_address = self.cleaned_data["origin_address"]
         instance.destination_address = self.cleaned_data["destination_address"]
-
-        # Geocoding will happen automatically in model save()
 
         if commit:  # pragma: no cover
             instance.save()
 
         return instance
-
-    def get_type_specific_data(self):
-        """Populate generic fields in JSONField"""
-        data = {}
-
-        if self.cleaned_data.get("company"):  # pragma: no cover
-            data["company"] = self.cleaned_data["company"]
-        if self.cleaned_data.get("company_website"):  # pragma: no cover
-            data["company_website"] = self.cleaned_data["company_website"]
-
-        return data
 
 
 # ============================================================================

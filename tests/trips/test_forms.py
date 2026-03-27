@@ -1094,7 +1094,7 @@ class TestTrainMainTransferForm:
 
 class TestCarMainTransferForm:
     def test_form_initialization(self):
-        """Test CarMainTransferForm initializes correctly"""
+        """Test CarMainTransferForm initializes correctly without rental fields"""
         from trips.forms import CarMainTransferForm
 
         trip = TripFactory()
@@ -1102,17 +1102,17 @@ class TestCarMainTransferForm:
 
         assert "origin_address" in form.fields
         assert "destination_address" in form.fields
-        assert "company" in form.fields
-        assert "is_rental" in form.fields
+        assert "company" not in form.fields
+        assert "is_rental" not in form.fields
+        assert "booking_reference" not in form.fields
+        assert "ticket_url" not in form.fields
 
     def test_populate_from_existing_instance(self):
-        """Test form populates fields from existing MainTransfer instance"""
+        """Test form populates address fields from existing MainTransfer instance"""
         from trips.forms import CarMainTransferForm
         from trips.models import MainTransfer
 
         trip = TripFactory()
-
-        # Create a car transfer with type-specific data
         transfer = MainTransfer.objects.create(
             trip=trip,
             type=MainTransfer.Type.CAR,
@@ -1121,22 +1121,12 @@ class TestCarMainTransferForm:
             destination_address="Via Milano 10, Milan",
             start_time="08:00",
             end_time="12:00",
-            type_specific_data={
-                "company": "Hertz",
-                "is_rental": True,
-                "company_website": "https://hertz.com",
-            },
         )
 
-        # Initialize form with instance
         form = CarMainTransferForm(instance=transfer, trip=trip)
 
-        # Check that fields are populated
         assert form.fields["origin_address"].initial == "Via Roma 1, Rome"
         assert form.fields["destination_address"].initial == "Via Milano 10, Milan"
-        assert form.fields["company"].initial == "Hertz"
-        assert form.fields["is_rental"].initial is True
-        assert form.fields["company_website"].initial == "https://hertz.com"
 
     def test_save_creates_car_transfer(self):
         """Test save method creates car transfer correctly"""
@@ -1150,9 +1140,6 @@ class TestCarMainTransferForm:
             "end_time": "12:00",
             "origin_address": "Via Roma 1, Rome",
             "destination_address": "Via Milano 10, Milan",
-            "company": "Hertz",
-            "is_rental": True,
-            "company_website": "https://hertz.com",
         }
 
         form = CarMainTransferForm(form_data, trip=trip)
@@ -1164,54 +1151,6 @@ class TestCarMainTransferForm:
         assert transfer.origin_address == "Via Roma 1, Rome"
         assert transfer.destination_address == "Via Milano 10, Milan"
         assert MainTransfer.objects.filter(pk=transfer.pk).exists()
-
-    def test_get_type_specific_data(self):
-        """Test car-specific data is extracted correctly"""
-        from trips.forms import CarMainTransferForm
-
-        trip = TripFactory()
-        form_data = {
-            "direction": "1",
-            "start_time": "08:00",
-            "end_time": "12:00",
-            "origin_address": "Via Roma 1",
-            "destination_address": "Via Milano 10",
-            "company": "Hertz",
-            "is_rental": True,
-            "company_website": "https://hertz.com",
-        }
-
-        form = CarMainTransferForm(form_data, trip=trip)
-        assert form.is_valid()
-
-        data = form.get_type_specific_data()
-        assert data["company"] == "Hertz"
-        assert data["is_rental"] is True
-        assert data["company_website"] == "https://hertz.com"
-
-    def test_get_type_specific_data_with_empty_fields(self):
-        """Test car-specific data excludes empty fields"""
-        from trips.forms import CarMainTransferForm
-
-        trip = TripFactory()
-        form_data = {
-            "direction": "1",
-            "start_time": "08:00",
-            "end_time": "12:00",
-            "origin_address": "Via Roma 1",
-            "destination_address": "Via Milano 10",
-            "company": "",  # Empty
-            "is_rental": False,  # False (not True)
-            "company_website": "",  # Empty
-        }
-
-        form = CarMainTransferForm(form_data, trip=trip)
-        assert form.is_valid()
-
-        data = form.get_type_specific_data()
-        assert "company" not in data
-        assert "is_rental" not in data  # False is not included
-        assert "company_website" not in data
 
     def test_form_initialization_without_autocomplete(self):
         """Test form initializes correctly and accepts autocomplete parameter"""
@@ -1270,10 +1209,21 @@ class TestCarMainTransferForm:
         assert form.fields["origin_address"].initial is None
         assert not hasattr(form, "prefilled_from_arrival")
 
+    def test_home_address_with_no_direction_does_not_prefill(self):
+        """Test CarMainTransferForm with home_address but no direction skips pre-fill"""
+        from trips.forms import CarMainTransferForm
+
+        trip = TripFactory()
+        form = CarMainTransferForm(trip=trip, home_address="Via Casa 1, Roma")
+
+        # Without direction, neither field should be pre-filled from home_address
+        assert form.fields["origin_address"].initial is None
+        assert form.fields["destination_address"].initial is None
+
 
 class TestOtherMainTransferForm:
     def test_form_initialization(self):
-        """Test OtherMainTransferForm initializes correctly"""
+        """Test OtherMainTransferForm initializes correctly without company fields"""
         from trips.forms import OtherMainTransferForm
 
         trip = TripFactory()
@@ -1281,16 +1231,15 @@ class TestOtherMainTransferForm:
 
         assert "origin_address" in form.fields
         assert "destination_address" in form.fields
-        assert "company" in form.fields
+        assert "company" not in form.fields
+        assert "company_website" not in form.fields
 
     def test_populate_from_existing_instance(self):
-        """Test form populates fields from existing MainTransfer instance"""
+        """Test form populates address fields from existing MainTransfer instance"""
         from trips.forms import OtherMainTransferForm
         from trips.models import MainTransfer
 
         trip = TripFactory()
-
-        # Create an other transfer with type-specific data
         transfer = MainTransfer.objects.create(
             trip=trip,
             type=MainTransfer.Type.OTHER,
@@ -1299,20 +1248,12 @@ class TestOtherMainTransferForm:
             destination_address="Bus Station Milan",
             start_time="08:00",
             end_time="14:00",
-            type_specific_data={
-                "company": "FlixBus",
-                "company_website": "https://flixbus.com",
-            },
         )
 
-        # Initialize form with instance
         form = OtherMainTransferForm(instance=transfer, trip=trip)
 
-        # Check that fields are populated
         assert form.fields["origin_address"].initial == "Bus Station Rome"
         assert form.fields["destination_address"].initial == "Bus Station Milan"
-        assert form.fields["company"].initial == "FlixBus"
-        assert form.fields["company_website"].initial == "https://flixbus.com"
 
     def test_save_creates_other_transfer(self):
         """Test save method creates other transfer correctly"""
@@ -1326,8 +1267,6 @@ class TestOtherMainTransferForm:
             "end_time": "14:00",
             "origin_address": "Bus Station Rome",
             "destination_address": "Bus Station Milan",
-            "company": "FlixBus",
-            "company_website": "https://flixbus.com",
         }
 
         form = OtherMainTransferForm(form_data, trip=trip)
@@ -1339,50 +1278,6 @@ class TestOtherMainTransferForm:
         assert transfer.origin_address == "Bus Station Rome"
         assert transfer.destination_address == "Bus Station Milan"
         assert MainTransfer.objects.filter(pk=transfer.pk).exists()
-
-    def test_get_type_specific_data(self):
-        """Test generic transfer specific data is extracted correctly"""
-        from trips.forms import OtherMainTransferForm
-
-        trip = TripFactory()
-        form_data = {
-            "direction": "1",
-            "start_time": "08:00",
-            "end_time": "14:00",
-            "origin_address": "Bus Station",
-            "destination_address": "Train Station",
-            "company": "FlixBus",
-            "company_website": "https://flixbus.com",
-        }
-
-        form = OtherMainTransferForm(form_data, trip=trip)
-        assert form.is_valid()
-
-        data = form.get_type_specific_data()
-        assert data["company"] == "FlixBus"
-        assert data["company_website"] == "https://flixbus.com"
-
-    def test_get_type_specific_data_with_empty_fields(self):
-        """Test generic transfer specific data excludes empty fields"""
-        from trips.forms import OtherMainTransferForm
-
-        trip = TripFactory()
-        form_data = {
-            "direction": "1",
-            "start_time": "08:00",
-            "end_time": "14:00",
-            "origin_address": "Bus Station",
-            "destination_address": "Train Station",
-            "company": "",  # Empty
-            "company_website": "",  # Empty
-        }
-
-        form = OtherMainTransferForm(form_data, trip=trip)
-        assert form.is_valid()
-
-        data = form.get_type_specific_data()
-        assert "company" not in data
-        assert "company_website" not in data
 
     def test_form_initialization_without_autocomplete(self):
         """Test form initializes correctly and accepts autocomplete parameter"""
@@ -1440,6 +1335,44 @@ class TestOtherMainTransferForm:
         # Check fields are NOT pre-filled
         assert form.fields["origin_address"].initial is None
         assert not hasattr(form, "prefilled_from_arrival")
+
+    def test_home_address_prefills_origin_for_arrival(self):
+        """OtherMainTransferForm: home_address pre-fills origin_address for arrival"""
+        from trips.forms import OtherMainTransferForm
+        from trips.models import MainTransfer
+
+        trip = TripFactory()
+        form = OtherMainTransferForm(
+            trip=trip,
+            home_address="Via Casa 1, Roma",
+            initial={"direction": MainTransfer.Direction.ARRIVAL},
+        )
+
+        assert form.fields["origin_address"].initial == "Via Casa 1, Roma"
+
+    def test_home_address_prefills_destination_for_departure(self):
+        """OtherMainTransferForm: home_address pre-fills destination_address for departure"""
+        from trips.forms import OtherMainTransferForm
+        from trips.models import MainTransfer
+
+        trip = TripFactory()
+        form = OtherMainTransferForm(
+            trip=trip,
+            home_address="Via Casa 1, Roma",
+            initial={"direction": MainTransfer.Direction.DEPARTURE},
+        )
+
+        assert form.fields["destination_address"].initial == "Via Casa 1, Roma"
+
+    def test_home_address_with_no_direction_does_not_prefill(self):
+        """OtherMainTransferForm with home_address but no direction skips pre-fill"""
+        from trips.forms import OtherMainTransferForm
+
+        trip = TripFactory()
+        form = OtherMainTransferForm(trip=trip, home_address="Via Casa 1, Roma")
+
+        assert form.fields["origin_address"].initial is None
+        assert form.fields["destination_address"].initial is None
 
 
 class TestMainTransferConnectionForm:

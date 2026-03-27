@@ -1,3 +1,5 @@
+import geocoder
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models.signals import post_save
@@ -108,6 +110,16 @@ class Profile(models.Model):
         default="date_asc",
     )
 
+    # Home Address (for transfer pre-fill)
+    home_address = models.CharField(
+        _("Home address"),
+        max_length=500,
+        blank=True,
+        default="",
+    )
+    home_address_latitude = models.FloatField(null=True, blank=True)
+    home_address_longitude = models.FloatField(null=True, blank=True)
+
     # Display Preferences (Phase 2)
     use_system_theme = models.BooleanField(
         _("Use system theme"),
@@ -116,6 +128,21 @@ class Profile(models.Model):
             "Follow your device's theme preference instead of manual selection"
         ),
     )
+
+    def save(self, *args, **kwargs):
+        # Geocode home_address when set and coordinates are missing
+        if self.home_address and not (
+            self.home_address_latitude and self.home_address_longitude
+        ):
+            old = Profile.objects.filter(pk=self.pk).first()
+            address_changed = not old or old.home_address != self.home_address
+            if address_changed:
+                g = geocoder.mapbox(
+                    self.home_address, access_token=settings.MAPBOX_ACCESS_TOKEN
+                )
+                if g.latlng:
+                    self.home_address_latitude, self.home_address_longitude = g.latlng
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return str(self.user)

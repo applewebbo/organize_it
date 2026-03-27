@@ -41,20 +41,29 @@
                 {% endif %}
             </h4>
         </div>
-        <!-- Origin address -->
+        <!-- Departure location -->
         <div class="sm:col-span-4">{{ form.origin_address|as_crispy_field }}</div>
-        <!-- Destination address -->
-        <div class="sm:col-span-4">{{ form.destination_address|as_crispy_field }}</div>
+        <!-- Arrival location -->
+        <div class="sm:col-span-4">
+            {{ form.destination_address|as_crispy_field }}
+            {# Quick-fill suggestions #}
+            {% if quick_fill_locations %}
+                <div class="flex flex-wrap gap-2 mt-1">
+                    {% for loc in quick_fill_locations %}
+                        <button type="button"
+                                class="btn btn-xs btn-outline"
+                                onclick="document.getElementById('id_destination_address').value = '{{ loc.address|escapejs }}'">
+                            <i class="ph ph-plus-circle"></i>
+                            {{ loc.label }}
+                        </button>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
         <!-- Start time -->
         <div class="sm:col-span-2">{{ form.start_time|as_crispy_field }}</div>
         <!-- End time -->
         <div class="sm:col-span-2">{{ form.end_time|as_crispy_field }}</div>
-        <!-- Rental company -->
-        <div class="sm:col-span-2">{{ form.company|as_crispy_field }}</div>
-        <!-- Booking reference -->
-        <div class="sm:col-span-2">{{ form.booking_reference|as_crispy_field }}</div>
-        <!-- Ticket URL -->
-        <div class="sm:col-span-4">{{ form.ticket_url|as_crispy_field }}</div>
         <!-- Notes -->
         <div class="sm:col-span-4">{{ form.notes|as_crispy_field }}</div>
     </div>

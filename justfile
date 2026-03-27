@@ -190,6 +190,11 @@ issue-label number *labels:
 issue-create title body="":
     ./bin/codeberg create "{{title}}" "{{body}}"
 
+# Edit issue body from file (usage: just issue-edit-body 249 /path/to/body.md)
+[group('codeberg')]
+issue-edit-body number file:
+    fgj issue edit {{number}} --body "$(cat {{file}})"
+
 # List all releases
 [group('codeberg')]
 release-list:

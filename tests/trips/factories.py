@@ -1009,8 +1009,6 @@ class MainTransferFactory(factory.django.DjangoModelFactory):
     end_time = factory.LazyFunction(lambda: time(12, 0))
 
     # Optional fields
-    booking_reference = factory.Faker("bothify", text="??#####")
-    ticket_url = factory.Faker("url")
     notes = ""
     type_specific_data = factory.LazyFunction(dict)
 

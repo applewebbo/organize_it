@@ -245,10 +245,6 @@ class MainTransfer(models.Model):
     # Common fields
     start_time = models.TimeField(help_text=_("Departure time"))
     end_time = models.TimeField(help_text=_("Arrival time"))
-    booking_reference = models.CharField(
-        max_length=100, blank=True, help_text=_("Booking/reservation reference")
-    )
-    ticket_url = models.URLField(blank=True, help_text=_("Link to ticket or booking"))
     notes = models.TextField(blank=True, help_text=_("Additional notes"))
 
     # Type-specific data (JSONField for flexibility)

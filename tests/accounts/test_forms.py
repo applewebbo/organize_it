@@ -20,6 +20,12 @@ class TestProfileUpdateForm:
         assert active_trip in fav_trip_queryset
         assert archived_trip not in fav_trip_queryset
 
+    def test_home_address_field_present_in_form(self, user_factory):
+        """Test that home_address field is present in ProfileUpdateForm"""
+        user = user_factory()
+        form = ProfileUpdateForm(instance=user.profile)
+        assert "home_address" in form.fields
+
     def test_fav_trip_queryset_filters_by_user(self, user_factory):
         """Test that fav_trip field only includes trips from the user"""
         user1 = user_factory()

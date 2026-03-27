@@ -25,7 +25,7 @@
         </span>
     </li>
     {# Booking Details Section #}
-    {% if event.company or event.booking_reference or event.ticket_url or event.price %}
+    {% if event.company or event.price %}
         <li class="mt-2">
             <div class="my-1 divider"></div>
             <span class="text-sm font-semibold text-base-content/80">{% trans "Booking Details" %}</span>
@@ -35,22 +35,6 @@
                 <i class="ph-bold ph-buildings i-md text-base-content/60"
                    aria-hidden="true"></i>
                 <span><span class="text-base-content/60">{% trans "Company" %}:</span> {{ event.company }}</span>
-            </li>
-        {% endif %}
-        {% if event.booking_reference %}
-            <li class="flex gap-2 items-center">
-                <i class="ph-bold ph-ticket i-md text-base-content/60"
-                   aria-hidden="true"></i>
-                <span><span class="text-base-content/60">{% trans "Booking Reference" %}:</span> {{ event.booking_reference }}</span>
-            </li>
-        {% endif %}
-        {% if event.ticket_url %}
-            <li class="flex gap-2 items-center">
-                <i class="ph-bold ph-link i-md text-base-content/60" aria-hidden="true"></i>
-                <a href="{{ event.ticket_url }}"
-                   class="link"
-                   target="_blank"
-                   rel="noopener">{% trans "View Ticket" %}</a>
             </li>
         {% endif %}
         {% if event.price %}
@@ -63,7 +47,7 @@
     {% endif %}
     {# Website (if present) #}
     {% if event.website %}
-        <li class="flex gap-2 items-center {% if event.company or event.booking_reference or event.ticket_url or event.price %}mt-2{% endif %}">
+        <li class="flex gap-2 items-center {% if event.company or event.price %}mt-2{% endif %}">
             <i class="ph-bold ph-globe i-md text-base-content/60" aria-hidden="true"></i>
             <a href="{{ event.website }}"
                class="link"

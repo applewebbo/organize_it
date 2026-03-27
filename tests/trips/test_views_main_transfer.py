@@ -5,7 +5,12 @@ from django.urls import reverse
 from pytest_django.asserts import assertTemplateUsed
 
 from tests.test import TestCase
-from tests.trips.factories import MainTransferFactory, TripFactory
+from tests.trips.factories import (
+    ExperienceFactory,
+    MainTransferFactory,
+    StayFactory,
+    TripFactory,
+)
 
 pytestmark = pytest.mark.django_db
 
@@ -701,3 +706,185 @@ class TestFlightStatusRedirect(TestCase):
             response = self.client.get(url)
         assert response.status_code == 302
         assert response["Location"] == "https://it.flightaware.com"
+
+
+class TestCarTransferQuickFill(TestCase):
+    """Tests for quick-fill location list in car/other main transfer forms"""
+
+    def test_car_arrival_quick_fill_includes_day1_stay(self):
+        """quick_fill_locations includes stay from day 1 for arrival direction"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day1 = trip.days.order_by("date").first()
+        stay = StayFactory(day=day1)
+        url = reverse("trips:main-transfer-step", kwargs={"trip_id": trip.pk})
+
+        with self.login(user):
+            response = self.client.get(
+                url,
+                {"step": "arrival", "transport_type": "car", "direction": "arrival"},
+            )
+
+        assert response.status_code == 200
+        locations = response.context["quick_fill_locations"]
+        addresses = [loc["address"] for loc in locations]
+        assert stay.address in addresses
+
+    def test_car_arrival_quick_fill_includes_day1_events(self):
+        """quick_fill_locations includes events from day 1 for arrival direction"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day1 = trip.days.order_by("date").first()
+        event = ExperienceFactory(trip=trip, day=day1, address="Via Test 1, Roma")
+        url = reverse("trips:main-transfer-step", kwargs={"trip_id": trip.pk})
+
+        with self.login(user):
+            response = self.client.get(
+                url,
+                {"step": "arrival", "transport_type": "car", "direction": "arrival"},
+            )
+
+        assert response.status_code == 200
+        locations = response.context["quick_fill_locations"]
+        addresses = [loc["address"] for loc in locations]
+        assert event.address in addresses
+
+    def test_car_arrival_fallback_to_trip_destination_when_no_events(self):
+        """quick_fill_locations falls back to trip.destination when day 1 has no stay/events"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        url = reverse("trips:main-transfer-step", kwargs={"trip_id": trip.pk})
+
+        with self.login(user):
+            response = self.client.get(
+                url,
+                {"step": "arrival", "transport_type": "car", "direction": "arrival"},
+            )
+
+        assert response.status_code == 200
+        locations = response.context["quick_fill_locations"]
+        assert len(locations) == 1
+        assert locations[0]["address"] == trip.destination
+
+    def test_car_departure_quick_fill_includes_last_day_stay(self):
+        """quick_fill_locations includes stay from last day for departure direction"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        last_day = trip.days.order_by("-date").first()
+        stay = StayFactory(day=last_day)
+        url = reverse("trips:main-transfer-step", kwargs={"trip_id": trip.pk})
+
+        with self.login(user):
+            response = self.client.get(
+                url,
+                {
+                    "step": "departure",
+                    "transport_type": "car",
+                    "direction": "departure",
+                },
+            )
+
+        assert response.status_code == 200
+        locations = response.context["quick_fill_locations"]
+        addresses = [loc["address"] for loc in locations]
+        assert stay.address in addresses
+
+    def test_car_departure_fallback_to_trip_destination_when_no_events(self):
+        """quick_fill_locations falls back to trip.destination when last day has no stay/events"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        url = reverse("trips:main-transfer-step", kwargs={"trip_id": trip.pk})
+
+        with self.login(user):
+            response = self.client.get(
+                url,
+                {
+                    "step": "departure",
+                    "transport_type": "car",
+                    "direction": "departure",
+                },
+            )
+
+        assert response.status_code == 200
+        locations = response.context["quick_fill_locations"]
+        assert len(locations) == 1
+        assert locations[0]["address"] == trip.destination
+
+    def test_car_arrival_home_address_in_form_initial(self):
+        """origin_address is pre-filled with profile.home_address for arrival"""
+        user = self.make_user("user")
+        user.profile.home_address = "Via Casa 10, Milano"
+        user.profile.save()
+        trip = TripFactory(author=user)
+        url = reverse("trips:main-transfer-step", kwargs={"trip_id": trip.pk})
+
+        with self.login(user):
+            response = self.client.get(
+                url,
+                {"step": "arrival", "transport_type": "car", "direction": "arrival"},
+            )
+
+        assert response.status_code == 200
+        form = response.context["form"]
+        assert form.fields["origin_address"].initial == "Via Casa 10, Milano"
+
+    def test_car_departure_home_address_in_form_initial(self):
+        """destination_address is pre-filled with profile.home_address for departure"""
+        user = self.make_user("user")
+        user.profile.home_address = "Via Casa 10, Milano"
+        user.profile.save()
+        trip = TripFactory(author=user)
+        url = reverse("trips:main-transfer-step", kwargs={"trip_id": trip.pk})
+
+        with self.login(user):
+            response = self.client.get(
+                url,
+                {
+                    "step": "departure",
+                    "transport_type": "car",
+                    "direction": "departure",
+                },
+            )
+
+        assert response.status_code == 200
+        form = response.context["form"]
+        assert form.fields["destination_address"].initial == "Via Casa 10, Milano"
+
+    def test_car_arrival_fallback_when_trip_has_no_days(self):
+        """quick_fill_locations falls back to trip.destination when trip has no days"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        trip.days.all().delete()
+        url = reverse("trips:main-transfer-step", kwargs={"trip_id": trip.pk})
+
+        with self.login(user):
+            response = self.client.get(
+                url,
+                {"step": "arrival", "transport_type": "car", "direction": "arrival"},
+            )
+
+        assert response.status_code == 200
+        locations = response.context["quick_fill_locations"]
+        assert len(locations) == 1
+        assert locations[0]["address"] == trip.destination
+
+    def test_car_arrival_skips_events_without_address(self):
+        """Events without address are excluded from quick_fill_locations"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day1 = trip.days.order_by("date").first()
+        # Create experience with no address
+        ExperienceFactory(trip=trip, day=day1, address="")
+        url = reverse("trips:main-transfer-step", kwargs={"trip_id": trip.pk})
+
+        with self.login(user):
+            response = self.client.get(
+                url,
+                {"step": "arrival", "transport_type": "car", "direction": "arrival"},
+            )
+
+        assert response.status_code == 200
+        locations = response.context["quick_fill_locations"]
+        # Event with empty address should not appear; fallback to trip.destination
+        assert len(locations) == 1
+        assert locations[0]["address"] == trip.destination

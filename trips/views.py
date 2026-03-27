@@ -785,7 +785,13 @@ def edit_main_transfer(request, pk):
 
     if request.method == "POST":
         # Handle form submission
-        form = form_class(request.POST, instance=transfer, trip=trip, autocomplete=True)
+        form = form_class(
+            request.POST,
+            instance=transfer,
+            trip=trip,
+            autocomplete=True,
+            home_address="",
+        )
         if form.is_valid():
             form.save()
             message = str(_("Main transfer updated successfully"))
@@ -807,7 +813,9 @@ def edit_main_transfer(request, pk):
         # If form is invalid, fall through to return form with errors
     else:
         # GET request - show form with existing data
-        form = form_class(instance=transfer, trip=trip, autocomplete=True)
+        form = form_class(
+            instance=transfer, trip=trip, autocomplete=True, home_address=""
+        )
 
     direction_str = (
         "arrival"
@@ -2377,10 +2385,47 @@ def main_transfer_step(request, trip_id):
 
         instance = MainTransfer.objects.filter(trip=trip, direction=direction).first()
         form_class = FORM_MAP[transport_type]
+
+        # Build home_address and quick_fill_locations for car/other forms
+        home_address = ""
+        quick_fill_locations = []
+        if transport_type in [MainTransfer.Type.CAR, MainTransfer.Type.OTHER]:
+            home_address = getattr(request.user.profile, "home_address", "")
+
+            if direction == MainTransfer.Direction.ARRIVAL:
+                ref_day = (
+                    trip.days.prefetch_related("events", "stay")
+                    .order_by("date")
+                    .first()
+                )
+            else:
+                ref_day = (
+                    trip.days.prefetch_related("events", "stay")
+                    .order_by("-date")
+                    .first()
+                )
+
+            if ref_day:
+                if hasattr(ref_day, "stay") and ref_day.stay and ref_day.stay.address:
+                    quick_fill_locations.append(
+                        {"label": ref_day.stay.name, "address": ref_day.stay.address}
+                    )
+                for event in ref_day.events.order_by("start_time"):
+                    if event.address:
+                        quick_fill_locations.append(
+                            {"label": event.name, "address": event.address}
+                        )
+
+            if not quick_fill_locations:
+                quick_fill_locations = [
+                    {"label": trip.destination, "address": trip.destination}
+                ]
+
         form = form_class(
             instance=instance,
             trip=trip,
             autocomplete=True,
+            home_address=home_address,
             initial={"direction": direction},
         )
 
@@ -2394,6 +2439,7 @@ def main_transfer_step(request, trip_id):
             "transport_type": transport_type,
             "direction": "arrival" if step == "arrival" else "departure",
             "prefilled_from_arrival": prefilled,
+            "quick_fill_locations": quick_fill_locations,
         }
 
         template_map = {
@@ -2442,7 +2488,9 @@ def save_main_transfer(request, trip_id):
 
     form_class = FORM_MAP[transport_type]
     instance = MainTransfer.objects.filter(trip=trip, direction=direction).first()
-    form = form_class(request.POST, instance=instance, trip=trip, autocomplete=False)
+    form = form_class(
+        request.POST, instance=instance, trip=trip, autocomplete=False, home_address=""
+    )
 
     if form.is_valid():
         transfer = form.save(commit=False)

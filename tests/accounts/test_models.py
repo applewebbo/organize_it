@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
 
 pytestmark = pytest.mark.django_db
@@ -115,3 +117,57 @@ class TestProfile:
         profile.save()
         profile.refresh_from_db()
         assert profile.trip_sort_preference == "name_desc"
+
+    def test_home_address_default_empty(self, user_factory):
+        """Test that home_address defaults to empty string"""
+        user = user_factory()
+        assert user.profile.home_address == ""
+        assert user.profile.home_address_latitude is None
+        assert user.profile.home_address_longitude is None
+
+    def test_home_address_can_be_saved(self, user_factory):
+        """Test saving home_address persists correctly"""
+        user = user_factory()
+        profile = user.profile
+        profile.home_address = "Via Roma 1, Milano, Italia"
+        profile.home_address_latitude = 45.464664
+        profile.home_address_longitude = 9.188540
+        profile.save()
+        profile.refresh_from_db()
+        assert profile.home_address == "Via Roma 1, Milano, Italia"
+        assert profile.home_address_latitude == 45.464664
+        assert profile.home_address_longitude == 9.188540
+
+    def test_geocoding_skipped_when_address_unchanged(self, user_factory):
+        """Geocoding is skipped when home_address is the same as before and no coords"""
+        from accounts.models import Profile
+
+        user = user_factory()
+        # Set address directly via update() so save() is not called and no coords are set
+        Profile.objects.filter(pk=user.profile.pk).update(
+            home_address="Via Roma 1, Milano"
+        )
+        user.profile.refresh_from_db()
+
+        with patch("accounts.models.geocoder") as mock_geocoder:
+            # Save with same address: address_changed=False → geocoder NOT called
+            user.profile.save()
+
+        mock_geocoder.mapbox.assert_not_called()
+
+    def test_geocoding_skipped_when_latlng_empty(self, user_factory):
+        """Geocoding failure (empty latlng) does not raise and coords stay None"""
+        user = user_factory()
+        profile = user.profile
+
+        mock_result = MagicMock()
+        mock_result.latlng = None
+
+        with patch("accounts.models.geocoder") as mock_geocoder:
+            mock_geocoder.mapbox.return_value = mock_result
+            profile.home_address = "Indirizzo Inesistente XYZ 999"
+            profile.save()
+
+        profile.refresh_from_db()
+        assert profile.home_address_latitude is None
+        assert profile.home_address_longitude is None

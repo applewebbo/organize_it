@@ -29,6 +29,7 @@ class ProfileUpdateForm(forms.ModelForm):
             "first_name",
             "last_name",
             "city",
+            "home_address",
             "avatar",
             "currency",
             "default_map_view",
@@ -40,6 +41,7 @@ class ProfileUpdateForm(forms.ModelForm):
             "first_name": _("First name"),
             "last_name": _("Last name"),
             "city": _("City"),
+            "home_address": _("Home address"),
             "avatar": _("Avatar"),
             "currency": _("Preferred currency"),
             "default_map_view": _("Default event view"),
@@ -55,6 +57,12 @@ class ProfileUpdateForm(forms.ModelForm):
                 attrs={"class": "input input-bordered w-full"}
             ),
             "city": forms.TextInput(attrs={"class": "input input-bordered w-full"}),
+            "home_address": forms.TextInput(
+                attrs={
+                    "class": "input input-bordered w-full",
+                    "placeholder": _("Full address (street, city, country)"),
+                }
+            ),
             "avatar": AvatarRadioSelect(),
             "currency": forms.Select(attrs={"class": "select select-bordered w-full"}),
             "default_map_view": forms.Select(
