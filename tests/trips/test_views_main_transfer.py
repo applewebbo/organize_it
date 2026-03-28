@@ -916,3 +916,42 @@ class TestCarTransferQuickFill(TestCase):
         locations = response.context["quick_fill_locations"]
         meal_loc = next(loc for loc in locations if loc["address"] == meal.address)
         assert meal_loc["type"] == "meal"
+
+
+class TestOtherTransferView(TestCase):
+    """Tests for OTHER main transfer view — no quick-fill, no home address"""
+
+    def test_other_transfer_no_quick_fill_locations(self):
+        """quick_fill_locations is empty for OTHER transport type"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day1 = trip.days.order_by("date").first()
+        StayFactory(day=day1)
+        url = reverse("trips:main-transfer-step", kwargs={"trip_id": trip.pk})
+
+        with self.login(user):
+            response = self.client.get(
+                url,
+                {"step": "arrival", "transport_type": "other", "direction": "arrival"},
+            )
+
+        assert response.status_code == 200
+        assert response.context["quick_fill_locations"] == []
+
+    def test_other_transfer_no_home_address_in_context(self):
+        """home_address is not passed to form for OTHER transport"""
+        user = self.make_user("user")
+        user.profile.home_address = "Via Casa 10, Milano"
+        user.profile.save()
+        trip = TripFactory(author=user)
+        url = reverse("trips:main-transfer-step", kwargs={"trip_id": trip.pk})
+
+        with self.login(user):
+            response = self.client.get(
+                url,
+                {"step": "arrival", "transport_type": "other", "direction": "arrival"},
+            )
+
+        assert response.status_code == 200
+        form = response.context["form"]
+        assert form.fields["origin_address"].initial is None

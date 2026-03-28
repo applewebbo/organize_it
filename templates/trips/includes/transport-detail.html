@@ -1,5 +1,12 @@
 {% load i18n trip_tags %}
 <ul class="leading-10">
+    {# Vehicle type (for OTHER transport) #}
+    {% if event.type_specific_data.vehicle_type %}
+        <li class="flex gap-2 items-center">
+            <i class="ph-bold ph-boat i-md text-base-content/60" aria-hidden="true"></i>
+            <span class="font-medium">{{ event.type_specific_data.vehicle_type }}</span>
+        </li>
+    {% endif %}
     {# Route: Origin → Destination #}
     <li class="flex gap-2 items-center">
         <i class="ph-bold ph-map-pin i-md text-base-content/60"

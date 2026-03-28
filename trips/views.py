@@ -2386,10 +2386,10 @@ def main_transfer_step(request, trip_id):
         instance = MainTransfer.objects.filter(trip=trip, direction=direction).first()
         form_class = FORM_MAP[transport_type]
 
-        # Build home_address and quick_fill_locations for car/other forms
+        # Build home_address and quick_fill_locations for car forms only
         home_address = ""
         quick_fill_locations = []
-        if transport_type in [MainTransfer.Type.CAR, MainTransfer.Type.OTHER]:
+        if transport_type == MainTransfer.Type.CAR:
             home_address = getattr(request.user.profile, "home_address", "")
 
             if direction == MainTransfer.Direction.ARRIVAL:

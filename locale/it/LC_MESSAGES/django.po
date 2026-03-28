@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-28 13:01+0100\n"
+"POT-Creation-Date: 2026-03-28 13:23+0100\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -274,15 +274,15 @@ msgstr "Impostazioni"
 msgid "Personal Information"
 msgstr "Informazioni Personali"
 
-#: templates/account/profile.html:48
+#: templates/account/profile.html:51
 msgid "Travel Preferences"
 msgstr "Preferenze di viaggio"
 
-#: templates/account/profile.html:67
+#: templates/account/profile.html:70
 msgid "Display Preferences"
 msgstr "Preferenze di visualizzazione"
 
-#: templates/account/profile.html:95
+#: templates/account/profile.html:98
 msgid ""
 "When enabled, the theme will follow your device settings. When disabled, use "
 "the theme switcher in the navbar to choose your preferred theme."
@@ -291,7 +291,7 @@ msgstr ""
 "disattivo utilizza il selettore dell’aspetto chiaro/scuro nella barra del "
 "menu per scegliere la tua preferenza."
 
-#: templates/account/profile.html:99 templates/trips/event-notes.html:30
+#: templates/account/profile.html:102 templates/trips/event-notes.html:30
 #: templates/trips/experience-create.html:45
 #: templates/trips/main-transfer-connection-create.html:97
 #: templates/trips/main-transfer-connection-edit.html:73
@@ -300,8 +300,8 @@ msgstr ""
 #: templates/trips/partials/main-transfer-car.html:96
 #: templates/trips/partials/main-transfer-flight.html:79
 #: templates/trips/partials/main-transfer-flight.html:96
-#: templates/trips/partials/main-transfer-other.html:79
-#: templates/trips/partials/main-transfer-other.html:96
+#: templates/trips/partials/main-transfer-other.html:65
+#: templates/trips/partials/main-transfer-other.html:82
 #: templates/trips/partials/main-transfer-train.html:94
 #: templates/trips/partials/main-transfer-train.html:111
 #: templates/trips/simple-transfer-create.html:53
@@ -707,9 +707,9 @@ msgstr "Accetta"
 #: templates/trips/main-transfer-form.html:23
 #: templates/trips/partials/main-transfer-car.html:77
 #: templates/trips/partials/main-transfer-flight.html:77
-#: templates/trips/partials/main-transfer-other.html:77
+#: templates/trips/partials/main-transfer-other.html:63
 #: templates/trips/partials/main-transfer-train.html:92
-#: templates/trips/partials/main-transfer-type.html:59
+#: templates/trips/partials/main-transfer-type.html:63
 #: templates/trips/simple-transfer-create.html:52
 #: templates/trips/simple-transfer-edit.html:58
 #: templates/trips/stay-create.html:31
@@ -724,7 +724,7 @@ msgstr "Annulla"
 #: templates/trips/event-enrich-preview.html:77
 #: templates/trips/partials/main-transfer-car.html:93
 #: templates/trips/partials/main-transfer-flight.html:93
-#: templates/trips/partials/main-transfer-other.html:93
+#: templates/trips/partials/main-transfer-other.html:79
 #: templates/trips/partials/main-transfer-train.html:108
 #: templates/trips/stay-enrich-preview.html:66
 msgid "Back"
@@ -915,15 +915,15 @@ msgstr "dalle"
 msgid "before"
 msgstr "entro le"
 
-#: templates/trips/includes/transport-detail.html:31
+#: templates/trips/includes/transport-detail.html:38
 msgid "Booking Details"
 msgstr "Dettagli Prenotazione"
 
-#: templates/trips/includes/transport-detail.html:37
+#: templates/trips/includes/transport-detail.html:44
 msgid "Company"
 msgstr "Azienda"
 
-#: templates/trips/includes/transport-detail.html:44
+#: templates/trips/includes/transport-detail.html:51
 msgid "Price"
 msgstr "Prezzo"
 
@@ -984,11 +984,11 @@ msgstr "Punto di partenza"
 #: templates/trips/simple-transfer-edit.html:45
 #: templates/trips/stay-transfer-create.html:57
 #: templates/trips/stay-transfer-edit.html:57 trips/forms.py:847
-#: trips/forms.py:878 trips/forms.py:931 trips/forms.py:1521
-#: trips/forms.py:1525 trips/forms.py:1594 trips/forms.py:1598
-#: trips/forms.py:1628 trips/forms.py:1632 trips/forms.py:1695
-#: trips/forms.py:1699 trips/forms.py:1739 trips/forms.py:1743
-#: trips/forms.py:1783 trips/forms.py:1787
+#: trips/forms.py:878 trips/forms.py:931 trips/forms.py:1523
+#: trips/forms.py:1527 trips/forms.py:1596 trips/forms.py:1600
+#: trips/forms.py:1630 trips/forms.py:1634 trips/forms.py:1697
+#: trips/forms.py:1701 trips/forms.py:1741 trips/forms.py:1745
+#: trips/forms.py:1785 trips/forms.py:1789
 msgid "Notes"
 msgstr "Note"
 
@@ -1133,7 +1133,7 @@ msgstr "Treno"
 msgid "Car"
 msgstr "Automobile"
 
-#: templates/trips/partials/main-transfer-type.html:53 trips/models.py:200
+#: templates/trips/partials/main-transfer-type.html:57 trips/models.py:200
 #: trips/models.py:919
 msgid "Other"
 msgstr "Altro"
@@ -1161,7 +1161,7 @@ msgstr "Condividi questo link"
 msgid "Expires on %(date)s"
 msgstr "Scade il %(date)s"
 
-#: templates/trips/share-link-created.html:35 trips/forms.py:1809
+#: templates/trips/share-link-created.html:35 trips/forms.py:1811
 msgid "Never expires"
 msgstr "Non scade mai"
 
@@ -1173,7 +1173,7 @@ msgstr "Crea un altro"
 msgid "Active share links"
 msgstr "Link di condivisione attivi"
 
-#: templates/trips/share-link-list.html:8 trips/forms.py:1815
+#: templates/trips/share-link-list.html:8 trips/forms.py:1817
 msgid "Label"
 msgstr "Etichetta"
 
@@ -1557,73 +1557,80 @@ msgstr ""
 "Facoltativo. Se inserito, permette di controllare lo stato del treno su "
 "Viaggiatreno."
 
-#: trips/forms.py:1360 trips/forms.py:1438
+#: trips/forms.py:1360 trips/forms.py:1450
 msgid "Departure Location"
 msgstr "Località di partenza"
 
-#: trips/forms.py:1368 trips/forms.py:1380 trips/forms.py:1446
-#: trips/forms.py:1458
+#: trips/forms.py:1368 trips/forms.py:1380
 msgid "Full address for geocoding"
 msgstr "Indirizzo completo per geocoding"
 
-#: trips/forms.py:1372 trips/forms.py:1450
+#: trips/forms.py:1372 trips/forms.py:1461
 msgid "Arrival Location"
 msgstr "Località di arrivo"
 
-#: trips/forms.py:1443 trips/forms.py:1455
+#: trips/forms.py:1437
+msgid "Vehicle type"
+msgstr "Tipo di mezzo"
+
+#: trips/forms.py:1443
+msgid "e.g. Ferry to Venice, Flixbus to Milan"
+msgstr "es. Traghetto per Venezia, Flixbus per Milano"
+
+#: trips/forms.py:1455 trips/forms.py:1466
 msgid "Full address or location name"
 msgstr "Indirizzo completo o nome località"
 
-#: trips/forms.py:1520 trips/forms.py:1593 trips/forms.py:1627
-#: trips/forms.py:1694 trips/forms.py:1738 trips/forms.py:1782
+#: trips/forms.py:1522 trips/forms.py:1595 trips/forms.py:1629
+#: trips/forms.py:1696 trips/forms.py:1740 trips/forms.py:1784
 msgid "Transport Mode"
 msgstr "Mezzo di trasporto"
 
-#: trips/forms.py:1557
+#: trips/forms.py:1559
 msgid "From event and to event must be different events."
 msgstr "Gli eventi di partenza e arrivo devono essere differenti."
 
-#: trips/forms.py:1562
+#: trips/forms.py:1564
 msgid "Events must be on the same day."
 msgstr "Gli eventi devono appartenere allo stesso giorno."
 
-#: trips/forms.py:1571
+#: trips/forms.py:1573
 msgid "The from event already has an outgoing transfer."
 msgstr "L’evento di partenza è già abbinato ad un trasferimento."
 
-#: trips/forms.py:1580
+#: trips/forms.py:1582
 msgid "The to event already has an incoming transfer."
 msgstr "L’evento di arrivo è già abbinato ad un trasferimento."
 
-#: trips/forms.py:1663
+#: trips/forms.py:1665
 msgid "From stay and to stay must be different."
 msgstr "I soggiorni di partenza e arrivo devono essere differenti."
 
-#: trips/forms.py:1672
+#: trips/forms.py:1674
 msgid "The from stay already has an outgoing transfer."
 msgstr "Il soggiorno di partenza è già abbinato ad un trasferimento."
 
-#: trips/forms.py:1681
+#: trips/forms.py:1683
 msgid "The to stay already has an incoming transfer."
 msgstr "Il soggiorno di arrivo è già abbinato ad un trasferimento."
 
-#: trips/forms.py:1806
+#: trips/forms.py:1808
 msgid "7 days"
 msgstr "7 giorni"
 
-#: trips/forms.py:1807
+#: trips/forms.py:1809
 msgid "30 days"
 msgstr "30 giorni"
 
-#: trips/forms.py:1808
+#: trips/forms.py:1810
 msgid "90 days"
 msgstr "90 giorni"
 
-#: trips/forms.py:1816
+#: trips/forms.py:1818
 msgid "Optional label to identify this link"
 msgstr "Etichetta opzionale per identificare il link"
 
-#: trips/forms.py:1821
+#: trips/forms.py:1823
 msgid "Expires after"
 msgstr "Scade dopo"
 

@@ -1431,7 +1431,19 @@ class CarMainTransferForm(MainTransferBaseForm):
 
 
 class OtherMainTransferForm(MainTransferBaseForm):
-    """Form for other transport types (bus, boat, taxi, etc.) with geocoding"""
+    """Form for other transport types (ferry, bus, taxi, etc.) with free vehicle type"""
+
+    vehicle_type = forms.CharField(
+        label=_("Vehicle type"),
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "class": "input input-bordered",
+                "placeholder": _("e.g. Ferry to Venice, Flixbus to Milan"),
+            }
+        ),
+    )
 
     # Address fields (geocoding like events)
     origin_address = forms.CharField(
@@ -1443,7 +1455,6 @@ class OtherMainTransferForm(MainTransferBaseForm):
                 "placeholder": _("Full address or location name"),
             }
         ),
-        help_text=_("Full address for geocoding"),
     )
 
     destination_address = forms.CharField(
@@ -1455,7 +1466,6 @@ class OtherMainTransferForm(MainTransferBaseForm):
                 "placeholder": _("Full address or location name"),
             }
         ),
-        help_text=_("Full address for geocoding"),
     )
 
     class Meta(MainTransferBaseForm.Meta):
@@ -1466,7 +1476,7 @@ class OtherMainTransferForm(MainTransferBaseForm):
 
     def __init__(self, *args, **kwargs):
         kwargs.pop("autocomplete", None)
-        home_address = kwargs.pop("home_address", "")
+        kwargs.pop("home_address", None)
         super().__init__(*args, **kwargs)
 
         if self.instance and self.instance.pk:
@@ -1474,30 +1484,22 @@ class OtherMainTransferForm(MainTransferBaseForm):
             self.fields[
                 "destination_address"
             ].initial = self.instance.destination_address
-        else:
-            direction = self.initial.get("direction")
-            if home_address:
-                if direction == MainTransfer.Direction.ARRIVAL:
-                    self.fields["origin_address"].initial = home_address
-                elif direction == MainTransfer.Direction.DEPARTURE:
-                    self.fields["destination_address"].initial = home_address
+            self.fields["vehicle_type"].initial = self.instance.type_specific_data.get(
+                "vehicle_type", ""
+            )
 
-            if self.trip and direction == MainTransfer.Direction.DEPARTURE:
-                arrival = MainTransfer.objects.filter(
-                    trip=self.trip,
-                    direction=MainTransfer.Direction.ARRIVAL,
-                    type=MainTransfer.Type.OTHER,
-                ).first()
-                if arrival:
-                    self.fields["origin_address"].initial = arrival.destination_address
-                    self.fields["destination_address"].initial = arrival.origin_address
-                    self.prefilled_from_arrival = True
+    def get_type_specific_data(self):
+        vehicle_type = self.cleaned_data.get("vehicle_type", "")
+        return {"vehicle_type": vehicle_type} if vehicle_type else {}
 
     def save(self, commit=True):
         instance = super().save(commit=False)
         instance.type = MainTransfer.Type.OTHER
         instance.origin_address = self.cleaned_data["origin_address"]
         instance.destination_address = self.cleaned_data["destination_address"]
+        type_specific_data = self.get_type_specific_data()
+        if type_specific_data:
+            instance.type_specific_data = type_specific_data
 
         if commit:  # pragma: no cover
             instance.save()

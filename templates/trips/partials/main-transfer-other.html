@@ -41,26 +41,12 @@
                 {% endif %}
             </h4>
         </div>
+        <!-- Vehicle type -->
+        <div class="sm:col-span-4">{{ form.vehicle_type|as_crispy_field }}</div>
         <!-- Origin address -->
         <div class="sm:col-span-4">{{ form.origin_address|as_crispy_field }}</div>
         <!-- Destination address -->
-        <div class="sm:col-span-4">
-            {{ form.destination_address|as_crispy_field }}
-            {# Quick-fill suggestions #}
-            {% if quick_fill_locations %}
-                <div class="flex flex-wrap gap-2 mt-1">
-                    {% for loc in quick_fill_locations %}
-                        <button type="button"
-                                class="btn btn-sm btn-outline {% if loc.type == 'stay' %}btn-neutral{% elif loc.type == 'meal' %}btn-warning{% elif loc.type == 'experience' %}btn-success{% else %}btn-neutral{% endif %}"
-                                onclick="document.getElementById('id_destination_address').value = '{{ loc.address|escapejs }}'">
-                            <i class="ph-bold {% if loc.type == 'stay' %}ph-bed{% elif loc.type == 'meal' %}ph-fork-knife{% else %}ph-images{% endif %}"></i>
-                            {{ loc.label }}
-                            <i class="ph-bold ph-plus"></i>
-                        </button>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        </div>
+        <div class="sm:col-span-4">{{ form.destination_address|as_crispy_field }}</div>
         <!-- Start time -->
         <div class="sm:col-span-2">{{ form.start_time|as_crispy_field }}</div>
         <!-- End time -->

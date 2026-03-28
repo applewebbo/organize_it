@@ -49,7 +49,11 @@
                 hx-target="#{% if direction %}{{ direction }}-transfer-content{% else %}main-transfer-content{% endif %}"
                 hx-swap="innerHTML"
                 @htmx:after-settle="currentStep = 'form'">
-            <i class="text-4xl ph-bold ph-bus text-primary"></i>
+            <span class="flex gap-1 items-center text-primary">
+                <i class="text-3xl ph-bold ph-boat"></i>
+                <span class="text-xl font-bold">/</span>
+                <i class="text-3xl ph-bold ph-bus"></i>
+            </span>
             <span class="font-semibold">{% trans "Other" %}</span>
         </button>
     </div>
