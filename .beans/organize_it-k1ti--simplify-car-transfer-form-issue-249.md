@@ -1,11 +1,11 @@
 ---
 # organize_it-k1ti
 title: 'Simplify car transfer form - issue #249'
-status: in-progress
+status: completed
 type: feature
 priority: normal
 created_at: 2026-03-26T19:54:10Z
-updated_at: 2026-03-26T19:57:58Z
+updated_at: 2026-03-28T11:55:07Z
 ---
 
 Remove rental fields from car form, add home address to profile, implement quick-fill location lists for main transfers. See issue #249 for full spec.
@@ -27,3 +27,15 @@ Remove rental fields from car form, add home address to profile, implement quick
 - [ ] Auto-populate `destination_address` con `profile.home_address` (ritorno)
 - [ ] Aggiorna/scrivi test copertura 100%
 - [ ] Aggiorna/crea documentazione (docs/en/ e docs/it/)
+
+## Summary of Changes
+
+- Removed booking_reference, ticket_url from MainTransfer model
+- Removed company, is_rental, booking_reference, ticket_url from CarMainTransferForm
+- Removed company, company_website from OtherMainTransferForm
+- Added home_address (+lat/lng + Mapbox geocoding) to Profile
+- Auto-populate origin/destination from profile.home_address
+- Quick-fill suggestions from day stays/events with type icons
+- Removed city field from Profile (redundant with home_address)
+- Updated transport-detail.html, profile template, documentation
+- 100% test coverage maintained
