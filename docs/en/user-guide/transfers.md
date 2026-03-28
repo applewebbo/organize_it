@@ -77,18 +77,19 @@ Your journey FROM the destination at the end of the trip.
 - **Destination Name** - Airport/station full name
 
 **For Car and Other**:
-- **Origin Address** - Full street address
-- **Destination Address** - Full street address
+- **Origin Location** - Full address or place name
+- **Destination Location** - Full address or place name
+
+!!! tip "Quick-fill suggestions"
+    When creating a car transfer, the form shows quick-fill buttons below the destination field.
+    For **arrival** transfers, suggestions come from Day 1 stays and experiences.
+    For **departure** transfers, suggestions come from the last day stays and experiences.
+    Click any button to instantly fill the address field.
+
+!!! tip "Home address pre-fill"
+    If you set a **Home address** in your profile, the form will automatically pre-fill the origin field (for arrivals) or destination field (for departures) with your home address.
 
 #### Optional Fields
-
-**Booking Reference** *(car, other only)*
-- Confirmation number
-- Example: "EUROSTAR-2025-0314"
-
-**Ticket URL** *(car, other only)*
-- Link to e-ticket or booking
-- Example: "https://www.rentalcar.com/booking/ABC123"
 
 **Notes**
 - Additional details
@@ -145,11 +146,11 @@ Notes: Night train. Sleeper cabin #12. Platform 3.
 ```
 Type: Car
 Direction: Departure
-Origin Address: 123 Main St, Vacation Town, CA 12345
-Destination Address: 456 Home Ave, Home City, CA 54321
+Origin Location: Piazza del Duomo 1, Florence, Italy
+Destination Location: Via Roma 10, Milan, Italy (pre-filled from home address)
 Departure Time: 10:00
 Arrival Time: 16:00
-Notes: 6-hour drive. Stop for lunch halfway. Return rental at airport.
+Notes: 6-hour drive. Stop for lunch halfway.
 ```
 
 ### Flight Transfer Features

@@ -77,18 +77,19 @@ Il tuo viaggio DA la destinazione alla fine del viaggio.
 - **Nome Destinazione** - Nome completo aeroporto/stazione
 
 **Per Auto e Altro**:
-- **Indirizzo Origine** - Indirizzo completo
-- **Indirizzo Destinazione** - Indirizzo completo
+- **Località di Partenza** - Indirizzo completo o nome del luogo
+- **Località di Arrivo** - Indirizzo completo o nome del luogo
+
+!!! tip "Suggerimenti rapidi"
+    Quando crei un trasferimento in auto, il form mostra bottoni di compilazione rapida sotto il campo destinazione.
+    Per i trasferimenti di **andata**, i suggerimenti provengono da soggiorni ed esperienze del Giorno 1.
+    Per i trasferimenti di **ritorno**, i suggerimenti provengono dall'ultimo giorno.
+    Clicca un bottone per compilare automaticamente il campo indirizzo.
+
+!!! tip "Indirizzo di casa"
+    Se imposti un **Indirizzo di casa** nel tuo profilo, il form compilerà automaticamente il campo origine (per gli arrivi) o destinazione (per le partenze) con il tuo indirizzo di casa.
 
 #### Campi Opzionali
-
-**Riferimento Prenotazione** *(solo auto, altro)*
-- Numero di conferma
-- Esempio: "EUROSTAR-2025-0314"
-
-**URL Biglietto** *(solo auto, altro)*
-- Link a e-ticket o prenotazione
-- Esempio: "https://www.rentalcar.com/booking/ABC123"
 
 **Note**
 - Dettagli aggiuntivi
@@ -145,11 +146,11 @@ Note: Treno notte. Cabina letto #12. Binario 3.
 ```
 Tipo: Auto
 Direzione: Partenza
-Indirizzo Origine: Via Esempio 123, Città Vacanza, CA 12345
-Indirizzo Destinazione: Via Casa 456, Città Casa, CA 54321
+Località di Partenza: Piazza del Duomo 1, Firenze, Italia
+Località di Arrivo: Via Roma 10, Milano, Italia (precompilato dall'indirizzo di casa)
 Ora Partenza: 10:00
 Ora Arrivo: 16:00
-Note: Viaggio 6 ore. Sosta pranzo a metà strada. Restituzione noleggio in aeroporto.
+Note: Viaggio 6 ore. Sosta pranzo a metà strada.
 ```
 
 ### Funzionalità Trasferimenti Volo
