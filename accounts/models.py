@@ -110,6 +110,10 @@ class Profile(models.Model):
         max_length=500,
         blank=True,
         default="",
+        help_text=_(
+            "Used to pre-fill the origin/destination field in car transfers. "
+            "It is not shared or used for any other purpose."
+        ),
     )
     home_address_latitude = models.FloatField(null=True, blank=True)
     home_address_longitude = models.FloatField(null=True, blank=True)
