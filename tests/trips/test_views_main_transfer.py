@@ -8,6 +8,7 @@ from tests.test import TestCase
 from tests.trips.factories import (
     ExperienceFactory,
     MainTransferFactory,
+    MealFactory,
     StayFactory,
     TripFactory,
 )
@@ -729,6 +730,8 @@ class TestCarTransferQuickFill(TestCase):
         locations = response.context["quick_fill_locations"]
         addresses = [loc["address"] for loc in locations]
         assert stay.address in addresses
+        stay_loc = next(loc for loc in locations if loc["address"] == stay.address)
+        assert stay_loc["type"] == "stay"
 
     def test_car_arrival_quick_fill_includes_day1_events(self):
         """quick_fill_locations includes events from day 1 for arrival direction"""
@@ -748,6 +751,8 @@ class TestCarTransferQuickFill(TestCase):
         locations = response.context["quick_fill_locations"]
         addresses = [loc["address"] for loc in locations]
         assert event.address in addresses
+        exp_loc = next(loc for loc in locations if loc["address"] == event.address)
+        assert exp_loc["type"] == "experience"
 
     def test_car_arrival_fallback_to_trip_destination_when_no_events(self):
         """quick_fill_locations falls back to trip.destination when day 1 has no stay/events"""
@@ -765,6 +770,7 @@ class TestCarTransferQuickFill(TestCase):
         locations = response.context["quick_fill_locations"]
         assert len(locations) == 1
         assert locations[0]["address"] == trip.destination
+        assert locations[0]["type"] == "destination"
 
     def test_car_departure_quick_fill_includes_last_day_stay(self):
         """quick_fill_locations includes stay from last day for departure direction"""
@@ -788,6 +794,8 @@ class TestCarTransferQuickFill(TestCase):
         locations = response.context["quick_fill_locations"]
         addresses = [loc["address"] for loc in locations]
         assert stay.address in addresses
+        stay_loc = next(loc for loc in locations if loc["address"] == stay.address)
+        assert stay_loc["type"] == "stay"
 
     def test_car_departure_fallback_to_trip_destination_when_no_events(self):
         """quick_fill_locations falls back to trip.destination when last day has no stay/events"""
@@ -809,6 +817,7 @@ class TestCarTransferQuickFill(TestCase):
         locations = response.context["quick_fill_locations"]
         assert len(locations) == 1
         assert locations[0]["address"] == trip.destination
+        assert locations[0]["type"] == "destination"
 
     def test_car_arrival_home_address_in_form_initial(self):
         """origin_address is pre-filled with profile.home_address for arrival"""
@@ -888,3 +897,22 @@ class TestCarTransferQuickFill(TestCase):
         # Event with empty address should not appear; fallback to trip.destination
         assert len(locations) == 1
         assert locations[0]["address"] == trip.destination
+
+    def test_car_arrival_meal_type_in_quick_fill(self):
+        """Meal events get type='meal' in quick_fill_locations"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day1 = trip.days.order_by("date").first()
+        meal = MealFactory(trip=trip, day=day1, address="Via del Ristorante 5, Roma")
+        url = reverse("trips:main-transfer-step", kwargs={"trip_id": trip.pk})
+
+        with self.login(user):
+            response = self.client.get(
+                url,
+                {"step": "arrival", "transport_type": "car", "direction": "arrival"},
+            )
+
+        assert response.status_code == 200
+        locations = response.context["quick_fill_locations"]
+        meal_loc = next(loc for loc in locations if loc["address"] == meal.address)
+        assert meal_loc["type"] == "meal"

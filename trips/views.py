@@ -2408,17 +2408,34 @@ def main_transfer_step(request, trip_id):
             if ref_day:
                 if hasattr(ref_day, "stay") and ref_day.stay and ref_day.stay.address:
                     quick_fill_locations.append(
-                        {"label": ref_day.stay.name, "address": ref_day.stay.address}
+                        {
+                            "label": ref_day.stay.name,
+                            "address": ref_day.stay.address,
+                            "type": "stay",
+                        }
                     )
                 for event in ref_day.events.order_by("start_time"):
                     if event.address:
+                        event_type = (
+                            "meal"
+                            if event.category == Event.Category.MEAL
+                            else "experience"
+                        )
                         quick_fill_locations.append(
-                            {"label": event.name, "address": event.address}
+                            {
+                                "label": event.name,
+                                "address": event.address,
+                                "type": event_type,
+                            }
                         )
 
             if not quick_fill_locations:
                 quick_fill_locations = [
-                    {"label": trip.destination, "address": trip.destination}
+                    {
+                        "label": trip.destination,
+                        "address": trip.destination,
+                        "type": "destination",
+                    }
                 ]
 
         form = form_class(

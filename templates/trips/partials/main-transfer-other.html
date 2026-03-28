@@ -51,10 +51,11 @@
                 <div class="flex flex-wrap gap-2 mt-1">
                     {% for loc in quick_fill_locations %}
                         <button type="button"
-                                class="btn btn-xs btn-outline"
+                                class="btn btn-sm btn-outline {% if loc.type == 'stay' %}btn-neutral{% elif loc.type == 'meal' %}btn-warning{% elif loc.type == 'experience' %}btn-success{% else %}btn-neutral{% endif %}"
                                 onclick="document.getElementById('id_destination_address').value = '{{ loc.address|escapejs }}'">
-                            <i class="ph ph-plus-circle"></i>
+                            <i class="ph-bold {% if loc.type == 'stay' %}ph-bed{% elif loc.type == 'meal' %}ph-fork-knife{% else %}ph-images{% endif %}"></i>
                             {{ loc.label }}
+                            <i class="ph-bold ph-plus"></i>
                         </button>
                     {% endfor %}
                 </div>
