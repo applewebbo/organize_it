@@ -75,12 +75,6 @@ class Profile(models.Model):
         blank=True,
         default="",
     )
-    city = models.CharField(
-        _("City"),
-        max_length=255,
-        blank=True,
-        default="",
-    )
     avatar = models.CharField(
         _("Avatar"),
         max_length=50,

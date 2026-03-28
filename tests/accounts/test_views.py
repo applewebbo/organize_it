@@ -71,7 +71,6 @@ class TestProfileView(TestCase):
         data = {
             "first_name": "John",
             "last_name": "Doe",
-            "city": "Milan",
             "trip_sort_preference": "date_asc",
             "default_map_view": "list",
         }
@@ -83,7 +82,6 @@ class TestProfileView(TestCase):
         profile = Profile.objects.get(user=user)
         assert profile.first_name == "John"
         assert profile.last_name == "Doe"
-        assert profile.city == "Milan"
 
     def test_post_avatar(self):
         """Test selecting avatar"""
@@ -221,7 +219,6 @@ class TestProfileViewAllFields(TestCase):
         data = {
             "first_name": "Jane",
             "last_name": "Smith",
-            "city": "Rome",
             "avatar": "tourist.png",
             "currency": "GBP",
             "default_map_view": "map",
@@ -237,7 +234,6 @@ class TestProfileViewAllFields(TestCase):
         profile = Profile.objects.get(user=user)
         assert profile.first_name == "Jane"
         assert profile.last_name == "Smith"
-        assert profile.city == "Rome"
         assert profile.avatar == "tourist.png"
         assert profile.currency == "GBP"
         assert profile.default_map_view == "map"

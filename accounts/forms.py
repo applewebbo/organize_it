@@ -28,7 +28,6 @@ class ProfileUpdateForm(forms.ModelForm):
         fields = (
             "first_name",
             "last_name",
-            "city",
             "home_address",
             "avatar",
             "currency",
@@ -40,7 +39,6 @@ class ProfileUpdateForm(forms.ModelForm):
         labels = {
             "first_name": _("First name"),
             "last_name": _("Last name"),
-            "city": _("City"),
             "home_address": _("Home address"),
             "avatar": _("Avatar"),
             "currency": _("Preferred currency"),
@@ -56,7 +54,6 @@ class ProfileUpdateForm(forms.ModelForm):
             "last_name": forms.TextInput(
                 attrs={"class": "input input-bordered w-full"}
             ),
-            "city": forms.TextInput(attrs={"class": "input input-bordered w-full"}),
             "home_address": forms.TextInput(
                 attrs={
                     "class": "input input-bordered w-full",

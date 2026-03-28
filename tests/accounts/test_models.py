@@ -29,7 +29,6 @@ class TestProfile:
 
         assert profile.first_name == ""
         assert profile.last_name == ""
-        assert profile.city == ""
         assert profile.avatar == ""
         assert profile.currency == "EUR"
         assert profile.default_map_view == "list"
@@ -41,14 +40,12 @@ class TestProfile:
 
         profile.first_name = "John"
         profile.last_name = "Doe"
-        profile.city = "Milan"
         profile.avatar = "hiker.png"
         profile.save()
 
         profile.refresh_from_db()
         assert profile.first_name == "John"
         assert profile.last_name == "Doe"
-        assert profile.city == "Milan"
         assert profile.avatar == "hiker.png"
 
     def test_currency_field_choices(self, user_factory):

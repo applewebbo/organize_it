@@ -31,12 +31,6 @@
                     </div>
                 </div>
                 <div class="mb-4">
-                    <label for="{{ profile_form.city.id_for_label }}"
-                           class="block mb-2 font-medium">{{ profile_form.city.label }}</label>
-                    {{ profile_form.city }}
-                    {% if profile_form.city.errors %}<div class="mt-1 text-sm text-error">{{ profile_form.city.errors }}</div>{% endif %}
-                </div>
-                <div class="mb-4">
                     <label for="{{ profile_form.home_address.id_for_label }}"
                            class="block mb-2 font-medium">{{ profile_form.home_address.label }}</label>
                     {{ profile_form.home_address }}
