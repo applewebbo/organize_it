@@ -326,6 +326,19 @@ wheels = [
 
 [[package]]
 dependencies = [
+  {name = "cloudinary"},
+  {name = "requests"}
+]
+name = "django-cloudinary-storage"
+sdist = {url = "https://files.pythonhosted.org/packages/72/da/6072905410b869566d3cb9f6706803d0a9d2052d90e0b8ed783031acdb6d/django-cloudinary-storage-0.3.0.tar.gz", hash = "sha256:debd403a5f225c9d35c4af508ff4abc7fdc262129464134b60b2feeb2c44d3e1", size = 21669, upload-time = "2020-08-23T22:19:57.854Z"}
+source = {registry = "https://pypi.org/simple"}
+version = "0.3.0"
+wheels = [
+  {url = "https://files.pythonhosted.org/packages/fe/e2/e52f63ddafa0985e2af70197c4d3e18963d0ea854083fc23705b88014891/django_cloudinary_storage-0.3.0-py3-none-any.whl", hash = "sha256:95c855c7334141b2a485ea7eb5716de87bb6ce0d848e205debb3a3ab7bbbd49a", size = 18866, upload-time = "2020-08-23T22:19:55.767Z"}
+]
+
+[[package]]
+dependencies = [
   {name = "django"}
 ]
 name = "django-cotton"
@@ -468,6 +481,11 @@ source = {registry = "https://pypi.org/simple"}
 version = "1.14.6"
 wheels = [
   {url = "https://files.pythonhosted.org/packages/1f/21/3cedee63417bc5553eed0c204be478071c9ab208e5e259e97287590194f1/django_storages-1.14.6-py3-none-any.whl", hash = "sha256:11b7b6200e1cb5ffcd9962bd3673a39c7d6a6109e8096f0e03d46fab3d3aabd9", size = 33095, upload-time = "2025-04-02T02:34:53.291Z"}
+]
+
+[package.optional-dependencies]
+dropbox = [
+  {name = "dropbox"}
 ]
 
 [[package]]
@@ -1002,6 +1020,7 @@ dependencies = [
   {name = "django-allauth"},
   {name = "django-anymail"},
   {name = "django-browser-reload"},
+  {name = "django-cloudinary-storage"},
   {name = "django-cotton"},
   {name = "django-crispy-forms"},
   {name = "django-dbbackup"},
@@ -1011,7 +1030,7 @@ dependencies = [
   {name = "django-htmx"},
   {name = "django-q2"},
   {name = "django-redis"},
-  {name = "django-storages"},
+  {name = "django-storages", extra = ["dropbox"]},
   {name = "django-tailwind-cli"},
   {name = "dropbox"},
   {name = "factory-boy"},
@@ -1064,6 +1083,7 @@ requires-dist = [
   {name = "django-allauth", specifier = ">=64.2.1"},
   {name = "django-anymail", extras = ["mailgun"], specifier = ">=13.0"},
   {name = "django-browser-reload", specifier = ">=1.18.0"},
+  {name = "django-cloudinary-storage", specifier = ">=0.3.0"},
   {name = "django-cotton", specifier = ">=2.0.0"},
   {name = "django-crispy-forms", specifier = ">=2.3"},
   {name = "django-dbbackup", specifier = ">=5.0.1"},
@@ -1073,7 +1093,7 @@ requires-dist = [
   {name = "django-htmx", specifier = ">=1.19.0"},
   {name = "django-q2", specifier = ">=1.8.0"},
   {name = "django-redis", specifier = ">=5.4.0"},
-  {name = "django-storages", specifier = ">=1.14.6"},
+  {name = "django-storages", extras = ["dropbox"], specifier = ">=1.14.6"},
   {name = "django-tailwind-cli", specifier = ">=2.15.0"},
   {name = "dropbox", specifier = ">=12.0.2"},
   {name = "factory-boy", specifier = ">=3.3.1"},

@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "django_tailwind_cli",
     "django_q",
     "storages",
+    "cloudinary_storage",
     "dbbackup",
     # INTERNAL_APP
     "trips",
@@ -384,12 +385,14 @@ elif ENVIRONMENT == "prod":
         "MAILGUN_SENDER_DOMAIN": env("MAILGUN_SENDER_DOMAIN"),
     }
 
+    # DJANGO-CLOUDINARY-STORAGE
+    CLOUDINARY_STORAGE = {
+        "CLOUDINARY_URL": env("CLOUDINARY_URL"),
+    }
+
     # Override storages for production
     STORAGES["default"] = {
-        "BACKEND": "storages.backends.cloudinary.CloudinaryStorage",
-        "OPTIONS": {
-            "folder": "organize-it",
-        },
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     }
     STORAGES["staticfiles"] = {
         "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
