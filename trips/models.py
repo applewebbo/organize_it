@@ -46,6 +46,10 @@ class Trip(models.Model):
 
     class Meta:
         ordering = ("status",)
+        indexes = [
+            models.Index(fields=["author", "status"]),
+            models.Index(fields=["author", "-start_date"]),
+        ]
 
     def __str__(self) -> str:
         return self.title
@@ -145,6 +149,11 @@ class Stay(models.Model):
     place_id = models.CharField(max_length=255, blank=True)
     opening_hours = models.JSONField(blank=True, null=True)
     enriched = models.BooleanField(default=False)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["place_id"]),
+        ]
 
     def save(self, *args, **kwargs):
         """
@@ -372,6 +381,9 @@ class Day(models.Model):
 
     class Meta:
         ordering = ["number"]
+        indexes = [
+            models.Index(fields=["trip", "date"]),
+        ]
 
     @property
     def next_day(self):
@@ -443,6 +455,7 @@ class Event(models.Model):
         ordering = ["start_time"]
         indexes = [
             models.Index(fields=["day_id", "start_time"]),
+            models.Index(fields=["trip_id"]),
         ]
 
     def save(self, *args, **kwargs):
