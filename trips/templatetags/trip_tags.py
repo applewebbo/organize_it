@@ -14,6 +14,7 @@ register = template.Library()
 def stay_transfer_out(day):
     """Get the StayTransfer from this day's stay (if any).
     Only returns the transfer if this is the last day of the stay.
+    Uses prefetched transfer_from when available to avoid N+1 queries.
     """
     if not day.stay:
         return None
@@ -21,15 +22,23 @@ def stay_transfer_out(day):
     next_day = day.next_day
     if next_day and next_day.stay and next_day.stay == day.stay:
         return None
-    return StayTransfer.objects.filter(from_stay=day.stay).first()
+    try:
+        return day.stay.transfer_from
+    except StayTransfer.DoesNotExist:
+        return None
 
 
 @register.filter
 def stay_transfer_in(day):
-    """Get the StayTransfer to this day's stay (if any)"""
+    """Get the StayTransfer to this day's stay (if any).
+    Uses prefetched transfer_to when available to avoid N+1 queries.
+    """
     if not day.stay:
         return None
-    return StayTransfer.objects.filter(to_stay=day.stay).first()
+    try:
+        return day.stay.transfer_to
+    except StayTransfer.DoesNotExist:
+        return None
 
 
 @register.filter

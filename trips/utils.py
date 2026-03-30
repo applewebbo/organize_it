@@ -68,7 +68,8 @@ def get_trips(user):
                         "start_time"
                     ),
                 ),
-                "days__stay",
+                "days__stay__transfer_from",
+                "days__stay__transfer_to",
                 "main_transfers",
             )
             .select_related("author")
@@ -94,7 +95,8 @@ def get_trips(user):
                     "start_time"
                 ),
             ),
-            "days__stay",
+            "days__stay__transfer_from",
+            "days__stay__transfer_to",
             "main_transfers",
         ).select_related("author")
 

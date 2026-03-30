@@ -508,6 +508,17 @@ class TestStayTransferTags:
         # Second day (last day of stay1) should return the transfer
         assert stay_transfer_out(days[1]) == transfer
 
+    def test_stay_transfer_out_no_transfer(self):
+        """Test stay_transfer_out returns None when last day of stay but no transfer exists"""
+        trip = TripFactory()
+        days = list(trip.days.all())
+        stay = StayFactory()
+
+        days[0].stay = stay
+        days[0].save()
+        # No StayTransfer created
+        assert stay_transfer_out(days[0]) is None
+
     def test_stay_transfer_in_no_stay(self):
         """Test stay_transfer_in returns None when day has no stay"""
         trip = TripFactory()

@@ -141,7 +141,8 @@ def trip_detail(request, pk):
                 "start_time"
             ),
         ),
-        "days__stay",
+        "days__stay__transfer_from",
+        "days__stay__transfer_to",
     ).select_related("author")
 
     trip = get_object_or_404(qs, pk=pk, author=request.user)
