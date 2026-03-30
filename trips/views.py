@@ -16,7 +16,7 @@ from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
-from accounts.models import Profile
+from accounts.models import Profile, get_profile
 from trips.forms import (
     AddNoteToStayForm,
     CarMainTransferForm,
@@ -77,10 +77,11 @@ def home(request):
     """Home page"""
     context = {}
     if request.user.is_authenticated:
-        if Profile.objects.filter(user=request.user).exists():
+        try:
             context = get_trips(request.user)
-            # Check if user wants to see the guide (default: hidden for users with trips)
             context["show_guide"] = request.session.get("show_guide", False)
+        except Profile.DoesNotExist:
+            pass
     return TemplateResponse(request, "trips/index.html", context)
 
 
@@ -102,7 +103,7 @@ def trip_list(request):
         template = "trips/trip-list.html"
 
     # Get user's sort preference
-    sort_preference = request.user.profile.trip_sort_preference
+    sort_preference = get_profile(request.user).trip_sort_preference
 
     # Build base querysets
     active_trips = Trip.objects.filter(author=request.user).exclude(status=5)
@@ -157,7 +158,7 @@ def trip_detail(request, pk):
     ).first()
 
     # Check user preference for default view
-    default_view = request.user.profile.default_map_view
+    default_view = get_profile(request.user).default_map_view
     show_map = default_view == "map"
 
     context = {
@@ -203,7 +204,7 @@ def day_detail(request, pk):
     if force_view in ["list", "map"]:
         show_map = force_view == "map"
     else:
-        default_view = request.user.profile.default_map_view
+        default_view = get_profile(request.user).default_map_view
         show_map = default_view == "map"
 
     # Get SimpleTransfers for this day
@@ -428,7 +429,7 @@ def trip_archive(request, pk):
     trip.save()
 
     # Reset fav_trip if this trip was the favourite
-    profile = request.user.profile
+    profile = get_profile(request.user)
     if profile.fav_trip == trip:
         profile.fav_trip = None
         profile.save()
@@ -2391,7 +2392,7 @@ def main_transfer_step(request, trip_id):
         home_address = ""
         quick_fill_locations = []
         if transport_type == MainTransfer.Type.CAR:
-            home_address = getattr(request.user.profile, "home_address", "")
+            home_address = get_profile(request.user).home_address
 
             if direction == MainTransfer.Direction.ARRIVAL:
                 ref_day = (

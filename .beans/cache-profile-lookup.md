@@ -1,11 +1,11 @@
 ---
 # cache
 title: Cache Profile lookup
-status: todo
+status: completed
 type: task
 priority: "1"
 created_at: 2026-03-30T13:06:33Z
-updated_at: 2026-03-30T15:08:30Z
+updated_at: 2026-03-30T16:17:20Z
 ---
 
 # Cache Profile lookup
@@ -72,3 +72,5 @@ default_view = profile.default_map_view
 - [ ] Cache invalidated correctly on logout
 
 Codeberg issue: #255
+
+## Summary of Changes\n\nAdded get_profile(user) in accounts/models.py:\n- Cache with 5min timeout (PROFILE_CACHE_TIMEOUT)\n- select_related('fav_trip') per evitare query extra\n- Profile.save() invalida il cache\n\nAggiornati trips/utils.py e trips/views.py per usare get_profile()\ninvece di Profile.objects.get() e request.user.profile.\n\nTest aggiunti: cache hit e invalidazione.

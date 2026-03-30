@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+from django.core.cache import cache
 
 pytestmark = pytest.mark.django_db
 
@@ -19,6 +20,24 @@ class TestCustomUser:
         assert hasattr(user, "profile")
         assert user.profile.__str__() == user.email
         assert user.profile.fav_trip is None
+
+
+class TestGetProfile:
+    def test_returns_profile(self, user_factory):
+        from accounts.models import get_profile
+
+        user = user_factory()
+        profile = get_profile(user)
+        assert profile.user == user
+
+    def test_cache_hit(self, user_factory):
+        """Second call returns cached profile without hitting DB."""
+        from accounts.models import get_profile
+
+        user = user_factory()
+        profile_first = get_profile(user)
+        profile_second = get_profile(user)
+        assert profile_first.pk == profile_second.pk
 
 
 class TestProfile:
@@ -151,6 +170,17 @@ class TestProfile:
             user.profile.save()
 
         mock_geocoder.mapbox.assert_not_called()
+
+    def test_save_invalidates_cache(self, user_factory):
+        """Profile.save() must invalidate the profile cache."""
+        from accounts.models import get_profile
+
+        user = user_factory()
+        cache_key = f"profile_{user.pk}"
+        get_profile(user)  # populate cache
+        assert cache.get(cache_key) is not None
+        user.profile.save()
+        assert cache.get(cache_key) is None
 
     def test_geocoding_skipped_when_latlng_empty(self, user_factory):
         """Geocoding failure (empty latlng) does not raise and coords stay None"""

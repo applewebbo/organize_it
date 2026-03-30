@@ -1,12 +1,15 @@
 import geocoder
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
+from django.core.cache import cache
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 
 from .managers import CustomUserManager
+
+PROFILE_CACHE_TIMEOUT = 300  # 5 minutes
 
 
 class CustomUser(AbstractUser):
@@ -141,9 +144,20 @@ class Profile(models.Model):
                 if g.latlng:
                     self.home_address_latitude, self.home_address_longitude = g.latlng
         super().save(*args, **kwargs)
+        cache.delete(f"profile_{self.user_id}")
 
     def __str__(self):
         return str(self.user)
+
+
+def get_profile(user):
+    """Return Profile for user, using cache to avoid repeated DB queries."""
+    cache_key = f"profile_{user.pk}"
+    profile = cache.get(cache_key)
+    if profile is None:
+        profile = Profile.objects.select_related("fav_trip").get(user=user)
+        cache.set(cache_key, profile, PROFILE_CACHE_TIMEOUT)
+    return profile
 
 
 @receiver(post_save, sender=CustomUser)

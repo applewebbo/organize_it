@@ -15,7 +15,7 @@ from django.db.models.functions import Lag, Lead
 from django.http import Http404
 from PIL import Image
 
-from accounts.models import Profile
+from accounts.models import get_profile
 from trips.models import Event, MainTransfer, SimpleTransfer, StayTransfer, Trip
 
 logger = logging.getLogger(__name__)
@@ -51,7 +51,7 @@ def annotate_event_overlaps(queryset):
 
 def get_trips(user):
     """Get the trips for the home page with favourite trip and latest/others"""
-    profile = Profile.objects.get(user=user)
+    profile = get_profile(user)
     fav_trip = profile.fav_trip
 
     # Check user preference for default view
