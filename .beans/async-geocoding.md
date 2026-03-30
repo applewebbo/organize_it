@@ -1,11 +1,11 @@
 ---
 # async
 title: Move geocoding to async task
-status: todo
+status: scrapped
 type: task
 priority: "2"
 created_at: 2026-03-30T13:06:33Z
-updated_at: 2026-03-30T15:08:30Z
+updated_at: 2026-03-30T18:14:22Z
 ---
 
 # Move geocoding to async task
@@ -120,3 +120,7 @@ Remove lines ~314-328 containing synchronous geocoding.
 - [ ] Tasks logged correctly
 
 Codeberg issue: #256
+
+## Reasons for Scrapping
+
+Too complex relative to the benefit. Django-Q2 with sync=True in tests proved unreliable for mocking external geocoder calls — task was enqueued but the geocoder mock was not applied in the task execution context. Significant test refactoring would be required for a marginal UX improvement.
