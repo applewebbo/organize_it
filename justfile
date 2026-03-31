@@ -324,3 +324,17 @@ release-create tag previous_tag="" notes_file="" draft="false" prerelease="false
     echo "Building documentation..."
     uv run --group docs mkdocs build
     echo "Documentation built in site/ directory"
+
+##########################################################################
+# Beans
+##########################################################################
+
+# List active beans (excludes completed and scrapped)
+[group('beans')]
+beans:
+    beans list --ready
+
+# List completed beans
+[group('beans')]
+beans_completed:
+    beans list -s completed
