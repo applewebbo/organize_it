@@ -1,11 +1,11 @@
 ---
 # optimize
 title: Optimize weather fetching task
-status: todo
+status: completed
 type: task
 priority: "2"
 created_at: 2026-03-30T13:06:33Z
-updated_at: 2026-03-30T15:08:30Z
+updated_at: 2026-03-31T05:41:39Z
 ---
 
 # Optimize weather fetching task
@@ -89,3 +89,9 @@ def get_coordinates_for_day(day):
 - [ ] Memory usage < 100MB during task
 
 Codeberg issue: #258
+
+## Summary of Changes
+
+Added prefetch_related to trips queryset in fetch_weather_for_active_trips.
+Removed inner prefetch in fetch_weather_for_trip to reuse outer cache.
+Query count reduced from ~3xN_trips to 4 total.

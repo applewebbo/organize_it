@@ -148,5 +148,5 @@ def fetch_weather_for_day(day):
 
 def fetch_weather_for_trip(trip):
     """Fetch and cache weather for all days of a trip."""
-    for day in trip.days.prefetch_related("events", "stay").all():
+    for day in trip.days.all():
         fetch_weather_for_day(day)
