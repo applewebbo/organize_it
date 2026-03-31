@@ -107,11 +107,12 @@ def cleanup_old_sessions():
     """
     try:
         logger.info("Starting cleanup_old_sessions task")
-        expired_count = Session.objects.filter(expire_date__lt=timezone.now()).count()
+        deleted_count, _ = Session.objects.filter(
+            expire_date__lt=timezone.now()
+        ).delete()
 
-        if expired_count > 0:
-            Session.objects.filter(expire_date__lt=timezone.now()).delete()
-            result_msg = f"Deleted {expired_count} expired sessions"
+        if deleted_count > 0:
+            result_msg = f"Deleted {deleted_count} expired sessions"
             logger.info(result_msg)
             return result_msg
         else:
