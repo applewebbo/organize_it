@@ -1,11 +1,11 @@
 ---
 # db
 title: Add database connection pooling
-status: todo
+status: completed
 type: task
 priority: "3"
 created_at: 2026-03-30T13:06:33Z
-updated_at: 2026-03-30T15:08:30Z
+updated_at: 2026-03-31T05:51:24Z
 ---
 
 # Add database connection pooling
@@ -87,3 +87,9 @@ DB_CONN_MAX_AGE=600
 - Monitor `pg_stat_activity` for pool size tuning
 
 Codeberg issue: #261
+
+## Summary of Changes
+
+Added CONN_MAX_AGE=600 and CONN_HEALTH_CHECKS=True to production DATABASES config.
+Skipped psycopg3 pool OPTIONS and PgBouncer (overengineering for current scale).
+psycopg[binary]>=3.2.1 already in dependencies — CONN_HEALTH_CHECKS natively supported.

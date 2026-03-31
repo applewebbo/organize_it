@@ -368,6 +368,8 @@ elif ENVIRONMENT == "prod":
             "PASSWORD": env("SQL_PASSWORD"),
             "HOST": env("SQL_HOST"),
             "PORT": env("SQL_PORT"),
+            "CONN_MAX_AGE": 600,  # Keep connections alive for 10 min
+            "CONN_HEALTH_CHECKS": True,  # Verify connection health before reuse
         }
     }
 
