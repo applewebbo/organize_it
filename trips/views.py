@@ -111,6 +111,7 @@ def trip_list(request):
     # Build base querysets
     active_trips = Trip.objects.filter(author=request.user).exclude(status=5)
     archived_trips = Trip.objects.filter(author=request.user, status=5)
+    shared_trips = Trip.objects.filter(collaborators=request.user).exclude(status=5)
 
     # Apply sorting based on preference
     sort_map = {
@@ -123,10 +124,12 @@ def trip_list(request):
     order_by = sort_map.get(sort_preference, "start_date")
     active_trips = active_trips.order_by(order_by)
     archived_trips = archived_trips.order_by(order_by)
+    shared_trips = shared_trips.order_by(order_by)
 
     context = {
         "active_trips": active_trips,
         "archived_trips": archived_trips,
+        "shared_trips": shared_trips,
     }
     return TemplateResponse(request, template, context)
 

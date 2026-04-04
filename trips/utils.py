@@ -96,8 +96,12 @@ def get_trips(user):
     else:
         unpaired_events = None
 
-    # Base queryset: all user trips excluding archived
-    base_qs = Trip.objects.filter(author=user).exclude(status=Trip.Status.ARCHIVED)
+    # Base queryset: owned + collaborated trips excluding archived
+    base_qs = (
+        Trip.objects.filter(Q(author=user) | Q(collaborators=user))
+        .exclude(status=Trip.Status.ARCHIVED)
+        .distinct()
+    )
     if fav_trip:
         base_qs = base_qs.exclude(pk=fav_trip.pk)
 

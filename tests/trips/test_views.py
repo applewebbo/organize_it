@@ -408,6 +408,52 @@ class TripListView(TestCase):
         # Should not crash, None dates sorted to end or beginning depending on DB
         assert response.status_code == 200
 
+    def test_shared_trips_appear_in_context(self):
+        """Collaborated trips appear in shared_trips context, not active_trips"""
+        from trips.models import TripCollaboration
+
+        owner = self.make_user("owner")
+        collab_user = self.make_user("collab")
+        shared_trip = TripFactory(author=owner, status=1)
+        TripCollaboration.objects.create(
+            trip=shared_trip, user=collab_user, color="blue", added_by=owner
+        )
+
+        with self.login(collab_user):
+            response = self.get("trips:trip-list")
+
+        self.response_200(response)
+        assert shared_trip in response.context["shared_trips"]
+        assert shared_trip not in response.context["active_trips"]
+
+    def test_shared_trips_empty_when_no_collaborations(self):
+        """shared_trips is empty when user has no collaborated trips"""
+        user = self.make_user("user")
+        TripFactory(author=user)
+
+        with self.login(user):
+            response = self.get("trips:trip-list")
+
+        self.response_200(response)
+        assert not response.context["shared_trips"].exists()
+
+    def test_shared_archived_trips_not_in_shared_trips(self):
+        """Archived collaborated trips do not appear in shared_trips section"""
+        from trips.models import TripCollaboration
+
+        owner = self.make_user("owner")
+        collab_user = self.make_user("collab")
+        archived_shared = TripFactory(author=owner, status=5)
+        TripCollaboration.objects.create(
+            trip=archived_shared, user=collab_user, color="green", added_by=owner
+        )
+
+        with self.login(collab_user):
+            response = self.get("trips:trip-list")
+
+        self.response_200(response)
+        assert archived_shared not in response.context["shared_trips"]
+
 
 class TripDetailView(TestCase):
     """Test cases for trip detail view"""

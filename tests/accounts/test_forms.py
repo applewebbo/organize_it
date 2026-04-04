@@ -38,3 +38,33 @@ class TestProfileUpdateForm:
         fav_trip_queryset = form.fields["fav_trip"].queryset
         assert user1_trip in fav_trip_queryset
         assert user2_trip not in fav_trip_queryset
+
+    def test_fav_trip_queryset_includes_collaborated_trips(self, user_factory):
+        """Test that fav_trip field includes trips where user is a collaborator"""
+        from trips.models import TripCollaboration
+
+        owner = user_factory()
+        collab_user = user_factory()
+        collab_trip = TripFactory(author=owner, status=1)
+        TripCollaboration.objects.create(
+            trip=collab_trip, user=collab_user, color="blue", added_by=owner
+        )
+
+        form = ProfileUpdateForm(instance=collab_user.profile)
+        fav_trip_queryset = form.fields["fav_trip"].queryset
+        assert collab_trip in fav_trip_queryset
+
+    def test_fav_trip_queryset_excludes_archived_collaborated_trips(self, user_factory):
+        """Test that archived collaborated trips are not in fav_trip queryset"""
+        from trips.models import TripCollaboration
+
+        owner = user_factory()
+        collab_user = user_factory()
+        archived_trip = TripFactory(author=owner, status=5)
+        TripCollaboration.objects.create(
+            trip=archived_trip, user=collab_user, color="green", added_by=owner
+        )
+
+        form = ProfileUpdateForm(instance=collab_user.profile)
+        fav_trip_queryset = form.fields["fav_trip"].queryset
+        assert archived_trip not in fav_trip_queryset

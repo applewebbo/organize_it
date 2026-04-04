@@ -7,6 +7,7 @@ import time_machine
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 
+from tests.accounts.factories import UserFactory
 from tests.test import TestCase
 from tests.trips.factories import (
     EventFactory,
@@ -475,6 +476,29 @@ class TestGetTrips(TestCase):
         self.assertNotIn(trip1, context["other_trips"])
         self.assertIn(trip2, context["other_trips"])
         self.assertIn(trip3, context["other_trips"])
+
+    def test_get_trips_includes_collaborated_trips_in_other_trips(self):
+        """get_trips includes collaborated trips in base queryset (other_trips)."""
+        from trips.models import TripCollaboration
+
+        owner = UserFactory()
+        collab_trip = TripFactory(
+            author=owner,
+            status=1,
+            start_date=date(2026, 5, 1),
+            end_date=date(2026, 5, 5),
+        )
+        TripCollaboration.objects.create(
+            trip=collab_trip, user=self.user, color="blue", added_by=owner
+        )
+
+        context = get_trips(self.user)
+        all_trips = (
+            list(context.get("other_trips", []))
+            + ([context["latest_trip"]] if context.get("latest_trip") else [])
+            + ([context["fav_trip"]] if context.get("fav_trip") else [])
+        )
+        assert collab_trip in all_trips
 
 
 class TestCacheKey(TestCase):

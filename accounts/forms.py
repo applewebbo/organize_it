@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 from trips.models import Trip
@@ -74,8 +75,12 @@ class ProfileUpdateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["fav_trip"].queryset = Trip.objects.filter(
-            author=self.instance.user
-        ).exclude(status=Trip.Status.ARCHIVED)
+        self.fields["fav_trip"].queryset = (
+            Trip.objects.filter(
+                Q(author=self.instance.user) | Q(collaborators=self.instance.user)
+            )
+            .exclude(status=Trip.Status.ARCHIVED)
+            .distinct()
+        )
         self.fields["trip_sort_preference"].empty_label = None
         self.fields["default_map_view"].empty_label = None
