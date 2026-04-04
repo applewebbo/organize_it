@@ -20,7 +20,14 @@ from trips.models import Event, MainTransfer, Stay, Trip
 logger = logging.getLogger("task")
 
 NUMBER_OF_USERS = 1
-TRIPS_PER_USER = 3
+
+# Trip date configs: (start_offset, end_offset) relative to today
+TRIP_DATE_CONFIGS = [
+    (-14, -10),  # completed: ended 10 days ago
+    (1, 4),  # impending: starts in 1 day
+    (3, 6),  # impending: starts in 3 days
+    (10, 14),  # not started: starts in 10 days (beyond 7-day impending threshold)
+]
 
 User = get_user_model()
 
@@ -41,11 +48,11 @@ class Command(BaseCommand):
         users = User.objects.all()
 
         for user in users:
-            for _ in range(TRIPS_PER_USER):
+            for start_offset, end_offset in TRIP_DATE_CONFIGS:
                 trip = TripFactory(
                     author=user,
-                    start_date=date.today() + timedelta(days=random.randint(1, 3)),
-                    end_date=date.today() + timedelta(days=random.randint(4, 6)),
+                    start_date=date.today() + timedelta(days=start_offset),
+                    end_date=date.today() + timedelta(days=end_offset),
                 )
 
                 # Create MainTransfers for 50% of trips
