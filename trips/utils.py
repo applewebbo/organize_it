@@ -13,10 +13,27 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models import BooleanField, Case, F, Max, Min, Prefetch, Q, When, Window
 from django.db.models.functions import Lag, Lead
 from django.http import Http404
+from django.shortcuts import get_object_or_404
 from PIL import Image
 
 from accounts.models import get_profile
 from trips.models import Event, MainTransfer, SimpleTransfer, StayTransfer, Trip
+
+
+def accessible_trips_qs(user):
+    """Return queryset of trips where user is author or collaborator."""
+    return Trip.objects.filter(Q(author=user) | Q(collaborators=user)).distinct()
+
+
+def get_trip_or_404(pk, user):
+    """Return Trip if user is author or collaborator, else 404."""
+    return get_object_or_404(accessible_trips_qs(user), pk=pk)
+
+
+def get_trip_for_owner_or_404(pk, user):
+    """Return Trip if user is the owner (author), else 404."""
+    return get_object_or_404(Trip, pk=pk, author=user)
+
 
 logger = logging.getLogger(__name__)
 

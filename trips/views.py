@@ -7,7 +7,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import transaction
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
@@ -47,6 +47,7 @@ from trips.models import (
     Trip,
 )
 from trips.utils import (
+    accessible_trips_qs,
     annotate_event_overlaps,
     convert_google_opening_hours,
     create_day_map,
@@ -55,6 +56,8 @@ from trips.utils import (
     get_airport_by_iata,
     get_event_instance,
     get_next_events,
+    get_trip_for_owner_or_404,
+    get_trip_or_404,
     get_trips,
     process_trip_image,
     search_airports,
@@ -146,7 +149,10 @@ def trip_detail(request, pk):
         "days__stay__transfer_to",
     ).select_related("author")
 
-    trip = get_object_or_404(qs, pk=pk, author=request.user)
+    trip = get_object_or_404(
+        qs.filter(Q(author=request.user) | Q(collaborators=request.user)).distinct(),
+        pk=pk,
+    )
     unpaired_events = trip.all_events.filter(day__isnull=True)
 
     # Get main transfers
@@ -197,7 +203,7 @@ def day_detail(request, pk):
         "trip__main_transfers",
     ).select_related("trip__author")
 
-    day = get_object_or_404(qs, pk=pk, trip__author=request.user)
+    day = get_object_or_404(qs, pk=pk, trip__in=accessible_trips_qs(request.user))
 
     # Check for forced view from query parameter, otherwise use user preference
     force_view = request.GET.get("view")
@@ -358,7 +364,7 @@ def trip_create(request):
 @login_required
 @require_http_methods(["DELETE"])
 def trip_delete(request, pk):
-    trip = get_object_or_404(Trip, pk=pk, author=request.user)
+    trip = get_trip_for_owner_or_404(pk, request.user)
     trip.delete()
     messages.add_message(
         request,
@@ -373,7 +379,7 @@ def trip_delete(request, pk):
 
 @login_required
 def trip_update(request, pk):
-    trip = get_object_or_404(Trip, pk=pk, author=request.user)
+    trip = get_trip_for_owner_or_404(pk, request.user)
     if request.method == "POST":
         form = TripForm(request.POST, request.FILES, instance=trip)
         if form.is_valid():
@@ -424,7 +430,7 @@ def trip_update(request, pk):
 
 @login_required
 def trip_archive(request, pk):
-    trip = get_object_or_404(Trip, pk=pk, author=request.user)
+    trip = get_trip_for_owner_or_404(pk, request.user)
     trip.status = 5
     trip.save()
 
@@ -447,7 +453,7 @@ def trip_archive(request, pk):
 
 @login_required
 def trip_unarchive(request, pk):
-    trip = get_object_or_404(Trip, pk=pk, author=request.user)
+    trip = get_trip_for_owner_or_404(pk, request.user)
     trip.status = Trip.Status.NOT_STARTED
     trip.save()
     messages.add_message(
@@ -467,7 +473,7 @@ def trip_dates_update(request, pk):
     Update the start and end dates of a trip.
     This view handles the form submission for updating trip dates and uses htmx to trigger a client-side event upon success.
     """
-    trip = get_object_or_404(Trip, pk=pk, author=request.user)
+    trip = get_trip_for_owner_or_404(pk, request.user)
 
     form = TripDateUpdateForm(request.POST or None, instance=trip)
     if form.is_valid():
@@ -488,7 +494,7 @@ def trip_dates_update(request, pk):
 
 @login_required
 def add_experience(request, day_id):
-    day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
+    day = get_object_or_404(Day, pk=day_id, trip__in=accessible_trips_qs(request.user))
     unpaired_experiences = Event.objects.filter(
         day__isnull=True, trip=day.trip, category=2
     )
@@ -511,7 +517,7 @@ def add_experience(request, day_id):
 
 @login_required
 def add_meal(request, day_id):
-    day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
+    day = get_object_or_404(Day, pk=day_id, trip__in=accessible_trips_qs(request.user))
     unpaired_experiences = Event.objects.filter(
         day__isnull=True, trip=day.trip, category=3
     )
@@ -534,7 +540,7 @@ def add_meal(request, day_id):
 
 @login_required
 def add_stay(request, day_id):
-    day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
+    day = get_object_or_404(Day, pk=day_id, trip__in=accessible_trips_qs(request.user))
     trip = day.trip
     form = StayForm(
         trip,
@@ -657,7 +663,9 @@ def create_stay_transfer(request, from_day_id):
     The button to create a transfer only appears on the last day of a stay
     (where next_day has a different stay), so next_day is the correct to_day.
     """
-    from_day = get_object_or_404(Day, pk=from_day_id, trip__author=request.user)
+    from_day = get_object_or_404(
+        Day, pk=from_day_id, trip__in=accessible_trips_qs(request.user)
+    )
 
     # Get the next day - the button only appears when next_day exists and has different stay
     to_day = from_day.next_day
@@ -728,7 +736,9 @@ def edit_stay_transfer(request, pk):
     qs = StayTransfer.objects.select_related(
         "from_stay", "to_stay", "from_day__trip__author", "to_day", "trip"
     )
-    stay_transfer = get_object_or_404(qs, pk=pk, trip__author=request.user)
+    stay_transfer = get_object_or_404(
+        qs, pk=pk, trip__in=accessible_trips_qs(request.user)
+    )
     form = StayTransferEditForm(request.POST or None, instance=stay_transfer)
 
     if form.is_valid():
@@ -753,7 +763,9 @@ def edit_stay_transfer(request, pk):
 def delete_stay_transfer(request, pk):
     """Delete a StayTransfer"""
     qs = StayTransfer.objects.select_related("from_day__trip__author", "to_day")
-    stay_transfer = get_object_or_404(qs, pk=pk, from_day__trip__author=request.user)
+    stay_transfer = get_object_or_404(
+        qs, pk=pk, trip__in=accessible_trips_qs(request.user)
+    )
     from_day_id = stay_transfer.from_day.pk
     to_day_id = stay_transfer.to_day.pk
     stay_transfer.delete()
@@ -772,7 +784,9 @@ def delete_stay_transfer(request, pk):
 @login_required
 def edit_main_transfer(request, pk):
     """Edit existing main transfer - opens modal with specific form"""
-    transfer = get_object_or_404(MainTransfer, pk=pk, trip__author=request.user)
+    transfer = get_object_or_404(
+        MainTransfer, pk=pk, trip__in=accessible_trips_qs(request.user)
+    )
     trip = transfer.trip
 
     # Form class mapper
@@ -840,7 +854,9 @@ def edit_main_transfer(request, pk):
 @login_required
 def delete_main_transfer(request, pk):
     """Delete main transfer"""
-    transfer = get_object_or_404(MainTransfer, pk=pk, trip__author=request.user)
+    transfer = get_object_or_404(
+        MainTransfer, pk=pk, trip__in=accessible_trips_qs(request.user)
+    )
 
     transfer.delete()
     messages.add_message(
@@ -855,7 +871,10 @@ def delete_main_transfer(request, pk):
 def train_status_redirect(request, pk):
     """Redirect to viaggiatreno for train status (specific train or station board)."""
     transfer = get_object_or_404(
-        MainTransfer, pk=pk, trip__author=request.user, type=MainTransfer.Type.TRAIN
+        MainTransfer,
+        pk=pk,
+        trip__in=accessible_trips_qs(request.user),
+        type=MainTransfer.Type.TRAIN,
     )
 
     base = (
@@ -919,7 +938,10 @@ def train_status_redirect(request, pk):
 def flight_status_redirect(request, pk):
     """Redirect to FlightAware for flight status (specific flight or airport board)."""
     transfer = get_object_or_404(
-        MainTransfer, pk=pk, trip__author=request.user, type=MainTransfer.Type.PLANE
+        MainTransfer,
+        pk=pk,
+        trip__in=accessible_trips_qs(request.user),
+        type=MainTransfer.Type.PLANE,
     )
 
     flight_number = transfer.flight_number
@@ -941,7 +963,7 @@ def flight_status_redirect(request, pk):
 @login_required
 def main_transfers_section(request, trip_id):
     """HTMX endpoint: returns main transfers section for trip detail page"""
-    trip = get_object_or_404(Trip, pk=trip_id, author=request.user)
+    trip = get_trip_or_404(trip_id, request.user)
 
     # Get main transfers
     arrival_transfer = MainTransfer.objects.filter(
@@ -971,7 +993,7 @@ def event_modal(request, pk):
     Modal for showing related event link for unpairing or deleting
     """
     qs = Event.objects.select_related("day__trip__author")
-    event = get_object_or_404(qs, pk=pk, day__trip__author=request.user)
+    event = get_object_or_404(qs, pk=pk, trip__in=accessible_trips_qs(request.user))
     context = {
         "event": event,
     }
@@ -982,7 +1004,7 @@ def event_modal(request, pk):
 @require_http_methods(["DELETE"])
 def event_delete(request, pk):
     qs = Event.objects.select_related("day__trip__author")
-    event = get_object_or_404(qs, pk=pk, day__trip__author=request.user)
+    event = get_object_or_404(qs, pk=pk, trip__in=accessible_trips_qs(request.user))
     event.delete()
     messages.add_message(
         request,
@@ -1000,7 +1022,7 @@ def event_unpair(request, pk):
     Only the trip author can unpair events.
     """
     qs = Event.objects.select_related("trip__author")
-    event = get_object_or_404(qs, pk=pk, trip__author=request.user)
+    event = get_object_or_404(qs, pk=pk, trip__in=accessible_trips_qs(request.user))
     event.day = None
     event.save()
     messages.add_message(
@@ -1018,8 +1040,8 @@ def event_pair(request, pk, day_id):
     Only the trip author can pair events.
     """
     qs = Event.objects.select_related("trip__author")
-    event = get_object_or_404(qs, pk=pk, trip__author=request.user)
-    day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
+    event = get_object_or_404(qs, pk=pk, trip__in=accessible_trips_qs(request.user))
+    day = get_object_or_404(Day, pk=day_id, trip__in=accessible_trips_qs(request.user))
 
     event.day = day
     event.save()
@@ -1039,7 +1061,7 @@ def event_pair_choice(request, pk):
     Provide a list of days to pair with the selected event.
     Only days from the same trip are shown.
     """
-    event = get_object_or_404(Event, pk=pk, trip__author=request.user)
+    event = get_object_or_404(Event, pk=pk, trip__in=accessible_trips_qs(request.user))
     trip = event.trip
     days = trip.days.all()
 
@@ -1058,7 +1080,9 @@ def event_pair_choice(request, pk):
 @login_required
 def create_simple_transfer(request, from_event_pk):
     """Create a SimpleTransfer from an event to the next event on the same day"""
-    from_event = get_object_or_404(Event, pk=from_event_pk, trip__author=request.user)
+    from_event = get_object_or_404(
+        Event, pk=from_event_pk, trip__in=accessible_trips_qs(request.user)
+    )
 
     if not from_event.day:
         messages.add_message(
@@ -1111,7 +1135,9 @@ def edit_simple_transfer(request, pk):
     qs = SimpleTransfer.objects.select_related(
         "from_event__trip__author", "to_event", "day", "trip"
     )
-    simple_transfer = get_object_or_404(qs, pk=pk, trip__author=request.user)
+    simple_transfer = get_object_or_404(
+        qs, pk=pk, trip__in=accessible_trips_qs(request.user)
+    )
     form = SimpleTransferEditForm(request.POST or None, instance=simple_transfer)
 
     if form.is_valid():
@@ -1133,7 +1159,9 @@ def edit_simple_transfer(request, pk):
 def delete_simple_transfer(request, pk):
     """Delete a SimpleTransfer"""
     qs = SimpleTransfer.objects.select_related("day__trip__author")
-    simple_transfer = get_object_or_404(qs, pk=pk, day__trip__author=request.user)
+    simple_transfer = get_object_or_404(
+        qs, pk=pk, trip__in=accessible_trips_qs(request.user)
+    )
     day_id = simple_transfer.day.pk
     simple_transfer.delete()
     messages.add_message(
@@ -1150,7 +1178,7 @@ def get_next_events_for_transfer(request, day_id):
     HTMX view to filter to_event dropdown based on selected from_event.
     Returns only events that occur after the selected from_event on the same day.
     """
-    day = get_object_or_404(Day, pk=day_id, trip__author=request.user)
+    day = get_object_or_404(Day, pk=day_id, trip__in=accessible_trips_qs(request.user))
     from_event_id = request.GET.get("from_event")
 
     if not from_event_id:
@@ -1176,7 +1204,7 @@ def main_transfer_connection_modal(request, main_transfer_pk):
     from trips.models import MainTransfer, MainTransferConnection
 
     main_transfer = get_object_or_404(
-        MainTransfer, pk=main_transfer_pk, trip__author=request.user
+        MainTransfer, pk=main_transfer_pk, trip__in=accessible_trips_qs(request.user)
     )
 
     # Check if connection already exists
@@ -1221,7 +1249,7 @@ def create_main_transfer_connection(request, main_transfer_pk, destination_type)
     from trips.models import MainTransfer
 
     main_transfer = get_object_or_404(
-        MainTransfer, pk=main_transfer_pk, trip__author=request.user
+        MainTransfer, pk=main_transfer_pk, trip__in=accessible_trips_qs(request.user)
     )
 
     # Check if connection already exists
@@ -1327,7 +1355,9 @@ def edit_main_transfer_connection(request, pk):
     qs = MainTransferConnection.objects.select_related(
         "main_transfer__trip__author", "event", "stay"
     )
-    connection = get_object_or_404(qs, pk=pk, main_transfer__trip__author=request.user)
+    connection = get_object_or_404(
+        qs, pk=pk, main_transfer__trip__in=accessible_trips_qs(request.user)
+    )
 
     from trips.forms import MainTransferConnectionEditForm
 
@@ -1354,7 +1384,9 @@ def delete_main_transfer_connection(request, pk):
     from trips.models import MainTransferConnection
 
     qs = MainTransferConnection.objects.select_related("main_transfer__trip__author")
-    connection = get_object_or_404(qs, pk=pk, main_transfer__trip__author=request.user)
+    connection = get_object_or_404(
+        qs, pk=pk, main_transfer__trip__in=accessible_trips_qs(request.user)
+    )
     connection.delete()
     messages.add_message(
         request,
@@ -1371,7 +1403,7 @@ def event_detail(request, pk):
     Uses window functions to efficiently detect event overlaps within the day.
     """
     qs = Event.objects.select_related("trip__author", "experience", "meal")
-    event = get_object_or_404(qs, pk=pk, trip__author=request.user)
+    event = get_object_or_404(qs, pk=pk, trip__in=accessible_trips_qs(request.user))
 
     event = get_event_instance(event)
 
@@ -1388,7 +1420,7 @@ def event_modify(request, pk):
     For Experience/Meal events, loads the specific instance to access model-specific fields.
     """
     qs = Event.objects.select_related("day__trip", "experience", "meal")
-    event = get_object_or_404(qs, pk=pk, day__trip__author=request.user)
+    event = get_object_or_404(qs, pk=pk, trip__in=accessible_trips_qs(request.user))
 
     event = get_event_instance(event)
 
@@ -1418,7 +1450,7 @@ def event_change_times(request, pk):
     Change the times of an event on the event detail card
     """
     qs = Event.objects.select_related("trip__author")
-    event = get_object_or_404(qs, pk=pk, trip__author=request.user)
+    event = get_object_or_404(qs, pk=pk, trip__in=accessible_trips_qs(request.user))
     form = EventChangeTimesForm(request.POST or None, instance=event)
     if form.is_valid():
         event = form.save(commit=False)
@@ -1474,8 +1506,12 @@ def event_swap(request, pk1, pk2):
     Swap the times of two events.
     Requires both events to belong to the same day and the same trip author.
     """
-    event1 = get_object_or_404(Event, pk=pk1, day__trip__author=request.user)
-    event2 = get_object_or_404(Event, pk=pk2, day__trip__author=request.user)
+    event1 = get_object_or_404(
+        Event, pk=pk1, trip__in=accessible_trips_qs(request.user)
+    )
+    event2 = get_object_or_404(
+        Event, pk=pk2, trip__in=accessible_trips_qs(request.user)
+    )
     day = event1.day
 
     try:
@@ -1495,7 +1531,7 @@ def single_event(request, pk):
     """
     Return a single event partial for HTMX updates.
     """
-    event = get_object_or_404(Event, pk=pk, day__trip__author=request.user)
+    event = get_object_or_404(Event, pk=pk, trip__in=accessible_trips_qs(request.user))
     context = {
         "event": event,
     }
@@ -1510,7 +1546,9 @@ def event_swap_modal(request, pk):
     Provide a list of events to swap with the selected event.
     Only events from the same day and trip are shown.
     """
-    selected_event = get_object_or_404(Event, pk=pk, day__trip__author=request.user)
+    selected_event = get_object_or_404(
+        Event, pk=pk, trip__in=accessible_trips_qs(request.user)
+    )
     day = selected_event.day
     swappable_events = Event.objects.filter(day=day).exclude(pk=pk)
 
@@ -1626,7 +1664,7 @@ def get_trip_addresses(request):
         ).strip()  # 'origin' or 'destination'
 
         if trip_id:
-            trip = get_object_or_404(Trip, pk=trip_id, author=request.user)
+            trip = get_trip_or_404(trip_id, request.user)
             stays_addresses = []
             events_addresses = []
 
@@ -1703,7 +1741,9 @@ def event_notes(request, event_id):
     """
     View or edit the notes for an event (now a field on Event).
     """
-    event = get_object_or_404(Event, pk=event_id, trip__author=request.user)
+    event = get_object_or_404(
+        Event, pk=event_id, trip__in=accessible_trips_qs(request.user)
+    )
     form = NoteForm(instance=event)
     context = {
         "event": event,
@@ -1718,7 +1758,9 @@ def note_create(request, event_id):
     """
     Add or update a note for an event (now a field on Event).
     """
-    event = get_object_or_404(Event, pk=event_id, trip__author=request.user)
+    event = get_object_or_404(
+        Event, pk=event_id, trip__in=accessible_trips_qs(request.user)
+    )
     form = NoteForm(request.POST, instance=event)
     if form.is_valid():
         form.save()
@@ -1738,7 +1780,9 @@ def note_modify(request, event_id):
     """
     Modify the note for an event (now a field on Event).
     """
-    event = get_object_or_404(Event, pk=event_id, trip__author=request.user)
+    event = get_object_or_404(
+        Event, pk=event_id, trip__in=accessible_trips_qs(request.user)
+    )
     form = NoteForm(request.POST or None, instance=event)
     context = {"form": form, "event": event}
     if form.is_valid():
@@ -1759,7 +1803,9 @@ def note_delete(request, event_id):
     """
     Delete the note from an event (clear the notes field).
     """
-    event = get_object_or_404(Event, pk=event_id, trip__author=request.user)
+    event = get_object_or_404(
+        Event, pk=event_id, trip__in=accessible_trips_qs(request.user)
+    )
     event.notes = ""
     event.save()
     messages.add_message(
@@ -1864,7 +1910,10 @@ def enrich_stay(request, stay_id):
     - Return preview for user confirmation.
     """
     stay = get_object_or_404(
-        Stay.objects.filter(days__trip__author=request.user).distinct(), pk=stay_id
+        Stay.objects.filter(
+            days__trip__in=accessible_trips_qs(request.user)
+        ).distinct(),
+        pk=stay_id,
     )
     context = {}
 
@@ -1974,7 +2023,10 @@ def confirm_enrich_stay(request, stay_id):
     Receives enriched data from the preview and saves it to the database.
     """
     stay = get_object_or_404(
-        Stay.objects.filter(days__trip__author=request.user).distinct(), pk=stay_id
+        Stay.objects.filter(
+            days__trip__in=accessible_trips_qs(request.user)
+        ).distinct(),
+        pk=stay_id,
     )
 
     # Get enriched data from POST parameters
@@ -2040,7 +2092,9 @@ def enrich_event(request, event_id):
     - Return preview for user confirmation.
     """
     qs = Event.objects.select_related("trip__author", "experience", "meal")
-    event = get_object_or_404(qs, pk=event_id, trip__author=request.user)
+    event = get_object_or_404(
+        qs, pk=event_id, trip__in=accessible_trips_qs(request.user)
+    )
     context = {}
 
     if not event.name or not event.address:
@@ -2138,7 +2192,9 @@ def confirm_enrich_event(request, event_id):
     Receives enriched data from the preview and saves it to the database.
     """
     qs = Event.objects.select_related("trip__author", "experience", "meal")
-    event = get_object_or_404(qs, pk=event_id, trip__author=request.user)
+    event = get_object_or_404(
+        qs, pk=event_id, trip__in=accessible_trips_qs(request.user)
+    )
 
     # Get enriched data from POST parameters
     place_id = request.POST.get("place_id", "")
@@ -2300,7 +2356,7 @@ def search_stations(request):
 @login_required
 def arrival_transfer_modal(request, trip_id):
     """Entry point for arrival transfer modal (2-step wizard)."""
-    trip = get_object_or_404(Trip, pk=trip_id, author=request.user)
+    trip = get_trip_or_404(trip_id, request.user)
 
     # Default transport type to PLANE
     transport_type = MainTransfer.Type.PLANE
@@ -2316,7 +2372,7 @@ def arrival_transfer_modal(request, trip_id):
 @login_required
 def departure_transfer_modal(request, trip_id):
     """Entry point for departure transfer modal (2-step wizard)."""
-    trip = get_object_or_404(Trip, pk=trip_id, author=request.user)
+    trip = get_trip_or_404(trip_id, request.user)
 
     # Default transport type to PLANE
     transport_type = MainTransfer.Type.PLANE
@@ -2332,7 +2388,7 @@ def departure_transfer_modal(request, trip_id):
 @login_required
 def main_transfer_step(request, trip_id):
     """HTMX endpoint to load specific step of multi-step modal."""
-    trip = get_object_or_404(Trip, pk=trip_id, author=request.user)
+    trip = get_trip_or_404(trip_id, request.user)
     step = request.GET.get("step", "type")
 
     # Map string to transport type
@@ -2476,7 +2532,7 @@ def main_transfer_step(request, trip_id):
 @login_required
 def save_main_transfer(request, trip_id):
     """Save main transfer (arrival or departure)."""
-    trip = get_object_or_404(Trip, pk=trip_id, author=request.user)
+    trip = get_trip_or_404(trip_id, request.user)
 
     if request.method != "POST":
         return HttpResponse(status=405)
@@ -2588,7 +2644,7 @@ def shared_trip_detail(request, token):
 @login_required
 def share_link_create(request, trip_id):
     """Create a new share link for a trip (owner only)."""
-    trip = get_object_or_404(Trip, id=trip_id, author=request.user)
+    trip = get_trip_for_owner_or_404(trip_id, request.user)
 
     created_link = None
     if request.method == "POST":
@@ -2610,7 +2666,7 @@ def share_link_create(request, trip_id):
 @login_required
 def share_link_list(request, trip_id):
     """List active share links for a trip (owner only)."""
-    trip = get_object_or_404(Trip, id=trip_id, author=request.user)
+    trip = get_trip_for_owner_or_404(trip_id, request.user)
     links = trip.share_links.filter(is_active=True).order_by("-created_at")
     return TemplateResponse(
         request,
