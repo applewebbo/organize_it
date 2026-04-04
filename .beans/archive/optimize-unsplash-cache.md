@@ -1,23 +1,11 @@
 ---
-name: "Optimize Unsplash API caching"
-title: "Optimize Unsplash API caching"
-description: |
-  Improve Unsplash API call caching.
-
-  ## Problem:
-  - Cache only 6 hours (21600s)
-  - No cache for download tracking
-  - Possible duplicate calls for same query
-
-  ## Solution:
-  - Extend cache to 24 hours
-  - Cache download URL
-  - More aggressive rate limiting
-
-labels: ["performance", "cache", "api", "priority-3"]
-priority: 3
-order: 9
-estimated_time: "20m"
+# optimize
+title: Optimize Unsplash API caching
+status: scrapped
+type: task
+priority: "3"
+created_at: 2026-03-31T06:02:32Z
+updated_at: 2026-04-04T05:44:25Z
 ---
 
 # Optimize Unsplash API caching

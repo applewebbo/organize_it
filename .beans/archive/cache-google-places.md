@@ -1,23 +1,11 @@
 ---
-name: "Cache Google Places API"
-title: "Cache Google Places API"
-description: |
-  Add caching to Google Places API calls for enrichment.
-
-  ## Problem:
-  - 2 API calls per enrichment (search + details)
-  - 10s timeout without retry
-  - Possible duplicates if user enriches multiple times
-
-  ## Solution:
-  - Cache results for 24 hours
-  - Cache key based on address/city
-  - Graceful fallback if cache unavailable
-
-labels: ["performance", "cache", "api", "priority-2"]
-priority: 2
-order: 5
-estimated_time: "30m"
+# cache
+title: Cache Google Places API
+status: scrapped
+type: task
+priority: "2"
+created_at: 2026-03-31T06:02:32Z
+updated_at: 2026-04-04T05:44:25Z
 ---
 
 # Cache Google Places API

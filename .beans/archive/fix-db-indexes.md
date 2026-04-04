@@ -1,37 +1,11 @@
 ---
-name: "Add missing database indexes"
-title: "Add missing database indexes"
-description: |
-  Add indexes to the database to optimize the most frequent queries.
-
-  ## Indexes to add:
-
-  ### Trip model (`trips/models.py`)
-  - `author, status` - For filter in `get_trips()`
-  - `author, -start_date` - For list ordering
-
-  ### Event model (`trips/models.py`)
-  - `day, -start_time` - For reverse ordering
-  - `trip` - For filter on `all_events`
-
-  ### Stay model (`trips/models.py`)
-  - `place_id` - For enrichment lookup
-
-  ### Day model (`trips/models.py`)
-  - `trip, date` - For filter and day ordering
-
-  ## Test:
-  - Create migration with `python manage.py makemigrations`
-  - Verify with `EXPLAIN ANALYZE` queries before/after
-  - Test on dataset with 100+ trips
-
-  ## Notes:
-  - Indexes increase disk space but improve reads
-  - In production, apply during low-traffic hours
-labels: ["performance", "database", "priority-1"]
-priority: 1
-order: 1
-estimated_time: "15m"
+# fix
+title: Add missing database indexes
+status: scrapped
+type: task
+priority: "1"
+created_at: 2026-03-31T06:02:32Z
+updated_at: 2026-04-04T05:44:25Z
 ---
 
 # Add missing database indexes
