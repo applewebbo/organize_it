@@ -58,7 +58,7 @@ class Profile(models.Model):
     ]
 
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    fav_trip = models.OneToOneField(
+    fav_trip = models.ForeignKey(
         "trips.Trip",
         on_delete=models.SET_NULL,
         null=True,

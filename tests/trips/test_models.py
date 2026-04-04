@@ -1911,3 +1911,130 @@ class TestMainTransferConnection:
         str_repr = str(connection)
         assert "Arrival Connection" in str_repr
         assert event.name in str_repr
+
+
+class TestTripCollaboration:
+    def test_str(self, user_factory, trip_factory):
+        from trips.models import TripCollaboration
+
+        user = user_factory()
+        trip = trip_factory()
+        collab = TripCollaboration.objects.create(
+            trip=trip, user=user, color="blue", added_by=trip.author
+        )
+        assert str(user) in str(collab)
+        assert trip.title in str(collab)
+        assert "blue" in str(collab)
+
+    def test_next_free_color_returns_first_unused(self, user_factory, trip_factory):
+        from trips.models import TripCollaboration
+
+        trip = trip_factory()
+        user1 = user_factory()
+        user2 = user_factory()
+        TripCollaboration.objects.create(
+            trip=trip, user=user1, color="blue", added_by=trip.author
+        )
+        color = TripCollaboration.next_free_color(trip)
+        assert color == "green"
+
+        TripCollaboration.objects.create(
+            trip=trip, user=user2, color="green", added_by=trip.author
+        )
+        color = TripCollaboration.next_free_color(trip)
+        assert color == "purple"
+
+    def test_next_free_color_wraps_when_all_used(self, trip_factory, user_factory):
+        from trips.models import TripCollaboration
+
+        trip = trip_factory()
+        for color in TripCollaboration.PALETTE_VALUES:
+            user = user_factory()
+            TripCollaboration.objects.create(
+                trip=trip, user=user, color=color, added_by=trip.author
+            )
+        color = TripCollaboration.next_free_color(trip)
+        assert color == TripCollaboration.PALETTE_VALUES[0]
+
+
+class TestTripInvitation:
+    def test_str(self, user_factory, trip_factory):
+        from datetime import datetime, timezone
+
+        from trips.models import TripInvitation
+
+        trip = trip_factory()
+        invitation = TripInvitation.objects.create(
+            trip=trip,
+            email="guest@example.com",
+            invited_by=trip.author,
+            expires_at=datetime(2099, 1, 1, tzinfo=timezone.utc),
+        )
+        assert "guest@example.com" in str(invitation)
+        assert trip.title in str(invitation)
+
+    def test_is_valid_true(self, user_factory, trip_factory):
+        from datetime import datetime, timezone
+
+        from trips.models import TripInvitation
+
+        trip = trip_factory()
+        invitation = TripInvitation.objects.create(
+            trip=trip,
+            email="guest@example.com",
+            invited_by=trip.author,
+            expires_at=datetime(2099, 1, 1, tzinfo=timezone.utc),
+        )
+        assert invitation.is_valid is True
+
+    def test_is_valid_false_when_accepted(self, trip_factory):
+        from datetime import datetime, timezone
+
+        from django.utils import timezone as dj_tz
+
+        from trips.models import TripInvitation
+
+        trip = trip_factory()
+        invitation = TripInvitation.objects.create(
+            trip=trip,
+            email="guest@example.com",
+            invited_by=trip.author,
+            expires_at=datetime(2099, 1, 1, tzinfo=timezone.utc),
+            is_accepted=True,
+            accepted_at=dj_tz.now(),
+        )
+        assert invitation.is_valid is False
+
+    def test_is_valid_false_when_expired(self, trip_factory):
+        from datetime import datetime, timezone
+
+        from trips.models import TripInvitation
+
+        trip = trip_factory()
+        invitation = TripInvitation.objects.create(
+            trip=trip,
+            email="guest@example.com",
+            invited_by=trip.author,
+            expires_at=datetime(2000, 1, 1, tzinfo=timezone.utc),
+        )
+        assert invitation.is_valid is False
+
+    def test_get_absolute_url(self, trip_factory):
+        from datetime import datetime, timezone
+        from unittest.mock import patch
+
+        from trips.models import TripInvitation
+
+        trip = trip_factory()
+        invitation = TripInvitation.objects.create(
+            trip=trip,
+            email="guest@example.com",
+            invited_by=trip.author,
+            expires_at=datetime(2099, 1, 1, tzinfo=timezone.utc),
+        )
+        with patch(
+            "trips.models.reverse",
+            return_value=f"/trips/invite/{invitation.token}/accept/",
+        ):
+            url = invitation.get_absolute_url()
+        assert str(invitation.token) in url

@@ -34,6 +34,13 @@ class Trip(models.Model):
     end_date = models.DateField(null=True, blank=True)
     status = models.IntegerField(choices=Status, default=Status.NOT_STARTED)
     links = models.ManyToManyField("Link", related_name="trips", blank=True)
+    collaborators = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        through="TripCollaboration",
+        through_fields=("trip", "user"),
+        related_name="collaborated_trips",
+        blank=True,
+    )
     image = models.ImageField(
         upload_to="trips/%Y/%m/",
         blank=True,
@@ -149,6 +156,20 @@ class Stay(models.Model):
     place_id = models.CharField(max_length=255, blank=True)
     opening_hours = models.JSONField(blank=True, null=True)
     enriched = models.BooleanField(default=False)
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="created_stays",
+    )
+    last_modified_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="modified_stays",
+    )
 
     class Meta:
         indexes = [
@@ -266,6 +287,13 @@ class MainTransfer(models.Model):
     # Metadata
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    last_modified_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="modified_main_transfers",
+    )
 
     class Meta:
         db_table = "trips_main_transfer"
@@ -450,6 +478,13 @@ class Event(models.Model):
     phone_number = models.CharField(max_length=50, blank=True)
     opening_hours = models.JSONField(blank=True, null=True)
     enriched = models.BooleanField(default=False)
+    last_modified_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="modified_events",
+    )
 
     class Meta:
         ordering = ["start_time"]
@@ -958,6 +993,84 @@ class Meal(Event):
         """autosave category for meal"""
         self.category = self.Category.MEAL
         return super().save(*args, **kwargs)
+
+
+class TripCollaboration(models.Model):
+    """Through model for Trip.collaborators M2M, stores color per collaborator."""
+
+    PALETTE = [
+        ("blue", _("Blue")),
+        ("green", _("Green")),
+        ("purple", _("Purple")),
+        ("orange", _("Orange")),
+        ("pink", _("Pink")),
+        ("teal", _("Teal")),
+        ("red", _("Red")),
+        ("indigo", _("Indigo")),
+    ]
+    PALETTE_VALUES = [c[0] for c in PALETTE]
+
+    trip = models.ForeignKey(
+        Trip, on_delete=models.CASCADE, related_name="collaborations"
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="trip_collaborations",
+    )
+    color = models.CharField(max_length=20, choices=PALETTE)
+    added_at = models.DateTimeField(auto_now_add=True)
+    added_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="collaborations_added",
+    )
+
+    class Meta:
+        unique_together = ("trip", "user")
+        ordering = ("added_at",)
+
+    def __str__(self) -> str:
+        return f"{self.user} → {self.trip.title} ({self.color})"
+
+    @classmethod
+    def next_free_color(cls, trip):
+        """Return the first palette color not yet used by this trip's collaborators."""
+        used = set(cls.objects.filter(trip=trip).values_list("color", flat=True))
+        for color in cls.PALETTE_VALUES:
+            if color not in used:
+                return color
+        return cls.PALETTE_VALUES[0]
+
+
+class TripInvitation(models.Model):
+    """Pending invitation for a non-registered user to join a trip as collaborator."""
+
+    token = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="invitations")
+    email = models.EmailField()
+    invited_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="sent_invitations",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    accepted_at = models.DateTimeField(null=True, blank=True)
+    is_accepted = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ("-created_at",)
+
+    def __str__(self) -> str:
+        return f"Invitation for {self.email} → {self.trip.title}"
+
+    @property
+    def is_valid(self) -> bool:
+        return not self.is_accepted and timezone.now() < self.expires_at
+
+    def get_absolute_url(self) -> str:
+        return reverse("trips:accept-invitation", kwargs={"token": self.token})
 
 
 class ShareLink(models.Model):
