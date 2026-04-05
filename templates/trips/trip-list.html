@@ -176,9 +176,10 @@
                                 <h2 class="card-title">
                                     <a href="{% url 'trips:trip-detail' trip.id %}">{{ trip.title }}</a>
                                 </h2>
-                                <p class="text-sm text-base-content/60">
-                                    <i class="mr-1 ph-bold ph-user"></i>{{ trip.author.profile.first_name|default:trip.author.email }}
-                                </p>
+                                <span class="flex gap-1.5 items-center self-start py-0.5 pr-2 pl-1.5 text-xs rounded-full text-info bg-info/15">
+                                    <i class="ph-bold ph-user-circle"></i>
+                                    {{ trip.author.profile.first_name|default:trip.author.email }}
+                                </span>
                                 <div class="text-sm text-base-content/70">
                                     {% if trip.start_date and trip.end_date %}
                                         {{ trip.start_date|date:"SHORT_DATE_FORMAT" }}&nbsp;-&nbsp;{{ trip.end_date|date:"SHORT_DATE_FORMAT" }}
