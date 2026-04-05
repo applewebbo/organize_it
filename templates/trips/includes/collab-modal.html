@@ -1,0 +1,25 @@
+{% load i18n %}
+<div class="p-4 sm:p-6" x-data>
+    <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold">{% trans "Collaborators" %}</h3>
+        <button class="btn btn-sm btn-ghost btn-circle"
+                @click="$dispatch('hide-modal')"
+                aria-label="{% trans 'Close' %}">
+            <i class="ph-bold ph-x i-md"></i>
+        </button>
+    </div>
+    {% include "trips/includes/collab-modal-list.html" %}
+    <div class="pt-3 border-t border-base-300">
+        <label class="block mb-1 text-sm font-medium text-base-content/70">{% trans "Add by email" %}</label>
+        <input type="email"
+               name="email"
+               placeholder="{% trans 'Search by email…' %}"
+               class="w-full input input-bordered input-sm"
+               hx-get="{% url 'trips:search-user-by-email' trip.pk %}"
+               hx-trigger="input changed delay:400ms, search"
+               hx-target="#collab-search-result"
+               hx-include="[name='email']"
+               autocomplete="off">
+        <div id="collab-search-result" class="mt-2"></div>
+    </div>
+</div>

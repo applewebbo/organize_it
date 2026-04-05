@@ -139,17 +139,15 @@
                 {% if trip.status == 2 or trip.status == 3 %}
                     {% weather_summary trip %}
                 {% endif %}
+                {% with collaborations=trip.collaborations.all %}
+                    {% if request.user == trip.author or collaborations %}
+                        {% include "trips/includes/collab-inline.html" with collaborations=collaborations %}
+                    {% endif %}
+                {% endwith %}
             </div>
         </div>
     </section>
     <!-- END Trip Header with Image Section -->
-    <!-- Collaborators Section -->
-    {% with collaborations=trip.collaborations.all %}
-        {% if request.user == trip.author or collaborations %}
-            {% include "trips/includes/collaborators-section.html" with collaborations=collaborations %}
-        {% endif %}
-    {% endwith %}
-    <!-- END Collaborators Section -->
     <!-- Main Transfers Section -->
     {% if trip.status != 5 %}
         {% include 'trips/includes/main-transfers.html' %}

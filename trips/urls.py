@@ -200,6 +200,16 @@ htmx_urlpatterns = [
     path("images/search/", views.search_trip_images, name="search-images"),
     # COLLABORATION
     path(
+        "trips/<int:trip_id>/collaborators/",
+        views.collaborators_modal,
+        name="collaborators-modal",
+    ),
+    path(
+        "trips/<int:trip_id>/collaborators/inline/",
+        views.collab_inline,
+        name="collab-inline",
+    ),
+    path(
         "trips/<int:trip_id>/collaborators/search/",
         views.search_user_by_email,
         name="search-user-by-email",

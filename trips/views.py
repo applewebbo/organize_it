@@ -2755,10 +2755,10 @@ def add_collaborator(request, trip_id):
         trip=trip, user=user, color=color, added_by=request.user
     )
 
-    collaborations = trip.collaborations.select_related("user").all()
+    collaborations = trip.collaborations.select_related("user__profile").all()
     return TemplateResponse(
         request,
-        "trips/includes/collaborators-section.html",
+        "trips/includes/collab-modal-list.html",
         {"trip": trip, "collaborations": collaborations},
         headers={"HX-Trigger": "collaboratorsModified"},
     )
@@ -2772,10 +2772,34 @@ def remove_collaborator(request, trip_id, collaboration_id):
     collaboration = get_object_or_404(TripCollaboration, pk=collaboration_id, trip=trip)
     collaboration.delete()
 
-    collaborations = trip.collaborations.select_related("user").all()
+    collaborations = trip.collaborations.select_related("user__profile").all()
     return TemplateResponse(
         request,
-        "trips/includes/collaborators-section.html",
+        "trips/includes/collab-modal-list.html",
         {"trip": trip, "collaborations": collaborations},
         headers={"HX-Trigger": "collaboratorsModified"},
+    )
+
+
+@login_required
+def collaborators_modal(request, trip_id):
+    """GET: render the collaborators management modal (owner only)."""
+    trip = get_trip_for_owner_or_404(trip_id, request.user)
+    collaborations = trip.collaborations.select_related("user__profile").all()
+    return TemplateResponse(
+        request,
+        "trips/includes/collab-modal.html",
+        {"trip": trip, "collaborations": collaborations},
+    )
+
+
+@login_required
+def collab_inline(request, trip_id):
+    """GET: render the compact inline collaborators row (HTMX refresh)."""
+    trip = get_trip_or_404(trip_id, request.user)
+    collaborations = trip.collaborations.select_related("user__profile").all()
+    return TemplateResponse(
+        request,
+        "trips/includes/collab-inline.html",
+        {"trip": trip, "collaborations": collaborations},
     )

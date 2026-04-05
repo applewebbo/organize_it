@@ -151,7 +151,7 @@ class TestAddCollaborator:
         url = reverse("trips:add-collaborator", args=[trip.pk])
         response = client.post(url, {"email": new_collab.email})
         assert response.status_code == 200
-        assert b"collaborators-section" in response.content
+        assert b"collab-modal-list" in response.content
 
     def test_response_triggers_collaborators_modified(
         self, client, user_factory, trip_factory
@@ -217,7 +217,7 @@ class TestRemoveCollaborator:
         url = reverse("trips:remove-collaborator", args=[trip.pk, tc.pk])
         response = client.post(url)
         assert response.status_code == 200
-        assert b"collaborators-section" in response.content
+        assert b"collab-modal-list" in response.content
 
     def test_response_triggers_collaborators_modified(
         self, client, user_factory, trip_factory
@@ -232,3 +232,62 @@ class TestRemoveCollaborator:
         url = reverse("trips:remove-collaborator", args=[trip.pk, tc.pk])
         response = client.post(url)
         assert "collaboratorsModified" in response.headers.get("HX-Trigger", "")
+
+
+class TestCollaboratorsModal:
+    def test_owner_sees_modal(self, client, user_factory, trip_factory):
+        owner = user_factory()
+        trip = trip_factory(author=owner)
+        client.force_login(owner)
+        url = reverse("trips:collaborators-modal", args=[trip.pk])
+        response = client.get(url)
+        assert response.status_code == 200
+        assert b"collab-modal-list" in response.content
+
+    def test_non_owner_gets_404(self, client, user_factory, trip_factory):
+        owner = user_factory()
+        stranger = user_factory()
+        trip = trip_factory(author=owner)
+        client.force_login(stranger)
+        url = reverse("trips:collaborators-modal", args=[trip.pk])
+        response = client.get(url)
+        assert response.status_code == 404
+
+    def test_unauthenticated_redirects(self, client, trip_factory, user_factory):
+        owner = user_factory()
+        trip = trip_factory(author=owner)
+        url = reverse("trips:collaborators-modal", args=[trip.pk])
+        response = client.get(url)
+        assert response.status_code == 302
+
+
+class TestCollabInline:
+    def test_owner_sees_inline(self, client, user_factory, trip_factory):
+        owner = user_factory()
+        trip = trip_factory(author=owner)
+        client.force_login(owner)
+        url = reverse("trips:collab-inline", args=[trip.pk])
+        response = client.get(url)
+        assert response.status_code == 200
+        assert b"collab-inline" in response.content
+
+    def test_collaborator_sees_inline(self, client, user_factory, trip_factory):
+        owner = user_factory()
+        collab = user_factory()
+        trip = trip_factory(author=owner)
+        TripCollaboration.objects.create(
+            trip=trip, user=collab, color="blue", added_by=owner
+        )
+        client.force_login(collab)
+        url = reverse("trips:collab-inline", args=[trip.pk])
+        response = client.get(url)
+        assert response.status_code == 200
+
+    def test_stranger_gets_404(self, client, user_factory, trip_factory):
+        owner = user_factory()
+        stranger = user_factory()
+        trip = trip_factory(author=owner)
+        client.force_login(stranger)
+        url = reverse("trips:collab-inline", args=[trip.pk])
+        response = client.get(url)
+        assert response.status_code == 404
