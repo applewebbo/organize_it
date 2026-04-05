@@ -1248,7 +1248,7 @@ msgstr ""
 
 #: templates/trips/trip-list.html:146
 msgid "Shared with me"
-msgstr ""
+msgstr "Shared with me"
 
 #: templates/trips/trip-list.html:200
 msgid "Archived Trips"

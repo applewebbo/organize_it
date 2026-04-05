@@ -1251,10 +1251,8 @@ msgid "Create a new trip"
 msgstr "Crea un nuovo viaggio"
 
 #: templates/trips/trip-list.html:146
-#, fuzzy
-#| msgid "Share this link"
 msgid "Shared with me"
-msgstr "Condividi questo link"
+msgstr "Condivise con me"
 
 #: templates/trips/trip-list.html:200
 msgid "Archived Trips"
