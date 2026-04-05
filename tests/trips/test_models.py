@@ -1956,6 +1956,26 @@ class TestTripCollaboration:
         color = TripCollaboration.next_free_color(trip)
         assert color == TripCollaboration.PALETTE_VALUES[0]
 
+    def test_badge_bg_class_returns_correct_class(self, user_factory, trip_factory):
+        from trips.models import TripCollaboration
+
+        user = user_factory()
+        trip = trip_factory()
+        collab = TripCollaboration.objects.create(
+            trip=trip, user=user, color="blue", added_by=trip.author
+        )
+        assert collab.badge_bg_class == "bg-blue-500"
+
+    def test_badge_bg_class_unknown_color_fallback(self, user_factory, trip_factory):
+        from trips.models import TripCollaboration
+
+        user = user_factory()
+        trip = trip_factory()
+        collab = TripCollaboration(
+            trip=trip, user=user, color="nonexistent", added_by=trip.author
+        )
+        assert collab.badge_bg_class == "bg-base-300"
+
 
 class TestTripInvitation:
     def test_str(self, user_factory, trip_factory):

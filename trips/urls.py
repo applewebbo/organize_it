@@ -198,6 +198,22 @@ htmx_urlpatterns = [
     ),
     # IMAGE MANAGEMENT
     path("images/search/", views.search_trip_images, name="search-images"),
+    # COLLABORATION
+    path(
+        "trips/<int:trip_id>/collaborators/search/",
+        views.search_user_by_email,
+        name="search-user-by-email",
+    ),
+    path(
+        "trips/<int:trip_id>/collaborators/add/",
+        views.add_collaborator,
+        name="add-collaborator",
+    ),
+    path(
+        "trips/<int:trip_id>/collaborators/<int:collaboration_id>/remove/",
+        views.remove_collaborator,
+        name="remove-collaborator",
+    ),
     # SHARING
     path(
         "trips/<int:trip_id>/share/create/",

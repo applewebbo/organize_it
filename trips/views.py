@@ -5,6 +5,7 @@ from datetime import date, timedelta
 import requests
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import transaction
 from django.db.models import Prefetch, Q
@@ -45,6 +46,7 @@ from trips.models import (
     Stay,
     StayTransfer,
     Trip,
+    TripCollaboration,
 )
 from trips.utils import (
     accessible_trips_qs,
@@ -150,6 +152,10 @@ def trip_detail(request, pk):
         ),
         "days__stay__transfer_from",
         "days__stay__transfer_to",
+        Prefetch(
+            "collaborations",
+            queryset=TripCollaboration.objects.select_related("user__profile"),
+        ),
     ).select_related("author")
 
     trip = get_object_or_404(
@@ -2696,4 +2702,80 @@ def share_link_revoke(request, link_id):
             "links": links,
             "created_link": None,
         },
+    )
+
+
+@login_required
+def search_user_by_email(request, trip_id):
+    """HTMX: search registered user by email to invite as collaborator (owner only)."""
+    trip = get_trip_for_owner_or_404(trip_id, request.user)
+    email = request.GET.get("email", "").strip()
+    User = get_user_model()
+
+    if not email:
+        return HttpResponse("")
+
+    existing_ids = set(trip.collaborators.values_list("id", flat=True))
+    existing_ids.add(trip.author_id)
+
+    try:
+        user = User.objects.get(email=email)
+        already_collab = user.id in existing_ids
+        return TemplateResponse(
+            request,
+            "trips/includes/collab-search-result.html",
+            {"trip": trip, "found_user": user, "already_collab": already_collab},
+        )
+    except User.DoesNotExist:
+        return TemplateResponse(
+            request,
+            "trips/includes/collab-search-result.html",
+            {"trip": trip, "found_user": None, "email": email},
+        )
+
+
+@login_required
+@require_http_methods(["POST"])
+def add_collaborator(request, trip_id):
+    """Add a registered user as collaborator (owner only)."""
+    trip = get_trip_for_owner_or_404(trip_id, request.user)
+    User = get_user_model()
+    email = request.POST.get("email", "").strip()
+
+    try:
+        user = User.objects.get(email=email)
+    except User.DoesNotExist:
+        return HttpResponse(status=400)
+
+    if user == trip.author or trip.collaborators.filter(pk=user.pk).exists():
+        return HttpResponse(status=400)
+
+    color = TripCollaboration.next_free_color(trip)
+    TripCollaboration.objects.create(
+        trip=trip, user=user, color=color, added_by=request.user
+    )
+
+    collaborations = trip.collaborations.select_related("user").all()
+    return TemplateResponse(
+        request,
+        "trips/includes/collaborators-section.html",
+        {"trip": trip, "collaborations": collaborations},
+        headers={"HX-Trigger": "collaboratorsModified"},
+    )
+
+
+@login_required
+@require_http_methods(["POST"])
+def remove_collaborator(request, trip_id, collaboration_id):
+    """Remove a collaborator from a trip (owner only, data is preserved)."""
+    trip = get_trip_for_owner_or_404(trip_id, request.user)
+    collaboration = get_object_or_404(TripCollaboration, pk=collaboration_id, trip=trip)
+    collaboration.delete()
+
+    collaborations = trip.collaborations.select_related("user").all()
+    return TemplateResponse(
+        request,
+        "trips/includes/collaborators-section.html",
+        {"trip": trip, "collaborations": collaborations},
+        headers={"HX-Trigger": "collaboratorsModified"},
     )

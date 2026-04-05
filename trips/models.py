@@ -1009,6 +1009,16 @@ class TripCollaboration(models.Model):
         ("indigo", _("Indigo")),
     ]
     PALETTE_VALUES = [c[0] for c in PALETTE]
+    COLOR_BADGE_CLASSES = {
+        "blue": "bg-blue-500",
+        "green": "bg-green-600",
+        "purple": "bg-purple-500",
+        "orange": "bg-orange-500",
+        "pink": "bg-pink-500",
+        "teal": "bg-teal-500",
+        "red": "bg-red-500",
+        "indigo": "bg-indigo-500",
+    }
 
     trip = models.ForeignKey(
         Trip, on_delete=models.CASCADE, related_name="collaborations"
@@ -1032,6 +1042,10 @@ class TripCollaboration(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user} → {self.trip.title} ({self.color})"
+
+    @property
+    def badge_bg_class(self):
+        return self.COLOR_BADGE_CLASSES.get(self.color, "bg-base-300")
 
     @classmethod
     def next_free_color(cls, trip):

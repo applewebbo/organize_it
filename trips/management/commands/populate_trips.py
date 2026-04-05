@@ -15,11 +15,11 @@ from tests.trips.factories import (
     StayFactory,
     TripFactory,
 )
-from trips.models import Event, MainTransfer, Stay, Trip
+from trips.models import Event, MainTransfer, Stay, Trip, TripCollaboration
 
 logger = logging.getLogger("task")
 
-NUMBER_OF_USERS = 1
+NUMBER_OF_USERS = 2
 
 # Trip date configs: (start_offset, end_offset) relative to today
 TRIP_DATE_CONFIGS = [
@@ -162,6 +162,35 @@ class Command(BaseCommand):
                             end_time=end_time,
                             city=trip.destination,
                         )
+
+        # Create a shared trip: user1 is owner, user2 is collaborator (and vice versa)
+        all_users = list(User.objects.exclude(is_superuser=True))
+        if len(all_users) >= 2:
+            user1, user2 = all_users[0], all_users[1]
+            for owner, collab in [(user1, user2), (user2, user1)]:
+                shared_trip = TripFactory(
+                    author=owner,
+                    start_date=date.today() + timedelta(days=5),
+                    end_date=date.today() + timedelta(days=8),
+                )
+                color = TripCollaboration.next_free_color(shared_trip)
+                TripCollaboration.objects.create(
+                    trip=shared_trip,
+                    user=collab,
+                    color=color,
+                    added_by=owner,
+                )
+                all_days = list(shared_trip.days.all())
+                stay = StayFactory(city=shared_trip.destination)
+                stay.days.set(all_days)
+                for day in shared_trip.days.all():
+                    ExperienceFactory.create(
+                        day=day,
+                        trip=shared_trip,
+                        start_time=time(10, 0),
+                        end_time=time(12, 0),
+                        city=shared_trip.destination,
+                    )
 
         logger.info("Trips populated correctly!")
         self.stdout.write(self.style.SUCCESS("Successfully populated database"))
