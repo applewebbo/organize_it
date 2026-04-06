@@ -14,7 +14,7 @@ class TestSearchUserByEmail:
         trip = trip_factory(author=owner)
         client.force_login(owner)
         url = reverse("trips:search-user-by-email", args=[trip.pk])
-        response = client.get(url, {"email": ""})
+        response = client.get(url, {"collab_email": ""})
         assert response.status_code == 200
         assert response.content == b""
 
@@ -24,7 +24,7 @@ class TestSearchUserByEmail:
         trip = trip_factory(author=owner)
         client.force_login(owner)
         url = reverse("trips:search-user-by-email", args=[trip.pk])
-        response = client.get(url, {"email": other.email})
+        response = client.get(url, {"collab_email": other.email})
         assert response.status_code == 200
         assert other.email.encode() in response.content
 
@@ -37,7 +37,7 @@ class TestSearchUserByEmail:
         )
         client.force_login(owner)
         url = reverse("trips:search-user-by-email", args=[trip.pk])
-        response = client.get(url, {"email": collab.email})
+        response = client.get(url, {"collab_email": collab.email})
         assert response.status_code == 200
         assert b"Already a collaborator" in response.content
 
@@ -46,7 +46,7 @@ class TestSearchUserByEmail:
         trip = trip_factory(author=owner)
         client.force_login(owner)
         url = reverse("trips:search-user-by-email", args=[trip.pk])
-        response = client.get(url, {"email": owner.email})
+        response = client.get(url, {"collab_email": owner.email})
         assert response.status_code == 200
         assert b"Already a collaborator" in response.content
 
@@ -55,7 +55,7 @@ class TestSearchUserByEmail:
         trip = trip_factory(author=owner)
         client.force_login(owner)
         url = reverse("trips:search-user-by-email", args=[trip.pk])
-        response = client.get(url, {"email": "nobody@example.com"})
+        response = client.get(url, {"collab_email": "nobody@example.com"})
         assert response.status_code == 200
         assert b"No account found" in response.content
 
@@ -65,14 +65,14 @@ class TestSearchUserByEmail:
         trip = trip_factory(author=owner)
         client.force_login(stranger)
         url = reverse("trips:search-user-by-email", args=[trip.pk])
-        response = client.get(url, {"email": "x@x.com"})
+        response = client.get(url, {"collab_email": "x@x.com"})
         assert response.status_code == 404
 
     def test_unauthenticated_redirects(self, client, user_factory, trip_factory):
         owner = user_factory()
         trip = trip_factory(author=owner)
         url = reverse("trips:search-user-by-email", args=[trip.pk])
-        response = client.get(url, {"email": "x@x.com"})
+        response = client.get(url, {"collab_email": "x@x.com"})
         assert response.status_code == 302
 
 

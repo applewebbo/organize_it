@@ -42,13 +42,14 @@
                     <label class="mb-1 text-sm font-medium text-base-content/70">{% trans "Add collaborator by email" %}</label>
                     <div class="flex gap-2 mt-1">
                         <input type="email"
-                               name="email"
+                               id="collab-search-input"
+                               name="collab_email"
                                placeholder="{% trans 'Search by email…' %}"
                                class="w-full max-w-sm input input-bordered input-sm"
                                hx-get="{% url 'trips:search-user-by-email' trip.pk %}"
-                               hx-trigger="input changed delay:400ms, search"
+                               hx-trigger="input changed delay:400ms"
                                hx-target="#collab-search-result"
-                               hx-include="[name='email']"
+                               hx-include="#collab-search-input"
                                autocomplete="off">
                     </div>
                     <div id="collab-search-result" class="mt-2"></div>

@@ -12,13 +12,14 @@
     <div class="pt-3 border-t border-base-300">
         <label class="block mb-1 text-sm font-medium text-base-content/70">{% trans "Add by email" %}</label>
         <input type="email"
-               name="email"
+               id="collab-search-input"
+               name="collab_email"
                placeholder="{% trans 'Search by email…' %}"
                class="w-full input input-bordered input-sm"
                hx-get="{% url 'trips:search-user-by-email' trip.pk %}"
-               hx-trigger="input changed delay:400ms, search"
+               hx-trigger="input changed delay:400ms"
                hx-target="#collab-search-result"
-               hx-include="[name='email']"
+               hx-include="#collab-search-input"
                autocomplete="off">
         <div id="collab-search-result" class="mt-2"></div>
     </div>

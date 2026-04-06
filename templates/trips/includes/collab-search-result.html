@@ -1,21 +1,23 @@
 {% load i18n %}
-{% if found_user %}
-    {% if already_collab %}
-        <p class="text-sm text-base-content/60">{% trans "Already a collaborator." %}</p>
-    {% else %}
-        <div class="flex gap-2 items-center p-2 rounded-lg bg-base-200">
-            <span class="text-sm grow">{{ found_user.email }}</span>
-            <form method="post"
-                  action="{% url 'trips:add-collaborator' trip.pk %}"
-                  hx-post="{% url 'trips:add-collaborator' trip.pk %}"
-                  hx-target="#collab-modal-list"
-                  hx-swap="outerHTML">
-                {% csrf_token %}
-                <input type="hidden" name="email" value="{{ found_user.email }}">
-                <button type="submit" class="btn btn-sm btn-primary">{% trans "Add" %}</button>
-            </form>
+{% if results %}
+    {% for result in results %}
+        <div class="flex gap-2 items-center p-2 rounded-lg bg-base-200 {% if not forloop.first %}mt-2{% endif %}">
+            <span class="text-sm grow">{{ result.user.email }}</span>
+            {% if result.already_collab %}
+                <span class="text-xs text-base-content/60">{% trans "Already a collaborator." %}</span>
+            {% else %}
+                <form method="post"
+                      action="{% url 'trips:add-collaborator' trip.pk %}"
+                      hx-post="{% url 'trips:add-collaborator' trip.pk %}"
+                      hx-target="#collab-modal-list"
+                      hx-swap="outerHTML">
+                    {% csrf_token %}
+                    <input type="hidden" name="email" value="{{ result.user.email }}">
+                    <button type="submit" class="btn btn-sm btn-primary">{% trans "Add" %}</button>
+                </form>
+            {% endif %}
         </div>
-    {% endif %}
+    {% endfor %}
 {% elif email %}
     <div class="flex gap-2 items-center p-2 text-sm rounded-lg bg-base-200">
         <i class="ph-bold ph-user-circle-dashed text-base-content/60 i-md"></i>

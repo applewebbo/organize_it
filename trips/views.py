@@ -2709,7 +2709,7 @@ def share_link_revoke(request, link_id):
 def search_user_by_email(request, trip_id):
     """HTMX: search registered user by email to invite as collaborator (owner only)."""
     trip = get_trip_for_owner_or_404(trip_id, request.user)
-    email = request.GET.get("email", "").strip()
+    email = request.GET.get("collab_email", "").strip()
     User = get_user_model()
 
     if not email:
@@ -2718,20 +2718,24 @@ def search_user_by_email(request, trip_id):
     existing_ids = set(trip.collaborators.values_list("id", flat=True))
     existing_ids.add(trip.author_id)
 
-    try:
-        user = User.objects.get(email=email)
+    # Use partial matching (case-insensitive) for email search
+    matching_users = User.objects.filter(email__icontains=email)[:10]
+
+    results = []
+    for user in matching_users:
         already_collab = user.id in existing_ids
-        return TemplateResponse(
-            request,
-            "trips/includes/collab-search-result.html",
-            {"trip": trip, "found_user": user, "already_collab": already_collab},
+        results.append(
+            {
+                "user": user,
+                "already_collab": already_collab,
+            }
         )
-    except User.DoesNotExist:
-        return TemplateResponse(
-            request,
-            "trips/includes/collab-search-result.html",
-            {"trip": trip, "found_user": None, "email": email},
-        )
+
+    return TemplateResponse(
+        request,
+        "trips/includes/collab-search-result.html",
+        {"trip": trip, "results": results, "email": email},
+    )
 
 
 @login_required
