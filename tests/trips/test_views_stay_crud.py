@@ -42,6 +42,28 @@ class AddStayView(TestCase):
         day.refresh_from_db()
         assert day.stay is not None
 
+    @patch("geocoder.mapbox")
+    def test_post_sets_author(self, mock_geocoder):
+        mock_geocoder.return_value.ok = True
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        days = trip.days.all()
+        day = days.first()
+        data = {
+            "name": "Grand Hotel",
+            "check_in": "14:00",
+            "check_out": "11:00",
+            "address": "Via Roma 1, Rome",
+            "apply_to_days": [day.pk for day in days],
+        }
+
+        with self.login(user):
+            self.post("trips:add-stay", day_id=day.pk, data=data)
+
+        day.refresh_from_db()
+        assert day.stay.author == user
+
     def test_post_with_invalid_data(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)

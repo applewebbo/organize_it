@@ -146,12 +146,16 @@ def trip_detail(request, pk):
     qs = Trip.objects.prefetch_related(
         Prefetch(
             "days__events",
-            queryset=annotate_event_overlaps(Event.objects.all()).order_by(
-                "start_time"
+            queryset=annotate_event_overlaps(
+                Event.objects.select_related("last_modified_by")
+            ).order_by("start_time"),
+        ),
+        Prefetch(
+            "days__stay",
+            queryset=Stay.objects.select_related("author").prefetch_related(
+                "transfer_from", "transfer_to"
             ),
         ),
-        "days__stay__transfer_from",
-        "days__stay__transfer_to",
         Prefetch(
             "collaborations",
             queryset=TripCollaboration.objects.select_related("user__profile"),
@@ -165,16 +169,24 @@ def trip_detail(request, pk):
     unpaired_events = trip.all_events.filter(day__isnull=True)
 
     # Get main transfers
-    arrival_transfer = MainTransfer.objects.filter(
-        trip=trip, direction=MainTransfer.Direction.ARRIVAL
-    ).first()
-    departure_transfer = MainTransfer.objects.filter(
-        trip=trip, direction=MainTransfer.Direction.DEPARTURE
-    ).first()
+    arrival_transfer = (
+        MainTransfer.objects.filter(trip=trip, direction=MainTransfer.Direction.ARRIVAL)
+        .select_related("last_modified_by")
+        .first()
+    )
+    departure_transfer = (
+        MainTransfer.objects.filter(
+            trip=trip, direction=MainTransfer.Direction.DEPARTURE
+        )
+        .select_related("last_modified_by")
+        .first()
+    )
 
     # Check user preference for default view
     default_view = get_profile(request.user).default_map_view
     show_map = default_view == "map"
+
+    collab_colors = {c.user_id: c.badge_bg_class for c in trip.collaborations.all()}
 
     context = {
         "trip": trip,
@@ -187,6 +199,7 @@ def trip_detail(request, pk):
         "today": date.today(),
         "arrival_origin_icao": _get_flight_origin_icao(arrival_transfer),
         "departure_origin_icao": _get_flight_origin_icao(departure_transfer),
+        "collab_colors": collab_colors,
     }
     if request.htmx:
         template = "trips/trip-detail.html#days"
@@ -205,11 +218,20 @@ def day_detail(request, pk):
         Prefetch(
             "events",
             queryset=annotate_event_overlaps(
-                Event.objects.prefetch_related("transfer_from__to_event")
+                Event.objects.prefetch_related(
+                    "transfer_from__to_event"
+                ).select_related("last_modified_by")
             ).order_by("start_time"),
         ),
-        "stay",
+        Prefetch(
+            "stay",
+            queryset=Stay.objects.select_related("author"),
+        ),
         "trip__main_transfers",
+        Prefetch(
+            "trip__collaborations",
+            queryset=TripCollaboration.objects.all(),
+        ),
     ).select_related("trip__author")
 
     day = get_object_or_404(qs, pk=pk, trip__in=accessible_trips_qs(request.user))
@@ -255,6 +277,8 @@ def day_detail(request, pk):
     ):
         can_add_stay_transfer = True
 
+    collab_colors = {c.user_id: c.badge_bg_class for c in day.trip.collaborations.all()}
+
     context = {
         "day": day,
         "show_map": show_map,
@@ -263,6 +287,7 @@ def day_detail(request, pk):
         "stay_transfer_in": stay_transfer_in,
         "can_add_stay_transfer": can_add_stay_transfer,
         "next_day": next_day,
+        "collab_colors": collab_colors,
     }
 
     # If map view is preferred, prepare map context
@@ -513,6 +538,7 @@ def add_experience(request, day_id):
     if form.is_valid():
         experience = form.save(commit=False)
         experience.day = day
+        experience.last_modified_by = request.user
         experience.save()
         messages.add_message(
             request,
@@ -536,6 +562,7 @@ def add_meal(request, day_id):
     if form.is_valid():
         meal = form.save(commit=False)
         meal.day = day
+        meal.last_modified_by = request.user
         meal.save()
         messages.add_message(
             request,
@@ -558,7 +585,8 @@ def add_stay(request, day_id):
         geocode=True,
     )
     if form.is_valid():
-        form.save()
+        stay = form.save()
+        Stay.objects.filter(pk=stay.pk).update(author=request.user)
         messages.add_message(
             request,
             messages.SUCCESS,
@@ -975,12 +1003,22 @@ def main_transfers_section(request, trip_id):
     trip = get_trip_or_404(trip_id, request.user)
 
     # Get main transfers
-    arrival_transfer = MainTransfer.objects.filter(
-        trip=trip, direction=MainTransfer.Direction.ARRIVAL
-    ).first()
-    departure_transfer = MainTransfer.objects.filter(
-        trip=trip, direction=MainTransfer.Direction.DEPARTURE
-    ).first()
+    arrival_transfer = (
+        MainTransfer.objects.filter(trip=trip, direction=MainTransfer.Direction.ARRIVAL)
+        .select_related("last_modified_by")
+        .first()
+    )
+    departure_transfer = (
+        MainTransfer.objects.filter(
+            trip=trip, direction=MainTransfer.Direction.DEPARTURE
+        )
+        .select_related("last_modified_by")
+        .first()
+    )
+
+    collab_colors = {
+        c.user_id: c.badge_bg_class for c in TripCollaboration.objects.filter(trip=trip)
+    }
 
     context = {
         "trip": trip,
@@ -991,6 +1029,7 @@ def main_transfers_section(request, trip_id):
         "today": date.today(),
         "arrival_origin_icao": _get_flight_origin_icao(arrival_transfer),
         "departure_origin_icao": _get_flight_origin_icao(departure_transfer),
+        "collab_colors": collab_colors,
     }
 
     return TemplateResponse(request, "trips/includes/main-transfers.html", context)
@@ -2581,6 +2620,8 @@ def save_main_transfer(request, trip_id):
         transfer.trip = trip
         transfer.type = transport_type
         transfer.direction = direction
+        if not instance:
+            transfer.last_modified_by = request.user
         transfer.save()
 
         # Always close modal and refresh trip
@@ -2634,18 +2675,27 @@ def shared_trip_detail(request, token):
     days = link.trip.days.prefetch_related(
         Prefetch(
             "events",
-            queryset=annotate_event_overlaps(Event.objects.all()).order_by(
-                "start_time"
-            ),
+            queryset=annotate_event_overlaps(
+                Event.objects.select_related("last_modified_by")
+            ).order_by("start_time"),
         ),
-        "stay",
+        Prefetch(
+            "stay",
+            queryset=Stay.objects.select_related("author"),
+        ),
     ).order_by("date")
+
+    collab_colors = {
+        c.user_id: c.badge_bg_class
+        for c in TripCollaboration.objects.filter(trip=link.trip)
+    }
 
     context = {
         "trip": link.trip,
         "days": days,
         "is_shared_view": True,
         "permission_level": link.permission_level,
+        "collab_colors": collab_colors,
     }
     return TemplateResponse(request, "trips/shared-trip-detail.html", context)
 

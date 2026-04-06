@@ -955,3 +955,68 @@ class TestOtherTransferView(TestCase):
         assert response.status_code == 200
         form = response.context["form"]
         assert form.fields["origin_address"].initial is None
+
+    def test_save_main_transfer_sets_last_modified_by_on_create(self):
+        """Test that creating a new main transfer sets last_modified_by."""
+        from trips.models import MainTransfer
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        url = reverse("trips:save-main-transfer", kwargs={"trip_id": trip.pk})
+
+        data = {
+            "direction": 1,
+            "origin_airport": "Rome Fiumicino",
+            "origin_iata": "FCO",
+            "origin_latitude": "41.8003",
+            "origin_longitude": "12.2389",
+            "destination_airport": "Milan Malpensa",
+            "destination_iata": "MXP",
+            "destination_latitude": "45.6306",
+            "destination_longitude": "8.7281",
+            "start_time": "10:00",
+            "end_time": "11:30",
+        }
+
+        with self.login(user):
+            self.client.post(
+                url, data, QUERY_STRING="transport_type=plane&direction=arrival"
+            )
+
+        transfer = MainTransfer.objects.get(
+            trip=trip, direction=MainTransfer.Direction.ARRIVAL
+        )
+        assert transfer.last_modified_by == user
+
+    def test_save_main_transfer_does_not_overwrite_last_modified_by_on_update(self):
+        """Test that updating an existing transfer does not set last_modified_by."""
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        # Create a transfer with no last_modified_by (default)
+        transfer = MainTransferFactory(trip=trip, direction=1, type=1)
+        transfer.last_modified_by = None
+        transfer.save(update_fields=["last_modified_by"])
+        url = reverse("trips:save-main-transfer", kwargs={"trip_id": trip.pk})
+
+        data = {
+            "direction": 1,
+            "origin_airport": "Rome Fiumicino",
+            "origin_iata": "FCO",
+            "origin_latitude": "41.8003",
+            "origin_longitude": "12.2389",
+            "destination_airport": "Milan Malpensa",
+            "destination_iata": "MXP",
+            "destination_latitude": "45.6306",
+            "destination_longitude": "8.7281",
+            "start_time": "12:00",
+            "end_time": "13:30",
+        }
+
+        with self.login(user):
+            self.client.post(
+                url, data, QUERY_STRING="transport_type=plane&direction=arrival"
+            )
+
+        transfer.refresh_from_db()
+        assert transfer.last_modified_by is None  # not set on update

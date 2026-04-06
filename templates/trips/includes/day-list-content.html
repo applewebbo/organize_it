@@ -11,17 +11,24 @@
                                 <i class="text-xl ph-bold ph-bed align-sub" aria-hidden="true"></i>
                             </div>
                             <div class="ms-3">
-                                <h2 class="text-lg font-semibold text-slate-500 dark:text-slate-200">
-                                    {% if day.trip.status != 5 %}
-                                        <a hx-get="{% url 'trips:stay-detail' day.stay.pk %}"
-                                           hx-target="#dialog"
-                                           hx-swap="innerHTML"
-                                           @click="$dispatch('open-modal'); document.activeElement.blur()"
-                                           class="link">{{ day.stay.name }}</a>
-                                    {% else %}
-                                        {{ day.stay.name }}
+                                <div class="flex gap-2 items-center">
+                                    <h2 class="text-lg font-semibold text-slate-500 dark:text-slate-200">
+                                        {% if day.trip.status != 5 %}
+                                            <a hx-get="{% url 'trips:stay-detail' day.stay.pk %}"
+                                               hx-target="#dialog"
+                                               hx-swap="innerHTML"
+                                               @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                               class="link">{{ day.stay.name }}</a>
+                                        {% else %}
+                                            {{ day.stay.name }}
+                                        {% endif %}
+                                    </h2>
+                                    {% if collab_colors and day.stay.author %}
+                                        {% with color=collab_colors|dict_get:day.stay.author.id %}
+                                            {% include "trips/includes/_collab-badge.html" with actor=day.stay.author color=color only %}
+                                        {% endwith %}
                                     {% endif %}
-                                </h2>
+                                </div>
                                 {% with prev_day=day|prev_day %}
                                     {% if day.stay.check_in %}
                                         {% if not prev_day or prev_day.stay != day.stay %}
@@ -175,7 +182,7 @@
             hx-target="#event-{{ event.pk }}"
             hx-swap="outerHTML">
             <c-event :event="event" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}" :transfer_from="event.transfer_from">
-            <div class="flex items-center" x-data>
+            <div class="flex gap-2 items-center" x-data>
                 {% if event.has_overlap %}
                     <div class="px-1 font-semibold rounded-sm me-1.5 text-error bg-slate-50 dark:bg-slate-700">!!</div>
                 {% endif %}
@@ -194,6 +201,11 @@
                     </a>
                 {% else %}
                     <span>{{ event.start_time|time:"H:i" }}&nbsp;-&nbsp;{{ event.end_time|time:"H:i" }}</span>
+                {% endif %}
+                {% if collab_colors and event.last_modified_by %}
+                    {% with color=collab_colors|dict_get:event.last_modified_by.id %}
+                        {% include "trips/includes/_collab-badge.html" with actor=event.last_modified_by color=color only %}
+                    {% endwith %}
                 {% endif %}
             </div>
             </c-event>

@@ -505,6 +505,34 @@ class TripDetailView(TestCase):
         assertTemplateUsed(response, "trips/trip-detail.html")
         assert response.context["trip"] == trip
 
+    def test_collab_colors_in_context(self):
+        """collab_colors dict is present and maps collaborator user_id → badge class."""
+        from trips.models import TripCollaboration
+
+        user = self.make_user("owner")
+        collab = self.make_user("collab")
+        trip = TripFactory(author=user)
+        TripCollaboration.objects.create(
+            trip=trip, user=collab, color="blue", added_by=user
+        )
+
+        with self.login(user):
+            response = self.get("trips:trip-detail", pk=trip.pk)
+
+        self.response_200(response)
+        collab_colors = response.context["collab_colors"]
+        assert collab_colors[collab.pk] == "bg-blue-500"
+
+    def test_collab_colors_empty_for_trip_without_collabs(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+
+        with self.login(user):
+            response = self.get("trips:trip-detail", pk=trip.pk)
+
+        self.response_200(response)
+        assert response.context["collab_colors"] == {}
+
 
 class TestTripDatesUpdate(TestCase):
     """Test cases for trip dates update view"""
@@ -621,6 +649,25 @@ class DayDetailView(TestCase):
         assert response.context["day"] == day
         assert "show_map" in response.context
         assert response.context["show_map"] is False
+        assert "collab_colors" in response.context
+
+    def test_day_detail_collab_colors_populated(self):
+        """collab_colors in day_detail context maps collaborator to badge class."""
+        from trips.models import TripCollaboration
+
+        user = self.make_user("owner")
+        collab = self.make_user("collab")
+        trip = TripFactory(author=user)
+        TripCollaboration.objects.create(
+            trip=trip, user=collab, color="green", added_by=user
+        )
+        day = trip.days.first()
+
+        with self.login(user):
+            response = self.get("trips:day-detail", pk=day.pk)
+
+        self.response_200(response)
+        assert response.context["collab_colors"][collab.pk] == "bg-green-600"
 
     def test_get_day_detail_with_map_preference(self):
         """Test day detail respects user's map view preference"""

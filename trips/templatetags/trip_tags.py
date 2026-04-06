@@ -11,6 +11,25 @@ register = template.Library()
 
 
 @register.filter
+def dict_get(d, key):
+    """Return d[key] or None — allows dict lookups in templates."""
+    if d is None:
+        return None
+    return d.get(key)
+
+
+@register.filter
+def user_display_name(user):
+    """Return Profile.first_name if set, else email prefix (before @)."""
+    if not user:
+        return ""
+    profile = getattr(user, "profile", None)
+    if profile and profile.first_name:
+        return profile.first_name
+    return user.email.split("@")[0]
+
+
+@register.filter
 def stay_transfer_out(day):
     """Get the StayTransfer from this day's stay (if any).
     Only returns the transfer if this is the last day of the stay.

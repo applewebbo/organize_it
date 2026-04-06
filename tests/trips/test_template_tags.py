@@ -8,6 +8,7 @@ from tests.trips.factories import (
     TripFactory,
 )
 from trips.templatetags.trip_tags import (
+    dict_get,
     event_bg_color,
     event_border_color,
     event_icon,
@@ -24,6 +25,7 @@ from trips.templatetags.trip_tags import (
     prev_day,
     stay_transfer_in,
     stay_transfer_out,
+    user_display_name,
 )
 
 pytestmark = pytest.mark.django_db
@@ -675,3 +677,31 @@ class TestWeatherTags:
         t = Template("{% load trip_tags %}{% trip_day_one_weather trip as w %}{{ w }}")
         result = t.render(Context({"trip": trip}))
         assert result.strip() == "None"
+
+
+class TestDictGet:
+    def test_existing_key(self):
+        assert dict_get({"a": 1, "b": 2}, "a") == 1
+
+    def test_missing_key(self):
+        assert dict_get({"a": 1}, "z") is None
+
+    def test_none_dict(self):
+        assert dict_get(None, "x") is None
+
+
+class TestUserDisplayName:
+    def test_profile_first_name_takes_precedence(self, user_factory):
+        user = user_factory()
+        user.profile.first_name = "John"
+        user.profile.save()
+        assert user_display_name(user) == "John"
+
+    def test_email_prefix_when_no_profile_first_name(self, user_factory):
+        user = user_factory()
+        user.profile.first_name = ""
+        user.profile.save()
+        assert user_display_name(user) == user.email.split("@")[0]
+
+    def test_none_user_returns_empty(self):
+        assert user_display_name(None) == ""

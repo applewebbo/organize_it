@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n trip_tags %}
 <section id="main-transfers"
          class="mb-8"
          hx-get="{% url 'trips:main-transfers-section' trip.pk %}"
@@ -26,6 +26,11 @@
                             {% endif %}
                         {% endif %}
                         <h4 class="font-medium">{% trans "Arrival" %}</h4>
+                        {% if collab_colors and arrival_transfer.last_modified_by %}
+                            {% with color=collab_colors|dict_get:arrival_transfer.last_modified_by.id %}
+                                {% include "trips/includes/_collab-badge.html" with actor=arrival_transfer.last_modified_by color=color only %}
+                            {% endwith %}
+                        {% endif %}
                     </div>
                     {% if arrival_transfer %}
                         <div class="flex gap-2">
@@ -172,6 +177,11 @@
                             {% endif %}
                         {% endif %}
                         <h4 class="font-medium">{% trans "Departure" %}</h4>
+                        {% if collab_colors and departure_transfer.last_modified_by %}
+                            {% with color=collab_colors|dict_get:departure_transfer.last_modified_by.id %}
+                                {% include "trips/includes/_collab-badge.html" with actor=departure_transfer.last_modified_by color=color only %}
+                            {% endwith %}
+                        {% endif %}
                     </div>
                     {% if departure_transfer %}
                         <div class="flex gap-2">

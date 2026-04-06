@@ -1,0 +1,10 @@
+{% load trip_tags %}
+{# Collab badge: same ph-user-circle icon as collaborator list, with DaisyUI tooltip. #}
+{# Requires: actor (User), color (CSS bg class, e.g. "bg-blue-500") #}
+{% if actor and color %}
+    <span class="tooltip tooltip-bottom"
+          data-tip="{{ actor|user_display_name }}">
+        <i class="ph-bold ph-user-circle {{ color }} rounded-full text-white"
+           aria-hidden="true"></i>
+    </span>
+{% endif %}
