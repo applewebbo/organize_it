@@ -7,12 +7,15 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.core.mail import EmailMessage
 from django.db import transaction
 from django.db.models import Prefetch, Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
+from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
@@ -47,6 +50,7 @@ from trips.models import (
     StayTransfer,
     Trip,
     TripCollaboration,
+    TripInvitation,
 )
 from trips.utils import (
     accessible_trips_qs,
@@ -2827,6 +2831,14 @@ def add_collaborator(request, trip_id):
         trip=trip, user=user, color=color, added_by=request.user
     )
 
+    trip_url = request.build_absolute_uri(reverse("trips:trip-detail", args=[trip.pk]))
+    context = {"trip": trip, "added_by": request.user, "trip_url": trip_url}
+    subject = render_to_string(
+        "trips/email/added_as_collaborator_subject.txt", context
+    ).strip()
+    body = render_to_string("trips/email/added_as_collaborator_body.html", context)
+    EmailMessage(subject=subject, body=body, to=[user.email]).send()
+
     collaborations = trip.collaborations.select_related("user__profile").all()
     return TemplateResponse(
         request,
@@ -2875,3 +2887,70 @@ def collab_inline(request, trip_id):
         "trips/includes/collab-inline.html",
         {"trip": trip, "collaborations": collaborations},
     )
+
+
+@login_required
+@require_http_methods(["POST"])
+def invite_collaborator(request, trip_id):
+    """Invite a non-registered user by email (owner only)."""
+    trip = get_trip_for_owner_or_404(trip_id, request.user)
+    User = get_user_model()
+    email = request.POST.get("email", "").strip()
+
+    if User.objects.filter(email=email).exists():
+        return HttpResponse(status=400)
+
+    invitation = TripInvitation.objects.create(
+        trip=trip,
+        email=email,
+        invited_by=request.user,
+        expires_at=timezone.now() + timezone.timedelta(days=7),
+    )
+
+    accept_url = request.build_absolute_uri(invitation.get_absolute_url())
+    context = {"trip": trip, "invited_by": request.user, "accept_url": accept_url}
+    subject = render_to_string("trips/email/invitation_subject.txt", context).strip()
+    body = render_to_string("trips/email/invitation_body.html", context)
+    EmailMessage(subject=subject, body=body, to=[email]).send()
+
+    return TemplateResponse(
+        request,
+        "trips/includes/collab-invite-sent.html",
+        {"email": email},
+    )
+
+
+@login_required
+def accept_invitation(request, token):
+    """Accept a trip collaboration invitation via token."""
+    invitation = get_object_or_404(TripInvitation, token=token)
+
+    if not invitation.is_valid:
+        return HttpResponse(status=400)
+
+    invitation.is_accepted = True
+    invitation.accepted_at = timezone.now()
+    invitation.save()
+
+    trip = invitation.trip
+    color = TripCollaboration.next_free_color(trip)
+    TripCollaboration.objects.get_or_create(
+        trip=trip,
+        user=request.user,
+        defaults={"color": color, "added_by": invitation.invited_by},
+    )
+
+    trip_url = request.build_absolute_uri(reverse("trips:trip-detail", args=[trip.pk]))
+    context = {
+        "trip": trip,
+        "new_collaborator_email": request.user.email,
+        "trip_url": trip_url,
+    }
+    subject = render_to_string(
+        "trips/email/invitation_accepted_subject.txt", context
+    ).strip()
+    body = render_to_string("trips/email/invitation_accepted_body.html", context)
+    EmailMessage(subject=subject, body=body, to=[invitation.invited_by.email]).send()
+
+    messages.success(request, _("You've joined the trip as a collaborator."))
+    return redirect(reverse("trips:trip-detail", args=[trip.pk]))

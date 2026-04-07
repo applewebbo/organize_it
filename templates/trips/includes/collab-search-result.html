@@ -22,6 +22,14 @@
     <div class="flex gap-2 items-center p-2 text-sm rounded-lg bg-base-200">
         <i class="ph-bold ph-user-circle-dashed text-base-content/60 i-md"></i>
         <span class="text-base-content/60 grow">{% trans "No account found." %}</span>
-        <button class="btn btn-sm btn-soft" disabled>{% trans "Invite by email" %}</button>
+        <form method="post"
+              action="{% url 'trips:invite-collaborator' trip.pk %}"
+              hx-post="{% url 'trips:invite-collaborator' trip.pk %}"
+              hx-target="#collab-search-result"
+              hx-swap="outerHTML">
+            {% csrf_token %}
+            <input type="hidden" name="email" value="{{ email }}">
+            <button type="submit" class="btn btn-sm btn-soft">{% trans "Invite by email" %}</button>
+        </form>
     </div>
 {% endif %}

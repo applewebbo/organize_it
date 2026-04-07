@@ -1,0 +1,1 @@
+{% load i18n %}{% blocktrans with email=new_collaborator_email title=trip.title %}{{ email }} accepted your invitation to "{{ title }}"{% endblocktrans %}

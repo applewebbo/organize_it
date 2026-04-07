@@ -1,0 +1,6 @@
+{% load i18n %}
+<div id="collab-search-result"
+     class="flex gap-2 items-center p-2 text-sm rounded-lg bg-success/10">
+    <i class="ph-bold ph-check-circle text-success i-md"></i>
+    <span class="text-success grow">{% blocktrans with email=email %}Invitation sent to {{ email }}.{% endblocktrans %}</span>
+</div>

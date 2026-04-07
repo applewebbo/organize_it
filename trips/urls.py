@@ -224,6 +224,16 @@ htmx_urlpatterns = [
         views.remove_collaborator,
         name="remove-collaborator",
     ),
+    path(
+        "trips/<int:trip_id>/collaborators/invite/",
+        views.invite_collaborator,
+        name="invite-collaborator",
+    ),
+    path(
+        "invitations/<uuid:token>/accept/",
+        views.accept_invitation,
+        name="accept-invitation",
+    ),
     # SHARING
     path(
         "trips/<int:trip_id>/share/create/",
