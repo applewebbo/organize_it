@@ -3,3 +3,5 @@ procs:
     shell: python manage.py tailwind runserver
   worker:
     shell: python manage.py qcluster
+  mailpit:
+    shell: mailpit

@@ -7,7 +7,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMultiAlternatives
 from django.db import transaction
 from django.db.models import Prefetch, Q
 from django.http import Http404, HttpResponse
@@ -2836,8 +2836,11 @@ def add_collaborator(request, trip_id):
     subject = render_to_string(
         "trips/email/added_as_collaborator_subject.txt", context
     ).strip()
-    body = render_to_string("trips/email/added_as_collaborator_body.html", context)
-    EmailMessage(subject=subject, body=body, to=[user.email]).send()
+    text_body = render_to_string("trips/email/added_as_collaborator_body.txt", context)
+    html_body = render_to_string("trips/email/added_as_collaborator_body.html", context)
+    msg = EmailMultiAlternatives(subject=subject, body=text_body, to=[user.email])
+    msg.attach_alternative(html_body, "text/html")
+    msg.send()
 
     collaborations = trip.collaborations.select_related("user__profile").all()
     return TemplateResponse(
@@ -2910,8 +2913,11 @@ def invite_collaborator(request, trip_id):
     accept_url = request.build_absolute_uri(invitation.get_absolute_url())
     context = {"trip": trip, "invited_by": request.user, "accept_url": accept_url}
     subject = render_to_string("trips/email/invitation_subject.txt", context).strip()
-    body = render_to_string("trips/email/invitation_body.html", context)
-    EmailMessage(subject=subject, body=body, to=[email]).send()
+    text_body = render_to_string("trips/email/invitation_body.txt", context)
+    html_body = render_to_string("trips/email/invitation_body.html", context)
+    msg = EmailMultiAlternatives(subject=subject, body=text_body, to=[email])
+    msg.attach_alternative(html_body, "text/html")
+    msg.send()
 
     return TemplateResponse(
         request,
@@ -2949,8 +2955,13 @@ def accept_invitation(request, token):
     subject = render_to_string(
         "trips/email/invitation_accepted_subject.txt", context
     ).strip()
-    body = render_to_string("trips/email/invitation_accepted_body.html", context)
-    EmailMessage(subject=subject, body=body, to=[invitation.invited_by.email]).send()
+    text_body = render_to_string("trips/email/invitation_accepted_body.txt", context)
+    html_body = render_to_string("trips/email/invitation_accepted_body.html", context)
+    msg = EmailMultiAlternatives(
+        subject=subject, body=text_body, to=[invitation.invited_by.email]
+    )
+    msg.attach_alternative(html_body, "text/html")
+    msg.send()
 
     messages.success(request, _("You've joined the trip as a collaborator."))
     return redirect(reverse("trips:trip-detail", args=[trip.pk]))

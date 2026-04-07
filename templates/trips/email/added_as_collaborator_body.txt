@@ -1,0 +1,8 @@
+{% load i18n %}{% blocktrans with email=added_by.email title=trip.title %}{{ email }} has added you as a collaborator on the trip "{{ title }}".{% endblocktrans %}
+
+{% trans "You can now view and edit this trip." %}
+
+{{ trip_url }}
+
+---
+{% trans "You received this email because someone invited you to collaborate on a trip in Organize It." %}

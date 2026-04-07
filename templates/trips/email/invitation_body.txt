@@ -1,0 +1,9 @@
+{% load i18n %}{% blocktrans with email=invited_by.email title=trip.title %}{{ email }} has invited you to collaborate on the trip "{{ title }}".{% endblocktrans %}
+
+{% trans "To accept the invitation and join the trip, visit the link below. You will need to create an account if you don't have one yet." %}
+
+{{ accept_url }}
+
+---
+{% trans "This invitation expires in 7 days." %}
+{% trans "If you did not expect this invitation, you can ignore this email." %}

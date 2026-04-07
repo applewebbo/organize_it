@@ -314,7 +314,10 @@ DBBACKUP_CLEANUP_KEEP_MEDIA = env.int("DBBACKUP_CLEANUP_KEEP_MEDIA", default=10)
 # DEVELOPMENT SPECIFIC SETTINGS
 if ENVIRONMENT == "dev":
     DEBUG = True
-    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = env("EMAIL_HOST", default="localhost")
+    EMAIL_PORT = env.int("EMAIL_PORT", default=1025)
+    EMAIL_USE_TLS = False
     INTERNAL_IPS = [
         "127.0.0.1",
     ]
