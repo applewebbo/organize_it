@@ -66,6 +66,14 @@ def annotate_event_overlaps(queryset):
     )
 
 
+def get_flight_origin_icao(transfer):
+    """Return ICAO code for origin airport of a flight transfer, or empty string."""
+    if transfer and transfer.type == MainTransfer.Type.PLANE and transfer.origin_code:
+        airport = get_airport_by_iata(transfer.origin_code)
+        return airport.get("icao_code", "") if airport else ""
+    return ""
+
+
 def get_trips(user):
     """Get the trips for the home page with favourite trip and latest/others"""
     profile = get_profile(user)
@@ -137,12 +145,28 @@ def get_trips(user):
     else:
         other_trips = base_qs.order_by("status", "start_date")
 
+    featured_trip = fav_trip or latest_trip
+    arrival_transfer = None
+    departure_transfer = None
+    if featured_trip:
+        for t in featured_trip.main_transfers.all():
+            if t.direction == 1:
+                arrival_transfer = t
+            else:
+                departure_transfer = t
+
     return {
         "fav_trip": fav_trip,
         "latest_trip": latest_trip,
         "other_trips": other_trips,
         "unpaired_events": unpaired_events,
         "show_map": show_map,
+        "arrival_transfer": arrival_transfer,
+        "departure_transfer": departure_transfer,
+        "both_transfers_exist": arrival_transfer is not None
+        and departure_transfer is not None,
+        "arrival_origin_icao": get_flight_origin_icao(arrival_transfer),
+        "departure_origin_icao": get_flight_origin_icao(departure_transfer),
     }
 
 

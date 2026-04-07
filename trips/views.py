@@ -57,6 +57,7 @@ from trips.utils import (
     geocode_location,
     get_airport_by_iata,
     get_event_instance,
+    get_flight_origin_icao,
     get_next_events,
     get_trip_for_owner_or_404,
     get_trip_or_404,
@@ -68,14 +69,6 @@ from trips.utils import (
 )
 
 logger = logging.getLogger(__name__)
-
-
-def _get_flight_origin_icao(transfer):
-    """Return ICAO code for origin airport of a flight transfer, or empty string."""
-    if transfer and transfer.type == MainTransfer.Type.PLANE and transfer.origin_code:
-        airport = get_airport_by_iata(transfer.origin_code)
-        return airport.get("icao_code", "") if airport else ""
-    return ""
 
 
 def home(request):
@@ -199,8 +192,8 @@ def trip_detail(request, pk):
         and departure_transfer is not None,
         "show_map": show_map,
         "today": date.today(),
-        "arrival_origin_icao": _get_flight_origin_icao(arrival_transfer),
-        "departure_origin_icao": _get_flight_origin_icao(departure_transfer),
+        "arrival_origin_icao": get_flight_origin_icao(arrival_transfer),
+        "departure_origin_icao": get_flight_origin_icao(departure_transfer),
         "collab_colors": collab_colors,
         "viewer_id": request.user.id,
     }
@@ -1035,8 +1028,8 @@ def main_transfers_section(request, trip_id):
         "both_transfers_exist": arrival_transfer is not None
         and departure_transfer is not None,
         "today": date.today(),
-        "arrival_origin_icao": _get_flight_origin_icao(arrival_transfer),
-        "departure_origin_icao": _get_flight_origin_icao(departure_transfer),
+        "arrival_origin_icao": get_flight_origin_icao(arrival_transfer),
+        "departure_origin_icao": get_flight_origin_icao(departure_transfer),
         "collab_colors": collab_colors,
         "viewer_id": request.user.id,
     }

@@ -11,6 +11,7 @@ from tests.accounts.factories import UserFactory
 from tests.test import TestCase
 from tests.trips.factories import (
     EventFactory,
+    MainTransferFactory,
     MealFactory,
     StayFactory,
     TripFactory,
@@ -499,6 +500,46 @@ class TestGetTrips(TestCase):
             + ([context["fav_trip"]] if context.get("fav_trip") else [])
         )
         assert collab_trip in all_trips
+
+    def test_get_trips_main_transfers_in_context_for_fav(self):
+        """arrival_transfer and departure_transfer are in context when fav_trip has transfers."""
+        from trips.models import MainTransfer
+
+        profile = self.user.profile
+        fav_trip = TripFactory(author=self.user)
+        profile.fav_trip = fav_trip
+        profile.save()
+        arrival = MainTransferFactory(
+            trip=fav_trip, direction=MainTransfer.Direction.ARRIVAL
+        )
+        departure = MainTransferFactory(
+            trip=fav_trip, direction=MainTransfer.Direction.DEPARTURE
+        )
+
+        context = get_trips(self.user)
+        assert context["arrival_transfer"] == arrival
+        assert context["departure_transfer"] == departure
+        assert context["both_transfers_exist"] is True
+
+    def test_get_trips_main_transfers_in_context_for_latest(self):
+        """arrival_transfer and departure_transfer are in context when latest_trip has transfers."""
+        from trips.models import MainTransfer
+
+        trip = TripFactory(author=self.user)
+        arrival = MainTransferFactory(
+            trip=trip, direction=MainTransfer.Direction.ARRIVAL
+        )
+
+        context = get_trips(self.user)
+        assert context["arrival_transfer"] == arrival
+        assert context["departure_transfer"] is None
+        assert context["both_transfers_exist"] is False
+
+    def test_get_trips_main_transfers_none_when_no_featured_trip(self):
+        """arrival_transfer and departure_transfer are None when no trips exist."""
+        context = get_trips(self.user)
+        assert context["arrival_transfer"] is None
+        assert context["departure_transfer"] is None
 
 
 class TestCacheKey(TestCase):
