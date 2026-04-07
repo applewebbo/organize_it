@@ -1,23 +1,23 @@
-{% load i18n %}
+{% load i18n trip_tags %}
 <div id="collab-inline"
      class="mt-4"
      hx-get="{% url 'trips:collab-inline' trip.pk %}"
      hx-trigger="collaboratorsModified from:body"
      hx-swap="outerHTML"
      x-data>
-    <p class="mb-2 text-xs font-semibold tracking-wide uppercase text-base-content/50">{% trans "Collaborators" %}</p>
-    <div class="flex flex-wrap gap-2 items-center">
-        {% for collab in collaborations %}
-            <span class="flex gap-1.5 items-center py-0.5 pr-2 pl-1.5 text-xs rounded-full border border-base-300">
-                <i class="ph-bold ph-user-circle {{ collab.badge_bg_class }} rounded-full text-white"></i>
-                {% if collab.user.profile.first_name %}
-                    {{ collab.user.profile.first_name }}
-                {% else %}
-                    {{ collab.user.email|truncatechars:18 }}
-                {% endif %}
-            </span>
-        {% endfor %}
-        {% if request.user == trip.author %}
+    {% if request.user == trip.author %}
+        <p class="mb-2 text-xs font-semibold tracking-wide uppercase text-base-content/50">{% trans "Collaborators" %}</p>
+        <div class="flex flex-wrap gap-2 items-center">
+            {% for collab in collaborations %}
+                <span class="flex gap-1.5 items-center py-0.5 pr-2 pl-1.5 text-xs rounded-full border border-base-300">
+                    <i class="ph-bold ph-user-circle {{ collab.badge_bg_class }} rounded-full text-white"></i>
+                    {% if collab.user.profile.first_name %}
+                        {{ collab.user.profile.first_name }}
+                    {% else %}
+                        {{ collab.user.email|truncatechars:18 }}
+                    {% endif %}
+                </span>
+            {% endfor %}
             <button class="btn btn-xs btn-soft btn-primary"
                     hx-get="{% url 'trips:collaborators-modal' trip.pk %}"
                     hx-target="#dialog"
@@ -26,6 +26,14 @@
                 <i class="ph-bold ph-user-plus"></i>
                 {% trans "Add" %}
             </button>
-        {% endif %}
-    </div>
+        </div>
+    {% else %}
+        <p class="mb-2 text-xs font-semibold tracking-wide uppercase text-base-content/50">{% trans "Shared by" %}</p>
+        <div class="flex flex-wrap gap-2 items-center">
+            <span class="flex gap-1.5 items-center py-0.5 pr-2 pl-1.5 text-xs rounded-full border border-base-300">
+                <i class="text-white rounded-full ph-bold ph-user-circle bg-neutral"></i>
+                {{ trip.author|user_display_name }}
+            </span>
+        </div>
+    {% endif %}
 </div>

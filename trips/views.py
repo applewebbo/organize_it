@@ -187,6 +187,8 @@ def trip_detail(request, pk):
     show_map = default_view == "map"
 
     collab_colors = {c.user_id: c.badge_bg_class for c in trip.collaborations.all()}
+    if collab_colors:
+        collab_colors[trip.author_id] = "bg-neutral"
 
     context = {
         "trip": trip,
@@ -200,6 +202,7 @@ def trip_detail(request, pk):
         "arrival_origin_icao": _get_flight_origin_icao(arrival_transfer),
         "departure_origin_icao": _get_flight_origin_icao(departure_transfer),
         "collab_colors": collab_colors,
+        "viewer_id": request.user.id,
     }
     if request.htmx:
         template = "trips/trip-detail.html#days"
@@ -278,6 +281,8 @@ def day_detail(request, pk):
         can_add_stay_transfer = True
 
     collab_colors = {c.user_id: c.badge_bg_class for c in day.trip.collaborations.all()}
+    if collab_colors:
+        collab_colors[day.trip.author_id] = "bg-neutral"
 
     context = {
         "day": day,
@@ -288,6 +293,7 @@ def day_detail(request, pk):
         "can_add_stay_transfer": can_add_stay_transfer,
         "next_day": next_day,
         "collab_colors": collab_colors,
+        "viewer_id": request.user.id,
     }
 
     # If map view is preferred, prepare map context
@@ -1019,6 +1025,8 @@ def main_transfers_section(request, trip_id):
     collab_colors = {
         c.user_id: c.badge_bg_class for c in TripCollaboration.objects.filter(trip=trip)
     }
+    if collab_colors:
+        collab_colors[trip.author_id] = "bg-neutral"
 
     context = {
         "trip": trip,
@@ -1030,6 +1038,7 @@ def main_transfers_section(request, trip_id):
         "arrival_origin_icao": _get_flight_origin_icao(arrival_transfer),
         "departure_origin_icao": _get_flight_origin_icao(departure_transfer),
         "collab_colors": collab_colors,
+        "viewer_id": request.user.id,
     }
 
     return TemplateResponse(request, "trips/includes/main-transfers.html", context)
@@ -1579,9 +1588,22 @@ def single_event(request, pk):
     """
     Return a single event partial for HTMX updates.
     """
-    event = get_object_or_404(Event, pk=pk, trip__in=accessible_trips_qs(request.user))
+    event = get_object_or_404(
+        Event.objects.select_related("last_modified_by", "trip").prefetch_related(
+            "trip__collaborations"
+        ),
+        pk=pk,
+        trip__in=accessible_trips_qs(request.user),
+    )
+    collab_colors = {
+        c.user_id: c.badge_bg_class for c in event.trip.collaborations.all()
+    }
+    if collab_colors:
+        collab_colors[event.trip.author_id] = "bg-neutral"
     context = {
         "event": event,
+        "collab_colors": collab_colors,
+        "viewer_id": request.user.id,
     }
     return TemplateResponse(
         request, "trips/includes/day-list-content.html#single_event", context
@@ -2689,6 +2711,8 @@ def shared_trip_detail(request, token):
         c.user_id: c.badge_bg_class
         for c in TripCollaboration.objects.filter(trip=link.trip)
     }
+    if collab_colors:
+        collab_colors[link.trip.author_id] = "bg-neutral"
 
     context = {
         "trip": link.trip,
@@ -2696,6 +2720,7 @@ def shared_trip_detail(request, token):
         "is_shared_view": True,
         "permission_level": link.permission_level,
         "collab_colors": collab_colors,
+        "viewer_id": request.user.id if request.user.is_authenticated else None,
     }
     return TemplateResponse(request, "trips/shared-trip-detail.html", context)
 

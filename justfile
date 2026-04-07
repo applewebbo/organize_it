@@ -113,11 +113,9 @@ ftest *args:
 mptest:
     ENVIRONMENT=test uv run python -m pytest -m "not mapbox" --cov-report html:htmlcov --cov-report term:skip-covered --cov-fail-under 100
 
-# Run Ruff linting and formatting
+# Run pre-commit hooks (linting, formatting, security checks)
 [group('utility')]
 lint:
-    uv run ruff check --fix --unsafe-fixes .
-    uv run ruff format .
     just _pre-commit run --all-files
 
 _pre-commit *args:

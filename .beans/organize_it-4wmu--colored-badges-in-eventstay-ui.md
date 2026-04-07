@@ -1,11 +1,11 @@
 ---
 # organize_it-4wmu
 title: Colored badges in event/stay UI
-status: todo
+status: completed
 type: task
 priority: normal
 created_at: 2026-04-04T06:20:01Z
-updated_at: 2026-04-06T17:27:53Z
+updated_at: 2026-04-07T10:51:42Z
 parent: organize_it-z5rm
 blocked_by:
     - organize_it-gvdb
@@ -22,9 +22,9 @@ Show who added/last-modified each event, stay and main transfer with collaborato
 - [x] Badge usa colore da TripCollaboration; owner ha colore neutro/default
 
 ## Todo aggiuntivi (da implementare)
-- [ ] Aggiungere autore trip a collab_colors con colore neutro bg-base-300 (solo se trip ha collaboratori)
-- [ ] Template: nascondere badge se event.last_modified_by == request.user (non mostrare il proprio badge)
-- [ ] Stesso per stay.author e transfer.last_modified_by
+- [x] Aggiungere autore trip a collab_colors con colore neutro bg-base-300 (solo se trip ha collaboratori)
+- [x] Template: nascondere badge se event.last_modified_by == request.user (non mostrare il proprio badge)
+- [x] Stesso per stay.author e transfer.last_modified_by
 
 ## Summary of Changes
 
@@ -34,3 +34,5 @@ Show who added/last-modified each event, stay and main transfer with collaborato
 - Created `_collab-badge.html` include: ph-user-circle icon with collaboration color + DaisyUI tooltip
 - Badge visible only when trip has at least one collaborator
 - 267 tests, 100% coverage maintained
+
+## Summary of Changes (finale)\n\n- Owner trip aggiunto a collab_colors con colore neutro bg-base-300 in tutti e 4 i contesti (trip_detail, day_detail, main_transfers_section, shared_trip_detail)\n- Badge nascosto per il viewer corrente tramite viewer_id passato al template _collab-badge.html\n- shared_trip_detail: viewer_id = request.user.id se autenticato, else None\n- 816 tests, 100% coverage

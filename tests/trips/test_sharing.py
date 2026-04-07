@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.utils import timezone
 from pytest_django.asserts import assertTemplateUsed
 
-from trips.models import ShareLink
+from trips.models import ShareLink, TripCollaboration
 
 pytestmark = pytest.mark.django_db
 
@@ -105,6 +105,24 @@ class TestSharedTripDetailView:
         assertTemplateUsed(response, "trips/shared-trip-detail.html")
         assert response.context["trip"] == trip
         assert response.context["is_shared_view"] is True
+
+    def test_collab_colors_includes_author_when_collaborators_exist(
+        self, client, user_factory, trip_factory
+    ):
+        owner = user_factory()
+        collab = user_factory()
+        trip = trip_factory(author=owner)
+        TripCollaboration.objects.create(
+            trip=trip, user=collab, color="blue", added_by=owner
+        )
+        link = ShareLink.objects.create(trip=trip, created_by=owner)
+
+        response = client.get(reverse("trips:shared-trip", kwargs={"token": link.id}))
+
+        assert response.status_code == 200
+        collab_colors = response.context["collab_colors"]
+        assert owner.id in collab_colors
+        assert collab_colors[owner.id] == "bg-neutral"
 
     def test_invalid_token_returns_404(self, client):
         response = client.get(

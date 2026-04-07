@@ -6,18 +6,22 @@
                 <i class="ph-bold ph-{{ icon }} i-sm sm:i-lg"></i>
             </div>
             <div class="ms-2" x-data>
-                <h2 class="{{ icon_color }} font-semibold text-base sm:text-lg">
-                    {% if event.day.trip.status != 5 %}
-                        <a class="link"
-                           href="{% url 'trips:event-detail' event.pk %}"
-                           hx-get="{% url 'trips:event-detail' event.pk %}"
-                           @click="$dispatch('open-modal'); document.activeElement.blur()"
-                           hx-target="#dialog"
-                           hx-swap="innerHTML">{{ event.name }}</a>
-                    {% else %}
-                        {{ event.name }}
-                    {% endif %}
-                </h2>
+                <div class="flex gap-2 items-center">
+                    <h2 class="{{ icon_color }} font-semibold text-base sm:text-lg"
+                        title="{{ event.name }}">
+                        {% if event.day.trip.status != 5 %}
+                            <a class="link"
+                               href="{% url 'trips:event-detail' event.pk %}"
+                               hx-get="{% url 'trips:event-detail' event.pk %}"
+                               @click="$dispatch('open-modal'); document.activeElement.blur()"
+                               hx-target="#dialog"
+                               hx-swap="innerHTML">{{ event.name|truncatechars:32 }}</a>
+                        {% else %}
+                            {{ event.name|truncatechars:32 }}
+                        {% endif %}
+                    </h2>
+                    {{ collab_badge }}
+                </div>
                 <div class="{{ icon_color }} flex items-center gap-x-2">{{ slot }}</div>
             </div>
         </div>
