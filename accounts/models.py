@@ -45,6 +45,11 @@ class Profile(models.Model):
         ("GBP", "Pound Sterling (£)"),
     ]
 
+    LANGUAGE_CHOICES = [
+        ("it", _("Italian")),
+        ("en", _("English")),
+    ]
+
     MAP_VIEW_CHOICES = [
         ("list", _("List")),
         ("map", _("Map")),
@@ -120,6 +125,13 @@ class Profile(models.Model):
     )
     home_address_latitude = models.FloatField(null=True, blank=True)
     home_address_longitude = models.FloatField(null=True, blank=True)
+
+    language = models.CharField(
+        _("Language"),
+        max_length=5,
+        choices=LANGUAGE_CHOICES,
+        default="it",
+    )
 
     # Display Preferences (Phase 2)
     use_system_theme = models.BooleanField(

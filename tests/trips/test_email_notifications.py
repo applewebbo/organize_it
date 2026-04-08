@@ -195,3 +195,18 @@ class TestAcceptInvitation:
         url = reverse("trips:accept-invitation", kwargs={"token": invitation.token})
         response = client.get(url)
         assert response.status_code == 302
+
+
+class TestEmailLanguage:
+    def test_email_uses_recipient_language(self, client, user_factory, trip_factory):
+        """Email to collaborator is rendered in their profile language."""
+        owner = user_factory()
+        collab = user_factory()
+        collab.profile.language = "it"
+        collab.profile.save()
+        trip = trip_factory(author=owner, title="Test Trip")
+        client.force_login(owner)
+        url = reverse("trips:add-collaborator", args=[trip.pk])
+        client.post(url, {"email": collab.email})
+        # Italian translation should be present
+        assert "collaboratore" in mail.outbox[0].body.lower()

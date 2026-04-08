@@ -18,6 +18,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import override as translation_override
 from django.views.decorators.http import require_http_methods
 
 from accounts.models import Profile, get_profile
@@ -2833,11 +2834,17 @@ def add_collaborator(request, trip_id):
 
     trip_url = request.build_absolute_uri(reverse("trips:trip-detail", args=[trip.pk]))
     context = {"trip": trip, "added_by": request.user, "trip_url": trip_url}
-    subject = render_to_string(
-        "trips/email/added_as_collaborator_subject.txt", context
-    ).strip()
-    text_body = render_to_string("trips/email/added_as_collaborator_body.txt", context)
-    html_body = render_to_string("trips/email/added_as_collaborator_body.html", context)
+    recipient_language = getattr(user.profile, "language", "it")
+    with translation_override(recipient_language):
+        subject = render_to_string(
+            "trips/email/added_as_collaborator_subject.txt", context
+        ).strip()
+        text_body = render_to_string(
+            "trips/email/added_as_collaborator_body.txt", context
+        )
+        html_body = render_to_string(
+            "trips/email/added_as_collaborator_body.html", context
+        )
     msg = EmailMultiAlternatives(subject=subject, body=text_body, to=[user.email])
     msg.attach_alternative(html_body, "text/html")
     msg.send()
@@ -2912,9 +2919,13 @@ def invite_collaborator(request, trip_id):
 
     accept_url = request.build_absolute_uri(invitation.get_absolute_url())
     context = {"trip": trip, "invited_by": request.user, "accept_url": accept_url}
-    subject = render_to_string("trips/email/invitation_subject.txt", context).strip()
-    text_body = render_to_string("trips/email/invitation_body.txt", context)
-    html_body = render_to_string("trips/email/invitation_body.html", context)
+    sender_language = getattr(request.user.profile, "language", "it")
+    with translation_override(sender_language):
+        subject = render_to_string(
+            "trips/email/invitation_subject.txt", context
+        ).strip()
+        text_body = render_to_string("trips/email/invitation_body.txt", context)
+        html_body = render_to_string("trips/email/invitation_body.html", context)
     msg = EmailMultiAlternatives(subject=subject, body=text_body, to=[email])
     msg.attach_alternative(html_body, "text/html")
     msg.send()
@@ -2952,11 +2963,17 @@ def accept_invitation(request, token):
         "new_collaborator_email": request.user.email,
         "trip_url": trip_url,
     }
-    subject = render_to_string(
-        "trips/email/invitation_accepted_subject.txt", context
-    ).strip()
-    text_body = render_to_string("trips/email/invitation_accepted_body.txt", context)
-    html_body = render_to_string("trips/email/invitation_accepted_body.html", context)
+    owner_language = getattr(invitation.invited_by.profile, "language", "it")
+    with translation_override(owner_language):
+        subject = render_to_string(
+            "trips/email/invitation_accepted_subject.txt", context
+        ).strip()
+        text_body = render_to_string(
+            "trips/email/invitation_accepted_body.txt", context
+        )
+        html_body = render_to_string(
+            "trips/email/invitation_accepted_body.html", context
+        )
     msg = EmailMultiAlternatives(
         subject=subject, body=text_body, to=[invitation.invited_by.email]
     )

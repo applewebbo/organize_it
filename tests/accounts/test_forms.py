@@ -68,3 +68,21 @@ class TestProfileUpdateForm:
         form = ProfileUpdateForm(instance=collab_user.profile)
         fav_trip_queryset = form.fields["fav_trip"].queryset
         assert archived_trip not in fav_trip_queryset
+
+
+class TestProfileLanguageField:
+    def test_language_field_in_form(self, user_factory):
+        user = user_factory()
+        form = ProfileUpdateForm(instance=user.profile)
+        assert "language" in form.fields
+
+    def test_language_default_is_italian(self, user_factory):
+        user = user_factory()
+        assert user.profile.language == "it"
+
+    def test_language_choices_include_it_and_en(self, user_factory):
+        user = user_factory()
+        form = ProfileUpdateForm(instance=user.profile)
+        choices = [c[0] for c in form.fields["language"].choices]
+        assert "it" in choices
+        assert "en" in choices

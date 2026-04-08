@@ -46,6 +46,7 @@ class TestProfileView(TestCase):
             "fav_trip": trip.pk,
             "trip_sort_preference": "date_asc",
             "default_map_view": "list",
+            "language": "it",
         }
 
         with self.login(user):
@@ -73,6 +74,7 @@ class TestProfileView(TestCase):
             "last_name": "Doe",
             "trip_sort_preference": "date_asc",
             "default_map_view": "list",
+            "language": "it",
         }
 
         with self.login(user):
@@ -90,6 +92,7 @@ class TestProfileView(TestCase):
             "avatar": "hiker.png",
             "trip_sort_preference": "date_asc",
             "default_map_view": "list",
+            "language": "it",
         }
 
         with self.login(user):
@@ -106,6 +109,7 @@ class TestProfileView(TestCase):
             "currency": "USD",
             "trip_sort_preference": "date_asc",
             "default_map_view": "list",
+            "language": "it",
         }
 
         with self.login(user):
@@ -118,7 +122,11 @@ class TestProfileView(TestCase):
     def test_post_default_map_view(self):
         """Test updating default map view preference"""
         user = self.make_user("user")
-        data = {"default_map_view": "map", "trip_sort_preference": "date_asc"}
+        data = {
+            "default_map_view": "map",
+            "trip_sort_preference": "date_asc",
+            "language": "it",
+        }
 
         with self.login(user):
             response = self.post("accounts:profile", data=data)
@@ -133,6 +141,7 @@ class TestProfileView(TestCase):
         data = {
             "trip_sort_preference": "date_desc",
             "default_map_view": "list",
+            "language": "it",
         }
 
         with self.login(user):
@@ -149,6 +158,7 @@ class TestProfileView(TestCase):
             "use_system_theme": True,
             "trip_sort_preference": "date_asc",
             "default_map_view": "list",
+            "language": "it",
         }
 
         with self.login(user):
@@ -221,6 +231,7 @@ class TestProfileViewAllFields(TestCase):
             "last_name": "Smith",
             "avatar": "tourist.png",
             "currency": "GBP",
+            "language": "en",
             "default_map_view": "map",
             "trip_sort_preference": "name_asc",
             "use_system_theme": True,
