@@ -188,13 +188,124 @@ class TestAcceptInvitation:
         response = client.get(url)
         assert response.status_code == 400
 
-    def test_unauthenticated_redirects(self, client, user_factory, trip_factory):
+    def test_unauthenticated_redirects_to_signup(
+        self, client, user_factory, trip_factory
+    ):
         owner = user_factory()
         trip = trip_factory(author=owner)
         invitation = self._make_invitation(trip, "invited@example.com", owner)
         url = reverse("trips:accept-invitation", kwargs={"token": invitation.token})
         response = client.get(url)
         assert response.status_code == 302
+        assert "signup" in response["Location"]
+
+    def test_unauthenticated_redirect_includes_next(
+        self, client, user_factory, trip_factory
+    ):
+        owner = user_factory()
+        trip = trip_factory(author=owner)
+        invitation = self._make_invitation(trip, "invited@example.com", owner)
+        url = reverse("trips:accept-invitation", kwargs={"token": invitation.token})
+        response = client.get(url)
+        assert str(invitation.token) in response["Location"]
+
+    def test_post_signup_auto_accepts_invitation(
+        self, client, user_factory, trip_factory
+    ):
+        """After signup via invitation link, collaboration is created automatically."""
+        owner = user_factory()
+        trip = trip_factory(author=owner)
+        invitation = TripInvitation.objects.create(
+            trip=trip,
+            email="newuser@example.com",
+            invited_by=owner,
+            expires_at=timezone.now() + timezone.timedelta(days=7),
+        )
+        # Simulate signup with invitation token in session
+        session = client.session
+        session["invitation_token"] = str(invitation.token)
+        session.save()
+        signup_url = reverse("account_signup")
+        client.post(
+            signup_url,
+            {
+                "email": "newuser@example.com",
+                "password1": "Str0ng!Pass",
+                "password2": "Str0ng!Pass",
+            },
+        )
+        from django.contrib.auth import get_user_model
+
+        from trips.models import TripCollaboration
+
+        User = get_user_model()
+        new_user = User.objects.get(email="newuser@example.com")
+        assert TripCollaboration.objects.filter(trip=trip, user=new_user).exists()
+        invitation.refresh_from_db()
+        assert invitation.is_accepted
+
+    def test_signup_without_token_no_collaboration(
+        self, client, user_factory, trip_factory
+    ):
+        """Normal signup without invitation token creates no collaboration."""
+        owner = user_factory()
+        trip = trip_factory(author=owner)
+        signup_url = reverse("account_signup")
+        client.post(
+            signup_url,
+            {
+                "email": "plain@example.com",
+                "password1": "Str0ng!Pass",
+                "password2": "Str0ng!Pass",
+            },
+        )
+        assert not TripCollaboration.objects.filter(trip=trip).exists()
+
+    def test_signup_with_invalid_token_no_collaboration(
+        self, client, user_factory, trip_factory
+    ):
+        """Signup with non-existent token in session creates no collaboration."""
+        owner = user_factory()
+        trip = trip_factory(author=owner)
+        session = client.session
+        session["invitation_token"] = "00000000-0000-0000-0000-000000000000"  # nosec B105
+        session.save()
+        signup_url = reverse("account_signup")
+        client.post(
+            signup_url,
+            {
+                "email": "plain2@example.com",
+                "password1": "Str0ng!Pass",
+                "password2": "Str0ng!Pass",
+            },
+        )
+        assert not TripCollaboration.objects.filter(trip=trip).exists()
+
+    def test_signup_with_expired_invitation_no_collaboration(
+        self, client, user_factory, trip_factory
+    ):
+        """Signup with expired invitation token creates no collaboration."""
+        owner = user_factory()
+        trip = trip_factory(author=owner)
+        invitation = TripInvitation.objects.create(
+            trip=trip,
+            email="expired@example.com",
+            invited_by=owner,
+            expires_at=timezone.now() - timezone.timedelta(days=1),
+        )
+        session = client.session
+        session["invitation_token"] = str(invitation.token)
+        session.save()
+        signup_url = reverse("account_signup")
+        client.post(
+            signup_url,
+            {
+                "email": "expired@example.com",
+                "password1": "Str0ng!Pass",
+                "password2": "Str0ng!Pass",
+            },
+        )
+        assert not TripCollaboration.objects.filter(trip=trip).exists()
 
 
 class TestEmailLanguage:

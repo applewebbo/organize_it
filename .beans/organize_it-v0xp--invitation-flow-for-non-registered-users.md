@@ -1,10 +1,11 @@
 ---
 # organize_it-v0xp
 title: Invitation flow for non-registered users
-status: todo
+status: in-progress
 type: task
+priority: normal
 created_at: 2026-04-04T06:19:54Z
-updated_at: 2026-04-04T06:19:54Z
+updated_at: 2026-04-08T05:59:14Z
 parent: organize_it-z5rm
 blocked_by:
     - organize_it-sf5l

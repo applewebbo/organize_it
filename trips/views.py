@@ -2937,13 +2937,18 @@ def invite_collaborator(request, trip_id):
     )
 
 
-@login_required
 def accept_invitation(request, token):
     """Accept a trip collaboration invitation via token."""
     invitation = get_object_or_404(TripInvitation, token=token)
 
     if not invitation.is_valid:
         return HttpResponse(status=400)
+
+    if not request.user.is_authenticated:
+        signup_url = reverse("account_signup")
+        accept_url = reverse("trips:accept-invitation", kwargs={"token": token})
+        request.session["invitation_token"] = str(token)
+        return redirect(f"{signup_url}?next={accept_url}")
 
     invitation.is_accepted = True
     invitation.accepted_at = timezone.now()

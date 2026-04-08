@@ -1,10 +1,12 @@
 import geocoder
+from allauth.account.signals import user_signed_up
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.cache import cache
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from .managers import CustomUserManager
@@ -176,3 +178,33 @@ def get_profile(user):
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
+
+
+@receiver(user_signed_up)
+def accept_invitation_on_signup(sender, request, user, **kwargs):
+    """Auto-accept a TripInvitation if token was stored in session before signup."""
+    from trips.models import TripCollaboration, TripInvitation
+
+    token = request.session.pop("invitation_token", None)
+    if not token:
+        return
+
+    try:
+        invitation = TripInvitation.objects.get(token=token)
+    except TripInvitation.DoesNotExist:
+        return
+
+    if not invitation.is_valid:
+        return
+
+    invitation.is_accepted = True
+    invitation.accepted_at = timezone.now()
+    invitation.save()
+
+    trip = invitation.trip
+    color = TripCollaboration.next_free_color(trip)
+    TripCollaboration.objects.get_or_create(
+        trip=trip,
+        user=user,
+        defaults={"color": color, "added_by": invitation.invited_by},
+    )
