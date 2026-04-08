@@ -183,6 +183,32 @@ label-create name color="#0075ca":
 issue-label number *labels:
     ./bin/codeberg label {{number}} {{labels}}
 
+# Create a label (if missing, with random color) and assign it to an issue: just issue-label-create <issue> <label>
+[group('codeberg')]
+issue-label-create number name:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    COLORS=("#e11d48" "#ea580c" "#d97706" "#65a30d" "#16a34a" "#059669" "#0891b2" "#2563eb" "#7c3aed" "#c026d3" \
+            "#be185d" "#b45309" "#4d7c0f" "#0e7490" "#1d4ed8" "#6d28d9" "#a21caf" "#be123c" "#15803d" "#0369a1")
+    RANDOM_COLOR=${COLORS[$((RANDOM % ${#COLORS[@]}))]}
+    TOKEN=$(grep "^CODEBERG_API_TOKEN=" .env | cut -d'=' -f2 | tr -d '"' | tr -d "'")
+    LABEL_ID=$(curl -s "https://codeberg.org/api/v1/repos/webbografico/organize_it/labels" \
+      -H "Authorization: token ${TOKEN}" | jq -r '.[] | select(.name == "{{name}}") | .id')
+    if [ -z "$LABEL_ID" ]; then
+        echo "Creating label '{{name}}' with color ${RANDOM_COLOR}..."
+        LABEL_ID=$(curl -s -X POST "https://codeberg.org/api/v1/repos/webbografico/organize_it/labels" \
+          -H "Authorization: token ${TOKEN}" \
+          -H "Content-Type: application/json" \
+          -d "{\"name\":\"{{name}}\",\"color\":\"${RANDOM_COLOR}\"}" | jq -r '.id')
+        echo "✓ Label '{{name}}' created (id: ${LABEL_ID})"
+    else
+        echo "✓ Label '{{name}}' already exists (id: ${LABEL_ID})"
+    fi
+    curl -s -X POST "https://codeberg.org/api/v1/repos/webbografico/organize_it/issues/{{number}}/labels" \
+      -H "Authorization: token ${TOKEN}" \
+      -H "Content-Type: application/json" \
+      -d "{\"labels\":[${LABEL_ID}]}" | jq -r '"✓ Label assigned to issue #{{number}}"'
+
 # Create new issue
 [group('codeberg')]
 issue-create title body="":
