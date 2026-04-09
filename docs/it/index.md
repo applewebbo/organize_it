@@ -33,6 +33,12 @@ Gli indirizzi vengono geocodificati automaticamente con supporto per l'arricchim
 ### 🖼️ Immagini Bellissime
 Carica le tue immagini di copertina o cerca su Unsplash direttamente dall'app.
 
+### 👥 Collaborazione
+Invita altri utenti a collaborare su un viaggio. Ogni collaboratore ottiene un badge colorato univoco sui propri contributi e il viaggio appare nella loro sezione "Condivisi con me".
+
+### 🔗 Condivisione del Viaggio
+Condividi una vista in sola lettura di qualsiasi viaggio tramite un magic link sicuro — i destinatari non hanno bisogno di un account.
+
 ### 📱 Design Responsivo
 Funziona perfettamente su desktop, tablet e dispositivi mobili.
 
@@ -61,6 +67,8 @@ Funziona perfettamente su desktop, tablet e dispositivi mobili.
     [:octicons-arrow-right-24: Giorni](user-guide/days.md)
 
     [:octicons-arrow-right-24: Alloggi](user-guide/stays.md)
+
+    [:octicons-arrow-right-24: Collaborazione](user-guide/collaboration.md)
 
 -   :material-help-circle:{ .lg .middle } __Serve Aiuto?__
 

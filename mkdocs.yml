@@ -55,6 +55,7 @@ plugins:
         Experiences: Experiences
         Meals: Meals
         Transfers: Transfers
+        Collaboration: Collaboration
         FAQ: FAQ
     - locale: it
       name: Italiano
@@ -72,6 +73,7 @@ plugins:
         Experiences: Esperienze
         Meals: Pasti
         Transfers: Trasferimenti
+        Collaboration: Collaborazione
         FAQ: Domande Frequenti
 
 nav:
@@ -87,6 +89,7 @@ nav:
   - Experiences: user-guide/experiences.md
   - Meals: user-guide/meals.md
   - Transfers: user-guide/transfers.md
+  - Collaboration: user-guide/collaboration.md
 - FAQ: faq.md
 
 markdown_extensions:

@@ -33,6 +33,12 @@ Addresses are automatically geocoded with support for Google Places enrichment a
 ### 🖼️ Beautiful Images
 Upload your own cover images or search Unsplash directly from the app.
 
+### 👥 Collaboration
+Invite other users to collaborate on a trip. Each collaborator gets a unique color badge on their contributions, and the trip appears in their "Shared with me" section.
+
+### 🔗 Trip Sharing
+Share a read-only view of any trip via a secure magic link — no account required for recipients.
+
 ### 📱 Responsive Design
 Works seamlessly on desktop, tablet, and mobile devices.
 
@@ -61,6 +67,8 @@ Works seamlessly on desktop, tablet, and mobile devices.
     [:octicons-arrow-right-24: Days](user-guide/days.md)
 
     [:octicons-arrow-right-24: Stays](user-guide/stays.md)
+
+    [:octicons-arrow-right-24: Collaboration](user-guide/collaboration.md)
 
 -   :material-help-circle:{ .lg .middle } __Need Help?__
 
