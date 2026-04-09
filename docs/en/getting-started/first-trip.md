@@ -31,7 +31,7 @@ From the homepage, click the **Create New Trip** button.
 
 ### 1.2 Fill in Trip Details
 
-![Trip Creation Form](../../assets/screenshots/trip-create-form.png)
+![Trip Creation Form](../assets/screenshots/trip-create-form.png)
 *The trip creation form*
 
 Enter the following information:
@@ -64,7 +64,7 @@ Click **Save** to create your trip.
 !!! success
     Your trip is now created! Notice that 3 days (Friday, Saturday, Sunday) have been automatically generated.
 
-![Trip Detail View](../../assets/screenshots/trip-detail.png)
+![Trip Detail View](../assets/screenshots/trip-detail.png)
 *Your trip with automatically generated days*
 
 ## Step 2: Add Your Accommodation
@@ -75,7 +75,7 @@ Click on **Day 1 (Friday, March 14)** to open the day view.
 
 ### 2.2 Create a Stay
 
-![Stay Form](../../assets/screenshots/stay-form.png)
+![Stay Form](../assets/screenshots/stay-form.png)
 *The stay creation form*
 
 1. Click **Add Stay**
@@ -140,7 +140,7 @@ If you have a Google Places API key configured:
 
 ### 4.1 Friday Afternoon - Colosseum Visit
 
-![Experience Form](../../assets/screenshots/experience-form.png)
+![Experience Form](../assets/screenshots/experience-form.png)
 *The experience creation form*
 
 1. Click **Add Experience**
@@ -201,7 +201,7 @@ If you have a Google Places API key configured:
 
 ### 5.1 Friday Dinner
 
-![Meal Form](../../assets/screenshots/meal-form.png)
+![Meal Form](../assets/screenshots/meal-form.png)
 *The meal creation form*
 
 1. Navigate to **Day 1 (Friday)**
@@ -296,7 +296,7 @@ If you have a Google Places API key configured:
 
 ### 7.1 View the Complete Trip
 
-![Day Detail View](../../assets/screenshots/day-detail.png)
+![Day Detail View](../assets/screenshots/day-detail.png)
 *A day with all its events*
 
 1. Click on the trip name to go back to the trip overview
@@ -325,7 +325,7 @@ Click on any day to see:
 
 ### 8.1 Edit an Event
 
-![Event Detail Modal](../../assets/screenshots/event-detail-modal.png)
+![Event Detail Modal](../assets/screenshots/event-detail-modal.png)
 *Event detail modal with edit options*
 
 1. Click on any event card

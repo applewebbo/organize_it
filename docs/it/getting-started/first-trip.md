@@ -31,7 +31,7 @@ Dalla homepage, clicca il pulsante **Crea Nuovo Viaggio**.
 
 ### 1.2 Compila i Dettagli del Viaggio
 
-![Form Creazione Viaggio](../../assets/screenshots/trip-create-form.png)
+![Form Creazione Viaggio](../assets/screenshots/trip-create-form.png)
 *Il form di creazione viaggio*
 
 Inserisci le seguenti informazioni:
@@ -64,7 +64,7 @@ Clicca **Salva** per creare il tuo viaggio.
 !!! success
     Il tuo viaggio è stato creato! Nota che 3 giorni (venerdì, sabato, domenica) sono stati generati automaticamente.
 
-![Vista Dettaglio Viaggio](../../assets/screenshots/trip-detail.png)
+![Vista Dettaglio Viaggio](../assets/screenshots/trip-detail.png)
 *Il tuo viaggio con i giorni generati automaticamente*
 
 ## Passo 2: Aggiungi il Tuo Alloggio
@@ -75,7 +75,7 @@ Clicca su **Giorno 1 (Venerdì, 14 marzo)** per aprire la vista giorno.
 
 ### 2.2 Crea un Soggiorno
 
-![Form Soggiorno](../../assets/screenshots/stay-form.png)
+![Form Soggiorno](../assets/screenshots/stay-form.png)
 *Il form di creazione soggiorno*
 
 1. Clicca **Aggiungi Soggiorno**
@@ -140,7 +140,7 @@ Se hai una chiave API Google Places configurata:
 
 ### 4.1 Venerdì Pomeriggio - Visita al Colosseo
 
-![Form Esperienza](../../assets/screenshots/experience-form.png)
+![Form Esperienza](../assets/screenshots/experience-form.png)
 *Il form di creazione esperienza*
 
 1. Clicca **Aggiungi Esperienza**
@@ -201,7 +201,7 @@ Se hai una chiave API Google Places configurata:
 
 ### 5.1 Cena di Venerdì
 
-![Form Pasto](../../assets/screenshots/meal-form.png)
+![Form Pasto](../assets/screenshots/meal-form.png)
 *Il form di creazione pasto*
 
 1. Vai a **Giorno 1 (Venerdì)**
@@ -296,7 +296,7 @@ Se hai una chiave API Google Places configurata:
 
 ### 7.1 Visualizza il Viaggio Completo
 
-![Vista Dettaglio Giorno](../../assets/screenshots/day-detail.png)
+![Vista Dettaglio Giorno](../assets/screenshots/day-detail.png)
 *Un giorno con tutti i suoi eventi*
 
 1. Clicca sul nome del viaggio per tornare alla panoramica viaggio
@@ -325,7 +325,7 @@ Clicca su qualsiasi giorno per vedere:
 
 ### 8.1 Modifica un Evento
 
-![Modal Dettaglio Evento](../../assets/screenshots/event-detail-modal.png)
+![Modal Dettaglio Evento](../assets/screenshots/event-detail-modal.png)
 *Modal dettaglio evento con opzioni di modifica*
 
 1. Clicca su qualsiasi card evento

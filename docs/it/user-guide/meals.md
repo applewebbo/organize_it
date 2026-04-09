@@ -30,7 +30,7 @@ Un **Pasto** è qualsiasi evento culinario durante il tuo viaggio, inclusi:
 3. Completa il form
 4. Salva
 
-![Form Pasto](../../assets/screenshots/meal-form.png)
+![Form Pasto](../assets/screenshots/meal-form.png)
 *Il form di creazione pasto*
 
 ## Campi del Pasto

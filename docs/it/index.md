@@ -2,7 +2,7 @@
 
 **Organize It** è una potente applicazione web progettata per aiutarti a pianificare e gestire i tuoi viaggi con facilità.
 
-![Organize It - Lista Viaggi](../assets/screenshots/home-trips-list.png)
+![Organize It - Lista Viaggi](assets/screenshots/home-trips-list.png)
 *I tuoi viaggi organizzati in un unico posto*
 
 ## Cos'è Organize It?

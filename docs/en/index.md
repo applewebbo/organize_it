@@ -2,7 +2,7 @@
 
 **Organize It** is a powerful web application designed to help you plan and manage your trips with ease.
 
-![Organize It - Trip List](../assets/screenshots/home-trips-list.png)
+![Organize It - Trip List](assets/screenshots/home-trips-list.png)
 *Your trips organized in one place*
 
 ## What is Organize It?

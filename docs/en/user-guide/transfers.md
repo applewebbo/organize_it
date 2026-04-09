@@ -32,7 +32,7 @@ Your journey FROM the destination at the end of the trip.
 - Train from Barcelona to Paris
 - Driving from vacation rental back home
 
-![Transfer Form](../../assets/screenshots/transfer-form.png)
+![Transfer Form](../assets/screenshots/transfer-form.png)
 *The transfer creation form*
 
 ### Creating a Main Transfer

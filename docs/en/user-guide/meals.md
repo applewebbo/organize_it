@@ -30,7 +30,7 @@ A **Meal** is any dining event during your trip, including:
 3. Complete the form
 4. Save
 
-![Meal Form](../../assets/screenshots/meal-form.png)
+![Meal Form](../assets/screenshots/meal-form.png)
 *The meal creation form*
 
 ## Meal Fields

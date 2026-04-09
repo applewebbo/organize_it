@@ -29,7 +29,7 @@ A **Stay** is an accommodation that spans one or more consecutive days in your t
 3. Fill in details
 4. Save
 
-![Stay Form](../../assets/screenshots/stay-form.png)
+![Stay Form](../assets/screenshots/stay-form.png)
 *The stay creation form*
 
 ## Stay Fields

@@ -31,7 +31,7 @@ An **Experience** is any planned activity during your trip, such as:
 3. Complete the form
 4. Save
 
-![Experience Form](../../assets/screenshots/experience-form.png)
+![Experience Form](../assets/screenshots/experience-form.png)
 *The experience creation form*
 
 ## Experience Fields
