@@ -1,21 +1,11 @@
 ---
-name: "Optimize session cleanup task"
-title: "Optimize session cleanup task"
-description: |
-  Optimize expired session cleanup task.
-
-  ## Problem:
-  - Two separate queries (count + delete)
-  - Redundant query for count
-
-  ## Solution:
-  - Use single queryset for count and delete
-  - Log only if sessions found
-
-labels: ["performance", "queries", "priority-3"]
-priority: 3
-order: 7
-estimated_time: "10m"
+# optimize
+title: Optimize session cleanup task
+status: scrapped
+type: task
+priority: "3"
+created_at: 2026-03-31T06:02:32Z
+updated_at: 2026-04-07T18:35:03Z
 ---
 
 # Optimize session cleanup task
@@ -64,3 +54,5 @@ def cleanup_old_sessions():
 - [ ] Single query for cleanup
 - [ ] Log shows correct count
 - [ ] All tests pass
+
+## Reasons for Scrapping\n\nNot a priority for current release cycle.

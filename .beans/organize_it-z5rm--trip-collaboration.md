@@ -1,10 +1,11 @@
 ---
 # organize_it-z5rm
 title: Trip Collaboration
-status: todo
+status: completed
 type: epic
+priority: normal
 created_at: 2026-04-04T06:19:25Z
-updated_at: 2026-04-04T06:19:25Z
+updated_at: 2026-04-09T06:17:46Z
 parent: organize_it-8u6a
 ---
 
