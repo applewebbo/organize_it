@@ -71,6 +71,7 @@ class ProfileUpdateForm(forms.ModelForm):
             "trip_sort_preference": forms.Select(
                 attrs={"class": "select select-bordered w-full"}
             ),
+            "language": forms.Select(attrs={"class": "select select-bordered w-full"}),
             "use_system_theme": forms.CheckboxInput(attrs={"class": "checkbox"}),
             "fav_trip": forms.Select(attrs={"class": "select select-bordered w-full"}),
         }

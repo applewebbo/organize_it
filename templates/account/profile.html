@@ -85,6 +85,14 @@
                             <div class="mt-1 text-sm text-error">{{ profile_form.trip_sort_preference.errors }}</div>
                         {% endif %}
                     </div>
+                    <div>
+                        <label for="{{ profile_form.language.id_for_label }}"
+                               class="block mb-2 font-medium">{{ profile_form.language.label }}</label>
+                        {{ profile_form.language }}
+                        {% if profile_form.language.errors %}
+                            <div class="mt-1 text-sm text-error">{{ profile_form.language.errors }}</div>
+                        {% endif %}
+                    </div>
                 </div>
                 <div class="mb-4 form-control">
                     <label class="gap-3 justify-start cursor-pointer label">
