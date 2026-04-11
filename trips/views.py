@@ -457,12 +457,12 @@ def trip_update(request, pk):
                 _("<strong>%(title)s</strong> updated successfully")
                 % {"title": trip.title},
             )
-            return HttpResponse(status=204, headers={"HX-Trigger": "tripSaved"})
-        context = {"form": form}
+            return HttpResponse(status=204, headers={"HX-Refresh": "true"})
+        context = {"form": form, "is_update": True}
         return TemplateResponse(request, "trips/trip-create.html", context)
 
     form = TripForm(instance=trip)
-    context = {"form": form}
+    context = {"form": form, "is_update": True}
     return TemplateResponse(request, "trips/trip-create.html", context)
 
 

@@ -47,12 +47,12 @@ class TripForm(forms.ModelForm):
     start_date = forms.DateField(
         label=_("Start date"),
         required=False,
-        widget=forms.DateInput(attrs={"type": "date"}),
+        widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
     )
     end_date = forms.DateField(
         label=_("End date"),
         required=False,
-        widget=forms.DateInput(attrs={"type": "date"}),
+        widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
     )
     selected_photo_id = forms.CharField(
         required=False, widget=forms.HiddenInput(), initial=""
@@ -214,7 +214,7 @@ class TripForm(forms.ModelForm):
 
     def clean_start_date(self):
         start_date = self.cleaned_data.get("start_date")
-        if start_date and start_date < date.today():
+        if start_date and start_date < date.today() and not self.instance.pk:
             raise ValidationError(_("Start date must be after today"))
         return start_date
 

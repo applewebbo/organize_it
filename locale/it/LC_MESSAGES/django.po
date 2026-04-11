@@ -2146,6 +2146,10 @@ msgstr "Trasferimento principale eliminato con successo"
 msgid "Event deleted successfully"
 msgstr "Evento eliminato correttamente"
 
+#: templates/trips/trip-create.html
+msgid "Changing the dates may remove some days. Events on removed days will become unpaired and can be reassigned later."
+msgstr "Modificare le date potrebbe rimuovere alcuni giorni. Gli eventi nei giorni rimossi diventeranno non assegnati e potranno essere riassegnati in seguito."
+
 #: trips/views.py:1086
 msgid "Event unpaired successfully"
 msgstr "Evento scollegato correttamente"
