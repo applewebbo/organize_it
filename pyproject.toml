@@ -61,7 +61,7 @@ description = "Help you organize your trips and travel plans."
 name = "organize_it"
 readme = "README.md"
 requires-python = ">=3.14"
-version = "2026.6"
+version = "2026.6.1"
 
 [tool.bandit]
 skips = ["B101", "B311"]
