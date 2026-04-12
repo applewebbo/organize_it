@@ -106,13 +106,13 @@ All commands use `just` (justfile). Never use `pip` - always use `uv`.
 - `just docs-serve` - Serve documentation locally at http://localhost:8001
 - `just docs-build` - Build documentation to `site/` directory
 - Documentation source files are in `docs/` directory (EN and IT)
-- Documentation is hosted on ReadTheDocs: https://organize-it.readthedocs.io
-- Auto-builds on push to main branch
+- Documentation is hosted on Codeberg Pages: https://webbografico.codeberg.page/organize_it/en/ (EN) and https://webbografico.codeberg.page/organize_it/it/ (IT)
+- Auto-builds via Forgejo Actions on push to main branch (changes in `docs/` or mkdocs config files)
 
 **Updating Documentation:**
 1. Edit markdown files in `docs/en/` (English) or `docs/it/` (Italian)
 2. Test locally with `just docs-serve`
-3. Commit and push to trigger ReadTheDocs rebuild
+3. Commit and push to trigger Codeberg Pages rebuild
 4. Screenshots are in `docs/assets/screenshots/`
 
 **IMPORTANT:** When making substantial UI changes, remind the user to update the documentation screenshots and content accordingly.
