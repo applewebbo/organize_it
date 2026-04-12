@@ -1,0 +1,21 @@
+/* Align mkdocs-material colors to DaisyUI default light/dark theme */
+
+/* DaisyUI light theme primary: oklch(49.12% 0.3096 275.75) ≈ #7C3AED (violet) */
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color: #7c3aed;
+  --md-primary-fg-color--light: #a78bfa;
+  --md-primary-fg-color--dark: #5b21b6;
+  --md-primary-bg-color: #ffffff;
+  --md-accent-fg-color: #7c3aed;
+  --md-accent-fg-color--transparent: rgba(124, 58, 237, 0.1);
+}
+
+/* DaisyUI dark theme primary: oklch(65.69% 0.196 275.75) ≈ #a78bfa (violet-400) */
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #a78bfa;
+  --md-primary-fg-color--light: #c4b5fd;
+  --md-primary-fg-color--dark: #7c3aed;
+  --md-primary-bg-color: #1e1e2e;
+  --md-accent-fg-color: #a78bfa;
+  --md-accent-fg-color--transparent: rgba(167, 139, 250, 0.1);
+}

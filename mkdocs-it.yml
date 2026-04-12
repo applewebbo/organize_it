@@ -10,14 +10,14 @@ theme:
   custom_dir: docs/overrides-it
   palette:
   - scheme: default
-    primary: indigo
-    accent: indigo
+    primary: custom
+    accent: custom
     toggle:
       icon: material/brightness-7
       name: Passa alla modalità scura
   - scheme: slate
-    primary: indigo
-    accent: indigo
+    primary: custom
+    accent: custom
     toggle:
       icon: material/brightness-4
       name: Passa alla modalità chiara
@@ -30,6 +30,9 @@ theme:
   - search.highlight
   - content.code.copy
   - content.action.edit
+
+extra_css:
+- assets/stylesheets/daisyui-theme.css
 
 docs_dir: docs/it
 
