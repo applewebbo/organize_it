@@ -64,7 +64,7 @@ steps:
   - git rm -rf . --quiet
   - cp -r pages/. .
   - git add .
-  - git commit -m "docs: deploy to Codeberg Pages"
+  - git commit -m 'docs: deploy to Codeberg Pages'
   - git push --force origin HEAD:pages
   environment:
     FORGEJO_TOKEN:
