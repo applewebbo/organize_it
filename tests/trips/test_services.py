@@ -1,0 +1,235 @@
+from unittest.mock import MagicMock, patch
+
+import pytest
+import requests
+
+from trips.services import (
+    GooglePlacesClient,
+    GooglePlacesError,
+    PlaceDetails,
+    PlaceResult,
+)
+
+pytestmark = pytest.mark.django_db
+
+
+SEARCH_RESPONSE = {
+    "places": [
+        {
+            "id": "ChIJ_place_123",
+            "displayName": {"text": "Museo Egizio"},
+            "formattedAddress": "Via Accademia delle Scienze, 6, Torino",
+            "location": {"latitude": 45.0687, "longitude": 7.6847},
+        }
+    ]
+}
+
+DETAILS_RESPONSE = {
+    "websiteUri": "https://museoegizio.it",
+    "internationalPhoneNumber": "+39 011 561 7776",
+    "regularOpeningHours": {
+        "periods": [
+            {
+                "open": {"day": 2, "hour": 9, "minute": 0},
+                "close": {"day": 2, "hour": 19, "minute": 0},
+            },
+        ]
+    },
+}
+
+PLACE_ID_RESPONSE = {"places": [{"id": "ChIJ_place_123"}]}
+EMPTY_RESPONSE = {"places": []}
+
+
+@pytest.fixture
+def client():
+    return GooglePlacesClient()
+
+
+class TestGooglePlacesClientSearchText:
+    def test_returns_place_results(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = SEARCH_RESPONSE
+        mock_resp.raise_for_status.return_value = None
+
+        with patch("trips.services.requests.post", return_value=mock_resp) as mock_post:
+            results = client.search_text("museo egizio torino")
+
+        assert len(results) == 1
+        r = results[0]
+        assert isinstance(r, PlaceResult)
+        assert r.place_id == "ChIJ_place_123"
+        assert r.name == "Museo Egizio"
+        assert r.lat == 45.0687
+        assert r.lng == 7.6847
+
+        call_args = mock_post.call_args
+        assert call_args.kwargs["headers"]["X-Goog-Api-Key"] == "test-key"
+        assert "places.id" in call_args.kwargs["headers"]["X-Goog-FieldMask"]
+        assert "places.location" in call_args.kwargs["headers"]["X-Goog-FieldMask"]
+
+    def test_returns_empty_list_when_no_results(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = EMPTY_RESPONSE
+        mock_resp.raise_for_status.return_value = None
+
+        with patch("trips.services.requests.post", return_value=mock_resp):
+            results = client.search_text("ristorante inesistente")
+
+        assert results == []
+
+    def test_raises_on_missing_api_key(self, settings):
+        settings.GOOGLE_PLACES_API_KEY = ""
+        c = GooglePlacesClient()
+        with pytest.raises(GooglePlacesError, match="not configured"):
+            c.search_text("query")
+
+    def test_raises_on_timeout(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        with patch(
+            "trips.services.requests.post", side_effect=requests.exceptions.Timeout
+        ):
+            with pytest.raises(GooglePlacesError, match="timed out"):
+                client.search_text("query")
+
+    def test_raises_on_request_exception(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        mock_err = requests.RequestException("network error")
+        mock_err.response = None
+        with patch("trips.services.requests.post", side_effect=mock_err):
+            with pytest.raises(GooglePlacesError, match="API error"):
+                client.search_text("query")
+
+    def test_respects_max_results(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = EMPTY_RESPONSE
+        mock_resp.raise_for_status.return_value = None
+
+        with patch("trips.services.requests.post", return_value=mock_resp) as mock_post:
+            client.search_text("query", max_results=5)
+
+        payload = mock_post.call_args.kwargs["json"]
+        assert payload["maxResultCount"] == 5
+
+
+class TestGooglePlacesClientGetDetails:
+    def test_returns_place_details(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = DETAILS_RESPONSE
+        mock_resp.raise_for_status.return_value = None
+
+        with patch("trips.services.requests.get", return_value=mock_resp):
+            details = client.get_place_details("ChIJ_place_123")
+
+        assert isinstance(details, PlaceDetails)
+        assert details.place_id == "ChIJ_place_123"
+        assert details.website == "https://museoegizio.it"
+        assert details.phone_number == "+39 011 561 7776"
+        assert details.opening_hours is not None
+        assert "tuesday" in details.opening_hours
+
+    def test_returns_empty_strings_when_fields_missing(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = {}
+        mock_resp.raise_for_status.return_value = None
+
+        with patch("trips.services.requests.get", return_value=mock_resp):
+            details = client.get_place_details("ChIJ_place_123")
+
+        assert details.website == ""
+        assert details.phone_number == ""
+        assert details.opening_hours is None
+
+    def test_raises_on_missing_api_key(self, settings):
+        settings.GOOGLE_PLACES_API_KEY = ""
+        c = GooglePlacesClient()
+        with pytest.raises(GooglePlacesError, match="not configured"):
+            c.get_place_details("some-id")
+
+    def test_raises_on_timeout(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        with patch(
+            "trips.services.requests.get", side_effect=requests.exceptions.Timeout
+        ):
+            with pytest.raises(GooglePlacesError, match="timed out"):
+                client.get_place_details("some-id")
+
+    def test_raises_on_request_exception(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        mock_err = requests.RequestException("network error")
+        mock_err.response = None
+        with patch("trips.services.requests.get", side_effect=mock_err):
+            with pytest.raises(GooglePlacesError, match="API error"):
+                client.get_place_details("some-id")
+
+    def test_raises_on_request_exception_with_response(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        mock_response = MagicMock()
+        mock_response.text = "Forbidden"
+        mock_err = requests.RequestException("forbidden")
+        mock_err.response = mock_response
+        with patch("trips.services.requests.get", side_effect=mock_err):
+            with pytest.raises(GooglePlacesError, match="Forbidden"):
+                client.get_place_details("some-id")
+
+
+class TestGooglePlacesClientSearchPlaceId:
+    def test_returns_place_id(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = PLACE_ID_RESPONSE
+        mock_resp.raise_for_status.return_value = None
+
+        with patch("trips.services.requests.post", return_value=mock_resp):
+            place_id = client.search_place_id("museo egizio")
+
+        assert place_id == "ChIJ_place_123"
+
+    def test_returns_none_when_no_results(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = EMPTY_RESPONSE
+        mock_resp.raise_for_status.return_value = None
+
+        with patch("trips.services.requests.post", return_value=mock_resp):
+            place_id = client.search_place_id("inesistente")
+
+        assert place_id is None
+
+    def test_raises_on_timeout(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        with patch(
+            "trips.services.requests.post", side_effect=requests.exceptions.Timeout
+        ):
+            with pytest.raises(GooglePlacesError, match="timed out"):
+                client.search_place_id("query")
+
+    def test_raises_on_request_exception(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        mock_err = requests.RequestException("network error")
+        mock_err.response = None
+        with patch("trips.services.requests.post", side_effect=mock_err):
+            with pytest.raises(GooglePlacesError, match="API error"):
+                client.search_place_id("query")
+
+    def test_raises_on_missing_api_key(self, settings):
+        settings.GOOGLE_PLACES_API_KEY = ""
+        c = GooglePlacesClient()
+        with pytest.raises(GooglePlacesError, match="not configured"):
+            c.search_place_id("query")
+
+    def test_requests_only_id_field(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = PLACE_ID_RESPONSE
+        mock_resp.raise_for_status.return_value = None
+
+        with patch("trips.services.requests.post", return_value=mock_resp) as mock_post:
+            client.search_place_id("query")
+
+        assert mock_post.call_args.kwargs["headers"]["X-Goog-FieldMask"] == "places.id"

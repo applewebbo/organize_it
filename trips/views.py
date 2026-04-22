@@ -53,10 +53,10 @@ from trips.models import (
     TripCollaboration,
     TripInvitation,
 )
+from trips.services import GooglePlacesClient, GooglePlacesError
 from trips.utils import (
     accessible_trips_qs,
     annotate_event_overlaps,
-    convert_google_opening_hours,
     create_day_map,
     download_unsplash_photo,
     geocode_location,
@@ -1992,71 +1992,28 @@ def enrich_stay(request, stay_id):
         context["stay"] = stay
         return TemplateResponse(request, "trips/stay-detail.html", context)
 
-    api_key = settings.GOOGLE_PLACES_API_KEY
-
-    if not api_key:
-        context["error_message"] = _("Google Places API key is not configured.")
-    else:
-        # 1. Find Place ID
-        search_url = "https://places.googleapis.com/v1/places:searchText"
-        search_payload = {"textQuery": f"{stay.name} {stay.address}"}
-        search_headers = {
-            "Content-Type": "application/json",
-            "X-Goog-Api-Key": api_key,
-            "X-Goog-FieldMask": "places.id",
-        }
-
-        place_id = None
-        try:
-            response = requests.post(
-                search_url, json=search_payload, headers=search_headers, timeout=5
-            )
-            response.raise_for_status()
-            data = response.json()
-
-            if data.get("places"):
-                place_id = data["places"][0]["id"]
-            else:
-                context["error_message"] = _("Could not find a matching place.")
-
-        except requests.exceptions.Timeout:
-            context["error_message"] = _("Google Places API request timed out.")
-        except requests.RequestException as e:
-            error_message = f"Error calling Google Places API: {e}"
-            if e.response is not None:
-                error_message = f"API Error: {e.response.text}"
-            context["error_message"] = error_message
-
-    # Store enriched data in context without saving to database
+    client = GooglePlacesClient()
+    place_id = None
     enriched_data = {}
+
+    try:
+        place_id = client.search_place_id(f"{stay.name} {stay.address}")
+        if not place_id:
+            context["error_message"] = _("Could not find a matching place.")
+    except GooglePlacesError as e:
+        context["error_message"] = str(e)
+
     if "error_message" not in context and place_id:
-        # 2. Get Place Details
-        details_url = f"https://places.googleapis.com/v1/places/{place_id}"
-        details_headers = {
-            "X-Goog-Api-Key": api_key,
-            "X-Goog-FieldMask": "websiteUri,internationalPhoneNumber,regularOpeningHours",
-        }
-
         try:
-            response = requests.get(details_url, headers=details_headers, timeout=5)
-            response.raise_for_status()
-            data = response.json()
-
-            enriched_data["place_id"] = place_id
-            enriched_data["website"] = data.get("websiteUri", "")
-            enriched_data["phone_number"] = data.get("internationalPhoneNumber", "")
-            google_opening_hours = data.get("regularOpeningHours", None)
-            enriched_data["opening_hours"] = convert_google_opening_hours(
-                google_opening_hours
-            )
-
-        except requests.exceptions.Timeout:
-            context["error_message"] = _("Google Places API request timed out.")
-        except requests.RequestException as e:
-            error_message = f"Error calling Google Places API: {e}"
-            if e.response is not None:
-                error_message = f"API Error: {e.response.text}"
-            context["error_message"] = error_message
+            details = client.get_place_details(place_id)
+            enriched_data = {
+                "place_id": details.place_id,
+                "website": details.website,
+                "phone_number": details.phone_number,
+                "opening_hours": details.opening_hours,
+            }
+        except GooglePlacesError as e:
+            context["error_message"] = str(e)
 
     # Serialize opening_hours to JSON string for form submission
     if enriched_data and enriched_data.get("opening_hours"):
@@ -2174,71 +2131,28 @@ def enrich_event(request, event_id):
         context["event"] = event
         return TemplateResponse(request, "trips/event-detail.html", context)
 
-    api_key = settings.GOOGLE_PLACES_API_KEY
-
-    if not api_key:
-        context["error_message"] = _("Google Places API key is not configured.")
-    else:
-        # 1. Find Place ID
-        search_url = "https://places.googleapis.com/v1/places:searchText"
-        search_payload = {"textQuery": f"{event.name} {event.address}"}
-        search_headers = {
-            "Content-Type": "application/json",
-            "X-Goog-Api-Key": api_key,
-            "X-Goog-FieldMask": "places.id",
-        }
-
-        place_id = None
-        try:
-            response = requests.post(
-                search_url, json=search_payload, headers=search_headers, timeout=5
-            )
-            response.raise_for_status()
-            data = response.json()
-
-            if data.get("places"):
-                place_id = data["places"][0]["id"]
-            else:
-                context["error_message"] = _("Could not find a matching place.")
-
-        except requests.exceptions.Timeout:
-            context["error_message"] = _("Google Places API request timed out.")
-        except requests.RequestException as e:
-            error_message = f"Error calling Google Places API: {e}"
-            if e.response is not None:
-                error_message = f"API Error: {e.response.text}"
-            context["error_message"] = error_message
-
-    # Store enriched data in context without saving to database
+    client = GooglePlacesClient()
+    place_id = None
     enriched_data = {}
+
+    try:
+        place_id = client.search_place_id(f"{event.name} {event.address}")
+        if not place_id:
+            context["error_message"] = _("Could not find a matching place.")
+    except GooglePlacesError as e:
+        context["error_message"] = str(e)
+
     if "error_message" not in context and place_id:
-        # 2. Get Place Details
-        details_url = f"https://places.googleapis.com/v1/places/{place_id}"
-        details_headers = {
-            "X-Goog-Api-Key": api_key,
-            "X-Goog-FieldMask": "websiteUri,internationalPhoneNumber,regularOpeningHours",
-        }
-
         try:
-            response = requests.get(details_url, headers=details_headers, timeout=5)
-            response.raise_for_status()
-            data = response.json()
-
-            enriched_data["place_id"] = place_id
-            enriched_data["website"] = data.get("websiteUri", "")
-            enriched_data["phone_number"] = data.get("internationalPhoneNumber", "")
-            google_opening_hours = data.get("regularOpeningHours", None)
-            enriched_data["opening_hours"] = convert_google_opening_hours(
-                google_opening_hours
-            )
-
-        except requests.exceptions.Timeout:
-            context["error_message"] = _("Google Places API request timed out.")
-        except requests.RequestException as e:
-            error_message = f"Error calling Google Places API: {e}"
-            if e.response is not None:
-                error_message = f"API Error: {e.response.text}"
-            context["error_message"] = error_message
+            details = client.get_place_details(place_id)
+            enriched_data = {
+                "place_id": details.place_id,
+                "website": details.website,
+                "phone_number": details.phone_number,
+                "opening_hours": details.opening_hours,
+            }
+        except GooglePlacesError as e:
+            context["error_message"] = str(e)
 
     event = get_event_instance(event)
 
