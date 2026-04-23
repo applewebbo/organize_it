@@ -8,7 +8,6 @@ from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db import models
 from django.urls import reverse
-from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
 
 from .models import (
@@ -224,74 +223,6 @@ class TripForm(forms.ModelForm):
         if not g.ok:
             raise ValidationError(_("Destination not found"))
         return destination
-
-
-class TripDateUpdateForm(forms.ModelForm):
-    start_date = forms.DateField(
-        label=_("Start date"),
-        required=False,
-    )
-    end_date = forms.DateField(
-        label=_("End date"),
-        required=False,
-    )
-
-    class Meta:
-        model = Trip
-        fields = (
-            "start_date",
-            "end_date",
-        )
-
-    def __init__(self, *args, **kwargs):
-        """
-        Initialize the form and set initial values for start_date and end_date
-        from the instance if available.
-        """
-        super().__init__(*args, **kwargs)
-
-        # Detect the current language
-        current_language = get_language()
-
-        # Set the date format dynamically
-        if current_language == "en":
-            date_format = "%m/%d/%Y"  # MM/DD/YYYY for English
-        elif current_language == "it":
-            date_format = "%d/%m/%Y"  # DD/MM/YYYY for Italian
-        else:
-            date_format = "%Y-%m-%d"  # Default to ISO format
-
-        # Update the widget and input_formats for both fields
-        self.fields["start_date"].widget = forms.DateInput(format=date_format)
-        self.fields["start_date"].input_formats = [date_format]
-        self.fields["end_date"].widget = forms.DateInput(format=date_format)
-        self.fields["end_date"].input_formats = [date_format]
-
-        self.helper = FormHelper()
-        self.helper.form_tag = False
-        self.helper.layout = Layout(
-            Div(
-                Field("start_date", autocomplete="Inizio"),
-                css_class="w-full",
-            ),
-            Div(
-                Field("end_date", autocomplete="Fine"),
-                css_class="w-full",
-            ),
-        )
-
-    def clean(self):
-        """
-        Validate that the end date is after the start date.
-        """
-        cleaned_data = super().clean()
-        if (
-            cleaned_data.get("start_date")
-            and cleaned_data.get("end_date")
-            and cleaned_data.get("start_date") > cleaned_data.get("end_date")
-        ):
-            raise ValidationError("End date must be after start date")
-        return cleaned_data
 
 
 class LinkForm(forms.ModelForm):

@@ -2,9 +2,7 @@ from datetime import date, time, timedelta
 from unittest.mock import patch
 
 import pytest
-from django.utils.translation import activate
 
-from tests.test import TestCase
 from tests.trips.factories import (
     ExperienceFactory,
     MainTransferFactory,
@@ -19,7 +17,6 @@ from trips.forms import (
     MealForm,
     NoteForm,
     StayForm,
-    TripDateUpdateForm,
     TripForm,
 )
 from trips.models import Experience
@@ -108,54 +105,6 @@ class TestTripForm:
 
         assert not form.is_valid()
         assert "Destination not found" in form.errors["destination"]
-
-
-class TestTripDateUpdateForm(TestCase):
-    def test_form(self):
-        data = {
-            "start_date": date.today() + timedelta(days=10),
-            "end_date": date.today() + timedelta(days=12),
-        }
-        form = TripDateUpdateForm(data=data)
-
-        assert form.is_valid()
-
-    def test_end_date_before_start_date(self):
-        data = {
-            "start_date": date.today() + timedelta(days=12),
-            "end_date": date.today() + timedelta(days=10),
-        }
-        form = TripDateUpdateForm(data=data)
-
-        assert not form.is_valid()
-        assert "End date must be after start date" in form.non_field_errors()
-
-    def test_date_format(self):
-        """
-        Test that the TripDateUpdateForm dynamically sets the date format
-        based on the current language.
-        """
-        # Create a Trip instance
-        user = self.make_user("user")
-        trip = TripFactory(author=user)
-
-        # Test for English (MM/DD/YYYY)
-        activate("en")
-        form = TripDateUpdateForm(instance=trip)
-        assert form.fields["start_date"].widget.format == "%m/%d/%Y"
-        assert form.fields["end_date"].widget.format == "%m/%d/%Y"
-
-        # Test for Italian (DD/MM/YYYY)
-        activate("it")
-        form = TripDateUpdateForm(instance=trip)
-        assert form.fields["start_date"].widget.format == "%d/%m/%Y"
-        assert form.fields["end_date"].widget.format == "%d/%m/%Y"
-
-        # Test for default (ISO format)
-        activate("fr")  # Assume French defaults to ISO
-        form = TripDateUpdateForm(instance=trip)
-        assert form.fields["start_date"].widget.format == "%Y-%m-%d"
-        assert form.fields["end_date"].widget.format == "%Y-%m-%d"
 
 
 class TestLinkForm:

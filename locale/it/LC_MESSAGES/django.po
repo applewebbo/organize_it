@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-09 07:45+0200\n"
+"POT-Creation-Date: 2026-04-23 14:50+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -91,7 +91,7 @@ msgstr "Inglese"
 msgid "List"
 msgstr "Lista"
 
-#: accounts/models.py:57
+#: accounts/models.py:57 templates/trips/trip-map.html:4
 msgid "Map"
 msgstr "Mappa"
 
@@ -290,7 +290,7 @@ msgstr "Preferenze di viaggio"
 msgid "Display Preferences"
 msgstr "Preferenze di visualizzazione"
 
-#: templates/account/profile.html:98
+#: templates/account/profile.html:106
 msgid ""
 "When enabled, the theme will follow your device settings. When disabled, use "
 "the theme switcher in the navbar to choose your preferred theme."
@@ -299,7 +299,7 @@ msgstr ""
 "disattivo utilizza il selettore dell’aspetto chiaro/scuro nella barra del "
 "menu per scegliere la tua preferenza."
 
-#: templates/account/profile.html:102 templates/trips/event-notes.html:30
+#: templates/account/profile.html:110 templates/trips/event-notes.html:30
 #: templates/trips/experience-create.html:45
 #: templates/trips/main-transfer-connection-create.html:97
 #: templates/trips/main-transfer-connection-edit.html:73
@@ -532,11 +532,11 @@ msgstr ""
 "ottiene un badge colorato univoco sui propri contributi così puoi vedere chi "
 "ha aggiunto cosa."
 
-#: templates/cotton/quick_guide.html:131
+#: templates/cotton/quick_guide.html:132
 msgid "Sharing"
 msgstr "Condivisione"
 
-#: templates/cotton/quick_guide.html:134
+#: templates/cotton/quick_guide.html:135
 msgid ""
 "Share a read-only view of your trip with anyone via a secure magic link — no "
 "account required to view."
@@ -544,11 +544,11 @@ msgstr ""
 "Condividi una vista in sola lettura del tuo viaggio con chiunque tramite un "
 "magic link sicuro — nessun account richiesto per visualizzare."
 
-#: templates/cotton/quick_guide.html:141
+#: templates/cotton/quick_guide.html:142
 msgid "Want to learn more? Check out our comprehensive documentation."
 msgstr "Vuoi saperne di più? Consulta la nostra documentazione completa."
 
-#: templates/cotton/quick_guide.html:147
+#: templates/cotton/quick_guide.html:149
 msgid "Read Documentation"
 msgstr "Leggi la documentazione"
 
@@ -1146,24 +1146,32 @@ msgid "Experiences & Restaurants"
 msgstr "Esperienze e Ristoranti"
 
 #: templates/trips/includes/trip-header-card.html:14
-#: templates/trips/includes/trip-header-card.html:23
-#: templates/trips/includes/trip-header-card.html:49
-#: templates/trips/includes/trip-header-card.html:59
+#: templates/trips/includes/trip-header-card.html:52
+#: templates/trips/includes/trip-header-card.html:54
+msgid "Edit trip"
+msgstr "Modifica viaggio"
+
+#: templates/trips/includes/trip-header-card.html:22
+#: templates/trips/includes/trip-header-card.html:61
 msgid "Modify trip dates"
 msgstr "Modifica date del viaggio"
 
-#: templates/trips/includes/trip-header-card.html:33
+#: templates/trips/includes/trip-header-card.html:30
 #: templates/trips/includes/trip-header-card.html:70
 #: templates/trips/share-link-created.html:4
 #: templates/trips/share-link-modal.html:4
 msgid "Share trip"
 msgstr "Condividi viaggio"
 
-#: templates/trips/includes/trip-header-card.html:52
-msgid "Edit trip"
-msgstr "Modifica viaggio"
+#: templates/trips/includes/trip-header-card.html:42
+msgid "Open map"
+msgstr "Apri mappa"
 
-#: templates/trips/includes/trip-header-card.html:61
+#: templates/trips/includes/trip-header-card.html:44
+msgid "Add events"
+msgstr "Aggiungi eventi"
+
+#: templates/trips/includes/trip-header-card.html:63
 msgid "Edit Dates"
 msgstr "Modifica date"
 
@@ -1387,6 +1395,39 @@ msgstr "Automobile"
 msgid "Other"
 msgstr "Altro"
 
+#: templates/trips/partials/map-events-panel.html:6
+#, python-format
+msgid "Day %(cnt)s — %(date)s"
+msgstr ""
+
+#: templates/trips/partials/map-events-panel.html:49
+msgid "Unassigned"
+msgstr "Non assegnato"
+
+#: templates/trips/partials/map-events-panel.html:72
+msgid "No events yet"
+msgstr "Nessun evento"
+
+#: templates/trips/partials/map-search-results.html:30
+msgid "Add as Experience"
+msgstr "Aggiungi come esperienza"
+
+#: templates/trips/partials/map-search-results.html:46
+msgid "Add as Meal"
+msgstr "Aggiungi come pasto"
+
+#: templates/trips/partials/map-search-results.html:62
+msgid "Add as Stay"
+msgstr "Aggiungi come soggiorno"
+
+#: templates/trips/partials/map-search-results.html:74
+msgid "No results found"
+msgstr "Nessun risultato trovato"
+
+#: templates/trips/partials/map-search-results.html:79
+msgid "Search for a place to add it to your trip"
+msgstr "Cerca un luogo per aggiungerlo al tuo viaggio"
+
 #: templates/trips/partials/to-event-options.html:2
 msgid "Select destination event"
 msgstr "Per favore seleziona il campo destinazione"
@@ -1505,9 +1546,23 @@ msgstr "Crea un nuovo trasferimento"
 msgid "Edit Stay Transfer"
 msgstr "Modifica trasferimento tra soggiorni"
 
-#: templates/trips/trip-create.html:8
+#: templates/trips/trip-create.html:10
+#, fuzzy
+#| msgid "Edit trip"
+msgid "Edit Trip"
+msgstr "Modifica viaggio"
+
+#: templates/trips/trip-create.html:12
 msgid "Create a New Trip"
 msgstr "Crea un nuovo viaggio"
+
+#: templates/trips/trip-create.html:34
+msgid ""
+"Changing the dates may remove some days. Events on removed days will become "
+"unpaired and can be reassigned later."
+msgstr ""
+"Modificare le date potrebbe rimuovere alcuni giorni. Gli eventi nei giorni "
+"rimossi diventeranno non assegnati e potranno essere riassegnati in seguito."
 
 #: templates/trips/trip-dates-update.html:4
 msgid "Change Dates"
@@ -1568,6 +1623,14 @@ msgstr "Viaggi Archiviati"
 #: templates/trips/trip-list.html:247
 msgid "View"
 msgstr "Vedi"
+
+#: templates/trips/trip-map.html:31
+msgid "Search a place…"
+msgstr "Cerca un luogo…"
+
+#: templates/trips/trip-map.html:49
+msgid "Trip events"
+msgstr "Eventi del viaggio"
 
 #: templates/trips/weather-widget.html:22
 msgid "Forecast unavailable"
@@ -2064,267 +2127,232 @@ msgstr "Solo visualizzazione"
 msgid "Can edit"
 msgstr "Può modificare"
 
-#: trips/views.py:386
+#: trips/views.py:388
 #, python-format
 msgid "<strong>%(title)s</strong> added successfully"
 msgstr "<strong>%(title)s</strong> aggiunta correttamente"
 
-#: trips/views.py:410
+#: trips/views.py:412
 #, python-format
 msgid "<strong>%(title)s</strong> deleted successfully"
 msgstr "<strong>%(title)s</strong> eliminata correttamente"
 
-#: trips/views.py:457
+#: trips/views.py:459
 #, python-format
 msgid "<strong>%(title)s</strong> updated successfully"
 msgstr "<strong>%(title)s</strong> modificata correttamente"
 
-#: trips/views.py:484
+#: trips/views.py:486
 #, python-format
 msgid "<strong>%(title)s</strong> archived successfully"
 msgstr "<strong>%(title)s</strong> archiviata correttamente"
 
-#: trips/views.py:500
+#: trips/views.py:502
 #, python-format
 msgid "<strong>%(title)s</strong> unarchived successfully"
 msgstr "<strong>%(title)s</strong> riaperta correttamente"
 
-#: trips/views.py:522
+#: trips/views.py:524
 msgid "Dates updated successfully"
 msgstr "Date modificate correttamente"
 
-#: trips/views.py:550
+#: trips/views.py:552
 msgid "Experience added successfully"
 msgstr "Esperienza aggiunta correttamente"
 
-#: trips/views.py:574
+#: trips/views.py:576
 msgid "Meal added successfully"
 msgstr "Pasto aggiunto correttamente"
 
-#: trips/views.py:597
+#: trips/views.py:599
 msgid "Stay added successfully"
 msgstr "Soggiorno aggiunto correttamente"
 
-#: trips/views.py:682
+#: trips/views.py:684
 msgid "Stay deleted successfully"
 msgstr "Soggiorno eliminato correttamente"
 
-#: trips/views.py:717
+#: trips/views.py:719
 msgid "No next day found for this stay"
 msgstr "Giorno successivo non trovato per questo soggiorno"
 
-#: trips/views.py:726
+#: trips/views.py:728
 msgid "Both days must have stays to create a transfer"
 msgstr ""
 "Entrambi i giorni devono avere un soggiorno per creare un trasferimento"
 
-#: trips/views.py:738
+#: trips/views.py:740
 msgid "Cannot create transfer between the same stay"
 msgstr "Non è possibile creare trasferimenti con lo stesso soggiorno"
 
-#: trips/views.py:758
+#: trips/views.py:760
 msgid "Stay transfer created successfully"
 msgstr "Trasferimento modificato con successo"
 
-#: trips/views.py:790
+#: trips/views.py:792
 msgid "Stay transfer updated successfully"
 msgstr "Trasferimento modificato con successo"
 
-#: trips/views.py:816
+#: trips/views.py:818
 msgid "Stay transfer deleted successfully"
 msgstr "Trasferimento eliminato con successo"
 
-#: trips/views.py:854
+#: trips/views.py:856
 msgid "Main transfer updated successfully"
 msgstr "Trasferimento principale modificato con successo"
 
-#: trips/views.py:906
+#: trips/views.py:908
 msgid "Main transfer deleted successfully"
 msgstr "Trasferimento principale eliminato con successo"
 
-#: trips/views.py:1067
+#: trips/views.py:1069
 msgid "Event deleted successfully"
 msgstr "Evento eliminato correttamente"
 
-#: templates/trips/trip-create.html
-msgid "Changing the dates may remove some days. Events on removed days will become unpaired and can be reassigned later."
-msgstr "Modificare le date potrebbe rimuovere alcuni giorni. Gli eventi nei giorni rimossi diventeranno non assegnati e potranno essere riassegnati in seguito."
-
-#: trips/views.py:1086
+#: trips/views.py:1088
 msgid "Event unpaired successfully"
 msgstr "Evento scollegato correttamente"
 
-#: trips/views.py:1106
+#: trips/views.py:1108
 msgid "Event paired successfully"
 msgstr "Evento ricollegato correttamente"
 
-#: trips/views.py:1146
+#: trips/views.py:1148
 msgid "Event must be assigned to a day to create a transfer"
 msgstr ""
 "Gli eventi devono essere assegnati ad un giorno per creare il trasferimento"
 
-#: trips/views.py:1159
+#: trips/views.py:1161
 msgid "No next event found for this transfer"
 msgstr "Evento successivo non trovato per questo trasferimento"
 
-#: trips/views.py:1179
+#: trips/views.py:1181
 msgid "Transfer created successfully"
 msgstr "Trasferimento salvato con successo"
 
-#: trips/views.py:1203
+#: trips/views.py:1205
 msgid "Transfer updated successfully"
 msgstr "Trasferimento modificato con successo"
 
-#: trips/views.py:1225
+#: trips/views.py:1227
 msgid "Transfer deleted successfully"
 msgstr "Trasferimento eliminato con successo"
 
-#: trips/views.py:1315
+#: trips/views.py:1317
 msgid "A connection already exists for this main transfer"
 msgstr "Esiste già un trasferimento per questo viaggio"
 
-#: trips/views.py:1326
+#: trips/views.py:1328
 msgid "Invalid destination type"
 msgstr "Tipo di destinazione non valido"
 
-#: trips/views.py:1337 trips/views.py:1352
+#: trips/views.py:1339 trips/views.py:1354
 msgid "No days available in this trip"
 msgstr "Nessun giorno disponibile in questo viaggio"
 
-#: trips/views.py:1390
+#: trips/views.py:1392
 msgid "Connection created successfully"
 msgstr "Trasferimento salvato con successo"
 
-#: trips/views.py:1426
+#: trips/views.py:1428
 msgid "Connection updated successfully"
 msgstr "Trasferimento modificata correttamente"
 
-#: trips/views.py:1449
+#: trips/views.py:1451
 msgid "Connection deleted successfully"
 msgstr "Trasferimento eliminata correttamente"
 
-#: trips/views.py:1518
+#: trips/views.py:1520
 msgid "Event times updated successfully"
 msgstr "Orari dell'evento modificati correttamente"
 
-#: trips/views.py:1551
+#: trips/views.py:1553
 msgid "This event overlaps with another event"
 msgstr ""
 "Gli orari di questo evento si sovrappongono con quelli di un altro evento"
 
-#: trips/views.py:1576
+#: trips/views.py:1578
 msgid "Events swapped successfully"
 msgstr "Eventi scambiati correttamente"
 
-#: trips/views.py:1671
+#: trips/views.py:1673
 msgid "Start date must be after today."
 msgstr "La data di inizio deve essere successiva a quella di oggi."
 
-#: trips/views.py:1675
+#: trips/views.py:1677
 msgid "Start date cannot be after end date."
 msgstr "La data di inizio deve essere successiva a quella di fine."
 
-#: trips/views.py:1838 trips/views.py:1916
+#: trips/views.py:1840 trips/views.py:1918
 msgid "Note added successfully"
 msgstr "Nota aggiunta con successo"
 
-#: trips/views.py:1861 trips/views.py:1942
+#: trips/views.py:1863 trips/views.py:1944
 msgid "Note updated successfully"
 msgstr "Nota modificata correttamente"
 
-#: trips/views.py:1882 trips/views.py:1963
+#: trips/views.py:1884 trips/views.py:1965
 msgid "Note deleted successfully"
 msgstr "Nota eliminata correttamente"
 
-#: trips/views.py:1990
+#: trips/views.py:1992
 msgid "Stay must have a name and an address to be enriched."
 msgstr ""
 "L’evento deve avere un nome e un indirizzo per poter procedere con aggiunta "
 "dei dati."
 
-#: trips/views.py:1998 trips/views.py:2180
-msgid "Google Places API key is not configured."
-msgstr "API di Google Places non è configurata correttamente."
-
-#: trips/views.py:2020 trips/views.py:2202
+#: trips/views.py:2004 trips/views.py:2143
 msgid "Could not find a matching place."
 msgstr "Non ho trovavo un luogo corrispondente."
 
-#: trips/views.py:2023 trips/views.py:2054 trips/views.py:2205
-#: trips/views.py:2236
-msgid "Google Places API request timed out."
-msgstr "La richiesta API di Google Places è scaduta."
-
-#: trips/views.py:2143
+#: trips/views.py:2102
 msgid "Stay enriched successfully!"
 msgstr "Dati aggiunti con successo!"
 
-#: trips/views.py:2170
+#: trips/views.py:2129
 msgid "Event must have a name and an address to be enriched."
 msgstr ""
 "L’evento deve avere un nome e un indirizzo per poter procedere con aggiunta "
 "dei dati aggiuntivi."
 
-#: trips/views.py:2296
+#: trips/views.py:2212
 msgid "Event enriched successfully!"
 msgstr "Dati aggiunti con successo!"
 
-#: trips/views.py:2314
+#: trips/views.py:2230
 msgid "Please enter a destination first"
 msgstr "Per favore compila prima il campo destinazione"
 
-#: trips/views.py:2324
+#: trips/views.py:2240
 msgid "Unsplash API error. Please try again later."
 msgstr "Errore API di Unsplash. Per favore riprova più tardi."
 
-#: trips/views.py:2331
+#: trips/views.py:2247
 #, python-brace-format
 msgid "No images found for '{query}'"
 msgstr "Nessuna immagine trovata per '{query}'"
 
-#: trips/views.py:2648
+#: trips/views.py:2564
 msgid "Transfer saved successfully!"
 msgstr "Trasferimento salvato con successo!"
 
-#: trips/views.py:2988
+#: trips/views.py:2904
 msgid "You've joined the trip as a collaborator."
 msgstr ""
 
-msgid "Search a place…"
-msgstr "Cerca un luogo…"
-
-msgid "Trip events"
-msgstr "Eventi del viaggio"
-
-msgid "Add as Experience"
-msgstr "Aggiungi come esperienza"
-
-msgid "Add as Meal"
-msgstr "Aggiungi come pasto"
-
-msgid "Add as Stay"
-msgstr "Aggiungi come soggiorno"
-
-msgid "No results found"
-msgstr "Nessun risultato trovato"
-
-msgid "Search for a place to add it to your trip"
-msgstr "Cerca un luogo per aggiungerlo al tuo viaggio"
-
-msgid "No events yet"
-msgstr "Nessun evento"
-
-msgid "Unassigned"
-msgstr "Non assegnato"
-
+#: trips/views.py:3110
 msgid "Event added to trip."
 msgstr "Evento aggiunto al viaggio."
 
+#: trips/views.py:3166
 msgid "Stay added to trip."
 msgstr "Soggiorno aggiunto al viaggio."
 
-msgid "Open map"
-msgstr "Apri mappa"
+#~ msgid "Google Places API key is not configured."
+#~ msgstr "API di Google Places non è configurata correttamente."
+
+#~ msgid "Google Places API request timed out."
+#~ msgstr "La richiesta API di Google Places è scaduta."
 
 #~ msgid "Booking Reference"
 #~ msgstr "Codice prenotazione"

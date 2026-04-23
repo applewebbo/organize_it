@@ -40,7 +40,6 @@ from trips.forms import (
     StayTransferCreateForm,
     StayTransferEditForm,
     TrainMainTransferForm,
-    TripDateUpdateForm,
     TripForm,
 )
 from trips.models import (
@@ -505,31 +504,6 @@ def trip_unarchive(request, pk):
         status=204,
         headers={"HX-Trigger": "tripSaved", "HX-Refresh": "true"},
     )
-
-
-@login_required
-def trip_dates_update(request, pk):
-    """
-    Update the start and end dates of a trip.
-    This view handles the form submission for updating trip dates and uses htmx to trigger a client-side event upon success.
-    """
-    trip = get_trip_for_owner_or_404(pk, request.user)
-
-    form = TripDateUpdateForm(request.POST or None, instance=trip)
-    if form.is_valid():
-        trip = form.save()
-        messages.add_message(
-            request,
-            messages.SUCCESS,
-            _("Dates updated successfully"),
-        )
-        return HttpResponse(
-            status=204,
-            headers={"HX-Trigger": json.dumps({"tripSaved": {}, "tripModified": {}})},
-        )
-
-    context = {"form": form}
-    return TemplateResponse(request, "trips/trip-dates-update.html", context)
 
 
 @login_required
