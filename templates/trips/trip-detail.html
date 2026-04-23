@@ -43,10 +43,11 @@
         <!-- END Days Section -->
         <!-- Unpaired Events Section -->
         {% if unpaired_events %}
-            <section id="unpaired">
+            <section id="unpaired" class="mt-4">
                 <div class="shadow card card-border bg-base-100" x-data>
                     <div class="card-body">
-                        <h2 class="text-xl font-medium sm:text-2xl grow">{% trans 'Unpaired Events' %}</h2>
+                        <h2 class="text-xl font-medium sm:text-2xl grow">{% trans 'Things to Do' %}</h2>
+                        <p class="text-sm text-base-content/60">{% trans 'Here you find events not yet assigned to a specific day' %}</p>
                         <ul class="flex flex-wrap gap-3 justify-center my-4">
                             {% for event in unpaired_events %}
                                 <c-unpaired-event :event="event" :days="trip.days.all" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}" />
