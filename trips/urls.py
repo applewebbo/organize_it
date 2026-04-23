@@ -24,6 +24,11 @@ htmx_urlpatterns = [
     ),
     path("meals/<int:day_id>/create", views.add_meal, name="add-meal"),
     path("stays/<int:day_id>/create", views.add_stay, name="add-stay"),
+    path(
+        "trips/<int:trip_pk>/stays/create",
+        views.add_stay_for_trip,
+        name="add-stay-for-trip",
+    ),
     path("stays/<int:pk>/modify", views.stay_modify, name="stay-modify"),
     path("stays/<int:pk>/delete", views.stay_delete, name="stay-delete"),
     path("stays/<int:stay_id>/enrich/", views.enrich_stay, name="enrich-stay"),

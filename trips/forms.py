@@ -623,6 +623,7 @@ class StayForm(forms.ModelForm):
             "phone_number",
             "website",
             "address",
+            "notes",
             "apply_to_days",
         ]
         formfield_callback = urlfields_assume_https
@@ -634,6 +635,7 @@ class StayForm(forms.ModelForm):
             "check_out": forms.TimeInput(attrs={"type": "time"}),
             "cancellation_date": forms.DateInput(attrs={"type": "date"}),
             "phone_number": forms.TextInput(attrs={"placeholder": _("Phone number")}),
+            "notes": forms.Textarea(attrs={"rows": 3}),
         }
         labels = {
             "name": _("Name"),
@@ -706,6 +708,7 @@ class StayForm(forms.ModelForm):
             Field("cancellation_date", wrapper_class="sm:col-span-2"),
             Field("phone_number", wrapper_class="sm:col-span-2"),
             Field("website", wrapper_class="sm:col-span-4"),
+            Field("notes", css_class="fl-textarea", wrapper_class="sm:col-span-4"),
             Field("apply_to_days", wrapper_class="sm:col-span-4"),
         ]
         self.helper.layout = Layout(*layout_fields)

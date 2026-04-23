@@ -28,6 +28,9 @@
         {% include 'trips/includes/main-transfers.html' %}
     {% endif %}
     <!-- END Main Transfers Section -->
+    <!-- Stays Section -->
+    {% include 'trips/includes/stays-section.html' %}
+    <!-- END Stays Section -->
     {% partialdef days inline %}
     <div id="days-events"
          hx-get="{% url 'trips:trip-detail' trip.pk %}"

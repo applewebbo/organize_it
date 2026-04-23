@@ -11,7 +11,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.mail import EmailMultiAlternatives
 from django.db import transaction
-from django.db.models import Prefetch, Q
+from django.db.models import Max, Min, Prefetch, Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.loader import render_to_string
@@ -167,6 +167,14 @@ def trip_detail(request, pk):
     )
     unpaired_events = trip.all_events.filter(day__isnull=True)
 
+    # Get unique stays ordered by first day date
+    stays = (
+        Stay.objects.filter(days__trip=trip)
+        .annotate(first_day_date=Min("days__date"), last_day_date=Max("days__date"))
+        .distinct()
+        .order_by("first_day_date")
+    )
+
     # Get main transfers
     arrival_transfer = (
         MainTransfer.objects.filter(trip=trip, direction=MainTransfer.Direction.ARRIVAL)
@@ -191,6 +199,7 @@ def trip_detail(request, pk):
 
     context = {
         "trip": trip,
+        "stays": stays,
         "unpaired_events": unpaired_events,
         "arrival_transfer": arrival_transfer,
         "departure_transfer": departure_transfer,
@@ -552,6 +561,24 @@ def add_meal(request, day_id):
         return HttpResponse(status=204, headers={"HX-Trigger": f"dayModified{day.pk}"})
     context = {"form": form, "day": day, "unpaired_experiences": unpaired_experiences}
     return TemplateResponse(request, "trips/meal-create.html", context)
+
+
+@login_required
+def add_stay_for_trip(request, trip_pk):
+    trip = get_trip_for_owner_or_404(trip_pk, request.user)
+    form = StayForm(
+        trip,
+        data=request.POST or None,
+        initial={"city": trip.destination},
+        geocode=True,
+    )
+    if form.is_valid():
+        stay = form.save()
+        Stay.objects.filter(pk=stay.pk).update(author=request.user)
+        messages.add_message(request, messages.SUCCESS, _("Stay added successfully"))
+        return HttpResponse(status=204, headers={"HX-Refresh": "true"})
+    context = {"form": form}
+    return TemplateResponse(request, "trips/stay-create.html", context)
 
 
 @login_required
