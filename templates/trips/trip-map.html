@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static i18n %}
+{% block page_title %}
+    {{ trip.title }} — {% trans 'Map' %}
+{% endblock page_title %}
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/leaflet.css' %}" />
+{% endblock extra_head %}
+{% block content %}
+    <div class="mb-4">
+        <a href="{% url 'trips:trip-detail' trip.pk %}"
+           class="gap-1 btn btn-sm btn-ghost">
+            <i class="ph-bold ph-arrow-left i-sm"></i>
+            {{ trip.title }}
+        </a>
+    </div>
+    <div class="flex flex-col gap-0 rounded-xl border lg:flex-row h-[calc(100vh-8rem)] overflow-clip border-base-300">
+        {# ── Left sidebar ── #}
+        <aside class="flex overflow-y-auto flex-col w-full border-b lg:w-80 lg:border-b-0 lg:border-r border-base-300 shrink-0">
+            {# Search form #}
+            <div class="p-3 border-b border-base-300">
+                <form hx-post="{% url 'trips:map-search' trip.pk %}"
+                      hx-target="#search-results-panel"
+                      hx-swap="innerHTML"
+                      hx-indicator="#search-spinner"
+                      hx-disabled-elt="button[type='submit']">
+                    {% csrf_token %}
+                    <div class="flex gap-2">
+                        <input type="search"
+                               name="query"
+                               placeholder="{% trans 'Search a place…' %}"
+                               autocomplete="off"
+                               required
+                               class="w-full input input-sm input-bordered" />
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="ph-bold ph-magnifying-glass i-sm htmx-hide-on-request"></i>
+                            <span id="search-spinner"
+                                  class="loading loading-spinner loading-xs htmx-indicator"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            {# Search results panel #}
+            <div id="search-results-panel" class="overflow-y-auto flex-1 p-3">
+                {% include "trips/partials/map-search-results.html" with results=None query=None %}
+            </div>
+            {# Divider #}
+            <div class="py-1 px-3 text-xs font-semibold tracking-wide uppercase border-t border-base-300 bg-base-200 text-base-content/50">
+                {% trans 'Trip events' %}
+                <span id="save-spinner"
+                      class="float-right loading loading-spinner loading-xs htmx-indicator"></span>
+            </div>
+            {# Existing events panel #}
+            <div id="events-panel" class="overflow-y-auto flex-1 p-3">{% include "trips/partials/map-events-panel.html" %}</div>
+        </aside>
+        {# ── Map ── #}
+        <div id="trip-map" class="flex-1 min-h-64"></div>
+    </div>
+{% endblock content %}
+{% block script %}
+    <script id="map-initial-data" type="application/json">{{ map_items_json|safe }}</script>
+    <script src="{% static 'js/leaflet.js' %}"></script>
+    <script src="{% static 'js/trip-map.js' %}"></script>
+{% endblock script %}

@@ -1,7 +1,9 @@
 import json
 import logging
+import math
 from datetime import date, timedelta
 
+import geocoder
 import requests
 from django.conf import settings
 from django.contrib import messages
@@ -2901,3 +2903,275 @@ def accept_invitation(request, token):
 
     messages.success(request, _("You've joined the trip as a collaborator."))
     return redirect(reverse("trips:trip-detail", args=[trip.pk]))
+
+
+# ──────────────────────────────────────────────────────────────
+# Unified Trip Map (Leaflet + Google Places + HTMX)
+# ──────────────────────────────────────────────────────────────
+
+
+def _build_map_events_context(trip):
+    """Return days_with_events and unassigned_events for the map events panel."""
+    days = trip.days.prefetch_related(
+        Prefetch(
+            "events",
+            queryset=Event.objects.filter(
+                category__in=[Event.Category.EXPERIENCE, Event.Category.MEAL]
+            ).order_by("start_time"),
+        ),
+        "stay",
+    ).order_by("date")
+
+    days_with_events = []
+    for day in days:
+        events = list(day.events.all())  # uses prefetch cache
+        stay = day.stay if hasattr(day, "stay") and day.stay else None
+        if events or stay:
+            days_with_events.append({"day": day, "events": events, "stay": stay})
+    unassigned_events = trip.all_events.filter(day__isnull=True).order_by("name")
+    return days_with_events, unassigned_events
+
+
+def _build_map_json(days_with_events, unassigned_events):
+    """
+    Serialize all map items to a JSON-safe list for the Leaflet JS module.
+    Each item has: kind, name, address, lat, lng, day_index (0=unassigned).
+    """
+    items = []
+    seen_stay_pks = set()
+
+    for idx, day_data in enumerate(days_with_events, start=1):
+        stay = day_data["stay"]
+        if stay and stay.pk not in seen_stay_pks and stay.latitude and stay.longitude:
+            seen_stay_pks.add(stay.pk)
+            items.append(
+                {
+                    "kind": "stay",
+                    "name": stay.name,
+                    "address": stay.address,
+                    "lat": stay.latitude,
+                    "lng": stay.longitude,
+                    "day_index": idx,
+                }
+            )
+        for event in day_data["events"]:
+            if event.latitude and event.longitude:
+                items.append(
+                    {
+                        "kind": "meal" if event.category == 3 else "experience",
+                        "name": event.name,
+                        "address": event.address,
+                        "lat": event.latitude,
+                        "lng": event.longitude,
+                        "day_index": idx,
+                    }
+                )
+
+    for event in unassigned_events:
+        if event.latitude and event.longitude:
+            items.append(
+                {
+                    "kind": "meal" if event.category == 3 else "experience",
+                    "name": event.name,
+                    "address": event.address,
+                    "lat": event.latitude,
+                    "lng": event.longitude,
+                    "day_index": 0,
+                }
+            )
+
+    return items
+
+
+@login_required
+def trip_map(request, pk):
+    """Unified interactive map for a trip: all events across all days + unassigned."""
+    trip = get_object_or_404(
+        Trip.objects.prefetch_related("collaborations"),
+        pk=pk,
+    )
+    if not accessible_trips_qs(request.user).filter(pk=trip.pk).exists():
+        raise Http404
+
+    days_with_events, unassigned_events = _build_map_events_context(trip)
+    map_items = _build_map_json(days_with_events, unassigned_events)
+    return TemplateResponse(
+        request,
+        "trips/trip-map.html",
+        {
+            "trip": trip,
+            "days_with_events": days_with_events,
+            "unassigned_events": unassigned_events,
+            "map_items_json": json.dumps(map_items),
+        },
+    )
+
+
+def _haversine_m(lat1: float, lng1: float, lat2: float, lng2: float) -> float:
+    """Approximate distance in meters between two lat/lng points."""
+    r = 6_371_000
+    phi1, phi2 = math.radians(lat1), math.radians(lat2)
+    dphi = math.radians(lat2 - lat1)
+    dlam = math.radians(lng2 - lng1)
+    a = (
+        math.sin(dphi / 2) ** 2
+        + math.cos(phi1) * math.cos(phi2) * math.sin(dlam / 2) ** 2
+    )
+    return r * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+
+def _trip_location_bias(trip) -> tuple[float, float, float] | None:
+    """
+    Return (lat, lng, radius_meters) to bias Google Places search.
+    Centroid of all trip events+stays; radius = max distance from centroid * 1.5
+    (min 10 km, max 500 km). Falls back to geocoding trip.destination.
+    """
+    coords = list(
+        Event.objects.filter(
+            trip=trip, latitude__isnull=False, longitude__isnull=False
+        ).values_list("latitude", "longitude")
+    )
+    stay_coords = list(
+        Stay.objects.filter(
+            days__trip=trip, latitude__isnull=False, longitude__isnull=False
+        ).values_list("latitude", "longitude")
+    )
+    all_coords = coords + stay_coords
+    if all_coords:
+        clat = sum(c[0] for c in all_coords) / len(all_coords)
+        clng = sum(c[1] for c in all_coords) / len(all_coords)
+        max_dist = max(_haversine_m(clat, clng, c[0], c[1]) for c in all_coords)
+        radius = min(max(max_dist * 1.5, 10_000), 500_000)
+        return clat, clng, radius
+    # Fallback: geocode the trip destination
+    if trip.destination:
+        g = geocoder.mapbox(trip.destination, key=settings.MAPBOX_ACCESS_TOKEN)
+        if g.latlng:
+            return g.latlng[0], g.latlng[1], 50_000
+    return None
+
+
+@login_required
+@require_http_methods(["POST"])
+def map_search(request, pk):
+    """HTMX endpoint: search Google Places and return results partial."""
+    trip = get_object_or_404(Trip, pk=pk)
+    if not accessible_trips_qs(request.user).filter(pk=trip.pk).exists():
+        raise Http404
+
+    query = request.POST.get("query", "").strip()
+    results = []
+    error = None
+
+    if query:
+        client = GooglePlacesClient()
+        try:
+            results = client.search_text(query, location_bias=_trip_location_bias(trip))
+        except GooglePlacesError as e:
+            error = str(e)
+
+    return TemplateResponse(
+        request,
+        "trips/partials/map-search-results.html",
+        {"results": results, "query": query, "error": error, "trip": trip},
+    )
+
+
+def _map_add_event(request, pk, category):
+    """Shared logic: create an Event from Google Places data and return events panel."""
+    trip = get_object_or_404(Trip, pk=pk)
+    if not accessible_trips_qs(request.user).filter(pk=trip.pk).exists():
+        raise Http404
+
+    name = request.POST.get("name", "").strip()
+    address = request.POST.get("address", "").strip()
+    place_id = request.POST.get("google_place_id", "").strip()
+    lat = request.POST.get("lat", "").strip()
+    lng = request.POST.get("lng", "").strip()
+
+    if name:
+        event = Event(
+            trip=trip,
+            name=name,
+            address=address,
+            place_id=place_id,
+            category=category,
+            start_time="00:00",
+            end_time="00:00",
+            last_modified_by=request.user,
+        )
+        if lat and lng:
+            try:
+                event.latitude = float(lat)
+                event.longitude = float(lng)
+            except ValueError:
+                pass
+        event.save()
+        messages.success(request, _("Event added to trip."))
+
+    days_with_events, unassigned_events = _build_map_events_context(trip)
+    return TemplateResponse(
+        request,
+        "trips/partials/map-events-panel.html",
+        {
+            "trip": trip,
+            "days_with_events": days_with_events,
+            "unassigned_events": unassigned_events,
+        },
+    )
+
+
+@login_required
+@require_http_methods(["POST"])
+def map_add_experience(request, pk):
+    """HTMX: add an Experience from map search result."""
+    return _map_add_event(request, pk, Event.Category.EXPERIENCE)
+
+
+@login_required
+@require_http_methods(["POST"])
+def map_add_meal(request, pk):
+    """HTMX: add a Meal from map search result."""
+    return _map_add_event(request, pk, Event.Category.MEAL)
+
+
+@login_required
+@require_http_methods(["POST"])
+def map_add_stay(request, pk):
+    """HTMX: create a Stay (unassigned) from map search result."""
+    trip = get_object_or_404(Trip, pk=pk)
+    if not accessible_trips_qs(request.user).filter(pk=trip.pk).exists():
+        raise Http404
+
+    name = request.POST.get("name", "").strip()
+    address = request.POST.get("address", "").strip()
+    place_id = request.POST.get("google_place_id", "").strip()
+    lat = request.POST.get("lat", "").strip()
+    lng = request.POST.get("lng", "").strip()
+
+    if name:
+        stay = Stay(
+            name=name,
+            address=address or "",
+            place_id=place_id,
+            author=request.user,
+        )
+        if lat and lng:
+            try:
+                stay.latitude = float(lat)
+                stay.longitude = float(lng)
+            except ValueError:
+                pass
+        stay.save()
+        messages.success(request, _("Stay added to trip."))
+
+    days_with_events, unassigned_events = _build_map_events_context(trip)
+    return TemplateResponse(
+        request,
+        "trips/partials/map-events-panel.html",
+        {
+            "trip": trip,
+            "days_with_events": days_with_events,
+            "unassigned_events": unassigned_events,
+        },
+    )

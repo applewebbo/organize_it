@@ -1,0 +1,81 @@
+{% load i18n l10n %}
+{% if results %}
+    <ul class="space-y-2">
+        {% for place in results %}
+            <li data-role="place-result"
+                data-place-id="{{ place.place_id }}"
+                data-name="{{ place.name }}"
+                data-address="{{ place.address }}"
+                data-lat="{{ place.lat|unlocalize }}"
+                data-lng="{{ place.lng|unlocalize }}"
+                class="p-3 rounded-lg border transition-colors cursor-pointer border-base-300 bg-base-100 hover:bg-base-200 active:bg-primary/10">
+                <div class="flex gap-2 justify-between items-start">
+                    <div class="min-w-0">
+                        <p class="font-semibold truncate">{{ place.name }}</p>
+                        <p class="text-sm truncate text-base-content/60">{{ place.address }}</p>
+                    </div>
+                    <div class="flex gap-1 shrink-0">
+                        <form hx-post="{% url 'trips:map-add-experience' trip.pk %}"
+                              hx-target="#events-panel"
+                              hx-swap="innerHTML"
+                              hx-indicator="#save-spinner">
+                            {% csrf_token %}
+                            <input type="hidden" name="google_place_id" value="{{ place.place_id }}">
+                            <input type="hidden" name="name" value="{{ place.name }}">
+                            <input type="hidden" name="address" value="{{ place.address }}">
+                            <input type="hidden" name="lat" value="{{ place.lat }}">
+                            <input type="hidden" name="lng" value="{{ place.lng }}">
+                            <button type="submit"
+                                    class="btn btn-xs btn-outline btn-success"
+                                    title="{% trans 'Add as Experience' %}">
+                                <i class="ph-bold ph-ticket i-xs"></i>
+                            </button>
+                        </form>
+                        <form hx-post="{% url 'trips:map-add-meal' trip.pk %}"
+                              hx-target="#events-panel"
+                              hx-swap="innerHTML"
+                              hx-indicator="#save-spinner">
+                            {% csrf_token %}
+                            <input type="hidden" name="google_place_id" value="{{ place.place_id }}">
+                            <input type="hidden" name="name" value="{{ place.name }}">
+                            <input type="hidden" name="address" value="{{ place.address }}">
+                            <input type="hidden" name="lat" value="{{ place.lat }}">
+                            <input type="hidden" name="lng" value="{{ place.lng }}">
+                            <button type="submit"
+                                    class="btn btn-xs btn-outline btn-warning"
+                                    title="{% trans 'Add as Meal' %}">
+                                <i class="ph-bold ph-fork-knife i-xs"></i>
+                            </button>
+                        </form>
+                        <form hx-post="{% url 'trips:map-add-stay' trip.pk %}"
+                              hx-target="#events-panel"
+                              hx-swap="innerHTML"
+                              hx-indicator="#save-spinner">
+                            {% csrf_token %}
+                            <input type="hidden" name="google_place_id" value="{{ place.place_id }}">
+                            <input type="hidden" name="name" value="{{ place.name }}">
+                            <input type="hidden" name="address" value="{{ place.address }}">
+                            <input type="hidden" name="lat" value="{{ place.lat }}">
+                            <input type="hidden" name="lng" value="{{ place.lng }}">
+                            <button type="submit"
+                                    class="btn btn-xs btn-outline btn-info"
+                                    title="{% trans 'Add as Stay' %}">
+                                <i class="ph-bold ph-bed i-xs"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+{% elif query %}
+    <div class="py-8 text-center text-base-content/50">
+        <i class="mb-2 ph-bold ph-magnifying-glass i-lg"></i>
+        <p>{% trans 'No results found' %}</p>
+    </div>
+{% else %}
+    <div class="py-8 text-center text-base-content/50">
+        <i class="mb-2 ph-bold ph-map-trifold i-lg"></i>
+        <p>{% trans 'Search for a place to add it to your trip' %}</p>
+    </div>
+{% endif %}

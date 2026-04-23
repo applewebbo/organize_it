@@ -61,16 +61,30 @@ class GooglePlacesClient:
             "X-Goog-FieldMask": field_mask,
         }
 
-    def search_text(self, query: str, max_results: int = 10) -> list[PlaceResult]:
+    def search_text(
+        self,
+        query: str,
+        max_results: int = 10,
+        location_bias: tuple[float, float, float] | None = None,
+    ) -> list[PlaceResult]:
         """
         Search places by free-text query.
+        location_bias: optional (lat, lng, radius_meters) to bias results geographically.
         Returns a list of PlaceResult with minimal fields.
         Raises GooglePlacesError on failure.
         """
         if not self.api_key:
             raise GooglePlacesError("Google Places API key is not configured.")
 
-        payload = {"textQuery": query, "maxResultCount": max_results}
+        payload: dict = {"textQuery": query, "maxResultCount": max_results}
+        if location_bias:
+            lat, lng, radius = location_bias
+            payload["locationBias"] = {
+                "circle": {
+                    "center": {"latitude": lat, "longitude": lng},
+                    "radius": radius,
+                }
+            }
         try:
             response = requests.post(
                 PLACES_SEARCH_URL,

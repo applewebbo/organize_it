@@ -1,0 +1,74 @@
+{% load i18n l10n trip_tags %}
+{% if days_with_events or unassigned_events %}
+    {% for day_data in days_with_events %}
+        <div class="mb-3">
+            <p class="px-1 mb-1 text-xs font-semibold tracking-wide uppercase text-base-content/50">
+                {% blocktrans with date=day_data.day.date cnt=forloop.counter %}Day {{ cnt }} — {{ date }}{% endblocktrans %}
+            </p>
+            <ul class="space-y-1">
+                {% if day_data.stay %}
+                    <li data-role="trip-event"
+                        data-kind="stay"
+                        data-name="{{ day_data.stay.name }}"
+                        data-address="{{ day_data.stay.address }}"
+                        data-lat="{{ day_data.stay.latitude|unlocalize }}"
+                        data-lng="{{ day_data.stay.longitude|unlocalize }}"
+                        class="map-sidebar-item flex gap-2 items-center p-2 rounded-md cursor-pointer transition-colors hover:bg-base-200 {% if not day_data.stay.latitude %}opacity-50{% endif %}">
+                        <i class="text-sky-500 shrink-0 ph-bold ph-bed i-sm"></i>
+                        <div class="min-w-0 grow">
+                            <p class="text-sm font-medium truncate">{{ day_data.stay.name }}</p>
+                            {% if day_data.stay.address %}
+                                <p class="text-xs truncate text-base-content/50">{{ day_data.stay.address }}</p>
+                            {% endif %}
+                        </div>
+                    </li>
+                {% endif %}
+                {% for event in day_data.events %}
+                    <li data-role="trip-event"
+                        data-kind="{% if event.category == 3 %}meal{% else %}experience{% endif %}"
+                        data-name="{{ event.name }}"
+                        data-address="{{ event.address }}"
+                        data-lat="{{ event.latitude|unlocalize }}"
+                        data-lng="{{ event.longitude|unlocalize }}"
+                        class="map-sidebar-item flex gap-2 items-center p-2 rounded-md cursor-pointer transition-colors hover:bg-base-200 {% if not event.latitude %}opacity-50{% endif %}">
+                        <i class="shrink-0 text-base {{ event|event_icon_color }} ph-bold {{ event|event_icon }} i-sm"></i>
+                        <div class="min-w-0 grow">
+                            <p class="text-sm font-medium truncate">{{ event.name }}</p>
+                            {% if event.address %}<p class="text-xs truncate text-base-content/50">{{ event.address }}</p>{% endif %}
+                        </div>
+                        {% if event.start_time %}
+                            <span class="text-xs shrink-0 text-base-content/50">{{ event.start_time|time:"H:i" }}</span>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endfor %}
+    {% if unassigned_events %}
+        <div class="mb-3">
+            <p class="px-1 mb-1 text-xs font-semibold tracking-wide uppercase text-base-content/50">{% trans 'Unassigned' %}</p>
+            <ul class="space-y-1">
+                {% for event in unassigned_events %}
+                    <li data-role="trip-event"
+                        data-kind="{% if event.category == 3 %}meal{% else %}experience{% endif %}"
+                        data-name="{{ event.name }}"
+                        data-address="{{ event.address }}"
+                        data-lat="{{ event.latitude|unlocalize }}"
+                        data-lng="{{ event.longitude|unlocalize }}"
+                        class="map-sidebar-item flex gap-2 items-center p-2 rounded-md cursor-pointer transition-colors hover:bg-base-200 {% if not event.latitude %}opacity-50{% endif %}">
+                        <i class="text-base shrink-0 text-base-content/40 ph-bold {{ event|event_icon }} i-sm"></i>
+                        <div class="min-w-0 grow">
+                            <p class="text-sm font-medium truncate">{{ event.name }}</p>
+                            {% if event.address %}<p class="text-xs truncate text-base-content/50">{{ event.address }}</p>{% endif %}
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+{% else %}
+    <div class="py-6 text-center text-base-content/40">
+        <i class="mb-2 ph-bold ph-calendar-blank i-lg"></i>
+        <p class="text-sm">{% trans 'No events yet' %}</p>
+    </div>
+{% endif %}

@@ -1948,3 +1948,39 @@ msgstr ""
 #: trips/views.py:2587
 msgid "Transfer saved successfully!"
 msgstr ""
+
+msgid "Search a place…"
+msgstr "Search a place…"
+
+msgid "Trip events"
+msgstr "Trip events"
+
+msgid "Add as Experience"
+msgstr "Add as Experience"
+
+msgid "Add as Meal"
+msgstr "Add as Meal"
+
+msgid "Add as Stay"
+msgstr "Add as Stay"
+
+msgid "No results found"
+msgstr "No results found"
+
+msgid "Search for a place to add it to your trip"
+msgstr "Search for a place to add it to your trip"
+
+msgid "No events yet"
+msgstr "No events yet"
+
+msgid "Unassigned"
+msgstr "Unassigned"
+
+msgid "Event added to trip."
+msgstr "Event added to trip."
+
+msgid "Stay added to trip."
+msgstr "Stay added to trip."
+
+msgid "Open map"
+msgstr "Open map"

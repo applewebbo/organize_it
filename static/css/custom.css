@@ -102,3 +102,24 @@ select ~ .pointer-events-none {
 .transfer-footer-overlay {
   background-color: rgba(0, 0, 0, 0.08);
 }
+
+/* ── Trip Map Pins ── */
+.map-pin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  font-size: 13px;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+.map-pin > * { transform: rotate(45deg); }
+.map-pin--search     { background: #6366f1; }
+.map-pin--experience { background: #10b981; }
+.map-pin--meal       { background: #f59e0b; }
+.map-pin--stay       { background: #0ea5e9; }
+.map-pin--default    { background: #6b7280; }
+.map-pin--numbered   { font-weight: 700; font-size: 11px; }

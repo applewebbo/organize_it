@@ -5,6 +5,11 @@
         <!-- Mobile: Title and Buttons -->
         <h2 class="text-xl font-semibold tracking-tight sm:hidden">{{ trip.title }}</h2>
         <div x-data class="flex gap-1.5 sm:hidden">
+            <a href="{% url 'trips:trip-map' trip.pk %}"
+               class="btn btn-sm btn-soft"
+               aria-label="{% trans 'Open map' %}">
+                <i class="ph-bold ph-map-trifold i-md" aria-hidden="true"></i>
+            </a>
             {% if trip.status != 5 and request.user == trip.author %}
                 <button class="btn btn-sm btn-soft"
                         hx-get="{% url 'trips:trip-update' trip.pk %}"
@@ -37,6 +42,12 @@
             <h2 class="text-3xl font-semibold tracking-tight">{{ trip.title }}</h2>
         </div>
         <div x-data class="hidden gap-2 sm:flex">
+            <a href="{% url 'trips:trip-map' trip.pk %}"
+               class="btn btn-md btn-soft"
+               aria-label="{% trans 'Open map' %}">
+                <i class="ph-bold ph-map-trifold i-lg" aria-hidden="true"></i>
+                <span class="hidden sm:inline">{% trans 'Map' %}</span>
+            </a>
             {% if trip.status != 5 and request.user == trip.author %}
                 <button class="btn btn-md btn-soft"
                         hx-get="{% url 'trips:trip-update' trip.pk %}"

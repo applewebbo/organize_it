@@ -2290,6 +2290,42 @@ msgstr "Trasferimento salvato con successo!"
 msgid "You've joined the trip as a collaborator."
 msgstr ""
 
+msgid "Search a place…"
+msgstr "Cerca un luogo…"
+
+msgid "Trip events"
+msgstr "Eventi del viaggio"
+
+msgid "Add as Experience"
+msgstr "Aggiungi come esperienza"
+
+msgid "Add as Meal"
+msgstr "Aggiungi come pasto"
+
+msgid "Add as Stay"
+msgstr "Aggiungi come soggiorno"
+
+msgid "No results found"
+msgstr "Nessun risultato trovato"
+
+msgid "Search for a place to add it to your trip"
+msgstr "Cerca un luogo per aggiungerlo al tuo viaggio"
+
+msgid "No events yet"
+msgstr "Nessun evento"
+
+msgid "Unassigned"
+msgstr "Non assegnato"
+
+msgid "Event added to trip."
+msgstr "Evento aggiunto al viaggio."
+
+msgid "Stay added to trip."
+msgstr "Soggiorno aggiunto al viaggio."
+
+msgid "Open map"
+msgstr "Apri mappa"
+
 #~ msgid "Booking Reference"
 #~ msgstr "Codice prenotazione"
 
