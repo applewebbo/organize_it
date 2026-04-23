@@ -32,7 +32,6 @@ class TestTripForm:
         data = {
             "title": "Test Trip",
             "destination": "Milano",
-            "description": "Test Description",
             "start_date": date.today() + timedelta(days=10),
             "end_date": date.today() + timedelta(days=12),
         }
@@ -46,7 +45,6 @@ class TestTripForm:
         mock_geocoder.return_value.latlng = [45.4773, 9.1815]
         data = {
             "title": "Test Trip",
-            "description": "Test Description",
             "start_date": date.today() + timedelta(days=12),
             "end_date": date.today() + timedelta(days=10),
             "destination": "Milano",
@@ -62,7 +60,6 @@ class TestTripForm:
         mock_geocoder.return_value.latlng = [45.4773, 9.1815]
         data = {
             "title": "Test Trip",
-            "description": "Test Description",
             "start_date": date.today() - timedelta(days=7),
             "end_date": date.today() + timedelta(days=10),
             "destination": "Milano",
@@ -79,7 +76,6 @@ class TestTripForm:
 
         data = {
             "title": "Test Trip",
-            "description": "Test Description",
             "destination": "Paris",
             "start_date": date.today() + timedelta(days=1),
             "end_date": date.today() + timedelta(days=3),
@@ -96,7 +92,6 @@ class TestTripForm:
 
         data = {
             "title": "Test Trip",
-            "description": "Test Description",
             "destination": "NonExistentPlace",
             "start_date": date.today() + timedelta(days=1),
             "end_date": date.today() + timedelta(days=3),
@@ -111,7 +106,6 @@ class TestLinkForm:
     def test_form(self):
         data = {
             "url": "https://www.google.com",
-            "description": "Test Description",
         }
         form = LinkForm(data=data)
 

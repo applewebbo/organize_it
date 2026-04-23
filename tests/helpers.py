@@ -32,7 +32,6 @@ def build_trip_data(title="Test Trip", destination="Test City", **kwargs):
     data = {
         "title": title,
         "destination": destination,
-        "description": kwargs.get("description", ""),
         "start_date": kwargs.get("start_date", date.today()),
         "end_date": kwargs.get("end_date", date.today() + timedelta(days=3)),
     }

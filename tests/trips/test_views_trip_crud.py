@@ -31,7 +31,6 @@ class TripCreateView(TestCase):
         data = {
             "title": "Trip to Paris",
             "destination": "Novara",
-            "description": "A trip to Paris",
             "start_date": datetime.date.today(),
             "end_date": datetime.date.today() + datetime.timedelta(days=3),
         }
@@ -53,7 +52,6 @@ class TripCreateView(TestCase):
         data = {
             "title": "Trip to Paris",
             "destination": "Novara",
-            "description": "A trip to Paris",
             "start_date": datetime.date.today(),
             "end_date": datetime.date.today() + datetime.timedelta(days=3),
         }
@@ -70,7 +68,6 @@ class TripCreateView(TestCase):
         user = self.make_user("user")
         data = {
             "title": "Trip to Paris",
-            "description": "A trip to Paris",
             "start_date": datetime.date.today() + datetime.timedelta(days=3),
             "end_date": datetime.date.today(),
         }
@@ -116,7 +113,6 @@ class TripUpdateView(TestCase):
         data = {
             "title": "Trip to Paris",
             "destination": "Novara",
-            "description": "A trip to Paris",
             "start_date": datetime.date.today(),
             "end_date": datetime.date.today() + datetime.timedelta(days=3),
         }

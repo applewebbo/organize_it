@@ -61,7 +61,6 @@ class TestTripCreateImageHandling:
             {
                 "title": "Test Trip",
                 "destination": "Paris",
-                "description": "Test",
                 "selected_photo_id": "photo123",
             },
         )
@@ -131,7 +130,6 @@ class TestTripUpdateImageHandling:
             {
                 "title": trip.title,
                 "destination": trip.destination,
-                "description": trip.description or "",
                 "selected_photo_id": "photo456",
             },
         )
@@ -177,7 +175,6 @@ class TestTripFileUpload:
             data={
                 "title": "Trip",
                 "destination": "Paris",
-                "description": "",
             },
             files={"image": fake_file},
         )
@@ -219,7 +216,6 @@ class TestTripFileUpload:
             data={
                 "title": trip.title,
                 "destination": trip.destination,
-                "description": trip.description or "",
             },
             files={"image": fake_file},
         )
@@ -280,7 +276,6 @@ class TestTripFileUpload:
             data={
                 "title": "Test Trip",
                 "destination": "Paris",
-                "description": "Test",
                 "selected_photo_id": "photo123",
             },
             files={"image": uploaded},
@@ -351,7 +346,6 @@ class TestTripFileUpload:
             data={
                 "title": trip.title,
                 "destination": trip.destination,
-                "description": trip.description or "",
                 "selected_photo_id": "photo456",
             },
             files={"image": uploaded},
