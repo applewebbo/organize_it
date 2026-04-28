@@ -358,3 +358,67 @@ class StayDeleteView(TestCase):
         for day in days[:2]:
             day.refresh_from_db()
             assert day.stay == new_stay
+
+
+class AddStayForTripView(TestCase):
+    @patch("geocoder.mapbox")
+    def test_post_valid(self, mock_geocoder):
+        mock_geocoder.return_value.ok = True
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        days = trip.days.all()
+        data = {
+            "name": "Grand Hotel",
+            "check_in": "14:00",
+            "check_out": "11:00",
+            "address": "Via Roma 1, Rome",
+            "apply_to_days": [day.pk for day in days],
+        }
+
+        with self.login(user):
+            response = self.post("trips:add-stay-for-trip", trip_pk=trip.pk, data=data)
+
+        self.response_204(response)
+        message = list(get_messages(response.wsgi_request))[0].message
+        assert message == "Stay added successfully"
+
+    @patch("geocoder.mapbox")
+    def test_post_sets_author(self, mock_geocoder):
+        mock_geocoder.return_value.ok = True
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        days = trip.days.all()
+        data = {
+            "name": "Grand Hotel",
+            "check_in": "14:00",
+            "check_out": "11:00",
+            "address": "Via Roma 1, Rome",
+            "apply_to_days": [day.pk for day in days],
+        }
+
+        with self.login(user):
+            self.post("trips:add-stay-for-trip", trip_pk=trip.pk, data=data)
+
+        stay = Stay.objects.filter(author=user).last()
+        assert stay is not None
+        assert stay.author == user
+
+    def test_post_invalid_returns_form(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        data = {"name": ""}
+
+        with self.login(user):
+            response = self.post("trips:add-stay-for-trip", trip_pk=trip.pk, data=data)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/stay-create.html")
+
+    def test_requires_login(self):
+        trip = TripFactory()
+        response = self.get("trips:add-stay-for-trip", trip_pk=trip.pk)
+        self.response_302(response)

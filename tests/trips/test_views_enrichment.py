@@ -183,10 +183,7 @@ class EnrichEventViewTest(TestCase):
 
         self.response_200(response)
         assert "error_message" in response.context
-        assert (
-            "Error calling Google Places API: Test error"
-            in response.context["error_message"]
-        )
+        assert "API error: Test error" in response.context["error_message"]
 
     def test_enrich_event_search_request_fails_with_response(self, mock_post, mock_get):
         """Test enrichment when search request fails with a response"""
@@ -206,7 +203,7 @@ class EnrichEventViewTest(TestCase):
 
         self.response_200(response)
         assert "error_message" in response.context
-        assert "API Error: API error details" in response.context["error_message"]
+        assert "API error: API error details" in response.context["error_message"]
 
     def test_enrich_event_no_place_found(self, mock_post, mock_get):
         """Test enrichment when no place is found"""
@@ -245,10 +242,7 @@ class EnrichEventViewTest(TestCase):
 
         self.response_200(response)
         assert "error_message" in response.context
-        assert (
-            "Error calling Google Places API: Test error"
-            in response.context["error_message"]
-        )
+        assert "API error: Test error" in response.context["error_message"]
 
     def test_enrich_event_details_request_fails_with_response(
         self, mock_post, mock_get
@@ -272,7 +266,7 @@ class EnrichEventViewTest(TestCase):
 
         self.response_200(response)
         assert "error_message" in response.context
-        assert "API Error: API error details" in response.context["error_message"]
+        assert "API error: API error details" in response.context["error_message"]
 
     def test_enrich_event_search_timeout(self, mock_post, mock_get):
         """Test enrichment when search request times out"""
@@ -541,10 +535,7 @@ class EnrichStayViewTest(TestCase):
 
         self.response_200(response)
         assert "error_message" in response.context
-        assert (
-            "Error calling Google Places API: Test error"
-            in response.context["error_message"]
-        )
+        assert "API error: Test error" in response.context["error_message"]
 
     def test_enrich_stay_search_request_fails_with_response(self, mock_post, mock_get):
         """Test enrichment when search request fails with a response"""
@@ -563,7 +554,7 @@ class EnrichStayViewTest(TestCase):
 
         self.response_200(response)
         assert "error_message" in response.context
-        assert "API Error: API error details" in response.context["error_message"]
+        assert "API error: API error details" in response.context["error_message"]
 
     def test_enrich_stay_no_place_found(self, mock_post, mock_get):
         """Test enrichment when no place is found"""
@@ -600,10 +591,7 @@ class EnrichStayViewTest(TestCase):
 
         self.response_200(response)
         assert "error_message" in response.context
-        assert (
-            "Error calling Google Places API: Test error"
-            in response.context["error_message"]
-        )
+        assert "API error: Test error" in response.context["error_message"]
 
     def test_enrich_stay_details_request_fails_with_response(self, mock_post, mock_get):
         """Test enrichment when details request fails with a response"""
@@ -624,7 +612,7 @@ class EnrichStayViewTest(TestCase):
 
         self.response_200(response)
         assert "error_message" in response.context
-        assert "API Error: API error details" in response.context["error_message"]
+        assert "API error: API error details" in response.context["error_message"]
 
     def test_enrich_stay_search_timeout(self, mock_post, mock_get):
         """Test enrichment when search request times out"""

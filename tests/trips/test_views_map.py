@@ -3,7 +3,10 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from tests.test import TestCase
-from tests.trips.factories import ExperienceFactory, TripFactory
+from tests.trips.factories import (
+    ExperienceFactory,
+    TripFactory,
+)
 from trips.models import Event, Stay
 from trips.services import GooglePlacesError, PlaceResult
 
@@ -314,6 +317,26 @@ class MapAddStayViewTest(TestCase):
         assert stay.latitude is None
         assert stay.longitude is None
 
+    def test_add_stay_without_lat_lng(self):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        with self.login(user):
+            with patch("trips.models.geocoder.mapbox", return_value=MOCK_GEO):
+                self.post(
+                    "trips:map-add-stay",
+                    pk=trip.pk,
+                    data={
+                        "google_place_id": "ChIJ_test_003",
+                        "name": "Hotel Senza Coordinate",
+                        "address": "Via Roma 1",
+                        "lat": "",
+                        "lng": "",
+                    },
+                )
+        stay = Stay.objects.get(name="Hotel Senza Coordinate")
+        assert stay.latitude is None
+        assert stay.longitude is None
+
     def test_add_stay_empty_name_creates_nothing(self):
         user = self.make_user("user@example.com")
         trip = TripFactory(author=user)
@@ -350,3 +373,254 @@ class MapAddStayViewTest(TestCase):
             )
         self.response_404(response)
         assert Stay.objects.count() == 0
+
+
+class BuildMapJsonTest(TestCase):
+    """Tests for _build_map_json branches: stay/event/unassigned with coordinates."""
+
+    def test_map_json_includes_stay_and_events_with_coords(self):
+        """Covers _build_map_json branches for stay, event with lat/lng."""
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        # Event with coords — covers line 2959 branch
+        Event.objects.create(
+            trip=trip,
+            day=day,
+            name="Museo Egizio",
+            address="Via Accademia 6, Torino",
+            latitude=45.0687,
+            longitude=7.6847,
+            category=Event.Category.EXPERIENCE,
+            start_time="10:00",
+            end_time="11:00",
+        )
+        # Meal event with coords — covers meal kind branch
+        Event.objects.create(
+            trip=trip,
+            day=day,
+            name="Ristorante Da Luigi",
+            address="Via Roma 1, Torino",
+            latitude=45.0703,
+            longitude=7.6869,
+            category=Event.Category.MEAL,
+            start_time="12:00",
+            end_time="13:00",
+        )
+        # Stay with coords — covers line 2946 branch
+        stay = Stay.objects.create(
+            name="Hotel Torino",
+            address="Via Po 1, Torino",
+            latitude=45.07,
+            longitude=7.68,
+        )
+        stay.days.add(day)
+
+        with self.login(user):
+            response = self.get("trips:trip-map", pk=trip.pk)
+
+        self.response_200(response)
+        import json
+
+        map_items = json.loads(response.context["map_items_json"])
+        kinds = {item["kind"] for item in map_items}
+        assert "stay" in kinds
+        assert "experience" in kinds
+        assert "meal" in kinds
+
+    def test_map_json_includes_unassigned_events_with_coords(self):
+        """Covers _build_map_json branch for unassigned events with lat/lng (line 2972)."""
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        Event.objects.create(
+            trip=trip,
+            day=None,
+            name="Piazza Castello",
+            address="Piazza Castello, Torino",
+            latitude=45.0703,
+            longitude=7.6869,
+            category=Event.Category.EXPERIENCE,
+            start_time="10:00",
+            end_time="11:00",
+        )
+
+        with self.login(user):
+            response = self.get("trips:trip-map", pk=trip.pk)
+
+        self.response_200(response)
+        import json
+
+        map_items = json.loads(response.context["map_items_json"])
+        unassigned = [i for i in map_items if i["day_index"] == 0]
+        assert len(unassigned) == 1
+        assert unassigned[0]["name"] == "Piazza Castello"
+
+    def test_map_json_skips_events_without_coords(self):
+        """Covers false branch of 'if event.latitude and event.longitude' (lines 2959, 2972)."""
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        with patch("trips.models.geocoder.mapbox", return_value=MOCK_GEO):
+            # Assigned event without coords
+            Event.objects.create(
+                trip=trip,
+                day=day,
+                name="No Coords Assigned",
+                address="Somewhere",
+                latitude=None,
+                longitude=None,
+                category=Event.Category.EXPERIENCE,
+                start_time="10:00",
+                end_time="11:00",
+            )
+            # Unassigned event without coords
+            Event.objects.create(
+                trip=trip,
+                day=None,
+                name="No Coords Unassigned",
+                address="Somewhere",
+                latitude=None,
+                longitude=None,
+                category=Event.Category.EXPERIENCE,
+                start_time="10:00",
+                end_time="11:00",
+            )
+
+        with self.login(user):
+            response = self.get("trips:trip-map", pk=trip.pk)
+
+        self.response_200(response)
+        import json
+
+        map_items = json.loads(response.context["map_items_json"])
+        names = [i["name"] for i in map_items]
+        assert "No Coords Assigned" not in names
+        assert "No Coords Unassigned" not in names
+
+
+class TripLocationBiasTest(TestCase):
+    """Tests for _trip_location_bias branches via map_search."""
+
+    def test_search_uses_coords_from_existing_events(self):
+        """Covers _trip_location_bias when all_coords is non-empty (line 3041→3042)."""
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        Event.objects.create(
+            trip=trip,
+            day=day,
+            name="Test Event",
+            address="Via Roma 1",
+            latitude=45.07,
+            longitude=7.68,
+            category=Event.Category.EXPERIENCE,
+            start_time="10:00",
+            end_time="11:00",
+        )
+
+        with self.login(user):
+            with patch("trips.views.GooglePlacesClient") as MockClient:
+                MockClient.return_value.search_text.return_value = []
+                self.post("trips:map-search", pk=trip.pk, data={"query": "museo"})
+
+        call_kwargs = MockClient.return_value.search_text.call_args.kwargs
+        assert call_kwargs["location_bias"] is not None
+        lat, lng, radius = call_kwargs["location_bias"]
+        assert lat == 45.07
+        assert lng == 7.68
+
+    def test_search_falls_back_to_geocoding_destination(self):
+        """Covers _trip_location_bias fallback to geocoder (lines 3048, 3050)."""
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)  # no events with coords
+
+        mock_geo = MagicMock()
+        mock_geo.latlng = [45.07, 7.68]
+
+        with self.login(user):
+            with patch("trips.views.GooglePlacesClient") as MockClient:
+                with patch("trips.views.geocoder.mapbox", return_value=mock_geo):
+                    MockClient.return_value.search_text.return_value = []
+                    self.post("trips:map-search", pk=trip.pk, data={"query": "museo"})
+
+        call_kwargs = MockClient.return_value.search_text.call_args.kwargs
+        assert call_kwargs["location_bias"] is not None
+        assert call_kwargs["location_bias"][2] == 50_000
+
+    def test_search_geocoder_no_latlng_returns_none_bias(self):
+        """Covers _trip_location_bias false branch of 'if g.latlng' (line 3050)."""
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)  # no events with coords
+
+        mock_geo = MagicMock()
+        mock_geo.latlng = None  # geocoder finds nothing
+
+        with self.login(user):
+            with patch("trips.views.GooglePlacesClient") as MockClient:
+                with patch("trips.views.geocoder.mapbox", return_value=mock_geo):
+                    MockClient.return_value.search_text.return_value = []
+                    self.post("trips:map-search", pk=trip.pk, data={"query": "museo"})
+
+        call_kwargs = MockClient.return_value.search_text.call_args.kwargs
+        assert call_kwargs["location_bias"] is None
+
+    def test_search_no_destination_returns_none_bias(self):
+        """Covers _trip_location_bias false branch of 'if trip.destination' (line 3048)."""
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user, destination="")  # no destination, no events
+
+        with self.login(user):
+            with patch("trips.views.GooglePlacesClient") as MockClient:
+                MockClient.return_value.search_text.return_value = []
+                self.post("trips:map-search", pk=trip.pk, data={"query": "museo"})
+
+        call_kwargs = MockClient.return_value.search_text.call_args.kwargs
+        assert call_kwargs["location_bias"] is None
+
+
+class MapAddExperienceLatLngTest(TestCase):
+    """Covers line 3104: 'if lat and lng' false branch (no coords provided)."""
+
+    def test_add_experience_without_lat_lng(self):
+        """When lat/lng are empty strings, coords are not set (line 3104 false branch)."""
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        with self.login(user):
+            with patch("trips.models.geocoder.mapbox", return_value=MOCK_GEO):
+                response = self.post(
+                    "trips:map-add-experience",
+                    pk=trip.pk,
+                    data={
+                        "google_place_id": "ChIJ_test_001",
+                        "name": "Luogo Senza Coordinate",
+                        "address": "Via Roma 1",
+                        "lat": "",
+                        "lng": "",
+                    },
+                )
+        self.response_200(response)
+        event = Event.objects.get(trip=trip, name="Luogo Senza Coordinate")
+        assert event.latitude is None
+        assert event.longitude is None
+
+    def test_add_meal_without_lat_lng(self):
+        """When lat/lng are empty strings for meal, coords are not set."""
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        with self.login(user):
+            with patch("trips.models.geocoder.mapbox", return_value=MOCK_GEO):
+                response = self.post(
+                    "trips:map-add-meal",
+                    pk=trip.pk,
+                    data={
+                        "google_place_id": "ChIJ_test_002",
+                        "name": "Ristorante Senza Coordinate",
+                        "address": "Via Roma 1",
+                        "lat": "",
+                        "lng": "",
+                    },
+                )
+        self.response_200(response)
+        event = Event.objects.get(trip=trip, name="Ristorante Senza Coordinate")
+        assert event.latitude is None
+        assert event.longitude is None

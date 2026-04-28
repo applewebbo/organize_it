@@ -114,6 +114,21 @@ class TestGooglePlacesClientSearchText:
         payload = mock_post.call_args.kwargs["json"]
         assert payload["maxResultCount"] == 5
 
+    def test_sends_location_bias_when_provided(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = EMPTY_RESPONSE
+        mock_resp.raise_for_status.return_value = None
+
+        with patch("trips.services.requests.post", return_value=mock_resp) as mock_post:
+            client.search_text("query", location_bias=(45.07, 7.68, 5000.0))
+
+        payload = mock_post.call_args.kwargs["json"]
+        assert "locationBias" in payload
+        assert payload["locationBias"]["circle"]["center"]["latitude"] == 45.07
+        assert payload["locationBias"]["circle"]["center"]["longitude"] == 7.68
+        assert payload["locationBias"]["circle"]["radius"] == 5000.0
+
 
 class TestGooglePlacesClientGetDetails:
     def test_returns_place_details(self, client, settings):
