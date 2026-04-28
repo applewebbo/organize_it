@@ -446,6 +446,10 @@ msgstr ""
 msgid "Main Transfers"
 msgstr ""
 
+#: templates/trips/includes/main-transfers.html
+msgid "How to Get There"
+msgstr ""
+
 #: templates/cotton/quick_guide.html:92
 msgid ""
 "Main transfers are your arrival and departure journeys. Add flight, train, "

@@ -6,13 +6,27 @@
          hx-swap="outerHTML"
          hx-trigger="tripModified from:body">
     <div class="shadow card card-border bg-base-100">
-        <div class="p-4 border-b sm:p-6 border-base-300">
-            <h3 class="text-xl font-semibold">{% trans "Main Transfers" %}</h3>
+        <div class="p-4 sm:p-6">
+            <h3 class="text-xl font-semibold">{% trans "How to Get There" %}</h3>
         </div>
         <div class="grid grid-cols-1 gap-4 p-4 sm:p-6 md:grid-cols-2">
             <!-- Arrival Transfer -->
-            <div class="p-4 rounded-lg bg-base-200" x-data>
-                <div class="flex gap-2 justify-between items-start mb-3">
+            <div class="overflow-hidden relative p-4 rounded-lg bg-base-200" x-data>
+                {% if arrival_transfer %}
+                    <div class="flex absolute right-0 top-1/2 justify-end pr-4 w-1/2 -translate-y-1/2 pointer-events-none select-none"
+                         aria-hidden="true">
+                        {% if arrival_transfer.type == 1 %}
+                            <i class="ph-bold ph-airplane-takeoff text-[7rem] text-base-content opacity-[0.07]"></i>
+                        {% elif arrival_transfer.type == 2 %}
+                            <i class="ph-bold ph-train text-[7rem] text-base-content opacity-[0.07]"></i>
+                        {% elif arrival_transfer.type == 3 %}
+                            <i class="ph-bold ph-car text-[7rem] text-base-content opacity-[0.07]"></i>
+                        {% else %}
+                            <i class="ph-bold ph-bus text-[7rem] text-base-content opacity-[0.07]"></i>
+                        {% endif %}
+                    </div>
+                {% endif %}
+                <div class="flex relative gap-2 justify-between items-start mb-3">
                     <div class="flex gap-2 items-center">
                         {% if arrival_transfer %}
                             {% if arrival_transfer.type == 1 %}
@@ -33,7 +47,45 @@
                         {% endif %}
                     </div>
                     {% if arrival_transfer %}
-                        <div class="flex gap-2">
+                        <div class="flex flex-wrap gap-2 justify-end">
+                            {# Train status button inline #}
+                            {% if arrival_transfer.type == 2 %}
+                                {% with travel_day=trip.start_date %}
+                                    <a href="{% url 'trips:train-status-redirect' arrival_transfer.pk %}"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       class="btn btn-sm btn-soft {% if today != travel_day %}btn-disabled{% endif %}"
+                                       title="{% if arrival_transfer.train_number %}{% trans 'Train status' %}{% else %}{% trans 'Station departures' %}{% endif %}">
+                                        <i class="ph-bold ph-train-simple"></i>
+                                        <span class="hidden sm:inline">
+                                            {% if arrival_transfer.train_number %}
+                                                {% trans "Train status" %}
+                                            {% else %}
+                                                {% trans "Station departures" %}
+                                            {% endif %}
+                                        </span>
+                                    </a>
+                                {% endwith %}
+                            {% endif %}
+                            {# Flight status button inline #}
+                            {% if arrival_transfer.type == 1 %}
+                                {% with travel_day=trip.start_date flight_active=arrival_transfer.flight_number|default:arrival_origin_icao %}
+                                    <a href="{% url 'trips:flight-status-redirect' arrival_transfer.pk %}"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       class="btn btn-sm btn-soft {% if not today == travel_day or not flight_active %}btn-disabled{% endif %}"
+                                       title="{% if arrival_transfer.flight_number %}{% trans 'Flight status' %}{% else %}{% trans 'Airport departures' %}{% endif %}">
+                                        <i class="ph-bold ph-airplane"></i>
+                                        <span class="hidden sm:inline">
+                                            {% if arrival_transfer.flight_number %}
+                                                {% trans "Flight status" %}
+                                            {% else %}
+                                                {% trans "Airport departures" %}
+                                            {% endif %}
+                                        </span>
+                                    </a>
+                                {% endwith %}
+                            {% endif %}
                             <button class="btn btn-sm btn-soft"
                                     hx-get="{% url 'trips:edit-main-transfer' pk=arrival_transfer.pk %}"
                                     hx-target="#dialog"
@@ -63,7 +115,7 @@
                     {% endif %}
                 </div>
                 {% if arrival_transfer %}
-                    <div class="space-y-1 text-sm">
+                    <div class="relative space-y-1 text-sm">
                         {% if arrival_transfer.type == 1 or arrival_transfer.type == 2 %}
                             <p>
                                 <strong>{% trans "From:" %}</strong> {{ arrival_transfer.origin_name }}
@@ -86,44 +138,8 @@
                             <strong>{% trans "Arrival:" %}</strong> {{ arrival_transfer.end_time }}
                         </p>
                     </div>
-                    {# Train status button #}
-                    {% if arrival_transfer.type == 2 %}
-                        {% with travel_day=trip.start_date %}
-                            <div class="pt-2 mt-2">
-                                <a href="{% url 'trips:train-status-redirect' arrival_transfer.pk %}"
-                                   target="_blank"
-                                   rel="noopener noreferrer"
-                                   class="w-full btn btn-xs {% if today == travel_day %}btn-outline{% else %}btn-disabled{% endif %}">
-                                    <i class="ph-bold ph-train-simple"></i>
-                                    {% if arrival_transfer.train_number %}
-                                        {% trans "Train status" %}
-                                    {% else %}
-                                        {% trans "Station departures" %}
-                                    {% endif %}
-                                </a>
-                            </div>
-                        {% endwith %}
-                    {% endif %}
-                    {# Flight status button #}
-                    {% if arrival_transfer.type == 1 %}
-                        {% with travel_day=trip.start_date flight_active=arrival_transfer.flight_number|default:arrival_origin_icao %}
-                            <div class="pt-2 mt-2">
-                                <a href="{% url 'trips:flight-status-redirect' arrival_transfer.pk %}"
-                                   target="_blank"
-                                   rel="noopener noreferrer"
-                                   class="w-full btn btn-xs {% if today == travel_day and flight_active %}btn-outline{% else %}btn-disabled{% endif %}">
-                                    <i class="ph-bold ph-airplane"></i>
-                                    {% if arrival_transfer.flight_number %}
-                                        {% trans "Flight status" %}
-                                    {% else %}
-                                        {% trans "Airport departures" %}
-                                    {% endif %}
-                                </a>
-                            </div>
-                        {% endwith %}
-                    {% endif %}
                     {# Connection to first event/stay #}
-                    <div class="pt-3 mt-3 border-t border-base-300">
+                    <div class="relative pt-3 mt-3 border-t border-base-300">
                         {% if arrival_transfer.connection %}
                             <div class="flex gap-2 justify-between items-center">
                                 <div class="flex gap-2 items-center text-sm">
@@ -133,15 +149,26 @@
                                     {% endwith %}
                                     <span>→ {{ arrival_transfer.connection.destination.name }}</span>
                                 </div>
-                                <button class="btn btn-xs btn-soft"
-                                        hx-get="{% url 'trips:main-transfer-connection-modal' arrival_transfer.pk %}"
-                                        hx-target="#dialog"
-                                        hx-swap="innerHTML"
-                                        @click="$dispatch('open-modal'); document.activeElement.blur()"
-                                        title="{% trans 'Edit connection' %}">
-                                    <i class="ph-bold ph-pencil-simple"></i>
-                                    <span class="hidden sm:inline">{% trans "Edit" %}</span>
-                                </button>
+                                <div class="flex gap-1 items-center">
+                                    {% if arrival_transfer.connection.google_maps_url %}
+                                        <a href="{{ arrival_transfer.connection.google_maps_url }}"
+                                           target="_blank"
+                                           rel="noopener noreferrer"
+                                           class="btn btn-xs btn-circle btn-ghost"
+                                           aria-label="{% trans 'Open in Google Maps' %}">
+                                            <i class="ph-bold ph-map-trifold i-sm" aria-hidden="true"></i>
+                                        </a>
+                                    {% endif %}
+                                    <button class="btn btn-xs btn-soft"
+                                            hx-get="{% url 'trips:main-transfer-connection-modal' arrival_transfer.pk %}"
+                                            hx-target="#dialog"
+                                            hx-swap="innerHTML"
+                                            @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                            title="{% trans 'Edit connection' %}">
+                                        <i class="ph-bold ph-pencil-simple"></i>
+                                        <span class="hidden sm:inline">{% trans "Edit" %}</span>
+                                    </button>
+                                </div>
                             </div>
                         {% else %}
                             <div class="flex justify-end">
@@ -162,12 +189,26 @@
                 {% endif %}
             </div>
             <!-- Departure Transfer -->
-            <div class="p-4 rounded-lg bg-base-200" x-data>
-                <div class="flex gap-2 justify-between items-start mb-3">
+            <div class="overflow-hidden relative p-4 rounded-lg bg-base-200" x-data>
+                {% if departure_transfer %}
+                    <div class="flex absolute right-0 top-1/2 justify-end pr-4 w-1/2 -translate-y-1/2 pointer-events-none select-none"
+                         aria-hidden="true">
+                        {% if departure_transfer.type == 1 %}
+                            <i class="ph-bold ph-airplane-landing text-[7rem] text-base-content opacity-[0.07]"></i>
+                        {% elif departure_transfer.type == 2 %}
+                            <i class="ph-bold ph-train text-[7rem] text-base-content opacity-[0.07]"></i>
+                        {% elif departure_transfer.type == 3 %}
+                            <i class="ph-bold ph-car text-[7rem] text-base-content opacity-[0.07]"></i>
+                        {% else %}
+                            <i class="ph-bold ph-bus text-[7rem] text-base-content opacity-[0.07]"></i>
+                        {% endif %}
+                    </div>
+                {% endif %}
+                <div class="flex relative gap-2 justify-between items-start mb-3">
                     <div class="flex gap-2 items-center">
                         {% if departure_transfer %}
                             {% if departure_transfer.type == 1 %}
-                                <i class="text-xl ph-bold ph-airplane-takeoff"></i>
+                                <i class="text-xl ph-bold ph-airplane-landing"></i>
                             {% elif departure_transfer.type == 2 %}
                                 <i class="text-xl ph-bold ph-train"></i>
                             {% elif departure_transfer.type == 3 %}
@@ -184,7 +225,45 @@
                         {% endif %}
                     </div>
                     {% if departure_transfer %}
-                        <div class="flex gap-2">
+                        <div class="flex flex-wrap gap-2 justify-end">
+                            {# Train status button inline #}
+                            {% if departure_transfer.type == 2 %}
+                                {% with travel_day=trip.end_date %}
+                                    <a href="{% url 'trips:train-status-redirect' departure_transfer.pk %}"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       class="btn btn-sm btn-soft {% if today != travel_day %}btn-disabled{% endif %}"
+                                       title="{% if departure_transfer.train_number %}{% trans 'Train status' %}{% else %}{% trans 'Station departures' %}{% endif %}">
+                                        <i class="ph-bold ph-train-simple"></i>
+                                        <span class="hidden sm:inline">
+                                            {% if departure_transfer.train_number %}
+                                                {% trans "Train status" %}
+                                            {% else %}
+                                                {% trans "Station departures" %}
+                                            {% endif %}
+                                        </span>
+                                    </a>
+                                {% endwith %}
+                            {% endif %}
+                            {# Flight status button inline #}
+                            {% if departure_transfer.type == 1 %}
+                                {% with travel_day=trip.end_date flight_active=departure_transfer.flight_number|default:departure_origin_icao %}
+                                    <a href="{% url 'trips:flight-status-redirect' departure_transfer.pk %}"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       class="btn btn-sm btn-soft {% if not today == travel_day or not flight_active %}btn-disabled{% endif %}"
+                                       title="{% if departure_transfer.flight_number %}{% trans 'Flight status' %}{% else %}{% trans 'Airport departures' %}{% endif %}">
+                                        <i class="ph-bold ph-airplane"></i>
+                                        <span class="hidden sm:inline">
+                                            {% if departure_transfer.flight_number %}
+                                                {% trans "Flight status" %}
+                                            {% else %}
+                                                {% trans "Airport departures" %}
+                                            {% endif %}
+                                        </span>
+                                    </a>
+                                {% endwith %}
+                            {% endif %}
                             <button class="btn btn-sm btn-soft"
                                     hx-get="{% url 'trips:edit-main-transfer' pk=departure_transfer.pk %}"
                                     hx-target="#dialog"
@@ -214,7 +293,7 @@
                     {% endif %}
                 </div>
                 {% if departure_transfer %}
-                    <div class="space-y-1 text-sm">
+                    <div class="relative space-y-1 text-sm">
                         {% if departure_transfer.type == 1 or departure_transfer.type == 2 %}
                             <p>
                                 <strong>{% trans "From:" %}</strong> {{ departure_transfer.origin_name }}
@@ -237,44 +316,8 @@
                             <strong>{% trans "Arrival:" %}</strong> {{ departure_transfer.end_time }}
                         </p>
                     </div>
-                    {# Train status button #}
-                    {% if departure_transfer.type == 2 %}
-                        {% with travel_day=trip.end_date %}
-                            <div class="pt-2 mt-2">
-                                <a href="{% url 'trips:train-status-redirect' departure_transfer.pk %}"
-                                   target="_blank"
-                                   rel="noopener noreferrer"
-                                   class="w-full btn btn-xs {% if today == travel_day %}btn-outline{% else %}btn-disabled{% endif %}">
-                                    <i class="ph-bold ph-train-simple"></i>
-                                    {% if departure_transfer.train_number %}
-                                        {% trans "Train status" %}
-                                    {% else %}
-                                        {% trans "Station departures" %}
-                                    {% endif %}
-                                </a>
-                            </div>
-                        {% endwith %}
-                    {% endif %}
-                    {# Flight status button #}
-                    {% if departure_transfer.type == 1 %}
-                        {% with travel_day=trip.end_date flight_active=departure_transfer.flight_number|default:departure_origin_icao %}
-                            <div class="pt-2 mt-2">
-                                <a href="{% url 'trips:flight-status-redirect' departure_transfer.pk %}"
-                                   target="_blank"
-                                   rel="noopener noreferrer"
-                                   class="w-full btn btn-xs {% if today == travel_day and flight_active %}btn-outline{% else %}btn-disabled{% endif %}">
-                                    <i class="ph-bold ph-airplane"></i>
-                                    {% if departure_transfer.flight_number %}
-                                        {% trans "Flight status" %}
-                                    {% else %}
-                                        {% trans "Airport departures" %}
-                                    {% endif %}
-                                </a>
-                            </div>
-                        {% endwith %}
-                    {% endif %}
                     {# Connection from last event/stay #}
-                    <div class="pt-3 mt-3 border-t border-base-300">
+                    <div class="relative pt-3 mt-3 border-t border-base-300">
                         {% if departure_transfer.connection %}
                             <div class="flex gap-2 justify-between items-center">
                                 <div class="flex gap-2 items-center text-sm">
@@ -284,15 +327,26 @@
                                     {% endwith %}
                                     <span>{{ departure_transfer.connection.destination.name }} →</span>
                                 </div>
-                                <button class="btn btn-xs btn-soft"
-                                        hx-get="{% url 'trips:main-transfer-connection-modal' departure_transfer.pk %}"
-                                        hx-target="#dialog"
-                                        hx-swap="innerHTML"
-                                        @click="$dispatch('open-modal'); document.activeElement.blur()"
-                                        title="{% trans 'Edit connection' %}">
-                                    <i class="ph-bold ph-pencil-simple"></i>
-                                    <span class="hidden sm:inline">{% trans "Edit" %}</span>
-                                </button>
+                                <div class="flex gap-1 items-center">
+                                    {% if departure_transfer.connection.google_maps_url %}
+                                        <a href="{{ departure_transfer.connection.google_maps_url }}"
+                                           target="_blank"
+                                           rel="noopener noreferrer"
+                                           class="btn btn-xs btn-circle btn-ghost"
+                                           aria-label="{% trans 'Open in Google Maps' %}">
+                                            <i class="ph-bold ph-map-trifold i-sm" aria-hidden="true"></i>
+                                        </a>
+                                    {% endif %}
+                                    <button class="btn btn-xs btn-soft"
+                                            hx-get="{% url 'trips:main-transfer-connection-modal' departure_transfer.pk %}"
+                                            hx-target="#dialog"
+                                            hx-swap="innerHTML"
+                                            @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                            title="{% trans 'Edit connection' %}">
+                                        <i class="ph-bold ph-pencil-simple"></i>
+                                        <span class="hidden sm:inline">{% trans "Edit" %}</span>
+                                    </button>
+                                </div>
                             </div>
                         {% else %}
                             <div class="flex justify-end">
