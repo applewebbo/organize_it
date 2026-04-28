@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
@@ -11,7 +10,6 @@ from .forms import ProfileUpdateForm
 from .models import Profile
 
 
-@login_required
 def profile(request):
     profile = get_object_or_404(Profile, user=request.user)
     form = ProfileUpdateForm(instance=profile)
@@ -35,7 +33,6 @@ def profile(request):
     return TemplateResponse(request, "account/profile.html", context)
 
 
-@login_required
 @require_POST
 def update_theme(request):
     """Update user theme preference via AJAX (stores in localStorage only if use_system_theme is enabled)"""

@@ -776,80 +776,96 @@ class ValidateDatesViewTests(TestCase):
 
     def test_valid_dates(self):
         """Should return empty response if dates are valid."""
+        user = self.make_user("user")
         today = datetime.date.today()
         data = {
             "start_date": today.isoformat(),
             "end_date": (today + datetime.timedelta(days=1)).isoformat(),
         }
-        response = self.client.post(reverse("trips:validate-dates"), data)
+        with self.login(user):
+            response = self.client.post(reverse("trips:validate-dates"), data)
         assert response.status_code == 200
         assert response.content == b""
 
     def test_start_date_before_today(self):
         """Should return error if start_date is before today."""
+        user = self.make_user("user")
         today = datetime.date.today()
         data = {
             "start_date": (today - datetime.timedelta(days=1)).isoformat(),
             "end_date": today.isoformat(),
         }
-        response = self.client.post(reverse("trips:validate-dates"), data)
+        with self.login(user):
+            response = self.client.post(reverse("trips:validate-dates"), data)
         assert b"Start date must be after today" in response.content
 
     def test_start_date_after_end_date(self):
         """Should return error if start_date is after end_date."""
+        user = self.make_user("user")
         today = datetime.date.today()
         data = {
             "start_date": (today + datetime.timedelta(days=2)).isoformat(),
             "end_date": (today + datetime.timedelta(days=1)).isoformat(),
         }
-        response = self.client.post(reverse("trips:validate-dates"), data)
+        with self.login(user):
+            response = self.client.post(reverse("trips:validate-dates"), data)
         assert b"Start date cannot be after end date" in response.content
 
     def test_invalid_date_format(self):
         """Should return empty response if date format is invalid."""
+        user = self.make_user("user")
         data = {
             "start_date": "not-a-date",
             "end_date": "also-not-a-date",
         }
-        response = self.client.post(reverse("trips:validate-dates"), data)
+        with self.login(user):
+            response = self.client.post(reverse("trips:validate-dates"), data)
         assert response.status_code == 200
         assert response.content == b""
 
     def test_both_errors(self):
         """Should return both errors if start_date is before today and after end_date."""
+        user = self.make_user("user")
         today = datetime.date.today()
         data = {
             "start_date": (today - datetime.timedelta(days=1)).isoformat(),
             "end_date": (today - datetime.timedelta(days=2)).isoformat(),
         }
-        response = self.client.post(reverse("trips:validate-dates"), data)
+        with self.login(user):
+            response = self.client.post(reverse("trips:validate-dates"), data)
         assert b"Start date must be after today" in response.content
         assert b"Start date cannot be after end date" in response.content
 
     def test_missing_start_date(self):
         """Should return empty response if start_date is missing."""
+        user = self.make_user("user")
         today = datetime.date.today()
         data = {
             "end_date": (today + datetime.timedelta(days=1)).isoformat(),
         }
-        response = self.client.post(reverse("trips:validate-dates"), data)
+        with self.login(user):
+            response = self.client.post(reverse("trips:validate-dates"), data)
         assert response.status_code == 200
         assert response.content == b""
 
     def test_missing_end_date(self):
         """Should return empty response if end_date is missing."""
+        user = self.make_user("user")
         today = datetime.date.today()
         data = {
             "start_date": today.isoformat(),
         }
-        response = self.client.post(reverse("trips:validate-dates"), data)
+        with self.login(user):
+            response = self.client.post(reverse("trips:validate-dates"), data)
         assert response.status_code == 200
         assert response.content == b""
 
     def test_missing_both_dates(self):
         """Should return empty response if both start_date and end_date are missing."""
+        user = self.make_user("user")
         data = {}
-        response = self.client.post(reverse("trips:validate-dates"), data)
+        with self.login(user):
+            response = self.client.post(reverse("trips:validate-dates"), data)
         assert response.status_code == 200
         assert response.content == b""
 
@@ -859,6 +875,7 @@ class GeocodeAddressViewTests(TestCase):
     def test_geocode_address_post_found(self, mock_geocode_location):
         from django.urls import reverse
 
+        user = self.make_user("user")
         mock_geocode_location.return_value = [
             {
                 "name": "Hotel Roma",
@@ -869,9 +886,10 @@ class GeocodeAddressViewTests(TestCase):
                 "place_rank": 30,
             }
         ]
-        response = self.client.post(
-            reverse("trips:geocode-address"), {"name": "Hotel Roma", "city": "Rome"}
-        )
+        with self.login(user):
+            response = self.client.post(
+                reverse("trips:geocode-address"), {"name": "Hotel Roma", "city": "Rome"}
+            )
         assert response.status_code == 200
         assert b"Hotel Roma" in response.content
         assert b"Via Roma 1, Rome" in response.content
@@ -880,10 +898,12 @@ class GeocodeAddressViewTests(TestCase):
     def test_geocode_address_post_not_found(self, mock_geocode_location):
         from django.urls import reverse
 
+        user = self.make_user("user")
         mock_geocode_location.return_value = []
-        response = self.client.post(
-            reverse("trips:geocode-address"), {"name": "Hotel Roma", "city": "Rome"}
-        )
+        with self.login(user):
+            response = self.client.post(
+                reverse("trips:geocode-address"), {"name": "Hotel Roma", "city": "Rome"}
+            )
         assert response.status_code == 200
         assert (
             b"No address found" in response.content or b"found" not in response.content
@@ -892,9 +912,11 @@ class GeocodeAddressViewTests(TestCase):
     def test_geocode_address_post_missing_fields(self):
         from django.urls import reverse
 
-        response = self.client.post(
-            reverse("trips:geocode-address"), {"name": "", "city": "Rome"}
-        )
+        user = self.make_user("user")
+        with self.login(user):
+            response = self.client.post(
+                reverse("trips:geocode-address"), {"name": "", "city": "Rome"}
+            )
         assert response.status_code == 200
         assert (
             b"No address found" in response.content or b"found" not in response.content
@@ -903,7 +925,9 @@ class GeocodeAddressViewTests(TestCase):
     def test_geocode_address_get(self):
         from django.urls import reverse
 
-        response = self.client.get(reverse("trips:geocode-address"))
+        user = self.make_user("user")
+        with self.login(user):
+            response = self.client.get(reverse("trips:geocode-address"))
         assert response.status_code == 200
         assert (
             b"No address found" in response.content or b"found" not in response.content

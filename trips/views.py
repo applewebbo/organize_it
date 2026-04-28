@@ -8,7 +8,7 @@ import requests
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_not_required, user_passes_test
 from django.core.mail import EmailMultiAlternatives
 from django.db import transaction
 from django.db.models import Max, Min, Prefetch, Q
@@ -77,6 +77,7 @@ from trips.utils import (
 logger = logging.getLogger(__name__)
 
 
+@login_not_required
 def home(request):
     """Home page"""
     context = {}
@@ -89,7 +90,6 @@ def home(request):
     return TemplateResponse(request, "trips/index.html", context)
 
 
-@login_required
 def toggle_guide(request):
     """Toggle the visibility of the quick guide in home page"""
     if request.method == "POST":
@@ -98,7 +98,6 @@ def toggle_guide(request):
     return HttpResponse(status=204)
 
 
-@login_required
 def trip_list(request):
     """List of all trips"""
     if request.htmx:
@@ -135,7 +134,6 @@ def trip_list(request):
     return TemplateResponse(request, template, context)
 
 
-@login_required
 def trip_detail(request, pk):
     """
     Detail Page for the selected trip.
@@ -207,7 +205,6 @@ def trip_detail(request, pk):
     return TemplateResponse(request, template, context)
 
 
-@login_required
 def day_detail(request, pk):
     """
     Detail Page for the selected day.
@@ -334,7 +331,6 @@ def day_detail(request, pk):
     return TemplateResponse(request, template, context)
 
 
-@login_required
 def trip_create(request):
     if request.method == "POST":
         form = TripForm(request.POST, request.FILES)
@@ -389,7 +385,6 @@ def trip_create(request):
     return TemplateResponse(request, "trips/trip-create.html", context)
 
 
-@login_required
 @require_http_methods(["DELETE"])
 def trip_delete(request, pk):
     trip = get_trip_for_owner_or_404(pk, request.user)
@@ -405,7 +400,6 @@ def trip_delete(request, pk):
     )
 
 
-@login_required
 def trip_update(request, pk):
     trip = get_trip_for_owner_or_404(pk, request.user)
     if request.method == "POST":
@@ -456,7 +450,6 @@ def trip_update(request, pk):
     return TemplateResponse(request, "trips/trip-create.html", context)
 
 
-@login_required
 def trip_archive(request, pk):
     trip = get_trip_for_owner_or_404(pk, request.user)
     trip.status = 5
@@ -479,7 +472,6 @@ def trip_archive(request, pk):
     )
 
 
-@login_required
 def trip_unarchive(request, pk):
     trip = get_trip_for_owner_or_404(pk, request.user)
     trip.status = Trip.Status.NOT_STARTED
@@ -495,7 +487,6 @@ def trip_unarchive(request, pk):
     )
 
 
-@login_required
 def add_experience(request, day_id):
     day = get_object_or_404(Day, pk=day_id, trip__in=accessible_trips_qs(request.user))
     unpaired_experiences = Event.objects.filter(
@@ -519,7 +510,6 @@ def add_experience(request, day_id):
     return TemplateResponse(request, "trips/experience-create.html", context)
 
 
-@login_required
 def add_meal(request, day_id):
     day = get_object_or_404(Day, pk=day_id, trip__in=accessible_trips_qs(request.user))
     unpaired_experiences = Event.objects.filter(
@@ -543,7 +533,6 @@ def add_meal(request, day_id):
     return TemplateResponse(request, "trips/meal-create.html", context)
 
 
-@login_required
 def add_stay_for_trip(request, trip_pk):
     trip = get_trip_for_owner_or_404(trip_pk, request.user)
     form = StayForm(
@@ -561,7 +550,6 @@ def add_stay_for_trip(request, trip_pk):
     return TemplateResponse(request, "trips/stay-create.html", context)
 
 
-@login_required
 def add_stay(request, day_id):
     day = get_object_or_404(Day, pk=day_id, trip__in=accessible_trips_qs(request.user))
     trip = day.trip
@@ -584,7 +572,6 @@ def add_stay(request, day_id):
     return TemplateResponse(request, "trips/stay-create.html", context)
 
 
-@login_required
 def stay_detail(request, pk):
     stay = get_object_or_404(Stay, pk=pk)
     days = stay.days.order_by("date")
@@ -607,7 +594,6 @@ def stay_detail(request, pk):
     return TemplateResponse(request, "trips/stay-detail.html", context)
 
 
-@login_required
 def stay_modify(request, pk):
     qs = Stay.objects.prefetch_related("days")
     stay = get_object_or_404(qs, pk=pk)
@@ -641,7 +627,6 @@ def stay_modify(request, pk):
     return TemplateResponse(request, "trips/stay-modify.html", context)
 
 
-@login_required
 def stay_delete(request, pk):
     stay = get_object_or_404(Stay, pk=pk)
     trip = stay.days.first().trip
@@ -679,7 +664,6 @@ def stay_delete(request, pk):
 # ============================================================================
 
 
-@login_required
 def create_stay_transfer(request, from_day_id):
     """
     Create a StayTransfer between stays of consecutive days.
@@ -754,7 +738,6 @@ def create_stay_transfer(request, from_day_id):
     return TemplateResponse(request, "trips/stay-transfer-create.html", context)
 
 
-@login_required
 def edit_stay_transfer(request, pk):
     """Edit an existing StayTransfer"""
     qs = StayTransfer.objects.select_related(
@@ -783,7 +766,6 @@ def edit_stay_transfer(request, pk):
     return TemplateResponse(request, "trips/stay-transfer-edit.html", context)
 
 
-@login_required
 def delete_stay_transfer(request, pk):
     """Delete a StayTransfer"""
     qs = StayTransfer.objects.select_related("from_day__trip__author", "to_day")
@@ -805,7 +787,6 @@ def delete_stay_transfer(request, pk):
     )
 
 
-@login_required
 def edit_main_transfer(request, pk):
     """Edit existing main transfer - opens modal with specific form"""
     transfer = get_object_or_404(
@@ -875,7 +856,6 @@ def edit_main_transfer(request, pk):
     return TemplateResponse(request, "trips/edit-main-transfer-modal.html", context)
 
 
-@login_required
 def delete_main_transfer(request, pk):
     """Delete main transfer"""
     transfer = get_object_or_404(
@@ -891,7 +871,6 @@ def delete_main_transfer(request, pk):
     return HttpResponse(status=204, headers={"HX-Refresh": "true"})
 
 
-@login_required
 def train_status_redirect(request, pk):
     """Redirect to viaggiatreno for train status (specific train or station board)."""
     transfer = get_object_or_404(
@@ -958,7 +937,6 @@ def train_status_redirect(request, pk):
     return redirect("http://www.viaggiatreno.it/infomobilitamobile/pages/home/home.jsp")
 
 
-@login_required
 def flight_status_redirect(request, pk):
     """Redirect to FlightAware for flight status (specific flight or airport board)."""
     transfer = get_object_or_404(
@@ -984,7 +962,6 @@ def flight_status_redirect(request, pk):
     return redirect("https://it.flightaware.com")
 
 
-@login_required
 def main_transfers_section(request, trip_id):
     """HTMX endpoint: returns main transfers section for trip detail page"""
     trip = get_trip_or_404(trip_id, request.user)
@@ -1011,7 +988,6 @@ def main_transfers_section(request, trip_id):
     return TemplateResponse(request, "trips/includes/main-transfers.html", context)
 
 
-@login_required
 def event_modal(request, pk):
     """
     Modal for showing related event link for unpairing or deleting
@@ -1024,7 +1000,6 @@ def event_modal(request, pk):
     return TemplateResponse(request, "trips/event-modal.html", context)
 
 
-@login_required
 @require_http_methods(["DELETE"])
 def event_delete(request, pk):
     qs = Event.objects.select_related("day__trip__author")
@@ -1038,7 +1013,6 @@ def event_delete(request, pk):
     return HttpResponse(status=204, headers={"HX-Refresh": "true"})
 
 
-@login_required
 @require_http_methods(["PUT"])
 def event_unpair(request, pk):
     """
@@ -1057,7 +1031,6 @@ def event_unpair(request, pk):
     return HttpResponse(status=204, headers={"HX-Refresh": "true"})
 
 
-@login_required
 def event_pair(request, pk, day_id):
     """
     Pair an event with a day.
@@ -1079,7 +1052,6 @@ def event_pair(request, pk, day_id):
     return HttpResponse(status=204, headers={"HX-Trigger": json.dumps(triggers)})
 
 
-@login_required
 def event_pair_choice(request, pk):
     """
     Provide a list of days to pair with the selected event.
@@ -1101,7 +1073,6 @@ def event_pair_choice(request, pk):
 # ============================================================================
 
 
-@login_required
 def create_simple_transfer(request, from_event_pk):
     """Create a SimpleTransfer from an event to the next event on the same day"""
     from_event = get_object_or_404(
@@ -1153,7 +1124,6 @@ def create_simple_transfer(request, from_event_pk):
     return TemplateResponse(request, "trips/simple-transfer-create.html", context)
 
 
-@login_required
 def edit_simple_transfer(request, pk):
     """Edit an existing SimpleTransfer"""
     qs = SimpleTransfer.objects.select_related(
@@ -1179,7 +1149,6 @@ def edit_simple_transfer(request, pk):
     return TemplateResponse(request, "trips/simple-transfer-edit.html", context)
 
 
-@login_required
 def delete_simple_transfer(request, pk):
     """Delete a SimpleTransfer"""
     qs = SimpleTransfer.objects.select_related("day__trip__author")
@@ -1196,7 +1165,6 @@ def delete_simple_transfer(request, pk):
     return HttpResponse(status=204, headers={"HX-Trigger": f"dayModified{day_id}"})
 
 
-@login_required
 def get_next_events_for_transfer(request, day_id):
     """
     HTMX view to filter to_event dropdown based on selected from_event.
@@ -1222,7 +1190,6 @@ def get_next_events_for_transfer(request, day_id):
 # ============================================================================
 
 
-@login_required
 def main_transfer_connection_modal(request, main_transfer_pk):
     """Show modal with event/stay options for creating a main transfer connection"""
     from trips.models import MainTransfer, MainTransferConnection
@@ -1267,7 +1234,6 @@ def main_transfer_connection_modal(request, main_transfer_pk):
     )
 
 
-@login_required
 def create_main_transfer_connection(request, main_transfer_pk, destination_type):
     """Create a MainTransferConnection to event or stay"""
     from trips.models import MainTransfer
@@ -1371,7 +1337,6 @@ def create_main_transfer_connection(request, main_transfer_pk, destination_type)
     )
 
 
-@login_required
 def edit_main_transfer_connection(request, pk):
     """Edit an existing MainTransferConnection"""
     from trips.models import MainTransferConnection
@@ -1402,7 +1367,6 @@ def edit_main_transfer_connection(request, pk):
     )
 
 
-@login_required
 def delete_main_transfer_connection(request, pk):
     """Delete a MainTransferConnection"""
     from trips.models import MainTransferConnection
@@ -1420,7 +1384,6 @@ def delete_main_transfer_connection(request, pk):
     return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
 
 
-@login_required
 def event_detail(request, pk):
     """
     Detail Page for the selected event.
@@ -1437,7 +1400,6 @@ def event_detail(request, pk):
     return TemplateResponse(request, "trips/event-detail.html", context)
 
 
-@login_required
 def event_modify(request, pk):
     """
     Modify an event based on its category.
@@ -1468,7 +1430,6 @@ def event_modify(request, pk):
     return TemplateResponse(request, "trips/event-modify.html", context)
 
 
-@login_required
 def event_change_times(request, pk):
     """
     Change the times of an event on the event detail card
@@ -1495,7 +1456,6 @@ def event_change_times(request, pk):
     )
 
 
-@login_required
 def check_event_overlap(request, day_id):
     """
     Check if the proposed event time overlaps with existing events.
@@ -1523,7 +1483,6 @@ def check_event_overlap(request, day_id):
     return HttpResponse("")
 
 
-@login_required
 @require_http_methods(["POST"])
 def event_swap(request, pk1, pk2):
     """
@@ -1550,7 +1509,6 @@ def event_swap(request, pk1, pk2):
         return HttpResponse(status=400)
 
 
-@login_required
 def single_event(request, pk):
     """
     Return a single event partial for HTMX updates.
@@ -1568,7 +1526,6 @@ def single_event(request, pk):
     )
 
 
-@login_required
 def event_swap_modal(request, pk):
     """
     Provide a list of events to swap with the selected event.
@@ -1764,7 +1721,6 @@ def get_trip_addresses(request):
     )
 
 
-@login_required
 def event_notes(request, event_id):
     """
     View or edit the notes for an event (now a field on Event).
@@ -1780,7 +1736,6 @@ def event_notes(request, event_id):
     return TemplateResponse(request, "trips/event-notes.html", context)
 
 
-@login_required
 @require_http_methods(["POST"])
 def note_create(request, event_id):
     """
@@ -1803,7 +1758,6 @@ def note_create(request, event_id):
     return HttpResponse(status=400)
 
 
-@login_required
 def note_modify(request, event_id):
     """
     Modify the note for an event (now a field on Event).
@@ -1826,7 +1780,6 @@ def note_modify(request, event_id):
     return TemplateResponse(request, "trips/note-modify.html", context)
 
 
-@login_required
 def note_delete(request, event_id):
     """
     Delete the note from an event (clear the notes field).
@@ -1844,7 +1797,6 @@ def note_delete(request, event_id):
     return HttpResponse(status=204, headers={"HX-Trigger": f"eventModified{event.pk}"})
 
 
-@login_required
 def stay_notes(request, stay_id):
     """
     View the note for an event.
@@ -1858,7 +1810,6 @@ def stay_notes(request, stay_id):
     return TemplateResponse(request, "trips/stay-notes.html", context)
 
 
-@login_required
 @require_http_methods(["POST"])
 def stay_note_create(request, stay_id):
     """
@@ -1883,7 +1834,6 @@ def stay_note_create(request, stay_id):
     return HttpResponse(status=400)
 
 
-@login_required
 def stay_note_modify(request, stay_id):
     """
     Modify a note for a stay. If the note does not exist, return 404.
@@ -1909,7 +1859,6 @@ def stay_note_modify(request, stay_id):
     return TemplateResponse(request, "trips/stay-note-modify.html", context)
 
 
-@login_required
 def stay_note_delete(request, stay_id):
     """
     Delete a note from a stay. If the note does not exist, return 404.
@@ -1927,7 +1876,6 @@ def stay_note_delete(request, stay_id):
     return HttpResponse(status=204, headers={"HX-Trigger": json.dumps(day_triggers)})
 
 
-@login_required
 @require_http_methods(["POST"])
 def enrich_stay(request, stay_id):
     """
@@ -2000,7 +1948,6 @@ def enrich_stay(request, stay_id):
     return TemplateResponse(request, "trips/stay-enrich-preview.html", context)
 
 
-@login_required
 @require_http_methods(["POST"])
 def confirm_enrich_stay(request, stay_id):
     """
@@ -2066,7 +2013,6 @@ def confirm_enrich_stay(request, stay_id):
     return response
 
 
-@login_required
 @require_http_methods(["POST"])
 def enrich_event(request, event_id):
     """
@@ -2126,7 +2072,6 @@ def enrich_event(request, event_id):
     return TemplateResponse(request, "trips/event-enrich-preview.html", context)
 
 
-@login_required
 @require_http_methods(["POST"])
 def confirm_enrich_event(request, event_id):
     """
@@ -2174,7 +2119,6 @@ def confirm_enrich_event(request, event_id):
     return response
 
 
-@login_required
 def search_trip_images(request):
     """HTMX endpoint for searching Unsplash images using destination"""
     if request.method == "POST":
@@ -2219,7 +2163,6 @@ def search_trip_images(request):
 # =============================================================================
 
 
-@login_required
 def search_airports_view(request):
     """
     HTMX endpoint for airport autocomplete.
@@ -2257,7 +2200,6 @@ def search_airports_view(request):
     )
 
 
-@login_required
 def search_stations(request):
     """
     HTMX endpoint for train station autocomplete.
@@ -2295,7 +2237,6 @@ def search_stations(request):
     )
 
 
-@login_required
 def arrival_transfer_modal(request, trip_id):
     """Entry point for arrival transfer modal (2-step wizard)."""
     trip = get_trip_or_404(trip_id, request.user)
@@ -2311,7 +2252,6 @@ def arrival_transfer_modal(request, trip_id):
     return TemplateResponse(request, "trips/arrival-transfer-modal.html", context)
 
 
-@login_required
 def departure_transfer_modal(request, trip_id):
     """Entry point for departure transfer modal (2-step wizard)."""
     trip = get_trip_or_404(trip_id, request.user)
@@ -2327,7 +2267,6 @@ def departure_transfer_modal(request, trip_id):
     return TemplateResponse(request, "trips/departure-transfer-modal.html", context)
 
 
-@login_required
 def main_transfer_step(request, trip_id):
     """HTMX endpoint to load specific step of multi-step modal."""
     trip = get_trip_or_404(trip_id, request.user)
@@ -2471,7 +2410,6 @@ def main_transfer_step(request, trip_id):
     return HttpResponse("Invalid step", status=400)
 
 
-@login_required
 def save_main_transfer(request, trip_id):
     """Save main transfer (arrival or departure)."""
     trip = get_trip_or_404(trip_id, request.user)
@@ -2557,6 +2495,7 @@ def save_main_transfer(request, trip_id):
 # ── SHARING VIEWS ─────────────────────────────────────────────────────────────
 
 
+@login_not_required
 def shared_trip_detail(request, token):
     """Public read-only view for a shared trip. No login required."""
     link = get_object_or_404(ShareLink, id=token)
@@ -2588,7 +2527,6 @@ def shared_trip_detail(request, token):
     return TemplateResponse(request, "trips/shared-trip-detail.html", context)
 
 
-@login_required
 def share_link_create(request, trip_id):
     """Create a new share link for a trip (owner only)."""
     trip = get_trip_for_owner_or_404(trip_id, request.user)
@@ -2610,7 +2548,6 @@ def share_link_create(request, trip_id):
     )
 
 
-@login_required
 def share_link_list(request, trip_id):
     """List active share links for a trip (owner only)."""
     trip = get_trip_for_owner_or_404(trip_id, request.user)
@@ -2622,7 +2559,6 @@ def share_link_list(request, trip_id):
     )
 
 
-@login_required
 @require_http_methods(["POST"])
 def share_link_revoke(request, link_id):
     """Deactivate a share link (owner only)."""
@@ -2643,7 +2579,6 @@ def share_link_revoke(request, link_id):
     )
 
 
-@login_required
 def search_user_by_email(request, trip_id):
     """HTMX: search registered user by email to invite as collaborator (owner only)."""
     trip = get_trip_for_owner_or_404(trip_id, request.user)
@@ -2676,7 +2611,6 @@ def search_user_by_email(request, trip_id):
     )
 
 
-@login_required
 @require_http_methods(["POST"])
 def add_collaborator(request, trip_id):
     """Add a registered user as collaborator (owner only)."""
@@ -2723,7 +2657,6 @@ def add_collaborator(request, trip_id):
     )
 
 
-@login_required
 @require_http_methods(["POST"])
 def remove_collaborator(request, trip_id, collaboration_id):
     """Remove a collaborator from a trip (owner only, data is preserved)."""
@@ -2740,7 +2673,6 @@ def remove_collaborator(request, trip_id, collaboration_id):
     )
 
 
-@login_required
 def collaborators_modal(request, trip_id):
     """GET: render the collaborators management modal (owner only)."""
     trip = get_trip_for_owner_or_404(trip_id, request.user)
@@ -2752,7 +2684,6 @@ def collaborators_modal(request, trip_id):
     )
 
 
-@login_required
 def collab_inline(request, trip_id):
     """GET: render the compact inline collaborators row (HTMX refresh)."""
     trip = get_trip_or_404(trip_id, request.user)
@@ -2764,7 +2695,6 @@ def collab_inline(request, trip_id):
     )
 
 
-@login_required
 @require_http_methods(["POST"])
 def invite_collaborator(request, trip_id):
     """Invite a non-registered user by email (owner only)."""
@@ -2802,6 +2732,7 @@ def invite_collaborator(request, trip_id):
     )
 
 
+@login_not_required
 def accept_invitation(request, token):
     """Accept a trip collaboration invitation via token."""
     invitation = get_object_or_404(TripInvitation, token=token)
@@ -2932,7 +2863,6 @@ def _build_map_json(days_with_events, unassigned_events):
     return items
 
 
-@login_required
 def trip_map(request, pk):
     """Unified interactive map for a trip: all events across all days + unassigned."""
     trip = get_object_or_404(
@@ -3000,7 +2930,6 @@ def _trip_location_bias(trip) -> tuple[float, float, float] | None:
     return None
 
 
-@login_required
 @require_http_methods(["POST"])
 def map_search(request, pk):
     """HTMX endpoint: search Google Places and return results partial."""
@@ -3070,21 +2999,18 @@ def _map_add_event(request, pk, category):
     )
 
 
-@login_required
 @require_http_methods(["POST"])
 def map_add_experience(request, pk):
     """HTMX: add an Experience from map search result."""
     return _map_add_event(request, pk, Event.Category.EXPERIENCE)
 
 
-@login_required
 @require_http_methods(["POST"])
 def map_add_meal(request, pk):
     """HTMX: add a Meal from map search result."""
     return _map_add_event(request, pk, Event.Category.MEAL)
 
 
-@login_required
 @require_http_methods(["POST"])
 def map_add_stay(request, pk):
     """HTMX: create a Stay (unassigned) from map search result."""
