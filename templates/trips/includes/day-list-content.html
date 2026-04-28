@@ -13,13 +13,6 @@
             hx-target="#event-{{ event.pk }}"
             hx-swap="outerHTML">
             <c-event :event="event" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}" :transfer_from="event.transfer_from">
-            <c-slot name="collab_badge">
-            {% if collab_colors and event.last_modified_by %}
-                {% with color=collab_colors|dict_get:event.last_modified_by.id %}
-                    {% include "trips/includes/_collab-badge.html" with actor=event.last_modified_by color=color viewer_id=viewer_id only %}
-                {% endwith %}
-            {% endif %}
-            </c-slot>
             <div class="flex gap-2 items-center" x-data>
                 {% if event.has_overlap %}
                     <div class="px-1 font-semibold rounded-sm me-1.5 text-error bg-slate-50 dark:bg-slate-700">!!</div>

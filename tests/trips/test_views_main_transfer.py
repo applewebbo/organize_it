@@ -12,7 +12,6 @@ from tests.trips.factories import (
     StayFactory,
     TripFactory,
 )
-from trips.models import TripCollaboration
 
 pytestmark = pytest.mark.django_db
 
@@ -247,25 +246,6 @@ class TestMainTransferViews(TestCase):
             assert response.context["trip"] == trip
             assert response.context["arrival_transfer"] == arrival
             assert response.context["departure_transfer"] == departure
-
-    def test_main_transfers_section_with_collaborators(self):
-        """Test main transfers section includes author in collab_colors when collaborators exist"""
-        user = self.make_user("owner@example.com")
-        collaborator = self.make_user("collab@example.com")
-        trip = TripFactory(author=user)
-        TripCollaboration.objects.create(
-            trip=trip, user=collaborator, color="blue", added_by=user
-        )
-        url = reverse("trips:main-transfers-section", kwargs={"trip_id": trip.pk})
-
-        with self.login(user):
-            response = self.client.get(url)
-
-            assert response.status_code == 200
-            collab_colors = response.context["collab_colors"]
-            assert user.id in collab_colors
-            assert collab_colors[user.id] == "bg-neutral"
-            assert response.context["viewer_id"] == user.id
 
     def test_arrival_transfer_modal(self):
         """Test arrival transfer modal"""

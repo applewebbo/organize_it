@@ -1,6 +1,5 @@
 {% extends "base-simplified.html" %}
 {% load i18n trip_tags %}
-{# collab_colors: {user_id: badge_bg_class} — passed from shared_trip_detail view #}
 {% block page_title %}
     {{ trip.title }}
 {% endblock page_title %}
@@ -31,13 +30,6 @@
                         <i class="ph-bold ph-bed i-sm text-base-content/60"></i>
                         <span>{{ day.stay.name }}</span>
                         {% if day.stay.address %}<span class="text-base-content/60">, {{ day.stay.address }}</span>{% endif %}
-                        {% if collab_colors and day.stay.author %}
-                            {% with color=collab_colors|dict_get:day.stay.author.id %}
-                                <span class="ms-auto">
-                                    {% include "trips/includes/_collab-badge.html" with actor=day.stay.author color=color viewer_id=viewer_id only %}
-                                </span>
-                            {% endwith %}
-                        {% endif %}
                     </div>
                 </div>
             {% endif %}
@@ -49,13 +41,6 @@
                             <span class="font-mono text-xs text-base-content/50">{{ event.start_time|time:"H:i" }}</span>
                         {% endif %}
                         <span class="font-medium">{{ event.name }}</span>
-                        {% if collab_colors and event.last_modified_by %}
-                            {% with color=collab_colors|dict_get:event.last_modified_by.id %}
-                                <span class="ms-auto">
-                                    {% include "trips/includes/_collab-badge.html" with actor=event.last_modified_by color=color viewer_id=viewer_id only %}
-                                </span>
-                            {% endwith %}
-                        {% endif %}
                     </div>
                     {% if event.address %}
                         <div class="mt-1 text-xs text-base-content/60">

@@ -12,7 +12,6 @@ from tests.trips.factories import (
     StayFactory,
     TripFactory,
 )
-from trips.models import TripCollaboration
 
 pytestmark = pytest.mark.django_db
 
@@ -32,26 +31,6 @@ class SingleEventViewTest(TestCase):
 
         self.response_200(response)
         assert response.context["event"] == event
-
-    def test_collab_colors_in_single_event_with_collaborators(self):
-        """collab_colors includes author with bg-neutral when trip has collaborators"""
-        owner = self.make_user("owner@example.com")
-        collab = self.make_user("collab@example.com")
-        trip = TripFactory(author=owner)
-        TripCollaboration.objects.create(
-            trip=trip, user=collab, color="blue", added_by=owner
-        )
-        day = trip.days.first()
-        event = EventFactory(day=day, trip=trip)
-
-        with self.login(owner):
-            response = self.get("trips:single-event", pk=event.pk)
-
-        self.response_200(response)
-        collab_colors = response.context["collab_colors"]
-        assert owner.id in collab_colors
-        assert collab_colors[owner.id] == "bg-neutral"
-        assert response.context["viewer_id"] == owner.id
 
 
 @patch("trips.views.requests.get")

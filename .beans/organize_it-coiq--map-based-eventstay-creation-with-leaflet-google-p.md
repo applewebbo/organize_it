@@ -1,11 +1,11 @@
 ---
 # organize_it-coiq
 title: Map-based event/stay creation with Leaflet + Google Places + HTMX
-status: draft
+status: completed
 type: epic
 priority: normal
 created_at: 2026-04-22T13:03:15Z
-updated_at: 2026-04-22T13:04:57Z
+updated_at: 2026-04-28T12:48:21Z
 ---
 
 Replace event/stay creation with interactive Leaflet map. Google Places via Django proxy, HTMX partials, unified map view across all days. Issue #276.
@@ -53,3 +53,5 @@ Template principale trip-map.html + partials: _map_search_results.html, _map_eve
 
 ### T7 - Tests
 Test per GooglePlacesClient (mock HTTP), test views HTMX search e add-from-map.
+
+## Summary of Changes\n\nTutti i 7 task completati: GooglePlacesClient service, unified Leaflet map view, HTMX search/add endpoints, JS module, templates e tests.

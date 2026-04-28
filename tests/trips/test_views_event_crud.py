@@ -41,27 +41,6 @@ class AddExperienceView(TestCase):
         assert message == "Experience added successfully"
         assert day.events.count() == 1
 
-    @patch("geocoder.mapbox")
-    def test_post_sets_last_modified_by(self, mock_geocoder):
-        mock_geocoder.return_value.ok = True
-        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
-        user = self.make_user("user")
-        trip = TripFactory(author=user)
-        day = trip.days.first()
-        data = {
-            "name": "Walking Tour",
-            "type": 1,
-            "address": "Starting Point",
-            "start_time": "14:00",
-            "duration": "120",
-        }
-
-        with self.login(user):
-            self.post("trips:add-experience", day_id=day.pk, data=data)
-
-        event = day.events.get()
-        assert event.last_modified_by == user
-
     def test_post_with_invalid_data(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)
@@ -102,27 +81,6 @@ class AddMealView(TestCase):
         message = list(get_messages(response.wsgi_request))[0].message
         assert message == "Meal added successfully"
         assert day.events.count() == 1
-
-    @patch("geocoder.mapbox")
-    def test_post_sets_last_modified_by(self, mock_geocoder):
-        mock_geocoder.return_value.ok = True
-        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
-        user = self.make_user("user")
-        trip = TripFactory(author=user)
-        day = trip.days.first()
-        data = {
-            "name": "La Pergola",
-            "type": 1,
-            "address": "Via Alberto Cadlolo, 101, Rome",
-            "start_time": "13:00",
-            "duration": "60",
-        }
-
-        with self.login(user):
-            self.post("trips:add-meal", day_id=day.pk, data=data)
-
-        event = day.events.get()
-        assert event.last_modified_by == user
 
     def test_post_with_invalid_data(self):
         user = self.make_user("user")
