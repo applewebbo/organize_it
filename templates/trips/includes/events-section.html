@@ -1,0 +1,35 @@
+{% load i18n trip_tags %}
+<div id="events-section"
+     class="flex flex-col gap-4 mb-4"
+     hx-get="{% url 'trips:trip-detail' trip.pk %}"
+     hx-target="#events-section"
+     hx-swap="outerHTML"
+     hx-trigger="tripModified from:body">
+    <!-- Cose da Fare: eventi assegnati ai giorni -->
+    <section class="shadow card card-border bg-base-100">
+        <div class="p-4 sm:p-6 card-body">
+            <h2 class="text-xl font-medium sm:text-2xl">{% trans 'Things to Do' %}</h2>
+            <div class="flex flex-col gap-3 mt-3">
+                {% for day in trip.days.all %}
+                    {% include 'trips/includes/day.html' with day=day %}
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    <!-- Altre Cose da Fare: eventi non ancora assegnati -->
+    {% if unpaired_events %}
+        <section class="shadow card card-border bg-base-100">
+            <div class="p-4 sm:p-6 card-body">
+                <div>
+                    <h2 class="text-xl font-medium sm:text-2xl">{% trans 'Other Things to Do' %}</h2>
+                    <p class="mt-1 text-sm text-base-content/60">{% trans 'Here you find events not yet assigned to a specific day' %}</p>
+                </div>
+                <ul class="flex flex-wrap gap-3 justify-center mt-4" x-data>
+                    {% for event in unpaired_events %}
+                        <c-unpaired-event :event="event" :days="trip.days.all" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}" />
+                    {% endfor %}
+                </ul>
+            </div>
+        </section>
+    {% endif %}
+</div>

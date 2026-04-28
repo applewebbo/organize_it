@@ -11,27 +11,11 @@
                 {% include 'trips/includes/main-transfers.html' %}
             {% endif %}
             <!-- END Main Transfers Section -->
-            <!-- Days & Events Section -->
-            <section id="days" class="flex flex-col gap-y-4 mb-8">
-                {% for day in trip.days.all %}
-                    {% include 'trips/includes/day.html' with day=day %}
-                {% endfor %}
-            </section>
-            <!-- Unpaired Events Section -->
-            {% if unpaired_events %}
-                <section id="unpaired" class="mb-8">
-                    <div class="shadow card card-border bg-base-100" x-data>
-                        <div class="card-body">
-                            <h2 class="text-xl font-medium sm:text-2xl grow">{% trans 'Unpaired Events' %}</h2>
-                            <ul class="flex flex-wrap gap-3 justify-center my-4">
-                                {% for event in unpaired_events %}
-                                    <c-unpaired-event :event="event" :days="trip.days.all" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}" />
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </div>
-                </section>
-            {% endif %}
+            <!-- Stays Section -->
+            {% include 'trips/includes/stays-section.html' %}
+            <!-- END Stays Section -->
+            <!-- Events Section -->
+            {% include 'trips/includes/events-section.html' %}
         {% endwith %}
         <!-- Other Trips Section -->
         {% if other_trips %}
@@ -52,7 +36,6 @@
                                         {% endif %}
                                     </span>
                                 </div>
-                                <p class="mb-3 italic text-base-content/80">{{ trip.description }}</p>
                                 <div class="justify-end text-right">
                                     <a href="{% url 'trips:trip-detail' trip.id %}"
                                        class="btn btn-sm btn-primary btn-soft">{% trans 'Edit' %}</a>

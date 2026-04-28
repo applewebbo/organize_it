@@ -32,36 +32,7 @@
     {% include 'trips/includes/stays-section.html' %}
     <!-- END Stays Section -->
     {% partialdef days inline %}
-    <div id="days-events"
-         hx-get="{% url 'trips:trip-detail' trip.pk %}"
-         hx-target="#days-events"
-         hx-swap="innerHTML"
-         hx-trigger="tripModified from:body">
-        <!-- Days Section   -->
-        <section id="days" class="flex flex-col gap-y-4">
-            {% for day in trip.days.all %}
-                {% include 'trips/includes/day.html' with day=day %}
-            {% endfor %}
-        </section>
-        <!-- END Days Section -->
-        <!-- Unpaired Events Section -->
-        {% if unpaired_events %}
-            <section id="unpaired" class="mt-4">
-                <div class="shadow card card-border bg-base-100" x-data>
-                    <div class="card-body">
-                        <h2 class="text-xl font-medium sm:text-2xl grow">{% trans 'Things to Do' %}</h2>
-                        <p class="text-sm text-base-content/60">{% trans 'Here you find events not yet assigned to a specific day' %}</p>
-                        <ul class="flex flex-wrap gap-3 justify-center my-4">
-                            {% for event in unpaired_events %}
-                                <c-unpaired-event :event="event" :days="trip.days.all" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}" />
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </div>
-            </section>
-        {% endif %}
-        <!-- END Unpaired Events Section -->
-    </div>
+    {% include 'trips/includes/events-section.html' %}
 {% endpartialdef %}
 {% endblock content %}
 {% block script %}
