@@ -11,6 +11,7 @@
                 <h2 class="text-xl font-medium sm:text-2xl">{% trans 'Where to Sleep' %}</h2>
                 {% if trip.status != 5 and request.user == trip.author %}
                     <button class="btn btn-sm btn-soft"
+                            x-data
                             hx-get="{% url 'trips:add-stay-for-trip' trip.pk %}"
                             hx-target="#dialog"
                             hx-swap="innerHTML"
