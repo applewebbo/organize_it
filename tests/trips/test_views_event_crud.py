@@ -46,7 +46,7 @@ class AddExperienceView(TestCase):
         trip = TripFactory(author=user)
         day = trip.days.first()
         data = {
-            "name": "Visit Museum",
+            "name": "",  # name is required
         }
 
         with self.login(user):
@@ -87,7 +87,7 @@ class AddMealView(TestCase):
         trip = TripFactory(author=user)
         day = trip.days.first()
         data = {
-            "name": "Lunch",
+            "name": "",  # name is required
         }
 
         with self.login(user):

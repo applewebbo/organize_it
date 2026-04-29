@@ -23,12 +23,8 @@ class TestSimpleTransferCreateForm:
         """Test form creates instance with from_event and to_event"""
         trip = TripFactory()
         day = trip.days.first()
-        event1 = ExperienceFactory(
-            trip=trip, day=day, start_time="10:00", end_time="11:00"
-        )
-        event2 = ExperienceFactory(
-            trip=trip, day=day, start_time="14:00", end_time="15:00"
-        )
+        event1 = ExperienceFactory(trip=trip, day=day)
+        event2 = ExperienceFactory(trip=trip, day=day)
 
         form = SimpleTransferCreateForm(from_event=event1, to_event=event2)
 
@@ -39,12 +35,8 @@ class TestSimpleTransferCreateForm:
         """Test form is valid with correct data"""
         trip = TripFactory()
         day = trip.days.first()
-        event1 = ExperienceFactory(
-            trip=trip, day=day, start_time="10:00", end_time="11:00"
-        )
-        event2 = ExperienceFactory(
-            trip=trip, day=day, start_time="14:00", end_time="15:00"
-        )
+        event1 = ExperienceFactory(trip=trip, day=day)
+        event2 = ExperienceFactory(trip=trip, day=day)
 
         form = SimpleTransferCreateForm(
             data={"transport_mode": "driving", "notes": ""},
@@ -91,15 +83,9 @@ class TestSimpleTransferCreateForm:
         """Test form is invalid when from_event already has an outgoing transfer"""
         trip = TripFactory()
         day = trip.days.first()
-        event1 = ExperienceFactory(
-            trip=trip, day=day, start_time="10:00", end_time="11:00"
-        )
-        event2 = ExperienceFactory(
-            trip=trip, day=day, start_time="14:00", end_time="15:00"
-        )
-        event3 = ExperienceFactory(
-            trip=trip, day=day, start_time="16:00", end_time="17:00"
-        )
+        event1 = ExperienceFactory(trip=trip, day=day)
+        event2 = ExperienceFactory(trip=trip, day=day)
+        event3 = ExperienceFactory(trip=trip, day=day)
 
         # Create existing transfer from event1
         SimpleTransfer.objects.create(
@@ -121,15 +107,9 @@ class TestSimpleTransferCreateForm:
         """Test form is invalid when to_event already has an incoming transfer"""
         trip = TripFactory()
         day = trip.days.first()
-        event1 = ExperienceFactory(
-            trip=trip, day=day, start_time="10:00", end_time="11:00"
-        )
-        event2 = ExperienceFactory(
-            trip=trip, day=day, start_time="14:00", end_time="15:00"
-        )
-        event3 = ExperienceFactory(
-            trip=trip, day=day, start_time="12:00", end_time="13:00"
-        )
+        event1 = ExperienceFactory(trip=trip, day=day)
+        event2 = ExperienceFactory(trip=trip, day=day)
+        event3 = ExperienceFactory(trip=trip, day=day)
 
         # Create existing transfer to event2
         SimpleTransfer.objects.create(
@@ -151,12 +131,8 @@ class TestSimpleTransferCreateForm:
         """Test that editing existing transfer excludes self from from_event check"""
         trip = TripFactory()
         day = trip.days.first()
-        event1 = ExperienceFactory(
-            trip=trip, day=day, start_time="10:00", end_time="11:00"
-        )
-        event2 = ExperienceFactory(
-            trip=trip, day=day, start_time="14:00", end_time="15:00"
-        )
+        event1 = ExperienceFactory(trip=trip, day=day)
+        event2 = ExperienceFactory(trip=trip, day=day)
 
         # Create existing transfer
         transfer = SimpleTransfer.objects.create(
@@ -177,12 +153,8 @@ class TestSimpleTransferCreateForm:
         """Test that editing existing transfer excludes self from to_event check"""
         trip = TripFactory()
         day = trip.days.first()
-        event1 = ExperienceFactory(
-            trip=trip, day=day, start_time="10:00", end_time="11:00"
-        )
-        event2 = ExperienceFactory(
-            trip=trip, day=day, start_time="14:00", end_time="15:00"
-        )
+        event1 = ExperienceFactory(trip=trip, day=day)
+        event2 = ExperienceFactory(trip=trip, day=day)
 
         # Create existing transfer
         transfer = SimpleTransfer.objects.create(
@@ -207,12 +179,8 @@ class TestSimpleTransferEditForm:
         """Test form is valid when editing existing transfer"""
         trip = TripFactory()
         day = trip.days.first()
-        event1 = ExperienceFactory(
-            trip=trip, day=day, start_time="10:00", end_time="11:00"
-        )
-        event2 = ExperienceFactory(
-            trip=trip, day=day, start_time="14:00", end_time="15:00"
-        )
+        event1 = ExperienceFactory(trip=trip, day=day)
+        event2 = ExperienceFactory(trip=trip, day=day)
 
         transfer = SimpleTransfer.objects.create(
             from_event=event1, to_event=event2, transport_mode="driving"

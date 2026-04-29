@@ -1,6 +1,6 @@
 import logging
 import random
-from datetime import date, datetime, time, timedelta
+from datetime import date, timedelta
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
@@ -58,8 +58,7 @@ def _create_stay_and_events(trip, all_days, author, creator):
                 day=day,
                 trip=trip,
                 type=2,
-                start_time=time(13, 0),
-                end_time=time(14, 30),
+                estimated_duration=timedelta(minutes=90),
                 city=destination,
                 chosen_place=chosen_restaurants[0],
                 last_modified_by=creator,
@@ -68,8 +67,7 @@ def _create_stay_and_events(trip, all_days, author, creator):
                 day=day,
                 trip=trip,
                 type=3,
-                start_time=time(20, 0),
-                end_time=time(21, 30),
+                estimated_duration=timedelta(minutes=90),
                 city=destination,
                 chosen_place=chosen_restaurants[1],
                 last_modified_by=creator,
@@ -79,22 +77,15 @@ def _create_stay_and_events(trip, all_days, author, creator):
                 day=day,
                 trip=trip,
                 type=2,
-                start_time=time(13, 0),
-                end_time=time(14, 30),
+                estimated_duration=timedelta(minutes=90),
                 city=destination,
                 last_modified_by=creator,
             )
 
-        start_time = time(random.randint(8, 11), random.randrange(0, 59, 15))
-        end_time = (
-            datetime.combine(day.date, start_time)
-            + timedelta(minutes=random.randrange(60, 120, 15))
-        ).time()
         ExperienceFactory.create(
             day=day,
             trip=trip,
-            start_time=start_time,
-            end_time=end_time,
+            estimated_duration=timedelta(minutes=random.randrange(60, 120, 15)),
             city=destination,
             last_modified_by=creator,
         )
@@ -132,14 +123,10 @@ class Command(BaseCommand):
                 MainTransferFactory(
                     trip=trip,
                     direction=1,
-                    start_time=time(8, 0),
-                    end_time=time(10, 30),
                 )
                 MainTransferFactory(
                     trip=trip,
                     direction=2,
-                    start_time=time(16, 0),
-                    end_time=time(18, 30),
                 )
                 all_days = list(trip.days.all())
                 _create_stay_and_events(trip, all_days, author=user, creator=user)
@@ -173,8 +160,6 @@ class Command(BaseCommand):
                 MainTransferFactory(
                     trip=shared_trip,
                     direction=1,
-                    start_time=time(9, 0),
-                    end_time=time(11, 0),
                 )
                 all_days = list(shared_trip.days.all())
                 stay = StayFactory(city=destination, author=owner)
@@ -188,38 +173,31 @@ class Command(BaseCommand):
                         day=day,
                         trip=shared_trip,
                         type=2,
-                        start_time=time(13, 0),
-                        end_time=time(14, 30),
+                        estimated_duration=timedelta(minutes=90),
                         city=destination,
                         chosen_place=chosen[0] if chosen else None,
                         last_modified_by=owner,
                     )
-                    # Meal by collaborator
                     MealFactory.create(
                         day=day,
                         trip=shared_trip,
                         type=3,
-                        start_time=time(20, 0),
-                        end_time=time(21, 30),
+                        estimated_duration=timedelta(minutes=90),
                         city=destination,
                         chosen_place=chosen[1] if len(chosen) > 1 else None,
                         last_modified_by=collab,
                     )
-                    # Experience by owner
                     ExperienceFactory.create(
                         day=day,
                         trip=shared_trip,
-                        start_time=time(10, 0),
-                        end_time=time(12, 0),
+                        estimated_duration=timedelta(minutes=120),
                         city=destination,
                         last_modified_by=owner,
                     )
-                    # Experience by collaborator
                     ExperienceFactory.create(
                         day=day,
                         trip=shared_trip,
-                        start_time=time(15, 0),
-                        end_time=time(17, 0),
+                        estimated_duration=timedelta(minutes=120),
                         city=destination,
                         last_modified_by=collab,
                     )

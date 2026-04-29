@@ -36,8 +36,8 @@
                             <p class="text-sm font-medium truncate">{{ event.name }}</p>
                             {% if event.address %}<p class="text-xs truncate text-base-content/50">{{ event.address }}</p>{% endif %}
                         </div>
-                        {% if event.start_time %}
-                            <span class="text-xs shrink-0 text-base-content/50">{{ event.start_time|time:"H:i" }}</span>
+                        {% if event.estimated_duration %}
+                            <span class="text-xs shrink-0 text-base-content/50">{{ event.estimated_duration|duration_display }}</span>
                         {% endif %}
                     </li>
                 {% endfor %}

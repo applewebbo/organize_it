@@ -291,6 +291,20 @@ def event_type_icon(event):
     return "ph-question"
 
 
+@register.filter
+def duration_display(duration):
+    """Format a timedelta as human-readable duration (e.g. '1h 30min' or '45min')."""
+    if not duration:
+        return ""
+    total_minutes = int(duration.total_seconds() // 60)
+    hours, minutes = divmod(total_minutes, 60)
+    if hours and minutes:
+        return f"{hours}h {minutes}min"
+    elif hours:
+        return f"{hours}h"
+    return f"{minutes}min"
+
+
 @register.inclusion_tag("trips/weather-widget.html")
 def weather_widget(day):
     """Render the weather widget for a day card."""

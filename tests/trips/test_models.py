@@ -285,7 +285,7 @@ class TestEventModel:
         trip = trip_factory(author=user, title="Test Trip")
         event = event_factory(day=trip.days.first())
 
-        assert event.__str__() == f"{event.name} ({event.start_time})"
+        assert event.__str__() == event.name
         assert event.day.trip == trip
 
     @patch("geocoder.mapbox")
@@ -302,8 +302,6 @@ class TestEventModel:
         event = Event.objects.create(
             day=day,
             name="Test Event",
-            start_time="10:00",
-            end_time="11:00",
             address="Milan, Italy",
         )
 
@@ -328,8 +326,6 @@ class TestEventModel:
         event = Event.objects.create(
             day=day,
             name="Test Event",
-            start_time="10:00",
-            end_time="11:00",
             address="Milan, Italy",
         )
 
@@ -342,51 +338,6 @@ class TestEventModel:
 
         # Verify geocoder was not called again
         mock_geocoder.assert_not_called()
-
-    def test_swap_times_with_success(self, user_factory, trip_factory, event_factory):
-        """Test successful swapping of event times"""
-        user = user_factory()
-        trip = trip_factory(author=user)
-        day = trip.days.first()
-
-        event1 = event_factory(
-            day=day, name="First Event", start_time="09:00", end_time="10:00"
-        )
-        event2 = event_factory(
-            day=day, name="Second Event", start_time="14:00", end_time="15:00"
-        )
-
-        # Store original times
-        event1_original_start = event1.start_time
-        event1_original_end = event1.end_time
-        event2_original_start = event2.start_time
-        event2_original_end = event2.end_time
-
-        # Perform swap
-        event1.swap_times_with(event2)
-
-        # Verify times were swapped
-        assert event1.start_time == event2_original_start
-        assert event1.end_time == event2_original_end
-        assert event2.start_time == event1_original_start
-        assert event2.end_time == event1_original_end
-
-    def test_swap_times_with_different_days(
-        self, user_factory, trip_factory, event_factory
-    ):
-        """Test error when swapping events from different days"""
-        user = user_factory()
-        trip = trip_factory(author=user)
-        day1 = trip.days.first()
-        day2 = trip.days.last()
-
-        event1 = event_factory(day=day1, start_time="09:00", end_time="10:00")
-        event2 = event_factory(day=day2, start_time="14:00", end_time="15:00")
-
-        # Verify ValueError is raised when swapping events from different days
-        with pytest.raises(ValueError) as exc:
-            event1.swap_times_with(event2)
-        assert str(exc.value) == "Can only swap events within the same day"
 
     def test_event_trip_relationship(self, trip_factory, event_factory):
         """Test that event maintains trip relationship when unpaired from day"""
@@ -445,23 +396,19 @@ class TestEventModel:
         assert event.longitude is None
 
     def test_has_next_event_with_next_event(self, trip_factory, experience_factory):
-        """Test has_next_event returns True when there is a later event"""
+        """Test has_next_event returns True when there is an event with higher order"""
         trip = trip_factory()
         day = trip.days.first()
-        event1 = experience_factory(
-            trip=trip, day=day, start_time="10:00", end_time="11:00"
-        )
-        experience_factory(trip=trip, day=day, start_time="14:00", end_time="15:00")
+        event1 = experience_factory(trip=trip, day=day, order=0)
+        experience_factory(trip=trip, day=day, order=1)
 
         assert event1.has_next_event() is True
 
     def test_has_next_event_without_next_event(self, trip_factory, experience_factory):
-        """Test has_next_event returns False when there is no later event"""
+        """Test has_next_event returns False when no event has higher order"""
         trip = trip_factory()
         day = trip.days.first()
-        event = experience_factory(
-            trip=trip, day=day, start_time="23:00", end_time="23:59"
-        )
+        event = experience_factory(trip=trip, day=day, order=99)
 
         assert event.has_next_event() is False
 
@@ -1059,12 +1006,8 @@ class TestSimpleTransfer:
         """Test creating a SimpleTransfer between two events on same day"""
         trip = trip_factory()
         day = trip.days.first()
-        event1 = experience_factory(
-            trip=trip, day=day, start_time="10:00", end_time="11:00"
-        )
-        event2 = experience_factory(
-            trip=trip, day=day, start_time="12:00", end_time="13:00"
-        )
+        event1 = experience_factory(trip=trip, day=day, order=0)
+        event2 = experience_factory(trip=trip, day=day, order=1)
 
         transfer = SimpleTransfer.objects.create(
             from_event=event1, to_event=event2, transport_mode="car"

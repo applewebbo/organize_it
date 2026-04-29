@@ -80,8 +80,6 @@ class TripMapViewTest(TestCase):
                 latitude=45.0703,
                 longitude=7.6869,
                 category=Event.Category.EXPERIENCE,
-                start_time="10:00",
-                end_time="11:00",
             )
         with self.login(user):
             response = self.get("trips:trip-map", pk=trip.pk)
@@ -392,8 +390,6 @@ class BuildMapJsonTest(TestCase):
             latitude=45.0687,
             longitude=7.6847,
             category=Event.Category.EXPERIENCE,
-            start_time="10:00",
-            end_time="11:00",
         )
         # Meal event with coords — covers meal kind branch
         Event.objects.create(
@@ -404,8 +400,6 @@ class BuildMapJsonTest(TestCase):
             latitude=45.0703,
             longitude=7.6869,
             category=Event.Category.MEAL,
-            start_time="12:00",
-            end_time="13:00",
         )
         # Stay with coords — covers line 2946 branch
         stay = Stay.objects.create(
@@ -440,8 +434,6 @@ class BuildMapJsonTest(TestCase):
             latitude=45.0703,
             longitude=7.6869,
             category=Event.Category.EXPERIENCE,
-            start_time="10:00",
-            end_time="11:00",
         )
 
         with self.login(user):
@@ -470,8 +462,6 @@ class BuildMapJsonTest(TestCase):
                 latitude=None,
                 longitude=None,
                 category=Event.Category.EXPERIENCE,
-                start_time="10:00",
-                end_time="11:00",
             )
             # Unassigned event without coords
             Event.objects.create(
@@ -482,8 +472,6 @@ class BuildMapJsonTest(TestCase):
                 latitude=None,
                 longitude=None,
                 category=Event.Category.EXPERIENCE,
-                start_time="10:00",
-                end_time="11:00",
             )
 
         with self.login(user):
@@ -514,8 +502,6 @@ class TripLocationBiasTest(TestCase):
             latitude=45.07,
             longitude=7.68,
             category=Event.Category.EXPERIENCE,
-            start_time="10:00",
-            end_time="11:00",
         )
 
         with self.login(user):

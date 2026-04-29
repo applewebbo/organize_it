@@ -458,8 +458,8 @@ class Event(models.Model):
     )
     trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="all_events")
     name = models.CharField(max_length=100)
-    start_time = models.TimeField()
-    end_time = models.TimeField()
+    estimated_duration = models.DurationField(null=True, blank=True)
+    order = models.PositiveIntegerField(default=0, db_index=True)
     address = models.CharField(max_length=200, blank=True)
     city = models.CharField(max_length=100, blank=True)
     latitude = models.FloatField(null=True, blank=True)
@@ -486,9 +486,8 @@ class Event(models.Model):
     )
 
     class Meta:
-        ordering = ["start_time"]
+        ordering = ["order", "pk"]
         indexes = [
-            models.Index(fields=["day_id", "start_time"]),
             models.Index(fields=["trip_id"]),
         ]
 
@@ -518,37 +517,13 @@ class Event(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self) -> str:
-        return f"{self.name} ({self.start_time})"
-
-    def swap_times_with(self, other_event):
-        """
-        Swap start and end times with another event.
-        Both events must belong to the same day.
-        """
-        if self.day_id != other_event.day_id:
-            raise ValueError("Can only swap events within the same day")
-
-        self.start_time, other_event.start_time = (
-            other_event.start_time,
-            self.start_time,
-        )
-        self.end_time, other_event.end_time = other_event.end_time, self.end_time
-
-        # Save both events
-        self.save()
-        other_event.save()
+        return self.name
 
     def has_next_event(self):
-        """
-        Check if there is a next event on the same day (later start time).
-        Used to determine if a simple transfer can be created.
-        """
-        if not self.day or not self.start_time:
+        """Check if there is another event on the same day with a higher order."""
+        if not self.day:
             return False
-
-        return Event.objects.filter(
-            day=self.day, start_time__gt=self.start_time
-        ).exists()
+        return Event.objects.filter(day=self.day, order__gt=self.order).exists()
 
 
 @receiver(pre_save, sender=Event)
@@ -599,7 +574,7 @@ class SimpleTransfer(models.Model):
         db_table = "trips_simple_transfer"
         verbose_name = _("Simple Transfer")
         verbose_name_plural = _("Simple Transfers")
-        ordering = ["day__number", "from_event__start_time"]
+        ordering = ["day__number", "from_event__order"]
         constraints = [
             models.CheckConstraint(
                 condition=~models.Q(from_event=models.F("to_event")),

@@ -12,7 +12,7 @@
                hx-get="{% url 'trips:event-detail' event.pk %}"
                @click="$dispatch('open-modal'); document.activeElement.blur()"
                hx-target="#dialog"
-               hx-swap="innerHTML">{{ event.name }}</a>&nbsp;<span class="badge badge-sm badge-outline badge-info">{{ event.start_time }}</span>
+               hx-swap="innerHTML">{{ event.name }}</a>
         </div>
         {% if not transfer_from and event.has_next_event %}
             <button class="btn btn-xs btn-outline"

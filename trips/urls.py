@@ -97,18 +97,9 @@ htmx_urlpatterns = [
         name="confirm-enrich-event",
     ),
     path(
-        "events/<int:pk>/change-times",
-        views.event_change_times,
-        name="event-change-times",
-    ),
-    path(
-        "days/<int:day_id>/check-overlap/",
-        views.check_event_overlap,
-        name="check-event-overlap",
-    ),
-    path("events/<int:pk1>/swap/<int:pk2>/", views.event_swap, name="event-swap"),
-    path(
-        "events/<int:pk>/swap-choices", views.event_swap_modal, name="event-swap-modal"
+        "days/<int:day_id>/reorder-events/",
+        views.reorder_events,
+        name="reorder-events",
     ),
     # SIMPLE TRANSFERS
     path(

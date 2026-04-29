@@ -256,12 +256,15 @@ class EventForm(forms.ModelForm):
         choices=[
             (
                 i * 30,
-                (datetime.min + timedelta(minutes=i * 30)).strftime("%H h %M min"),
+                (datetime.min + timedelta(minutes=i * 30)).strftime("%H h %M min")
+                if i > 0
+                else _("Not specified"),
             )
             for i in range(16)
         ],
         label=_("Duration"),
-        initial=60,
+        initial=0,
+        required=False,
     )
 
     name = forms.CharField(
@@ -302,7 +305,6 @@ class EventForm(forms.ModelForm):
             "name",
             "city",
             "address",
-            "start_time",
             "duration",
             "website",
             "phone_number",
@@ -310,7 +312,6 @@ class EventForm(forms.ModelForm):
         formfield_callback = urlfields_assume_https
         labels = {
             "address": _("Address"),
-            "start_time": _("Start Time"),
             "website": _("Website"),
         }
         widgets = {
@@ -318,7 +319,6 @@ class EventForm(forms.ModelForm):
             "city": forms.TextInput(attrs={"placeholder": _("City")}),
             "website": forms.TextInput(attrs={"placeholder": _("Website")}),
             "address": forms.TextInput(attrs={"placeholder": _("Address")}),
-            "start_time": forms.TimeInput(attrs={"type": "time"}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -355,11 +355,11 @@ class EventForm(forms.ModelForm):
             self.fields["address"].widget.attrs.update(address_htmx_attrs)
         layout_fields.append(Field("name", wrapper_class="sm:col-span-2"))
         layout_fields.append(Field("city", wrapper_class="sm:col-span-2"))
-        if self.instance.pk and self.instance.end_time and self.instance.start_time:
-            start_time = datetime.combine(date.today(), self.instance.start_time)
-            end_time = datetime.combine(date.today(), self.instance.end_time)
-            duration = (end_time - start_time).total_seconds() // 60
-            self.initial["duration"] = int(duration)
+        if self.instance.pk and self.instance.estimated_duration:
+            duration_minutes = int(
+                self.instance.estimated_duration.total_seconds() // 60
+            )
+            self.initial["duration"] = duration_minutes
 
         # Opening hours dynamic fields
         days = [
@@ -427,19 +427,10 @@ class EventForm(forms.ModelForm):
             ),
             HTML(ADDRESS_RESULTS_HTML),
             Field(
-                "start_time",
-                x_ref="startTime",
-                **{"x-on:change": "checkOverlap()"},
+                "duration",
                 wrapper_class="sm:col-span-2",
             ),
-            Field(
-                "duration",
-                x_ref="duration",
-                **{"x-on:change": "checkOverlap()"},
-                wrapper_class="sm:col-span-1",
-            ),
             Field("type", css_class="select select-primary"),
-            Div(id="overlap-warning", css_class="sm:col-span-4"),
             Field("website", wrapper_class="sm:col-span-4"),
             Field("phone_number", wrapper_class="sm:col-span-4"),
             HTML(
@@ -500,11 +491,10 @@ class EventForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super().save(commit=False)
-        # convert duration to end_time
-        duration = self.cleaned_data.get("duration")
-        start_time = datetime.combine(date.today(), self.cleaned_data["start_time"])
-        end_time = start_time + timedelta(minutes=int(duration))
-        instance.end_time = end_time.time()
+        duration_minutes = int(self.cleaned_data.get("duration") or 0)
+        instance.estimated_duration = (
+            timedelta(minutes=duration_minutes) if duration_minutes > 0 else None
+        )
 
         # Build opening_hours JSON from form fields
         opening_hours = {}
@@ -722,46 +712,6 @@ class StayForm(forms.ModelForm):
             day.stay = stay
             day.save()
         return stay
-
-
-class EventChangeTimesForm(forms.ModelForm):
-    start_time = forms.TimeField(
-        label=_("Start Time"),
-        widget=forms.TimeInput(attrs={"type": "time"}),
-    )
-    end_time = forms.TimeField(
-        label=_("End Time"),
-        widget=forms.TimeInput(attrs={"type": "time"}),
-    )
-
-    class Meta:
-        model = Event
-        fields = ["start_time", "end_time"]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_tag = False
-        self.helper.layout = Layout(
-            Div(
-                "start_time",
-                css_class="sm:col-span-2",
-            ),
-            Div(
-                "end_time",
-                css_class="sm:col-span-2",
-            ),
-        )
-
-    def clean(self):
-        cleaned_data = super().clean()
-        start_time = cleaned_data.get("start_time")
-        end_time = cleaned_data.get("end_time")
-
-        if start_time and end_time and start_time >= end_time:
-            raise ValidationError("End time must be after start time")
-
-        return cleaned_data
 
 
 class NoteForm(forms.ModelForm):

@@ -1,4 +1,4 @@
-from datetime import date, time, timedelta
+from datetime import date, timedelta
 from unittest.mock import patch
 
 import pytest
@@ -11,7 +11,6 @@ from tests.trips.factories import (
 )
 from trips.forms import (
     AddNoteToStayForm,
-    EventChangeTimesForm,
     ExperienceForm,
     LinkForm,
     MealForm,
@@ -131,24 +130,22 @@ class TestNoteForm:
 class TestExperienceForm:
     @patch("geocoder.mapbox")
     def test_form(self, mock_geocoder, user_factory, trip_factory):
-        """Test that the form saves an experience"""
+        """Test that the form saves an experience with estimated_duration"""
         mock_geocoder.return_value.ok = True
         mock_geocoder.return_value.latlng = [45.4773, 9.1815]
 
         data = {
             "name": "Uffizi Gallery",
-            "type": 1,  # MUSEUM
+            "type": 1,
             "address": "Piazzale degli Uffizi, Florence",
-            "start_time": "10:00",
-            "duration": "60",  # 1 hour
-            "url": "https://example.com",
+            "duration": "60",
         }
         form = ExperienceForm(data=data)
 
         assert form.is_valid()
         experience = form.save(commit=False)
         assert experience.name == "Uffizi Gallery"
-        assert experience.end_time.strftime("%H:%M") == "11:00"
+        assert experience.estimated_duration.total_seconds() == 3600
 
     @patch("geocoder.mapbox")
     def test_form_url_assumes_https(self, mock_geocoder, user_factory, trip_factory):
@@ -164,7 +161,6 @@ class TestExperienceForm:
             "name": "Colosseum",
             "type": 1,
             "address": "Piazza del Colosseo, Rome",
-            "start_time": "09:00",
             "duration": "90",
             "website": "example.com",
         }
@@ -179,42 +175,23 @@ class TestExperienceForm:
     def test_init_with_existing_instance(
         self, user_factory, trip_factory, experience_factory
     ):
-        """Test form initialization with existing experience instance"""
+        """Test form initialization with existing experience populates duration"""
+        from datetime import timedelta
+
         user = user_factory()
         trip = trip_factory(author=user)
         day = trip.days.first()
         experience = experience_factory(
-            start_time=time(10, 0), end_time=time(11, 30), day=day
+            estimated_duration=timedelta(minutes=90), day=day
         )
 
         form = ExperienceForm(instance=experience)
 
-        # Check that duration was calculated correctly from start/end time
         assert form.initial["duration"] == 90
 
     @patch("geocoder.mapbox")
-    def test_save_with_duration(self, mock_geocoder):
-        """Test save method properly converts duration to end_time"""
-        mock_geocoder.return_value.ok = True
-        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
-
-        data = {
-            "name": "Walking Tour",
-            "type": 1,
-            "address": "Starting Point",
-            "start_time": "14:00",
-            "duration": "120",
-            "url": "https://example.com",
-        }
-        form = ExperienceForm(data=data)
-
-        assert form.is_valid()
-        experience = form.save(commit=False)
-        assert experience.end_time.strftime("%H:%M") == "16:00"
-
-    @patch("geocoder.mapbox")
     def test_save_without_commit(self, mock_geocoder):
-        """Test save method with commit=False"""
+        """Test save method with commit=False does not persist"""
         mock_geocoder.return_value.ok = True
         mock_geocoder.return_value.latlng = [45.4773, 9.1815]
 
@@ -222,17 +199,27 @@ class TestExperienceForm:
             "name": "Walking Tour",
             "type": 1,
             "address": "Starting Point",
-            "start_time": "14:00",
             "duration": "120",
-            "url": "https://example.com",
         }
         form = ExperienceForm(data=data)
 
         assert form.is_valid()
         experience = form.save(commit=False)
-        assert experience.end_time.strftime("%H:%M") == "16:00"
-        # Verify that the instance wasn't saved to the database
+        assert experience.estimated_duration.total_seconds() == 7200
         assert not Experience.objects.filter(name="Walking Tour").exists()
+
+    def test_save_with_no_duration(self):
+        """Test that duration=0 sets estimated_duration to None"""
+        data = {
+            "name": "Free wander",
+            "type": 5,
+            "address": "Somewhere",
+            "duration": "0",
+        }
+        form = ExperienceForm(data=data)
+        assert form.is_valid()
+        instance = form.save(commit=False)
+        assert instance.estimated_duration is None
 
     def test_save_with_opening_hours(self):
         """Test save method with opening hours data."""
@@ -240,13 +227,12 @@ class TestExperienceForm:
             "name": "Test Cafe",
             "type": 1,
             "address": "Someplace",
-            "start_time": "10:00",
             "duration": "60",
             "website": "https://example.com",
-            "monday_closed": "on",  # closed
+            "monday_closed": "on",
             "tuesday_open": "09:00",
-            "tuesday_close": "17:00",  # open
-            "wednesday_open": "10:00",  # only open
+            "tuesday_close": "17:00",
+            "wednesday_open": "10:00",
         }
         form = ExperienceForm(data=data)
         assert form.is_valid()
@@ -261,24 +247,22 @@ class TestExperienceForm:
 class TestMealForm:
     @patch("geocoder.mapbox")
     def test_form(self, mock_geocoder, user_factory, trip_factory):
-        """Test that the form saves a meal"""
+        """Test that the form saves a meal with estimated_duration"""
         mock_geocoder.return_value.ok = True
         mock_geocoder.return_value.latlng = [45.4773, 9.1815]
 
         data = {
             "name": "La Pergola",
-            "type": 1,  # LUNCH
+            "type": 1,
             "address": "Via Alberto Cadlolo, 101, Rome",
-            "start_time": "13:00",
-            "duration": "60",  # 1 hour
-            "url": "https://example.com",
+            "duration": "60",
         }
         form = MealForm(data=data)
 
         assert form.is_valid()
         meal = form.save(commit=False)
         assert meal.name == "La Pergola"
-        assert meal.end_time.strftime("%H:%M") == "14:00"
+        assert meal.estimated_duration.total_seconds() == 3600
 
     @patch("geocoder.mapbox")
     def test_form_url_assumes_https(self, mock_geocoder, user_factory, trip_factory):
@@ -292,9 +276,8 @@ class TestMealForm:
 
         data = {
             "name": "Osteria Francescana",
-            "type": 2,  # DINNER
+            "type": 2,
             "address": "Via Stella, 22, Modena",
-            "start_time": "20:00",
             "duration": "90",
             "website": "example.com",
         }
@@ -309,36 +292,17 @@ class TestMealForm:
     def test_init_with_existing_instance(
         self, user_factory, trip_factory, meal_factory
     ):
-        """Test form initialization with existing meal instance"""
+        """Test form initialization with existing meal populates duration"""
+        from datetime import timedelta
+
         user = user_factory()
         trip = trip_factory(author=user)
         day = trip.days.first()
-        meal = meal_factory(start_time=time(12, 0), end_time=time(13, 30), day=day)
+        meal = meal_factory(estimated_duration=timedelta(minutes=90), day=day)
 
         form = MealForm(instance=meal)
 
-        # Check that duration was calculated correctly from start/end time
         assert form.initial["duration"] == 90
-
-    @patch("geocoder.mapbox")
-    def test_save_with_duration(self, mock_geocoder):
-        """Test save method properly converts duration to end_time"""
-        mock_geocoder.return_value.ok = True
-        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
-
-        data = {
-            "name": "Quick Lunch",
-            "type": 1,
-            "address": "Restaurant Address",
-            "start_time": "12:00",
-            "duration": "30",
-            "url": "https://example.com",
-        }
-        form = MealForm(data=data)
-
-        assert form.is_valid()
-        meal = form.save(commit=False)
-        assert meal.end_time.strftime("%H:%M") == "12:30"
 
 
 class TestStayForm:
@@ -421,40 +385,6 @@ class TestStayForm:
         assert "phone_number" in form.errors
 
 
-class TestEventChangeTimesForm:
-    """Test suite for EventChangeTimesForm"""
-
-    def test_form_valid(self, user_factory, trip_factory, experience_factory):
-        """Test that form accepts valid time inputs"""
-        user = user_factory()
-        trip = trip_factory(author=user)
-        day = trip.days.first()
-        experience = experience_factory(day=day)
-
-        data = {"start_time": "09:00", "end_time": "10:00"}
-        form = EventChangeTimesForm(data=data, instance=experience)
-
-        assert form.is_valid()
-        event = form.save()
-        assert event.start_time.strftime("%H:%M") == "09:00"
-        assert event.end_time.strftime("%H:%M") == "10:00"
-
-    def test_form_invalid_end_time_before_start_time(
-        self, user_factory, trip_factory, experience_factory
-    ):
-        """Test that form rejects end time before start time"""
-        user = user_factory()
-        trip = trip_factory(author=user)
-        day = trip.days.first()
-        experience = experience_factory(day=day)
-
-        data = {"start_time": "10:00", "end_time": "09:00"}
-        form = EventChangeTimesForm(data=data, instance=experience)
-
-        assert not form.is_valid()
-        assert "End time must be after start time" in form.non_field_errors()
-
-
 class TestAddNoteToStayForm:
     def test_form_valid(self, user_factory, trip_factory, stay_factory):
         """
@@ -479,7 +409,6 @@ class TestEventForm:
         data = {
             "name": "Test Event",
             "address": "Test Address",
-            "start_time": "10:00",
             "duration": "60",
             "type": 1,
             "website": "https://example.com",

@@ -10,8 +10,7 @@ import requests
 from django.conf import settings
 from django.core.cache import cache
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.db.models import BooleanField, Case, F, Max, Min, Prefetch, Q, When, Window
-from django.db.models.functions import Lag, Lead
+from django.db.models import Max, Min, Prefetch, Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from PIL import Image
@@ -38,34 +37,6 @@ def get_trip_for_owner_or_404(pk, user):
 logger = logging.getLogger(__name__)
 
 
-def annotate_event_overlaps(queryset):
-    """
-    Annotates events with overlap information using window functions.
-    An event overlaps when either:
-    - Its start time is before the next event's end time
-    - Its end time is after the previous event's start time
-
-    Returns: Queryset annotated with has_overlap boolean field
-    """
-    return queryset.annotate(
-        next_start=Window(
-            expression=Lead("start_time"), partition_by="day_id", order_by="start_time"
-        ),
-        prev_end=Window(
-            expression=Lag("end_time"), partition_by="day_id", order_by="start_time"
-        ),
-    ).annotate(
-        has_overlap=Case(
-            When(
-                Q(end_time__gt=F("next_start")) | Q(start_time__lt=F("prev_end")),
-                then=True,
-            ),
-            default=False,
-            output_field=BooleanField(),
-        )
-    )
-
-
 def get_flight_origin_icao(transfer):
     """Return ICAO code for origin airport of a flight transfer, or empty string."""
     if transfer and transfer.type == MainTransfer.Type.PLANE and transfer.origin_code:
@@ -89,9 +60,7 @@ def get_trips(user):
             Trip.objects.prefetch_related(
                 Prefetch(
                     "days__events",
-                    queryset=annotate_event_overlaps(Event.objects.all()).order_by(
-                        "start_time"
-                    ),
+                    queryset=Event.objects.all().order_by("order", "pk"),
                 ),
                 "days__stay__transfer_from",
                 "days__stay__transfer_to",
@@ -120,9 +89,7 @@ def get_trips(user):
         latest_qs = base_qs.prefetch_related(
             Prefetch(
                 "days__events",
-                queryset=annotate_event_overlaps(Event.objects.all()).order_by(
-                    "start_time"
-                ),
+                queryset=Event.objects.all().order_by("order", "pk"),
             ),
             "days__stay__transfer_from",
             "days__stay__transfer_to",
@@ -994,11 +961,13 @@ def get_next_events(day, from_event):
     Returns:
         QuerySet of Event objects occurring after from_event
     """
-    if not from_event or not from_event.start_time:
-        return Event.objects.filter(day=day).order_by("start_time")
+    if not from_event:
+        return Event.objects.filter(day=day).order_by("order", "pk")
 
-    return Event.objects.filter(day=day, start_time__gt=from_event.start_time).order_by(
-        "start_time"
+    return (
+        Event.objects.filter(day=day, order__gte=from_event.order)
+        .exclude(pk=from_event.pk)
+        .order_by("order", "pk")
     )
 
 

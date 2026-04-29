@@ -126,22 +126,26 @@ The app has two main Django apps: `accounts` and `trips`.
 **Core Entity Relationships:**
 - `Trip` (1) → (many) `Day` - A trip contains multiple days
 - `Trip` (many) → (many) `Link` - A trip can have multiple links (URLs)
-- `Day` (1) → (many) `Event` - Each day can have multiple events
-- `Day` (1) → (0-1) `Stay` - Each day can have one stay (hotel, etc.)
-- `Event` is a polymorphic parent model with three child types:
-  - `Transport` - Movement between locations (has destination field)
-  - `Experience` - Activities, museums, walks, etc.
-  - `Meal` - Restaurants, food experiences
-- `Trip` (1) → (many) `Event` via `all_events` - Direct trip→event relationship for orphaned events
+- `Day` (many) → (0-1) `Stay` via FK on Day - Each day optionally belongs to a stay; a single Stay can span multiple consecutive days
+- `Day` (1) → (many) `Event` - Each day can have multiple events (nullable, so events can be "unpaired")
+- `Event` is a polymorphic parent model with **two** concrete child types (STI via `category` field):
+  - `Experience` - Activities, museums, walks, etc. (`category=2`)
+  - `Meal` - Restaurants, food experiences (`category=3`)
+- `Trip` (1) → (many) `Event` via `all_events` - Direct trip→event relationship (includes orphaned events)
+- `MainTransfer` - Arrival/departure transfers for a trip (plane, train, car, other). Has `start_time`/`end_time`. Max one per direction per trip.
+- `SimpleTransfer` - Transfer between two consecutive `Event` objects on the same day. Links `from_event` → `to_event` (OneToOne each side).
+- `StayTransfer` - Transfer between two `Stay` objects on consecutive days. Has optional `departure_time` and `estimated_duration`.
+- `MainTransferConnection` - Links a `MainTransfer` to either an `Event` or a `Stay` (the first/last point of the trip).
 
 **Key Model Behaviors:**
 - Trip status auto-updates based on dates (NOT_STARTED → IMPENDING → IN_PROGRESS → COMPLETED → ARCHIVED)
 - Trip images can be uploaded directly or searched/downloaded from Unsplash with attribution tracking
 - Days auto-generate/update when trip dates change via `update_trip_days` signal (trips/models.py:63)
 - Events can be "unpaired" (day=None) and later paired to days
-- Stays can span multiple consecutive days
+- A Stay spans multiple days: `Stay` is referenced by multiple `Day` objects via FK (`Day.stay`)
 - All location-based models (Event, Stay) auto-geocode addresses on save using Mapbox
-- Single Table Inheritance pattern: Transport/Experience/Meal extend Event with category field
+- STI pattern: `Experience` and `Meal` extend `Event`; `category` field is auto-set in their `save()` methods
+- `Event.order` field controls display ordering within a day (drag & drop); `Event.estimated_duration` replaces `start_time`/`end_time` for Experience/Meal
 
 ### Views Architecture
 
@@ -153,7 +157,6 @@ The app has two main Django apps: `accounts` and `trips`.
 
 **Optimization patterns:**
 - Uses `prefetch_related` and `select_related` heavily to avoid N+1 queries
-- `annotate_event_overlaps` function (trips/utils.py) uses window functions to detect time conflicts
 - Day-based queries always prefetch events and stays together
 
 ### Forms & Geocoding
@@ -324,7 +327,7 @@ if form.is_valid():
 qs = Day.objects.prefetch_related(
     Prefetch(
         "events",
-        queryset=annotate_event_overlaps(Event.objects.all()).order_by("start_time"),
+        queryset=Event.objects.all().order_by("order", "pk"),
     ),
     "stay",
 ).select_related("trip__author")
@@ -332,7 +335,7 @@ qs = Day.objects.prefetch_related(
 
 ### Polymorphic Event Handling
 ```python
-event = get_event_instance(event)  # Returns Transport/Experience/Meal instance
+event = get_event_instance(event)  # Returns Experience or Meal instance
 ```
 
 ## Important Notes

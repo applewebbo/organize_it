@@ -816,8 +816,6 @@ class EventFactory(factory.django.DjangoModelFactory):
     address = factory.LazyAttribute(lambda o: o.chosen_place["address"])
     latitude = factory.LazyAttribute(lambda o: o.chosen_place.get("latitude"))
     longitude = factory.LazyAttribute(lambda o: o.chosen_place.get("longitude"))
-    start_time = factory.LazyFunction(lambda: time(10, 0))
-    end_time = factory.LazyFunction(lambda: time(11, 0))
     website = factory.Faker("url")
     notes = factory.Maybe(
         factory.Faker("pybool"),
@@ -844,8 +842,6 @@ class ExperienceFactory(factory.django.DjangoModelFactory):
     address = factory.LazyAttribute(lambda o: o.chosen_place["address"])
     latitude = factory.LazyAttribute(lambda o: o.chosen_place.get("latitude"))
     longitude = factory.LazyAttribute(lambda o: o.chosen_place.get("longitude"))
-    start_time = factory.LazyFunction(lambda: time(10, 0))
-    end_time = factory.LazyFunction(lambda: time(11, 0))
     type = factory.Faker("random_element", elements=[1, 2, 3, 4, 5])
     category = 2
     website = factory.Maybe(factory.Faker("pybool"), factory.Faker("url"), "")
@@ -874,8 +870,6 @@ class MealFactory(factory.django.DjangoModelFactory):
     address = factory.LazyAttribute(lambda o: o.chosen_place["address"])
     latitude = factory.LazyAttribute(lambda o: o.chosen_place.get("latitude"))
     longitude = factory.LazyAttribute(lambda o: o.chosen_place.get("longitude"))
-    start_time = factory.LazyFunction(lambda: time(10, 0))
-    end_time = factory.LazyFunction(lambda: time(11, 0))
     type = factory.Faker("random_element", elements=[1, 2, 3, 4])
     category = 3
     website = factory.Maybe(factory.Faker("pybool"), factory.Faker("url"), "")

@@ -9,6 +9,7 @@ from tests.trips.factories import (
 )
 from trips.templatetags.trip_tags import (
     dict_get,
+    duration_display,
     event_bg_color,
     event_border_color,
     event_icon,
@@ -705,3 +706,29 @@ class TestUserDisplayName:
 
     def test_none_user_returns_empty(self):
         assert user_display_name(None) == ""
+
+
+class TestDurationDisplay:
+    def test_none_returns_empty(self):
+
+        assert duration_display(None) == ""
+
+    def test_zero_returns_empty(self):
+        from datetime import timedelta
+
+        assert duration_display(timedelta(0)) == ""
+
+    def test_minutes_only(self):
+        from datetime import timedelta
+
+        assert duration_display(timedelta(minutes=45)) == "45min"
+
+    def test_hours_only(self):
+        from datetime import timedelta
+
+        assert duration_display(timedelta(hours=2)) == "2h"
+
+    def test_hours_and_minutes(self):
+        from datetime import timedelta
+
+        assert duration_display(timedelta(hours=1, minutes=30)) == "1h 30min"

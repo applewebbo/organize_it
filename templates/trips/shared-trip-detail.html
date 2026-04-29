@@ -37,10 +37,10 @@
             {% for event in day.events.all %}
                 <div class="p-3 mb-2 rounded-lg border border-base-300 bg-base-100">
                     <div class="flex gap-2 items-center">
-                        {% if event.start_time %}
-                            <span class="font-mono text-xs text-base-content/50">{{ event.start_time|time:"H:i" }}</span>
-                        {% endif %}
                         <span class="font-medium">{{ event.name }}</span>
+                        {% if event.estimated_duration %}
+                            <span class="font-mono text-xs text-base-content/50">{{ event.estimated_duration|duration_display }}</span>
+                        {% endif %}
                     </div>
                     {% if event.address %}
                         <div class="mt-1 text-xs text-base-content/60">

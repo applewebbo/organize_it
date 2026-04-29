@@ -22,10 +22,8 @@ class TestSimpleTransferViews:
         """Test GET request to create simple transfer form"""
         trip = trip_factory()
         day = trip.days.first()
-        event1 = experience_factory(
-            trip=trip, day=day, start_time="10:00", end_time="11:00"
-        )
-        experience_factory(trip=trip, day=day, start_time="14:00", end_time="15:00")
+        event1 = experience_factory(trip=trip, day=day)
+        experience_factory(trip=trip, day=day)
 
         client.force_login(trip.author)
         url = reverse(
@@ -42,10 +40,8 @@ class TestSimpleTransferViews:
         """Test POST request to create simple transfer"""
         trip = trip_factory()
         day = trip.days.first()
-        event1 = experience_factory(
-            trip=trip, day=day, start_time="10:00", end_time="11:00"
-        )
-        experience_factory(trip=trip, day=day, start_time="14:00", end_time="15:00")
+        event1 = experience_factory(trip=trip, day=day)
+        experience_factory(trip=trip, day=day)
 
         client.force_login(trip.author)
         url = reverse(
@@ -81,9 +77,7 @@ class TestSimpleTransferViews:
         """Test creating transfer when no next event exists"""
         trip = trip_factory()
         day = trip.days.first()
-        event = experience_factory(
-            trip=trip, day=day, start_time="23:00", end_time="23:59"
-        )
+        event = experience_factory(trip=trip, day=day)
 
         client.force_login(trip.author)
         url = reverse(
@@ -98,12 +92,8 @@ class TestSimpleTransferViews:
         """Test GET request to edit simple transfer form"""
         trip = trip_factory()
         day = trip.days.first()
-        event1 = experience_factory(
-            trip=trip, day=day, start_time="10:00", end_time="11:00"
-        )
-        event2 = experience_factory(
-            trip=trip, day=day, start_time="14:00", end_time="15:00"
-        )
+        event1 = experience_factory(trip=trip, day=day)
+        event2 = experience_factory(trip=trip, day=day)
 
         transfer = SimpleTransfer.objects.create(
             from_event=event1, to_event=event2, transport_mode="driving"
@@ -120,12 +110,8 @@ class TestSimpleTransferViews:
         """Test POST request to edit simple transfer"""
         trip = trip_factory()
         day = trip.days.first()
-        event1 = experience_factory(
-            trip=trip, day=day, start_time="10:00", end_time="11:00"
-        )
-        event2 = experience_factory(
-            trip=trip, day=day, start_time="14:00", end_time="15:00"
-        )
+        event1 = experience_factory(trip=trip, day=day)
+        event2 = experience_factory(trip=trip, day=day)
 
         transfer = SimpleTransfer.objects.create(
             from_event=event1, to_event=event2, transport_mode="driving"
@@ -143,12 +129,8 @@ class TestSimpleTransferViews:
         """Test deleting a simple transfer"""
         trip = trip_factory()
         day = trip.days.first()
-        event1 = experience_factory(
-            trip=trip, day=day, start_time="10:00", end_time="11:00"
-        )
-        event2 = experience_factory(
-            trip=trip, day=day, start_time="14:00", end_time="15:00"
-        )
+        event1 = experience_factory(trip=trip, day=day)
+        event2 = experience_factory(trip=trip, day=day)
 
         transfer = SimpleTransfer.objects.create(
             from_event=event1, to_event=event2, transport_mode="driving"
@@ -347,8 +329,8 @@ class TestGetNextEventsForTransfer:
         """Test getting all events when no from_event is selected"""
         trip = trip_factory()
         day = trip.days.first()
-        experience_factory(trip=trip, day=day, start_time="10:00", end_time="11:00")
-        experience_factory(trip=trip, day=day, start_time="14:00", end_time="15:00")
+        experience_factory(trip=trip, day=day)
+        experience_factory(trip=trip, day=day)
 
         client.force_login(trip.author)
         url = reverse("trips:get-next-events-for-transfer", kwargs={"day_id": day.pk})
@@ -364,10 +346,8 @@ class TestGetNextEventsForTransfer:
         """Test getting only events after from_event"""
         trip = trip_factory()
         day = trip.days.first()
-        event1 = experience_factory(
-            trip=trip, day=day, start_time="10:00", end_time="11:00"
-        )
-        experience_factory(trip=trip, day=day, start_time="14:00", end_time="15:00")
+        event1 = experience_factory(trip=trip, day=day)
+        experience_factory(trip=trip, day=day)
 
         client.force_login(trip.author)
         url = reverse("trips:get-next-events-for-transfer", kwargs={"day_id": day.pk})
@@ -377,42 +357,6 @@ class TestGetNextEventsForTransfer:
         assert "events" in response.context
         # Should only return events after event1
         assert len(response.context["events"]) == 1
-
-
-class TestEventChangeTimes:
-    """Tests for event_change_times view"""
-
-    def test_event_change_times_get(self, client, trip_factory, experience_factory):
-        """Test GET request to change times form"""
-        trip = trip_factory()
-        day = trip.days.first()
-        event = experience_factory(
-            trip=trip, day=day, start_time="10:00", end_time="11:00"
-        )
-
-        client.force_login(trip.author)
-        url = reverse("trips:event-change-times", kwargs={"pk": event.pk})
-        response = client.get(url)
-
-        assert response.status_code == 200
-        assert "form" in response.context
-
-    def test_event_change_times_post(self, client, trip_factory, experience_factory):
-        """Test POST request to change event times"""
-        trip = trip_factory()
-        day = trip.days.first()
-        event = experience_factory(
-            trip=trip, day=day, start_time="10:00", end_time="11:00"
-        )
-
-        client.force_login(trip.author)
-        url = reverse("trips:event-change-times", kwargs={"pk": event.pk})
-        response = client.post(url, {"start_time": "14:00", "end_time": "15:00"})
-
-        assert response.status_code == 204
-        event.refresh_from_db()
-        assert str(event.start_time) == "14:00:00"
-        assert str(event.end_time) == "15:00:00"
 
 
 class TestMainTransferConnectionViews:
@@ -514,7 +458,7 @@ class TestMainTransferConnectionViews:
             trip=trip, direction=MainTransfer.Direction.DEPARTURE
         )
         last_day = trip.days.last()
-        event = experience_factory(trip=trip, day=last_day, start_time="20:00")
+        event = experience_factory(trip=trip, day=last_day)
         stay = stay_factory()
         last_day.stay = stay
         last_day.save()
@@ -722,9 +666,7 @@ class TestMainTransferConnectionViews:
             trip=trip, direction=MainTransfer.Direction.DEPARTURE
         )
         last_day = trip.days.last()
-        event = experience_factory(
-            trip=trip, day=last_day, start_time="20:00", end_time="21:00"
-        )
+        event = experience_factory(trip=trip, day=last_day)
 
         client.force_login(trip.author)
         url = reverse(

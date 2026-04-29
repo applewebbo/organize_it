@@ -13,27 +13,11 @@
             hx-target="#event-{{ event.pk }}"
             hx-swap="outerHTML">
             <c-event :event="event" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}" :transfer_from="event.transfer_from">
-            <div class="flex gap-2 items-center" x-data>
-                {% if event.has_overlap %}
-                    <div class="px-1 font-semibold rounded-sm me-1.5 text-error bg-slate-50 dark:bg-slate-700">!!</div>
-                {% endif %}
-                {% if day.trip.status != 5 %}
-                    <a href="#"
-                       class="flex items-center"
-                       x-data="{ showIcon: false }"
-                       @mouseenter="showIcon = true"
-                       @mouseleave="showIcon = false"
-                       hx-get="{% url 'trips:event-change-times' event.pk %}"
-                       @click="$dispatch('open-modal'); document.activeElement.blur()"
-                       hx-target="#dialog"
-                       hx-swap="innerHTML">
-                        {{ event.start_time|time:"H:i" }}&nbsp;-&nbsp;{{ event.end_time|time:"H:i" }}
-                        <i x-show="showIcon" class="ph-bold ph-pencil-simple ms-2 align-sub"></i>
-                    </a>
-                {% else %}
-                    <span>{{ event.start_time|time:"H:i" }}&nbsp;-&nbsp;{{ event.end_time|time:"H:i" }}</span>
-                {% endif %}
-            </div>
+            {% if event.estimated_duration %}
+                <div class="flex gap-2 items-center text-sm text-base-content/60">
+                    <i class="ph-bold ph-clock i-sm"></i>{{ event.estimated_duration|duration_display }}
+                </div>
+            {% endif %}
             </c-event>
         </li>
     {% endpartialdef single_event %}

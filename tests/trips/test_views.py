@@ -97,7 +97,6 @@ class HomeView(TestCase):
         assert len(response.context["fav_trip"].days.all()) == 3
 
     def test_get_with_unpaired_events(self):
-        from datetime import time as time_obj
 
         from trips.models import Experience
 
@@ -107,8 +106,6 @@ class HomeView(TestCase):
             trip=trip,
             day=None,
             name="Test Event",
-            start_time=time_obj(10, 0),
-            end_time=time_obj(11, 0),
             address="Test Address",
             city=trip.destination,
         )

@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_not_required, user_passes_test
 from django.core.mail import EmailMultiAlternatives
-from django.db import transaction
+from django.db import models, transaction
 from django.db.models import Max, Min, Prefetch, Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
@@ -27,7 +27,6 @@ from accounts.models import Profile, get_profile
 from trips.forms import (
     AddNoteToStayForm,
     CarMainTransferForm,
-    EventChangeTimesForm,
     ExperienceForm,
     FlightMainTransferForm,
     MealForm,
@@ -57,7 +56,6 @@ from trips.models import (
 from trips.services import GooglePlacesClient, GooglePlacesError
 from trips.utils import (
     accessible_trips_qs,
-    annotate_event_overlaps,
     create_day_map,
     download_unsplash_photo,
     geocode_location,
@@ -143,9 +141,7 @@ def trip_detail(request, pk):
     qs = Trip.objects.prefetch_related(
         Prefetch(
             "days__events",
-            queryset=annotate_event_overlaps(Event.objects.all()).order_by(
-                "start_time"
-            ),
+            queryset=Event.objects.all().order_by("order", "pk"),
         ),
         Prefetch(
             "days__stay",
@@ -213,9 +209,9 @@ def day_detail(request, pk):
     qs = Day.objects.prefetch_related(
         Prefetch(
             "events",
-            queryset=annotate_event_overlaps(
-                Event.objects.prefetch_related("transfer_from__to_event")
-            ).order_by("start_time"),
+            queryset=Event.objects.prefetch_related("transfer_from__to_event").order_by(
+                "order", "pk"
+            ),
         ),
         Prefetch(
             "stay",
@@ -487,6 +483,31 @@ def trip_unarchive(request, pk):
     )
 
 
+@require_http_methods(["POST"])
+def reorder_events(request, day_id):
+    """Save new event order after drag & drop. Expects JSON body: {"order": [pk1, pk2, ...]}"""
+    import json
+
+    day = get_object_or_404(Day, pk=day_id, trip__in=accessible_trips_qs(request.user))
+    try:
+        data = json.loads(request.body)
+        ordered_pks = data.get("order", [])
+    except json.JSONDecodeError, AttributeError:
+        return HttpResponse(status=400)
+
+    events = Event.objects.filter(day=day, pk__in=ordered_pks)
+    pk_to_event = {e.pk: e for e in events}
+
+    with transaction.atomic():
+        for i, pk in enumerate(ordered_pks):
+            event = pk_to_event.get(int(pk))
+            if event:
+                event.order = i
+                event.save(update_fields=["order"])
+
+    return HttpResponse(status=204)
+
+
 def add_experience(request, day_id):
     day = get_object_or_404(Day, pk=day_id, trip__in=accessible_trips_qs(request.user))
     unpaired_experiences = Event.objects.filter(
@@ -499,6 +520,10 @@ def add_experience(request, day_id):
         experience = form.save(commit=False)
         experience.day = day
         experience.last_modified_by = request.user
+        max_order = (
+            Event.objects.filter(day=day).aggregate(m=models.Max("order"))["m"] or 0
+        )
+        experience.order = max_order + 1
         experience.save()
         messages.add_message(
             request,
@@ -522,6 +547,10 @@ def add_meal(request, day_id):
         meal = form.save(commit=False)
         meal.day = day
         meal.last_modified_by = request.user
+        max_order = (
+            Event.objects.filter(day=day).aggregate(m=models.Max("order"))["m"] or 0
+        )
+        meal.order = max_order + 1
         meal.save()
         messages.add_message(
             request,
@@ -1175,7 +1204,7 @@ def get_next_events_for_transfer(request, day_id):
 
     if not from_event_id:
         # Return all events if no from_event selected
-        events = Event.objects.filter(day=day).order_by("start_time")
+        events = Event.objects.filter(day=day).order_by("order", "pk")
     else:
         from_event = get_object_or_404(Event, pk=from_event_id, day=day)
         # Use helper function to get next events
@@ -1213,14 +1242,14 @@ def main_transfer_connection_modal(request, main_transfer_pk):
         first_day = trip.days.first()
         available_stay = first_day.stay if first_day else None
         available_event = (
-            first_day.events.order_by("start_time").first() if first_day else None
+            first_day.events.order_by("order", "pk").first() if first_day else None
         )
     else:
         # For DEPARTURE: last day's stay and last event
         last_day = trip.days.last()
         available_stay = last_day.stay if last_day else None
         available_event = (
-            last_day.events.order_by("start_time").last() if last_day else None
+            last_day.events.order_by("order", "pk").last() if last_day else None
         )
 
     context = {
@@ -1276,7 +1305,7 @@ def create_main_transfer_connection(request, main_transfer_pk, destination_type)
         if destination_type == "stay":
             destination = first_day.stay
         else:
-            destination = first_day.events.order_by("start_time").first()
+            destination = first_day.events.order_by("order", "pk").first()
     else:
         # DEPARTURE
         last_day = trip.days.last()
@@ -1291,7 +1320,7 @@ def create_main_transfer_connection(request, main_transfer_pk, destination_type)
         if destination_type == "stay":
             destination = last_day.stay
         else:
-            destination = last_day.events.order_by("start_time").last()
+            destination = last_day.events.order_by("order", "pk").last()
 
     if not destination:
         messages.add_message(
@@ -1430,85 +1459,6 @@ def event_modify(request, pk):
     return TemplateResponse(request, "trips/event-modify.html", context)
 
 
-def event_change_times(request, pk):
-    """
-    Change the times of an event on the event detail card
-    """
-    qs = Event.objects.select_related("trip__author")
-    event = get_object_or_404(qs, pk=pk, trip__in=accessible_trips_qs(request.user))
-    form = EventChangeTimesForm(request.POST or None, instance=event)
-    if form.is_valid():
-        event = form.save(commit=False)
-        event.start_time = form.cleaned_data["start_time"]
-        event.end_time = form.cleaned_data["end_time"]
-        event.save()
-        messages.add_message(
-            request,
-            messages.SUCCESS,
-            _("Event times updated successfully"),
-        )
-        return HttpResponse(
-            status=204, headers={"HX-Trigger": f"eventModified{event.pk}"}
-        )
-
-    return TemplateResponse(
-        request, "trips/event-change-times.html", {"event": event, "form": form}
-    )
-
-
-def check_event_overlap(request, day_id):
-    """
-    Check if the proposed event time overlaps with existing events.
-    Returns a warning message if there's an overlap.
-    """
-    start_time = request.GET.get("start_time")
-    end_time = request.GET.get("end_time")
-
-    if not (start_time and end_time):
-        return HttpResponse("")
-
-    day = get_object_or_404(Day, pk=day_id)
-
-    overlapping_events = Event.objects.filter(
-        day=day, start_time__lt=end_time, end_time__gt=start_time
-    ).exists()
-
-    if overlapping_events:
-        return TemplateResponse(
-            request,
-            "trips/overlap-warning.html",
-            {"message": _("This event overlaps with another event")},
-        )
-
-    return HttpResponse("")
-
-
-@require_http_methods(["POST"])
-def event_swap(request, pk1, pk2):
-    """
-    Swap the times of two events.
-    Requires both events to belong to the same day and the same trip author.
-    """
-    event1 = get_object_or_404(
-        Event, pk=pk1, trip__in=accessible_trips_qs(request.user)
-    )
-    event2 = get_object_or_404(
-        Event, pk=pk2, trip__in=accessible_trips_qs(request.user)
-    )
-    day = event1.day
-
-    try:
-        with transaction.atomic():
-            event1.swap_times_with(event2)
-
-        messages.success(request, _("Events swapped successfully"))
-        return HttpResponse(status=204, headers={"HX-Trigger": f"dayModified{day.pk}"})
-
-    except ValueError as e:
-        messages.error(request, str(e))
-        return HttpResponse(status=400)
-
-
 def single_event(request, pk):
     """
     Return a single event partial for HTMX updates.
@@ -1524,25 +1474,6 @@ def single_event(request, pk):
     return TemplateResponse(
         request, "trips/includes/day-list-content.html#single_event", context
     )
-
-
-def event_swap_modal(request, pk):
-    """
-    Provide a list of events to swap with the selected event.
-    Only events from the same day and trip are shown.
-    """
-    selected_event = get_object_or_404(
-        Event, pk=pk, trip__in=accessible_trips_qs(request.user)
-    )
-    day = selected_event.day
-    swappable_events = Event.objects.filter(day=day).exclude(pk=pk)
-
-    context = {
-        "selected_event": selected_event,
-        "swappable_events": swappable_events,
-    }
-
-    return TemplateResponse(request, "trips/event-swap.html", context)
 
 
 @user_passes_test(lambda u: u.is_staff)
@@ -2353,7 +2284,7 @@ def main_transfer_step(request, trip_id):
                             "type": "stay",
                         }
                     )
-                for event in ref_day.events.order_by("start_time"):
+                for event in ref_day.events.order_by("order", "pk"):
                     if event.address:
                         event_type = (
                             "meal"
@@ -2508,9 +2439,7 @@ def shared_trip_detail(request, token):
     days = link.trip.days.prefetch_related(
         Prefetch(
             "events",
-            queryset=annotate_event_overlaps(Event.objects.all()).order_by(
-                "start_time"
-            ),
+            queryset=Event.objects.all().order_by("order", "pk"),
         ),
         Prefetch(
             "stay",
@@ -2797,7 +2726,7 @@ def _build_map_events_context(trip):
             "events",
             queryset=Event.objects.filter(
                 category__in=[Event.Category.EXPERIENCE, Event.Category.MEAL]
-            ).order_by("start_time"),
+            ).order_by("order", "pk"),
         ),
         "stay",
     ).order_by("date")
@@ -2974,8 +2903,6 @@ def _map_add_event(request, pk, category):
             address=address,
             place_id=place_id,
             category=category,
-            start_time="00:00",
-            end_time="00:00",
             last_modified_by=request.user,
         )
         if lat and lng:
