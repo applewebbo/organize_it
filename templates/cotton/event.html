@@ -1,5 +1,7 @@
 {% load i18n %}
-<div class="flex flex-col h-full rounded-lg border {{ border_color }} {{ bg_color }} overflow-hidden">
+<div class="relative flex flex-col h-full rounded-lg border {{ border_color }} {{ bg_color }} overflow-hidden">
+    <i class="hidden absolute top-1 right-1 pointer-events-none sm:block ph-bold ph-dots-six-vertical text-base-content/20"
+       aria-hidden="true"></i>
     <div class="flex-grow py-3 px-2 sm:px-4">
         <div class="flex items-start mb-3">
             <div class="{{ icon_color }} bg-slate-50 dark:bg-slate-700 mt-1 p-1 sm:p-1.5 rounded-md border-2 {{ border_color }} ">
@@ -44,6 +46,17 @@
                             hx-swap="innerHTML"
                             aria-label="{% trans 'Add transfer to next event' %}">
                         <i class="ph-bold ph-path i-sm {{ icon_color }}" aria-hidden="true"></i>
+                    </button>
+                {% endif %}
+                {% if swap_url %}
+                    <button class="btn btn-sm btn-soft sm:hidden {{ border_color }} {{ bg_color }} dark:hover:bg-slate-900/10 hover:bg-white/50"
+                            hx-get="{{ swap_url }}"
+                            hx-target="#dialog"
+                            hx-swap="innerHTML"
+                            @click="$dispatch('open-modal'); document.activeElement.blur()"
+                            aria-label="{% trans 'Reorder event' %}">
+                        <i class="ph-bold ph-arrows-down-up i-sm {{ icon_color }}"
+                           aria-hidden="true"></i>
                     </button>
                 {% endif %}
             </div>

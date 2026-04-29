@@ -7,9 +7,14 @@ htmx.on("htmx:beforeSwap", (e) => {
   }
 })
 
-// Re-initialize Alpine.js after HTMX OOB swaps
+// Re-initialize Alpine.js after HTMX swaps (OOB and normal)
 htmx.on("htmx:oobAfterSwap", (e) => {
-  // Re-initialize Alpine on the OOB swapped element
+  if (window.Alpine && e.detail.target) {
+    Alpine.initTree(e.detail.target)
+  }
+})
+
+htmx.on("htmx:afterSwap", (e) => {
   if (window.Alpine && e.detail.target) {
     Alpine.initTree(e.detail.target)
   }
@@ -211,7 +216,59 @@ window.setStationFieldsFromButton = function(button, fieldType = 'origin') {
     if (resultsDiv) resultsDiv.innerHTML = '';
 };
 
-if (window.Alpine) {
+// SortableJS drag & drop for events (sm+ only)
+function initSortableLists() {
+    if (window.innerWidth < 640) return;
+    if (typeof Sortable === "undefined") return;
+    document.querySelectorAll("[data-reorder-url]:not([data-sortable-init])").forEach((el) => {
+        el.setAttribute("data-sortable-init", "true");
+        el.querySelectorAll("[data-event-id]").forEach((li) => {
+            li.style.cursor = "grab";
+        });
+        const reorderUrl = el.dataset.reorderUrl;
+        Sortable.create(el, {
+            animation: 150,
+            filter: "button, a",
+            preventOnFilter: false,
+            ghostClass: "opacity-40",
+            onStart() {
+                el.querySelectorAll("[data-event-id]").forEach((li) => {
+                    li.style.cursor = "grabbing";
+                });
+            },
+            onEnd() {
+                el.querySelectorAll("[data-event-id]").forEach((li) => {
+                    li.style.cursor = "grab";
+                });
+                const order = [...el.querySelectorAll("[data-event-id]")].map(
+                    (li) => li.dataset.eventId
+                );
+                const csrfToken = document.cookie
+                    .split("; ")
+                    .find((c) => c.startsWith("csrftoken="))
+                    ?.split("=")[1] || "";
+                fetch(reorderUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrfToken,
+                    },
+                    body: JSON.stringify({ order }),
+                });
+            },
+        });
+    });
+}
+
+initSortableLists();
+document.addEventListener("htmx:afterSettle", () => initSortableLists());
+
+function swapButton(eventId, swapUrl, label) {
+    return { open: false };
+}
+
+document.addEventListener("alpine:init", () => {
+    Alpine.data("swapButton", swapButton);
     Alpine.data("autocompleteForm", () => ({
         geocodeTimer: null,
         addressFilled: false,
@@ -255,6 +312,4 @@ if (window.Alpine) {
             }
         }
     }));
-
-    console.log("Alpine components loaded");
-}
+});

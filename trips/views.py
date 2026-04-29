@@ -508,6 +508,49 @@ def reorder_events(request, day_id):
     return HttpResponse(status=204)
 
 
+@require_http_methods(["GET"])
+def swap_event_order_modal(request, event_id):
+    event = get_object_or_404(
+        Event,
+        pk=event_id,
+        day__trip__in=accessible_trips_qs(request.user),
+    )
+    other_events = (
+        Event.objects.filter(day=event.day).exclude(pk=event_id).order_by("order", "pk")
+    )
+    return TemplateResponse(
+        request,
+        "trips/swap-event-order-modal.html",
+        {"event": event, "other_events": other_events},
+    )
+
+
+@require_http_methods(["POST"])
+def swap_event_order(request, event_id):
+    """Swap order between two events on the same day (mobile reorder)."""
+    event = get_object_or_404(
+        Event,
+        pk=event_id,
+        day__trip__in=accessible_trips_qs(request.user),
+    )
+    try:
+        other_id = int(request.POST.get("other_event_id", ""))
+    except ValueError, TypeError:
+        return HttpResponse(status=400)
+
+    other = get_object_or_404(Event, pk=other_id, day=event.day)
+
+    with transaction.atomic():
+        event.order, other.order = other.order, event.order
+        event.save(update_fields=["order"])
+        other.save(update_fields=["order"])
+
+    return HttpResponse(
+        status=204,
+        headers={"HX-Trigger": f"dayModified{event.day.pk}"},
+    )
+
+
 def add_experience(request, day_id):
     day = get_object_or_404(Day, pk=day_id, trip__in=accessible_trips_qs(request.user))
     unpaired_experiences = Event.objects.filter(

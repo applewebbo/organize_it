@@ -101,6 +101,16 @@ htmx_urlpatterns = [
         views.reorder_events,
         name="reorder-events",
     ),
+    path(
+        "events/<int:event_id>/swap-order/",
+        views.swap_event_order,
+        name="swap-event-order",
+    ),
+    path(
+        "events/<int:event_id>/swap-order/modal/",
+        views.swap_event_order_modal,
+        name="swap-event-order-modal",
+    ),
     # SIMPLE TRANSFERS
     path(
         "simple-transfers/from-event/<int:from_event_pk>/create",

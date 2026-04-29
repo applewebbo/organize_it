@@ -140,3 +140,119 @@ class TestEventDetail(TestCase):
             response = self.get("trips:event-detail", pk=event.pk)
 
         self.response_404(response)
+
+
+class TestSwapEventOrderModal(TestCase):
+    """Test cases for the mobile swap order modal"""
+
+    def test_modal_renders(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        e1 = EventFactory(day=day, order=0)
+        EventFactory(day=day, order=1)
+
+        with self.login(user):
+            response = self.client.get(f"/events/{e1.pk}/swap-order/modal/")
+
+        self.response_200(response)
+
+    def test_modal_unauthorized(self):
+        owner = self.make_user("owner")
+        trip = TripFactory(author=owner)
+        day = trip.days.first()
+        e1 = EventFactory(day=day, order=0)
+
+        user = self.make_user("other")
+        with self.login(user):
+            response = self.client.get(f"/events/{e1.pk}/swap-order/modal/")
+
+        self.response_404(response)
+
+
+class TestSwapEventOrder(TestCase):
+    """Test cases for mobile event order swap"""
+
+    def test_swap_success(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        e1 = EventFactory(day=day, order=0)
+        e2 = EventFactory(day=day, order=1)
+
+        with self.login(user):
+            response = self.client.post(
+                f"/events/{e1.pk}/swap-order/",
+                data={"other_event_id": e2.pk},
+            )
+
+        self.response_204(response)
+        e1.refresh_from_db()
+        e2.refresh_from_db()
+        assert e1.order == 1
+        assert e2.order == 0
+
+    def test_swap_triggers_day_refresh(self):
+        user = self.make_user("user2")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        e1 = EventFactory(day=day, order=0)
+        e2 = EventFactory(day=day, order=1)
+
+        with self.login(user):
+            response = self.client.post(
+                f"/events/{e1.pk}/swap-order/",
+                data={"other_event_id": e2.pk},
+            )
+
+        assert f"dayModified{day.pk}" in response.headers.get("HX-Trigger", "")
+
+    def test_swap_invalid_other_id(self):
+        user = self.make_user("user3")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        e1 = EventFactory(day=day, order=0)
+
+        with self.login(user):
+            response = self.client.post(
+                f"/events/{e1.pk}/swap-order/",
+                data={"other_event_id": "notanumber"},
+            )
+
+        self.response_400(response)
+
+    def test_swap_other_event_different_day(self):
+        user = self.make_user("user4")
+        trip = TripFactory(author=user)
+        days = list(trip.days.all())
+        day1, day2 = days[0], days[-1] if len(days) > 1 else days[0]
+        if day1 == day2:
+            # Trip has only one day; create a second trip to get another day
+            trip2 = TripFactory(author=user)
+            day2 = trip2.days.first()
+        e1 = EventFactory(day=day1, order=0)
+        e2 = EventFactory(day=day2, order=0)
+
+        with self.login(user):
+            response = self.client.post(
+                f"/events/{e1.pk}/swap-order/",
+                data={"other_event_id": e2.pk},
+            )
+
+        self.response_404(response)
+
+    def test_swap_unauthorized(self):
+        owner = self.make_user("owner")
+        trip = TripFactory(author=owner)
+        day = trip.days.first()
+        e1 = EventFactory(day=day, order=0)
+        e2 = EventFactory(day=day, order=1)
+
+        user = self.make_user("other")
+        with self.login(user):
+            response = self.client.post(
+                f"/events/{e1.pk}/swap-order/",
+                data={"other_event_id": e2.pk},
+            )
+
+        self.response_404(response)

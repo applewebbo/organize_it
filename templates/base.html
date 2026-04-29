@@ -44,12 +44,14 @@
         </div>
         <!-- Htmx -->
         <script src="{% static 'js/htmx.min.js' %}" defer></script>
+        <!-- SortableJS -->
+        <script src="{% static 'js/sortable.js' %}" defer></script>
+        <!-- Main.js must load before Alpine to register alpine:init listener -->
+        <script src="{% static 'js/main.js' %}" defer></script>
         <!-- Alpine.js -->
         <script src="{% static 'js/alpine-collapse.min.js' %}" defer></script>
         <script src="{% static 'js/alpine-focus.min.js' %}" defer></script>
         <script src="{% static 'js/alpine.min.js' %}" defer></script>
-        <!-- Main.js -->
-        <script src="{% static 'js/main.js' %}" defer></script>
         {% django_htmx_script %}
         {% block script %}
         {% endblock script %}

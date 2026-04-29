@@ -2,24 +2,28 @@
 {% if day.trip.status == 2 or day.trip.status == 3 %}
     <div class="mb-4">{% weather_widget day %}</div>
 {% endif %}
-<ul id="events-list-{{ day.pk }}"
-    class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 grid-col">
-    {% for event in day.events.all %}
-        {% partialdef single_event inline %}
-        <li id="event-{{ event.pk }}"
-            class="h-full"
-            hx-get="{% url 'trips:single-event' event.pk %}"
-            hx-trigger="eventModified{{ event.pk }} from:body"
-            hx-target="#event-{{ event.pk }}"
-            hx-swap="outerHTML">
-            <c-event :event="event" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}" :transfer_from="event.transfer_from">
-            {% if event.estimated_duration %}
-                <div class="flex gap-2 items-center text-sm text-base-content/60">
-                    <i class="ph-bold ph-clock i-sm"></i>{{ event.estimated_duration|duration_display }}
-                </div>
-            {% endif %}
-            </c-event>
-        </li>
-    {% endpartialdef single_event %}
+{# djlint:off #}
+<ul id="events-list-{{ day.pk }}" class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 grid-col" data-day-id="{{ day.pk }}" data-reorder-url="{% url 'trips:reorder-events' day.pk %}">
+{# djlint:on #}
+{% for event in day.events.all %}
+    {% partialdef single_event inline %}
+    <li id="event-{{ event.pk }}"
+        class="h-full"
+        data-event-id="{{ event.pk }}"
+        hx-get="{% url 'trips:single-event' event.pk %}"
+        hx-trigger="eventModified{{ event.pk }} from:body"
+        hx-target="#event-{{ event.pk }}"
+        hx-swap="outerHTML">
+        {# djlint:off #}
+            <c-event :event="event" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}" :transfer_from="event.transfer_from" swap_url="{% if day.trip.status != 5 and day.events.count > 1 %}{% url 'trips:swap-event-order-modal' event.pk %}{% endif %}">
+        {# djlint:on #}
+        {% if event.estimated_duration %}
+            <div class="flex gap-2 items-center text-sm text-base-content/60">
+                <i class="ph-bold ph-clock i-sm"></i>{{ event.estimated_duration|duration_display }}
+            </div>
+        {% endif %}
+        </c-event>
+    </li>
+{% endpartialdef single_event %}
 {% endfor %}
 </ul>
