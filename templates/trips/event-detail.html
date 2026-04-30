@@ -63,6 +63,14 @@
         </button>
     {% endif %}
     <button type="button"
+            class="btn btn-info btn-soft"
+            hx-get="{% url 'trips:event-notes' event.pk %}"
+            hx-target="#dialog"
+            hx-swap="innerHTML">
+        <i class="text-xl sm:hidden ph-bold ph-note"></i>
+        <span class="hidden sm:inline">{% trans 'Notes' %}</span>
+    </button>
+    <button type="button"
             class="btn btn-success btn-soft"
             hx-get="{% url 'trips:event-modify' event.pk %}"
             hx-target="#dialog"

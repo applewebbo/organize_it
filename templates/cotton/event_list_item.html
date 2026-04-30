@@ -3,11 +3,13 @@
     <div class="flex gap-2 items-center">
         <div class="flex gap-2 items-center grow">
             {% if icon == 'fork-knife' %}
-                <i class="ph-bold ph-{{ icon }} i-sm text-yellow-500" aria-hidden="true"></i>
+                <i class="ph-bold ph-{{ icon }} i-sm text-yellow-500 shrink-0"
+                   aria-hidden="true"></i>
             {% else %}
-                <i class="ph-bold ph-{{ icon }} i-sm text-green-500" aria-hidden="true"></i>
+                <i class="ph-bold ph-{{ icon }} i-sm text-green-500 shrink-0"
+                   aria-hidden="true"></i>
             {% endif %}
-            <a class="link"
+            <a class="leading-tight link"
                href="{% url 'trips:event-detail' event.pk %}"
                hx-get="{% url 'trips:event-detail' event.pk %}"
                @click="$dispatch('open-modal'); document.activeElement.blur()"
@@ -23,14 +25,5 @@
                 <i class="ph-bold ph-path i-sm" aria-hidden="true"></i>
             </a>
         {% endif %}
-        <button class="relative btn btn-xs btn-outline"
-                hx-get="{% url 'trips:event-notes' event.pk %}"
-                @click="$dispatch('open-modal'); document.activeElement.blur()"
-                hx-target="#dialog"
-                hx-swap="innerHTML"
-                aria-label="{% trans 'View or add notes' %}">
-            <i class="ph-bold ph-paperclip i-sm" aria-hidden="true"></i>
-            <span class="absolute size-2.5 text-xs font-bold text-white {% if event.notes %}bg-slate-400 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
-        </button>
     </div>
 </li>

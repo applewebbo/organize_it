@@ -23,4 +23,10 @@
             <i class="ph-bold ph-door-open i-md text-base-content/60"></i>{{ event.opening_hours|format_opening_hours }}
         </li>
     {% endif %}
+    {% if event.notes %}
+        <li class="flex gap-2 items-center mt-1 leading-normal">
+            <i class="ph-bold ph-note i-md text-base-content/60 shrink-0"></i>
+            <span class="text-sm whitespace-pre-line">{{ event.notes }}</span>
+        </li>
+    {% endif %}
 </ul>
