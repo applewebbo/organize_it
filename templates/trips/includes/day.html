@@ -7,8 +7,11 @@
      hx-swap="outerHTML">
     <div class="flex justify-between items-center">
         <h3 class="text-base font-semibold grow">
-            {% trans 'Day' %} {{ day.number }}
-            {% if day.date %}<span class="font-normal text-base-content/50">– {{ day.date|date:"j F" }}</span>{% endif %}
+            {% if day.date %}
+                {{ day.date|date:"j F" }} <span class="font-normal text-base-content/50 ms-2">{% trans 'Day' %} {{ day.number }}</span>
+            {% else %}
+                {% trans 'Day' %} {{ day.number }}
+            {% endif %}
         </h3>
         <c-dropdown :day="day" />
     </div>
