@@ -111,27 +111,6 @@ htmx_urlpatterns = [
         views.swap_event_order_modal,
         name="swap-event-order-modal",
     ),
-    # SIMPLE TRANSFERS
-    path(
-        "simple-transfers/from-event/<int:from_event_pk>/create",
-        views.create_simple_transfer,
-        name="create-simple-transfer",
-    ),
-    path(
-        "simple-transfers/<int:pk>/edit",
-        views.edit_simple_transfer,
-        name="edit-simple-transfer",
-    ),
-    path(
-        "simple-transfers/<int:pk>/delete",
-        views.delete_simple_transfer,
-        name="delete-simple-transfer",
-    ),
-    path(
-        "simple-transfers/<int:day_id>/next-events",
-        views.get_next_events_for_transfer,
-        name="get-next-events-for-transfer",
-    ),
     # MAIN TRANSFER CONNECTIONS
     path(
         "main-transfer-connections/<int:main_transfer_pk>/modal",

@@ -9,7 +9,6 @@ from trips.models import (
     Event,
     Experience,
     Meal,
-    SimpleTransfer,
     Stay,
     StayTransfer,
 )
@@ -394,34 +393,6 @@ class TestEventModel:
         event = event_factory(address="Nowhere", latitude=None, longitude=None)
         assert event.latitude is None
         assert event.longitude is None
-
-    def test_has_next_event_with_next_event(self, trip_factory, experience_factory):
-        """Test has_next_event returns True when there is an event with higher order"""
-        trip = trip_factory()
-        day = trip.days.first()
-        event1 = experience_factory(trip=trip, day=day, order=0)
-        experience_factory(trip=trip, day=day, order=1)
-
-        assert event1.has_next_event() is True
-
-    def test_has_next_event_without_next_event(self, trip_factory, experience_factory):
-        """Test has_next_event returns False when no event has higher order"""
-        trip = trip_factory()
-        day = trip.days.first()
-        event = experience_factory(trip=trip, day=day, order=99)
-
-        assert event.has_next_event() is False
-
-    def test_has_next_event_without_day(self, trip_factory, experience_factory):
-        """Test has_next_event returns False when event has no day"""
-        trip = trip_factory()
-        day = trip.days.first()
-        event = experience_factory(trip=trip, day=day)
-        # Remove day while keeping trip
-        event.day = None
-        event.save()
-
-        assert event.has_next_event() is False
 
 
 class TestExperienceModel:
@@ -999,226 +970,43 @@ class TestMainTransferModel:
         assert transfer.destination_longitude is None
 
 
-class TestSimpleTransfer:
-    """Tests for SimpleTransfer model"""
+class TestEventGoogleMapsDirections:
+    """Tests for Event.google_maps_directions_url property"""
 
-    def test_simple_transfer_creation(self, trip_factory, experience_factory):
-        """Test creating a SimpleTransfer between two events on same day"""
+    def test_returns_url_with_address(self, trip_factory, experience_factory):
         trip = trip_factory()
         day = trip.days.first()
-        event1 = experience_factory(trip=trip, day=day, order=0)
-        event2 = experience_factory(trip=trip, day=day, order=1)
-
-        transfer = SimpleTransfer.objects.create(
-            from_event=event1, to_event=event2, transport_mode="car"
+        event = experience_factory(
+            trip=trip, day=day, address="Via Roma 1", city="Milano"
         )
+        assert event.google_maps_directions_url is not None
+        assert "google.com/maps" in event.google_maps_directions_url
+        assert "destination" in event.google_maps_directions_url
 
-        assert transfer.from_event == event1
-        assert transfer.to_event == event2
-        assert transfer.day == day
-        assert transfer.trip == trip
-        assert transfer.transport_mode == "car"
-        assert str(transfer) == f"{event1.name} → {event2.name}"
-
-    def test_simple_transfer_same_event_validation(
-        self, trip_factory, experience_factory
-    ):
-        """Test that transfer to same event fails"""
+    def test_returns_url_with_coordinates_only(self, trip_factory, experience_factory):
         trip = trip_factory()
         day = trip.days.first()
         event = experience_factory(trip=trip, day=day)
-
-        from django.core.exceptions import ValidationError
-
-        transfer = SimpleTransfer(
-            from_event=event, to_event=event, transport_mode="driving"
+        Event.objects.filter(pk=event.pk).update(
+            address="", city="", latitude=45.0, longitude=9.0
         )
-
-        with pytest.raises(ValidationError) as exc_info:
-            transfer.full_clean()
-
-        assert "Cannot create transfer to the same event" in str(exc_info.value)
-
-    def test_simple_transfer_different_days_validation(
-        self, trip_factory, experience_factory
-    ):
-        """Test that transfer between different days fails"""
-        trip = trip_factory()
-        days = list(trip.days.all())
-        event1 = experience_factory(trip=trip, day=days[0])
-        event2 = experience_factory(trip=trip, day=days[1])
-
-        from django.core.exceptions import ValidationError
-
-        transfer = SimpleTransfer(
-            from_event=event1, to_event=event2, transport_mode="driving"
-        )
-
-        with pytest.raises(ValidationError) as exc_info:
-            transfer.full_clean()
-
-        assert "Both events must be on the same day" in str(exc_info.value)
-
-    def test_simple_transfer_properties(self, trip_factory, experience_factory):
-        """Test SimpleTransfer property methods"""
-
-        trip = trip_factory()
-        day = trip.days.first()
-        event1 = experience_factory(trip=trip, day=day)
-        event2 = experience_factory(trip=trip, day=day)
-
-        transfer = SimpleTransfer.objects.create(
-            from_event=event1,
-            to_event=event2,
-            transport_mode="driving",
-        )
-
-        assert transfer.from_location == event1.name
-        assert transfer.to_location == event2.name
-        assert transfer.from_coordinates == (event1.latitude, event1.longitude)
-        assert transfer.to_coordinates == (event2.latitude, event2.longitude)
-        assert transfer.google_maps_url is not None
-        assert "google.com/maps" in transfer.google_maps_url
-
-    def test_simple_transfer_onetoone_constraint(
-        self, trip_factory, experience_factory
-    ):
-        """Test that OneToOne constraint prevents duplicate transfers"""
-        trip = trip_factory()
-        day = trip.days.first()
-        event1 = experience_factory(trip=trip, day=day)
-        event2 = experience_factory(trip=trip, day=day)
-        event3 = experience_factory(trip=trip, day=day)
-
-        from django.db import IntegrityError
-
-        # Create first transfer from event1
-        SimpleTransfer.objects.create(
-            from_event=event1, to_event=event2, transport_mode="car"
-        )
-
-        # Try to create another transfer FROM event1 (should fail - already has transfer_from)
-        with pytest.raises(IntegrityError):
-            SimpleTransfer.objects.create(
-                from_event=event1, to_event=event3, transport_mode="walk"
-            )
+        event.refresh_from_db()
+        assert event.google_maps_directions_url is not None
+        assert "45.0,9.0" in event.google_maps_directions_url
 
     @patch("geocoder.mapbox")
-    def test_simple_transfer_google_maps_url_without_addresses(
+    def test_returns_none_without_address_or_coords(
         self, mock_geocoder, trip_factory, experience_factory
     ):
-        """Test google_maps_url returns None when events lack addresses"""
         mock_geocoder.return_value.latlng = None
-
         trip = trip_factory()
         day = trip.days.first()
-        event1 = experience_factory(trip=trip, day=day)
-        event2 = experience_factory(trip=trip, day=day)
-
-        # Force addresses to empty
-        Event.objects.filter(pk__in=[event1.pk, event2.pk]).update(address="")
-        event1.refresh_from_db()
-        event2.refresh_from_db()
-
-        transfer = SimpleTransfer.objects.create(
-            from_event=event1, to_event=event2, transport_mode="car"
+        event = experience_factory(trip=trip, day=day)
+        Event.objects.filter(pk=event.pk).update(
+            address="", city="", latitude=None, longitude=None
         )
-
-        assert transfer.google_maps_url is None
-
-    def test_simple_transfer_different_trips_validation(
-        self, trip_factory, experience_factory
-    ):
-        """Test that transfer between orphaned events from different trips fails"""
-        trip1 = trip_factory()
-        trip2 = trip_factory()
-        day1 = trip1.days.first()
-        day2 = trip2.days.first()
-
-        # Create events then orphan them (remove day)
-        event1 = experience_factory(trip=trip1, day=day1)
-        event2 = experience_factory(trip=trip2, day=day2)
-        event1.day = None
-        event1.save()
-        event2.day = None
-        event2.save()
-
-        from django.core.exceptions import ValidationError
-
-        transfer = SimpleTransfer(
-            from_event=event1, to_event=event2, transport_mode="driving"
-        )
-
-        with pytest.raises(ValidationError) as exc_info:
-            transfer.full_clean()
-
-        assert "Both events must belong to the same trip" in str(exc_info.value)
-
-    def test_simple_transfer_clean_skips_validation_when_event_ids_none(
-        self, trip_factory, experience_factory
-    ):
-        """Test clean skips same-event validation when event IDs are None"""
-        trip = trip_factory()
-        day = trip.days.first()
-        experience_factory(trip=trip, day=day)
-        event2 = experience_factory(trip=trip, day=day)
-
-        # Create transfer with only to_event set (from_event_id will be None)
-        transfer = SimpleTransfer(transport_mode="car")
-        transfer.to_event = event2
-        # from_event_id is None - this should skip the same-event validation
-
-        # Will raise RelatedObjectDoesNotExist when accessing from_event
-        # but the branch for None event_id is covered
-        with pytest.raises(SimpleTransfer.from_event.RelatedObjectDoesNotExist):
-            transfer.clean()
-
-    def test_simple_transfer_clean_skips_day_validation_when_day_ids_none(
-        self, trip_factory, experience_factory
-    ):
-        """Test clean skips day validation when event day IDs are None"""
-        trip = trip_factory()
-        day = trip.days.first()
-        event1 = experience_factory(trip=trip, day=day)
-        event2 = experience_factory(trip=trip, day=day)
-
-        # Orphan events (day_id = None)
-        event1.day = None
-        event1.save()
-        event2.day = None
-        event2.save()
-
-        transfer = SimpleTransfer(
-            from_event=event1, to_event=event2, transport_mode="car"
-        )
-
-        # Should not raise day validation error - skips when day_id is None
-        # But will fail on trip validation since trips are same
-        transfer.clean()
-
-    def test_simple_transfer_clean_skips_trip_validation_when_trip_ids_none(
-        self, trip_factory, experience_factory
-    ):
-        """Test clean skips trip validation when event trip IDs are None"""
-        trip = trip_factory()
-        day = trip.days.first()
-        event1 = experience_factory(trip=trip, day=day)
-        event2 = experience_factory(trip=trip, day=day)
-
-        # Create transfer and manually set trip_id to None on events
-        transfer = SimpleTransfer(
-            from_event=event1, to_event=event2, transport_mode="car"
-        )
-
-        # Temporarily set trip_id to None to test branch
-        original_trip_id = event1.trip_id
-        event1.trip_id = None
-
-        # Should not raise trip validation error - skips when trip_id is None
-        transfer.clean()
-
-        # Restore
-        event1.trip_id = original_trip_id
+        event.refresh_from_db()
+        assert event.google_maps_directions_url is None
 
 
 class TestStayTransfer:

@@ -519,11 +519,17 @@ class Event(models.Model):
     def __str__(self) -> str:
         return self.name
 
-    def has_next_event(self):
-        """Check if there is another event on the same day with a higher order."""
-        if not self.day:
-            return False
-        return Event.objects.filter(day=self.day, order__gt=self.order).exists()
+    @property
+    def google_maps_directions_url(self):
+        """Google Maps directions URL from current location to this event's address."""
+        address = self.address or ""
+        if self.city:
+            address = f"{address}, {self.city}"
+        if address.strip():
+            return f"https://www.google.com/maps/dir/?api=1&destination={quote(address.strip())}"
+        if self.latitude and self.longitude:
+            return f"https://www.google.com/maps/dir/?api=1&destination={self.latitude},{self.longitude}"
+        return None
 
 
 @receiver(pre_save, sender=Event)
@@ -534,122 +540,6 @@ def update_event_trip(sender, instance, **kwargs):
     if instance.day_id:
         if not instance.trip_id or instance.trip_id != instance.day.trip_id:
             instance.trip = instance.day.trip
-
-
-class SimpleTransfer(models.Model):
-    """Transfer between two events on the same day"""
-
-    class TransportMode(models.TextChoices):
-        DRIVING = "driving", _("Driving")
-        WALKING = "walking", _("Walking")
-        BICYCLING = "bicycling", _("Bicycling")
-        TRANSIT = "transit", _("Transit")
-
-    # 1-to-1 relationships (max 1 transfer in/out per event)
-    from_event = models.OneToOneField(
-        Event, on_delete=models.CASCADE, related_name="transfer_from"
-    )
-    to_event = models.OneToOneField(
-        Event, on_delete=models.CASCADE, related_name="transfer_to"
-    )
-
-    # Auto-populated from events
-    day = models.ForeignKey(
-        Day, on_delete=models.CASCADE, related_name="simple_transfers"
-    )
-    trip = models.ForeignKey(
-        Trip, on_delete=models.CASCADE, related_name="simple_transfers"
-    )
-
-    # Transfer details
-    transport_mode = models.CharField(
-        max_length=50, choices=TransportMode.choices, default=TransportMode.DRIVING
-    )
-    notes = models.TextField(blank=True)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        db_table = "trips_simple_transfer"
-        verbose_name = _("Simple Transfer")
-        verbose_name_plural = _("Simple Transfers")
-        ordering = ["day__number", "from_event__order"]
-        constraints = [
-            models.CheckConstraint(
-                condition=~models.Q(from_event=models.F("to_event")),
-                name="simple_transfer_different_events",
-            )
-        ]
-        indexes = [
-            models.Index(fields=["day", "from_event"]),
-            models.Index(fields=["trip"]),
-        ]
-
-    def __str__(self):
-        return f"{self.from_event.name} → {self.to_event.name}"
-
-    @property
-    def from_location(self):
-        """Get from_event location name"""
-        return self.from_event.name
-
-    @property
-    def to_location(self):
-        """Get to_event location name"""
-        return self.to_event.name
-
-    @property
-    def from_coordinates(self):
-        """Get from_event coordinates as tuple"""
-        return (self.from_event.latitude, self.from_event.longitude)
-
-    @property
-    def to_coordinates(self):
-        """Get to_event coordinates as tuple"""
-        return (self.to_event.latitude, self.to_event.longitude)
-
-    @property
-    def google_maps_url(self):
-        """Generate Google Maps URL from addresses with travel mode"""
-        from_address = self.from_event.address
-        to_address = self.to_event.address
-
-        if from_address and to_address:
-            return (
-                f"https://www.google.com/maps/dir/?api=1"
-                f"&origin={quote(from_address)}"
-                f"&destination={quote(to_address)}"
-                f"&travelmode={self.transport_mode}"
-            )
-        return None
-
-    def clean(self):
-        """Validate SimpleTransfer constraints"""
-        super().clean()
-
-        # Check from_event != to_event
-        if self.from_event_id and self.to_event_id:
-            if self.from_event_id == self.to_event_id:
-                raise ValidationError(_("Cannot create transfer to the same event"))
-
-        # Check same day
-        if self.from_event.day_id and self.to_event.day_id:
-            if self.from_event.day_id != self.to_event.day_id:
-                raise ValidationError(
-                    _("Both events must be on the same day for SimpleTransfer")
-                )
-
-        # Check same trip
-        if self.from_event.trip_id and self.to_event.trip_id:
-            if self.from_event.trip_id != self.to_event.trip_id:
-                raise ValidationError(_("Both events must belong to the same trip"))
-
-    def save(self, *args, **kwargs):
-        """Auto-populate day and trip from events"""
-        self.day = self.from_event.day
-        self.trip = self.from_event.trip
-        super().save(*args, **kwargs)
 
 
 class StayTransfer(models.Model):
@@ -813,8 +703,8 @@ class MainTransferConnection(models.Model):
 
     transport_mode = models.CharField(
         max_length=50,
-        choices=SimpleTransfer.TransportMode.choices,
-        default=SimpleTransfer.TransportMode.DRIVING,
+        choices=StayTransfer.TransportMode.choices,
+        default=StayTransfer.TransportMode.DRIVING,
     )
     notes = models.TextField(blank=True)
 
@@ -926,7 +816,7 @@ class MainTransferConnection(models.Model):
                 _("Either event or stay must be set for the connection")
             )
 
-        if self.event_id and self.stay_id:
+        if self.event_id and self.stay_id:  # pragma: no branch
             raise ValidationError(
                 _("Cannot set both event and stay - choose only one destination")
             )

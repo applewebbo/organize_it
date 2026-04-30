@@ -16,7 +16,7 @@ from django.shortcuts import get_object_or_404
 from PIL import Image
 
 from accounts.models import get_profile
-from trips.models import Event, MainTransfer, SimpleTransfer, StayTransfer, Trip
+from trips.models import Event, MainTransfer, StayTransfer, Trip
 
 
 def accessible_trips_qs(user):
@@ -930,63 +930,6 @@ def get_station_by_id(station_id):
 
 
 # ============================================================================
-# SimpleTransfer Helper Functions
-# ============================================================================
-
-
-def get_day_simple_transfers(day):
-    """
-    Get all SimpleTransfers for a given day.
-
-    Args:
-        day: Day object
-
-    Returns:
-        QuerySet of SimpleTransfer objects for this day
-    """
-    return SimpleTransfer.objects.filter(day=day).select_related(
-        "from_event", "to_event"
-    )
-
-
-def get_next_events(day, from_event):
-    """
-    Get events that occur after the from_event on the same day.
-    Used to populate the to_event dropdown.
-
-    Args:
-        day: Day object
-        from_event: Event object (the starting event)
-
-    Returns:
-        QuerySet of Event objects occurring after from_event
-    """
-    if not from_event:
-        return Event.objects.filter(day=day).order_by("order", "pk")
-
-    return (
-        Event.objects.filter(day=day, order__gte=from_event.order)
-        .exclude(pk=from_event.pk)
-        .order_by("order", "pk")
-    )
-
-
-def can_add_simple_transfer(event):
-    """
-    Check if an event can have a SimpleTransfer in its outgoing direction.
-    An event can only have ONE transfer going out (from_event).
-
-    Args:
-        event: Event object
-
-    Returns:
-        Boolean - True if transfer can be added, False otherwise
-    """
-    if not event:
-        return False
-
-    # Check if event already has a transfer going out
-    return not hasattr(event, "transfer_from")
 
 
 # ============================================================================

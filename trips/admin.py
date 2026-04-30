@@ -5,7 +5,6 @@ from .models import (
     Experience,
     Link,
     Meal,
-    SimpleTransfer,
     Stay,
     StayTransfer,
     Trip,
@@ -23,11 +22,6 @@ admin.site.register(Link)
 @admin.register(Day)
 class DayAdmin(admin.ModelAdmin):
     list_display = ["__str__", "trip", "date"]
-
-
-@admin.register(SimpleTransfer)
-class SimpleTransferAdmin(admin.ModelAdmin):
-    list_display = ["__str__", "day", "transport_mode"]
 
 
 @admin.register(StayTransfer)

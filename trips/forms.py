@@ -19,7 +19,6 @@ from .models import (
     MainTransferConnection,
     Meal,
     ShareLink,
-    SimpleTransfer,
     Stay,
     StayTransfer,
     Trip,
@@ -1384,113 +1383,6 @@ class OtherMainTransferForm(MainTransferBaseForm):
 
 
 # ============================================================================
-# SimpleTransfer Forms
-# ============================================================================
-
-
-class SimpleTransferCreateForm(forms.ModelForm):
-    """Form for creating a SimpleTransfer between events on the same day (auto-populates from/to events)"""
-
-    class Meta:
-        model = SimpleTransfer
-        fields = ["transport_mode", "notes"]
-        labels = {
-            "transport_mode": _("Transport Mode"),
-            "notes": _("Notes"),
-        }
-        widgets = {
-            "transport_mode": TransportModeRadioSelect(),
-            "notes": forms.Textarea(attrs={"rows": 3, "placeholder": _("Notes")}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        self.from_event = kwargs.pop("from_event", None)
-        self.to_event = kwargs.pop("to_event", None)
-
-        # Create instance with from_event and to_event already set to avoid validation errors
-        if "instance" not in kwargs and self.from_event and self.to_event:
-            kwargs["instance"] = SimpleTransfer(
-                from_event=self.from_event, to_event=self.to_event
-            )
-
-        super().__init__(*args, **kwargs)
-
-        self.helper = FormHelper()
-        self.helper.form_tag = False
-
-        self.fields["transport_mode"].choices = SimpleTransfer.TransportMode.choices
-
-        self.helper.layout = Layout(
-            Field("transport_mode", wrapper_class="col-span-full"),
-            Field("notes", wrapper_class="col-span-full"),
-        )
-
-    def clean(self):
-        cleaned_data = super().clean()
-
-        if self.from_event and self.to_event:  # pragma: no branch
-            # Check that events are different
-            if self.from_event == self.to_event:
-                raise ValidationError(
-                    _("From event and to event must be different events.")
-                )
-
-            # Check that events belong to the same day
-            if self.from_event.day != self.to_event.day:
-                raise ValidationError(_("Events must be on the same day."))
-
-            # Check that from_event doesn't already have an outgoing transfer (excluding current instance)
-            # Use explicit DB query to avoid Django's reverse relation caching issues
-            from_qs = SimpleTransfer.objects.filter(from_event=self.from_event)
-            if self.instance.pk:
-                from_qs = from_qs.exclude(pk=self.instance.pk)
-            if from_qs.exists():
-                raise ValidationError(
-                    _("The from event already has an outgoing transfer.")
-                )
-
-            # Check that to_event doesn't already have an incoming transfer (excluding current instance)
-            to_qs = SimpleTransfer.objects.filter(to_event=self.to_event)
-            if self.instance.pk:
-                to_qs = to_qs.exclude(pk=self.instance.pk)
-            if to_qs.exists():
-                raise ValidationError(
-                    _("The to event already has an incoming transfer.")
-                )
-
-        return cleaned_data
-
-
-class SimpleTransferEditForm(forms.ModelForm):
-    """Form for editing an existing SimpleTransfer"""
-
-    class Meta:
-        model = SimpleTransfer
-        fields = ["transport_mode", "notes"]
-        labels = {
-            "transport_mode": _("Transport Mode"),
-            "notes": _("Notes"),
-        }
-        widgets = {
-            "transport_mode": TransportModeRadioSelect(),
-            "notes": forms.Textarea(attrs={"rows": 3, "placeholder": _("Notes")}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.helper = FormHelper()
-        self.helper.form_tag = False
-
-        self.fields["transport_mode"].choices = SimpleTransfer.TransportMode.choices
-
-        self.helper.layout = Layout(
-            Field("transport_mode", wrapper_class="col-span-full"),
-            Field("notes", wrapper_class="col-span-full"),
-        )
-
-
-# ============================================================================
 # StayTransfer Forms
 # ============================================================================
 
@@ -1642,7 +1534,7 @@ class MainTransferConnectionForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_tag = False
 
-        self.fields["transport_mode"].choices = SimpleTransfer.TransportMode.choices
+        self.fields["transport_mode"].choices = StayTransfer.TransportMode.choices
 
         self.helper.layout = Layout(
             Field("transport_mode", wrapper_class="col-span-full"),
@@ -1671,7 +1563,7 @@ class MainTransferConnectionEditForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_tag = False
 
-        self.fields["transport_mode"].choices = SimpleTransfer.TransportMode.choices
+        self.fields["transport_mode"].choices = StayTransfer.TransportMode.choices
 
         self.helper.layout = Layout(
             Field("transport_mode", wrapper_class="col-span-full"),

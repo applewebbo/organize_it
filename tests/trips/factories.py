@@ -1006,35 +1006,6 @@ class MainTransferFactory(factory.django.DjangoModelFactory):
     type_specific_data = factory.LazyFunction(dict)
 
 
-class SimpleTransferFactory(factory.django.DjangoModelFactory):
-    """Factory for SimpleTransfer (transfers between events on same day)"""
-
-    class Meta:
-        model = "trips.SimpleTransfer"
-
-    # Create two events on same day for testing
-    from_event = factory.SubFactory(ExperienceFactory)
-    to_event = factory.SubFactory(
-        ExperienceFactory,
-        trip=factory.SelfAttribute("..from_event.trip"),
-        day=factory.SelfAttribute("..from_event.day"),
-    )
-
-    # Auto-populated from events (will be set in save())
-    day = factory.SelfAttribute("from_event.day")
-    trip = factory.SelfAttribute("from_event.trip")
-
-    # Transfer details
-    transport_mode = factory.Faker(
-        "random_element", elements=["car", "train", "walk", "bus", "taxi"]
-    )
-    notes = factory.Maybe(
-        factory.Faker("pybool"),
-        factory.Faker("sentence", nb_words=6),
-        "",
-    )
-
-
 class StayTransferFactory(factory.django.DjangoModelFactory):
     """Factory for StayTransfer (transfers between stays on consecutive days)"""
 

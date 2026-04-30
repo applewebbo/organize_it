@@ -33,8 +33,6 @@ from trips.forms import (
     NoteForm,
     OtherMainTransferForm,
     ShareLinkCreateForm,
-    SimpleTransferCreateForm,
-    SimpleTransferEditForm,
     StayForm,
     StayTransferCreateForm,
     StayTransferEditForm,
@@ -46,7 +44,6 @@ from trips.models import (
     Event,
     MainTransfer,
     ShareLink,
-    SimpleTransfer,
     Stay,
     StayTransfer,
     Trip,
@@ -62,7 +59,6 @@ from trips.utils import (
     get_airport_by_iata,
     get_event_instance,
     get_flight_origin_icao,
-    get_next_events,
     get_trip_for_owner_or_404,
     get_trip_or_404,
     get_trips,
@@ -209,9 +205,7 @@ def day_detail(request, pk):
     qs = Day.objects.prefetch_related(
         Prefetch(
             "events",
-            queryset=Event.objects.prefetch_related("transfer_from__to_event").order_by(
-                "order", "pk"
-            ),
+            queryset=Event.objects.order_by("order", "pk"),
         ),
         Prefetch(
             "stay",
@@ -233,11 +227,6 @@ def day_detail(request, pk):
     else:
         default_view = get_profile(request.user).default_map_view
         show_map = default_view == "map"
-
-    # Get SimpleTransfers for this day
-    simple_transfers = day.simple_transfers.select_related(
-        "from_event", "to_event"
-    ).all()
 
     # Check if there's a StayTransfer from this day to the next
     # Use explicit DB query to avoid Django's reverse relation caching issues
@@ -270,7 +259,6 @@ def day_detail(request, pk):
     context = {
         "day": day,
         "show_map": show_map,
-        "simple_transfers": simple_transfers,
         "stay_transfer_out": stay_transfer_out,
         "stay_transfer_in": stay_transfer_in,
         "can_add_stay_transfer": can_add_stay_transfer,
@@ -1138,123 +1126,6 @@ def event_pair_choice(request, pk):
         "days": days,
     }
     return TemplateResponse(request, "trips/event-pair-choice.html", context)
-
-
-# ============================================================================
-# SimpleTransfer Views
-# ============================================================================
-
-
-def create_simple_transfer(request, from_event_pk):
-    """Create a SimpleTransfer from an event to the next event on the same day"""
-    from_event = get_object_or_404(
-        Event, pk=from_event_pk, trip__in=accessible_trips_qs(request.user)
-    )
-
-    if not from_event.day:
-        messages.add_message(
-            request,
-            messages.ERROR,
-            _("Event must be assigned to a day to create a transfer"),
-        )
-        return HttpResponse(status=204, headers={"HX-Refresh": "true"})
-
-    day = from_event.day
-
-    # Get next events
-    next_events = get_next_events(day, from_event)
-
-    if not next_events.exists():
-        messages.add_message(
-            request,
-            messages.ERROR,
-            _("No next event found for this transfer"),
-        )
-        return HttpResponse(status=204, headers={"HX-Refresh": "true"})
-
-    # Get the first next event
-    to_event = next_events.first()
-
-    form = SimpleTransferCreateForm(
-        request.POST or None, from_event=from_event, to_event=to_event
-    )
-
-    if form.is_valid():
-        simple_transfer = form.save(commit=False)
-        # from_event and to_event are already set by the form's __init__
-        simple_transfer.day = day
-        simple_transfer.trip = day.trip
-        simple_transfer.save()
-        messages.add_message(
-            request,
-            messages.SUCCESS,
-            _("Transfer created successfully"),
-        )
-        return HttpResponse(status=204, headers={"HX-Trigger": f"dayModified{day.pk}"})
-
-    context = {"form": form, "day": day, "from_event": from_event, "to_event": to_event}
-    return TemplateResponse(request, "trips/simple-transfer-create.html", context)
-
-
-def edit_simple_transfer(request, pk):
-    """Edit an existing SimpleTransfer"""
-    qs = SimpleTransfer.objects.select_related(
-        "from_event__trip__author", "to_event", "day", "trip"
-    )
-    simple_transfer = get_object_or_404(
-        qs, pk=pk, trip__in=accessible_trips_qs(request.user)
-    )
-    form = SimpleTransferEditForm(request.POST or None, instance=simple_transfer)
-
-    if form.is_valid():
-        form.save()
-        messages.add_message(
-            request,
-            messages.SUCCESS,
-            _("Transfer updated successfully"),
-        )
-        return HttpResponse(
-            status=204, headers={"HX-Trigger": f"dayModified{simple_transfer.day.pk}"}
-        )
-
-    context = {"form": form, "simple_transfer": simple_transfer}
-    return TemplateResponse(request, "trips/simple-transfer-edit.html", context)
-
-
-def delete_simple_transfer(request, pk):
-    """Delete a SimpleTransfer"""
-    qs = SimpleTransfer.objects.select_related("day__trip__author")
-    simple_transfer = get_object_or_404(
-        qs, pk=pk, trip__in=accessible_trips_qs(request.user)
-    )
-    day_id = simple_transfer.day.pk
-    simple_transfer.delete()
-    messages.add_message(
-        request,
-        messages.SUCCESS,
-        _("Transfer deleted successfully"),
-    )
-    return HttpResponse(status=204, headers={"HX-Trigger": f"dayModified{day_id}"})
-
-
-def get_next_events_for_transfer(request, day_id):
-    """
-    HTMX view to filter to_event dropdown based on selected from_event.
-    Returns only events that occur after the selected from_event on the same day.
-    """
-    day = get_object_or_404(Day, pk=day_id, trip__in=accessible_trips_qs(request.user))
-    from_event_id = request.GET.get("from_event")
-
-    if not from_event_id:
-        # Return all events if no from_event selected
-        events = Event.objects.filter(day=day).order_by("order", "pk")
-    else:
-        from_event = get_object_or_404(Event, pk=from_event_id, day=day)
-        # Use helper function to get next events
-        events = get_next_events(day, from_event)
-
-    context = {"events": events, "day": day}
-    return TemplateResponse(request, "trips/partials/to-event-options.html", context)
 
 
 # ============================================================================

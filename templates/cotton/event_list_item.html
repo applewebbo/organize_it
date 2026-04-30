@@ -14,25 +14,14 @@
                hx-target="#dialog"
                hx-swap="innerHTML">{{ event.name }}</a>
         </div>
-        {% if not transfer_from and event.has_next_event %}
-            <button class="btn btn-xs btn-outline"
-                    hx-get="{% url 'trips:create-simple-transfer' event.pk %}"
-                    @click="$dispatch('open-modal'); document.activeElement.blur()"
-                    hx-target="#dialog"
-                    hx-swap="innerHTML"
-                    aria-label="{% trans 'Add transfer to next event' %}">
+        {% if event.google_maps_directions_url %}
+            <a class="sm:hidden btn btn-xs btn-outline"
+               href="{{ event.google_maps_directions_url }}"
+               target="_blank"
+               rel="noopener noreferrer"
+               aria-label="{% trans 'Get directions' %}">
                 <i class="ph-bold ph-path i-sm" aria-hidden="true"></i>
-            </button>
-        {% elif transfer_from %}
-            <button class="relative btn btn-xs btn-outline"
-                    hx-get="{% url 'trips:edit-simple-transfer' transfer_from.pk %}"
-                    @click="$dispatch('open-modal'); document.activeElement.blur()"
-                    hx-target="#dialog"
-                    hx-swap="innerHTML"
-                    aria-label="{% trans 'Edit transfer' %}">
-                <i class="ph-bold ph-path i-sm" aria-hidden="true"></i>
-                <span class="absolute -top-1 rounded-full size-2.5 bg-slate-400 -end-1"></span>
-            </button>
+            </a>
         {% endif %}
         <button class="relative btn btn-xs btn-outline"
                 hx-get="{% url 'trips:event-notes' event.pk %}"
@@ -44,23 +33,4 @@
             <span class="absolute size-2.5 text-xs font-bold text-white {% if event.notes %}bg-slate-400 {% else %} bg-transparent {% endif %}  rounded-full -top-1 -end-1"></span>
         </button>
     </div>
-    {% if transfer_from %}
-        {% with mode=transfer_from.transport_mode %}
-            <div class="flex gap-2 items-center -mt-1 text-sm ps-5 text-slate-500 dark:text-slate-400">
-                <i class="ph-bold i-sm {% if mode == 'driving' %}ph-car{% endif %} {% if mode == 'walking' %}ph-person-simple-walk{% endif %} {% if mode == 'bicycling' %}ph-bicycle{% endif %} {% if mode == 'transit' %}ph-train{% endif %}"
-                   aria-hidden="true"></i>
-                <i class="ph-bold ph-arrow-right i-xs" aria-hidden="true"></i>
-                <span class="truncate">{{ transfer_from.to_event.name }}</span>
-                {% if transfer_from.google_maps_url %}
-                    <a href="{{ transfer_from.google_maps_url }}"
-                       target="_blank"
-                       rel="noopener noreferrer"
-                       class="btn btn-xs btn-outline ms-2"
-                       aria-label="{% trans 'Open in Google Maps' %}">
-                        <i class="ph-bold ph-map-trifold i-sm" aria-hidden="true"></i>
-                    </a>
-                {% endif %}
-            </div>
-        {% endwith %}
-    {% endif %}
 </li>

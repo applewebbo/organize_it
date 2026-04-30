@@ -17,17 +17,14 @@ from tests.trips.factories import (
     TripFactory,
 )
 from trips.utils import (
-    can_add_simple_transfer,
     can_add_stay_transfer,
     convert_google_opening_hours,
     create_day_map,
     download_unsplash_photo,
     generate_cache_key,
     geocode_location,
-    get_day_simple_transfers,
     get_day_stay_transfers,
     get_next_day_stay,
-    get_next_events,
     get_trips,
     process_trip_image,
     rate_limit_check,
@@ -1295,77 +1292,6 @@ class TestMapWithMainTransfers(TestCase):
         )
         self.assertIsNotNone(day_map)
         self.assertIn("person-walking", day_map)
-
-
-class TestSimpleTransferUtils(TestCase):
-    """Tests for SimpleTransfer utility functions"""
-
-    def test_get_simple_transfers_for_day(self):
-        """Test getting simple transfers for a day"""
-        from trips.models import SimpleTransfer
-
-        trip = TripFactory()
-        day = trip.days.first()
-        event1 = EventFactory(trip=trip, day=day)
-        event2 = EventFactory(trip=trip, day=day)
-
-        transfer = SimpleTransfer.objects.create(
-            from_event=event1, to_event=event2, transport_mode="driving"
-        )
-
-        transfers = get_day_simple_transfers(day)
-        self.assertEqual(transfers.count(), 1)
-        self.assertEqual(transfers.first(), transfer)
-
-    def test_get_next_events_with_from_event(self):
-        """Test get_next_events filters events after from_event"""
-        trip = TripFactory()
-        day = trip.days.first()
-        event1 = EventFactory(trip=trip, day=day)
-        event2 = EventFactory(trip=trip, day=day)
-        event3 = EventFactory(trip=trip, day=day)
-
-        next_events = get_next_events(day, event1)
-        self.assertEqual(next_events.count(), 2)
-        self.assertIn(event2, next_events)
-        self.assertIn(event3, next_events)
-
-    def test_get_next_events_without_from_event(self):
-        """Test get_next_events returns all events when no from_event"""
-        trip = TripFactory()
-        day = trip.days.first()
-        EventFactory(trip=trip, day=day)
-        EventFactory(trip=trip, day=day)
-
-        next_events = get_next_events(day, None)
-        self.assertEqual(next_events.count(), 2)
-
-    def test_can_add_simple_transfer_true(self):
-        """Test can_add_simple_transfer returns True for valid event"""
-        trip = TripFactory()
-        day = trip.days.first()
-        event = EventFactory(trip=trip, day=day)
-
-        self.assertTrue(can_add_simple_transfer(event))
-
-    def test_can_add_simple_transfer_false_already_has_transfer(self):
-        """Test can_add_simple_transfer returns False when event has transfer"""
-        from trips.models import SimpleTransfer
-
-        trip = TripFactory()
-        day = trip.days.first()
-        event1 = EventFactory(trip=trip, day=day)
-        event2 = EventFactory(trip=trip, day=day)
-
-        SimpleTransfer.objects.create(
-            from_event=event1, to_event=event2, transport_mode="driving"
-        )
-
-        self.assertFalse(can_add_simple_transfer(event1))
-
-    def test_can_add_simple_transfer_false_no_event(self):
-        """Test can_add_simple_transfer returns False for None"""
-        self.assertFalse(can_add_simple_transfer(None))
 
 
 class TestStayTransferUtils(TestCase):
