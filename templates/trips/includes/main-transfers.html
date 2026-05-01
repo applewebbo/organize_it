@@ -49,7 +49,7 @@
                                     <a href="{% url 'trips:train-status-redirect' arrival_transfer.pk %}"
                                        target="_blank"
                                        rel="noopener noreferrer"
-                                       class="btn btn-sm btn-soft {% if today != travel_day %}btn-disabled{% endif %}"
+                                       class="btn btn-xs sm:btn-sm btn-soft {% if today != travel_day %}btn-disabled{% endif %}"
                                        title="{% if arrival_transfer.train_number %}{% trans 'Train status' %}{% else %}{% trans 'Station departures' %}{% endif %}">
                                         <i class="ph-bold ph-train-simple"></i>
                                         <span class="hidden sm:inline">
@@ -68,7 +68,7 @@
                                     <a href="{% url 'trips:flight-status-redirect' arrival_transfer.pk %}"
                                        target="_blank"
                                        rel="noopener noreferrer"
-                                       class="btn btn-sm btn-soft {% if not today == travel_day or not flight_active %}btn-disabled{% endif %}"
+                                       class="btn btn-xs sm:btn-sm btn-soft {% if not today == travel_day or not flight_active %}btn-disabled{% endif %}"
                                        title="{% if arrival_transfer.flight_number %}{% trans 'Flight status' %}{% else %}{% trans 'Airport departures' %}{% endif %}">
                                         <i class="ph-bold ph-airplane"></i>
                                         <span class="hidden sm:inline">
@@ -81,7 +81,7 @@
                                     </a>
                                 {% endwith %}
                             {% endif %}
-                            <button class="btn btn-sm btn-soft"
+                            <button class="btn btn-xs btn-soft sm:btn-sm"
                                     hx-get="{% url 'trips:edit-main-transfer' pk=arrival_transfer.pk %}"
                                     hx-target="#dialog"
                                     hx-swap="innerHTML"
@@ -90,7 +90,7 @@
                                 <i class="ph-bold ph-pencil-simple"></i>
                                 <span class="hidden sm:inline">{% trans "Edit" %}</span>
                             </button>
-                            <button class="btn btn-sm btn-error btn-soft"
+                            <button class="btn btn-xs btn-error btn-soft sm:btn-sm"
                                     hx-delete="{% url 'trips:delete-main-transfer' pk=arrival_transfer.pk %}"
                                     hx-confirm="{% trans 'Are you sure you want to delete this main transfer?' %}"
                                     title="{% trans 'Delete transfer' %}">
@@ -99,7 +99,7 @@
                             </button>
                         </div>
                     {% else %}
-                        <button class="btn btn-sm btn-primary"
+                        <button class="btn btn-xs btn-primary sm:btn-sm"
                                 hx-get="{% url 'trips:arrival-transfer-modal' trip.pk %}"
                                 hx-target="#dialog"
                                 hx-swap="innerHTML"
@@ -222,7 +222,7 @@
                                     <a href="{% url 'trips:train-status-redirect' departure_transfer.pk %}"
                                        target="_blank"
                                        rel="noopener noreferrer"
-                                       class="btn btn-sm btn-soft {% if today != travel_day %}btn-disabled{% endif %}"
+                                       class="btn btn-xs sm:btn-sm btn-soft {% if today != travel_day %}btn-disabled{% endif %}"
                                        title="{% if departure_transfer.train_number %}{% trans 'Train status' %}{% else %}{% trans 'Station departures' %}{% endif %}">
                                         <i class="ph-bold ph-train-simple"></i>
                                         <span class="hidden sm:inline">
@@ -241,7 +241,7 @@
                                     <a href="{% url 'trips:flight-status-redirect' departure_transfer.pk %}"
                                        target="_blank"
                                        rel="noopener noreferrer"
-                                       class="btn btn-sm btn-soft {% if not today == travel_day or not flight_active %}btn-disabled{% endif %}"
+                                       class="btn btn-xs sm:btn-sm btn-soft {% if not today == travel_day or not flight_active %}btn-disabled{% endif %}"
                                        title="{% if departure_transfer.flight_number %}{% trans 'Flight status' %}{% else %}{% trans 'Airport departures' %}{% endif %}">
                                         <i class="ph-bold ph-airplane"></i>
                                         <span class="hidden sm:inline">
@@ -254,7 +254,7 @@
                                     </a>
                                 {% endwith %}
                             {% endif %}
-                            <button class="btn btn-sm btn-soft"
+                            <button class="btn btn-xs btn-soft sm:btn-sm"
                                     hx-get="{% url 'trips:edit-main-transfer' pk=departure_transfer.pk %}"
                                     hx-target="#dialog"
                                     hx-swap="innerHTML"
@@ -263,7 +263,7 @@
                                 <i class="ph-bold ph-pencil-simple"></i>
                                 <span class="hidden sm:inline">{% trans "Edit" %}</span>
                             </button>
-                            <button class="btn btn-sm btn-error btn-soft"
+                            <button class="btn btn-xs btn-error btn-soft sm:btn-sm"
                                     hx-delete="{% url 'trips:delete-main-transfer' pk=departure_transfer.pk %}"
                                     hx-confirm="{% trans 'Are you sure you want to delete this main transfer?' %}"
                                     title="{% trans 'Delete transfer' %}">
@@ -272,7 +272,7 @@
                             </button>
                         </div>
                     {% else %}
-                        <button class="btn btn-sm btn-primary"
+                        <button class="btn btn-xs btn-primary sm:btn-sm"
                                 hx-get="{% url 'trips:departure-transfer-modal' trip.pk %}"
                                 hx-target="#dialog"
                                 hx-swap="innerHTML"

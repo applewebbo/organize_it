@@ -12,6 +12,7 @@
             <div class="flex flex-col gap-5 mt-3 sm:gap-3">
                 {% for day in trip.days.all %}
                     {% include 'trips/includes/day.html' with day=day %}
+                    {% if not forloop.last %}<hr class="pb-2 sm:hidden border-base-300">{% endif %}
                 {% endfor %}
             </div>
         </div>

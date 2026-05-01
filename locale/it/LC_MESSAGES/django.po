@@ -948,6 +948,10 @@ msgstr "Rimuovi"
 msgid "No collaborators yet."
 msgstr "Nessun collaboratore."
 
+#: templates/trips/includes/collab-inline.html
+msgid "Add collaborator"
+msgstr "Aggiungi collaboratore"
+
 #: templates/trips/includes/collab-modal.html:13
 msgid "Add by email"
 msgstr "Aggiungi per email"

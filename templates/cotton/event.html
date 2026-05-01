@@ -30,7 +30,7 @@
         {% if event.day.trip.status != 5 %}
             <div class="flex flex-row gap-2 justify-end mt-2 me-2" x-data>
                 {% if event.google_maps_directions_url %}
-                    <a class="btn btn-sm btn-soft sm:hidden {{ border_color }} {{ bg_color }} dark:hover:bg-slate-900/10 hover:bg-white/50"
+                    <a class="btn btn-xs btn-soft sm:hidden {{ border_color }} {{ bg_color }} dark:hover:bg-slate-900/10 hover:bg-white/50"
                        href="{{ event.google_maps_directions_url }}"
                        target="_blank"
                        rel="noopener noreferrer"
@@ -39,7 +39,7 @@
                     </a>
                 {% endif %}
                 {% if swap_url %}
-                    <button class="btn btn-sm btn-soft sm:hidden {{ border_color }} {{ bg_color }} dark:hover:bg-slate-900/10 hover:bg-white/50"
+                    <button class="btn btn-xs btn-soft sm:hidden {{ border_color }} {{ bg_color }} dark:hover:bg-slate-900/10 hover:bg-white/50"
                             hx-get="{{ swap_url }}"
                             hx-target="#dialog"
                             hx-swap="innerHTML"

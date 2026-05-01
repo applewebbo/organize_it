@@ -6,21 +6,21 @@
         <h2 class="text-xl font-semibold tracking-tight sm:hidden">{{ trip.title }}</h2>
         <div x-data class="flex gap-1.5 sm:hidden">
             {% if trip.status != 5 and request.user == trip.author %}
-                <button class="btn btn-sm btn-soft"
+                <button class="btn btn-xs btn-soft"
                         hx-get="{% url 'trips:trip-update' trip.pk %}"
                         hx-target="#dialog"
                         hx-swap="innerHTML"
                         @click="$dispatch('open-modal'); document.activeElement.blur()"
                         aria-label="{% trans 'Edit trip' %}">
-                    <i class="ph-bold ph-pencil-simple i-md" aria-hidden="true"></i>
+                    <i class="ph-bold ph-pencil-simple i-sm" aria-hidden="true"></i>
                 </button>
-                <button class="btn btn-sm btn-soft"
+                <button class="btn btn-xs btn-soft"
                         hx-get="{% url 'trips:share-link-create' trip.pk %}"
                         hx-target="#dialog"
                         hx-swap="innerHTML"
                         @click="$dispatch('open-modal'); document.activeElement.blur()"
                         aria-label="{% trans 'Share trip' %}">
-                    <i class="ph-bold ph-share-network i-md" aria-hidden="true"></i>
+                    <i class="ph-bold ph-share-network i-sm" aria-hidden="true"></i>
                 </button>
             {% endif %}
         </div>
@@ -33,10 +33,10 @@
                 {% if trip.status != 5 %}
                     {% if request.user == trip.author or collaborations %}
                         <a href="{% url 'trips:trip-map' trip.pk %}"
-                           class="btn btn-md btn-primary"
+                           class="btn btn-md btn-soft btn-primary"
                            aria-label="{% trans 'Add events' %}">
                             <i class="ph-bold ph-map-trifold i-lg" aria-hidden="true"></i>
-                            <span class="hidden sm:inline">{% trans 'Add events' %}</span>
+                            <span class="hidden sm:inline">{% trans 'Add' %}</span>
                         </a>
                     {% endif %}
                 {% endif %}
@@ -49,7 +49,7 @@
                         @click="$dispatch('open-modal'); document.activeElement.blur()"
                         aria-label="{% trans 'Edit trip' %}">
                     <i class="ph-bold ph-pencil-simple i-lg" aria-hidden="true"></i>
-                    <span class="hidden sm:inline">{% trans 'Edit trip' %}</span>
+                    <span class="hidden sm:inline">{% trans 'Edit' %}</span>
                 </button>
                 <button class="btn btn-md btn-soft"
                         hx-get="{% url 'trips:share-link-create' trip.pk %}"
@@ -110,10 +110,5 @@
         {% if trip.status == 2 or trip.status == 3 %}
             {% weather_summary trip %}
         {% endif %}
-        {% with collaborations=trip.collaborations.all %}
-            {% if request.user == trip.author or collaborations %}
-                {% include "trips/includes/collab-inline.html" with collaborations=collaborations %}
-            {% endif %}
-        {% endwith %}
     </div>
 </div>

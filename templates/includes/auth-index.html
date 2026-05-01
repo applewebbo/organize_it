@@ -16,6 +16,13 @@
             <!-- END Stays Section -->
             <!-- Events Section -->
             {% include 'trips/includes/events-section.html' %}
+            <!-- Collaborators Section -->
+            {% with collaborations=trip.collaborations.all %}
+                {% if request.user == trip.author or collaborations %}
+                    {% include "trips/includes/collab-inline.html" with collaborations=collaborations %}
+                {% endif %}
+            {% endwith %}
+            <!-- END Collaborators Section -->
         {% endwith %}
         <!-- Other Trips Section -->
         {% if other_trips %}

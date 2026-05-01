@@ -6,9 +6,9 @@
      hx-target="#day-{{ day.pk }}"
      hx-swap="outerHTML">
     <div class="flex justify-between items-center">
-        <h3 class="text-base font-semibold grow">
+        <h3 class="text-base font-semibold">
             {% if day.date %}
-                {{ day.date|date:"j F" }} <span class="font-normal text-base-content/50 ms-2">{% trans 'Day' %} {{ day.number }}</span>
+                {{ day.date|date:"j F" }} <span class="font-normal text-base-content/50 ms-0.5">{% trans 'Day' %} {{ day.number }}</span>
             {% else %}
                 {% trans 'Day' %} {{ day.number }}
             {% endif %}

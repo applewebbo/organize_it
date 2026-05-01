@@ -10,7 +10,7 @@
             <div class="flex justify-between items-center">
                 <h2 class="text-xl font-medium sm:text-2xl">{% trans 'Where to Sleep' %}</h2>
                 {% if trip.status != 5 and request.user == trip.author %}
-                    <button class="btn btn-sm btn-soft"
+                    <button class="btn btn-xs btn-soft btn-primary sm:btn-sm"
                             x-data
                             hx-get="{% url 'trips:add-stay-for-trip' trip.pk %}"
                             hx-target="#dialog"

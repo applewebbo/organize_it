@@ -347,3 +347,4 @@ event = get_event_instance(event)  # Returns Experience or Meal instance
 - All location models geocode automatically on address change
 - Events can exist without a day (orphaned) for later scheduling
 - Trip images from Unsplash require proper attribution (automatically tracked via `image_metadata`)
+- `templates/trips/trip-detail.html` and `templates/includes/auth-index.html` share the same trip layout sections — any change to one must be verified and mirrored in the other

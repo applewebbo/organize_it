@@ -34,6 +34,13 @@
     {% partialdef days inline %}
     {% include 'trips/includes/events-section.html' %}
 {% endpartialdef %}
+<!-- Collaborators Section -->
+{% with collaborations=trip.collaborations.all %}
+    {% if request.user == trip.author or collaborations %}
+        {% include "trips/includes/collab-inline.html" with collaborations=collaborations %}
+    {% endif %}
+{% endwith %}
+<!-- END Collaborators Section -->
 {% endblock content %}
 {% block script %}
 {% endblock script %}
