@@ -527,6 +527,122 @@ def process_trip_image(image_file, max_size_mb=2):
         return None
 
 
+DAY_COLORS = [
+    "#ef4444",
+    "#f97316",
+    "#eab308",
+    "#22c55e",
+    "#06b6d4",
+    "#8b5cf6",
+    "#ec4899",
+    "#14b8a6",
+    "#f43f5e",
+    "#6366f1",
+]
+STAY_ICON_COLOR = "gray"
+
+
+def create_trip_map(days_with_events, unassigned_events):
+    """
+    Create a unified Folium map for all trip days.
+    Each day is a FeatureGroup with a distinct color; LayerControl allows toggling.
+    Stays use a neutral gray icon. Returns the HTML string (iframe srcdoc).
+    """
+    all_points = []
+
+    # Collect any point to check if map is worth creating
+    for day_data in days_with_events:
+        stay = day_data["stay"]
+        if stay and stay.latitude:
+            all_points.append((stay.latitude, stay.longitude))
+        for ev in day_data["events"]:
+            if ev.latitude and ev.longitude:
+                all_points.append((ev.latitude, ev.longitude))
+    for ev in unassigned_events:
+        if ev.latitude and ev.longitude:
+            all_points.append((ev.latitude, ev.longitude))
+
+    if not all_points:
+        return None
+
+    center = [
+        sum(p[0] for p in all_points) / len(all_points),
+        sum(p[1] for p in all_points) / len(all_points),
+    ]
+
+    m = folium.Map(
+        location=center, zoom_start=12, tiles=None, width="100%", height="500px"
+    )
+    folium.TileLayer(
+        tiles="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+        attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> '
+        '&copy; <a href="https://carto.com/attributions">CARTO</a>',
+        name="Mappa",
+        control=False,
+    ).add_to(m)
+
+    seen_stay_pks = set()
+    fg_stays = folium.FeatureGroup(name="Soggiorni")
+
+    for idx, day_data in enumerate(days_with_events, start=1):
+        day = day_data["day"]
+        color = DAY_COLORS[(idx - 1) % len(DAY_COLORS)]
+        fg = folium.FeatureGroup(name=f"Giorno {idx} — {day.date.strftime('%d %b')}")
+
+        stay = day_data["stay"]
+        if stay and stay.pk not in seen_stay_pks and stay.latitude and stay.longitude:
+            seen_stay_pks.add(stay.pk)
+            folium.Marker(
+                [stay.latitude, stay.longitude],
+                popup=stay.name,
+                tooltip=stay.name,
+                icon=folium.Icon(prefix="fa", color=STAY_ICON_COLOR, icon="bed"),
+            ).add_to(fg_stays)
+
+        for ev in day_data["events"]:
+            if not (ev.latitude and ev.longitude):
+                continue
+            icon_name = "utensils" if ev.category == 3 else "map-marker"
+            folium.Marker(
+                [ev.latitude, ev.longitude],
+                popup=ev.name,
+                tooltip=ev.name,
+                icon=folium.Icon(
+                    prefix="fa", color="white", icon=icon_name, icon_color=color
+                ),
+            ).add_to(fg)
+
+        fg.add_to(m)
+
+    if seen_stay_pks:
+        fg_stays.add_to(m)
+
+    fg_unassigned = folium.FeatureGroup(name="Senza giorno")
+    has_unassigned = False
+    for ev in unassigned_events:
+        if not (ev.latitude and ev.longitude):
+            continue
+        folium.Marker(
+            [ev.latitude, ev.longitude],
+            popup=ev.name,
+            tooltip=ev.name,
+            icon=folium.Icon(prefix="fa", color="lightgray", icon="map-marker"),
+        ).add_to(fg_unassigned)
+        has_unassigned = True
+    if has_unassigned:
+        fg_unassigned.add_to(m)
+
+    folium.LayerControl(collapsed=False).add_to(m)
+    m.fit_bounds(
+        [
+            [min(p[0] for p in all_points), min(p[1] for p in all_points)],
+            [max(p[0] for p in all_points), max(p[1] for p in all_points)],
+        ]
+    )
+
+    return m._repr_html_()
+
+
 def create_day_map(events_with_location, stay, next_day_stay, day=None):
     """
     Create a map for a given day with events, stay, and next day stay.

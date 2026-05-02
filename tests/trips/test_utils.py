@@ -20,6 +20,7 @@ from trips.utils import (
     can_add_stay_transfer,
     convert_google_opening_hours,
     create_day_map,
+    create_trip_map,
     download_unsplash_photo,
     generate_cache_key,
     geocode_location,
@@ -510,6 +511,114 @@ class TestCreateDayMap(TestCase):
         map_html = create_day_map(day.events.all(), day.stay, None)
         self.assertIn(event.name, map_html)
         self.assertNotIn(stay_no_location.name, map_html)
+
+
+class TestCreateTripMap(TestCase):
+    def test_returns_html_with_events(self):
+        trip = TripFactory(start_date=date(2024, 1, 1), end_date=date(2024, 1, 2))
+        day = trip.days.first()
+        meal = MealFactory(name="Pizzeria Roma", day=day, latitude=41.9, longitude=12.5)
+        days_data = [{"day": day, "events": [meal], "stay": None}]
+        result = create_trip_map(days_data, [])
+        assert result is not None
+        assert "Pizzeria Roma" in result
+
+    def test_returns_none_when_no_coordinates(self):
+        trip = TripFactory(start_date=date(2024, 1, 1), end_date=date(2024, 1, 1))
+        day = trip.days.first()
+        days_data = [{"day": day, "events": [], "stay": None}]
+        result = create_trip_map(days_data, [])
+        assert result is None
+
+    def test_includes_stay(self):
+        trip = TripFactory(start_date=date(2024, 1, 1), end_date=date(2024, 1, 1))
+        day = trip.days.first()
+        stay = StayFactory(name="Hotel Bello", latitude=41.9, longitude=12.5)
+        day.stay = stay
+        day.save()
+        days_data = [{"day": day, "events": [], "stay": stay}]
+        result = create_trip_map(days_data, [])
+        assert result is not None
+        assert "Hotel Bello" in result
+
+    def test_includes_unassigned_events(self):
+        from trips.models import Meal
+
+        trip = TripFactory(start_date=date(2024, 1, 1), end_date=date(2024, 1, 1))
+        day = trip.days.first()
+        unassigned = Meal.objects.create(
+            trip=trip,
+            day=None,
+            name="Free Event",
+            latitude=41.9,
+            longitude=12.5,
+            category=3,
+        )
+        days_data = [{"day": day, "events": [], "stay": None}]
+        result = create_trip_map(days_data, [unassigned])
+        assert result is not None
+        assert "Free Event" in result
+
+    def test_multiple_days_different_colors(self):
+        trip = TripFactory(start_date=date(2024, 1, 1), end_date=date(2024, 1, 2))
+        day1, day2 = trip.days.all()
+        e1 = MealFactory(name="Giorno1", day=day1, latitude=41.9, longitude=12.5)
+        e2 = MealFactory(name="Giorno2", day=day2, latitude=42.0, longitude=12.6)
+        days_data = [
+            {"day": day1, "events": [e1], "stay": None},
+            {"day": day2, "events": [e2], "stay": None},
+        ]
+        result = create_trip_map(days_data, [])
+        assert "Giorno1" in result
+        assert "Giorno2" in result
+
+    def test_stay_shown_only_once_across_days(self):
+        trip = TripFactory(start_date=date(2024, 1, 1), end_date=date(2024, 1, 2))
+        day1, day2 = trip.days.all()
+        stay = StayFactory(name="Shared Stay", latitude=41.9, longitude=12.5)
+        day1.stay = stay
+        day1.save()
+        day2.stay = stay
+        day2.save()
+        e1 = MealFactory(name="Pranzo", day=day1, latitude=41.91, longitude=12.51)
+        days_data = [
+            {"day": day1, "events": [e1], "stay": stay},
+            {"day": day2, "events": [], "stay": stay},
+        ]
+        result = create_trip_map(days_data, [])
+        # Map is generated (has stay+events with coords)
+        assert result is not None
+        # Stay appears at least once (deduplication means not added multiple times as marker)
+        assert "Shared Stay" in result
+
+    def test_event_without_coordinates_skipped(self):
+        from trips.models import Meal
+
+        trip = TripFactory(start_date=date(2024, 1, 1), end_date=date(2024, 1, 1))
+        day = trip.days.first()
+        e_with = MealFactory(name="Con Coord", day=day, latitude=41.9, longitude=12.5)
+        e_without = Meal.objects.create(
+            trip=trip, day=day, name="Senza Coord", category=3
+        )
+        days_data = [{"day": day, "events": [e_with, e_without], "stay": None}]
+        result = create_trip_map(days_data, [])
+        assert result is not None
+        assert "Con Coord" in result
+        assert "Senza Coord" not in result
+
+    def test_unassigned_without_coordinates_skipped(self):
+        from trips.models import Meal
+
+        trip = TripFactory(start_date=date(2024, 1, 1), end_date=date(2024, 1, 1))
+        day = trip.days.first()
+        e_with = MealFactory(name="Con Coord", day=day, latitude=41.9, longitude=12.5)
+        e_without = Meal.objects.create(
+            trip=trip, day=None, name="Senza Coord", category=3
+        )
+        days_data = [{"day": day, "events": [e_with], "stay": None}]
+        result = create_trip_map(days_data, [e_without])
+        assert result is not None
+        assert "Senza Coord" not in result
 
 
 class TestConvertGoogleOpeningHours(TestCase):

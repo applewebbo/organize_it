@@ -54,6 +54,7 @@ from trips.services import GooglePlacesClient, GooglePlacesError
 from trips.utils import (
     accessible_trips_qs,
     create_day_map,
+    create_trip_map,
     download_unsplash_photo,
     editable_trips_qs,
     geocode_location,
@@ -2835,6 +2836,60 @@ def trip_map(request, pk):
             "unassigned_events": unassigned_events,
             "map_items_json": json.dumps(map_items),
         },
+    )
+
+
+def trip_events_map(request, pk):
+    """HTMX fragment: embedded Folium map for all trip events (trip-detail toggle)."""
+    trip = get_object_or_404(Trip, pk=pk)
+    if not accessible_trips_qs(request.user).filter(pk=trip.pk).exists():
+        raise Http404
+    days_with_events, unassigned_events = _build_map_events_context(trip)
+    trip_map_html = create_trip_map(days_with_events, unassigned_events)
+    return TemplateResponse(
+        request,
+        "trips/includes/events-map-fragment.html",
+        {
+            "trip": trip,
+            "map": trip_map_html,
+        },
+    )
+
+
+def trip_events_list(request, pk):
+    """HTMX fragment: days list for trip-detail events section (map→list toggle)."""
+    trip = get_object_or_404(
+        Trip.objects.prefetch_related(
+            Prefetch(
+                "days__events",
+                queryset=Event.objects.all().order_by("order", "pk"),
+            ),
+            "days__stay",
+        ),
+        pk=pk,
+    )
+    if not accessible_trips_qs(request.user).filter(pk=trip.pk).exists():
+        raise Http404
+    unpaired_events = trip.all_events.filter(day__isnull=True)
+    return TemplateResponse(
+        request,
+        "trips/includes/events-list-fragment.html",
+        {"trip": trip, "unpaired_events": unpaired_events},
+    )
+
+
+def select_day_for_event(request, pk, category):
+    """HTMX: step-1 modal – choose a day before creating an experience or meal from map view."""
+    if category not in ("experience", "meal"):
+        raise Http404
+    trip = get_object_or_404(Trip, pk=pk)
+    if not editable_trips_qs(request.user).filter(pk=trip.pk).exists():
+        raise Http404
+    days = trip.days.order_by("date")
+    return TemplateResponse(
+        request,
+        "trips/includes/day-selector.html",
+        {"trip": trip, "days": days, "category": category},
     )
 
 

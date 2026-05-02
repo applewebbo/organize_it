@@ -610,3 +610,97 @@ class MapAddExperienceLatLngTest(TestCase):
         event = Event.objects.get(trip=trip, name="Ristorante Senza Coordinate")
         assert event.latitude is None
         assert event.longitude is None
+
+
+class TripEventsMapFragmentTest(TestCase):
+    def test_owner_gets_map_fragment(self):
+        user = self.make_user("owner@example.com")
+        trip = TripFactory(author=user)
+        with self.login(user):
+            response = self.get("trips:trip-events-map", pk=trip.pk)
+        self.response_200(response)
+        assert response.context["trip"] == trip
+
+    def test_unauthorized_user_gets_404(self):
+        owner = self.make_user("owner@example.com")
+        other = self.make_user("other@example.com")
+        trip = TripFactory(author=owner)
+        with self.login(other):
+            response = self.get("trips:trip-events-map", pk=trip.pk)
+        self.response_404(response)
+
+    def test_unauthenticated_redirects(self):
+        trip = TripFactory()
+        response = self.get("trips:trip-events-map", pk=trip.pk)
+        self.response_302(response)
+
+
+class TripEventsListFragmentTest(TestCase):
+    def test_owner_gets_list_fragment(self):
+        user = self.make_user("owner@example.com")
+        trip = TripFactory(author=user)
+        with self.login(user):
+            response = self.get("trips:trip-events-list", pk=trip.pk)
+        self.response_200(response)
+        assert response.context["trip"] == trip
+
+    def test_unauthorized_user_gets_404(self):
+        owner = self.make_user("owner@example.com")
+        other = self.make_user("other@example.com")
+        trip = TripFactory(author=owner)
+        with self.login(other):
+            response = self.get("trips:trip-events-list", pk=trip.pk)
+        self.response_404(response)
+
+    def test_unauthenticated_redirects(self):
+        trip = TripFactory()
+        response = self.get("trips:trip-events-list", pk=trip.pk)
+        self.response_302(response)
+
+
+class SelectDayForEventTest(TestCase):
+    def test_owner_gets_day_selector_experience(self):
+        user = self.make_user("owner@example.com")
+        trip = TripFactory(author=user)
+        with self.login(user):
+            response = self.get(
+                "trips:select-day-for-event", pk=trip.pk, category="experience"
+            )
+        self.response_200(response)
+        assert response.context["category"] == "experience"
+
+    def test_owner_gets_day_selector_meal(self):
+        user = self.make_user("owner@example.com")
+        trip = TripFactory(author=user)
+        with self.login(user):
+            response = self.get(
+                "trips:select-day-for-event", pk=trip.pk, category="meal"
+            )
+        self.response_200(response)
+        assert response.context["category"] == "meal"
+
+    def test_invalid_category_returns_404(self):
+        user = self.make_user("owner@example.com")
+        trip = TripFactory(author=user)
+        with self.login(user):
+            response = self.get(
+                "trips:select-day-for-event", pk=trip.pk, category="invalid"
+            )
+        self.response_404(response)
+
+    def test_non_editor_gets_404(self):
+        owner = self.make_user("owner@example.com")
+        other = self.make_user("other@example.com")
+        trip = TripFactory(author=owner)
+        with self.login(other):
+            response = self.get(
+                "trips:select-day-for-event", pk=trip.pk, category="experience"
+            )
+        self.response_404(response)
+
+    def test_unauthenticated_redirects(self):
+        trip = TripFactory()
+        response = self.get(
+            "trips:select-day-for-event", pk=trip.pk, category="experience"
+        )
+        self.response_302(response)

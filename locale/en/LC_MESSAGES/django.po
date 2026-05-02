@@ -1031,6 +1031,34 @@ msgstr "Other Things to Do"
 msgid "Here you find events not yet assigned to a specific day"
 msgstr "Here you find events not yet assigned to a specific day"
 
+#: templates/trips/includes/events-section.html
+msgid "Show map"
+msgstr "Show map"
+
+#: templates/trips/includes/events-section.html
+msgid "Show list"
+msgstr "Show list"
+
+#: templates/trips/includes/day-selector.html
+msgid "Select a day for the experience"
+msgstr "Select a day for the experience"
+
+#: templates/trips/includes/day-selector.html
+msgid "Select a day for the meal"
+msgstr "Select a day for the meal"
+
+#: templates/trips/includes/day-selector.html
+msgid "No days in this trip."
+msgstr "No days in this trip."
+
+#: templates/trips/includes/events-map-fragment.html
+msgid "No events with location to display on the map."
+msgstr "No events with location to display on the map."
+
+#: templates/trips/includes/events-map-fragment.html
+msgid "Map view is not available on mobile devices."
+msgstr "Map view is not available on mobile devices."
+
 #: templates/trips/includes/experience-preview.html:16
 #: templates/trips/includes/experience-preview.html:27
 #: templates/trips/includes/experience-preview.html:38

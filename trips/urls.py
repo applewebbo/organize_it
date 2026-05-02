@@ -260,4 +260,14 @@ urlpatterns += [
     ),
     path("trips/<int:pk>/map/add/meal/", views.map_add_meal, name="map-add-meal"),
     path("trips/<int:pk>/map/add/stay/", views.map_add_stay, name="map-add-stay"),
+    # Embedded events map (trip-detail toggle)
+    path("trips/<int:pk>/events-map/", views.trip_events_map, name="trip-events-map"),
+    path(
+        "trips/<int:pk>/events-list/", views.trip_events_list, name="trip-events-list"
+    ),
+    path(
+        "trips/<int:pk>/select-day/<str:category>/",
+        views.select_day_for_event,
+        name="select-day-for-event",
+    ),
 ]
