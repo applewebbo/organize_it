@@ -37,9 +37,9 @@
                                          alt=""
                                          class="mx-2 w-8 h-8">
                                 {% else %}
-                                    <span class="flex justify-center items-center w-8 h-8 rounded-full {{ collab.badge_bg_class }}">
-                                        <i class="text-white ph-bold ph-user" aria-hidden="true"></i>
-                                    </span>
+                                    <img src="{% static 'img/avatars/generic.png' %}"
+                                         alt=""
+                                         class="mx-2 w-8 h-8">
                                 {% endif %}
                                 <div>
                                     <span class="text-sm font-medium">
@@ -79,9 +79,9 @@
                                  alt=""
                                  class="mx-2 w-8 h-8">
                         {% else %}
-                            <span class="flex justify-center items-center w-8 h-8 rounded-full bg-neutral">
-                                <i class="text-white ph-bold ph-user" aria-hidden="true"></i>
-                            </span>
+                            <img src="{% static 'img/avatars/generic.png' %}"
+                                 alt=""
+                                 class="mx-2 w-8 h-8">
                         {% endif %}
                         <span class="text-sm font-medium">{{ trip.author|user_display_name }}</span>
                     </li>
