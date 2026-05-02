@@ -1,0 +1,8 @@
+{% load i18n %}{% blocktrans with email=invited_by.email title=trip.title %}{{ email }} has invited you to view the trip "{{ title }}".{% endblocktrans %}
+
+{% trans "Click the link below to access the trip. No account required." %}
+
+{{ share_url }}
+
+---
+{% trans "If you did not expect this invitation, you can ignore this email." %}

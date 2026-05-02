@@ -214,6 +214,16 @@ htmx_urlpatterns = [
         name="toggle-participant-role",
     ),
     path(
+        "trips/<int:trip_id>/collaborators/add-viewer/",
+        views.add_viewer_by_email,
+        name="add-viewer-by-email",
+    ),
+    path(
+        "trips/<int:trip_id>/collaborators/add-named/",
+        views.add_named_participant,
+        name="add-named-participant",
+    ),
+    path(
         "trips/<int:trip_id>/collaborators/invite/",
         views.invite_collaborator,
         name="invite-collaborator",

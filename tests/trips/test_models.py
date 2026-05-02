@@ -1687,6 +1687,37 @@ class TestTripCollaboration:
         color = TripCollaboration.next_free_color(trip)
         assert color == TripCollaboration.PALETTE_VALUES[0]
 
+    def test_display_name_named_only(self, trip_factory):
+        from trips.models import TripCollaboration
+
+        trip = trip_factory()
+        collab = TripCollaboration.objects.create(
+            trip=trip,
+            user=None,
+            participant_name="Marco",
+            color="blue",
+            added_by=trip.author,
+            can_edit=False,
+        )
+        assert collab.display_name == "Marco"
+        assert collab.is_named_only is True
+        assert "Marco" in str(collab)
+
+    def test_display_name_email_viewer(self, trip_factory):
+        from trips.models import TripCollaboration
+
+        trip = trip_factory()
+        collab = TripCollaboration.objects.create(
+            trip=trip,
+            user=None,
+            participant_email="viewer@example.com",
+            color="blue",
+            added_by=trip.author,
+            can_edit=False,
+        )
+        assert collab.display_name == "viewer@example.com"
+        assert collab.is_named_only is False
+
 
 class TestTripInvitation:
     def test_str(self, user_factory, trip_factory):

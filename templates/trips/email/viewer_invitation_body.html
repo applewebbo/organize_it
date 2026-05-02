@@ -1,0 +1,28 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="description" content="{% trans "Trip view invitation" %}">
+        <meta name="keywords" content="invitation, trip, view">
+        <title>{% blocktrans with title=trip.title %}You've been invited to view "{{ title }}"{% endblocktrans %}</title>
+        <style>
+    body { font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 24px; }
+    .btn { display: inline-block; padding: 10px 20px; background-color: #4f46e5; color: #fff; text-decoration: none; border-radius: 6px; font-weight: bold; }
+    .footer { margin-top: 32px; font-size: 12px; color: #888; }
+        </style>
+    </head>
+    <body>
+        <h2>{% blocktrans with title=trip.title %}You've been invited to view "{{ title }}"{% endblocktrans %}</h2>
+        <p>
+            {% blocktrans with email=invited_by.email title=trip.title %}{{ email }} has invited you to view the trip <strong>{{ title }}</strong>.{% endblocktrans %}
+        </p>
+        <p>{% trans "No account required — just click the button below." %}</p>
+        <p>
+            <a href="{{ share_url }}" class="btn">{% trans "View the trip" %}</a>
+        </p>
+        <div class="footer">
+            <p>{% trans "If you did not expect this invitation, you can ignore this email." %}</p>
+        </div>
+    </body>
+</html>

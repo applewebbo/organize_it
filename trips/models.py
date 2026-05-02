@@ -860,7 +860,7 @@ class Meal(Event):
 
 
 class TripCollaboration(models.Model):
-    """Through model for Trip.collaborators M2M, stores color per collaborator."""
+    """Through model for Trip.collaborators M2M, stores role and color per participant."""
 
     PALETTE = [
         ("blue", _("Blue")),
@@ -890,7 +890,18 @@ class TripCollaboration(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
+        null=True,
+        blank=True,
         related_name="trip_collaborations",
+    )
+    participant_name = models.CharField(max_length=100, blank=True)
+    participant_email = models.EmailField(blank=True)
+    share_link = models.OneToOneField(
+        "ShareLink",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="collaboration",
     )
     color = models.CharField(max_length=20, choices=PALETTE)
     added_at = models.DateTimeField(auto_now_add=True)
@@ -906,11 +917,29 @@ class TripCollaboration(models.Model):
         ordering = ("added_at",)
 
     def __str__(self) -> str:
-        return f"{self.user} → {self.trip.title} ({self.color})"
+        label = self.display_name
+        return f"{label} → {self.trip.title} ({self.color})"
+
+    @property
+    def display_name(self) -> str:
+        if self.user:
+            return self.user.profile.first_name or self.user.email
+        return self.participant_name or self.participant_email or "—"
+
+    @property
+    def is_named_only(self) -> bool:
+        """True for participants added by name only (no account, no email)."""
+        return not self.user and not self.participant_email
 
     @property
     def badge_bg_class(self):
         return self.COLOR_BADGE_CLASSES.get(self.color, "bg-base-300")
+
+    def delete(self, *args, **kwargs):
+        link = self.share_link
+        super().delete(*args, **kwargs)
+        if link:
+            link.delete()
 
     @classmethod
     def next_free_color(cls, trip):

@@ -2497,11 +2497,109 @@ def add_collaborator(request, trip_id):
 
 @require_http_methods(["POST"])
 def toggle_participant_role(request, trip_id, collaboration_id):
-    """Toggle can_edit for a participant (owner only)."""
+    """Downgrade editor to viewer (owner only). Upgrade is not allowed via this view."""
     trip = get_trip_for_owner_or_404(trip_id, request.user)
     collaboration = get_object_or_404(TripCollaboration, pk=collaboration_id, trip=trip)
-    collaboration.can_edit = not collaboration.can_edit
+    if not collaboration.can_edit:
+        return HttpResponse(status=400)
+    collaboration.can_edit = False
     collaboration.save()
+    collaborations = trip.collaborations.select_related("user__profile").all()
+    return TemplateResponse(
+        request,
+        "trips/includes/collab-modal-list.html",
+        {"trip": trip, "collaborations": collaborations},
+        headers={"HX-Trigger": "collaboratorsModified"},
+    )
+
+
+@require_http_methods(["POST"])
+def add_viewer_by_email(request, trip_id):
+    """Add a viewer by email — sends a permanent share link (owner only)."""
+    trip = get_trip_for_owner_or_404(trip_id, request.user)
+    User = get_user_model()
+    email = request.POST.get("email", "").strip()
+
+    if not email:
+        return HttpResponse(status=400)
+
+    if trip.collaborations.filter(participant_email=email).exists():
+        return HttpResponse(status=400)
+
+    share_link = ShareLink.objects.create(
+        trip=trip,
+        created_by=request.user,
+        permission_level=ShareLink.PermissionLevel.VIEW,
+        expires_at=None,
+        label=email,
+    )
+
+    color = TripCollaboration.next_free_color(trip)
+    try:
+        user = User.objects.get(email=email)
+        if trip.collaborators.filter(pk=user.pk).exists() or user == trip.author:
+            share_link.delete()
+            return HttpResponse(status=400)
+        TripCollaboration.objects.create(
+            trip=trip,
+            user=user,
+            color=color,
+            added_by=request.user,
+            can_edit=False,
+            share_link=share_link,
+        )
+    except User.DoesNotExist:
+        TripCollaboration.objects.create(
+            trip=trip,
+            user=None,
+            participant_email=email,
+            color=color,
+            added_by=request.user,
+            can_edit=False,
+            share_link=share_link,
+        )
+
+    share_url = request.build_absolute_uri(share_link.get_absolute_url())
+    context = {"trip": trip, "invited_by": request.user, "share_url": share_url}
+    sender_language = getattr(request.user.profile, "language", "it")
+    with translation_override(sender_language):
+        subject = render_to_string(
+            "trips/email/viewer_invitation_subject.txt", context
+        ).strip()
+        text_body = render_to_string("trips/email/viewer_invitation_body.txt", context)
+        html_body = render_to_string("trips/email/viewer_invitation_body.html", context)
+    msg = EmailMultiAlternatives(subject=subject, body=text_body, to=[email])
+    msg.attach_alternative(html_body, "text/html")
+    msg.send()
+
+    collaborations = trip.collaborations.select_related("user__profile").all()
+    return TemplateResponse(
+        request,
+        "trips/includes/collab-modal-list.html",
+        {"trip": trip, "collaborations": collaborations},
+        headers={"HX-Trigger": "collaboratorsModified"},
+    )
+
+
+@require_http_methods(["POST"])
+def add_named_participant(request, trip_id):
+    """Add a named participant with no account or email (owner only)."""
+    trip = get_trip_for_owner_or_404(trip_id, request.user)
+    name = request.POST.get("name", "").strip()
+
+    if not name:
+        return HttpResponse(status=400)
+
+    color = TripCollaboration.next_free_color(trip)
+    TripCollaboration.objects.create(
+        trip=trip,
+        user=None,
+        participant_name=name,
+        color=color,
+        added_by=request.user,
+        can_edit=False,
+    )
+
     collaborations = trip.collaborations.select_related("user__profile").all()
     return TemplateResponse(
         request,

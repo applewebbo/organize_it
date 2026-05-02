@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-02 07:56+0200\n"
+"POT-Creation-Date: 2026-05-02 09:05+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -775,6 +775,8 @@ msgstr "Questo invito scade tra 7 giorni."
 
 #: templates/trips/email/invitation_body.html:29
 #: templates/trips/email/invitation_body.txt:9
+#: templates/trips/email/viewer_invitation_body.html:23
+#: templates/trips/email/viewer_invitation_body.txt:8
 msgid "If you did not expect this invitation, you can ignore this email."
 msgstr "Se non ti aspettavi questo invito, puoi ignorare questa email."
 
@@ -795,6 +797,39 @@ msgstr ""
 #, python-format
 msgid "You've been invited to collaborate on \"%(title)s\""
 msgstr "Sei stato invitato a collaborare a \"%(title)s\""
+
+#: templates/trips/email/viewer_invitation_body.html:6
+#: templates/trips/email/viewer_invitation_body.html:14
+#, python-format
+msgid "You've been invited to view \"%(title)s\""
+msgstr "Sei stato invitato a vedere \"%(title)s\""
+
+#: templates/trips/email/viewer_invitation_body.html:16
+#, python-format
+msgid "%(email)s has invited you to view the trip <strong>%(title)s</strong>."
+msgstr "%(email)s ti ha invitato a vedere il viaggio <strong>%(title)s</strong>."
+
+#: templates/trips/email/viewer_invitation_body.html:18
+msgid "No account required — just click the button below."
+msgstr "Nessun account richiesto — clicca il pulsante qui sotto."
+
+#: templates/trips/email/viewer_invitation_body.html:20
+msgid "View the trip"
+msgstr "Vedi il viaggio"
+
+#: templates/trips/email/viewer_invitation_body.txt:1
+#, python-format
+msgid "%(email)s has invited you to view the trip \"%(title)s\"."
+msgstr "%(email)s ti ha invitato a vedere il viaggio \"%(title)s\"."
+
+#: templates/trips/email/viewer_invitation_body.txt:3
+msgid "Click the link below to access the trip. No account required."
+msgstr "Clicca il link qui sotto per accedere al viaggio. Nessun account richiesto."
+
+#: templates/trips/email/viewer_invitation_subject.txt:1
+#, python-format
+msgid "You've been invited to view the trip \"%(title)s\""
+msgstr "Sei stato invitato a vedere il viaggio \"%(title)s\""
 
 #: templates/trips/event-detail.html:62 templates/trips/stay-detail.html:79
 msgid "Enrich"
@@ -932,20 +967,25 @@ msgstr "Condividi"
 msgid "Add participant"
 msgstr "Aggiungi partecipante"
 
-#: templates/trips/includes/collab-inline.html:53
-#: templates/trips/includes/collab-modal-list.html:16
-#: templates/trips/includes/collab-search-result.html:24
+#: templates/trips/includes/collab-inline.html:70
+#: templates/trips/includes/collab-modal-list.html:33
+#: templates/trips/includes/collab-modal.html:19
 msgid "Editor"
 msgstr "Editor"
 
-#: templates/trips/includes/collab-inline.html:53
-#: templates/trips/includes/collab-modal-list.html:16
-#: templates/trips/includes/collab-search-result.html:24
+#: templates/trips/includes/collab-inline.html:72
+#: templates/trips/includes/collab-modal-list.html:35
+msgid "Participant"
+msgstr "Partecipante"
+
+#: templates/trips/includes/collab-inline.html:74
+#: templates/trips/includes/collab-modal-list.html:37
+#: templates/trips/includes/collab-modal.html:25
 msgid "Viewer"
 msgstr "Osservatore"
 
-#: templates/trips/includes/collab-inline.html:60
-#: templates/trips/includes/collab-modal-list.html:43
+#: templates/trips/includes/collab-inline.html:82
+#: templates/trips/includes/collab-modal-list.html:67
 #: templates/trips/includes/collaborators-section.html:37
 msgid "No participants yet."
 msgstr "Nessun partecipante."
@@ -955,32 +995,38 @@ msgstr "Nessun partecipante."
 msgid "Invitation sent to %(email)s."
 msgstr ""
 
-#: templates/trips/includes/collab-modal-list.html:25
-msgid "Set as viewer"
-msgstr "Imposta come osservatore"
+#: templates/trips/includes/collab-modal-list.html:48
+msgid "Downgrade to viewer"
+msgstr "Passa a osservatore"
 
-#: templates/trips/includes/collab-modal-list.html:25
-msgid "Set as editor"
-msgstr "Imposta come editor"
-
-#: templates/trips/includes/collab-modal-list.html:35
+#: templates/trips/includes/collab-modal-list.html:59
 msgid "Remove"
 msgstr "Rimuovi"
 
-#: templates/trips/includes/collab-modal.html:13
-msgid "Add by email"
-msgstr "Aggiungi per email"
+#: templates/trips/includes/collab-modal.html:31
+msgid "Name only"
+msgstr "Solo nome"
 
-#: templates/trips/includes/collab-modal.html:17
+#: templates/trips/includes/collab-modal.html:36
+msgid "Search editor by email"
+msgstr "Cerca editor per email"
+
+#: templates/trips/includes/collab-modal.html:40
 #: templates/trips/includes/collaborators-section.html:47
 msgid "Search by email…"
 msgstr "Cerca per email…"
 
-#: templates/trips/includes/collab-search-result.html:7
-msgid "Already a participant."
-msgstr "Già partecipante."
+#: templates/trips/includes/collab-modal.html:51
+msgid "Add viewer by email (receives a share link)"
+msgstr "Aggiungi osservatore via email (riceve un link di accesso)"
 
-#: templates/trips/includes/collab-search-result.html:26
+#: templates/trips/includes/collab-modal.html:60
+msgid "Email address…"
+msgstr "Indirizzo email…"
+
+#: templates/trips/includes/collab-modal.html:64
+#: templates/trips/includes/collab-modal.html:83
+#: templates/trips/includes/collab-search-result.html:17
 #: templates/trips/includes/main-transfers.html:108
 #: templates/trips/includes/main-transfers.html:281
 #: templates/trips/includes/trip-header-card.html:39
@@ -988,11 +1034,23 @@ msgstr "Già partecipante."
 msgid "Add"
 msgstr "Aggiungi"
 
-#: templates/trips/includes/collab-search-result.html:35
+#: templates/trips/includes/collab-modal.html:70
+msgid "Add participant by name (no account needed)"
+msgstr "Aggiungi partecipante per nome (senza account)"
+
+#: templates/trips/includes/collab-modal.html:79
+msgid "Name…"
+msgstr "Nome…"
+
+#: templates/trips/includes/collab-search-result.html:7
+msgid "Already a participant."
+msgstr "Già partecipante."
+
+#: templates/trips/includes/collab-search-result.html:25
 msgid "No account found."
 msgstr "Nessun account trovato."
 
-#: templates/trips/includes/collab-search-result.html:43
+#: templates/trips/includes/collab-search-result.html:33
 msgid "Invite by email"
 msgstr "Invita per email"
 
@@ -2077,11 +2135,11 @@ msgstr ""
 msgid "Indigo"
 msgstr ""
 
-#: trips/models.py:957
+#: trips/models.py:986
 msgid "View only"
 msgstr "Solo visualizzazione"
 
-#: trips/models.py:958
+#: trips/models.py:987
 msgid "Can edit"
 msgstr "Può modificare"
 
@@ -2215,58 +2273,67 @@ msgstr "Nota modificata correttamente"
 msgid "Note deleted successfully"
 msgstr "Nota eliminata correttamente"
 
-#: trips/views.py:1745
+#: trips/views.py:1743
 msgid "Stay must have a name and an address to be enriched."
 msgstr ""
 "L’evento deve avere un nome e un indirizzo per poter procedere con aggiunta "
 "dei dati."
 
-#: trips/views.py:1757 trips/views.py:1894
+#: trips/views.py:1755 trips/views.py:1888
 msgid "Could not find a matching place."
 msgstr "Non ho trovavo un luogo corrispondente."
 
-#: trips/views.py:1854
+#: trips/views.py:1850
 msgid "Stay enriched successfully!"
 msgstr "Dati aggiunti con successo!"
 
-#: trips/views.py:1880
+#: trips/views.py:1874
 msgid "Event must have a name and an address to be enriched."
 msgstr ""
 "L’evento deve avere un nome e un indirizzo per poter procedere con aggiunta "
 "dei dati aggiuntivi."
 
-#: trips/views.py:1962
+#: trips/views.py:1954
 msgid "Event enriched successfully!"
 msgstr "Dati aggiunti con successo!"
 
-#: trips/views.py:1979
+#: trips/views.py:1971
 msgid "Please enter a destination first"
 msgstr "Per favore compila prima il campo destinazione"
 
-#: trips/views.py:1989
+#: trips/views.py:1981
 msgid "Unsplash API error. Please try again later."
 msgstr "Errore API di Unsplash. Per favore riprova più tardi."
 
-#: trips/views.py:1996
+#: trips/views.py:1988
 #, python-brace-format
 msgid "No images found for '{query}'"
 msgstr "Nessuna immagine trovata per '{query}'"
 
-#: trips/views.py:2307
+#: trips/views.py:2299
 msgid "Transfer saved successfully!"
 msgstr "Trasferimento salvato con successo!"
 
-#: trips/views.py:2646
+#: trips/views.py:2723
 msgid "You've joined the trip as a participant."
 msgstr "Sei entrato nel viaggio come partecipante."
 
-#: trips/views.py:2848
+#: trips/views.py:2925
 msgid "Event added to trip."
 msgstr "Evento aggiunto al viaggio."
 
-#: trips/views.py:2901
+#: trips/views.py:2978
 msgid "Stay added to trip."
 msgstr "Soggiorno aggiunto al viaggio."
+
+#~ msgid "Set as viewer"
+#~ msgstr "Imposta come osservatore"
+
+#~ msgid "Set as editor"
+#~ msgstr "Imposta come editor"
+
+#~ msgid "Add by email"
+#~ msgstr "Aggiungi per email"
 
 #~ msgid "Collaborators"
 #~ msgstr "Collaboratori"
@@ -2594,9 +2661,6 @@ msgstr "Soggiorno aggiunto al viaggio."
 
 #~ msgid "Favourite"
 #~ msgstr "Preferito"
-
-#~ msgid "View Trip"
-#~ msgstr "Vedi Viaggio"
 
 #~ msgid "Latest"
 #~ msgstr "Più recente"

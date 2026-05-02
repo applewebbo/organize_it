@@ -5,7 +5,7 @@ status: in-progress
 type: feature
 priority: normal
 created_at: 2026-05-01T08:04:18Z
-updated_at: 2026-05-02T05:37:41Z
+updated_at: 2026-05-02T06:11:22Z
 ---
 
 Rename collaborators to participants and introduce role-based access. Codeberg issue #292.
@@ -34,13 +34,13 @@ Rename collaborators to participants and introduce role-based access. Codeberg i
 - Aggiornare tutte le label 'Collaborator' → 'Participant'
 
 ## Todo
-- [ ] Aggiungere campo `can_edit` al modello `TripCollaboration`
-- [ ] Creare e applicare migrazione (default `can_edit=True` per esistenti)
-- [ ] Forzare `can_edit=False` per utenti senza account al momento dell'invito
-- [ ] Estendere controlli permessi nelle view
+- [x] Aggiungere campo `can_edit` al modello `TripCollaboration`
+- [x] Creare e applicare migrazione (default `can_edit=True` per esistenti)
+- [x] Forzare `can_edit=False` per utenti senza account al momento dell'invito
+- [x] Estendere controlli permessi nelle view
 - [ ] Aggiornare modal aggiunta con toggle ruolo ed email condizionale
-- [ ] Aggiungere possibilità di modificare ruolo senza rimuovere il partecipante
-- [ ] Aggiornare UI badge con colori per ruolo
-- [ ] Aggiornare label 'Collaborator' → 'Participant' ovunque
+- [x] Aggiungere possibilità di modificare ruolo senza rimuovere il partecipante
+- [x] Aggiornare UI badge con colori per ruolo
+- [x] Aggiornare label 'Collaborator' → 'Participant' ovunque
 
 Target release: 2026.7

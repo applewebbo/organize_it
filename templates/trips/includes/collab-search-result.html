@@ -10,21 +10,11 @@
                       action="{% url 'trips:add-collaborator' trip.pk %}"
                       hx-post="{% url 'trips:add-collaborator' trip.pk %}"
                       hx-target="#collab-modal-list"
-                      hx-swap="outerHTML"
-                      x-data="{ canEdit: true }">
+                      hx-swap="outerHTML">
                     {% csrf_token %}
                     <input type="hidden" name="email" value="{{ result.user.email }}">
-                    <input type="hidden" name="can_edit" :value="canEdit ? 'true' : 'false'">
-                    <div class="flex gap-2 items-center">
-                        <label class="flex gap-1 items-center text-xs cursor-pointer text-base-content/70">
-                            <input type="checkbox"
-                                   class="toggle toggle-xs toggle-primary"
-                                   x-model="canEdit"
-                                   checked>
-                            <span x-text="canEdit ? '{% trans "Editor" %}' : '{% trans "Viewer" %}'"></span>
-                        </label>
-                        <button type="submit" class="btn btn-sm btn-primary">{% trans "Add" %}</button>
-                    </div>
+                    <input type="hidden" name="can_edit" value="true">
+                    <button type="submit" class="btn btn-sm btn-primary">{% trans "Add" %}</button>
                 </form>
             {% endif %}
         </div>

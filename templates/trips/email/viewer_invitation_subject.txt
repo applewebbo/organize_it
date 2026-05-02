@@ -1,0 +1,1 @@
+{% load i18n %}{% blocktrans with title=trip.title %}You've been invited to view the trip "{{ title }}"{% endblocktrans %}
