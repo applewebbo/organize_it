@@ -582,12 +582,16 @@ def create_trip_map(days_with_events, unassigned_events):
     ).add_to(m)
 
     seen_stay_pks = set()
-    fg_stays = folium.FeatureGroup(name="Soggiorni")
+    fg_stays = folium.FeatureGroup(
+        name='<span style="display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:-1px;background:#6b7280;margin-right:5px"></span>Soggiorni'
+    )
 
     for idx, day_data in enumerate(days_with_events, start=1):
         day = day_data["day"]
         color = DAY_COLORS[(idx - 1) % len(DAY_COLORS)]
-        fg = folium.FeatureGroup(name=f"Giorno {idx} — {day.date.strftime('%d %b')}")
+        fg = folium.FeatureGroup(
+            name=f'<span style="display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:-1px;background:{color};margin-right:5px"></span>Giorno {idx} — {day.date.strftime("%d %b")}'
+        )
 
         stay = day_data["stay"]
         if stay and stay.pk not in seen_stay_pks and stay.latitude and stay.longitude:
@@ -596,19 +600,27 @@ def create_trip_map(days_with_events, unassigned_events):
                 [stay.latitude, stay.longitude],
                 popup=stay.name,
                 tooltip=stay.name,
-                icon=folium.Icon(prefix="fa", color=STAY_ICON_COLOR, icon="bed"),
+                icon=folium.DivIcon(
+                    html='<div style="background:#6b7280;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,0.8);box-shadow:0 2px 5px rgba(0,0,0,0.35)"><i class="fa fa-bed" style="color:white;font-size:13px"></i></div>',
+                    icon_size=(30, 30),
+                    icon_anchor=(15, 15),
+                    popup_anchor=(0, -15),
+                ),
             ).add_to(fg_stays)
 
         for ev in day_data["events"]:
             if not (ev.latitude and ev.longitude):
                 continue
-            icon_name = "utensils" if ev.category == 3 else "map-marker"
+            icon_name = "cutlery" if ev.category == 3 else "map-marker"
             folium.Marker(
                 [ev.latitude, ev.longitude],
                 popup=ev.name,
                 tooltip=ev.name,
-                icon=folium.Icon(
-                    prefix="fa", color="white", icon=icon_name, icon_color=color
+                icon=folium.DivIcon(
+                    html=f'<div style="background:{color};width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,0.8);box-shadow:0 2px 5px rgba(0,0,0,0.35)"><i class="fa fa-{icon_name}" style="color:white;font-size:13px"></i></div>',
+                    icon_size=(30, 30),
+                    icon_anchor=(15, 15),
+                    popup_anchor=(0, -15),
                 ),
             ).add_to(fg)
 
@@ -626,7 +638,12 @@ def create_trip_map(days_with_events, unassigned_events):
             [ev.latitude, ev.longitude],
             popup=ev.name,
             tooltip=ev.name,
-            icon=folium.Icon(prefix="fa", color="lightgray", icon="map-marker"),
+            icon=folium.DivIcon(
+                html='<div style="background:#9ca3af;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,0.8);box-shadow:0 2px 5px rgba(0,0,0,0.35)"><i class="fa fa-map-marker" style="color:white;font-size:13px"></i></div>',
+                icon_size=(30, 30),
+                icon_anchor=(15, 15),
+                popup_anchor=(0, -15),
+            ),
         ).add_to(fg_unassigned)
         has_unassigned = True
     if has_unassigned:
@@ -637,7 +654,8 @@ def create_trip_map(days_with_events, unassigned_events):
         [
             [min(p[0] for p in all_points), min(p[1] for p in all_points)],
             [max(p[0] for p in all_points), max(p[1] for p in all_points)],
-        ]
+        ],
+        padding=[30, 30],
     )
 
     return m._repr_html_()

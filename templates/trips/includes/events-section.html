@@ -1,13 +1,9 @@
 {% load i18n trip_tags %}
 <div id="events-section" class="flex flex-col gap-4 mb-4">
     <section class="shadow card card-border bg-base-100">
-        <div class="p-4 sm:p-6 card-body" x-data="{ view: window.innerWidth < 640 ? 'list' : '
-            {% if show_map %}
-                map
-            {% else %}
-                list
-            {% endif %}
-            ' }">
+        <div class="card-body"
+             :class="view === 'map' ? 'p-4 pb-0 sm:p-6 sm:pb-0' : 'p-4 sm:p-6'"
+             x-data="{ view: window.innerWidth < 640 ? 'list' : ' {% if show_map %} map {% else %} list {% endif %} ' }">
             <div class="flex justify-between items-center">
                 <h2 class="text-xl font-medium sm:text-2xl">{% trans 'Things to Do' %}</h2>
                 {# Map tab only on desktop (sm+) #}
