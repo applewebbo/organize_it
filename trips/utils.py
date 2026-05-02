@@ -24,6 +24,13 @@ def accessible_trips_qs(user):
     return Trip.objects.filter(Q(author=user) | Q(collaborators=user)).distinct()
 
 
+def editable_trips_qs(user):
+    """Return queryset of trips where user is author or collaborator with can_edit=True."""
+    return Trip.objects.filter(
+        Q(author=user) | Q(collaborations__user=user, collaborations__can_edit=True)
+    ).distinct()
+
+
 def get_trip_or_404(pk, user):
     """Return Trip if user is author or collaborator, else 404."""
     return get_object_or_404(accessible_trips_qs(user), pk=pk)
@@ -32,6 +39,11 @@ def get_trip_or_404(pk, user):
 def get_trip_for_owner_or_404(pk, user):
     """Return Trip if user is the owner (author), else 404."""
     return get_object_or_404(Trip, pk=pk, author=user)
+
+
+def get_trip_for_editor_or_404(pk, user):
+    """Return Trip if user is author or collaborator with can_edit=True, else 404."""
+    return get_object_or_404(editable_trips_qs(user), pk=pk)
 
 
 logger = logging.getLogger(__name__)

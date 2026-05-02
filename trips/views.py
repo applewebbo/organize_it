@@ -55,10 +55,12 @@ from trips.utils import (
     accessible_trips_qs,
     create_day_map,
     download_unsplash_photo,
+    editable_trips_qs,
     geocode_location,
     get_airport_by_iata,
     get_event_instance,
     get_flight_origin_icao,
+    get_trip_for_editor_or_404,
     get_trip_for_owner_or_404,
     get_trip_or_404,
     get_trips,
@@ -385,7 +387,7 @@ def trip_delete(request, pk):
 
 
 def trip_update(request, pk):
-    trip = get_trip_for_owner_or_404(pk, request.user)
+    trip = get_trip_for_editor_or_404(pk, request.user)
     if request.method == "POST":
         form = TripForm(request.POST, request.FILES, instance=trip)
         if form.is_valid():
@@ -476,7 +478,7 @@ def reorder_events(request, day_id):
     """Save new event order after drag & drop. Expects JSON body: {"order": [pk1, pk2, ...]}"""
     import json
 
-    day = get_object_or_404(Day, pk=day_id, trip__in=accessible_trips_qs(request.user))
+    day = get_object_or_404(Day, pk=day_id, trip__in=editable_trips_qs(request.user))
     try:
         data = json.loads(request.body)
         ordered_pks = data.get("order", [])
@@ -519,7 +521,7 @@ def swap_event_order(request, event_id):
     event = get_object_or_404(
         Event,
         pk=event_id,
-        day__trip__in=accessible_trips_qs(request.user),
+        day__trip__in=editable_trips_qs(request.user),
     )
     try:
         other_id = int(request.POST.get("other_event_id", ""))
@@ -540,7 +542,7 @@ def swap_event_order(request, event_id):
 
 
 def add_experience(request, day_id):
-    day = get_object_or_404(Day, pk=day_id, trip__in=accessible_trips_qs(request.user))
+    day = get_object_or_404(Day, pk=day_id, trip__in=editable_trips_qs(request.user))
     unpaired_experiences = Event.objects.filter(
         day__isnull=True, trip=day.trip, category=2
     )
@@ -567,7 +569,7 @@ def add_experience(request, day_id):
 
 
 def add_meal(request, day_id):
-    day = get_object_or_404(Day, pk=day_id, trip__in=accessible_trips_qs(request.user))
+    day = get_object_or_404(Day, pk=day_id, trip__in=editable_trips_qs(request.user))
     unpaired_experiences = Event.objects.filter(
         day__isnull=True, trip=day.trip, category=3
     )
@@ -594,7 +596,7 @@ def add_meal(request, day_id):
 
 
 def add_stay_for_trip(request, trip_pk):
-    trip = get_trip_for_owner_or_404(trip_pk, request.user)
+    trip = get_trip_for_editor_or_404(trip_pk, request.user)
     form = StayForm(
         trip,
         data=request.POST or None,
@@ -611,7 +613,7 @@ def add_stay_for_trip(request, trip_pk):
 
 
 def add_stay(request, day_id):
-    day = get_object_or_404(Day, pk=day_id, trip__in=accessible_trips_qs(request.user))
+    day = get_object_or_404(Day, pk=day_id, trip__in=editable_trips_qs(request.user))
     trip = day.trip
     form = StayForm(
         trip,
@@ -732,7 +734,7 @@ def create_stay_transfer(request, from_day_id):
     (where next_day has a different stay), so next_day is the correct to_day.
     """
     from_day = get_object_or_404(
-        Day, pk=from_day_id, trip__in=accessible_trips_qs(request.user)
+        Day, pk=from_day_id, trip__in=editable_trips_qs(request.user)
     )
 
     # Get the next day - the button only appears when next_day exists and has different stay
@@ -804,7 +806,7 @@ def edit_stay_transfer(request, pk):
         "from_stay", "to_stay", "from_day__trip__author", "to_day", "trip"
     )
     stay_transfer = get_object_or_404(
-        qs, pk=pk, trip__in=accessible_trips_qs(request.user)
+        qs, pk=pk, trip__in=editable_trips_qs(request.user)
     )
     form = StayTransferEditForm(request.POST or None, instance=stay_transfer)
 
@@ -830,7 +832,7 @@ def delete_stay_transfer(request, pk):
     """Delete a StayTransfer"""
     qs = StayTransfer.objects.select_related("from_day__trip__author", "to_day")
     stay_transfer = get_object_or_404(
-        qs, pk=pk, trip__in=accessible_trips_qs(request.user)
+        qs, pk=pk, trip__in=editable_trips_qs(request.user)
     )
     from_day_id = stay_transfer.from_day.pk
     to_day_id = stay_transfer.to_day.pk
@@ -850,7 +852,7 @@ def delete_stay_transfer(request, pk):
 def edit_main_transfer(request, pk):
     """Edit existing main transfer - opens modal with specific form"""
     transfer = get_object_or_404(
-        MainTransfer, pk=pk, trip__in=accessible_trips_qs(request.user)
+        MainTransfer, pk=pk, trip__in=editable_trips_qs(request.user)
     )
     trip = transfer.trip
 
@@ -919,7 +921,7 @@ def edit_main_transfer(request, pk):
 def delete_main_transfer(request, pk):
     """Delete main transfer"""
     transfer = get_object_or_404(
-        MainTransfer, pk=pk, trip__in=accessible_trips_qs(request.user)
+        MainTransfer, pk=pk, trip__in=editable_trips_qs(request.user)
     )
 
     transfer.delete()
@@ -1063,7 +1065,7 @@ def event_modal(request, pk):
 @require_http_methods(["DELETE"])
 def event_delete(request, pk):
     qs = Event.objects.select_related("day__trip__author")
-    event = get_object_or_404(qs, pk=pk, trip__in=accessible_trips_qs(request.user))
+    event = get_object_or_404(qs, pk=pk, trip__in=editable_trips_qs(request.user))
     event.delete()
     messages.add_message(
         request,
@@ -1080,7 +1082,7 @@ def event_unpair(request, pk):
     Only the trip author can unpair events.
     """
     qs = Event.objects.select_related("trip__author")
-    event = get_object_or_404(qs, pk=pk, trip__in=accessible_trips_qs(request.user))
+    event = get_object_or_404(qs, pk=pk, trip__in=editable_trips_qs(request.user))
     event.day = None
     event.save()
     messages.add_message(
@@ -1097,8 +1099,8 @@ def event_pair(request, pk, day_id):
     Only the trip author can pair events.
     """
     qs = Event.objects.select_related("trip__author")
-    event = get_object_or_404(qs, pk=pk, trip__in=accessible_trips_qs(request.user))
-    day = get_object_or_404(Day, pk=day_id, trip__in=accessible_trips_qs(request.user))
+    event = get_object_or_404(qs, pk=pk, trip__in=editable_trips_qs(request.user))
+    day = get_object_or_404(Day, pk=day_id, trip__in=editable_trips_qs(request.user))
 
     event.day = day
     event.save()
@@ -1182,7 +1184,7 @@ def create_main_transfer_connection(request, main_transfer_pk, destination_type)
     from trips.models import MainTransfer
 
     main_transfer = get_object_or_404(
-        MainTransfer, pk=main_transfer_pk, trip__in=accessible_trips_qs(request.user)
+        MainTransfer, pk=main_transfer_pk, trip__in=editable_trips_qs(request.user)
     )
 
     # Check if connection already exists
@@ -1288,7 +1290,7 @@ def edit_main_transfer_connection(request, pk):
         "main_transfer__trip__author", "event", "stay"
     )
     connection = get_object_or_404(
-        qs, pk=pk, main_transfer__trip__in=accessible_trips_qs(request.user)
+        qs, pk=pk, main_transfer__trip__in=editable_trips_qs(request.user)
     )
 
     from trips.forms import MainTransferConnectionEditForm
@@ -1316,7 +1318,7 @@ def delete_main_transfer_connection(request, pk):
 
     qs = MainTransferConnection.objects.select_related("main_transfer__trip__author")
     connection = get_object_or_404(
-        qs, pk=pk, main_transfer__trip__in=accessible_trips_qs(request.user)
+        qs, pk=pk, main_transfer__trip__in=editable_trips_qs(request.user)
     )
     connection.delete()
     messages.add_message(
@@ -1349,7 +1351,7 @@ def event_modify(request, pk):
     For Experience/Meal events, loads the specific instance to access model-specific fields.
     """
     qs = Event.objects.select_related("day__trip", "experience", "meal")
-    event = get_object_or_404(qs, pk=pk, trip__in=accessible_trips_qs(request.user))
+    event = get_object_or_404(qs, pk=pk, trip__in=editable_trips_qs(request.user))
 
     event = get_event_instance(event)
 
@@ -1587,7 +1589,7 @@ def note_create(request, event_id):
     Add or update a note for an event (now a field on Event).
     """
     event = get_object_or_404(
-        Event, pk=event_id, trip__in=accessible_trips_qs(request.user)
+        Event, pk=event_id, trip__in=editable_trips_qs(request.user)
     )
     form = NoteForm(request.POST, instance=event)
     if form.is_valid():
@@ -1608,7 +1610,7 @@ def note_modify(request, event_id):
     Modify the note for an event (now a field on Event).
     """
     event = get_object_or_404(
-        Event, pk=event_id, trip__in=accessible_trips_qs(request.user)
+        Event, pk=event_id, trip__in=editable_trips_qs(request.user)
     )
     form = NoteForm(request.POST or None, instance=event)
     context = {"form": form, "event": event}
@@ -1630,7 +1632,7 @@ def note_delete(request, event_id):
     Delete the note from an event (clear the notes field).
     """
     event = get_object_or_404(
-        Event, pk=event_id, trip__in=accessible_trips_qs(request.user)
+        Event, pk=event_id, trip__in=editable_trips_qs(request.user)
     )
     event.notes = ""
     event.save()
@@ -1731,9 +1733,7 @@ def enrich_stay(request, stay_id):
     - Return preview for user confirmation.
     """
     stay = get_object_or_404(
-        Stay.objects.filter(
-            days__trip__in=accessible_trips_qs(request.user)
-        ).distinct(),
+        Stay.objects.filter(days__trip__in=editable_trips_qs(request.user)).distinct(),
         pk=stay_id,
     )
     context = {}
@@ -1800,9 +1800,7 @@ def confirm_enrich_stay(request, stay_id):
     Receives enriched data from the preview and saves it to the database.
     """
     stay = get_object_or_404(
-        Stay.objects.filter(
-            days__trip__in=accessible_trips_qs(request.user)
-        ).distinct(),
+        Stay.objects.filter(days__trip__in=editable_trips_qs(request.user)).distinct(),
         pk=stay_id,
     )
 
@@ -1868,9 +1866,7 @@ def enrich_event(request, event_id):
     - Return preview for user confirmation.
     """
     qs = Event.objects.select_related("trip__author", "experience", "meal")
-    event = get_object_or_404(
-        qs, pk=event_id, trip__in=accessible_trips_qs(request.user)
-    )
+    event = get_object_or_404(qs, pk=event_id, trip__in=editable_trips_qs(request.user))
     context = {}
 
     if not event.name or not event.address:
@@ -1924,9 +1920,7 @@ def confirm_enrich_event(request, event_id):
     Receives enriched data from the preview and saves it to the database.
     """
     qs = Event.objects.select_related("trip__author", "experience", "meal")
-    event = get_object_or_404(
-        qs, pk=event_id, trip__in=accessible_trips_qs(request.user)
-    )
+    event = get_object_or_404(qs, pk=event_id, trip__in=editable_trips_qs(request.user))
 
     # Get enriched data from POST parameters
     place_id = request.POST.get("place_id", "")
@@ -2257,7 +2251,7 @@ def main_transfer_step(request, trip_id):
 
 def save_main_transfer(request, trip_id):
     """Save main transfer (arrival or departure)."""
-    trip = get_trip_or_404(trip_id, request.user)
+    trip = get_trip_for_editor_or_404(trip_id, request.user)
 
     if request.method != "POST":
         return HttpResponse(status=405)
@@ -2460,6 +2454,7 @@ def add_collaborator(request, trip_id):
     trip = get_trip_for_owner_or_404(trip_id, request.user)
     User = get_user_model()
     email = request.POST.get("email", "").strip()
+    can_edit = request.POST.get("can_edit", "true").lower() != "false"
 
     try:
         user = User.objects.get(email=email)
@@ -2471,7 +2466,7 @@ def add_collaborator(request, trip_id):
 
     color = TripCollaboration.next_free_color(trip)
     TripCollaboration.objects.create(
-        trip=trip, user=user, color=color, added_by=request.user
+        trip=trip, user=user, color=color, added_by=request.user, can_edit=can_edit
     )
 
     trip_url = request.build_absolute_uri(reverse("trips:trip-detail", args=[trip.pk]))
@@ -2491,6 +2486,22 @@ def add_collaborator(request, trip_id):
     msg.attach_alternative(html_body, "text/html")
     msg.send()
 
+    collaborations = trip.collaborations.select_related("user__profile").all()
+    return TemplateResponse(
+        request,
+        "trips/includes/collab-modal-list.html",
+        {"trip": trip, "collaborations": collaborations},
+        headers={"HX-Trigger": "collaboratorsModified"},
+    )
+
+
+@require_http_methods(["POST"])
+def toggle_participant_role(request, trip_id, collaboration_id):
+    """Toggle can_edit for a participant (owner only)."""
+    trip = get_trip_for_owner_or_404(trip_id, request.user)
+    collaboration = get_object_or_404(TripCollaboration, pk=collaboration_id, trip=trip)
+    collaboration.can_edit = not collaboration.can_edit
+    collaboration.save()
     collaborations = trip.collaborations.select_related("user__profile").all()
     return TemplateResponse(
         request,
@@ -2598,7 +2609,7 @@ def accept_invitation(request, token):
     TripCollaboration.objects.get_or_create(
         trip=trip,
         user=request.user,
-        defaults={"color": color, "added_by": invitation.invited_by},
+        defaults={"color": color, "added_by": invitation.invited_by, "can_edit": False},
     )
 
     trip_url = request.build_absolute_uri(reverse("trips:trip-detail", args=[trip.pk]))
@@ -2624,7 +2635,7 @@ def accept_invitation(request, token):
     msg.attach_alternative(html_body, "text/html")
     msg.send()
 
-    messages.success(request, _("You've joined the trip as a collaborator."))
+    messages.success(request, _("You've joined the trip as a participant."))
     return redirect(reverse("trips:trip-detail", args=[trip.pk]))
 
 

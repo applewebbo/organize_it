@@ -39,7 +39,7 @@ class TestSearchUserByEmail:
         url = reverse("trips:search-user-by-email", args=[trip.pk])
         response = client.get(url, {"collab_email": collab.email})
         assert response.status_code == 200
-        assert b"Already a collaborator" in response.content
+        assert b"Already a participant" in response.content
 
     def test_owner_email_shows_already_collab(self, client, user_factory, trip_factory):
         owner = user_factory()
@@ -48,7 +48,7 @@ class TestSearchUserByEmail:
         url = reverse("trips:search-user-by-email", args=[trip.pk])
         response = client.get(url, {"collab_email": owner.email})
         assert response.status_code == 200
-        assert b"Already a collaborator" in response.content
+        assert b"Already a participant" in response.content
 
     def test_email_not_found(self, client, user_factory, trip_factory):
         owner = user_factory()
@@ -230,6 +230,62 @@ class TestRemoveCollaborator:
         )
         client.force_login(owner)
         url = reverse("trips:remove-collaborator", args=[trip.pk, tc.pk])
+        response = client.post(url)
+        assert "collaboratorsModified" in response.headers.get("HX-Trigger", "")
+
+
+class TestToggleParticipantRole:
+    def test_owner_toggles_editor_to_viewer(self, client, user_factory, trip_factory):
+        owner = user_factory()
+        collab = user_factory()
+        trip = trip_factory(author=owner)
+        tc = TripCollaboration.objects.create(
+            trip=trip, user=collab, color="blue", added_by=owner, can_edit=True
+        )
+        client.force_login(owner)
+        url = reverse("trips:toggle-participant-role", args=[trip.pk, tc.pk])
+        response = client.post(url)
+        assert response.status_code == 200
+        tc.refresh_from_db()
+        assert tc.can_edit is False
+
+    def test_owner_toggles_viewer_to_editor(self, client, user_factory, trip_factory):
+        owner = user_factory()
+        collab = user_factory()
+        trip = trip_factory(author=owner)
+        tc = TripCollaboration.objects.create(
+            trip=trip, user=collab, color="blue", added_by=owner, can_edit=False
+        )
+        client.force_login(owner)
+        url = reverse("trips:toggle-participant-role", args=[trip.pk, tc.pk])
+        response = client.post(url)
+        assert response.status_code == 200
+        tc.refresh_from_db()
+        assert tc.can_edit is True
+
+    def test_non_owner_gets_404(self, client, user_factory, trip_factory):
+        owner = user_factory()
+        collab = user_factory()
+        trip = trip_factory(author=owner)
+        tc = TripCollaboration.objects.create(
+            trip=trip, user=collab, color="blue", added_by=owner
+        )
+        client.force_login(collab)
+        url = reverse("trips:toggle-participant-role", args=[trip.pk, tc.pk])
+        response = client.post(url)
+        assert response.status_code == 404
+
+    def test_response_triggers_collaborators_modified(
+        self, client, user_factory, trip_factory
+    ):
+        owner = user_factory()
+        collab = user_factory()
+        trip = trip_factory(author=owner)
+        tc = TripCollaboration.objects.create(
+            trip=trip, user=collab, color="blue", added_by=owner
+        )
+        client.force_login(owner)
+        url = reverse("trips:toggle-participant-role", args=[trip.pk, tc.pk])
         response = client.post(url)
         assert "collaboratorsModified" in response.headers.get("HX-Trigger", "")
 

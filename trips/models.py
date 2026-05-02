@@ -899,6 +899,7 @@ class TripCollaboration(models.Model):
         on_delete=models.CASCADE,
         related_name="collaborations_added",
     )
+    can_edit = models.BooleanField(default=True)
 
     class Meta:
         unique_together = ("trip", "user")

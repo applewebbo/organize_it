@@ -209,6 +209,11 @@ htmx_urlpatterns = [
         name="remove-collaborator",
     ),
     path(
+        "trips/<int:trip_id>/collaborators/<int:collaboration_id>/toggle-role/",
+        views.toggle_participant_role,
+        name="toggle-participant-role",
+    ),
+    path(
         "trips/<int:trip_id>/collaborators/invite/",
         views.invite_collaborator,
         name="invite-collaborator",

@@ -4,16 +4,27 @@
         <div class="flex gap-2 items-center p-2 rounded-lg bg-base-200 {% if not forloop.first %}mt-2{% endif %}">
             <span class="text-sm grow">{{ result.user.email }}</span>
             {% if result.already_collab %}
-                <span class="text-xs text-base-content/60">{% trans "Already a collaborator." %}</span>
+                <span class="text-xs text-base-content/60">{% trans "Already a participant." %}</span>
             {% else %}
                 <form method="post"
                       action="{% url 'trips:add-collaborator' trip.pk %}"
                       hx-post="{% url 'trips:add-collaborator' trip.pk %}"
                       hx-target="#collab-modal-list"
-                      hx-swap="outerHTML">
+                      hx-swap="outerHTML"
+                      x-data="{ canEdit: true }">
                     {% csrf_token %}
                     <input type="hidden" name="email" value="{{ result.user.email }}">
-                    <button type="submit" class="btn btn-sm btn-primary">{% trans "Add" %}</button>
+                    <input type="hidden" name="can_edit" :value="canEdit ? 'true' : 'false'">
+                    <div class="flex gap-2 items-center">
+                        <label class="flex gap-1 items-center text-xs cursor-pointer text-base-content/70">
+                            <input type="checkbox"
+                                   class="toggle toggle-xs toggle-primary"
+                                   x-model="canEdit"
+                                   checked>
+                            <span x-text="canEdit ? '{% trans "Editor" %}' : '{% trans "Viewer" %}'"></span>
+                        </label>
+                        <button type="submit" class="btn btn-sm btn-primary">{% trans "Add" %}</button>
+                    </div>
                 </form>
             {% endif %}
         </div>

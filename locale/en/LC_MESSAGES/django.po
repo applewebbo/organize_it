@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-30 19:24+0200\n"
+"POT-Creation-Date: 2026-05-02 07:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -482,31 +482,32 @@ msgstr ""
 msgid "Get started"
 msgstr ""
 
-#: templates/includes/auth-index.html:23
+#: templates/includes/auth-index.html:30
 msgid "Other Trips"
 msgstr ""
 
-#: templates/includes/auth-index.html:41 templates/trips/event-detail.html:79
+#: templates/includes/auth-index.html:48 templates/trips/event-detail.html:79
 #: templates/trips/includes/main-transfers.html:91
 #: templates/trips/includes/main-transfers.html:164
 #: templates/trips/includes/main-transfers.html:264
 #: templates/trips/includes/main-transfers.html:337
 #: templates/trips/includes/note.html:8
+#: templates/trips/includes/trip-header-card.html:52
 #: templates/trips/main-transfer-connection-modal.html:37
 #: templates/trips/stay-detail.html:88 templates/trips/trip-list.html:99
 #: templates/trips/trip-list.html:185
 msgid "Edit"
 msgstr ""
 
-#: templates/includes/auth-index.html:55
+#: templates/includes/auth-index.html:62
 msgid "Toggle guide visibility"
 msgstr ""
 
-#: templates/includes/auth-index.html:59
+#: templates/includes/auth-index.html:66
 msgid "Hide Guide"
 msgstr ""
 
-#: templates/includes/auth-index.html:61
+#: templates/includes/auth-index.html:68
 msgid "Show Guide"
 msgstr ""
 
@@ -837,39 +838,57 @@ msgstr ""
 msgid "No airport found. Try searching by name, city, or IATA code."
 msgstr ""
 
-#: templates/trips/includes/collab-inline.html:9
+#: templates/trips/includes/collab-inline.html:13
 #: templates/trips/includes/collab-modal.html:4
 #: templates/trips/includes/collaborators-section.html:5
-msgid "Collaborators"
-msgstr "Collaborators"
+msgid "Participants"
+msgstr "Participants"
 
-#: templates/trips/includes/collab-inline.html:27
-#: templates/trips/includes/collab-search-result.html:16
-#: templates/trips/includes/main-transfers.html:108
-#: templates/trips/includes/main-transfers.html:281
-#: templates/trips/main-transfer-form.html:28
-msgid "Add"
-msgstr "Add"
-
-#: templates/trips/includes/collab-inline.html:31
+#: templates/trips/includes/collab-inline.html:15
 #, fuzzy
 #| msgid "Shared with me"
 msgid "Shared by"
 msgstr "Shared with me"
+
+#: templates/trips/includes/collab-inline.html:24
+#: templates/trips/includes/collab-inline.html:26
+msgid "Add participant"
+msgstr "Add participant"
+
+#: templates/trips/includes/collab-inline.html:53
+#: templates/trips/includes/collab-modal-list.html:16
+#: templates/trips/includes/collab-search-result.html:24
+msgid "Editor"
+msgstr "Editor"
+
+#: templates/trips/includes/collab-inline.html:53
+#: templates/trips/includes/collab-modal-list.html:16
+#: templates/trips/includes/collab-search-result.html:24
+msgid "Viewer"
+msgstr "Viewer"
+
+#: templates/trips/includes/collab-inline.html:60
+#: templates/trips/includes/collab-modal-list.html:43
+#: templates/trips/includes/collaborators-section.html:37
+msgid "No participants yet."
+msgstr "No participants yet."
 
 #: templates/trips/includes/collab-invite-sent.html:5
 #, python-format
 msgid "Invitation sent to %(email)s."
 msgstr ""
 
-#: templates/trips/includes/collab-modal-list.html:22
+#: templates/trips/includes/collab-modal-list.html:25
+msgid "Set as viewer"
+msgstr "Set as viewer"
+
+#: templates/trips/includes/collab-modal-list.html:25
+msgid "Set as editor"
+msgstr "Set as editor"
+
+#: templates/trips/includes/collab-modal-list.html:35
 msgid "Remove"
 msgstr "Remove"
-
-#: templates/trips/includes/collab-modal-list.html:30
-#: templates/trips/includes/collaborators-section.html:37
-msgid "No collaborators yet."
-msgstr "No collaborators yet."
 
 #: templates/trips/includes/collab-modal.html:13
 msgid "Add by email"
@@ -881,24 +900,32 @@ msgid "Search by email…"
 msgstr "Search by email…"
 
 #: templates/trips/includes/collab-search-result.html:7
-msgid "Already a collaborator."
-msgstr "Already a collaborator."
+msgid "Already a participant."
+msgstr "Already a participant."
 
-#: templates/trips/includes/collab-search-result.html:24
+#: templates/trips/includes/collab-search-result.html:26
+#: templates/trips/includes/main-transfers.html:108
+#: templates/trips/includes/main-transfers.html:281
+#: templates/trips/includes/trip-header-card.html:39
+#: templates/trips/main-transfer-form.html:28
+msgid "Add"
+msgstr "Add"
+
+#: templates/trips/includes/collab-search-result.html:35
 msgid "No account found."
 msgstr "No account found."
 
-#: templates/trips/includes/collab-search-result.html:32
+#: templates/trips/includes/collab-search-result.html:43
 msgid "Invite by email"
 msgstr "Invite by email"
 
 #: templates/trips/includes/collaborators-section.html:28
-msgid "Remove collaborator"
-msgstr "Remove collaborator"
+msgid "Remove participant"
+msgstr "Remove participant"
 
 #: templates/trips/includes/collaborators-section.html:42
-msgid "Add collaborator by email"
-msgstr "Add collaborator by email"
+msgid "Add participant by email"
+msgstr "Add participant by email"
 
 #: templates/trips/includes/day-map-content.html:12
 msgid "No events to display on a map for this day"
@@ -920,7 +947,7 @@ msgstr ""
 msgid "Open in Google Maps"
 msgstr ""
 
-#: templates/trips/includes/day.html:10
+#: templates/trips/includes/day.html:11 templates/trips/includes/day.html:13
 #: templates/trips/shared-trip-detail.html:25 trips/forms.py:675
 #: trips/models.py:436
 msgid "Day"
@@ -930,11 +957,11 @@ msgstr ""
 msgid "Things to Do"
 msgstr "Things to Do"
 
-#: templates/trips/includes/events-section.html:24
+#: templates/trips/includes/events-section.html:25
 msgid "Other Things to Do"
 msgstr "Other Things to Do"
 
-#: templates/trips/includes/events-section.html:25
+#: templates/trips/includes/events-section.html:26
 msgid "Here you find events not yet assigned to a specific day"
 msgstr "Here you find events not yet assigned to a specific day"
 
@@ -1095,7 +1122,6 @@ msgstr ""
 
 #: templates/trips/includes/trip-header-card.html:14
 #: templates/trips/includes/trip-header-card.html:50
-#: templates/trips/includes/trip-header-card.html:52
 msgid "Edit trip"
 msgstr ""
 
@@ -1107,7 +1133,6 @@ msgid "Share trip"
 msgstr ""
 
 #: templates/trips/includes/trip-header-card.html:37
-#: templates/trips/includes/trip-header-card.html:39
 msgid "Add events"
 msgstr "Add events"
 
@@ -1956,191 +1981,197 @@ msgstr ""
 msgid "Indigo"
 msgstr ""
 
-#: trips/models.py:956
+#: trips/models.py:957
 msgid "View only"
 msgstr ""
 
-#: trips/models.py:957
+#: trips/models.py:958
 msgid "Can edit"
 msgstr ""
 
-#: trips/views.py:356
+#: trips/views.py:358
 #, python-format
 msgid "<strong>%(title)s</strong> added successfully"
 msgstr ""
 
-#: trips/views.py:379
+#: trips/views.py:381
 #, python-format
 msgid "<strong>%(title)s</strong> deleted successfully"
 msgstr ""
 
-#: trips/views.py:425
+#: trips/views.py:427
 #, python-format
 msgid "<strong>%(title)s</strong> updated successfully"
 msgstr ""
 
-#: trips/views.py:451
+#: trips/views.py:453
 #, python-format
 msgid "<strong>%(title)s</strong> archived successfully"
 msgstr ""
 
-#: trips/views.py:466
+#: trips/views.py:468
 #, python-format
 msgid "<strong>%(title)s</strong> unarchived successfully"
 msgstr ""
 
-#: trips/views.py:562
+#: trips/views.py:564
 msgid "Experience added successfully"
 msgstr ""
 
-#: trips/views.py:589
+#: trips/views.py:591
 msgid "Meal added successfully"
 msgstr ""
 
-#: trips/views.py:607 trips/views.py:628
+#: trips/views.py:609 trips/views.py:630
 msgid "Stay added successfully"
 msgstr ""
 
-#: trips/views.py:710
+#: trips/views.py:712
 msgid "Stay deleted successfully"
 msgstr ""
 
-#: trips/views.py:744
+#: trips/views.py:746
 msgid "No next day found for this stay"
 msgstr ""
 
-#: trips/views.py:753
+#: trips/views.py:755
 msgid "Both days must have stays to create a transfer"
 msgstr ""
 
-#: trips/views.py:765
+#: trips/views.py:767
 msgid "Cannot create transfer between the same stay"
 msgstr ""
 
-#: trips/views.py:785
+#: trips/views.py:787
 msgid "Stay transfer created successfully"
 msgstr ""
 
-#: trips/views.py:816
+#: trips/views.py:818
 msgid "Stay transfer updated successfully"
 msgstr ""
 
-#: trips/views.py:841
+#: trips/views.py:843
 msgid "Stay transfer deleted successfully"
 msgstr ""
 
-#: trips/views.py:878
+#: trips/views.py:880
 msgid "Main transfer updated successfully"
 msgstr ""
 
-#: trips/views.py:929
+#: trips/views.py:931
 msgid "Main transfer deleted successfully"
 msgstr ""
 
-#: trips/views.py:1071
+#: trips/views.py:1073
 msgid "Event deleted successfully"
 msgstr ""
 
-#: trips/views.py:1089
+#: trips/views.py:1091
 msgid "Event unpaired successfully"
 msgstr ""
 
-#: trips/views.py:1108
+#: trips/views.py:1110
 msgid "Event paired successfully"
 msgstr ""
 
-#: trips/views.py:1193
+#: trips/views.py:1195
 msgid "A connection already exists for this main transfer"
 msgstr ""
 
-#: trips/views.py:1204
+#: trips/views.py:1206
 msgid "Invalid destination type"
 msgstr ""
 
-#: trips/views.py:1215 trips/views.py:1230
+#: trips/views.py:1217 trips/views.py:1232
 msgid "No days available in this trip"
 msgstr ""
 
-#: trips/views.py:1268
+#: trips/views.py:1270
 msgid "Connection created successfully"
 msgstr ""
 
-#: trips/views.py:1303
+#: trips/views.py:1305
 msgid "Connection updated successfully"
 msgstr ""
 
-#: trips/views.py:1325
+#: trips/views.py:1327
 msgid "Connection deleted successfully"
 msgstr ""
 
-#: trips/views.py:1433
+#: trips/views.py:1435
 msgid "Start date must be after today."
 msgstr ""
 
-#: trips/views.py:1437
+#: trips/views.py:1439
 msgid "Start date cannot be after end date."
 msgstr ""
 
-#: trips/views.py:1598 trips/views.py:1672
+#: trips/views.py:1600 trips/views.py:1674
 msgid "Note added successfully"
 msgstr ""
 
-#: trips/views.py:1620 trips/views.py:1697
+#: trips/views.py:1622 trips/views.py:1699
 msgid "Note updated successfully"
 msgstr ""
 
-#: trips/views.py:1640 trips/views.py:1717
+#: trips/views.py:1642 trips/views.py:1719
 msgid "Note deleted successfully"
 msgstr ""
 
-#: trips/views.py:1743
+#: trips/views.py:1745
 msgid "Stay must have a name and an address to be enriched."
 msgstr ""
 
-#: trips/views.py:1755 trips/views.py:1892
+#: trips/views.py:1757 trips/views.py:1894
 msgid "Could not find a matching place."
 msgstr ""
 
-#: trips/views.py:1852
+#: trips/views.py:1854
 msgid "Stay enriched successfully!"
 msgstr ""
 
-#: trips/views.py:1878
+#: trips/views.py:1880
 msgid "Event must have a name and an address to be enriched."
 msgstr ""
 
-#: trips/views.py:1960
+#: trips/views.py:1962
 msgid "Event enriched successfully!"
 msgstr ""
 
-#: trips/views.py:1977
+#: trips/views.py:1979
 msgid "Please enter a destination first"
 msgstr ""
 
-#: trips/views.py:1987
+#: trips/views.py:1989
 msgid "Unsplash API error. Please try again later."
 msgstr ""
 
-#: trips/views.py:1994
+#: trips/views.py:1996
 #, python-brace-format
 msgid "No images found for '{query}'"
 msgstr ""
 
-#: trips/views.py:2305
+#: trips/views.py:2307
 msgid "Transfer saved successfully!"
 msgstr ""
 
-#: trips/views.py:2627
-msgid "You've joined the trip as a collaborator."
-msgstr ""
+#: trips/views.py:2646
+msgid "You've joined the trip as a participant."
+msgstr "You've joined the trip as a participant."
 
-#: trips/views.py:2829
+#: trips/views.py:2848
 msgid "Event added to trip."
 msgstr "Event added to trip."
 
-#: trips/views.py:2882
+#: trips/views.py:2901
 msgid "Stay added to trip."
 msgstr "Stay added to trip."
+
+#~ msgid "Collaborators"
+#~ msgstr "Collaborators"
+
+#~ msgid "Remove collaborator"
+#~ msgstr "Remove collaborator"
 
 #~ msgid "Activities and events organized by day"
 #~ msgstr "Activities and events organized by day"
