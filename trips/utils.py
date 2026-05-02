@@ -16,7 +16,7 @@ from django.shortcuts import get_object_or_404
 from PIL import Image
 
 from accounts.models import get_profile
-from trips.models import Event, MainTransfer, StayTransfer, Trip
+from trips.models import Event, MainTransfer, Stay, StayTransfer, Trip
 
 
 def accessible_trips_qs(user):
@@ -127,18 +127,26 @@ def get_trips(user):
     featured_trip = fav_trip or latest_trip
     arrival_transfer = None
     departure_transfer = None
+    stays = None
     if featured_trip:
         for t in featured_trip.main_transfers.all():
             if t.direction == 1:
                 arrival_transfer = t
             else:
                 departure_transfer = t
+        stays = (
+            Stay.objects.filter(days__trip=featured_trip)
+            .annotate(first_day_date=Min("days__date"), last_day_date=Max("days__date"))
+            .distinct()
+            .order_by("first_day_date")
+        )
 
     return {
         "fav_trip": fav_trip,
         "latest_trip": latest_trip,
         "other_trips": other_trips,
         "unpaired_events": unpaired_events,
+        "stays": stays,
         "show_map": show_map,
         "arrival_transfer": arrival_transfer,
         "departure_transfer": departure_transfer,
