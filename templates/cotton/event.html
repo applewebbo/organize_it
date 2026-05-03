@@ -3,7 +3,7 @@
     <i class="hidden absolute top-1 right-1 pointer-events-none sm:block ph-bold ph-dots-six-vertical text-base-content/20"
        aria-hidden="true"></i>
     <div class="flex-grow py-3 px-2 sm:px-4">
-        <div class="flex items-center mb-3">
+        <div class="flex items-center">
             <div class="{{ icon_color }} bg-slate-50 dark:bg-slate-700 mt-1 p-1 sm:p-1.5 rounded-md border-2 {{ border_color }} ">
                 <i class="ph-bold ph-{{ icon }} i-sm sm:i-lg"></i>
             </div>
@@ -27,7 +27,7 @@
                 <div class="{{ icon_color }} flex items-center gap-x-2">{{ slot }}</div>
             </div>
         </div>
-        {% if event.day.trip.status != 5 %}
+        {% if event.day.trip.status != 5 and event.google_maps_directions_url or swap_url %}
             <div class="flex flex-row gap-2 justify-end mt-2 me-2" x-data>
                 {% if event.google_maps_directions_url %}
                     <a class="btn btn-xs btn-soft sm:hidden {{ border_color }} {{ bg_color }} dark:hover:bg-slate-900/10 hover:bg-white/50"
