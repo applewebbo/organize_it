@@ -881,35 +881,27 @@ msgstr ""
 msgid "Participants"
 msgstr "Participants"
 
-#: templates/trips/includes/collab-inline.html:15
-#, fuzzy
-#| msgid "Shared with me"
-msgid "Shared by"
-msgstr "Shared with me"
-
-#: templates/trips/includes/collab-inline.html:24
-#: templates/trips/includes/collab-inline.html:26
+#: templates/trips/includes/collab-inline.html:21
+#: templates/trips/includes/collab-inline.html:23
 msgid "Add participant"
 msgstr "Add participant"
 
-#: templates/trips/includes/collab-inline.html:70
+#: templates/trips/includes/collab-inline.html:41
+msgid "Organizer"
+msgstr "Organizer"
+
+#: templates/trips/includes/collab-inline.html:57
 #: templates/trips/includes/collab-modal-list.html:33
 #: templates/trips/includes/collab-modal.html:19
 msgid "Editor"
 msgstr "Editor"
 
-#: templates/trips/includes/collab-inline.html:72
+#: templates/trips/includes/collab-inline.html:59
 #: templates/trips/includes/collab-modal-list.html:35
-#, fuzzy
-#| msgid "Participants"
-msgid "Participant"
-msgstr "Participants"
-
-#: templates/trips/includes/collab-inline.html:74
 #: templates/trips/includes/collab-modal-list.html:37
 #: templates/trips/includes/collab-modal.html:25
-msgid "Viewer"
-msgstr "Viewer"
+msgid "Guest"
+msgstr "Guest"
 
 #: templates/trips/includes/collab-inline.html:82
 #: templates/trips/includes/collab-modal-list.html:67
