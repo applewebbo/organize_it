@@ -68,6 +68,11 @@
                                             {% endif %}
                                         </div>
                                     </div>
+                                    {% if stay.notes %}
+                                        <p class="flex gap-1.5 items-center mt-1 text-sm text-slate-500 line-clamp-2 dark:text-slate-400">
+                                            <i class="ph-bold ph-note shrink-0" aria-hidden="true"></i>{{ stay.notes }}
+                                        </p>
+                                    {% endif %}
                                 </div>
                             </div>
                         </li>
