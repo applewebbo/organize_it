@@ -77,10 +77,11 @@ class TripForm(forms.ModelForm):
 
         # Configure image upload field
         self.fields["image"].required = False
-        self.fields["image"].widget.attrs.update(
-            {"accept": "image/*", "x-show": "imageMode === 'upload'"}
-        )
+        self.fields["image"].widget.attrs.update({"accept": "image/*"})
 
+        current_image_url = (
+            self.instance.image.url if self.instance.pk and self.instance.image else ""
+        )
         trip_id = self.instance.pk if self.instance.pk else "new"
 
         self.helper = FormHelper()
@@ -120,11 +121,12 @@ class TripForm(forms.ModelForm):
             # Mode Toggle
             HTML(
                 """
-            <div class="mb-4 sm:col-span-2" x-data="{ showDestinationError: false }">
-                <div class="flex gap-2">
+            <div class="sm:col-span-2" x-data="{ showDestinationError: false }">
+                <div role="tablist" class="tabs tabs-border tabs-sm">
                     <button type="button"
-                            class="btn btn-outline dark:btn-soft"
-                            :class="imageMode === 'search' ? 'btn-primary' : ''"
+                            role="tab"
+                            class="gap-1 tab"
+                            :class="imageMode === 'search' ? 'tab-active' : ''"
                             @click="
                                 const destValue = document.querySelector('[name=destination]').value;
                                 if (!destValue || destValue.trim() === '') {
@@ -155,8 +157,9 @@ class TripForm(forms.ModelForm):
                 + """
                     </button>
                     <button type="button"
-                            class="btn btn-outline dark:btn-soft"
-                            :class="imageMode === 'upload' ? 'btn-primary' : ''"
+                            role="tab"
+                            class="gap-1 tab"
+                            :class="imageMode === 'upload' ? 'tab-active' : ''"
                             @click="imageMode = 'upload'">
                         <i class="ph-bold ph-upload"></i>
                         """
@@ -185,9 +188,37 @@ class TripForm(forms.ModelForm):
             ),
             # Upload section
             Div(
-                Field("image", wrapper_class="w-full"),
-                HTML('<div id="upload-preview" class="mt-4"></div>'),
-                css_class="upload-section sm:col-span-2",
+                HTML(
+                    f"""
+                    <div x-data="{{
+                        previewUrl: '{current_image_url}',
+                        fileName: '',
+                        onFileChange(e) {{
+                            const file = e.target.files[0];
+                            if (!file) return;
+                            this.fileName = file.name;
+                            const reader = new FileReader();
+                            reader.onload = (ev) => {{ this.previewUrl = ev.target.result; }};
+                            reader.readAsDataURL(file);
+                        }}
+                    }}" class="flex flex-col gap-2">
+                        <template x-if="previewUrl">
+                            <img :src="previewUrl"
+                                 class="object-cover w-full h-32 rounded-lg border border-base-300"
+                                 alt="preview">
+                        </template>
+                        <label for="id_image"
+                               class="flex gap-2 justify-center items-center w-full h-12 rounded-lg border-2 border-dashed cursor-pointer border-base-300 hover:border-primary hover:bg-base-200">
+                            <i class="ph-bold ph-upload-simple text-base-content/50"></i>
+                            <span class="text-sm text-base-content/60"
+                                  x-text="fileName || '{_("Click to select an image")}'"
+                            ></span>
+                        </label>
+                        <input type="file" name="image" accept="image/*" class="hidden" id="id_image" @change="onFileChange($event)">
+                    </div>
+                    """
+                ),
+                css_class="upload-section sm:col-span-2 mt-4",
                 x_show="imageMode === 'upload'",
             ),
         )

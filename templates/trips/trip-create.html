@@ -29,7 +29,7 @@
         {% csrf_token %}
         {% crispy form %}
         {% if is_update %}
-            <div class="sm:col-span-2 alert alert-warning alert-soft alert-sm">
+            <div class="mt-4 sm:col-span-2 alert alert-warning alert-soft alert-sm">
                 <i class="ph-bold ph-warning i-sm"></i>
                 <span>{% trans "Changing the dates may remove some days. Events on removed days will become unpaired and can be reassigned later." %}</span>
             </div>

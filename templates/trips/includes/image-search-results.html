@@ -5,7 +5,7 @@
         <span>{{ error }}</span>
     </div>
 {% elif photos %}
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-3"
+    <div class="grid grid-cols-2 gap-2 md:grid-cols-3"
          x-data="{ selectedId: '' }">
         {% for photo in photos %}
             <div class="overflow-hidden relative rounded-lg shadow-lg cursor-pointer group"
@@ -14,7 +14,7 @@
                 <!-- Image -->
                 <img src="{{ photo.urls.small }}"
                      alt="{{ photo.alt_description }}"
-                     class="object-cover w-full h-48 transition-transform duration-200 group-hover:scale-110">
+                     class="object-cover w-full h-32 transition-transform duration-200 group-hover:scale-110">
                 <!-- Overlay with photographer credit -->
                 <div class="flex absolute inset-0 flex-col justify-end p-3 bg-gradient-to-t to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100 from-black/70">
                     <p class="text-sm text-white">
