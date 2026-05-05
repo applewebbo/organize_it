@@ -217,7 +217,7 @@ issue-create title body="":
 # Edit issue body from file (usage: just issue-edit-body 249 /path/to/body.md)
 [group('codeberg')]
 issue-edit-body number file:
-    fgj issue edit {{number}} --body "$(cat {{file}})"
+    fj issue edit {{number}} body "$(cat {{file}})"
 
 # List all releases
 [group('codeberg')]
@@ -241,7 +241,7 @@ release-show tag:
       -H "Authorization: token ${TOKEN}" | \
       jq -r '"\nTag: \(.tag_name)\nName: \(.name)\nPublished: \(.published_at)\nDraft: \(.draft)\nPrerelease: \(.prerelease)\n\nURL: \(.html_url)\n\nBody:\n\(.body)\n"'
 
-# Create a new release (creates tag, pushes main+tag, creates Codeberg release via fgj)
+# Create a new release (creates tag, pushes main+tag, creates Codeberg release via fj)
 # Pass notes_file to use custom rich notes; omit for auto-generated notes from commits
 [group('codeberg')]
 release-create tag previous_tag="" notes_file="" draft="false" prerelease="false":
@@ -324,9 +324,9 @@ release-create tag previous_tag="" notes_file="" draft="false" prerelease="false
         } > "$NOTES_FILE"
     fi
 
-    # Create release via fgj
+    # Create release via fj
     echo "🚀 Creating release on Codeberg..."
-    fgj release create "{{tag}}" --repo webbografico/organize_it --title "{{tag}}" --notes-file "$NOTES_FILE"
+    fj release create "{{tag}}" -r webbografico/organize_it --tag "{{tag}}" --body "$(cat "$NOTES_FILE")"
     echo ""
     echo "✓ Release {{tag}} created!"
 
