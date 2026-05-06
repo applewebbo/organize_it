@@ -2140,6 +2140,10 @@ msgid "Sport"
 msgstr "Attività sportiva"
 
 #: trips/models.py:847
+msgid "To be defined"
+msgstr "Da definire"
+
+#: trips/models.py:848
 msgid "Breakfast"
 msgstr "Colazione"
 

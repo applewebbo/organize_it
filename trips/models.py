@@ -844,12 +844,13 @@ class Experience(Event):
 
 class Meal(Event):
     class Type(models.IntegerChoices):
+        UNDEFINED = 0, _("To be defined")
         BREAKFAST = 1, _("Breakfast")
         LUNCH = 2, _("Lunch")
         DINNER = 3, _("Dinner")
         SNACK = 4, _("Snack")
 
-    type = models.IntegerField(choices=Type.choices, default=Type.LUNCH)
+    type = models.IntegerField(choices=Type.choices, default=Type.UNDEFINED)
 
     def __str__(self) -> str:
         return f"{self.name} ({self.day.trip.title} - Day {self.day.number})"

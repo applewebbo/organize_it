@@ -21,6 +21,7 @@ from trips.templatetags.trip_tags import (
     is_first_day_of_stay,
     is_first_day_of_trip,
     is_last_day,
+    meal_type_label,
     next_day,
     phone_format,
     prev_day,
@@ -732,3 +733,37 @@ class TestDurationDisplay:
         from datetime import timedelta
 
         assert duration_display(timedelta(hours=1, minutes=30)) == "1h 30min"
+
+
+class TestMealTypeLabel:
+    def test_returns_empty_for_experience(self):
+        trip = TripFactory()
+        day = trip.days.first()
+        event = ExperienceFactory(day=day)
+        assert meal_type_label(event) == ""
+
+    def test_returns_empty_for_undefined(self):
+        from trips.models import Meal
+
+        trip = TripFactory()
+        day = trip.days.first()
+        event = MealFactory(day=day, type=Meal.Type.UNDEFINED)
+        assert meal_type_label(event) == ""
+
+    def test_returns_label_for_defined_type(self):
+        from trips.models import Meal
+
+        trip = TripFactory()
+        day = trip.days.first()
+        event = MealFactory(day=day, type=Meal.Type.DINNER)
+        assert meal_type_label(event) == "Dinner"
+
+    def test_returns_label_via_event_queryset(self):
+        """Test that meal_type_label works when called with base Event instance."""
+        from trips.models import Event, Meal
+
+        trip = TripFactory()
+        day = trip.days.first()
+        MealFactory(day=day, type=Meal.Type.LUNCH)
+        event = Event.objects.get(day=day)
+        assert meal_type_label(event) == "Lunch"

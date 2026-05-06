@@ -4,8 +4,11 @@
        aria-hidden="true"></i>
     <div class="flex-grow py-3 px-2 sm:px-4">
         <div class="flex items-start">
-            <div class="{{ icon_color }} bg-slate-50 dark:bg-slate-700 mt-0.5 p-1 sm:p-1.5 rounded-md border-2 {{ border_color }} ">
-                <i class="ph-bold ph-{{ icon }} i-sm sm:i-lg"></i>
+            <div class="flex flex-col gap-1 items-center">
+                <div class="{{ icon_color }} bg-slate-50 dark:bg-slate-700 mt-0.5 p-1 sm:p-1.5 rounded-md border-2 {{ border_color }} ">
+                    <i class="ph-bold ph-{{ icon }} i-sm sm:i-lg"></i>
+                </div>
+                {% if meal_badge %}<span class="badge badge-xs badge-warning text-warning-content">{{ meal_badge }}</span>{% endif %}
             </div>
             <div class="ms-2" x-data>
                 <div class="flex gap-2 items-center">

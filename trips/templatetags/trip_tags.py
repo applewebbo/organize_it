@@ -292,6 +292,19 @@ def event_type_icon(event):
 
 
 @register.filter
+def meal_type_label(event):
+    """Return the display label for a meal's type, or empty string if UNDEFINED."""
+    if event.category != 3:
+        return ""
+    from trips.models import Meal
+
+    meal_type = event.meal.type if hasattr(event, "meal") else getattr(event, "type", 0)
+    if meal_type == Meal.Type.UNDEFINED:
+        return ""
+    return Meal.Type(meal_type).label
+
+
+@register.filter
 def duration_display(duration):
     """Format a timedelta as human-readable duration (e.g. '1h 30min' or '45min')."""
     if not duration:

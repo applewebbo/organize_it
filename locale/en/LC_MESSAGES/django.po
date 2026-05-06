@@ -2048,6 +2048,10 @@ msgid "Sport"
 msgstr ""
 
 #: trips/models.py:847
+msgid "To be defined"
+msgstr "To be defined"
+
+#: trips/models.py:848
 msgid "Breakfast"
 msgstr ""
 
