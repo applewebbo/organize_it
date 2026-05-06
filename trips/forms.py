@@ -282,6 +282,12 @@ ADDRESS_RESULTS_HTML = """
 
 
 class EventForm(forms.ModelForm):
+    start_time = forms.TimeField(
+        required=False,
+        label=_("Start time"),
+        widget=forms.TimeInput(attrs={"type": "time"}),
+    )
+
     duration = forms.ChoiceField(
         choices=[
             (
@@ -335,6 +341,7 @@ class EventForm(forms.ModelForm):
             "name",
             "city",
             "address",
+            "start_time",
             "duration",
             "website",
             "phone_number",
@@ -456,6 +463,7 @@ class EventForm(forms.ModelForm):
                 css_class="relative sm:col-span-4",
             ),
             HTML(ADDRESS_RESULTS_HTML),
+            Field("start_time", wrapper_class="sm:col-span-2"),
             Field(
                 "duration",
                 wrapper_class="sm:col-span-2",
@@ -560,7 +568,7 @@ class ExperienceForm(EventForm):
         fields = EventForm.Meta.fields + ["type"]
         labels = {
             **EventForm.Meta.labels,
-            "type": _("Type"),
+            "type": _("Experience type"),
         }
         widgets = {
             **EventForm.Meta.widgets,

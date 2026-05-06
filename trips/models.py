@@ -458,6 +458,7 @@ class Event(models.Model):
     )
     trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="all_events")
     name = models.CharField(max_length=100)
+    start_time = models.TimeField(null=True, blank=True)
     estimated_duration = models.DurationField(null=True, blank=True)
     order = models.PositiveIntegerField(default=0, db_index=True)
     address = models.CharField(max_length=200, blank=True)

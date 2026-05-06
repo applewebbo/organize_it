@@ -26,8 +26,8 @@
                 </div>
                 <div class="{{ icon_color }} flex items-center gap-x-2">{{ slot }}</div>
                 {% if event.notes %}
-                    <p class="flex gap-1.5 items-center mt-1 text-sm {{ icon_color }} opacity-70 line-clamp-2">
-                        <i class="ph-bold ph-note shrink-0" aria-hidden="true"></i>{{ event.notes }}
+                    <p class="flex gap-1.5 items-center mt-0.5 leading-tight text-sm {{ icon_color }} opacity-70">
+                        <i class="ph-bold ph-note shrink-0" aria-hidden="true"></i>{{ event.notes|truncatechars:40 }}
                     </p>
                 {% endif %}
             </div>

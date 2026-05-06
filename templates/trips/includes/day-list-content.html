@@ -17,9 +17,18 @@
         {# djlint:off #}
             <c-event :event="event" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}" swap_url="{% if day.trip.status != 5 and day.events.count > 1 %}{% url 'trips:swap-event-order-modal' event.pk %}{% endif %}">
         {# djlint:on #}
-        {% if event.estimated_duration %}
-            <div class="flex gap-2 items-center text-sm text-base-content/60">
-                <i class="ph-bold ph-clock i-sm"></i>{{ event.estimated_duration|duration_display }}
+        {% if event.start_time or event.estimated_duration %}
+            <div class="flex gap-x-4 items-center mt-1 text-sm opacity-70">
+                {% if event.start_time %}
+                    <span class="flex gap-x-1 items-center">
+                        <i class="ph-bold ph-clock i-sm"></i>{{ event.start_time|time:"H:i" }}
+                    </span>
+                {% endif %}
+                {% if event.estimated_duration %}
+                    <span class="flex gap-x-1 items-center">
+                        <i class="ph-bold ph-timer i-sm"></i>{{ event.estimated_duration|duration_display }}
+                    </span>
+                {% endif %}
             </div>
         {% endif %}
         </c-event>

@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n trip_tags %}
 <li class="flex flex-col mb-1 list-row">
     <div class="flex gap-2 items-center">
         <div class="flex gap-2 items-center grow">
@@ -16,6 +16,16 @@
                hx-target="#dialog"
                hx-swap="innerHTML">{{ event.name }}</a>
         </div>
+        {% if event.start_time or event.estimated_duration %}
+            <div class="flex gap-2 items-center text-xs text-base-content/60 shrink-0">
+                {% if event.start_time %}
+                    <i class="ph-bold ph-clock i-sm" aria-hidden="true"></i>{{ event.start_time|time:"H:i" }}
+                {% endif %}
+                {% if event.estimated_duration %}
+                    <i class="ph-bold ph-timer i-sm" aria-hidden="true"></i>{{ event.estimated_duration|duration_display }}
+                {% endif %}
+            </div>
+        {% endif %}
         {% if event.google_maps_directions_url %}
             <a class="sm:hidden btn btn-xs btn-outline"
                href="{{ event.google_maps_directions_url }}"
