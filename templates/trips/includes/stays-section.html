@@ -46,6 +46,11 @@
                                         </h3>
                                     </div>
                                     <div class="flex flex-col gap-y-1 mt-1 text-sm text-slate-500 dark:text-slate-400">
+                                        {% if stay.city %}
+                                            <span>
+                                                <i class="ph-bold ph-map-pin me-1" aria-hidden="true"></i>{{ stay.city }}
+                                            </span>
+                                        {% endif %}
                                         {% if stay.first_day_date %}
                                             <span>
                                                 <i class="ph-bold ph-calendar-blank me-1" aria-hidden="true"></i>
