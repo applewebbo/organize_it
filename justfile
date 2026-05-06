@@ -134,17 +134,17 @@ secure:
 # List issues (state: open|closed|all)
 [group('codeberg')]
 issues state="open":
-    ./bin/codeberg list {{state}}
+    fj issue search "" --state {{state}}
 
 # Show issue details
 [group('codeberg')]
 issue number:
-    ./bin/codeberg show {{number}}
+    fj issue view {{number}}
 
 # Add comment to issue
 [group('codeberg')]
 issue-comment number text:
-    ./bin/codeberg comment {{number}} "{{text}}"
+    fj issue comment {{number}} "{{text}}"
 
 # Mark a checkbox step as done in issue body
 [group('codeberg')]
@@ -154,12 +154,18 @@ issue-check number step:
 # Close issue
 [group('codeberg')]
 issue-close number:
-    ./bin/codeberg close {{number}}
+    fj issue close {{number}}
 
 # Reopen issue
 [group('codeberg')]
 issue-reopen number:
-    ./bin/codeberg reopen {{number}}
+    #!/usr/bin/env bash
+    set -euo pipefail
+    TOKEN=$(grep "^CODEBERG_API_TOKEN=" .env | cut -d'=' -f2 | tr -d '"' | tr -d "'")
+    curl -s -X PATCH "https://codeberg.org/api/v1/repos/webbografico/organize_it/issues/{{number}}" \
+      -H "Authorization: token ${TOKEN}" \
+      -H "Content-Type: application/json" \
+      -d '{"state":"open"}' | python3 -c "import sys,json; d=json.load(sys.stdin); print(f'✓ Issue #{d[\"number\"]} reopened')"
 
 # Create a label if it doesn't exist (color optional, default blue)
 [group('codeberg')]
@@ -178,10 +184,15 @@ label-create name color="#0075ca":
           -d '{"name":"{{name}}","color":"{{color}}"}' | jq -r '"✓ Label \(.name) created (id: \(.id))"'
     fi
 
-# Add labels to issue (space-separated)
+# Add labels to issue (space-separated label names)
 [group('codeberg')]
 issue-label number *labels:
-    ./bin/codeberg label {{number}} {{labels}}
+    #!/usr/bin/env bash
+    set -euo pipefail
+    for label in {{labels}}; do
+        fj issue edit {{number}} labels -a "$label"
+        echo "✓ Label '$label' added to issue #{{number}}"
+    done
 
 # Create a label (if missing, with random color) and assign it to an issue: just issue-label-create <issue> <label>
 [group('codeberg')]
@@ -204,15 +215,22 @@ issue-label-create number name:
     else
         echo "✓ Label '{{name}}' already exists (id: ${LABEL_ID})"
     fi
-    curl -s -X POST "https://codeberg.org/api/v1/repos/webbografico/organize_it/issues/{{number}}/labels" \
-      -H "Authorization: token ${TOKEN}" \
-      -H "Content-Type: application/json" \
-      -d "{\"labels\":[${LABEL_ID}]}" | jq -r '"✓ Label assigned to issue #{{number}}"'
+    fj issue edit {{number}} labels -a "{{name}}"
+    echo "✓ Label assigned to issue #{{number}}"
 
-# Create new issue
+# Create new issue (body optional)
 [group('codeberg')]
 issue-create title body="":
-    ./bin/codeberg create "{{title}}" "{{body}}"
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ -z "{{body}}" ]; then
+        EDITOR=true fj issue create "{{title}}" --no-template
+    else
+        TMPFILE=$(mktemp /tmp/issue-body-XXXXXX.md)
+        echo "{{body}}" > "$TMPFILE"
+        EDITOR=true fj issue create "{{title}}" --body-file "$TMPFILE" --no-template
+        rm "$TMPFILE"
+    fi
 
 # Edit issue body from file (usage: just issue-edit-body 249 /path/to/body.md)
 [group('codeberg')]
@@ -222,24 +240,12 @@ issue-edit-body number file:
 # List all releases
 [group('codeberg')]
 release-list:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    TOKEN=$(grep "^CODEBERG_API_TOKEN=" .env | cut -d'=' -f2 | tr -d '"' | tr -d "'")
-    echo -e "TAG\tNAME\tPUBLISHED\tDRAFT"
-    curl -s "https://codeberg.org/api/v1/repos/webbografico/organize_it/releases" \
-      -H "Authorization: token ${TOKEN}" | \
-      jq -r '.[] | "\(.tag_name)\t\(.name)\t\(.published_at)\t\(.draft)"' | \
-      column -t -s $'\t'
+    fj release list --include-draft --include-prerelease
 
 # Show release details
 [group('codeberg')]
 release-show tag:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    TOKEN=$(grep "^CODEBERG_API_TOKEN=" .env | cut -d'=' -f2 | tr -d '"' | tr -d "'")
-    curl -s "https://codeberg.org/api/v1/repos/webbografico/organize_it/releases/tags/{{tag}}" \
-      -H "Authorization: token ${TOKEN}" | \
-      jq -r '"\nTag: \(.tag_name)\nName: \(.name)\nPublished: \(.published_at)\nDraft: \(.draft)\nPrerelease: \(.prerelease)\n\nURL: \(.html_url)\n\nBody:\n\(.body)\n"'
+    fj release view "{{tag}}" --by-tag
 
 # Create a new release (creates tag, pushes main+tag, creates Codeberg release via fj)
 # Pass notes_file to use custom rich notes; omit for auto-generated notes from commits
