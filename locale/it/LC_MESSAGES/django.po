@@ -1136,6 +1136,10 @@ msgstr "Altre Cose da Fare"
 msgid "Here you find events not yet assigned to a specific day"
 msgstr "Qui trovi gli eventi non ancora abbinati ad un giorno specifico"
 
+#: templates/trips/includes/events-section.html
+msgid "Nothing to do here."
+msgstr "Niente da fare qui."
+
 #: templates/trips/includes/experience-preview.html:16
 #: templates/trips/includes/experience-preview.html:27
 #: templates/trips/includes/experience-preview.html:38

@@ -296,3 +296,129 @@ class EventModifyView(TestCase):
         self.response_200(response)
         event.refresh_from_db()
         assert event.name == "Updated Meal"
+
+
+class AddExperienceToTripView(TestCase):
+    @patch("geocoder.mapbox")
+    def test_post(self, mock_geocoder):
+        mock_geocoder.return_value.ok = True
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        data = {
+            "name": "Walking Tour",
+            "type": 1,
+            "address": "Starting Point",
+            "start_time": "14:00",
+            "duration": "120",
+            "website": "https://example.com",
+        }
+
+        with self.login(user):
+            response = self.post(
+                "trips:add-experience-to-trip", trip_pk=trip.pk, data=data
+            )
+
+        self.response_204(response)
+        message = list(get_messages(response.wsgi_request))[0].message
+        assert message == "Experience added successfully"
+        event = trip.all_events.get()
+        assert event.day is None
+        assert response["HX-Trigger"] == "unpairedModified"
+
+    def test_post_invalid(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+
+        with self.login(user):
+            response = self.post(
+                "trips:add-experience-to-trip", trip_pk=trip.pk, data={"name": ""}
+            )
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/experience-create-unpaired.html")
+        assert trip.all_events.count() == 0
+
+    def test_get(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+
+        with self.login(user):
+            response = self.get("trips:add-experience-to-trip", trip_pk=trip.pk)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/experience-create-unpaired.html")
+
+    def test_other_user_cannot_post(self):
+        owner = self.make_user("owner")
+        other = self.make_user("other")
+        trip = TripFactory(author=owner)
+
+        with self.login(other):
+            response = self.post(
+                "trips:add-experience-to-trip", trip_pk=trip.pk, data={"name": "X"}
+            )
+
+        self.response_404(response)
+
+
+class AddMealToTripView(TestCase):
+    @patch("geocoder.mapbox")
+    def test_post(self, mock_geocoder):
+        mock_geocoder.return_value.ok = True
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        data = {
+            "name": "Pizza",
+            "type": 1,
+            "address": "Via Roma 1",
+            "start_time": "13:00",
+            "duration": "60",
+            "website": "https://example.com",
+        }
+
+        with self.login(user):
+            response = self.post("trips:add-meal-to-trip", trip_pk=trip.pk, data=data)
+
+        self.response_204(response)
+        message = list(get_messages(response.wsgi_request))[0].message
+        assert message == "Meal added successfully"
+        event = trip.all_events.get()
+        assert event.day is None
+        assert response["HX-Trigger"] == "unpairedModified"
+
+    def test_post_invalid(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+
+        with self.login(user):
+            response = self.post(
+                "trips:add-meal-to-trip", trip_pk=trip.pk, data={"name": ""}
+            )
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/meal-create-unpaired.html")
+        assert trip.all_events.count() == 0
+
+    def test_get(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+
+        with self.login(user):
+            response = self.get("trips:add-meal-to-trip", trip_pk=trip.pk)
+
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/meal-create-unpaired.html")
+
+    def test_other_user_cannot_post(self):
+        owner = self.make_user("owner")
+        other = self.make_user("other")
+        trip = TripFactory(author=owner)
+
+        with self.login(other):
+            response = self.post(
+                "trips:add-meal-to-trip", trip_pk=trip.pk, data={"name": "X"}
+            )
+
+        self.response_404(response)

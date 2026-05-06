@@ -34,5 +34,10 @@
         </c-event>
     </li>
 {% endpartialdef single_event %}
+{% empty %}
+<li class="col-span-full py-6 text-center text-base-content/50">
+    <i class="ph-bold ph-calendar-blank i-lg" aria-hidden="true"></i>
+    <p class="mt-2 text-sm">{% trans 'Nothing to do here.' %}</p>
+</li>
 {% endfor %}
 </ul>

@@ -1,5 +1,10 @@
 {% load i18n trip_tags %}
-<div id="events-section" class="flex flex-col gap-4 mb-4">
+<div id="events-section"
+     class="flex flex-col gap-4 mb-4"
+     hx-get="{% url 'trips:trip-detail' trip.pk %}"
+     hx-target="#events-section"
+     hx-swap="outerHTML"
+     hx-trigger="unpairedModified from:body">
     <section class="shadow card card-border bg-base-100">
         <div class="card-body"
              :class="view === 'map' ? 'p-4 pb-0 sm:p-6 sm:pb-0' : 'p-4 sm:p-6'"
@@ -44,19 +49,56 @@
             </p>
         </div>
     </section>
-    {% if unpaired_events %}
-        <section class="shadow card card-border bg-base-100">
-            <div class="p-4 sm:p-6 card-body">
+    <section class="shadow card card-border bg-base-100">
+        <div class="p-4 sm:p-6 card-body">
+            <div class="flex justify-between items-center">
                 <div>
                     <h2 class="text-xl font-medium sm:text-2xl">{% trans 'Other Things to Do' %}</h2>
                     <p class="mt-1 text-sm text-base-content/60">{% trans 'Here you find events not yet assigned to a specific day' %}</p>
                 </div>
+                <div class="dropdown dropdown-end" x-data>
+                    <div tabindex="0"
+                         role="button"
+                         class="btn btn-sm btn-outline btn-primary"
+                         aria-haspopup="menu">
+                        <i class="ph-bold ph-plus i-sm" aria-hidden="true"></i>
+                        <span class="hidden sm:inline">{% trans 'Add event' %}</span>
+                    </div>
+                    <ul tabindex="0"
+                        class="z-20 p-2 w-52 border shadow dropdown-content menu bg-base-100 rounded-box border-base-300">
+                        <li>
+                            <a hx-get="{% url 'trips:add-experience-to-trip' trip.pk %}"
+                               hx-target="#dialog"
+                               hx-swap="innerHTML"
+                               @click="$dispatch('open-modal'); document.activeElement.blur()">
+                                <i class="text-green-500 ph-bold ph-map-pin i-sm" aria-hidden="true"></i>
+                                {% trans 'Experience' %}
+                            </a>
+                        </li>
+                        <li>
+                            <a hx-get="{% url 'trips:add-meal-to-trip' trip.pk %}"
+                               hx-target="#dialog"
+                               hx-swap="innerHTML"
+                               @click="$dispatch('open-modal'); document.activeElement.blur()">
+                                <i class="text-yellow-500 ph-bold ph-fork-knife i-sm" aria-hidden="true"></i>
+                                {% trans 'Meal' %}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            {% if unpaired_events %}
                 <ul class="flex flex-wrap gap-3 justify-center mt-4" x-data>
                     {% for event in unpaired_events %}
                         <c-unpaired-event :event="event" :days="trip.days.all" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}" />
                     {% endfor %}
                 </ul>
-            </div>
-        </section>
-    {% endif %}
+            {% else %}
+                <div class="py-6 text-center text-base-content/50">
+                    <i class="ph-bold ph-calendar-blank i-lg" aria-hidden="true"></i>
+                    <p class="mt-2 text-sm">{% trans 'Nothing to do here.' %}</p>
+                </div>
+            {% endif %}
+        </div>
+    </section>
 </div>

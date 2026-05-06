@@ -596,6 +596,40 @@ def add_meal(request, day_id):
     return TemplateResponse(request, "trips/meal-create.html", context)
 
 
+def add_experience_to_trip(request, trip_pk):
+    trip = get_trip_for_editor_or_404(trip_pk, request.user)
+    form = ExperienceForm(
+        request.POST or None, initial={"city": trip.destination}, geocode=True
+    )
+    if form.is_valid():
+        experience = form.save(commit=False)
+        experience.trip = trip
+        experience.last_modified_by = request.user
+        experience.save()
+        messages.add_message(
+            request, messages.SUCCESS, _("Experience added successfully")
+        )
+        return HttpResponse(status=204, headers={"HX-Trigger": "unpairedModified"})
+    context = {"form": form, "trip": trip}
+    return TemplateResponse(request, "trips/experience-create-unpaired.html", context)
+
+
+def add_meal_to_trip(request, trip_pk):
+    trip = get_trip_for_editor_or_404(trip_pk, request.user)
+    form = MealForm(
+        request.POST or None, initial={"city": trip.destination}, geocode=True
+    )
+    if form.is_valid():
+        meal = form.save(commit=False)
+        meal.trip = trip
+        meal.last_modified_by = request.user
+        meal.save()
+        messages.add_message(request, messages.SUCCESS, _("Meal added successfully"))
+        return HttpResponse(status=204, headers={"HX-Trigger": "unpairedModified"})
+    context = {"form": form, "trip": trip}
+    return TemplateResponse(request, "trips/meal-create-unpaired.html", context)
+
+
 def add_stay_for_trip(request, trip_pk):
     trip = get_trip_for_editor_or_404(trip_pk, request.user)
     form = StayForm(
