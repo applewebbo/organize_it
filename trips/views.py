@@ -65,6 +65,7 @@ from trips.utils import (
     get_trip_for_owner_or_404,
     get_trip_or_404,
     get_trips,
+    group_days_by_destination,
     process_trip_image,
     search_airports,
     search_train_stations,
@@ -180,6 +181,9 @@ def trip_detail(request, pk):
     default_view = get_profile(request.user).default_map_view
     show_map = default_view == "map"
 
+    days = trip.days.all()
+    day_groups = group_days_by_destination(days)
+
     context = {
         "trip": trip,
         "stays": stays,
@@ -192,6 +196,7 @@ def trip_detail(request, pk):
         "today": date.today(),
         "arrival_origin_icao": get_flight_origin_icao(arrival_transfer),
         "departure_origin_icao": get_flight_origin_icao(departure_transfer),
+        "day_groups": day_groups,
     }
     if request.htmx:
         template = "trips/trip-detail.html#days"

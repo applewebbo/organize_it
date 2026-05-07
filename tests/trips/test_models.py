@@ -356,6 +356,51 @@ class TestDayModel:
         capture_trip_old_destination(sender=Trip, instance=trip)
         assert trip._old_destination is None
 
+    def test_group_days_by_destination_empty(self):
+        """group_days_by_destination returns None for empty list."""
+        from trips.utils import group_days_by_destination
+
+        assert group_days_by_destination([]) is None
+
+    def test_group_days_by_destination_single_destination(
+        self, user_factory, trip_factory
+    ):
+        """group_days_by_destination returns None when all days share one destination."""
+        from trips.utils import group_days_by_destination
+
+        trip = trip_factory(author=user_factory(), destination="")
+        for day in trip.days.all():
+            day.destination = "Roma"
+            day.save(update_fields=["destination"])
+        assert group_days_by_destination(trip.days.all()) is None
+
+    def test_group_days_by_destination_multi(self, user_factory, trip_factory):
+        """group_days_by_destination groups consecutive days with different destinations."""
+        from datetime import date, timedelta
+
+        from trips.utils import group_days_by_destination
+
+        trip = trip_factory(
+            author=user_factory(),
+            destination="",
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=3),
+        )
+        days = list(trip.days.order_by("number"))
+        days[0].destination = "Roma"
+        days[1].destination = "Roma"
+        days[2].destination = "Napoli"
+        days[3].destination = "Roma"
+        for day in days:
+            day.save(update_fields=["destination"])
+
+        groups = group_days_by_destination(trip.days.order_by("number"))
+        assert groups is not None
+        assert len(groups) == 3
+        assert groups[0] == {"destination": "Roma", "days": [days[0], days[1]]}
+        assert groups[1] == {"destination": "Napoli", "days": [days[2]]}
+        assert groups[2] == {"destination": "Roma", "days": [days[3]]}
+
 
 class TestLinkModel:
     def test_factory(self, user_factory, trip_factory, link_factory):

@@ -1,7 +1,29 @@
 {% load i18n trip_tags %}
 <div class="flex flex-col gap-5 sm:gap-3">
-    {% for day in trip.days.all %}
-        {% include 'trips/includes/day.html' with day=day %}
-        {% if not forloop.last %}<hr class="pb-2 sm:hidden border-base-300">{% endif %}
-    {% endfor %}
+    {% if day_groups %}
+        {% for group in day_groups %}
+            {% if group.destination %}
+                <div class="flex gap-2 items-center mt-1">
+                    <i class="ph-bold ph-map-pin text-primary i-sm" aria-hidden="true"></i>
+                    <span class="text-sm font-semibold text-primary">{{ group.destination }}</span>
+                    <hr class="flex-1 border-primary/30">
+                </div>
+            {% else %}
+                <div class="flex gap-2 items-center mt-1">
+                    <hr class="flex-1 border-base-300">
+                    <span class="text-xs text-base-content/40">{% trans 'No destination' %}</span>
+                    <hr class="flex-1 border-base-300">
+                </div>
+            {% endif %}
+            {% for day in group.days %}
+                {% include 'trips/includes/day.html' with day=day %}
+                {% if not forloop.last %}<hr class="pb-2 sm:hidden border-base-300">{% endif %}
+            {% endfor %}
+        {% endfor %}
+    {% else %}
+        {% for day in trip.days.all %}
+            {% include 'trips/includes/day.html' with day=day %}
+            {% if not forloop.last %}<hr class="pb-2 sm:hidden border-base-300">{% endif %}
+        {% endfor %}
+    {% endif %}
 </div>

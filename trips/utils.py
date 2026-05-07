@@ -19,6 +19,28 @@ from accounts.models import get_profile
 from trips.models import Event, MainTransfer, Stay, StayTransfer, Trip
 
 
+def group_days_by_destination(days):
+    """
+    Group an ordered list of Day objects into consecutive destination blocks.
+    Returns a list of dicts: [{"destination": str, "days": [Day, ...]}, ...]
+    If all days share the same destination (or all are blank), returns None
+    so the caller can fall back to the flat layout.
+    """
+    day_list = list(days)
+    if not day_list:
+        return None
+    destinations = {d.destination for d in day_list}
+    if len(destinations) <= 1:
+        return None
+    groups = []
+    for day in day_list:
+        if groups and groups[-1]["destination"] == day.destination:
+            groups[-1]["days"].append(day)
+        else:
+            groups.append({"destination": day.destination, "days": [day]})
+    return groups
+
+
 def accessible_trips_qs(user):
     """Return queryset of trips where user is author or collaborator."""
     return Trip.objects.filter(Q(author=user) | Q(collaborators=user)).distinct()
