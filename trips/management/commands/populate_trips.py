@@ -28,6 +28,9 @@ SOLO_TRIP_DATE_CONFIGS = [
     (10, 14),  # not started: starts in 10 days
 ]
 
+# Multi-destination road trip: currently in progress, 8 days
+MULTI_TRIP_DATE_CONFIG = (-3, 4)
+
 User = get_user_model()
 
 
@@ -91,6 +94,91 @@ def _create_stay_and_events(trip, all_days, author, creator):
         )
 
 
+def _create_events_for_day(day, trip, city, creator):
+    """Create meal and experience events for a day using the given city's places."""
+    restaurants = PLACES[city]["restaurants"]
+    if len(restaurants) >= 2:
+        chosen = random.sample(restaurants, 2)
+        MealFactory.create(
+            day=day,
+            trip=trip,
+            type=2,
+            estimated_duration=timedelta(minutes=90),
+            city=city,
+            chosen_place=chosen[0],
+            last_modified_by=creator,
+        )
+        MealFactory.create(
+            day=day,
+            trip=trip,
+            type=3,
+            estimated_duration=timedelta(minutes=90),
+            city=city,
+            chosen_place=chosen[1],
+            last_modified_by=creator,
+        )
+    else:
+        MealFactory.create(
+            day=day,
+            trip=trip,
+            type=2,
+            estimated_duration=timedelta(minutes=90),
+            city=city,
+            last_modified_by=creator,
+        )
+    ExperienceFactory.create(
+        day=day,
+        trip=trip,
+        estimated_duration=timedelta(minutes=random.randrange(60, 120, 15)),
+        city=city,
+        last_modified_by=creator,
+    )
+
+
+def _create_multi_destination_trip(user, cities):
+    """Create a road-trip style in-progress trip spanning two cities."""
+    city1, city2 = cities[0], cities[1]
+    start_offset, end_offset = MULTI_TRIP_DATE_CONFIG
+    trip = TripFactory(
+        author=user,
+        destination=city1,
+        start_date=date.today() + timedelta(days=start_offset),
+        end_date=date.today() + timedelta(days=end_offset),
+    )
+    all_days = list(trip.days.order_by("number"))
+    mid = len(all_days) // 2
+
+    # First half: main destination (city1, leave day.destination blank = inherits trip.destination)
+    first_half = all_days[:mid]
+    second_half = all_days[mid:]
+
+    # Second half: assign custom destination (city2)
+    for day in second_half:
+        day.destination = city2
+        day.save(update_fields=["destination"])
+
+    # Stay for city1
+    if PLACES[city1]["hotels"]:
+        stay1 = StayFactory(
+            city=city1, chosen_place=PLACES[city1]["hotels"][0], author=user
+        )
+        stay1.days.set(first_half)
+
+    # Stay for city2
+    if PLACES[city2]["hotels"]:
+        stay2 = StayFactory(
+            city=city2, chosen_place=PLACES[city2]["hotels"][0], author=user
+        )
+        stay2.days.set(second_half)
+
+    for day in first_half:
+        _create_events_for_day(day, trip, city1, user)
+    for day in second_half:
+        _create_events_for_day(day, trip, city2, user)
+
+    return trip
+
+
 class Command(BaseCommand):
     help = "Generates dummy trips with stays and events (keeps existing users)"
 
@@ -130,6 +218,11 @@ class Command(BaseCommand):
                 )
                 all_days = list(trip.days.all())
                 _create_stay_and_events(trip, all_days, author=user, creator=user)
+
+        # Multi-destination road trip for each user
+        for user in users:
+            multi_cities = random.sample(cities, 2)
+            _create_multi_destination_trip(user, multi_cities)
 
         # Shared trips: user1 owns → user2 collabs, and vice versa
         if len(users) >= 2:
