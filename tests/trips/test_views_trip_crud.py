@@ -369,14 +369,15 @@ class DeleteStageView(TestCase):
         user = self.make_user("user")
         trip = TripFactory(author=user)
         day = trip.days.first()
-        day.destination = "Firenze"
+        custom_dest = f"NOT_{trip.destination}"
+        day.destination = custom_dest
         day.save()
 
         with self.login(user):
             response = self.post(
                 "trips:delete-stage",
                 trip_pk=trip.pk,
-                data={"destination": "Firenze"},
+                data={"destination": custom_dest},
             )
 
         self.response_200(response)
@@ -389,7 +390,8 @@ class DeleteStageView(TestCase):
         user = self.make_user("user")
         trip = TripFactory(author=user)
         day = trip.days.first()
-        day.destination = "Firenze"
+        custom_dest = f"NOT_{trip.destination}"
+        day.destination = custom_dest
         day.save()
         event = ExperienceFactory(trip=trip, day=day)
 
@@ -397,7 +399,7 @@ class DeleteStageView(TestCase):
             self.post(
                 "trips:delete-stage",
                 trip_pk=trip.pk,
-                data={"destination": "Firenze"},
+                data={"destination": custom_dest},
             )
 
         event.refresh_from_db()
@@ -419,6 +421,16 @@ class DeleteStageView(TestCase):
         self.response_200(response)
         day.refresh_from_db()
         assert day.destination == original_dest
+
+    def test_get_returns_step1_modal(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+
+        with self.login(user):
+            response = self.get("trips:delete-stage", trip_pk=trip.pk)
+
+        self.response_200(response)
+        self.assertTemplateUsed(response, "trips/includes/trip-destinations-modal.html")
 
     def test_post_forbidden_for_non_member(self):
         owner = self.make_user("owner")
