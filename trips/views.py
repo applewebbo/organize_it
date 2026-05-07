@@ -1150,9 +1150,7 @@ def event_pair(request, pk, day_id):
         messages.SUCCESS,
         _("Event paired successfully"),
     )
-    # Trigger update for the day and for the unpaired events section
-    triggers = {f"dayModified{day.pk}": {}, "tripModified": {}}
-    return HttpResponse(status=204, headers={"HX-Trigger": json.dumps(triggers)})
+    return HttpResponse(status=204, headers={"HX-Trigger": "unpairedModified"})
 
 
 def event_pair_choice(request, pk):

@@ -189,6 +189,10 @@ def get_trips(user):
             .order_by("first_day_date")
         )
 
+    day_groups = (
+        group_days_by_destination(featured_trip.days.all()) if featured_trip else None
+    )
+
     return {
         "fav_trip": fav_trip,
         "latest_trip": latest_trip,
@@ -202,6 +206,7 @@ def get_trips(user):
         and departure_transfer is not None,
         "arrival_origin_icao": get_flight_origin_icao(arrival_transfer),
         "departure_origin_icao": get_flight_origin_icao(departure_transfer),
+        "day_groups": day_groups,
     }
 
 
