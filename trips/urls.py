@@ -280,4 +280,14 @@ urlpatterns += [
         views.select_day_for_event,
         name="select-day-for-event",
     ),
+    path(
+        "trips/<int:trip_pk>/destinations/",
+        views.trip_destinations,
+        name="trip-destinations",
+    ),
+    path(
+        "trips/<int:trip_pk>/days/<int:day_pk>/destination/",
+        views.update_day_destination,
+        name="update-day-destination",
+    ),
 ]

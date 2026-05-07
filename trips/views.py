@@ -2917,6 +2917,41 @@ def trip_events_list(request, pk):
     )
 
 
+def trip_destinations(request, trip_pk):
+    """HTMX modal: show all days as editable destination cards."""
+    trip = get_object_or_404(
+        accessible_trips_qs(request.user).prefetch_related("days"),
+        pk=trip_pk,
+    )
+    return TemplateResponse(
+        request,
+        "trips/includes/trip-destinations-modal.html",
+        {"trip": trip},
+    )
+
+
+def update_day_destination(request, trip_pk, day_pk):
+    """HTMX: update a single day's destination and return updated card."""
+    trip = get_object_or_404(editable_trips_qs(request.user), pk=trip_pk)
+    day = get_object_or_404(Day, pk=day_pk, trip=trip)
+    if request.method == "POST":
+        destination = request.POST.get("destination", "").strip()
+        day.destination = destination
+        day.destination_latitude = None
+        day.destination_longitude = None
+        day.save()
+        messages.success(request, _("Destination updated."))
+        return HttpResponse(
+            status=204,
+            headers={"HX-Trigger": "destinationModified"},
+        )
+    return TemplateResponse(
+        request,
+        "trips/includes/day-destination-card.html",
+        {"day": day, "trip": trip},
+    )
+
+
 def select_day_for_event(request, pk, category):
     """HTMX: step-1 modal – choose a day before creating an experience or meal from map view."""
     if category not in ("experience", "meal"):

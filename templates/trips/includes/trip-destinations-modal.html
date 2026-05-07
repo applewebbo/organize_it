@@ -1,0 +1,19 @@
+{% load i18n %}
+<div class="p-4 sm:p-6">
+    <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold">{% trans "Day Destinations" %}</h3>
+        <button class="btn btn-sm btn-ghost btn-circle"
+                @click="$dispatch('hide-modal')"
+                aria-label="{% trans 'Close' %}">
+            <i class="ph-bold ph-x i-md"></i>
+        </button>
+    </div>
+    <p class="mb-4 text-sm text-base-content/60">
+        {% trans "Set a destination for each day. Leave blank to inherit the trip destination." %}
+    </p>
+    <div class="flex flex-col gap-3" id="day-destinations-list">
+        {% for day in trip.days.all %}
+            {% include "trips/includes/day-destination-card.html" with day=day trip=trip %}
+        {% endfor %}
+    </div>
+</div>

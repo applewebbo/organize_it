@@ -201,3 +201,75 @@ class TripUnarchiveView(TestCase):
         assert message == f"<strong>{trip.title}</strong> unarchived successfully"
         trip.refresh_from_db()
         assert trip.status == Trip.Status.COMPLETED
+
+
+class TripDestinationsView(TestCase):
+    def test_get_modal(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+
+        with self.login(user):
+            response = self.get("trips:trip-destinations", trip_pk=trip.pk)
+
+        self.response_200(response)
+        self.assertTemplateUsed(response, "trips/includes/trip-destinations-modal.html")
+
+    def test_get_modal_forbidden_for_non_member(self):
+        owner = self.make_user("owner")
+        other = self.make_user("other")
+        trip = TripFactory(author=owner)
+
+        with self.login(other):
+            response = self.get("trips:trip-destinations", trip_pk=trip.pk)
+
+        self.response_404(response)
+
+
+class UpdateDayDestinationView(TestCase):
+    def test_post_updates_destination(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+
+        with self.login(user):
+            response = self.post(
+                "trips:update-day-destination",
+                trip_pk=trip.pk,
+                day_pk=day.pk,
+                data={"destination": "Firenze"},
+            )
+
+        self.response_204(response)
+        day.refresh_from_db()
+        assert day.destination == "Firenze"
+
+    def test_post_forbidden_for_non_member(self):
+        owner = self.make_user("owner")
+        other = self.make_user("other")
+        trip = TripFactory(author=owner)
+        day = trip.days.first()
+
+        with self.login(other):
+            response = self.post(
+                "trips:update-day-destination",
+                trip_pk=trip.pk,
+                day_pk=day.pk,
+                data={"destination": "Firenze"},
+            )
+
+        self.response_404(response)
+
+    def test_get_returns_card(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+
+        with self.login(user):
+            response = self.get(
+                "trips:update-day-destination",
+                trip_pk=trip.pk,
+                day_pk=day.pk,
+            )
+
+        self.response_200(response)
+        self.assertTemplateUsed(response, "trips/includes/day-destination-card.html")

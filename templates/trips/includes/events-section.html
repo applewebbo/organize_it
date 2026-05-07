@@ -4,13 +4,24 @@
      hx-get="{% url 'trips:trip-detail' trip.pk %}"
      hx-target="#events-section"
      hx-swap="outerHTML"
-     hx-trigger="unpairedModified from:body">
+     hx-trigger="unpairedModified from:body, destinationModified from:body">
     <section class="shadow card card-border bg-base-100">
         <div class="card-body"
              :class="view === 'map' ? 'p-4 pb-0 sm:p-6 sm:pb-0' : 'p-4 sm:p-6'"
              x-data="{ view: window.innerWidth < 640 ? 'list' : ' {% if show_map %} map {% else %} list {% endif %} ' }">
             <div class="flex justify-between items-center">
-                <h2 class="text-xl font-medium sm:text-2xl">{% trans 'Things to Do' %}</h2>
+                <div class="flex gap-2 items-center">
+                    <h2 class="text-xl font-medium sm:text-2xl">{% trans 'Things to Do' %}</h2>
+                    <button class="btn btn-xs btn-ghost text-base-content/50"
+                            hx-get="{% url 'trips:trip-destinations' trip.pk %}"
+                            hx-target="#dialog"
+                            hx-swap="innerHTML"
+                            @click="$dispatch('open-modal'); document.activeElement.blur()"
+                            aria-label="{% trans 'Edit day destinations' %}">
+                        <i class="ph-bold ph-map-trifold i-sm" aria-hidden="true"></i>
+                        <span class="hidden text-xs sm:inline">{% trans 'Destinations' %}</span>
+                    </button>
+                </div>
                 {# Map tab only on desktop (sm+) #}
                 <div role="tablist" class="hidden sm:flex tabs tabs-border tabs-sm">
                     <button role="tab"

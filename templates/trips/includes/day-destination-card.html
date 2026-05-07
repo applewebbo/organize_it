@@ -1,0 +1,35 @@
+{% load i18n %}
+<div class="flex gap-3 items-center p-3 rounded-lg border border-base-300 bg-base-50"
+     id="day-destination-{{ day.pk }}">
+    <div class="flex flex-col justify-center items-center w-10 h-10 rounded-full bg-primary/10 shrink-0">
+        <span class="text-xs font-bold text-primary">{{ day.number }}</span>
+        <span class="text-xs leading-none text-primary/70">{% trans "Day" %}</span>
+    </div>
+    <div class="flex flex-col flex-1 min-w-0">
+        <span class="text-xs text-base-content/50">{{ day.date|date:"D, d M" }}</span>
+        <form hx-post="{% url 'trips:update-day-destination' trip.pk day.pk %}"
+              hx-target="#day-destination-{{ day.pk }}"
+              hx-swap="outerHTML"
+              class="flex gap-2 items-center mt-1">
+            {% csrf_token %}
+            <input type="text"
+                   name="destination"
+                   value="{{ day.destination }}"
+                   placeholder="{{ trip.destination }}"
+                   class="w-full input input-sm input-bordered"
+                   aria-label="{% trans 'Destination for day' %} {{ day.number }}">
+            <button type="submit"
+                    class="btn btn-sm btn-primary btn-square"
+                    aria-label="{% trans 'Save' %}">
+                <i class="ph-bold ph-check i-sm"></i>
+            </button>
+        </form>
+    </div>
+    {% if day.destination %}
+        <i class="ph-bold ph-map-pin text-primary i-sm shrink-0"
+           aria-hidden="true"></i>
+    {% else %}
+        <i class="ph-bold ph-map-pin text-base-content/20 i-sm shrink-0"
+           aria-hidden="true"></i>
+    {% endif %}
+</div>
