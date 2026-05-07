@@ -98,6 +98,7 @@ def _create_stay_and_events(trip, all_days, author, creator):
 def _create_events_for_day(day, trip, city, creator):
     """Create meal and experience events for a day using the given city's places."""
     restaurants = PLACES[city]["restaurants"]
+    attractions = PLACES[city]["attractions"]
     if len(restaurants) >= 2:
         chosen = random.sample(restaurants, 2)
         MealFactory.create(
@@ -125,15 +126,18 @@ def _create_events_for_day(day, trip, city, creator):
             type=2,
             estimated_duration=timedelta(minutes=90),
             city=city,
+            chosen_place=random.choice(restaurants) if restaurants else None,
             last_modified_by=creator,
         )
-    ExperienceFactory.create(
-        day=day,
-        trip=trip,
-        estimated_duration=timedelta(minutes=random.randrange(60, 120, 15)),
-        city=city,
-        last_modified_by=creator,
-    )
+    if attractions:
+        ExperienceFactory.create(
+            day=day,
+            trip=trip,
+            estimated_duration=timedelta(minutes=random.randrange(60, 120, 15)),
+            city=city,
+            chosen_place=random.choice(attractions),
+            last_modified_by=creator,
+        )
 
 
 def _create_multi_destination_trip(user, cities):

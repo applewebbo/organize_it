@@ -2909,10 +2909,11 @@ def trip_events_list(request, pk):
     if not accessible_trips_qs(request.user).filter(pk=trip.pk).exists():
         raise Http404
     unpaired_events = trip.all_events.filter(day__isnull=True)
+    day_groups = group_days_by_destination(trip.days.all())
     return TemplateResponse(
         request,
         "trips/includes/events-list-fragment.html",
-        {"trip": trip, "unpaired_events": unpaired_events},
+        {"trip": trip, "unpaired_events": unpaired_events, "day_groups": day_groups},
     )
 
 
