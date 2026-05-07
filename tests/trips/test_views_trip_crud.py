@@ -7,7 +7,7 @@ from django.contrib.messages import get_messages
 from pytest_django.asserts import assertTemplateUsed
 
 from tests.test import TestCase
-from tests.trips.factories import TripFactory
+from tests.trips.factories import ExperienceFactory, TripFactory
 from trips.models import Trip
 
 pytestmark = pytest.mark.django_db
@@ -273,3 +273,163 @@ class UpdateDayDestinationView(TestCase):
 
         self.response_200(response)
         self.assertTemplateUsed(response, "trips/includes/day-destination-card.html")
+
+
+class CreateStageView(TestCase):
+    def test_get_returns_create_stage_modal(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+
+        with self.login(user):
+            response = self.get("trips:create-stage", trip_pk=trip.pk)
+
+        self.response_200(response)
+        self.assertTemplateUsed(response, "trips/includes/create-stage-modal.html")
+
+    def test_get_forbidden_for_non_member(self):
+        owner = self.make_user("owner")
+        other = self.make_user("other")
+        trip = TripFactory(author=owner)
+
+        with self.login(other):
+            response = self.get("trips:create-stage", trip_pk=trip.pk)
+
+        self.response_404(response)
+
+    def test_post_updates_day_destinations(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+
+        with self.login(user):
+            response = self.post(
+                "trips:create-stage",
+                trip_pk=trip.pk,
+                data={"destination": "Firenze", "days": [str(day.pk)]},
+            )
+
+        self.response_200(response)
+        self.assertTemplateUsed(response, "trips/includes/trip-destinations-modal.html")
+        assert response.headers.get("HX-Trigger") == "destinationModified"
+        day.refresh_from_db()
+        assert day.destination == "Firenze"
+
+    def test_post_ignores_already_custom_days(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        days = list(trip.days.order_by("number"))
+        days[0].destination = "Roma"
+        days[0].save()
+
+        with self.login(user):
+            response = self.post(
+                "trips:create-stage",
+                trip_pk=trip.pk,
+                data={"destination": "Firenze", "days": [str(days[0].pk)]},
+            )
+
+        self.response_200(response)
+        days[0].refresh_from_db()
+        assert days[0].destination == "Roma"
+
+    def test_post_without_destination_does_not_update(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+
+        with self.login(user):
+            response = self.post(
+                "trips:create-stage",
+                trip_pk=trip.pk,
+                data={"destination": "", "days": [str(day.pk)]},
+            )
+
+        self.response_200(response)
+        day.refresh_from_db()
+        assert day.destination == trip.destination or day.destination == ""
+
+    def test_post_forbidden_for_non_member(self):
+        owner = self.make_user("owner")
+        other = self.make_user("other")
+        trip = TripFactory(author=owner)
+        day = trip.days.first()
+
+        with self.login(other):
+            response = self.post(
+                "trips:create-stage",
+                trip_pk=trip.pk,
+                data={"destination": "Firenze", "days": [str(day.pk)]},
+            )
+
+        self.response_404(response)
+
+
+class DeleteStageView(TestCase):
+    def test_post_resets_days_to_trip_destination(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        day.destination = "Firenze"
+        day.save()
+
+        with self.login(user):
+            response = self.post(
+                "trips:delete-stage",
+                trip_pk=trip.pk,
+                data={"destination": "Firenze"},
+            )
+
+        self.response_200(response)
+        self.assertTemplateUsed(response, "trips/includes/trip-destinations-modal.html")
+        assert response.headers.get("HX-Trigger") == "destinationModified"
+        day.refresh_from_db()
+        assert day.destination == trip.destination
+
+    def test_post_unpairs_events(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        day.destination = "Firenze"
+        day.save()
+        event = ExperienceFactory(trip=trip, day=day)
+
+        with self.login(user):
+            self.post(
+                "trips:delete-stage",
+                trip_pk=trip.pk,
+                data={"destination": "Firenze"},
+            )
+
+        event.refresh_from_db()
+        assert event.day is None
+
+    def test_post_ignores_main_destination(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        original_dest = day.destination
+
+        with self.login(user):
+            response = self.post(
+                "trips:delete-stage",
+                trip_pk=trip.pk,
+                data={"destination": trip.destination},
+            )
+
+        self.response_200(response)
+        day.refresh_from_db()
+        assert day.destination == original_dest
+
+    def test_post_forbidden_for_non_member(self):
+        owner = self.make_user("owner")
+        other = self.make_user("other")
+        trip = TripFactory(author=owner)
+
+        with self.login(other):
+            response = self.post(
+                "trips:delete-stage",
+                trip_pk=trip.pk,
+                data={"destination": "Firenze"},
+            )
+
+        self.response_404(response)

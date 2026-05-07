@@ -2382,6 +2382,45 @@ msgstr "Evento aggiunto al viaggio."
 msgid "Stay added to trip."
 msgstr "Soggiorno aggiunto al viaggio."
 
+msgid "Trip Stages"
+msgstr "Tappe del viaggio"
+
+msgid "Main"
+msgstr "Principale"
+
+msgid "Delete stage"
+msgstr "Elimina tappa"
+
+msgid "All events on these days will be unassigned."
+msgstr "Tutti gli eventi di questi giorni verranno disabbinati."
+
+msgid "%(count)s days"
+msgstr "%(count)s giorni"
+
+msgid "Confirm delete"
+msgstr "Conferma eliminazione"
+
+msgid "Add stage"
+msgstr "Aggiungi tappa"
+
+msgid "New Stage"
+msgstr "Nuova tappa"
+
+msgid "Select days"
+msgstr "Seleziona giorni"
+
+msgid "Create stage"
+msgstr "Crea tappa"
+
+msgid "Manage stages"
+msgstr "Gestisci tappe"
+
+msgid "Stages"
+msgstr "Tappe"
+
+msgid "Events"
+msgstr "Eventi"
+
 #~ msgid "Show map"
 #~ msgstr "Mostra mappa"
 

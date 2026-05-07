@@ -286,6 +286,16 @@ urlpatterns += [
         name="trip-destinations",
     ),
     path(
+        "trips/<int:trip_pk>/stages/create/",
+        views.create_stage,
+        name="create-stage",
+    ),
+    path(
+        "trips/<int:trip_pk>/stages/delete/",
+        views.delete_stage,
+        name="delete-stage",
+    ),
+    path(
         "trips/<int:trip_pk>/days/<int:day_pk>/destination/",
         views.update_day_destination,
         name="update-day-destination",

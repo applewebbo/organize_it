@@ -26,6 +26,7 @@ from trips.utils import (
     geocode_location,
     get_day_stay_transfers,
     get_next_day_stay,
+    get_trip_stages,
     get_trips,
     process_trip_image,
     rate_limit_check,
@@ -1602,3 +1603,47 @@ class TestStayTransferUtils(TestCase):
         is_valid, error = validate_stay_transfer(stay1, stay2)
         self.assertFalse(is_valid)
         self.assertEqual(error, "Stays must be on consecutive days (day N and day N+1)")
+
+
+class TestGetTripStages(TestCase):
+    def test_single_main_stage_no_custom(self):
+        trip = TripFactory()
+        stages = get_trip_stages(trip)
+        assert len(stages) == 1
+        assert stages[0]["is_main"] is True
+        assert stages[0]["destination"] == trip.destination
+
+    def test_main_stage_with_custom_stage(self):
+        trip = TripFactory()
+        days = list(trip.days.order_by("number"))
+        custom_day = days[-1]
+        custom_day.destination = "Firenze"
+        custom_day.save()
+        stages = get_trip_stages(trip)
+        assert len(stages) == 2
+        main = next(s for s in stages if s["is_main"])
+        custom = next(s for s in stages if not s["is_main"])
+        assert main["destination"] == trip.destination
+        assert custom["destination"] == "Firenze"
+        assert custom_day in custom["days"]
+
+    def test_blank_destination_days_counted_as_main(self):
+        trip = TripFactory()
+        days = list(trip.days.order_by("number"))
+        # Set all days to blank (default); they should all land in main
+        for day in days:
+            day.destination = ""
+            day.save()
+        stages = get_trip_stages(trip)
+        assert len(stages) == 1
+        assert stages[0]["is_main"] is True
+        assert len(stages[0]["days"]) == len(days)
+
+    def test_no_days_returns_empty_main_stage(self):
+        # TripFactory creates days; use a trip with dates that yield 0 days by manipulating directly
+        trip = TripFactory()
+        trip.days.all().delete()
+        stages = get_trip_stages(trip)
+        assert len(stages) == 1
+        assert stages[0]["is_main"] is True
+        assert stages[0]["days"] == []

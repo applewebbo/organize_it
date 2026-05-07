@@ -1,19 +1,72 @@
 {% load i18n %}
 <div class="p-4 sm:p-6">
     <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold">{% trans "Day Destinations" %}</h3>
+        <h3 class="text-lg font-semibold">{% trans "Trip Stages" %}</h3>
         <button class="btn btn-sm btn-ghost btn-circle"
                 @click="$dispatch('hide-modal')"
                 aria-label="{% trans 'Close' %}">
             <i class="ph-bold ph-x i-md"></i>
         </button>
     </div>
-    <p class="mb-4 text-sm text-base-content/60">
-        {% trans "Set a destination for each day. Leave blank to inherit the trip destination." %}
-    </p>
-    <div class="flex flex-col gap-3" id="day-destinations-list">
-        {% for day in trip.days.all %}
-            {% include "trips/includes/day-destination-card.html" with day=day trip=trip %}
+    <div class="flex flex-col gap-3 mb-4" x-data="{ confirmingDest: '' }">
+        {% for stage in stages %}
+            <div class="flex items-center gap-3 p-3 rounded-lg {% if stage.is_main %}bg-secondary/10 border border-secondary/20{% else %}bg-base-200 border border-base-300{% endif %}">
+                <div class="flex items-center justify-center w-8 h-8 rounded-full shrink-0 {% if stage.is_main %}bg-secondary/20{% else %}bg-base-300{% endif %}">
+                    <i class="ph-bold ph-line-segments {% if stage.is_main %}text-secondary{% else %}text-base-content/50{% endif %} i-sm"
+                       aria-hidden="true"></i>
+                </div>
+                <div class="flex flex-1 gap-2 justify-between items-center min-w-0">
+                    <div>
+                        <p class="text-sm font-semibold">{{ stage.destination }}</p>
+                        <p class="text-xs text-base-content/60">
+                            {% with first=stage.days.0 last=stage.days|last %}
+                                {% if first %}
+                                    {{ first.date|date:"d M" }}
+                                    {% if stage.days|length > 1 %}&nbsp;–&nbsp;{{ last.date|date:"d M" }}{% endif %}
+                                {% endif %}
+                            {% endwith %}
+                        </p>
+                    </div>
+                    {% if stage.is_main %}
+                        <span class="badge badge-secondary badge-sm shrink-0">{% trans "Main" %}</span>
+                    {% else %}
+                        <button class="btn btn-xs btn-ghost text-error shrink-0"
+                                @click="confirmingDest = '{{ stage.destination }}'"
+                                x-show="confirmingDest !== '{{ stage.destination }}'"
+                                aria-label="{% trans 'Delete stage' %}">
+                            <i class="ph-bold ph-trash i-sm"></i>
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
         {% endfor %}
+        <div class="flex justify-end" x-show="confirmingDest === ''" x-cloak>
+            <button class="btn btn-sm btn-soft btn-primary"
+                    hx-get="{% url 'trips:create-stage' trip.pk %}"
+                    hx-target="#dialog"
+                    hx-swap="innerHTML">
+                <i class="ph-bold ph-plus i-sm" aria-hidden="true"></i>
+                {% trans "Add stage" %}
+            </button>
+        </div>
+        <div x-show="confirmingDest !== ''" x-cloak>
+            <p class="mb-3 text-xs text-center text-error">
+                <i class="ph-bold ph-warning i-sm"></i>
+                {% trans "All events on these days will be unassigned." %}
+            </p>
+            <div class="flex gap-2 justify-end">
+                <button class="btn btn-sm btn-ghost" @click="confirmingDest = ''">{% trans "Cancel" %}</button>
+                <form hx-post="{% url 'trips:delete-stage' trip.pk %}"
+                      hx-target="#dialog"
+                      hx-swap="innerHTML">
+                    {% csrf_token %}
+                    <input type="hidden" name="destination" :value="confirmingDest">
+                    <button type="submit" class="btn btn-sm btn-soft btn-error">
+                        <i class="ph-bold ph-trash i-sm" aria-hidden="true"></i>
+                        {% trans "Confirm delete" %}
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>

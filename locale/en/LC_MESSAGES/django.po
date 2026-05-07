@@ -2285,6 +2285,45 @@ msgstr "Event added to trip."
 msgid "Stay added to trip."
 msgstr "Stay added to trip."
 
+msgid "Trip Stages"
+msgstr "Trip Stages"
+
+msgid "Main"
+msgstr "Main"
+
+msgid "Delete stage"
+msgstr "Delete stage"
+
+msgid "All events on these days will be unassigned."
+msgstr "All events on these days will be unassigned."
+
+msgid "Confirm delete"
+msgstr "Confirm delete"
+
+msgid "Add stage"
+msgstr "Add stage"
+
+msgid "New Stage"
+msgstr "New Stage"
+
+msgid "Select days"
+msgstr "Select days"
+
+msgid "Create stage"
+msgstr "Create stage"
+
+msgid "Manage stages"
+msgstr "Manage stages"
+
+msgid "Stages"
+msgstr "Stages"
+
+msgid "Events"
+msgstr "Events"
+
+msgid "%(count)s days"
+msgstr "%(count)s days"
+
 #~ msgid "Show map"
 #~ msgstr "Show map"
 

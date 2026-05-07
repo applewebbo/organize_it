@@ -19,6 +19,32 @@ from accounts.models import get_profile
 from trips.models import Event, MainTransfer, Stay, StayTransfer, Trip
 
 
+def get_trip_stages(trip):
+    """
+    Return destination stages for a trip.
+    Main stage (trip.destination) always first; custom stages follow.
+    Each stage: {"destination": str, "days": [Day, ...], "is_main": bool}
+    Days with blank destination are treated as belonging to the main stage.
+    """
+    days = list(trip.days.order_by("number"))
+    main_dest = trip.destination
+    groups = {}
+    for day in days:
+        key = day.destination if day.destination else main_dest
+        groups.setdefault(key, []).append(day)
+
+    result = []
+    if main_dest in groups:
+        result.append(
+            {"destination": main_dest, "days": groups.pop(main_dest), "is_main": True}
+        )
+    elif not groups:
+        result.append({"destination": main_dest, "days": [], "is_main": True})
+    for dest, dest_days in groups.items():
+        result.append({"destination": dest, "days": dest_days, "is_main": False})
+    return result
+
+
 def group_days_by_destination(days):
     """
     Group an ordered list of Day objects into consecutive destination blocks.

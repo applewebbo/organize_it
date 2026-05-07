@@ -64,6 +64,7 @@ from trips.utils import (
     get_trip_for_editor_or_404,
     get_trip_for_owner_or_404,
     get_trip_or_404,
+    get_trip_stages,
     get_trips,
     group_days_by_destination,
     process_trip_image,
@@ -2918,15 +2919,77 @@ def trip_events_list(request, pk):
 
 
 def trip_destinations(request, trip_pk):
-    """HTMX modal: show all days as editable destination cards."""
+    """HTMX modal step 1: show current stages."""
     trip = get_object_or_404(
         accessible_trips_qs(request.user).prefetch_related("days"),
         pk=trip_pk,
     )
+    stages = get_trip_stages(trip)
     return TemplateResponse(
         request,
         "trips/includes/trip-destinations-modal.html",
-        {"trip": trip},
+        {"trip": trip, "stages": stages},
+    )
+
+
+def create_stage(request, trip_pk):
+    """HTMX modal step 2: form to create a new stage (GET) or save it (POST)."""
+    trip = get_object_or_404(
+        editable_trips_qs(request.user).prefetch_related("days"), pk=trip_pk
+    )
+    stages = get_trip_stages(trip)
+    custom_day_pks = {
+        day.pk for stage in stages if not stage["is_main"] for day in stage["days"]
+    }
+
+    if request.method == "POST":
+        destination = request.POST.get("destination", "").strip()
+        selected_pks = {int(pk) for pk in request.POST.getlist("days")}
+        if destination and selected_pks:
+            valid_pks = selected_pks - custom_day_pks
+            Day.objects.filter(pk__in=valid_pks, trip=trip).update(
+                destination=destination,
+                destination_latitude=None,
+                destination_longitude=None,
+            )
+        stages = get_trip_stages(trip)
+        return TemplateResponse(
+            request,
+            "trips/includes/trip-destinations-modal.html",
+            {"trip": trip, "stages": stages},
+            headers={"HX-Trigger": "destinationModified"},
+        )
+
+    days = list(trip.days.order_by("number"))
+    return TemplateResponse(
+        request,
+        "trips/includes/create-stage-modal.html",
+        {"trip": trip, "days": days, "custom_day_pks": custom_day_pks},
+    )
+
+
+def delete_stage(request, trip_pk):
+    """HTMX: delete a custom stage, reassign days to trip.destination, unpair events."""
+    trip = get_object_or_404(
+        editable_trips_qs(request.user).prefetch_related("days"), pk=trip_pk
+    )
+    if request.method == "POST":
+        destination = request.POST.get("destination", "").strip()
+        if destination and destination != trip.destination:
+            stage_days = trip.days.filter(destination=destination)
+            for day in stage_days:
+                day.events.update(day=None)
+            stage_days.update(
+                destination=trip.destination,
+                destination_latitude=None,
+                destination_longitude=None,
+            )
+    stages = get_trip_stages(trip)
+    return TemplateResponse(
+        request,
+        "trips/includes/trip-destinations-modal.html",
+        {"trip": trip, "stages": stages},
+        headers={"HX-Trigger": "destinationModified"},
     )
 
 
@@ -2940,7 +3003,6 @@ def update_day_destination(request, trip_pk, day_pk):
         day.destination_latitude = None
         day.destination_longitude = None
         day.save()
-        messages.success(request, _("Destination updated."))
         return HttpResponse(
             status=204,
             headers={"HX-Trigger": "destinationModified"},
