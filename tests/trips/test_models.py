@@ -11,6 +11,7 @@ from trips.models import (
     Meal,
     Stay,
     StayTransfer,
+    Trip,
 )
 
 pytestmark = pytest.mark.django_db
@@ -253,6 +254,108 @@ class TestDayModel:
         assert last_day.number == 4
         assert last_day.date == date.today() + timedelta(days=3)
 
+    @patch("geocoder.mapbox")
+    def test_new_days_get_trip_destination(
+        self, mock_geocoder, user_factory, trip_factory
+    ):
+        """New days created via signal receive trip.destination with geocoded coords."""
+        mock_geocoder.return_value.latlng = [45.4654, 9.1866]
+        trip = trip_factory(
+            author=user_factory(),
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=2),
+            destination="Milano",
+        )
+        # geocoder called once (cached) for all 3 days
+        calls = [c for c in mock_geocoder.call_args_list if c.args[0] == "Milano"]
+        assert len(calls) == 1
+        for day in trip.days.all():
+            assert day.destination == "Milano"
+            assert day.destination_latitude == 45.4654
+            assert day.destination_longitude == 9.1866
+
+    @patch("geocoder.mapbox")
+    def test_trip_destination_change_updates_non_customized_days(
+        self, mock_geocoder, user_factory, trip_factory
+    ):
+        """When trip.destination changes, days still matching old destination are updated; customized days are not."""
+        mock_geocoder.return_value.latlng = [45.4654, 9.1866]
+        trip = trip_factory(
+            author=user_factory(),
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=2),
+            destination="Milano",
+        )
+        # Customize day 1 destination
+        day1 = trip.days.get(number=1)
+        day1.destination = "Bergamo"
+        day1.save(update_fields=["destination"])
+
+        mock_geocoder.return_value.latlng = [41.8967, 12.4822]
+        trip.destination = "Roma"
+        trip.save()
+
+        day1.refresh_from_db()
+        day2 = trip.days.get(number=2)
+        day3 = trip.days.get(number=3)
+
+        # Customized day unchanged
+        assert day1.destination == "Bergamo"
+        # Non-customized days updated
+        assert day2.destination == "Roma"
+        assert day3.destination == "Roma"
+
+    @patch("geocoder.mapbox")
+    def test_day_geocoding_on_save(self, mock_geocoder, user_factory, trip_factory):
+        """Day.save() geocodes destination when it changes and coords are missing."""
+        mock_geocoder.return_value.latlng = [45.4654, 9.1866]
+        trip = trip_factory(author=user_factory(), destination="")
+        day = trip.days.first()
+        day.destination = "Milano"
+        day.destination_latitude = None
+        day.destination_longitude = None
+        day.save()
+        mock_geocoder.assert_called_with(
+            "Milano", access_token=settings.MAPBOX_ACCESS_TOKEN
+        )
+        day.refresh_from_db()
+        assert day.destination_latitude == 45.4654
+        assert day.destination_longitude == 9.1866
+
+    @patch("geocoder.mapbox")
+    def test_day_geocoding_clears_coords_when_destination_empty(
+        self, mock_geocoder, user_factory, trip_factory
+    ):
+        """Clearing Day.destination also clears lat/lng."""
+        mock_geocoder.return_value.latlng = [45.4654, 9.1866]
+        trip = trip_factory(author=user_factory(), destination="")
+        day = trip.days.first()
+        day.destination = "Milano"
+        day.save()
+        day.destination = ""
+        day.save()
+        day.refresh_from_db()
+        assert day.destination_latitude is None
+        assert day.destination_longitude is None
+
+    @patch("geocoder.mapbox")
+    def test_capture_old_destination_handles_deleted_trip(
+        self, mock_geocoder, user_factory
+    ):
+        """pre_save signal sets _old_destination=None when trip pk exists but record is gone."""
+        from trips.models import capture_trip_old_destination
+
+        mock_geocoder.return_value.latlng = None
+        trip = Trip(
+            pk=999999,
+            author=user_factory(),
+            title="Ghost Trip",
+            destination="Firenze",
+        )
+        # pk is set but no DB record → DoesNotExist → _old_destination = None
+        capture_trip_old_destination(sender=Trip, instance=trip)
+        assert trip._old_destination is None
+
 
 class TestLinkModel:
     def test_factory(self, user_factory, trip_factory, link_factory):
@@ -380,7 +483,7 @@ class TestEventModel:
             address="Colosseum", city="Roma", latitude=None, longitude=None
         )
         event.save()
-        mock_geocoder.assert_called_once_with(
+        mock_geocoder.assert_called_with(
             "Colosseum, Roma", access_token=settings.MAPBOX_ACCESS_TOKEN
         )
         assert event.latitude == 41.890251

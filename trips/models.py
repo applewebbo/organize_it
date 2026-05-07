@@ -101,11 +101,34 @@ class Trip(models.Model):
         return None
 
 
+def _geocode_destination(destination, cache):
+    """Geocode a destination string, using cache to avoid duplicate API calls."""
+    if destination in cache:
+        return cache[destination]
+    g = geocoder.mapbox(destination, access_token=settings.MAPBOX_ACCESS_TOKEN)
+    result = tuple(g.latlng) if g.latlng else (None, None)
+    cache[destination] = result
+    return result
+
+
+@receiver(pre_save, sender="trips.Trip")
+def capture_trip_old_destination(sender, instance, **kwargs):
+    """Store old destination on the instance before save so post_save can detect changes."""
+    if instance.pk:
+        try:
+            instance._old_destination = Trip.objects.get(pk=instance.pk).destination
+        except Trip.DoesNotExist:
+            instance._old_destination = None
+    else:
+        instance._old_destination = None
+
+
 @receiver(post_save, sender=Trip)
 def update_trip_days(sender, instance, **kwargs):
     """
     Update the days for a trip when start_date or end_date changes.
     Retain the order of days and shift existing days and their related objects accordingly.
+    New days are assigned trip.destination; existing days with the old destination are updated too.
     """
     if not instance.start_date or not instance.end_date:
         return
@@ -115,6 +138,12 @@ def update_trip_days(sender, instance, **kwargs):
 
     # Build a mapping of current days by date
     current_days_by_date = {day.date: day for day in instance.days.all()}
+
+    old_destination = getattr(instance, "_old_destination", None)
+    destination_changed = old_destination and old_destination != instance.destination
+
+    geocode_cache = {}
+
     # Delete days outside the new range
     for day in instance.days.all():
         if day.date not in desired_dates:
@@ -126,17 +155,40 @@ def update_trip_days(sender, instance, **kwargs):
     # For each desired date, either update an existing day or create a new one
     for idx, day_date in enumerate(desired_dates):
         if day_date in current_days_by_date:
-            # Update number if needed
             day = current_days_by_date[day_date]
+            update_fields = []
             if day.number != idx + 1:
                 day.number = idx + 1
-                day.save(update_fields=["number"])
+                update_fields.append("number")
+            # Update destination only if it still matches the old trip destination
+            if (
+                destination_changed
+                and day.destination == old_destination
+                and instance.destination
+            ):
+                lat, lng = _geocode_destination(instance.destination, geocode_cache)
+                day.destination = instance.destination
+                day.destination_latitude = lat
+                day.destination_longitude = lng
+                update_fields += [
+                    "destination",
+                    "destination_latitude",
+                    "destination_longitude",
+                ]
+            if update_fields:
+                day.save(update_fields=update_fields)
         else:
-            # Insert a new day at the correct position
+            # New day: assign trip destination with geocoding (cached)
+            lat, lng = (None, None)
+            if instance.destination:
+                lat, lng = _geocode_destination(instance.destination, geocode_cache)
             Day.objects.create(
                 trip=instance,
                 number=idx + 1,
                 date=day_date,
+                destination=instance.destination,
+                destination_latitude=lat,
+                destination_longitude=lng,
             )
 
 
@@ -416,6 +468,25 @@ class Day(models.Model):
         indexes = [
             models.Index(fields=["trip", "date"]),
         ]
+
+    def save(self, *args, **kwargs):
+        old = type(self).objects.get(pk=self.pk) if self.pk else None
+        destination_changed = old and old.destination != self.destination
+        coords_missing = (
+            self.destination_latitude is None or self.destination_longitude is None
+        )
+
+        if self.destination and (destination_changed or coords_missing):
+            g = geocoder.mapbox(
+                self.destination, access_token=settings.MAPBOX_ACCESS_TOKEN
+            )
+            if g.latlng:
+                self.destination_latitude, self.destination_longitude = g.latlng
+        elif not self.destination:
+            self.destination_latitude = None
+            self.destination_longitude = None
+
+        super().save(*args, **kwargs)
 
     @property
     def next_day(self):
