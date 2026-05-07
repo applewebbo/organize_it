@@ -1,0 +1,55 @@
+{% load i18n %}
+<div class="p-4 sm:p-6">
+    <div class="flex gap-2 items-center mb-4">
+        <button class="btn btn-sm btn-ghost btn-circle"
+                hx-get="{% url 'trips:trip-destinations' trip.pk %}"
+                hx-target="#dialog"
+                hx-swap="innerHTML"
+                aria-label="{% trans 'Back' %}">
+            <i class="ph-bold ph-arrow-left i-sm"></i>
+        </button>
+        <h3 class="flex-1 text-lg font-semibold">{% trans "New Stage" %}</h3>
+        <button class="btn btn-sm btn-ghost btn-circle"
+                @click="$dispatch('hide-modal')"
+                aria-label="{% trans 'Close' %}">
+            <i class="ph-bold ph-x i-md"></i>
+        </button>
+    </div>
+    <form hx-post="{% url 'trips:create-stage' trip.pk %}"
+          hx-target="#dialog"
+          hx-swap="innerHTML">
+        {% csrf_token %}
+        <div class="mb-4">
+            <label class="block mb-1 text-sm font-medium">{% trans "Destination" %}</label>
+            <input type="text"
+                   name="destination"
+                   required
+                   placeholder="{{ trip.destination }}"
+                   class="w-full input input-bordered input-sm"
+                   autocomplete="off">
+        </div>
+        <div class="mb-4">
+            <label class="block mb-2 text-sm font-medium">{% trans "Select days" %}</label>
+            <div class="flex overflow-y-auto flex-col gap-2 max-h-64">
+                {% for day in days %}
+                    <label class="flex items-center gap-3 p-2 rounded-md cursor-pointer {% if day.pk in custom_day_pks %}opacity-40 cursor-not-allowed{% else %}hover:bg-base-200{% endif %}">
+                        <input type="checkbox"
+                               name="days"
+                               value="{{ day.pk }}"
+                               class="checkbox checkbox-sm checkbox-primary"
+                               {% if day.pk in custom_day_pks %}disabled{% endif %}>
+                        <span class="flex-1 text-sm">
+                            <span class="font-medium">{% trans "Day" %} {{ day.number }}</span>
+                            <span class="ml-2 text-base-content/60">{{ day.date|date:"D, d M" }}</span>
+                        </span>
+                        {% if day.pk in custom_day_pks %}<span class="text-xs text-base-content/40">{{ day.destination }}</span>{% endif %}
+                    </label>
+                {% endfor %}
+            </div>
+        </div>
+        <button type="submit" class="w-full btn btn-sm btn-primary">
+            <i class="ph-bold ph-check i-sm"></i>
+            {% trans "Create stage" %}
+        </button>
+    </form>
+</div>
