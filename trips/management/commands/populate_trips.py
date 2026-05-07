@@ -16,7 +16,8 @@ from tests.trips.factories import (
     StayFactory,
     TripFactory,
 )
-from trips.models import Trip, TripCollaboration
+from trips.models import Day, Trip, TripCollaboration
+from trips.tasks import calculate_day_transfer
 
 logger = logging.getLogger("task")
 
@@ -152,10 +153,9 @@ def _create_multi_destination_trip(user, cities):
     first_half = all_days[:mid]
     second_half = all_days[mid:]
 
-    # Second half: assign custom destination (city2)
-    for day in second_half:
-        day.destination = city2
-        day.save(update_fields=["destination"])
+    # Second half: assign custom destination (city2) via bulk update to skip async_task
+    second_half_pks = [day.pk for day in second_half]
+    Day.objects.filter(pk__in=second_half_pks).update(destination=city2)
 
     # Stay for city1
     if PLACES[city1]["hotels"]:
@@ -175,6 +175,10 @@ def _create_multi_destination_trip(user, cities):
         _create_events_for_day(day, trip, city1, user)
     for day in second_half:
         _create_events_for_day(day, trip, city2, user)
+
+    # Calculate transfers after stays/events are created (needs geocoded coordinates)
+    for day in all_days[:-1]:
+        calculate_day_transfer(day.pk)
 
     return trip
 

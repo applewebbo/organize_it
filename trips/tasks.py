@@ -3,12 +3,13 @@
 import logging
 from datetime import date, timedelta
 
+import requests
 from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.core import management
 from django.utils import timezone
 
-from trips.models import Trip
+from trips.models import Day, Trip
 from trips.weather import fetch_weather_for_trip
 
 logger = logging.getLogger("task")
@@ -34,6 +35,84 @@ def populate_trips():
     except Exception as e:
         logger.error(f"Error in populate_trips task: {e}", exc_info=True)
         raise
+
+
+def _get_day_coords(day):
+    """Return (lat, lng) from day's stay or first geocoded event, or (None, None)."""
+    if day.stay and day.stay.latitude is not None and day.stay.longitude is not None:
+        return day.stay.latitude, day.stay.longitude
+    event = day.events.filter(latitude__isnull=False, longitude__isnull=False).first()
+    if event:
+        return event.latitude, event.longitude
+    return None, None
+
+
+def calculate_day_transfer(day_pk):
+    """
+    Calculate driving duration and distance between consecutive days with different
+    destinations, using stay/event coordinates. Saves results on
+    Day.transfer_duration_to_next (minutes) and Day.transfer_distance_to_next (km).
+    Clears fields if destinations are equal or no geocoded stay/event is found.
+    """
+    try:
+        day = (
+            Day.objects.select_related("trip", "stay")
+            .prefetch_related("events")
+            .get(pk=day_pk)
+        )
+    except Day.DoesNotExist:
+        return
+
+    next_day = (
+        Day.objects.select_related("stay")
+        .prefetch_related("events")
+        .filter(trip=day.trip, number=day.number + 1)
+        .first()
+    )
+
+    has_different_dest = next_day and next_day.destination != day.destination
+    if not has_different_dest:
+        Day.objects.filter(pk=day_pk).update(
+            transfer_duration_to_next=None,
+            transfer_distance_to_next=None,
+        )
+        return
+
+    lat1, lng1 = _get_day_coords(day)
+    lat2, lng2 = _get_day_coords(next_day)
+
+    if lat1 is None or lat2 is None:
+        Day.objects.filter(pk=day_pk).update(
+            transfer_duration_to_next=None,
+            transfer_distance_to_next=None,
+        )
+        return
+
+    url = (
+        f"https://api.mapbox.com/directions/v5/mapbox/driving/"
+        f"{lng1},{lat1};"
+        f"{lng2},{lat2}"
+    )
+    try:
+        resp = requests.get(
+            url, params={"access_token": settings.MAPBOX_ACCESS_TOKEN}, timeout=10
+        )
+        resp.raise_for_status()
+        data = resp.json()
+    except Exception as e:
+        logger.error(f"Mapbox Directions API error for day {day_pk}: {e}")
+        return
+
+    if data.get("routes"):
+        route = data["routes"][0]
+        Day.objects.filter(pk=day_pk).update(
+            transfer_duration_to_next=round(route["duration"] / 60),
+            transfer_distance_to_next=round(route["distance"] / 1000),
+        )
+        logger.debug(
+            f"Transfer calculated for day {day_pk}: "
+            f"{route['duration'] / 60:.0f}min, {route['distance'] / 1000:.0f}km"
+        )
 
 
 def check_trips_status():

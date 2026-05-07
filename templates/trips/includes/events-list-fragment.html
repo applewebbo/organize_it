@@ -3,7 +3,7 @@
     {% if day_groups %}
         {% for group in day_groups %}
             {% with dest=group.destination|default:trip.destination %}
-                {% if not forloop.first or dest != trip.destination %}
+                {% if forloop.first and dest != trip.destination %}
                     <div class="text-sm uppercase divider text-base-content/50">{{ dest }}</div>
                 {% endif %}
             {% endwith %}
@@ -11,6 +11,27 @@
                 {% include 'trips/includes/day.html' with day=day %}
                 {% if not forloop.last %}<hr class="pb-2 sm:hidden border-base-300">{% endif %}
             {% endfor %}
+            {% if group.next_destination %}
+                {% with from_dest=group.destination|default:trip.destination %}
+                    <div class="mb-1 text-sm uppercase divider text-base-content/50">{{ group.next_destination }}</div>
+                    <div class="flex gap-3 justify-center items-center mb-4 text-sm text-base-content/50">
+                        <span>{{ from_dest }}</span>
+                        <i class="ph-bold ph-arrow-right i-sm" aria-hidden="true"></i>
+                        <span>{{ group.next_destination }}</span>
+                        {% if group.transfer_duration %}
+                            <span>·</span>
+                            <span>~{{ group.transfer_duration|format_minutes }}</span>
+                            <span>·</span>
+                            <span>~{{ group.transfer_distance }} km</span>
+                        {% else %}
+                            <span>·</span>
+                            <i class="ph-bold ph-clock i-sm" aria-hidden="true"></i>
+                            <span>·</span>
+                            <i class="ph-bold ph-car i-sm" aria-hidden="true"></i>
+                        {% endif %}
+                    </div>
+                {% endwith %}
+            {% endif %}
         {% endfor %}
     {% else %}
         {% for day in trip.days.all %}

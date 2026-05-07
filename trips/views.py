@@ -2941,15 +2941,26 @@ def create_stage(request, trip_pk):
     }
 
     if request.method == "POST":
+        from django_q.tasks import async_task
+
         destination = request.POST.get("destination", "").strip()
         selected_pks = {int(pk) for pk in request.POST.getlist("days")}
         if destination and selected_pks:
             valid_pks = selected_pks - custom_day_pks
             Day.objects.filter(pk__in=valid_pks, trip=trip).update(
                 destination=destination,
-                destination_latitude=None,
-                destination_longitude=None,
             )
+            affected_numbers = list(
+                Day.objects.filter(pk__in=valid_pks, trip=trip).values_list(
+                    "number", flat=True
+                )
+            )
+            for pk in valid_pks:
+                async_task("trips.tasks.calculate_day_transfer", pk)
+            for number in affected_numbers:
+                prev = Day.objects.filter(trip=trip, number=number - 1).first()
+                if prev:
+                    async_task("trips.tasks.calculate_day_transfer", prev.pk)
         stages = get_trip_stages(trip)
         return TemplateResponse(
             request,
@@ -2972,16 +2983,22 @@ def delete_stage(request, trip_pk):
         editable_trips_qs(request.user).prefetch_related("days"), pk=trip_pk
     )
     if request.method == "POST":
+        from django_q.tasks import async_task
+
         destination = request.POST.get("destination", "").strip()
         if destination and destination != trip.destination:
             stage_days = trip.days.filter(destination=destination)
+            affected_pks = list(stage_days.values_list("pk", flat=True))
+            affected_numbers = list(stage_days.values_list("number", flat=True))
             for day in stage_days:
                 day.events.update(day=None)
-            stage_days.update(
-                destination=trip.destination,
-                destination_latitude=None,
-                destination_longitude=None,
-            )
+            stage_days.update(destination=trip.destination)
+            for pk in affected_pks:
+                async_task("trips.tasks.calculate_day_transfer", pk)
+            for number in affected_numbers:
+                prev = Day.objects.filter(trip=trip, number=number - 1).first()
+                if prev:
+                    async_task("trips.tasks.calculate_day_transfer", prev.pk)
     stages = get_trip_stages(trip)
     return TemplateResponse(
         request,
@@ -2998,8 +3015,6 @@ def update_day_destination(request, trip_pk, day_pk):
     if request.method == "POST":
         destination = request.POST.get("destination", "").strip()
         day.destination = destination
-        day.destination_latitude = None
-        day.destination_longitude = None
         day.save()
         return HttpResponse(
             status=204,

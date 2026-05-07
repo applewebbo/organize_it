@@ -48,9 +48,12 @@ def get_trip_stages(trip):
 def group_days_by_destination(days):
     """
     Group an ordered list of Day objects into consecutive destination blocks.
-    Returns a list of dicts: [{"destination": str, "days": [Day, ...]}, ...]
-    If all days share the same destination (or all are blank), returns None
-    so the caller can fall back to the flat layout.
+    Returns a list of dicts:
+      [{"destination": str, "days": [Day, ...],
+        "next_destination": str|None,
+        "transfer_duration": int|None,
+        "transfer_distance": int|None}, ...]
+    Returns None if all days share the same destination (flat layout).
     """
     day_list = list(days)
     if not day_list:
@@ -64,6 +67,17 @@ def group_days_by_destination(days):
             groups[-1]["days"].append(day)
         else:
             groups.append({"destination": day.destination, "days": [day]})
+
+    for i, group in enumerate(groups):
+        if i < len(groups) - 1:
+            last_day = group["days"][-1]
+            group["next_destination"] = groups[i + 1]["destination"]
+            group["transfer_duration"] = last_day.transfer_duration_to_next
+            group["transfer_distance"] = last_day.transfer_distance_to_next
+        else:
+            group["next_destination"] = None
+            group["transfer_duration"] = None
+            group["transfer_distance"] = None
     return groups
 
 

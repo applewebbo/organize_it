@@ -266,13 +266,8 @@ class TestDayModel:
             end_date=date.today() + timedelta(days=2),
             destination="Milano",
         )
-        # geocoder called once (cached) for all 3 days
-        calls = [c for c in mock_geocoder.call_args_list if c.args[0] == "Milano"]
-        assert len(calls) == 1
         for day in trip.days.all():
             assert day.destination == "Milano"
-            assert day.destination_latitude == 45.4654
-            assert day.destination_longitude == 9.1866
 
     @patch("geocoder.mapbox")
     def test_trip_destination_change_updates_non_customized_days(
@@ -304,39 +299,6 @@ class TestDayModel:
         # Non-customized days updated
         assert day2.destination == "Roma"
         assert day3.destination == "Roma"
-
-    @patch("geocoder.mapbox")
-    def test_day_geocoding_on_save(self, mock_geocoder, user_factory, trip_factory):
-        """Day.save() geocodes destination when it changes and coords are missing."""
-        mock_geocoder.return_value.latlng = [45.4654, 9.1866]
-        trip = trip_factory(author=user_factory(), destination="")
-        day = trip.days.first()
-        day.destination = "Milano"
-        day.destination_latitude = None
-        day.destination_longitude = None
-        day.save()
-        mock_geocoder.assert_called_with(
-            "Milano", access_token=settings.MAPBOX_ACCESS_TOKEN
-        )
-        day.refresh_from_db()
-        assert day.destination_latitude == 45.4654
-        assert day.destination_longitude == 9.1866
-
-    @patch("geocoder.mapbox")
-    def test_day_geocoding_clears_coords_when_destination_empty(
-        self, mock_geocoder, user_factory, trip_factory
-    ):
-        """Clearing Day.destination also clears lat/lng."""
-        mock_geocoder.return_value.latlng = [45.4654, 9.1866]
-        trip = trip_factory(author=user_factory(), destination="")
-        day = trip.days.first()
-        day.destination = "Milano"
-        day.save()
-        day.destination = ""
-        day.save()
-        day.refresh_from_db()
-        assert day.destination_latitude is None
-        assert day.destination_longitude is None
 
     @patch("geocoder.mapbox")
     def test_capture_old_destination_handles_deleted_trip(
@@ -397,9 +359,15 @@ class TestDayModel:
         groups = group_days_by_destination(trip.days.order_by("number"))
         assert groups is not None
         assert len(groups) == 3
-        assert groups[0] == {"destination": "Roma", "days": [days[0], days[1]]}
-        assert groups[1] == {"destination": "Napoli", "days": [days[2]]}
-        assert groups[2] == {"destination": "Roma", "days": [days[3]]}
+        assert groups[0]["destination"] == "Roma"
+        assert groups[0]["days"] == [days[0], days[1]]
+        assert groups[0]["next_destination"] == "Napoli"
+        assert groups[1]["destination"] == "Napoli"
+        assert groups[1]["days"] == [days[2]]
+        assert groups[1]["next_destination"] == "Roma"
+        assert groups[2]["destination"] == "Roma"
+        assert groups[2]["days"] == [days[3]]
+        assert groups[2]["next_destination"] is None
 
 
 class TestLinkModel:

@@ -101,16 +101,6 @@ class Trip(models.Model):
         return None
 
 
-def _geocode_destination(destination, cache):
-    """Geocode a destination string, using cache to avoid duplicate API calls."""
-    if destination in cache:
-        return cache[destination]
-    g = geocoder.mapbox(destination, access_token=settings.MAPBOX_ACCESS_TOKEN)
-    result = tuple(g.latlng) if g.latlng else (None, None)
-    cache[destination] = result
-    return result
-
-
 @receiver(pre_save, sender="trips.Trip")
 def capture_trip_old_destination(sender, instance, **kwargs):
     """Store old destination on the instance before save so post_save can detect changes."""
@@ -142,8 +132,6 @@ def update_trip_days(sender, instance, **kwargs):
     old_destination = getattr(instance, "_old_destination", None)
     destination_changed = old_destination and old_destination != instance.destination
 
-    geocode_cache = {}
-
     # Delete days outside the new range
     for day in instance.days.all():
         if day.date not in desired_dates:
@@ -166,29 +154,16 @@ def update_trip_days(sender, instance, **kwargs):
                 and day.destination == old_destination
                 and instance.destination
             ):
-                lat, lng = _geocode_destination(instance.destination, geocode_cache)
                 day.destination = instance.destination
-                day.destination_latitude = lat
-                day.destination_longitude = lng
-                update_fields += [
-                    "destination",
-                    "destination_latitude",
-                    "destination_longitude",
-                ]
+                update_fields.append("destination")
             if update_fields:
                 day.save(update_fields=update_fields)
         else:
-            # New day: assign trip destination with geocoding (cached)
-            lat, lng = (None, None)
-            if instance.destination:
-                lat, lng = _geocode_destination(instance.destination, geocode_cache)
             Day.objects.create(
                 trip=instance,
                 number=idx + 1,
                 date=day_date,
                 destination=instance.destination,
-                destination_latitude=lat,
-                destination_longitude=lng,
             )
 
 
@@ -456,8 +431,6 @@ class Day(models.Model):
     number = models.PositiveSmallIntegerField()
     date = models.DateField()
     destination = models.CharField(max_length=100, blank=True)
-    destination_latitude = models.FloatField(null=True, blank=True)
-    destination_longitude = models.FloatField(null=True, blank=True)
     transfer_duration_to_next = models.PositiveIntegerField(null=True, blank=True)
     transfer_distance_to_next = models.PositiveIntegerField(null=True, blank=True)
     weather_data = models.JSONField(null=True, blank=True)
@@ -472,21 +445,16 @@ class Day(models.Model):
     def save(self, *args, **kwargs):
         old = type(self).objects.get(pk=self.pk) if self.pk else None
         destination_changed = old and old.destination != self.destination
-        coords_missing = (
-            self.destination_latitude is None or self.destination_longitude is None
-        )
-
-        if self.destination and (destination_changed or coords_missing):
-            g = geocoder.mapbox(
-                self.destination, access_token=settings.MAPBOX_ACCESS_TOKEN
-            )
-            if g.latlng:
-                self.destination_latitude, self.destination_longitude = g.latlng
-        elif not self.destination:
-            self.destination_latitude = None
-            self.destination_longitude = None
 
         super().save(*args, **kwargs)
+
+        if destination_changed:
+            from django_q.tasks import async_task
+
+            async_task("trips.tasks.calculate_day_transfer", self.pk)
+            prev = Day.objects.filter(trip=self.trip, number=self.number - 1).first()
+            if prev:
+                async_task("trips.tasks.calculate_day_transfer", prev.pk)
 
     @property
     def next_day(self):
