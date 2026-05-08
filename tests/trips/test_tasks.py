@@ -125,6 +125,22 @@ class TestGetDayCoords:
         assert lat == 43.0
         assert lng == 10.0
 
+    def test_destination_coords_take_priority(self, user_factory, trip_factory):
+        from trips.models import Day
+
+        user = user_factory()
+        trip = trip_factory(author=user)
+        day = trip.days.first()
+        Day.objects.filter(pk=day.pk).update(
+            destination_latitude=42.0, destination_longitude=11.0
+        )
+        stay = StayFactory(latitude=45.0, longitude=9.0)
+        stay.days.set([day])
+        day.refresh_from_db()
+        lat, lng = _get_day_coords(day)
+        assert lat == 42.0
+        assert lng == 11.0
+
 
 class TestCalculateDayTransfer:
     def test_clears_fields_if_same_destination(self, user_factory, trip_factory):

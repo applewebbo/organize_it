@@ -57,6 +57,7 @@ from trips.utils import (
     create_trip_map,
     download_unsplash_photo,
     editable_trips_qs,
+    geocode_city,
     geocode_location,
     get_airport_by_iata,
     get_event_instance,
@@ -548,13 +549,18 @@ def swap_event_order(request, event_id):
     )
 
 
+def _day_city(day):
+    """Return the relevant city for a day: stage destination if set, else trip destination."""
+    return day.destination or day.trip.destination
+
+
 def add_experience(request, day_id):
     day = get_object_or_404(Day, pk=day_id, trip__in=editable_trips_qs(request.user))
     unpaired_experiences = Event.objects.filter(
         day__isnull=True, trip=day.trip, category=2
     )
     form = ExperienceForm(
-        request.POST or None, initial={"city": day.trip.destination}, geocode=True
+        request.POST or None, initial={"city": _day_city(day)}, geocode=True
     )
     if form.is_valid():
         experience = form.save(commit=False)
@@ -581,7 +587,7 @@ def add_meal(request, day_id):
         day__isnull=True, trip=day.trip, category=3
     )
     form = MealForm(
-        request.POST or None, initial={"city": day.trip.destination}, geocode=True
+        request.POST or None, initial={"city": _day_city(day)}, geocode=True
     )
     if form.is_valid():
         meal = form.save(commit=False)
@@ -659,7 +665,7 @@ def add_stay(request, day_id):
     form = StayForm(
         trip,
         data=request.POST or None,
-        initial={"apply_to_days": [day_id], "city": trip.destination},
+        initial={"apply_to_days": [day_id], "city": _day_city(day)},
         geocode=True,
     )
     if form.is_valid():
@@ -1523,6 +1529,22 @@ def geocode_address(request):
 
     return TemplateResponse(
         request, "trips/includes/address-results.html", {"found": False}
+    )
+
+
+def geocode_city_view(request):
+    """HTMX: search for a city/destination using Nominatim and return a list of results."""
+    if request.method == "POST":
+        query = request.POST.get("destination", "").strip()
+        if query:
+            results = geocode_city(query)
+            return TemplateResponse(
+                request,
+                "trips/includes/city-results.html",
+                {"cities": results, "found": bool(results)},
+            )
+    return TemplateResponse(
+        request, "trips/includes/city-results.html", {"found": False}
     )
 
 
@@ -2945,12 +2967,19 @@ def create_stage(request, trip_pk):
         from django_q.tasks import async_task
 
         destination = request.POST.get("destination", "").strip()
+        dest_lat = request.POST.get("destination_latitude", "").strip()
+        dest_lon = request.POST.get("destination_longitude", "").strip()
         selected_pks = {int(pk) for pk in request.POST.getlist("days")}
         if destination and selected_pks:
             valid_pks = selected_pks - custom_day_pks
-            Day.objects.filter(pk__in=valid_pks, trip=trip).update(
-                destination=destination,
-            )
+            update_fields = {"destination": destination}
+            if dest_lat and dest_lon:
+                try:
+                    update_fields["destination_latitude"] = float(dest_lat)
+                    update_fields["destination_longitude"] = float(dest_lon)
+                except ValueError:
+                    pass
+            Day.objects.filter(pk__in=valid_pks, trip=trip).update(**update_fields)
             affected_numbers = list(
                 Day.objects.filter(pk__in=valid_pks, trip=trip).values_list(
                     "number", flat=True

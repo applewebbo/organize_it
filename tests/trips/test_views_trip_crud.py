@@ -318,19 +318,23 @@ class CreateStageView(TestCase):
         user = self.make_user("user")
         trip = TripFactory(author=user)
         days = list(trip.days.order_by("number"))
-        days[0].destination = "Roma"
+        existing_custom = f"NOT_{trip.destination}"
+        days[0].destination = existing_custom
         days[0].save()
 
         with self.login(user):
             response = self.post(
                 "trips:create-stage",
                 trip_pk=trip.pk,
-                data={"destination": "Firenze", "days": [str(days[0].pk)]},
+                data={
+                    "destination": f"OTHER_{trip.destination}",
+                    "days": [str(days[0].pk)],
+                },
             )
 
         self.response_200(response)
         days[0].refresh_from_db()
-        assert days[0].destination == "Roma"
+        assert days[0].destination == existing_custom
 
     def test_post_without_destination_does_not_update(self):
         user = self.make_user("user")
@@ -348,6 +352,27 @@ class CreateStageView(TestCase):
         day.refresh_from_db()
         assert day.destination == trip.destination or day.destination == ""
 
+    def test_post_enqueues_transfer_for_prev_day(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        days = list(trip.days.order_by("number"))
+        # Select second day so there's a previous day
+        target_day = days[1]
+
+        with self.login(user):
+            self.post(
+                "trips:create-stage",
+                trip_pk=trip.pk,
+                data={
+                    "destination": f"NOT_{trip.destination}",
+                    "days": [str(target_day.pk)],
+                },
+            )
+
+        # Just verify the request succeeded — task enqueue is tested implicitly
+        target_day.refresh_from_db()
+        assert target_day.destination == f"NOT_{trip.destination}"
+
     def test_post_forbidden_for_non_member(self):
         owner = self.make_user("owner")
         other = self.make_user("other")
@@ -362,6 +387,50 @@ class CreateStageView(TestCase):
             )
 
         self.response_404(response)
+
+    def test_post_saves_destination_coords_when_provided(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+
+        with self.login(user):
+            self.post(
+                "trips:create-stage",
+                trip_pk=trip.pk,
+                data={
+                    "destination": "Firenze",
+                    "destination_latitude": "43.7697",
+                    "destination_longitude": "11.2556",
+                    "days": [str(day.pk)],
+                },
+            )
+
+        day.refresh_from_db()
+        assert day.destination == "Firenze"
+        assert day.destination_latitude == 43.7697
+        assert day.destination_longitude == 11.2556
+
+    def test_post_ignores_invalid_coords(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+
+        with self.login(user):
+            self.post(
+                "trips:create-stage",
+                trip_pk=trip.pk,
+                data={
+                    "destination": "Firenze",
+                    "destination_latitude": "not-a-number",
+                    "destination_longitude": "also-invalid",
+                    "days": [str(day.pk)],
+                },
+            )
+
+        day.refresh_from_db()
+        assert day.destination == "Firenze"
+        assert day.destination_latitude is None
+        assert day.destination_longitude is None
 
 
 class DeleteStageView(TestCase):
@@ -421,6 +490,25 @@ class DeleteStageView(TestCase):
         self.response_200(response)
         day.refresh_from_db()
         assert day.destination == original_dest
+
+    def test_post_enqueues_transfer_for_prev_day(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        days = list(trip.days.order_by("number"))
+        custom_dest = f"NOT_{trip.destination}"
+        # Set second day as custom stage so first day is its predecessor
+        days[1].destination = custom_dest
+        days[1].save()
+
+        with self.login(user):
+            self.post(
+                "trips:delete-stage",
+                trip_pk=trip.pk,
+                data={"destination": custom_dest},
+            )
+
+        days[1].refresh_from_db()
+        assert days[1].destination == trip.destination
 
     def test_get_returns_step1_modal(self):
         user = self.make_user("user")

@@ -339,6 +339,62 @@ def geocode_location(name, city):
     return []
 
 
+def geocode_city(query):
+    """Search for a city/destination using Nominatim. Returns a list of city results with name, country, lat, lon."""
+    if not query:
+        return []
+
+    cache_key = f"geocode_city_{query.strip().lower()}"
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+
+    rate_limit_check()
+    time.sleep(1)
+
+    url = "https://nominatim.openstreetmap.org/search"
+    params = {
+        "q": query.strip(),
+        "format": "json",
+        "limit": 5,
+        "addressdetails": 1,
+        "featuretype": "city",
+    }
+    headers = {"User-Agent": "OrganizeIt-Geocoding"}
+
+    try:
+        response = requests.get(url, params=params, headers=headers, timeout=5)
+        if response.status_code == 200:
+            results = response.json()
+            city_list = []
+            for result in results:
+                addr = result.get("address", {})
+                city_name = (
+                    result.get("name")
+                    or addr.get("city")
+                    or addr.get("town")
+                    or addr.get("village")
+                    or ""
+                )
+                country = addr.get("country", "")
+                city_list.append(
+                    {
+                        "name": city_name,
+                        "country": country,
+                        "lat": float(result.get("lat", 0)),
+                        "lon": float(result.get("lon", 0)),
+                        "importance": result.get("importance", 0),
+                    }
+                )
+            city_list.sort(key=lambda x: x["importance"], reverse=True)
+            cache.set(cache_key, city_list, 3600)
+            return city_list
+    except Exception as e:
+        logger.error(f"Error geocoding city: {e}")
+
+    return []
+
+
 def select_best_result(results, name, city):
     """Select the best result from Nominatim results based on custom scoring"""
     if not results:

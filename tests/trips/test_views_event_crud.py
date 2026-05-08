@@ -56,6 +56,32 @@ class AddExperienceView(TestCase):
         assertTemplateUsed(response, "trips/experience-create.html")
         assert day.events.count() == 0
 
+    def test_get_uses_stage_destination_as_city(self):
+        """City initial value should be stage destination, not trip destination."""
+        from trips.models import Day
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        Day.objects.filter(pk=day.pk).update(destination="Venezia")
+
+        with self.login(user):
+            response = self.get("trips:add-experience", day_id=day.pk)
+
+        self.response_200(response)
+        assert response.context["form"].initial["city"] == "Venezia"
+
+    def test_get_falls_back_to_trip_destination_if_no_stage(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user, destination="Roma")
+        day = trip.days.first()
+
+        with self.login(user):
+            response = self.get("trips:add-experience", day_id=day.pk)
+
+        self.response_200(response)
+        assert response.context["form"].initial["city"] == "Roma"
+
 
 class AddMealView(TestCase):
     @patch("geocoder.mapbox")
@@ -96,6 +122,20 @@ class AddMealView(TestCase):
         self.response_200(response)
         assertTemplateUsed(response, "trips/meal-create.html")
         assert day.events.count() == 0
+
+    def test_get_uses_stage_destination_as_city(self):
+        from trips.models import Day
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        Day.objects.filter(pk=day.pk).update(destination="Napoli")
+
+        with self.login(user):
+            response = self.get("trips:add-meal", day_id=day.pk)
+
+        self.response_200(response)
+        assert response.context["form"].initial["city"] == "Napoli"
 
 
 class EventDeleteView(TestCase):

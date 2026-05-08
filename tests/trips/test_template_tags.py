@@ -16,6 +16,7 @@ from trips.templatetags.trip_tags import (
     event_icon_color,
     event_type_icon,
     format_duration,
+    format_minutes,
     format_opening_hours,
     has_different_stay,
     is_first_day_of_stay,
@@ -767,3 +768,20 @@ class TestMealTypeLabel:
         MealFactory(day=day, type=Meal.Type.LUNCH)
         event = Event.objects.get(day=day)
         assert meal_type_label(event) == "Lunch"
+
+
+class TestFormatMinutes:
+    def test_none_returns_empty(self):
+        assert format_minutes(None) == ""
+
+    def test_hours_and_minutes(self):
+        assert format_minutes(150) == "2h 30min"
+
+    def test_hours_only(self):
+        assert format_minutes(120) == "2h"
+
+    def test_minutes_only(self):
+        assert format_minutes(45) == "45min"
+
+    def test_zero(self):
+        assert format_minutes(0) == "0min"

@@ -931,6 +931,51 @@ class GeocodeAddressViewTests(TestCase):
         )
 
 
+class GeocodeCityViewTests(TestCase):
+    @patch("trips.views.geocode_city")
+    def test_geocode_city_post_found(self, mock_geocode_city):
+        mock_geocode_city.return_value = [
+            {
+                "name": "Roma",
+                "country": "Italia",
+                "lat": 41.89,
+                "lon": 12.48,
+                "importance": 0.9,
+            }
+        ]
+        user = self.make_user("user")
+        with self.login(user):
+            response = self.client.post(
+                reverse("trips:geocode-city"), {"destination": "Roma"}
+            )
+        assert response.status_code == 200
+        assert b"Roma" in response.content
+
+    @patch("trips.views.geocode_city")
+    def test_geocode_city_post_not_found(self, mock_geocode_city):
+        mock_geocode_city.return_value = []
+        user = self.make_user("user")
+        with self.login(user):
+            response = self.client.post(
+                reverse("trips:geocode-city"), {"destination": "XYZ"}
+            )
+        assert response.status_code == 200
+
+    def test_geocode_city_post_empty(self):
+        user = self.make_user("user")
+        with self.login(user):
+            response = self.client.post(
+                reverse("trips:geocode-city"), {"destination": ""}
+            )
+        assert response.status_code == 200
+
+    def test_geocode_city_get(self):
+        user = self.make_user("user")
+        with self.login(user):
+            response = self.client.get(reverse("trips:geocode-city"))
+        assert response.status_code == 200
+
+
 class TestGetTripAddresses(TestCase):
     def test_get_trip_addresses_with_events(self):
         """Test fetching addresses from trip events."""

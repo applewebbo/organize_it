@@ -243,6 +243,20 @@ def phone_format(value):
 
 
 @register.filter
+def format_minutes(minutes):
+    """Format integer minutes to human-readable format (e.g., 150 → '2h 30min')."""
+    if minutes is None:
+        return ""
+    hours, mins = divmod(int(minutes), 60)
+    parts = []
+    if hours:
+        parts.append(f"{hours}h")
+    if mins:
+        parts.append(f"{mins}min")
+    return " ".join(parts) if parts else "0min"
+
+
+@register.filter
 def format_duration(duration):
     """Format timedelta object to human-readable format (e.g., 2h 30m)"""
     if not duration:

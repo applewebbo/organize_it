@@ -23,6 +23,7 @@ from trips.utils import (
     create_trip_map,
     download_unsplash_photo,
     generate_cache_key,
+    geocode_city,
     geocode_location,
     get_day_stay_transfers,
     get_next_day_stay,
@@ -154,6 +155,64 @@ class TestGeocoding(TestCase):
         # Second call, should use cache
         geocode_location("Test Place", "Test City")
         mock_get.assert_called_once()  # Should not be called again
+
+    @patch("trips.utils.requests.get")
+    def test_geocode_city_success(self, mock_get):
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = [
+            {
+                "name": "Roma",
+                "lat": "41.89",
+                "lon": "12.48",
+                "importance": 0.9,
+                "address": {"country": "Italia", "city": "Roma"},
+            }
+        ]
+        mock_get.return_value = mock_response
+        results = geocode_city("Roma")
+        assert len(results) == 1
+        assert results[0]["name"] == "Roma"
+        assert results[0]["country"] == "Italia"
+        assert results[0]["lat"] == 41.89
+
+    @patch("trips.utils.requests.get")
+    def test_geocode_city_empty_query(self, mock_get):
+        results = geocode_city("")
+        assert results == []
+        mock_get.assert_not_called()
+
+    @patch("trips.utils.requests.get")
+    def test_geocode_city_non_200_response(self, mock_get):
+        mock_response = MagicMock()
+        mock_response.status_code = 500
+        mock_get.return_value = mock_response
+        results = geocode_city("errorcity_unique_xyz")
+        assert results == []
+
+    @patch("trips.utils.requests.get")
+    def test_geocode_city_api_error(self, mock_get):
+        mock_get.side_effect = Exception("network error")
+        results = geocode_city("Roma")
+        assert results == []
+
+    @patch("trips.utils.requests.get")
+    def test_geocode_city_caching(self, mock_get):
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = [
+            {
+                "name": "Roma",
+                "lat": "41.89",
+                "lon": "12.48",
+                "importance": 0.9,
+                "address": {"country": "Italia"},
+            }
+        ]
+        mock_get.return_value = mock_response
+        geocode_city("caching_test_city_xyz")
+        geocode_city("caching_test_city_xyz")
+        mock_get.assert_called_once()
 
     def test_select_best_result(self):
         """Test the logic for selecting the best geocoding result."""
