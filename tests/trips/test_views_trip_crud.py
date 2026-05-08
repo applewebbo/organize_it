@@ -432,6 +432,63 @@ class CreateStageView(TestCase):
         assert day.destination_latitude is None
         assert day.destination_longitude is None
 
+    def test_post_enqueues_transfer_for_day_after_stage(self):
+        """When a new stage borders another stage, the day after it is also re-queued."""
+        from datetime import date, timedelta
+
+        from trips.models import Day
+
+        user = self.make_user("user")
+        trip = TripFactory(
+            author=user,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=3),
+        )
+        days = list(trip.days.order_by("number"))
+        # Assign last day to a pre-existing stage
+        Day.objects.filter(pk=days[-1].pk).update(destination="OtherCity")
+
+        with self.login(user):
+            response = self.post(
+                "trips:create-stage",
+                trip_pk=trip.pk,
+                data={
+                    "destination": "MidCity",
+                    "days": [str(days[1].pk)],
+                },
+            )
+
+        self.response_200(response)
+        days[1].refresh_from_db()
+        assert days[1].destination == "MidCity"
+
+    def test_post_no_next_day_after_last_stage(self):
+        """Stage assigned to the last day — no day after it to re-queue."""
+        from datetime import date, timedelta
+
+        user = self.make_user("user")
+        trip = TripFactory(
+            author=user,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=2),
+        )
+        days = list(trip.days.order_by("number"))
+        last_day = days[-1]
+
+        with self.login(user):
+            response = self.post(
+                "trips:create-stage",
+                trip_pk=trip.pk,
+                data={
+                    "destination": "LastCity",
+                    "days": [str(last_day.pk)],
+                },
+            )
+
+        self.response_200(response)
+        last_day.refresh_from_db()
+        assert last_day.destination == "LastCity"
+
 
 class DeleteStageView(TestCase):
     def test_post_resets_days_to_trip_destination(self):

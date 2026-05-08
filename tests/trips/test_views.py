@@ -976,6 +976,68 @@ class GeocodeCityViewTests(TestCase):
         assert response.status_code == 200
 
 
+class TransferInfoViewTests(TestCase):
+    def test_returns_fragment_with_data(self):
+        from datetime import date, timedelta
+
+        from trips.models import Day
+
+        user = self.make_user("user")
+        trip = TripFactory(
+            author=user,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=2),
+        )
+        days = list(trip.days.order_by("number"))
+        Day.objects.filter(pk=days[0].pk).update(
+            transfer_duration_to_next=90, transfer_distance_to_next=120
+        )
+        days[1].destination = "OtherCity"
+        days[1].save()
+
+        with self.login(user):
+            response = self.client.get(
+                reverse("trips:transfer-info", args=[days[0].pk])
+            )
+
+        assert response.status_code == 200
+
+    def test_returns_fragment_without_data(self):
+        from datetime import date, timedelta
+
+        user = self.make_user("user")
+        trip = TripFactory(
+            author=user,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+        )
+        days = list(trip.days.order_by("number"))
+
+        with self.login(user):
+            response = self.client.get(
+                reverse("trips:transfer-info", args=[days[0].pk])
+            )
+
+        assert response.status_code == 200
+
+    def test_returns_404_for_unauthorized(self):
+        from datetime import date, timedelta
+
+        owner = self.make_user("owner")
+        other = self.make_user("other")
+        trip = TripFactory(
+            author=owner,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+        )
+        day = trip.days.first()
+
+        with self.login(other):
+            response = self.client.get(reverse("trips:transfer-info", args=[day.pk]))
+
+        assert response.status_code == 404
+
+
 class TestGetTripAddresses(TestCase):
     def test_get_trip_addresses_with_events(self):
         """Test fetching addresses from trip events."""

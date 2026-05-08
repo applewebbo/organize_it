@@ -14,24 +14,7 @@
             {% if group.next_destination %}
                 {% with from_dest=group.destination|default:trip.destination %}
                     <div class="mb-1 text-sm uppercase divider text-base-content/50">{{ group.next_destination }}</div>
-                    <div class="flex gap-3 justify-center items-center mb-4 text-sm text-base-content/50">
-                        <span>{{ from_dest }}</span>
-                        <i class="ph-bold ph-arrow-right i-sm" aria-hidden="true"></i>
-                        <span>{{ group.next_destination }}</span>
-                        {% if group.transfer_duration %}
-                            <span>·</span>
-                            <i class="ph-bold ph-clock i-sm" aria-hidden="true"></i>
-                            <span>~{{ group.transfer_duration|format_minutes }}</span>
-                            <span>·</span>
-                            <i class="ph-bold ph-car i-sm" aria-hidden="true"></i>
-                            <span>~{{ group.transfer_distance }} km</span>
-                        {% else %}
-                            <span>·</span>
-                            <i class="ph-bold ph-clock i-sm" aria-hidden="true"></i>
-                            <span>·</span>
-                            <i class="ph-bold ph-car i-sm" aria-hidden="true"></i>
-                        {% endif %}
-                    </div>
+                    {% include 'trips/includes/transfer-info.html' with day_pk=group.last_day_pk from_dest=from_dest next_destination=group.next_destination transfer_duration=group.transfer_duration transfer_distance=group.transfer_distance %}
                 {% endwith %}
             {% endif %}
         {% endfor %}

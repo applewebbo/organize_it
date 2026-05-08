@@ -1,0 +1,19 @@
+{% load i18n trip_tags %}
+<div id="transfer-info-{{ day_pk }}"
+     class="flex gap-3 justify-center items-center mb-4 text-sm text-base-content/50"
+     {% if not transfer_duration %} hx-get="{% url 'trips:transfer-info' day_pk %}" hx-trigger="every 4s" hx-target="#transfer-info-{{ day_pk }}" hx-swap="outerHTML" {% endif %}>
+    <span>{{ from_dest }}</span>
+    <i class="ph-bold ph-arrow-right i-sm" aria-hidden="true"></i>
+    <span>{{ next_destination }}</span>
+    {% if transfer_duration %}
+        <span>·</span>
+        <i class="ph-bold ph-clock i-sm" aria-hidden="true"></i>
+        <span>~{{ transfer_duration|format_minutes }}</span>
+        <span>·</span>
+        <i class="ph-bold ph-car i-sm" aria-hidden="true"></i>
+        <span>~{{ transfer_distance }} km</span>
+    {% else %}
+        <span>·</span>
+        <span class="loading loading-spinner loading-xs"></span>
+    {% endif %}
+</div>

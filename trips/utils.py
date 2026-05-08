@@ -74,10 +74,12 @@ def group_days_by_destination(days):
             group["next_destination"] = groups[i + 1]["destination"]
             group["transfer_duration"] = last_day.transfer_duration_to_next
             group["transfer_distance"] = last_day.transfer_distance_to_next
+            group["last_day_pk"] = last_day.pk
         else:
             group["next_destination"] = None
             group["transfer_duration"] = None
             group["transfer_distance"] = None
+            group["last_day_pk"] = None
     return groups
 
 
@@ -337,6 +339,26 @@ def geocode_location(name, city):
         logger.error(f"Error geocoding: {e}")
 
     return []
+
+
+def geocode_trip_destination(trip):
+    """
+    Geocode trip.destination via Nominatim and update all main-destination days
+    (days whose destination matches trip.destination or is blank) with
+    destination_latitude/destination_longitude.
+    Returns (lat, lon) or (None, None) if geocoding fails.
+    """
+    results = geocode_city(trip.destination)
+    if not results:
+        return None, None
+    best = results[0]
+    lat, lon = best["lat"], best["lon"]
+    from trips.models import Day
+
+    Day.objects.filter(trip=trip).filter(
+        Q(destination="") | Q(destination=trip.destination)
+    ).update(destination_latitude=lat, destination_longitude=lon)
+    return lat, lon
 
 
 def geocode_city(query):

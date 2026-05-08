@@ -25,6 +25,7 @@ from trips.utils import (
     generate_cache_key,
     geocode_city,
     geocode_location,
+    geocode_trip_destination,
     get_day_stay_transfers,
     get_next_day_stay,
     get_trip_stages,
@@ -213,6 +214,39 @@ class TestGeocoding(TestCase):
         geocode_city("caching_test_city_xyz")
         geocode_city("caching_test_city_xyz")
         mock_get.assert_called_once()
+
+    @patch("trips.utils.geocode_city")
+    def test_geocode_trip_destination_updates_days(self, mock_geocode_city):
+        from tests.trips.factories import TripFactory
+
+        mock_geocode_city.return_value = [
+            {
+                "name": "Roma",
+                "lat": 41.89,
+                "lon": 12.48,
+                "country": "Italia",
+                "importance": 0.9,
+            }
+        ]
+        trip = TripFactory(destination="Roma")
+        lat, lon = geocode_trip_destination(trip)
+        assert lat == 41.89
+        assert lon == 12.48
+        from trips.models import Day
+
+        days = Day.objects.filter(trip=trip, destination="Roma")
+        for d in days:
+            assert d.destination_latitude == 41.89
+
+    @patch("trips.utils.geocode_city")
+    def test_geocode_trip_destination_no_results(self, mock_geocode_city):
+        from tests.trips.factories import TripFactory
+
+        mock_geocode_city.return_value = []
+        trip = TripFactory(destination="XYZnonexistent")
+        lat, lon = geocode_trip_destination(trip)
+        assert lat is None
+        assert lon is None
 
     def test_select_best_result(self):
         """Test the logic for selecting the best geocoding result."""

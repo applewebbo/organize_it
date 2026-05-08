@@ -59,6 +59,7 @@ from trips.utils import (
     editable_trips_qs,
     geocode_city,
     geocode_location,
+    geocode_trip_destination,
     get_airport_by_iata,
     get_event_instance,
     get_flight_origin_icao,
@@ -360,6 +361,7 @@ def trip_create(request):
                     trip.image_metadata = {"source": "upload"}
 
             trip.save()
+            geocode_trip_destination(trip)
             messages.add_message(
                 request,
                 messages.SUCCESS,
@@ -429,6 +431,7 @@ def trip_update(request, pk):
                     trip.image_metadata = {"source": "upload"}
 
             trip.save()
+            geocode_trip_destination(trip)
             messages.add_message(
                 request,
                 messages.SUCCESS,
@@ -1545,6 +1548,29 @@ def geocode_city_view(request):
             )
     return TemplateResponse(
         request, "trips/includes/city-results.html", {"found": False}
+    )
+
+
+def transfer_info(request, day_pk):
+    """HTMX polling endpoint: return transfer-info fragment for a day."""
+    day = get_object_or_404(
+        Day.objects.select_related("trip", "stay").prefetch_related("events"),
+        pk=day_pk,
+        trip__in=accessible_trips_qs(request.user),
+    )
+    next_day = Day.objects.filter(trip=day.trip, number=day.number + 1).first()
+    from_dest = day.destination or day.trip.destination
+    next_destination = next_day.destination if next_day else None
+    return TemplateResponse(
+        request,
+        "trips/includes/transfer-info.html",
+        {
+            "day_pk": day_pk,
+            "from_dest": from_dest,
+            "next_destination": next_destination,
+            "transfer_duration": day.transfer_duration_to_next,
+            "transfer_distance": day.transfer_distance_to_next,
+        },
     )
 
 
@@ -2987,10 +3013,20 @@ def create_stage(request, trip_pk):
             )
             for pk in valid_pks:
                 async_task("trips.tasks.calculate_day_transfer", pk)
-            for number in affected_numbers:
-                prev = Day.objects.filter(trip=trip, number=number - 1).first()
-                if prev:
-                    async_task("trips.tasks.calculate_day_transfer", prev.pk)
+            if affected_numbers:
+                max_number = max(affected_numbers)
+                for number in affected_numbers:
+                    prev = Day.objects.filter(trip=trip, number=number - 1).first()
+                    if prev:
+                        async_task("trips.tasks.calculate_day_transfer", prev.pk)
+                # If the new stage has a following stage, recalculate the day after it too
+                next_after_stage = Day.objects.filter(
+                    trip=trip, number=max_number + 1
+                ).first()
+                if next_after_stage:
+                    async_task(
+                        "trips.tasks.calculate_day_transfer", next_after_stage.pk
+                    )
         stages = get_trip_stages(trip)
         return TemplateResponse(
             request,
@@ -3022,7 +3058,11 @@ def delete_stage(request, trip_pk):
             affected_numbers = list(stage_days.values_list("number", flat=True))
             for day in stage_days:
                 day.events.update(day=None)
-            stage_days.update(destination=trip.destination)
+            stage_days.update(
+                destination=trip.destination,
+                destination_latitude=None,
+                destination_longitude=None,
+            )
             for pk in affected_pks:
                 async_task("trips.tasks.calculate_day_transfer", pk)
             for number in affected_numbers:
