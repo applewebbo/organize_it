@@ -33,15 +33,14 @@ def get_trip_stages(trip):
         key = day.destination if day.destination else main_dest
         groups.setdefault(key, []).append(day)
 
+    main_days = groups.pop(main_dest, None)
     result = []
-    if main_dest in groups:
-        result.append(
-            {"destination": main_dest, "days": groups.pop(main_dest), "is_main": True}
-        )
-    elif not groups:
-        result.append({"destination": main_dest, "days": [], "is_main": True})
     for dest, dest_days in groups.items():
         result.append({"destination": dest, "days": dest_days, "is_main": False})
+    if main_days is not None:
+        result.append({"destination": main_dest, "days": main_days, "is_main": True})
+    elif not result:
+        result.append({"destination": main_dest, "days": [], "is_main": True})
     return result
 
 

@@ -262,6 +262,19 @@ class TripDestinationsView(TestCase):
         self.response_200(response)
         self.assertTemplateUsed(response, "trips/includes/trip-destinations-modal.html")
 
+    def test_get_modal_main_stage_is_last(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        days = list(trip.days.order_by("number"))
+        days[0].destination = f"NOT_{trip.destination}"
+        days[0].save()
+
+        with self.login(user):
+            response = self.get("trips:trip-destinations", trip_pk=trip.pk)
+
+        stages = response.context["stages"]
+        assert stages[-1]["is_main"] is True
+
     def test_get_modal_forbidden_for_non_member(self):
         owner = self.make_user("owner")
         other = self.make_user("other")
@@ -477,6 +490,37 @@ class CreateStageView(TestCase):
         assert day.destination == "Firenze"
         assert day.destination_latitude is None
         assert day.destination_longitude is None
+
+    def test_get_shows_all_days_including_last(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        days = list(trip.days.order_by("number"))
+        last_day = days[-1]
+
+        with self.login(user):
+            response = self.get("trips:create-stage", trip_pk=trip.pk)
+
+        self.response_200(response)
+        context_days = response.context["days"]
+        assert last_day in context_days
+
+    def test_post_can_assign_last_day_to_custom_stage(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        last_day = trip.days.order_by("number").last()
+
+        with self.login(user):
+            self.post(
+                "trips:create-stage",
+                trip_pk=trip.pk,
+                data={
+                    "destination": f"NOT_{trip.destination}",
+                    "days": [str(last_day.pk)],
+                },
+            )
+
+        last_day.refresh_from_db()
+        assert last_day.destination == f"NOT_{trip.destination}"
 
     def test_post_enqueues_transfer_for_day_after_stage(self):
         """When a new stage borders another stage, the day after it is also re-queued."""

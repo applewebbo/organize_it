@@ -1750,3 +1750,32 @@ class TestGetTripStages(TestCase):
         assert len(stages) == 1
         assert stages[0]["is_main"] is False
         assert stages[0]["destination"] == custom_dest
+
+    def test_main_stage_is_last_when_custom_stages_exist(self):
+        trip = TripFactory()
+        days = list(trip.days.order_by("number"))
+        days[0].destination = f"NOT_{trip.destination}"
+        days[0].save()
+        stages = get_trip_stages(trip)
+        assert len(stages) == 2
+        assert stages[-1]["is_main"] is True
+
+    def test_last_day_included_in_stages(self):
+        trip = TripFactory()
+        days = list(trip.days.order_by("number"))
+        last_day = days[-1]
+        stages = get_trip_stages(trip)
+        main = next(s for s in stages if s["is_main"])
+        assert last_day in main["days"]
+
+    def test_last_day_can_be_in_custom_stage(self):
+        trip = TripFactory()
+        days = list(trip.days.order_by("number"))
+        last_day = days[-1]
+        last_day.destination = f"NOT_{trip.destination}"
+        last_day.save()
+        stages = get_trip_stages(trip)
+        custom = next(s for s in stages if not s["is_main"])
+        assert last_day in custom["days"]
+        main = next(s for s in stages if s["is_main"])
+        assert last_day not in main["days"]
