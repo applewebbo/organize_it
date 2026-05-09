@@ -6,13 +6,20 @@
      hx-target="#day-{{ day.pk }}"
      hx-swap="outerHTML">
     <div class="flex justify-between items-center">
-        <h3 class="text-base font-semibold">
-            {% if day.date %}
-                {{ day.date|date:"j F" }} <span class="font-normal text-base-content/50 ms-0.5">{% trans 'Day' %} {{ day.number }}</span>
-            {% else %}
-                {% trans 'Day' %} {{ day.number }}
+        <div class="flex gap-2 items-center">
+            <h3 class="text-base font-semibold">
+                {% if day.date %}
+                    {{ day.date|date:"j F" }} <span class="font-normal text-base-content/50 ms-0.5">{% trans 'Day' %} {{ day.number }}</span>
+                {% else %}
+                    {% trans 'Day' %} {{ day.number }}
+                {% endif %}
+            </h3>
+            {% if day.stay %}
+                <span class="inline-flex gap-1.5 items-center py-1 px-2.5 text-xs font-medium rounded-md ms-1 bg-base-300 text-base-content/70 dark:bg-base-200/50">
+                    <i class="ph-bold ph-bed i-sm"></i><span class="hidden sm:inline">{{ day.stay.name }}</span>
+                </span>
             {% endif %}
-        </h3>
+        </div>
         <c-dropdown :day="day" />
     </div>
     <div id="day-info-{{ day.pk }}"
