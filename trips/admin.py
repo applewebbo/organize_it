@@ -28,8 +28,8 @@ class DayAdmin(admin.ModelAdmin):
         "destination",
         "destination_latitude",
         "destination_longitude",
-        "transfer_duration_to_next",
-        "transfer_distance_to_next",
+        "transfer_duration_from_prev",
+        "transfer_distance_from_prev",
     ]
     search_fields = ["destination", "trip__title"]
     list_filter = ["trip"]

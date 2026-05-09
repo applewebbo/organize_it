@@ -39,6 +39,8 @@ def urlfields_assume_https(db_field, **kwargs):
 class TripForm(forms.ModelForm):
     title = forms.CharField(label=_("Title"))
     destination = forms.CharField(label=_("Destination"))
+    destination_latitude = forms.FloatField(required=False, widget=forms.HiddenInput())
+    destination_longitude = forms.FloatField(required=False, widget=forms.HiddenInput())
     start_date = forms.DateField(
         label=_("Start date"),
         required=False,
@@ -75,6 +77,19 @@ class TripForm(forms.ModelForm):
         self.fields["start_date"].widget.attrs.update(htmx_attrs)
         self.fields["end_date"].widget.attrs.update(htmx_attrs)
 
+        geocode_city_url = reverse("trips:geocode-city")
+        self.fields["destination"].widget.attrs.update(
+            {
+                "hx-post": geocode_city_url,
+                "hx-trigger": "input changed delay:600ms",
+                "hx-target": "#city-results-trip",
+                "hx-swap": "innerHTML",
+            }
+        )
+        self.fields["destination"].help_text = _(
+            "Select from suggestions for accurate geolocation"
+        )
+
         # Configure image upload field
         self.fields["image"].required = False
         self.fields["image"].widget.attrs.update({"accept": "image/*"})
@@ -93,7 +108,13 @@ class TripForm(forms.ModelForm):
             ),
             Div(
                 "destination",
+                Field("destination_latitude"),
+                Field("destination_longitude"),
                 css_class="w-full",
+            ),
+            Div(
+                HTML('<div id="city-results-trip"></div>'),
+                css_class="sm:col-span-2",
             ),
             Div(
                 "start_date",

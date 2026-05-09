@@ -64,6 +64,30 @@ class TripCreateView(TestCase):
         self.response_204(response)
         assert response.headers.get("HX-Redirect") == self.reverse("trips:trip-list")
 
+    @patch("geocoder.mapbox")
+    def test_post_with_coords_updates_days(self, mock_geocoder):
+        mock_geocoder.return_value.ok = True
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
+        user = self.make_user("user")
+        data = {
+            "title": "Trip to Novara",
+            "destination": "Novara",
+            "destination_latitude": "45.4473",
+            "destination_longitude": "8.6218",
+            "start_date": datetime.date.today(),
+            "end_date": datetime.date.today() + datetime.timedelta(days=2),
+        }
+
+        with self.login(user):
+            response = self.post("trips:trip-create", data=data)
+
+        self.response_204(response)
+        from trips.models import Day
+
+        trip = Trip.objects.filter(author=user).first()
+        day = Day.objects.filter(trip=trip).first()
+        assert day.destination_latitude == 45.4473
+
     def test_post_with_invalid_start_date(self):
         user = self.make_user("user")
         data = {
@@ -125,6 +149,30 @@ class TripUpdateView(TestCase):
         trip = Trip.objects.filter(author=user).first()
         assert message == f"<strong>{trip.title}</strong> updated successfully"
         assert trip.title == data["title"]
+
+    @patch("geocoder.mapbox")
+    def test_post_with_coords_updates_days(self, mock_geocoder):
+        mock_geocoder.return_value.ok = True
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        data = {
+            "title": "Trip to Novara",
+            "destination": "Novara",
+            "destination_latitude": "45.4473",
+            "destination_longitude": "8.6218",
+            "start_date": datetime.date.today(),
+            "end_date": datetime.date.today() + datetime.timedelta(days=2),
+        }
+
+        with self.login(user):
+            response = self.post("trips:trip-update", pk=trip.pk, data=data)
+
+        self.response_204(response)
+        from trips.models import Day
+
+        day = Day.objects.filter(trip=trip).first()
+        assert day.destination_latitude == 45.4473
 
     def test_post_with_invalid_data(self):
         user = self.make_user("user")
@@ -352,11 +400,10 @@ class CreateStageView(TestCase):
         day.refresh_from_db()
         assert day.destination == trip.destination or day.destination == ""
 
-    def test_post_enqueues_transfer_for_prev_day(self):
+    def test_post_creates_stage_for_non_first_day(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)
         days = list(trip.days.order_by("number"))
-        # Select second day so there's a previous day
         target_day = days[1]
 
         with self.login(user):
@@ -369,7 +416,6 @@ class CreateStageView(TestCase):
                 },
             )
 
-        # Just verify the request succeeded — task enqueue is tested implicitly
         target_day.refresh_from_db()
         assert target_day.destination == f"NOT_{trip.destination}"
 
@@ -548,14 +594,18 @@ class DeleteStageView(TestCase):
         day.refresh_from_db()
         assert day.destination == original_dest
 
-    def test_post_enqueues_transfer_for_prev_day(self):
+    def test_post_resets_transfer_fields_immediately(self):
+        from trips.models import Day
+
         user = self.make_user("user")
         trip = TripFactory(author=user)
         days = list(trip.days.order_by("number"))
         custom_dest = f"NOT_{trip.destination}"
-        # Set second day as custom stage so first day is its predecessor
         days[1].destination = custom_dest
         days[1].save()
+        Day.objects.filter(pk=days[1].pk).update(
+            transfer_duration_from_prev=60, transfer_distance_from_prev=100
+        )
 
         with self.login(user):
             self.post(
@@ -566,6 +616,34 @@ class DeleteStageView(TestCase):
 
         days[1].refresh_from_db()
         assert days[1].destination == trip.destination
+        assert days[1].transfer_duration_from_prev is None
+        assert days[1].transfer_distance_from_prev is None
+
+    def test_post_no_next_stage_after_last_deleted(self):
+        """Deleting the last stage — no next day exists, no crash."""
+        from datetime import date, timedelta
+
+        user = self.make_user("user")
+        trip = TripFactory(
+            author=user,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=2),
+        )
+        days = list(trip.days.order_by("number"))
+        custom_dest = f"NOT_{trip.destination}"
+        days[-1].destination = custom_dest
+        days[-1].save()
+
+        with self.login(user):
+            response = self.post(
+                "trips:delete-stage",
+                trip_pk=trip.pk,
+                data={"destination": custom_dest},
+            )
+
+        self.response_200(response)
+        days[-1].refresh_from_db()
+        assert days[-1].destination == trip.destination
 
     def test_get_returns_step1_modal(self):
         user = self.make_user("user")

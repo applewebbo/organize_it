@@ -3,7 +3,7 @@
       hx-target="#dialog"
       method="post"
       enctype="multipart/form-data"
-      x-data="{ imageMode: '', lastSearchQuery: '' }">
+      x-data="{ imageMode: '', lastSearchQuery: '', selectCity(name, lat, lon) { document.querySelector('[name=destination]').value = name; document.querySelector('[name=destination_latitude]').value = lat; document.querySelector('[name=destination_longitude]').value = lon; document.getElementById('city-results-trip').innerHTML = ''; } }">
     <div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
         <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
             {% if is_update %}

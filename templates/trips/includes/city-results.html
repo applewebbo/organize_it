@@ -1,23 +1,29 @@
 {% load i18n l10n %}
 {% if found %}
-    <ul class="mt-2 space-y-1">
-        {% for city in cities %}
-            <li>
-                <button type="button"
-                        class="flex justify-between items-center py-2 px-3 w-full text-sm text-left rounded-lg border border-base-300 hover:bg-base-200"
-                        @click="selectCity('{{ city.name|escapejs }}', '{{ city.lat|unlocalize }}', '{{ city.lon|unlocalize }}')">
-                    <span class="font-medium">{{ city.name }}</span>
-                    <span class="text-xs text-base-content/50">{{ city.country }}</span>
-                </button>
-            </li>
-        {% endfor %}
-    </ul>
-    <p class="flex gap-1 justify-end items-center px-1 mt-1 text-xs italic text-base-content/40">
-        <i class="ph-bold ph-info i-xs"></i>{% trans 'Search conducted via' %}&nbsp;<a href="https://nominatim.openstreetmap.org/ui/search.html"
+    <div class="mb-2 -mt-1">
+        <ul>
+            {% for city in cities %}
+                <li class="flex gap-2 justify-between items-center py-2 px-3 mx-2 mb-2 text-sm rounded-lg border text-slate-600 bg-slate-50 border-slate-200">
+                    <div>
+                        <span class="font-bold">{{ city.name }}</span>&nbsp;<span class="text-xs text-base-content/50">{{ city.country }}</span>
+                    </div>
+                    <button type="button"
+                            class="btn btn-xs btn-ghost"
+                            @click="selectCity('{{ city.name|escapejs }}', '{{ city.lat|unlocalize }}', '{{ city.lon|unlocalize }}')">
+                        <i class="ph-bold ph-plus-circle i-sm"></i>
+                    </button>
+                </li>
+            {% endfor %}
+        </ul>
+        <p class="flex gap-1 justify-end items-center px-3 my-1 mx-2 text-xs italic text-slate-400">
+            <i class="ph-bold ph-info i-xs"></i>{% trans 'Search conducted via' %}&nbsp;<a href="https://nominatim.openstreetmap.org/ui/search.html"
    class="link link-primary">Nominatim API</a>
-    </p>
+        </p>
+    </div>
 {% elif found is False %}
-    <p class="py-2 px-3 mt-2 text-sm rounded-lg border text-error border-base-300 bg-base-200">
-        {% trans 'No city found.' %}
-    </p>
+    <div class="mb-2 -mt-1">
+        <p class="py-2 px-3 mx-2 mb-2 text-sm text-red-500 rounded-lg border bg-slate-50 border-slate-200">
+            {% trans 'No city found.' %}
+        </p>
+    </div>
 {% endif %}

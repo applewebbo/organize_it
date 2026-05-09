@@ -144,36 +144,40 @@ class TestGetDayCoords:
 
 class TestCalculateDayTransfer:
     def test_clears_fields_if_same_destination(self, user_factory, trip_factory):
+        """day_pk = first day of arriving stage; prev has same dest → clear."""
+        from trips.models import Day
+
         user = user_factory()
         trip = trip_factory(author=user)
         days = list(trip.days.order_by("number"))
-        day = days[0]
-        day.transfer_duration_to_next = 60
-        day.transfer_distance_to_next = 100
-        day.save()
-        calculate_day_transfer(day.pk)
-        day.refresh_from_db()
-        assert day.transfer_duration_to_next is None
-        assert day.transfer_distance_to_next is None
+        # days[1] arrives from days[0] with same destination
+        Day.objects.filter(pk=days[1].pk).update(
+            transfer_duration_from_prev=60, transfer_distance_from_prev=100
+        )
+        calculate_day_transfer(days[1].pk)
+        days[1].refresh_from_db()
+        assert days[1].transfer_duration_from_prev is None
+        assert days[1].transfer_distance_from_prev is None
 
-    def test_clears_fields_if_no_next_day(self, user_factory, trip_factory):
+    def test_clears_fields_if_no_prev_day(self, user_factory, trip_factory):
+        """First day of trip has no prev → clear."""
         user = user_factory()
         trip = trip_factory(author=user)
-        day = trip.days.order_by("-number").first()
+        day = trip.days.order_by("number").first()
         calculate_day_transfer(day.pk)
         day.refresh_from_db()
-        assert day.transfer_duration_to_next is None
+        assert day.transfer_duration_from_prev is None
 
     def test_clears_fields_if_no_coords(self, user_factory, trip_factory):
+        """prev and day have different dest but no coords → clear on arriving day."""
         user = user_factory()
         trip = trip_factory(author=user)
         days = list(trip.days.order_by("number"))
-        days[0].destination = trip.destination
         days[1].destination = f"NOT_{trip.destination}"
         days[1].save()
-        calculate_day_transfer(days[0].pk)
-        days[0].refresh_from_db()
-        assert days[0].transfer_duration_to_next is None
+        calculate_day_transfer(days[1].pk)
+        days[1].refresh_from_db()
+        assert days[1].transfer_duration_from_prev is None
 
     def test_does_nothing_if_day_not_found(self):
         calculate_day_transfer(99999)
@@ -182,23 +186,24 @@ class TestCalculateDayTransfer:
     def test_saves_duration_and_distance_from_api(
         self, mock_get, user_factory, trip_factory
     ):
+        """Saves transfer on the arriving day (days[1]) using prev (days[0]) coords."""
         user = user_factory()
         trip = trip_factory(author=user)
         days = list(trip.days.order_by("number"))
         days[1].destination = f"NOT_{trip.destination}"
         days[1].save()
-        stay1 = StayFactory(latitude=45.0, longitude=9.0)
-        stay1.days.set([days[0]])
-        stay2 = StayFactory(latitude=43.0, longitude=11.0)
-        stay2.days.set([days[1]])
+        stay0 = StayFactory(latitude=45.0, longitude=9.0)
+        stay0.days.set([days[0]])
+        stay1 = StayFactory(latitude=43.0, longitude=11.0)
+        stay1.days.set([days[1]])
         mock_get.return_value.json.return_value = {
             "routes": [{"duration": 7200, "distance": 270000}]
         }
         mock_get.return_value.raise_for_status = lambda: None
-        calculate_day_transfer(days[0].pk)
-        days[0].refresh_from_db()
-        assert days[0].transfer_duration_to_next == 120
-        assert days[0].transfer_distance_to_next == 270
+        calculate_day_transfer(days[1].pk)
+        days[1].refresh_from_db()
+        assert days[1].transfer_duration_from_prev == 120
+        assert days[1].transfer_distance_from_prev == 270
 
     @patch("trips.tasks.requests.get")
     def test_handles_api_error_gracefully(self, mock_get, user_factory, trip_factory):
@@ -207,14 +212,14 @@ class TestCalculateDayTransfer:
         days = list(trip.days.order_by("number"))
         days[1].destination = f"NOT_{trip.destination}"
         days[1].save()
-        stay1 = StayFactory(latitude=45.0, longitude=9.0)
-        stay1.days.set([days[0]])
-        stay2 = StayFactory(latitude=43.0, longitude=11.0)
-        stay2.days.set([days[1]])
+        stay0 = StayFactory(latitude=45.0, longitude=9.0)
+        stay0.days.set([days[0]])
+        stay1 = StayFactory(latitude=43.0, longitude=11.0)
+        stay1.days.set([days[1]])
         mock_get.side_effect = Exception("API error")
-        calculate_day_transfer(days[0].pk)
-        days[0].refresh_from_db()
-        assert days[0].transfer_duration_to_next is None
+        calculate_day_transfer(days[1].pk)
+        days[1].refresh_from_db()
+        assert days[1].transfer_duration_from_prev is None
 
     @patch("trips.tasks.requests.get")
     def test_handles_empty_routes(self, mock_get, user_factory, trip_factory):
@@ -223,12 +228,12 @@ class TestCalculateDayTransfer:
         days = list(trip.days.order_by("number"))
         days[1].destination = f"NOT_{trip.destination}"
         days[1].save()
-        stay1 = StayFactory(latitude=45.0, longitude=9.0)
-        stay1.days.set([days[0]])
-        stay2 = StayFactory(latitude=43.0, longitude=11.0)
-        stay2.days.set([days[1]])
+        stay0 = StayFactory(latitude=45.0, longitude=9.0)
+        stay0.days.set([days[0]])
+        stay1 = StayFactory(latitude=43.0, longitude=11.0)
+        stay1.days.set([days[1]])
         mock_get.return_value.json.return_value = {"routes": []}
         mock_get.return_value.raise_for_status = lambda: None
-        calculate_day_transfer(days[0].pk)
-        days[0].refresh_from_db()
-        assert days[0].transfer_duration_to_next is None
+        calculate_day_transfer(days[1].pk)
+        days[1].refresh_from_db()
+        assert days[1].transfer_duration_from_prev is None

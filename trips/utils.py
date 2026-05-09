@@ -70,11 +70,12 @@ def group_days_by_destination(days):
 
     for i, group in enumerate(groups):
         if i < len(groups) - 1:
-            last_day = group["days"][-1]
-            group["next_destination"] = groups[i + 1]["destination"]
-            group["transfer_duration"] = last_day.transfer_duration_to_next
-            group["transfer_distance"] = last_day.transfer_distance_to_next
-            group["last_day_pk"] = last_day.pk
+            next_group = groups[i + 1]
+            first_day_of_next = next_group["days"][0]
+            group["next_destination"] = next_group["destination"]
+            group["transfer_duration"] = first_day_of_next.transfer_duration_from_prev
+            group["transfer_distance"] = first_day_of_next.transfer_distance_from_prev
+            group["last_day_pk"] = first_day_of_next.pk
         else:
             group["next_destination"] = None
             group["transfer_duration"] = None
@@ -409,8 +410,15 @@ def geocode_city(query):
                     }
                 )
             city_list.sort(key=lambda x: x["importance"], reverse=True)
-            cache.set(cache_key, city_list, 3600)
-            return city_list
+            seen = set()
+            deduped = []
+            for item in city_list:
+                key = (item["name"].lower(), item["country"].lower())
+                if key not in seen:
+                    seen.add(key)
+                    deduped.append(item)
+            cache.set(cache_key, deduped, 3600)
+            return deduped
     except Exception as e:
         logger.error(f"Error geocoding city: {e}")
 

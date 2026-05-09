@@ -51,10 +51,10 @@ def _get_day_coords(day):
 
 def calculate_day_transfer(day_pk):
     """
-    Calculate driving duration and distance between consecutive days with different
-    destinations, using stay/event coordinates. Saves results on
-    Day.transfer_duration_to_next (minutes) and Day.transfer_distance_to_next (km).
-    Clears fields if destinations are equal or no geocoded stay/event is found.
+    Calculate driving duration and distance for the transfer arriving at day_pk.
+    day_pk must be the first day of a stage. Looks at day.number - 1 as the origin.
+    Saves results on Day.transfer_duration_from_prev (minutes) and
+    Day.transfer_distance_from_prev (km). Clears fields if same destination or no coords.
     """
     try:
         day = (
@@ -65,28 +65,28 @@ def calculate_day_transfer(day_pk):
     except Day.DoesNotExist:
         return
 
-    next_day = (
+    prev_day = (
         Day.objects.select_related("stay")
         .prefetch_related("events")
-        .filter(trip=day.trip, number=day.number + 1)
+        .filter(trip=day.trip, number=day.number - 1)
         .first()
     )
 
-    has_different_dest = next_day and next_day.destination != day.destination
+    has_different_dest = prev_day and prev_day.destination != day.destination
     if not has_different_dest:
         Day.objects.filter(pk=day_pk).update(
-            transfer_duration_to_next=None,
-            transfer_distance_to_next=None,
+            transfer_duration_from_prev=None,
+            transfer_distance_from_prev=None,
         )
         return
 
-    lat1, lng1 = _get_day_coords(day)
-    lat2, lng2 = _get_day_coords(next_day)
+    lat1, lng1 = _get_day_coords(prev_day)
+    lat2, lng2 = _get_day_coords(day)
 
     if lat1 is None or lat2 is None:
         Day.objects.filter(pk=day_pk).update(
-            transfer_duration_to_next=None,
-            transfer_distance_to_next=None,
+            transfer_duration_from_prev=None,
+            transfer_distance_from_prev=None,
         )
         return
 
@@ -108,8 +108,8 @@ def calculate_day_transfer(day_pk):
     if data.get("routes"):
         route = data["routes"][0]
         Day.objects.filter(pk=day_pk).update(
-            transfer_duration_to_next=round(route["duration"] / 60),
-            transfer_distance_to_next=round(route["distance"] / 1000),
+            transfer_duration_from_prev=round(route["duration"] / 60),
+            transfer_distance_from_prev=round(route["distance"] / 1000),
         )
         logger.debug(
             f"Transfer calculated for day {day_pk}: "

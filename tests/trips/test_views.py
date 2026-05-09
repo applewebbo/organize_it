@@ -989,15 +989,16 @@ class TransferInfoViewTests(TestCase):
             end_date=date.today() + timedelta(days=2),
         )
         days = list(trip.days.order_by("number"))
-        Day.objects.filter(pk=days[0].pk).update(
-            transfer_duration_to_next=90, transfer_distance_to_next=120
-        )
+        # days[1] is first day of arriving stage — stores transfer_duration_from_prev
         days[1].destination = "OtherCity"
         days[1].save()
+        Day.objects.filter(pk=days[1].pk).update(
+            transfer_duration_from_prev=90, transfer_distance_from_prev=120
+        )
 
         with self.login(user):
             response = self.client.get(
-                reverse("trips:transfer-info", args=[days[0].pk])
+                reverse("trips:transfer-info", args=[days[1].pk])
             )
 
         assert response.status_code == 200
