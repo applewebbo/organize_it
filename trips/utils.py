@@ -41,6 +41,7 @@ def get_trip_stages(trip):
         result.append({"destination": main_dest, "days": main_days, "is_main": True})
     elif not result:
         result.append({"destination": main_dest, "days": [], "is_main": True})
+    result.sort(key=lambda s: s["days"][0].date if s["days"] else trip.start_date)
     return result
 
 

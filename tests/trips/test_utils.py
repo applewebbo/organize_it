@@ -1751,14 +1751,16 @@ class TestGetTripStages(TestCase):
         assert stages[0]["is_main"] is False
         assert stages[0]["destination"] == custom_dest
 
-    def test_main_stage_is_last_when_custom_stages_exist(self):
+    def test_stages_sorted_chronologically(self):
         trip = TripFactory()
         days = list(trip.days.order_by("number"))
+        # First day gets a custom destination → custom stage comes before main
         days[0].destination = f"NOT_{trip.destination}"
         days[0].save()
         stages = get_trip_stages(trip)
         assert len(stages) == 2
-        assert stages[-1]["is_main"] is True
+        assert stages[0]["is_main"] is False
+        assert stages[1]["is_main"] is True
 
     def test_last_day_included_in_stages(self):
         trip = TripFactory()
