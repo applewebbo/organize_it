@@ -5,7 +5,7 @@ status: completed
 type: epic
 priority: normal
 created_at: 2026-04-22T13:03:15Z
-updated_at: 2026-04-28T12:48:21Z
+updated_at: 2026-05-10T10:51:45Z
 ---
 
 Replace event/stay creation with interactive Leaflet map. Google Places via Django proxy, HTMX partials, unified map view across all days. Issue #276.

@@ -5,7 +5,7 @@ status: completed
 type: epic
 priority: normal
 created_at: 2026-04-23T13:44:53Z
-updated_at: 2026-05-03T06:30:52Z
+updated_at: 2026-05-10T10:51:45Z
 ---
 
 Redesign the trip detail page: dedicated stays section, unified events card, estimated duration, drag & drop, unified map. Tracks #278.
