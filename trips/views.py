@@ -110,9 +110,19 @@ def trip_list(request):
     sort_preference = get_profile(request.user).trip_sort_preference
 
     # Build base querysets
-    active_trips = Trip.objects.filter(author=request.user).exclude(status=5)
-    archived_trips = Trip.objects.filter(author=request.user, status=5)
-    shared_trips = Trip.objects.filter(collaborators=request.user).exclude(status=5)
+    active_trips = (
+        Trip.objects.filter(author=request.user)
+        .exclude(status=5)
+        .prefetch_related("days")
+    )
+    archived_trips = Trip.objects.filter(
+        author=request.user, status=5
+    ).prefetch_related("days")
+    shared_trips = (
+        Trip.objects.filter(collaborators=request.user)
+        .exclude(status=5)
+        .prefetch_related("days")
+    )
 
     # Apply sorting based on preference
     sort_map = {
@@ -181,8 +191,8 @@ def trip_detail(request, pk):
     ).first()
 
     # Check user preference for default view
-    default_view = get_profile(request.user).default_map_view
-    show_map = default_view == "map"
+    profile = get_profile(request.user)
+    show_map = profile.default_map_view == "map"
 
     days = trip.days.all()
     day_groups = group_days_by_destination(days)
@@ -236,8 +246,7 @@ def day_detail(request, pk):
     if force_view in ["list", "map"]:
         show_map = force_view == "map"
     else:
-        default_view = get_profile(request.user).default_map_view
-        show_map = default_view == "map"
+        show_map = get_profile(request.user).default_map_view == "map"
 
     # Check if there's a StayTransfer from this day to the next
     # Use explicit DB query to avoid Django's reverse relation caching issues

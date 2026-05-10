@@ -1,11 +1,11 @@
 ---
 # organize_it-v1sd
 title: 'Performance improvements: N+1 queries, sync geocoding, missing prefetch and indexes'
-status: todo
+status: in-progress
 type: task
 priority: normal
 created_at: 2026-05-01T08:11:11Z
-updated_at: 2026-05-02T12:56:00Z
+updated_at: 2026-05-10T11:04:15Z
 ---
 
 Performance audit. Codeberg issue #293. Target release: 2026.7.1

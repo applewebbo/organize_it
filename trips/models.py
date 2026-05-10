@@ -181,7 +181,7 @@ class Stay(models.Model):
     notes = models.CharField(max_length=500, blank=True)
     place_id = models.CharField(max_length=255, blank=True)
     opening_hours = models.JSONField(blank=True, null=True)
-    enriched = models.BooleanField(default=False)
+    enriched = models.BooleanField(default=False, db_index=True)
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -523,7 +523,7 @@ class Event(models.Model):
     website = models.URLField(max_length=255, blank=True)
     phone_number = models.CharField(max_length=50, blank=True)
     opening_hours = models.JSONField(blank=True, null=True)
-    enriched = models.BooleanField(default=False)
+    enriched = models.BooleanField(default=False, db_index=True)
     last_modified_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

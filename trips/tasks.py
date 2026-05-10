@@ -133,40 +133,36 @@ def check_trips_status():
     """
     try:
         logger.info("Starting check_trips_status task")
-        trips = Trip.objects.all()
-        trips_count = 0
-        modified_trips_count = 0
+        trips = list(
+            Trip.objects.exclude(status=5).filter(
+                start_date__isnull=False, end_date__isnull=False
+            )
+        )
+        trips_count = len(trips)
         today = date.today()
         seven_days_after = today + timedelta(days=7)
+        to_update = []
 
         for trip in trips:
-            trips_count += 1
             original_status = trip.status
 
-            # Skip archived trips (status 5)
-            if trip.status == 5:
-                continue
+            if trip.end_date < today:
+                trip.status = 4
+            elif trip.start_date <= today <= trip.end_date:
+                trip.status = 3
+            elif today < trip.start_date < seven_days_after:
+                trip.status = 2
+            elif trip.start_date >= seven_days_after:
+                trip.status = 1
 
-            if trip.start_date and trip.end_date:
-                # After end date
-                if trip.end_date < today:
-                    trip.status = 4
-                # Between start date and end date
-                elif trip.start_date <= today <= trip.end_date:
-                    trip.status = 3
-                # Less than 7 days from start date
-                elif today < trip.start_date < seven_days_after:
-                    trip.status = 2
-                # More than 7 days from start date
-                elif trip.start_date >= seven_days_after:
-                    trip.status = 1
+            if trip.status != original_status:
+                to_update.append(trip)
+                logger.debug(
+                    f"Trip '{trip.title}' status changed from {original_status} to {trip.status}"
+                )
 
-                if trip.status != original_status:
-                    modified_trips_count += 1
-                    trip.save(update_fields=["status"])
-                    logger.debug(
-                        f"Trip '{trip.title}' status changed from {original_status} to {trip.status}"
-                    )
+        Trip.objects.bulk_update(to_update, ["status"])
+        modified_trips_count = len(to_update)
 
         result_msg = (
             f"{trips_count} trips checked, {modified_trips_count} trips modified"
