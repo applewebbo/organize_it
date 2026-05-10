@@ -78,7 +78,7 @@ class Trip(models.Model):
             elif self.start_date < seven_days_after and self.start_date > today:
                 self.status = 2
             # more than 7 days from start date
-            elif self.start_date <= seven_days_after:
+            else:
                 self.status = 1
 
         super().save(*args, **kwargs)
@@ -178,7 +178,7 @@ class Stay(models.Model):
     city = models.CharField(max_length=100, blank=True)
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
-    notes = models.CharField(max_length=500, blank=True)
+    notes = models.TextField(blank=True)
     place_id = models.CharField(max_length=255, blank=True)
     opening_hours = models.JSONField(blank=True, null=True)
     enriched = models.BooleanField(default=False, db_index=True)
@@ -514,10 +514,7 @@ class Event(models.Model):
     category = models.PositiveSmallIntegerField(
         choices=Category.choices, default=Category.EXPERIENCE
     )
-    notes = models.CharField(
-        max_length=500,
-        blank=True,
-    )
+    notes = models.TextField(blank=True)
     # Additional fields for Google Places data
     place_id = models.CharField(max_length=255, blank=True)
     website = models.URLField(max_length=255, blank=True)

@@ -184,7 +184,7 @@ class StayNoteCreateView(TestCase):
 
     def test_stay_note_create_invalid_data(self):
         """
-        Test stay note creation with invalid data: send a value that is too long for the notes field.
+        Test stay note creation with empty notes (required field).
         """
         user = self.make_user("user")
         trip = TripFactory(author=user)
@@ -192,8 +192,7 @@ class StayNoteCreateView(TestCase):
         stay = StayFactory(notes="")
         stay.save()
         stay.days.set(days)
-        # Assuming notes field has max_length=500
-        data = {"notes": "a" * 1001}  # Exceeds max_length
+        data = {"notes": ""}  # Empty, required field
 
         with self.login(user):
             response = self.post("trips:stay-note-create", stay_id=stay.pk, data=data)
@@ -225,7 +224,7 @@ class StayNoteModifyView(TestCase):
 
     def test_stay_note_modify_invalid_data(self):
         """
-        Test modification of a stay note with invalid data: send a value that is too long for the notes field.
+        Test modification of a stay note with empty data (required field).
         """
         user = self.make_user("user")
         trip = TripFactory(author=user)
@@ -233,8 +232,7 @@ class StayNoteModifyView(TestCase):
         stay = StayFactory(notes="Original stay note")
         stay.save()
         stay.days.set(days)
-        # Assuming notes field has max_length=500
-        data = {"notes": "a" * 1001}  # Exceeds max_length
+        data = {"notes": ""}  # Empty, required field
 
         with self.login(user):
             response = self.post("trips:stay-note-modify", stay_id=stay.pk, data=data)
