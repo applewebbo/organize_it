@@ -3,6 +3,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 import requests
+from django.core.cache import cache
 from django.test import override_settings
 
 from tests.test import TestCase
@@ -37,6 +38,10 @@ class SingleEventViewTest(TestCase):
 @patch("trips.views.requests.post")
 class EnrichEventViewTest(TestCase):
     """Test cases for enrich_event view"""
+
+    def setUp(self):
+        super().setUp()
+        cache.clear()
 
     def test_enrich_event_success(self, mock_post, mock_get):
         """Test successful enrichment of an event - returns preview"""
@@ -423,6 +428,10 @@ class ConfirmEnrichEventViewTest(TestCase):
 @patch("trips.views.requests.post")
 class EnrichStayViewTest(TestCase):
     """Test cases for enrich_stay view"""
+
+    def setUp(self):
+        super().setUp()
+        cache.clear()
 
     def test_enrich_stay_success(self, mock_post, mock_get):
         """Test successful enrichment of a stay - returns preview"""

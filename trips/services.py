@@ -1,8 +1,12 @@
+import dataclasses
+import hashlib
+import json
 import logging
 from dataclasses import dataclass, field
 
 import requests
 from django.conf import settings
+from django.core.cache import cache
 
 from trips.utils import convert_google_opening_hours
 
@@ -18,6 +22,11 @@ SEARCH_FIELD_MASK = (
 
 # Fields returned for place details
 DETAILS_FIELD_MASK = "websiteUri,internationalPhoneNumber,regularOpeningHours"
+
+# Cache TTLs in seconds
+_TTL_PLACE_ID = 7 * 24 * 3600  # 7 days — place_id is stable
+_TTL_DETAILS = 24 * 3600  # 24 hours — hours/phone change rarely
+_TTL_SEARCH = 3600  # 1 hour — search results more volatile
 
 
 class GooglePlacesError(Exception):
@@ -61,6 +70,10 @@ class GooglePlacesClient:
             "X-Goog-FieldMask": field_mask,
         }
 
+    @staticmethod
+    def _hash(value: str) -> str:
+        return hashlib.sha256(value.encode()).hexdigest()[:16]
+
     def search_text(
         self,
         query: str,
@@ -75,6 +88,11 @@ class GooglePlacesClient:
         """
         if not self.api_key:
             raise GooglePlacesError("Google Places API key is not configured.")
+
+        cache_key = f"gp:srch:{self._hash(json.dumps([query, max_results, location_bias], sort_keys=True))}"
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return [PlaceResult(**r) for r in cached]
 
         payload: dict = {"textQuery": query, "maxResultCount": max_results}
         if location_bias:
@@ -113,6 +131,7 @@ class GooglePlacesClient:
                     lng=loc.get("longitude", 0.0),
                 )
             )
+        cache.set(cache_key, [dataclasses.asdict(r) for r in results], _TTL_SEARCH)
         return results
 
     def get_place_details(self, place_id: str) -> PlaceDetails:
@@ -122,6 +141,11 @@ class GooglePlacesClient:
         """
         if not self.api_key:
             raise GooglePlacesError("Google Places API key is not configured.")
+
+        cache_key = f"gp:det:{place_id}"
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return PlaceDetails(**cached)
 
         url = PLACES_DETAILS_URL.format(place_id=place_id)
         try:
@@ -139,12 +163,14 @@ class GooglePlacesClient:
             raise GooglePlacesError(f"API error: {detail}") from exc
 
         data = response.json()
-        return PlaceDetails(
+        result = PlaceDetails(
             place_id=place_id,
             website=data.get("websiteUri", ""),
             phone_number=data.get("internationalPhoneNumber", ""),
             opening_hours=convert_google_opening_hours(data.get("regularOpeningHours")),
         )
+        cache.set(cache_key, dataclasses.asdict(result), _TTL_DETAILS)
+        return result
 
     def search_place_id(self, query: str) -> str | None:
         """
@@ -153,6 +179,11 @@ class GooglePlacesClient:
         """
         if not self.api_key:
             raise GooglePlacesError("Google Places API key is not configured.")
+
+        cache_key = f"gp:pid:{self._hash(query)}"
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return cached
 
         payload = {"textQuery": query}
         try:
@@ -170,4 +201,7 @@ class GooglePlacesClient:
             raise GooglePlacesError(f"API error: {detail}") from exc
 
         places = response.json().get("places", [])
-        return places[0]["id"] if places else None
+        place_id = places[0]["id"] if places else None
+        if place_id:
+            cache.set(cache_key, place_id, _TTL_PLACE_ID)
+        return place_id

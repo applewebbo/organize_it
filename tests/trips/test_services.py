@@ -2,6 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 import requests
+from django.core.cache import cache
 
 from trips.services import (
     GooglePlacesClient,
@@ -47,6 +48,9 @@ def client():
 
 
 class TestGooglePlacesClientSearchText:
+    def setup_method(self):
+        cache.clear()
+
     def test_returns_place_results(self, client, settings):
         settings.GOOGLE_PLACES_API_KEY = "test-key"
         mock_resp = MagicMock()
@@ -131,6 +135,9 @@ class TestGooglePlacesClientSearchText:
 
 
 class TestGooglePlacesClientGetDetails:
+    def setup_method(self):
+        cache.clear()
+
     def test_returns_place_details(self, client, settings):
         settings.GOOGLE_PLACES_API_KEY = "test-key"
         mock_resp = MagicMock()
@@ -194,6 +201,9 @@ class TestGooglePlacesClientGetDetails:
 
 
 class TestGooglePlacesClientSearchPlaceId:
+    def setup_method(self):
+        cache.clear()
+
     def test_returns_place_id(self, client, settings):
         settings.GOOGLE_PLACES_API_KEY = "test-key"
         mock_resp = MagicMock()
@@ -248,3 +258,95 @@ class TestGooglePlacesClientSearchPlaceId:
             client.search_place_id("query")
 
         assert mock_post.call_args.kwargs["headers"]["X-Goog-FieldMask"] == "places.id"
+
+
+class TestGooglePlacesClientCache:
+    def setup_method(self):
+        cache.clear()
+
+    def test_search_place_id_cached_on_second_call(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = PLACE_ID_RESPONSE
+        mock_resp.raise_for_status.return_value = None
+
+        with patch("trips.services.requests.post", return_value=mock_resp) as mock_post:
+            result1 = client.search_place_id("museo egizio")
+            result2 = client.search_place_id("museo egizio")
+
+        assert result1 == result2 == "ChIJ_place_123"
+        assert mock_post.call_count == 1
+
+    def test_search_place_id_different_queries_both_hit_api(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = PLACE_ID_RESPONSE
+        mock_resp.raise_for_status.return_value = None
+
+        with patch("trips.services.requests.post", return_value=mock_resp) as mock_post:
+            client.search_place_id("museo egizio")
+            client.search_place_id("colosseo")
+
+        assert mock_post.call_count == 2
+
+    def test_search_place_id_none_result_not_cached(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = EMPTY_RESPONSE
+        mock_resp.raise_for_status.return_value = None
+
+        with patch("trips.services.requests.post", return_value=mock_resp) as mock_post:
+            client.search_place_id("inesistente")
+            client.search_place_id("inesistente")
+
+        assert mock_post.call_count == 2
+
+    def test_get_place_details_cached_on_second_call(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = DETAILS_RESPONSE
+        mock_resp.raise_for_status.return_value = None
+
+        with patch("trips.services.requests.get", return_value=mock_resp) as mock_get:
+            d1 = client.get_place_details("ChIJ_place_123")
+            d2 = client.get_place_details("ChIJ_place_123")
+
+        assert d1.website == d2.website == "https://museoegizio.it"
+        assert mock_get.call_count == 1
+
+    def test_get_place_details_different_ids_both_hit_api(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = DETAILS_RESPONSE
+        mock_resp.raise_for_status.return_value = None
+
+        with patch("trips.services.requests.get", return_value=mock_resp) as mock_get:
+            client.get_place_details("place_aaa")
+            client.get_place_details("place_bbb")
+
+        assert mock_get.call_count == 2
+
+    def test_search_text_cached_on_second_call(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = SEARCH_RESPONSE
+        mock_resp.raise_for_status.return_value = None
+
+        with patch("trips.services.requests.post", return_value=mock_resp) as mock_post:
+            r1 = client.search_text("museo egizio")
+            r2 = client.search_text("museo egizio")
+
+        assert len(r1) == len(r2) == 1
+        assert mock_post.call_count == 1
+
+    def test_search_text_different_bias_both_hit_api(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = SEARCH_RESPONSE
+        mock_resp.raise_for_status.return_value = None
+
+        with patch("trips.services.requests.post", return_value=mock_resp) as mock_post:
+            client.search_text("query", location_bias=(45.0, 7.0, 1000.0))
+            client.search_text("query", location_bias=(48.0, 2.0, 1000.0))
+
+        assert mock_post.call_count == 2
