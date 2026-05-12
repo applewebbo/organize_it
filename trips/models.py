@@ -521,6 +521,7 @@ class Event(models.Model):
     phone_number = models.CharField(max_length=50, blank=True)
     opening_hours = models.JSONField(blank=True, null=True)
     enriched = models.BooleanField(default=False, db_index=True)
+    tag = models.CharField(max_length=20, blank=True)
     last_modified_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

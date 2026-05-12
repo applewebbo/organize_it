@@ -294,6 +294,13 @@ document.addEventListener("alpine:init", () => {
                 this.nameFilled = false;
                 this.addressFilled = false;
             }, 500);
+        },
+        setTag(value) {
+            const input = document.getElementById("id_tag");
+            if (input) {
+                input.value = value;
+                document.getElementById("tag-results").innerHTML = "";
+            }
         }
     }));
 

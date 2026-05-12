@@ -9,6 +9,9 @@
                     <i class="ph-bold ph-{{ icon }} i-sm sm:i-lg"></i>
                 </div>
                 {% if meal_badge %}<span class="badge badge-xs badge-warning text-warning-content">{{ meal_badge }}</span>{% endif %}
+                {% if event.tag %}
+                    <span class="text-white bg-emerald-800 border-emerald-800 badge badge-xs">{{ event.tag|capfirst }}</span>
+                {% endif %}
             </div>
             <div class="ms-2" x-data>
                 <div class="flex gap-2 items-center">

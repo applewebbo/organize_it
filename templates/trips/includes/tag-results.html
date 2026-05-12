@@ -1,0 +1,16 @@
+{% if tags %}
+    <div class="px-2 mt-1 mb-2">
+        <ul>
+            {% for tag in tags %}
+                <li class="flex gap-2 justify-between items-center py-1 px-3 mb-1 text-sm rounded-lg border text-slate-600 bg-slate-50 border-slate-200">
+                    <span>{{ tag|capfirst }}</span>
+                    <button type="button"
+                            class="btn btn-xs btn-ghost"
+                            @click="setTag('{{ tag }}')">
+                        <i class="ph-bold ph-plus-circle i-sm"></i>
+                    </button>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}

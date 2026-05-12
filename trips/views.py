@@ -1562,6 +1562,25 @@ def geocode_address(request):
     )
 
 
+def tag_suggestions(request):
+    """HTMX: return existing tags for autocomplete."""
+    q = request.GET.get("tag", "").strip()
+    tags_qs = (
+        Event.objects.filter(trip__in=accessible_trips_qs(request.user))
+        .exclude(tag="")
+        .values_list("tag", flat=True)
+        .distinct()
+        .order_by("tag")
+    )
+    if q:
+        tags_qs = tags_qs.filter(tag__icontains=q)
+    return TemplateResponse(
+        request,
+        "trips/includes/tag-results.html",
+        {"tags": list(tags_qs[:10])},
+    )
+
+
 def geocode_city_view(request):
     """HTMX: search for a city/destination using Nominatim and return a list of results."""
     if request.method == "POST":

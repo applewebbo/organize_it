@@ -1348,3 +1348,50 @@ class TestGetTripAddresses(TestCase):
 
         # Vatican Museum should also appear
         assert "Vatican Museum" in content
+
+
+class TagSuggestionsViewTests(TestCase):
+    def test_returns_matching_tags(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        ExperienceFactory(day=day, trip=trip, tag="museo")
+        ExperienceFactory(day=day, trip=trip, tag="spiaggia")
+        with self.login(user):
+            response = self.client.get(reverse("trips:tag-suggestions"), {"tag": "mu"})
+        assert response.status_code == 200
+        assert b"museo" in response.content
+        assert b"spiaggia" not in response.content
+
+    def test_returns_all_tags_when_no_query(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        ExperienceFactory(day=day, trip=trip, tag="museo")
+        ExperienceFactory(day=day, trip=trip, tag="spiaggia")
+        with self.login(user):
+            response = self.client.get(reverse("trips:tag-suggestions"), {"tag": ""})
+        assert response.status_code == 200
+        assert b"museo" in response.content
+        assert b"spiaggia" in response.content
+
+    def test_excludes_empty_tags(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        ExperienceFactory(day=day, trip=trip, tag="")
+        with self.login(user):
+            response = self.client.get(reverse("trips:tag-suggestions"), {"tag": ""})
+        assert response.status_code == 200
+        assert b"badge" not in response.content
+
+    def test_excludes_other_users_tags(self):
+        user = self.make_user("user")
+        other = self.make_user("other")
+        trip = TripFactory(author=other)
+        day = trip.days.first()
+        ExperienceFactory(day=day, trip=trip, tag="privato")
+        with self.login(user):
+            response = self.client.get(reverse("trips:tag-suggestions"), {"tag": ""})
+        assert response.status_code == 200
+        assert b"privato" not in response.content

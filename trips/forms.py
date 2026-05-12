@@ -7,7 +7,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db import models
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
 from .models import (
@@ -301,6 +301,11 @@ ADDRESS_RESULTS_HTML = """
     </div>
 """
 
+TAG_RESULTS_HTML = """
+    <div id="tag-results" class="sm:col-start-3 sm:col-span-2 -mt-3">
+    </div>
+"""
+
 
 class EventForm(forms.ModelForm):
     start_time = forms.TimeField(
@@ -371,12 +376,14 @@ class EventForm(forms.ModelForm):
         labels = {
             "address": _("Address"),
             "website": _("Website"),
+            "tag": _("Tag"),
         }
         widgets = {
             "name": forms.TextInput(attrs={"placeholder": _("Name")}),
             "city": forms.TextInput(attrs={"placeholder": _("City")}),
             "website": forms.TextInput(attrs={"placeholder": _("Website")}),
             "address": forms.TextInput(attrs={"placeholder": _("Address")}),
+            "tag": forms.TextInput(attrs={"placeholder": _("Tag"), "maxlength": "20"}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -484,12 +491,25 @@ class EventForm(forms.ModelForm):
                 css_class="relative sm:col-span-4",
             ),
             HTML(ADDRESS_RESULTS_HTML),
-            Field("start_time", wrapper_class="sm:col-span-2"),
+            Field("start_time", wrapper_class="sm:col-span-1"),
             Field(
                 "duration",
-                wrapper_class="sm:col-span-2",
+                wrapper_class="sm:col-span-1",
             ),
-            Field("type", css_class="select select-primary"),
+            Field(
+                "tag",
+                wrapper_class="sm:col-span-2",
+                **{
+                    "hx-get": reverse_lazy("trips:tag-suggestions"),
+                    "hx-trigger": "input delay:300ms",
+                    "hx-target": "#tag-results",
+                    "hx-include": "[name='tag']",
+                },
+            ),
+            HTML(TAG_RESULTS_HTML),
+            Field(
+                "type", css_class="select select-primary", wrapper_class="sm:col-span-2"
+            ),
             Field("website", wrapper_class="sm:col-span-4"),
             Field("phone_number", wrapper_class="sm:col-span-4"),
             HTML(
@@ -586,19 +606,17 @@ class EventForm(forms.ModelForm):
 class ExperienceForm(EventForm):
     class Meta(EventForm.Meta):
         model = Experience
-        fields = EventForm.Meta.fields + ["type"]
+        fields = EventForm.Meta.fields + ["tag"]
         labels = {
             **EventForm.Meta.labels,
-            "type": _("Experience type"),
+            "tag": _("Experience type"),
         }
         widgets = {
             **EventForm.Meta.widgets,
-            "type": forms.Select(),
+            "tag": forms.TextInput(
+                attrs={"placeholder": _("Experience type"), "maxlength": "20"}
+            ),
         }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["type"].choices = Experience.Type.choices
 
 
 class MealForm(EventForm):
