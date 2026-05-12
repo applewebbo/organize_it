@@ -1,6 +1,8 @@
 {% load trip_tags i18n %}
-{% if day.trip.status == 2 or day.trip.status == 3 %}
-    <div class="mb-4">{% weather_widget day %}</div>
+{% if show_weather %}
+    {% if day.trip.status == 2 or day.trip.status == 3 %}
+        <div class="mb-4">{% weather_widget day %}</div>
+    {% endif %}
 {% endif %}
 {# djlint:off #}
 <ul id="events-list-{{ day.pk }}" class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 grid-col" data-day-id="{{ day.pk }}" data-reorder-url="{% url 'trips:reorder-events' day.pk %}">

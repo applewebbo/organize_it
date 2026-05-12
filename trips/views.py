@@ -210,6 +210,8 @@ def trip_detail(request, pk):
         "arrival_origin_icao": get_flight_origin_icao(arrival_transfer),
         "departure_origin_icao": get_flight_origin_icao(departure_transfer),
         "day_groups": day_groups,
+        "show_transfer_info": profile.show_transfer_info,
+        "show_weather": profile.show_weather,
     }
     if request.htmx:
         template = "trips/trip-detail.html#days"
@@ -243,10 +245,11 @@ def day_detail(request, pk):
 
     # Check for forced view from query parameter, otherwise use user preference
     force_view = request.GET.get("view")
+    profile = get_profile(request.user)
     if force_view in ["list", "map"]:
         show_map = force_view == "map"
     else:
-        show_map = get_profile(request.user).default_map_view == "map"
+        show_map = profile.default_map_view == "map"
 
     # Check if there's a StayTransfer from this day to the next
     # Use explicit DB query to avoid Django's reverse relation caching issues
@@ -283,6 +286,7 @@ def day_detail(request, pk):
         "stay_transfer_in": stay_transfer_in,
         "can_add_stay_transfer": can_add_stay_transfer,
         "next_day": next_day,
+        "show_weather": profile.show_weather,
     }
 
     # If map view is preferred, prepare map context
@@ -1599,6 +1603,8 @@ def geocode_city_view(request):
 
 def transfer_info(request, day_pk):
     """HTMX polling endpoint: return transfer-info fragment for the first day of an arriving stage."""
+    if not get_profile(request.user).show_transfer_info:
+        return HttpResponse(status=204)
     day = get_object_or_404(
         Day.objects.select_related("trip", "stay").prefetch_related("events"),
         pk=day_pk,
@@ -3004,10 +3010,17 @@ def trip_events_list(request, pk):
         raise Http404
     unpaired_events = trip.all_events.filter(day__isnull=True)
     day_groups = group_days_by_destination(trip.days.all())
+    profile = get_profile(request.user)
     return TemplateResponse(
         request,
         "trips/includes/events-list-fragment.html",
-        {"trip": trip, "unpaired_events": unpaired_events, "day_groups": day_groups},
+        {
+            "trip": trip,
+            "unpaired_events": unpaired_events,
+            "day_groups": day_groups,
+            "show_transfer_info": profile.show_transfer_info,
+            "show_weather": profile.show_weather,
+        },
     )
 
 

@@ -14,7 +14,9 @@
             {% if group.next_destination %}
                 {% with from_dest=group.destination|default:trip.destination %}
                     <div class="mb-1 text-sm uppercase divider text-base-content/50">{{ group.next_destination }}</div>
-                    {% include 'trips/includes/transfer-info.html' with day_pk=group.last_day_pk from_dest=from_dest next_destination=group.next_destination transfer_duration=group.transfer_duration transfer_distance=group.transfer_distance %}
+                    {% if show_transfer_info %}
+                        {% include 'trips/includes/transfer-info.html' with day_pk=group.last_day_pk from_dest=from_dest next_destination=group.next_destination transfer_duration=group.transfer_duration transfer_distance=group.transfer_distance %}
+                    {% endif %}
                 {% endwith %}
             {% endif %}
         {% endfor %}

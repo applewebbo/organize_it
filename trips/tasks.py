@@ -232,7 +232,8 @@ def fetch_weather_for_active_trips():
     try:
         logger.info("Starting fetch_weather_for_active_trips task")
         trips = Trip.objects.prefetch_related("days__events", "days__stay").filter(
-            status__in=[Trip.Status.IMPENDING, Trip.Status.IN_PROGRESS]
+            status__in=[Trip.Status.IMPENDING, Trip.Status.IN_PROGRESS],
+            author__profile__show_weather=True,
         )
         count = trips.count()
         for trip in trips:

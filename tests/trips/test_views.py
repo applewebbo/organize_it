@@ -1021,6 +1021,24 @@ class TransferInfoViewTests(TestCase):
 
         assert response.status_code == 200
 
+    def test_returns_204_when_transfer_info_disabled(self):
+        from datetime import date, timedelta
+
+        user = self.make_user("user")
+        user.profile.show_transfer_info = False
+        user.profile.save()
+        trip = TripFactory(
+            author=user,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+        )
+        day = trip.days.first()
+
+        with self.login(user):
+            response = self.client.get(reverse("trips:transfer-info", args=[day.pk]))
+
+        assert response.status_code == 204
+
     def test_returns_404_for_unauthorized(self):
         from datetime import date, timedelta
 

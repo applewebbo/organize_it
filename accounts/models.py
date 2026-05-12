@@ -139,9 +139,17 @@ class Profile(models.Model):
     use_system_theme = models.BooleanField(
         _("Use system theme"),
         default=False,
-        help_text=_(
-            "Follow your device's theme preference instead of manual selection"
-        ),
+        help_text=_("Use your device's light/dark system setting."),
+    )
+    show_transfer_info = models.BooleanField(
+        _("Show transfer info"),
+        default=True,
+        help_text=_("Show duration and distance info between trip stages."),
+    )
+    show_weather = models.BooleanField(
+        _("Show weather forecast"),
+        default=True,
+        help_text=_("When disabled, weather data is not fetched from the API."),
     )
 
     def save(self, *args, **kwargs):

@@ -43,8 +43,8 @@ msgstr "Vista eventi di default"
 msgid "Sort trips by"
 msgstr "Ordine viaggi"
 
-msgid "Use system theme"
-msgstr "Segui le impostazioni di aspetto chiaro/scuro del tuo dispositivi"
+msgid "Use your device's light/dark system setting."
+msgstr "Usa le impostazioni di sistema per il tema chiaro/scuro."
 
 msgid "Favourite trip"
 msgstr "Viaggio preferito"
@@ -104,10 +104,6 @@ msgstr ""
 msgid "Language"
 msgstr ""
 
-msgid "Follow your device's theme preference instead of manual selection"
-msgstr ""
-"Segui le impostazioni del tuo dispositivo relative all’aspetto chiaro/scuro "
-"invece della selezione manuale"
 
 msgid "Settings modified succesfully"
 msgstr "Impostazioni salvate"
@@ -230,13 +226,17 @@ msgstr "Preferenze di viaggio"
 msgid "Display Preferences"
 msgstr "Preferenze di visualizzazione"
 
-msgid ""
-"When enabled, the theme will follow your device settings. When disabled, use "
-"the theme switcher in the navbar to choose your preferred theme."
-msgstr ""
-"Se attivo l’aspetto seguirà le impostazioni del tuo dispositivo. Se "
-"disattivo utilizza il selettore dell’aspetto chiaro/scuro nella barra del "
-"menu per scegliere la tua preferenza."
+msgid "Show transfer info"
+msgstr "Mostra info trasferimenti"
+
+msgid "Show duration and distance info between trip stages."
+msgstr "Mostra durata e distanza tra le tappe del viaggio."
+
+msgid "Show weather forecast"
+msgstr "Mostra meteo"
+
+msgid "When disabled, weather data is not fetched from the API."
+msgstr "Se disattivo, i dati meteo non vengono recuperati dall’API."
 
 msgid "Save"
 msgstr "Salva"

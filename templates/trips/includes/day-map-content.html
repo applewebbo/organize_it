@@ -4,7 +4,9 @@
         {% if map %}
             <div>
                 <div class="map-container">{{ map|safe }}</div>
-                {% weather_widget locations.day %}
+                {% if show_weather %}
+                    {% weather_widget locations.day %}
+                {% endif %}
             </div>
         {% else %}
             <div class="my-4 md:my-5 alert alert-info alert-soft">

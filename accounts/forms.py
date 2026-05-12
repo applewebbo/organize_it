@@ -36,6 +36,8 @@ class ProfileUpdateForm(forms.ModelForm):
             "default_map_view",
             "trip_sort_preference",
             "use_system_theme",
+            "show_transfer_info",
+            "show_weather",
             "fav_trip",
         )
         labels = {
@@ -47,7 +49,9 @@ class ProfileUpdateForm(forms.ModelForm):
             "language": _("Email language"),
             "default_map_view": _("Default event view"),
             "trip_sort_preference": _("Sort trips by"),
-            "use_system_theme": _("Use system theme"),
+            "use_system_theme": _("Use your device's light/dark system setting."),
+            "show_transfer_info": _("Show transfer info"),
+            "show_weather": _("Show weather forecast"),
             "fav_trip": _("Favourite trip"),
         }
         widgets = {
@@ -72,7 +76,15 @@ class ProfileUpdateForm(forms.ModelForm):
                 attrs={"class": "select select-bordered w-full"}
             ),
             "language": forms.Select(attrs={"class": "select select-bordered w-full"}),
-            "use_system_theme": forms.CheckboxInput(attrs={"class": "checkbox"}),
+            "use_system_theme": forms.CheckboxInput(
+                attrs={"class": "checkbox checkbox-sm"}
+            ),
+            "show_transfer_info": forms.CheckboxInput(
+                attrs={"class": "checkbox checkbox-sm"}
+            ),
+            "show_weather": forms.CheckboxInput(
+                attrs={"class": "checkbox checkbox-sm"}
+            ),
             "fav_trip": forms.Select(attrs={"class": "select select-bordered w-full"}),
         }
 
