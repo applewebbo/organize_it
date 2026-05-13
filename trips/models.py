@@ -166,6 +166,14 @@ def update_trip_days(sender, instance, **kwargs):
                 destination=instance.destination,
             )
 
+    # Trigger home transfer calculation for first and last day
+    from django_q.tasks import async_task
+
+    days = list(instance.days.order_by("number"))
+    async_task("trips.tasks.calculate_day_transfer", days[0].pk)
+    if len(days) > 1:
+        async_task("trips.tasks.calculate_day_transfer", days[-1].pk)
+
 
 class Stay(models.Model):
     name = models.CharField(max_length=100)

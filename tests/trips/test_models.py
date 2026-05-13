@@ -123,6 +123,24 @@ class TestDayModel:
         assert trip.days.all().first().date == trip.start_date
         assert trip.days.all().count() == 3
 
+    def test_single_day_trip_triggers_one_home_transfer_task(
+        self, user_factory, trip_factory
+    ):
+        """Single-day trip: only one calculate_day_transfer task is queued on creation."""
+        from unittest.mock import patch
+
+        with patch("django_q.tasks.async_task") as mock_async:
+            trip = trip_factory(
+                author=user_factory(),
+                start_date=date.today(),
+                end_date=date.today(),
+            )
+        assert trip.days.count() == 1
+        called_pks = [call.args[1] for call in mock_async.call_args_list]
+        day_pk = trip.days.first().pk
+        assert called_pks.count(day_pk) >= 1
+        assert len(set(called_pks)) == 1
+
     def test_days_deleted_when_trip_dates_updated(self, user_factory, trip_factory):
         """Test correct days are deleted when trip dates updated"""
         user = user_factory()
