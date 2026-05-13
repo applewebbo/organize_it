@@ -1,3 +1,4 @@
+from datetime import date, timedelta
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -198,3 +199,165 @@ class TestProfile:
         profile.refresh_from_db()
         assert profile.home_address_latitude is None
         assert profile.home_address_longitude is None
+
+
+class TestProfileHomeAddressSignal:
+    @patch("accounts.models.async_task")
+    def test_triggers_recalculation_when_home_coords_change(
+        self, mock_async, user_factory, trip_factory
+    ):
+        """When home coords change, recalculate first/last day for active trips."""
+        from accounts.models import Profile
+
+        user = user_factory()
+        today = date.today()
+        trip = trip_factory(
+            author=user,
+            start_date=today + timedelta(days=5),
+            end_date=today + timedelta(days=10),
+        )
+        days = list(trip.days.order_by("number"))
+        Profile.objects.filter(user=user).update(
+            home_address_latitude=44.0, home_address_longitude=8.0
+        )
+        profile = user.profile
+        profile.refresh_from_db()
+        profile.home_address_latitude = 45.0
+        profile.home_address_longitude = 9.0
+        mock_async.reset_mock()
+        profile.save()
+
+        called_pks = [call.args[1] for call in mock_async.call_args_list]
+        assert days[0].pk in called_pks
+        assert days[-1].pk in called_pks
+
+    @patch("accounts.models.async_task")
+    def test_skips_completed_trips(self, mock_async, user_factory, trip_factory):
+        """Signal does not trigger recalculation for completed trips."""
+        from accounts.models import Profile
+        from trips.models import Trip
+
+        user = user_factory()
+        today = date.today()
+        trip = trip_factory(
+            author=user,
+            start_date=today - timedelta(days=10),
+            end_date=today - timedelta(days=5),
+        )
+        Trip.objects.filter(pk=trip.pk).update(status=Trip.Status.COMPLETED)
+        Profile.objects.filter(user=user).update(
+            home_address_latitude=44.0, home_address_longitude=8.0
+        )
+        profile = user.profile
+        profile.refresh_from_db()
+        profile.home_address_latitude = 45.0
+        profile.home_address_longitude = 9.0
+        mock_async.reset_mock()
+        profile.save()
+
+        day_pks = list(trip.days.values_list("pk", flat=True))
+        called_pks = [call.args[1] for call in mock_async.call_args_list]
+        assert not any(pk in called_pks for pk in day_pks)
+
+    @patch("accounts.models.async_task")
+    def test_skips_archived_trips(self, mock_async, user_factory, trip_factory):
+        """Signal does not trigger recalculation for archived trips."""
+        from accounts.models import Profile
+        from trips.models import Trip
+
+        user = user_factory()
+        today = date.today()
+        trip = trip_factory(
+            author=user,
+            start_date=today - timedelta(days=10),
+            end_date=today - timedelta(days=5),
+        )
+        Trip.objects.filter(pk=trip.pk).update(status=Trip.Status.ARCHIVED)
+        Profile.objects.filter(user=user).update(
+            home_address_latitude=44.0, home_address_longitude=8.0
+        )
+        profile = user.profile
+        profile.refresh_from_db()
+        profile.home_address_latitude = 45.0
+        profile.home_address_longitude = 9.0
+        mock_async.reset_mock()
+        profile.save()
+
+        day_pks = list(trip.days.values_list("pk", flat=True))
+        called_pks = [call.args[1] for call in mock_async.call_args_list]
+        assert not any(pk in called_pks for pk in day_pks)
+
+    @patch("accounts.models.async_task")
+    def test_no_recalculation_if_coords_unchanged(
+        self, mock_async, user_factory, trip_factory
+    ):
+        """Signal does not trigger if home coords did not change."""
+        from accounts.models import Profile
+
+        user = user_factory()
+        today = date.today()
+        trip_factory(
+            author=user,
+            start_date=today + timedelta(days=5),
+            end_date=today + timedelta(days=10),
+        )
+        Profile.objects.filter(user=user).update(
+            home_address_latitude=44.0, home_address_longitude=8.0
+        )
+        profile = user.profile
+        profile.refresh_from_db()
+        profile.show_transfer_info = not profile.show_transfer_info
+        mock_async.reset_mock()
+        profile.save()
+
+        assert mock_async.call_count == 0
+
+    @patch("accounts.models.async_task")
+    def test_skips_trip_with_no_days(self, mock_async, user_factory, trip_factory):
+        """Signal skips trips that have no days (edge case)."""
+        from accounts.models import Profile
+
+        user = user_factory()
+        today = date.today()
+        trip = trip_factory(
+            author=user,
+            start_date=today + timedelta(days=5),
+            end_date=today + timedelta(days=5),
+        )
+        trip.days.all().delete()
+        Profile.objects.filter(user=user).update(
+            home_address_latitude=44.0, home_address_longitude=8.0
+        )
+        profile = user.profile
+        profile.refresh_from_db()
+        profile.home_address_latitude = 45.0
+        mock_async.reset_mock()
+        profile.save()
+
+        assert mock_async.call_count == 0
+
+    @patch("accounts.models.async_task")
+    def test_single_day_trip_triggers_only_one_task(
+        self, mock_async, user_factory, trip_factory
+    ):
+        """Single-day trip: first_day == last_day, so only one async_task call."""
+        from accounts.models import Profile
+
+        user = user_factory()
+        today = date.today()
+        trip = trip_factory(
+            author=user,
+            start_date=today + timedelta(days=5),
+            end_date=today + timedelta(days=5),
+        )
+        assert trip.days.count() == 1
+        Profile.objects.filter(user=user).update(
+            home_address_latitude=44.0, home_address_longitude=8.0
+        )
+        profile = user.profile
+        profile.refresh_from_db()
+        profile.home_address_latitude = 45.0
+        mock_async.reset_mock()
+        profile.save()
+
+        assert mock_async.call_count == 1

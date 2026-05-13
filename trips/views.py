@@ -197,6 +197,9 @@ def trip_detail(request, pk):
     days = trip.days.all()
     day_groups = group_days_by_destination(days)
 
+    first_day = trip.days.order_by("number").first()
+    last_day = trip.days.order_by("number").last()
+
     context = {
         "trip": trip,
         "stays": stays,
@@ -212,6 +215,24 @@ def trip_detail(request, pk):
         "day_groups": day_groups,
         "show_transfer_info": profile.show_transfer_info,
         "show_weather": profile.show_weather,
+        "from_home_duration": first_day.transfer_duration_from_prev
+        if first_day and not arrival_transfer
+        else None,
+        "from_home_distance": first_day.transfer_distance_from_prev
+        if first_day and not arrival_transfer
+        else None,
+        "from_home_destination": (first_day.destination or trip.destination)
+        if first_day and not arrival_transfer
+        else None,
+        "to_home_duration": last_day.transfer_to_home_duration
+        if last_day and not departure_transfer
+        else None,
+        "to_home_distance": last_day.transfer_to_home_distance
+        if last_day and not departure_transfer
+        else None,
+        "to_home_destination": (last_day.destination or trip.destination)
+        if last_day and not departure_transfer
+        else None,
     }
     if request.htmx:
         template = "trips/trip-detail.html#days"
@@ -3011,6 +3032,14 @@ def trip_events_list(request, pk):
     unpaired_events = trip.all_events.filter(day__isnull=True)
     day_groups = group_days_by_destination(trip.days.all())
     profile = get_profile(request.user)
+    arrival_transfer = trip.main_transfers.filter(
+        direction=MainTransfer.Direction.ARRIVAL
+    ).first()
+    departure_transfer = trip.main_transfers.filter(
+        direction=MainTransfer.Direction.DEPARTURE
+    ).first()
+    first_day = trip.days.order_by("number").first()
+    last_day = trip.days.order_by("number").last()
     return TemplateResponse(
         request,
         "trips/includes/events-list-fragment.html",
@@ -3020,6 +3049,24 @@ def trip_events_list(request, pk):
             "day_groups": day_groups,
             "show_transfer_info": profile.show_transfer_info,
             "show_weather": profile.show_weather,
+            "from_home_duration": first_day.transfer_duration_from_prev
+            if first_day and not arrival_transfer
+            else None,
+            "from_home_distance": first_day.transfer_distance_from_prev
+            if first_day and not arrival_transfer
+            else None,
+            "from_home_destination": (first_day.destination or trip.destination)
+            if first_day and not arrival_transfer
+            else None,
+            "to_home_duration": last_day.transfer_to_home_duration
+            if last_day and not departure_transfer
+            else None,
+            "to_home_distance": last_day.transfer_to_home_distance
+            if last_day and not departure_transfer
+            else None,
+            "to_home_destination": (last_day.destination or trip.destination)
+            if last_day and not departure_transfer
+            else None,
         },
     )
 

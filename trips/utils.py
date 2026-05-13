@@ -210,6 +210,9 @@ def get_trips(user):
         group_days_by_destination(featured_trip.days.all()) if featured_trip else None
     )
 
+    first_day = featured_trip.days.order_by("number").first() if featured_trip else None
+    last_day = featured_trip.days.order_by("number").last() if featured_trip else None
+
     return {
         "fav_trip": fav_trip,
         "latest_trip": latest_trip,
@@ -224,6 +227,26 @@ def get_trips(user):
         "arrival_origin_icao": get_flight_origin_icao(arrival_transfer),
         "departure_origin_icao": get_flight_origin_icao(departure_transfer),
         "day_groups": day_groups,
+        "show_transfer_info": profile.show_transfer_info,
+        "show_weather": profile.show_weather,
+        "from_home_duration": first_day.transfer_duration_from_prev
+        if first_day and not arrival_transfer
+        else None,
+        "from_home_distance": first_day.transfer_distance_from_prev
+        if first_day and not arrival_transfer
+        else None,
+        "from_home_destination": (first_day.destination or featured_trip.destination)
+        if first_day and not arrival_transfer
+        else None,
+        "to_home_duration": last_day.transfer_to_home_duration
+        if last_day and not departure_transfer
+        else None,
+        "to_home_distance": last_day.transfer_to_home_distance
+        if last_day and not departure_transfer
+        else None,
+        "to_home_destination": (last_day.destination or featured_trip.destination)
+        if last_day and not departure_transfer
+        else None,
     }
 
 

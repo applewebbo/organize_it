@@ -15,6 +15,7 @@ from tests.test import TestCase
 from tests.trips.factories import (
     EventFactory,
     ExperienceFactory,
+    MainTransferFactory,
     StayFactory,
     TripFactory,
 )
@@ -500,6 +501,57 @@ class TripDetailView(TestCase):
         self.response_200(response)
         assertTemplateUsed(response, "trips/trip-detail.html")
         assert response.context["trip"] == trip
+
+    def test_home_transfer_context_without_main_transfers(self):
+        """from_home_* and to_home_* are in context when no main transfers."""
+        from accounts.models import Profile
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        Profile.objects.filter(user=user).update(
+            home_address_latitude=44.0, home_address_longitude=8.0
+        )
+
+        with self.login(user):
+            response = self.get("trips:trip-detail", pk=trip.pk)
+
+        self.response_200(response)
+        assert "from_home_duration" in response.context
+        assert "to_home_duration" in response.context
+        assert "from_home_destination" in response.context
+        assert "to_home_destination" in response.context
+
+    def test_home_transfer_context_none_when_arrival_transfer_present(self):
+        """from_home_* are None when an ARRIVAL MainTransfer exists."""
+        from trips.models import MainTransfer
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        MainTransferFactory(trip=trip, direction=MainTransfer.Direction.ARRIVAL)
+
+        with self.login(user):
+            response = self.get("trips:trip-detail", pk=trip.pk)
+
+        self.response_200(response)
+        assert response.context["from_home_duration"] is None
+        assert response.context["from_home_distance"] is None
+        assert response.context["from_home_destination"] is None
+
+    def test_home_transfer_context_none_when_departure_transfer_present(self):
+        """to_home_* are None when a DEPARTURE MainTransfer exists."""
+        from trips.models import MainTransfer
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        MainTransferFactory(trip=trip, direction=MainTransfer.Direction.DEPARTURE)
+
+        with self.login(user):
+            response = self.get("trips:trip-detail", pk=trip.pk)
+
+        self.response_200(response)
+        assert response.context["to_home_duration"] is None
+        assert response.context["to_home_distance"] is None
+        assert response.context["to_home_destination"] is None
 
 
 class DayDetailView(TestCase):

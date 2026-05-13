@@ -237,3 +237,152 @@ class TestCalculateDayTransfer:
         calculate_day_transfer(days[1].pk)
         days[1].refresh_from_db()
         assert days[1].transfer_duration_from_prev is None
+
+    # --- Home address tests (issue #309) ---
+
+    @patch("trips.tasks.requests.get")
+    def test_uses_home_as_origin_for_day1_without_arrival_transfer(
+        self, mock_get, user_factory, trip_factory
+    ):
+        """Day 1, no ARRIVAL MainTransfer, profile has home coords → calculates from home."""
+        from accounts.models import Profile
+
+        user = user_factory()
+        trip = trip_factory(author=user)
+        Profile.objects.filter(user=user).update(
+            home_address_latitude=44.0, home_address_longitude=8.0
+        )
+        day1 = trip.days.order_by("number").first()
+        stay = StayFactory(latitude=43.0, longitude=11.0)
+        stay.days.set([day1])
+        mock_get.return_value.json.return_value = {
+            "routes": [{"duration": 3600, "distance": 180000}]
+        }
+        mock_get.return_value.raise_for_status = lambda: None
+        calculate_day_transfer(day1.pk)
+        day1.refresh_from_db()
+        assert day1.transfer_duration_from_prev == 60
+        assert day1.transfer_distance_from_prev == 180
+
+    def test_clears_fields_if_day1_has_arrival_main_transfer(
+        self, user_factory, trip_factory, main_transfer_factory
+    ):
+        """Day 1 with ARRIVAL MainTransfer → clear from_prev fields."""
+        from accounts.models import Profile
+        from trips.models import Day, MainTransfer
+
+        user = user_factory()
+        trip = trip_factory(author=user)
+        Profile.objects.filter(user=user).update(
+            home_address_latitude=44.0, home_address_longitude=8.0
+        )
+        main_transfer_factory(trip=trip, direction=MainTransfer.Direction.ARRIVAL)
+        day1 = trip.days.order_by("number").first()
+        Day.objects.filter(pk=day1.pk).update(
+            transfer_duration_from_prev=60, transfer_distance_from_prev=100
+        )
+        calculate_day_transfer(day1.pk)
+        day1.refresh_from_db()
+        assert day1.transfer_duration_from_prev is None
+        assert day1.transfer_distance_from_prev is None
+
+    def test_clears_fields_if_day1_no_home_coords(self, user_factory, trip_factory):
+        """Day 1, no ARRIVAL, but profile has no home coords → clear."""
+        day1 = trip_factory(author=user_factory()).days.order_by("number").first()
+        calculate_day_transfer(day1.pk)
+        day1.refresh_from_db()
+        assert day1.transfer_duration_from_prev is None
+
+    def test_clears_fields_if_day1_home_coords_but_no_day_coords(
+        self, user_factory, trip_factory
+    ):
+        """Day 1, home has coords, day has no geocoords → clear."""
+        from accounts.models import Profile
+
+        user = user_factory()
+        trip = trip_factory(author=user)
+        Profile.objects.filter(user=user).update(
+            home_address_latitude=44.0, home_address_longitude=8.0
+        )
+        day1 = trip.days.order_by("number").first()
+        calculate_day_transfer(day1.pk)
+        day1.refresh_from_db()
+        assert day1.transfer_duration_from_prev is None
+
+    @patch("trips.tasks.requests.get")
+    def test_saves_to_home_for_last_day_without_departure_transfer(
+        self, mock_get, user_factory, trip_factory
+    ):
+        """Last day, no DEPARTURE MainTransfer, home has coords → saves to_home fields."""
+        from accounts.models import Profile
+
+        user = user_factory()
+        trip = trip_factory(author=user)
+        Profile.objects.filter(user=user).update(
+            home_address_latitude=44.0, home_address_longitude=8.0
+        )
+        last_day = trip.days.order_by("number").last()
+        stay = StayFactory(latitude=43.0, longitude=11.0)
+        stay.days.set([last_day])
+        mock_get.return_value.json.return_value = {
+            "routes": [{"duration": 5400, "distance": 240000}]
+        }
+        mock_get.return_value.raise_for_status = lambda: None
+        calculate_day_transfer(last_day.pk)
+        last_day.refresh_from_db()
+        assert last_day.transfer_to_home_duration == 90
+        assert last_day.transfer_to_home_distance == 240
+
+    def test_clears_to_home_for_last_day_with_departure_transfer(
+        self, user_factory, trip_factory, main_transfer_factory
+    ):
+        """Last day with DEPARTURE MainTransfer → clear to_home fields."""
+        from accounts.models import Profile
+        from trips.models import Day, MainTransfer
+
+        user = user_factory()
+        trip = trip_factory(author=user)
+        Profile.objects.filter(user=user).update(
+            home_address_latitude=44.0, home_address_longitude=8.0
+        )
+        main_transfer_factory(trip=trip, direction=MainTransfer.Direction.DEPARTURE)
+        last_day = trip.days.order_by("number").last()
+        Day.objects.filter(pk=last_day.pk).update(
+            transfer_to_home_duration=90, transfer_to_home_distance=240
+        )
+        calculate_day_transfer(last_day.pk)
+        last_day.refresh_from_db()
+        assert last_day.transfer_to_home_duration is None
+        assert last_day.transfer_to_home_distance is None
+
+    def test_clears_to_home_if_not_last_day(self, user_factory, trip_factory):
+        """Non-last day → to_home fields are cleared."""
+        from trips.models import Day
+
+        user = user_factory()
+        trip = trip_factory(author=user)
+        days = list(trip.days.order_by("number"))
+        Day.objects.filter(pk=days[0].pk).update(
+            transfer_to_home_duration=90, transfer_to_home_distance=240
+        )
+        calculate_day_transfer(days[0].pk)
+        days[0].refresh_from_db()
+        assert days[0].transfer_to_home_duration is None
+        assert days[0].transfer_to_home_distance is None
+
+    def test_clears_to_home_if_last_day_no_home_coords(
+        self, user_factory, trip_factory
+    ):
+        """Last day, no home coords → to_home fields are cleared."""
+        from trips.models import Day
+
+        user = user_factory()
+        trip = trip_factory(author=user)
+        last_day = trip.days.order_by("number").last()
+        Day.objects.filter(pk=last_day.pk).update(
+            transfer_to_home_duration=90, transfer_to_home_distance=240
+        )
+        calculate_day_transfer(last_day.pk)
+        last_day.refresh_from_db()
+        assert last_day.transfer_to_home_duration is None
+        assert last_day.transfer_to_home_distance is None

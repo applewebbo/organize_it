@@ -8,6 +8,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django_q.tasks import async_task
 
 from .managers import CustomUserManager
 
@@ -153,11 +154,12 @@ class Profile(models.Model):
     )
 
     def save(self, *args, **kwargs):
+        old = Profile.objects.filter(pk=self.pk).first()
+        self._pre_save_instance = old
         # Geocode home_address when set and coordinates are missing
         if self.home_address and not (
             self.home_address_latitude and self.home_address_longitude
         ):
-            old = Profile.objects.filter(pk=self.pk).first()
             address_changed = not old or old.home_address != self.home_address
             if address_changed:
                 g = geocoder.mapbox(
@@ -216,3 +218,29 @@ def accept_invitation_on_signup(sender, request, user, **kwargs):
         user=user,
         defaults={"color": color, "added_by": invitation.invited_by},
     )
+
+
+@receiver(post_save, sender=Profile)
+def recalculate_home_transfers(sender, instance, **kwargs):
+    """When home coords change, recalculate first/last day transfers for active trips."""
+    from trips.models import Trip
+
+    old = getattr(instance, "_pre_save_instance", None)
+    coords_changed = old is None or (
+        old.home_address_latitude != instance.home_address_latitude
+        or old.home_address_longitude != instance.home_address_longitude
+    )
+    if not coords_changed:
+        return
+
+    excluded = [Trip.Status.COMPLETED, Trip.Status.ARCHIVED]
+    trips = Trip.objects.filter(author=instance.user).exclude(status__in=excluded)
+    for trip in trips:
+        days = trip.days.order_by("number")
+        if not days.exists():
+            continue
+        first_day = days.first()
+        last_day = days.last()
+        async_task("trips.tasks.calculate_day_transfer", first_day.pk)
+        if last_day.pk != first_day.pk:
+            async_task("trips.tasks.calculate_day_transfer", last_day.pk)

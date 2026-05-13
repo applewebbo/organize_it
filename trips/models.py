@@ -435,6 +435,8 @@ class Day(models.Model):
     destination_longitude = models.FloatField(null=True, blank=True)
     transfer_duration_from_prev = models.PositiveIntegerField(null=True, blank=True)
     transfer_distance_from_prev = models.PositiveIntegerField(null=True, blank=True)
+    transfer_to_home_duration = models.PositiveIntegerField(null=True, blank=True)
+    transfer_to_home_distance = models.PositiveIntegerField(null=True, blank=True)
     weather_data = models.JSONField(null=True, blank=True)
     weather_fetched_at = models.DateTimeField(null=True, blank=True)
 
