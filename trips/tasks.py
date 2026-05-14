@@ -38,7 +38,7 @@ def populate_trips():
 
 
 def _get_day_coords(day):
-    """Return (lat, lng) for a day. Priority: destination coords → stay → first geocoded event."""
+    """Return (lat, lng) for a day. Priority: destination coords → stay → first geocoded event → trip destination."""
     if day.destination_latitude is not None and day.destination_longitude is not None:
         return day.destination_latitude, day.destination_longitude
     if day.stay and day.stay.latitude is not None and day.stay.longitude is not None:
@@ -46,6 +46,12 @@ def _get_day_coords(day):
     event = day.events.filter(latitude__isnull=False, longitude__isnull=False).first()
     if event:
         return event.latitude, event.longitude
+    if (
+        day.destination == day.trip.destination
+        and day.trip.destination_latitude is not None
+        and day.trip.destination_longitude is not None
+    ):
+        return day.trip.destination_latitude, day.trip.destination_longitude
     return None, None
 
 

@@ -28,6 +28,8 @@ class Trip(models.Model):
 
     title = models.CharField(max_length=100)
     destination = models.CharField(max_length=100)
+    destination_latitude = models.FloatField(null=True, blank=True)
+    destination_longitude = models.FloatField(null=True, blank=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
@@ -103,14 +105,26 @@ class Trip(models.Model):
 
 @receiver(pre_save, sender="trips.Trip")
 def capture_trip_old_destination(sender, instance, **kwargs):
-    """Store old destination on the instance before save so post_save can detect changes."""
+    """Store old destination and geocode when destination changes."""
     if instance.pk:
         try:
-            instance._old_destination = Trip.objects.get(pk=instance.pk).destination
+            old = Trip.objects.get(pk=instance.pk)
+            instance._old_destination = old.destination
         except Trip.DoesNotExist:
             instance._old_destination = None
     else:
         instance._old_destination = None
+
+    destination_changed = instance._old_destination != instance.destination
+    if destination_changed and instance.destination:
+        g = geocoder.mapbox(
+            instance.destination, access_token=settings.MAPBOX_ACCESS_TOKEN
+        )
+        if g.latlng:
+            instance.destination_latitude, instance.destination_longitude = g.latlng
+        else:
+            instance.destination_latitude = None
+            instance.destination_longitude = None
 
 
 @receiver(post_save, sender=Trip)

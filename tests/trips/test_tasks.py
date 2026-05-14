@@ -103,12 +103,34 @@ class TestGetDayCoords:
         assert lng == 8.0
 
     def test_returns_none_if_no_stay_or_event(self, user_factory, trip_factory):
+        from trips.models import Trip
+
         user = user_factory()
         trip = trip_factory(author=user)
+        Trip.objects.filter(pk=trip.pk).update(
+            destination_latitude=None, destination_longitude=None
+        )
         day = trip.days.first()
+        day.refresh_from_db()
         lat, lng = _get_day_coords(day)
         assert lat is None
         assert lng is None
+
+    def test_returns_trip_destination_coords_as_fallback(
+        self, user_factory, trip_factory
+    ):
+        from trips.models import Trip
+
+        user = user_factory()
+        trip = trip_factory(author=user)
+        Trip.objects.filter(pk=trip.pk).update(
+            destination_latitude=41.9, destination_longitude=12.5
+        )
+        day = trip.days.first()
+        day.refresh_from_db()
+        lat, lng = _get_day_coords(day)
+        assert lat == 41.9
+        assert lng == 12.5
 
     def test_stay_without_coords_falls_back_to_event(self, user_factory, trip_factory):
         from trips.models import Stay
@@ -296,11 +318,15 @@ class TestCalculateDayTransfer:
     def test_clears_fields_if_day1_home_coords_but_no_day_coords(
         self, user_factory, trip_factory
     ):
-        """Day 1, home has coords, day has no geocoords → clear."""
+        """Day 1, home has coords, day and trip have no geocoords → clear."""
         from accounts.models import Profile
+        from trips.models import Trip
 
         user = user_factory()
         trip = trip_factory(author=user)
+        Trip.objects.filter(pk=trip.pk).update(
+            destination_latitude=None, destination_longitude=None
+        )
         Profile.objects.filter(user=user).update(
             home_address_latitude=44.0, home_address_longitude=8.0
         )
