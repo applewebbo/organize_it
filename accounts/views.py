@@ -6,6 +6,8 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 
+from trips.services import GooglePlacesClient, GooglePlacesError
+
 from .forms import ProfileUpdateForm
 from .models import Profile
 
@@ -31,6 +33,27 @@ def profile(request):
         return TemplateResponse(request, "account/profile.html", context)
 
     return TemplateResponse(request, "account/profile.html", context)
+
+
+@require_POST
+def autocomplete_home_address(request):
+    """HTMX: search for a home address using Google Places API and return a list of results."""
+    query = request.POST.get("home_address", "").strip()
+    if query and len(query) >= 3:
+        try:
+            results = GooglePlacesClient().search_text(query, max_results=5)
+            return TemplateResponse(
+                request,
+                "account/includes/home-address-results.html",
+                {"places": results, "found": bool(results)},
+            )
+        except GooglePlacesError:
+            pass
+    return TemplateResponse(
+        request,
+        "account/includes/home-address-results.html",
+        {"found": False},
+    )
 
 
 @require_POST

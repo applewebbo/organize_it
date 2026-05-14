@@ -30,6 +30,8 @@ class ProfileUpdateForm(forms.ModelForm):
             "first_name",
             "last_name",
             "home_address",
+            "home_address_latitude",
+            "home_address_longitude",
             "avatar",
             "currency",
             "language",
@@ -86,6 +88,8 @@ class ProfileUpdateForm(forms.ModelForm):
                 attrs={"class": "checkbox checkbox-sm"}
             ),
             "fav_trip": forms.Select(attrs={"class": "select select-bordered w-full"}),
+            "home_address_latitude": forms.HiddenInput(),
+            "home_address_longitude": forms.HiddenInput(),
         }
 
     def __init__(self, *args, **kwargs):

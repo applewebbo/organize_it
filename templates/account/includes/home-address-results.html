@@ -1,0 +1,25 @@
+{% load i18n %}
+{% if found %}
+    <div class="mt-2 mb-4">
+        <ul>
+            {% for place in places %}
+                <li class="flex gap-2 justify-between items-center py-2 px-3 mx-2 mb-2 text-sm rounded-lg border text-slate-600 bg-slate-50 border-slate-200"
+                    data-address="{{ place.address }}"
+                    data-lat="{{ place.lat }}"
+                    data-lng="{{ place.lng }}">
+                    <div>
+                        <span class="font-bold">{{ place.name }}</span>&nbsp;<span>{{ place.address }}</span>
+                    </div>
+                    <button type="button"
+                            class="btn btn-xs btn-ghost"
+                            @click="selectAddress('{{ place.address|escapejs }}', '{{ place.lat }}', '{{ place.lng }}')">
+                        <i class="ph-bold ph-plus-circle i-sm"></i>
+                    </button>
+                </li>
+            {% endfor %}
+        </ul>
+        <p class="flex gap-1 justify-end items-center px-3 my-1 mx-2 text-xs italic text-slate-400">
+            <i class="ph-bold ph-info i-xs"></i>{% trans 'Powered by' %}&nbsp;<a href="https://maps.google.com" class="link link-primary">Google Places</a>
+        </p>
+    </div>
+{% endif %}

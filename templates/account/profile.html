@@ -30,10 +30,22 @@
                         {% endif %}
                     </div>
                 </div>
-                <div class="mb-4">
-                    <label for="{{ profile_form.home_address.id_for_label }}"
-                           class="block mb-2 font-medium">{{ profile_form.home_address.label }}</label>
-                    {{ profile_form.home_address }}
+                <div class="mb-4" x-data="homeAddressForm()">
+                    <label for="id_home_address" class="block mb-2 font-medium">{{ profile_form.home_address.label }}</label>
+                    <input type="text"
+                           id="id_home_address"
+                           name="home_address"
+                           value="{{ profile_form.home_address.value|default:'' }}"
+                           class="w-full input input-bordered"
+                           placeholder="{% trans 'Full address (street, city, country)' %}"
+                           hx-post="{% url 'accounts:autocomplete-home-address' %}"
+                           hx-trigger="input changed delay:500ms"
+                           hx-target="#home-address-results"
+                           hx-include="[name='home_address']"
+                           @input="clearCoords()">
+                    {{ profile_form.home_address_latitude }}
+                    {{ profile_form.home_address_longitude }}
+                    <div id="home-address-results"></div>
                     {% if profile_form.home_address.help_text %}
                         <p class="mt-1 text-xs italic text-base-content/50">{{ profile_form.home_address.help_text }}</p>
                     {% endif %}

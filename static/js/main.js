@@ -304,6 +304,25 @@ document.addEventListener("alpine:init", () => {
         }
     }));
 
+    Alpine.data("homeAddressForm", () => ({
+        clearCoords() {
+            const lat = document.getElementById("id_home_address_latitude");
+            const lng = document.getElementById("id_home_address_longitude");
+            if (lat) lat.value = "";
+            if (lng) lng.value = "";
+        },
+        selectAddress(address, lat, lng) {
+            const addressField = document.getElementById("id_home_address");
+            const latField = document.getElementById("id_home_address_latitude");
+            const lngField = document.getElementById("id_home_address_longitude");
+            if (addressField) addressField.value = address;
+            if (latField) latField.value = lat;
+            if (lngField) lngField.value = lng;
+            const resultsDiv = document.getElementById("home-address-results");
+            if (resultsDiv) resultsDiv.innerHTML = "";
+        }
+    }));
+
     Alpine.data("overlapChecker", () => ({
         checkOverlap() {
             const startTime = this.$refs.startTime.value;
