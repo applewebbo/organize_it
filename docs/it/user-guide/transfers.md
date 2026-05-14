@@ -4,11 +4,10 @@ I trasferimenti rappresentano tutti i trasporti durante il tuo viaggio - da voli
 
 ## Cos'è un Trasferimento?
 
-Un **Trasferimento** è qualsiasi spostamento da una posizione all'altra durante il tuo viaggio. Ci sono tre tipi:
+Un **Trasferimento** è qualsiasi spostamento da una posizione all'altra durante il tuo viaggio. Ci sono due tipi:
 
 1. **Trasferimenti Principali** - Arrivo e partenza (voli, treni da/verso destinazione)
 2. **Trasferimenti tra Alloggi** - Spostamento tra diverse sistemazioni
-3. **Trasferimenti Semplici** - Spostamento tra eventi nello stesso giorno
 
 ## Trasferimenti Principali
 
@@ -490,101 +489,6 @@ Note: Treno da Roma Termini a Firenze SMN.
       Viaggio totale: ~3.5 ore
 ```
 
-## Trasferimenti Semplici
-
-Spostamenti rapidi tra eventi nello stesso giorno.
-
-### Quando Usare i Trasferimenti Semplici
-
-Crea trasferimenti semplici per:
-- Camminata tra museo e ristorante
-- Taxi da pranzo ad attività pomeridiana
-- Corsa in metro tra due attrazioni
-
-### Creare un Trasferimento Semplice
-
-1. Naviga a un giorno
-2. Clicca **Aggiungi Trasferimento** → **Trasferimento Semplice**
-3. Seleziona:
-   - **Da Evento**: Punto di partenza
-   - **A Evento**: Destinazione
-4. Scegli modalità trasporto
-5. Aggiungi note se necessario
-6. Salva
-
-### Campi Trasferimento Semplice
-
-**Da Evento**
-- L'evento che stai lasciando
-- Auto-popolato con posizione
-
-**A Evento**
-- L'evento dove stai andando
-- Auto-popolato con posizione
-
-**Modalità Trasporto**
-- Come stai viaggiando
-- Opzioni stesse dei trasferimenti tra alloggi:
-  - Guida, A piedi, Bicicletta, Mezzi Pubblici
-
-**Note**
-- Informazioni aggiuntive
-- Esempio: "Camminata 15 minuti lungo il fiume. Percorso panoramico."
-
-### Funzionalità Trasferimenti Semplici
-
-#### Link Google Maps Auto-Generato
-
-I trasferimenti semplici generano automaticamente un URL Google Maps:
-- Usa indirizzi di entrambi gli eventi
-- Include modalità trasporto selezionata
-- Clicca per aprire indicazioni in Google Maps
-
-#### Timeline Visuale
-
-I trasferimenti semplici appaiono tra eventi nella timeline del giorno:
-
-```
-12:00 - Pranzo da Roscioli (Pasto)
-    ↓ [A piedi - 10 min]
-14:00 - Tour Colosseo (Esperienza)
-    ↓ [Metro - 20 min]
-17:00 - Cena a Trastevere (Pasto)
-```
-
-### Esempi Trasferimenti Semplici
-
-#### A Piedi
-
-```
-Da Evento: Museo del Louvre
-A Evento: Café de Flore (Pranzo)
-Modalità Trasporto: A piedi
-Note: Camminata panoramica 20 minuti lungo la Senna.
-      Attraversa Pont des Arts.
-```
-
-#### Metro/Mezzi Pubblici
-
-```
-Da Evento: Tour Colosseo
-A Evento: Musei Vaticani
-Modalità Trasporto: Mezzi Pubblici
-Note: Metro Linea A (Colosseo → Ottaviano).
-      15 minuti + 5 min camminata all'ingresso Vaticano.
-      Compra biglietti in anticipo.
-```
-
-#### Taxi/Guida
-
-```
-Da Evento: Cena al Ristorante
-A Evento: Hotel (fine giornata)
-Modalità Trasporto: Guida
-Note: Taxi. Circa €15-20. 10 minuti.
-      Usa Uber o fermalo per strada.
-```
-
 ## Modalità di Trasporto
 
 ### Guida
@@ -761,16 +665,6 @@ Aggiungi dettagli coincidenza nelle note:
 Note: LHR → FCO (diretto)
       Opzione coincidenza: Cambio a CDG
       Se ritardo, volo riserva: BA502 (2 ore dopo)
-```
-
-### Posso tracciare trasporto stazione-hotel?
-
-Sì! Usa un trasferimento semplice:
-```
-Da Evento: Arrivo a Roma Termini (endpoint trasferimento arrivo)
-A Evento: Check-in Hotel (primo alloggio)
-Modalità Trasporto: Metro
-Note: Linea B verso Colosseo. 10 minuti.
 ```
 
 ### Dovrei aggiungere trasferimenti per ogni spostamento?

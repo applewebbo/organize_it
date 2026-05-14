@@ -78,9 +78,8 @@ Each day can contain multiple events:
 
 - **Experiences**: Museums, tours, walks, attractions
 - **Meals**: Breakfast, lunch, dinner, snacks
-- **Transfers**: Arrival, departure, moving between locations
 
-Events are displayed in chronological order based on their start time.
+Events are displayed in chronological order based on their start time. Events without a start time appear last, ordered by the sequence you added them. You can also reorder events manually (see [Reordering Events](#reordering-events)).
 
 ### Stay on a Day
 
@@ -107,9 +106,9 @@ Click on a day to view:
 
 - Complete timeline of events
 - Event details with expand/collapse
-- Overlap warnings (if events conflict)
 - Navigation to previous/next day
 - Quick actions to add events
+- Toggle between **list view** and **map view** (top-right switch)
 
 ### Day Navigation
 
@@ -126,7 +125,7 @@ When viewing a day, you can:
 ![Day Detail](../assets/screenshots/day-detail.png)
 *A day with its events in timeline view*
 
-### Timeline View
+### List View
 
 Events are displayed in chronological order:
 
@@ -135,20 +134,22 @@ Day 1 - Friday, March 14, 2025
 ─────────────────────────────────
 Stay: Hotel Forum Roma (Check-in: 15:00)
 
-08:00 - Flight to Rome (Arrival)
-12:00 - Train to hotel (Transfer)
 16:00 - Colosseum Tour (Experience)
 19:30 - Trattoria da Enzo (Meal)
 ```
 
-### Overlapping Events
+### Map View
 
-The system detects when events overlap in time:
+Switch to map view to see all events and your accommodation plotted on an interactive map. Use the view toggle in the top-right corner of the day detail page, or set your preferred default in your profile settings.
 
-!!! warning "Time Conflict"
-    Experience at 16:00-18:00 overlaps with Meal at 17:30
+### Reordering Events
 
-Review and adjust event times to avoid conflicts.
+You can manually change the display order of events within a day:
+
+- **Desktop**: Drag and drop events to the desired position
+- **Mobile**: Use the **↕ Swap order** button on each event card to select a target position
+
+The order is saved automatically and used for display in both list and map view.
 
 ### Unpaired Events
 
@@ -272,6 +273,28 @@ Day 1: Hotel ABC (Check-in: 15:00)
 Day 2: Hotel ABC (staying)
 Day 3: Hotel ABC (Check-out: 11:00)
 ```
+
+## Multi-Destination Trips
+
+If your trip spans multiple cities or regions, you can assign a **destination** to each day. Days with the same consecutive destination are grouped together in the trip overview.
+
+### Assigning a Destination to a Day
+
+1. Open the trip detail page
+2. Click **Manage Destinations** (or the destination badge on a day group)
+3. Edit the city for each day
+4. Save
+
+### Stages
+
+A **stage** is a group of consecutive days sharing the same destination. You can create stages from the destinations modal:
+
+1. Click **Manage Destinations**
+2. Use the stage controls to create, rename, or delete stages
+3. Each stage shows the destination, duration, and transfer info to the next stage
+
+!!! tip "Transfer Distance & Duration"
+    When two consecutive stages have geocoded destinations, Organize It automatically calculates the road distance and estimated driving time between them.
 
 ## Day Statistics
 

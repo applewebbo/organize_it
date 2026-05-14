@@ -4,11 +4,10 @@ Transfers represent all transportation during your trip - from flights and train
 
 ## What is a Transfer?
 
-A **Transfer** is any movement from one location to another during your trip. There are three types:
+A **Transfer** is any movement from one location to another during your trip. There are two types:
 
 1. **Main Transfers** - Arrival and departure (flights, trains to/from destination)
 2. **Stay Transfers** - Moving between different accommodations
-3. **Simple Transfers** - Moving between events on the same day
 
 ## Main Transfers
 
@@ -490,101 +489,6 @@ Notes: Train from Roma Termini to Firenze SMN.
        Total journey: ~3.5 hours
 ```
 
-## Simple Transfers
-
-Quick movements between events on the same day.
-
-### When to Use Simple Transfers
-
-Create simple transfers for:
-- Walking between museum and restaurant
-- Taxi from lunch to afternoon activity
-- Metro ride between two attractions
-
-### Creating a Simple Transfer
-
-1. Navigate to a day
-2. Click **Add Transfer** → **Simple Transfer**
-3. Select:
-   - **From Event**: Starting point
-   - **To Event**: Destination
-4. Choose transport mode
-5. Add notes if needed
-6. Save
-
-### Simple Transfer Fields
-
-**From Event**
-- The event you're leaving
-- Auto-populated with location
-
-**To Event**
-- The event you're going to
-- Auto-populated with location
-
-**Transport Mode**
-- How you're traveling
-- Options same as stay transfers:
-  - Driving, Walking, Bicycling, Transit
-
-**Notes**
-- Additional information
-- Example: "15-minute walk along the river. Scenic route."
-
-### Simple Transfer Features
-
-#### Auto-Generated Google Maps Link
-
-Simple transfers automatically generate a Google Maps URL:
-- Uses addresses from both events
-- Includes selected transport mode
-- Click to open directions in Google Maps
-
-#### Visual Timeline
-
-Simple transfers appear between events in the day timeline:
-
-```
-12:00 - Lunch at Roscioli (Meal)
-    ↓ [Walking - 10 min]
-14:00 - Colosseum Tour (Experience)
-    ↓ [Metro - 20 min]
-17:00 - Dinner at Trastevere (Meal)
-```
-
-### Simple Transfer Examples
-
-#### Walking
-
-```
-From Event: Louvre Museum
-To Event: Café de Flore (Lunch)
-Transport Mode: Walking
-Notes: 20-minute scenic walk along Seine.
-       Cross Pont des Arts.
-```
-
-#### Metro/Transit
-
-```
-From Event: Colosseum Tour
-To Event: Vatican Museums
-Transport Mode: Transit
-Notes: Metro Line A (Colosseo → Ottaviano).
-       15 minutes + 5 min walk to Vatican entrance.
-       Buy tickets in advance.
-```
-
-#### Taxi/Driving
-
-```
-From Event: Dinner at Restaurant
-To Event: Hotel (end of day)
-Transport Mode: Driving
-Notes: Taxi. Approx €15-20. 10 minutes.
-       Use Uber or hail on street.
-```
-
 ## Transport Modes
 
 ### Driving
@@ -761,16 +665,6 @@ Add connection details in the notes:
 Notes: LHR → FCO (direct)
        Connection option: Change at CDG
        If delayed, backup flight: BA502 (2 hours later)
-```
-
-### Can I track train station to hotel transport?
-
-Yes! Use a simple transfer:
-```
-From Event: Arrival at Roma Termini (arrival transfer endpoint)
-To Event: Check-in at Hotel (first stay)
-Transport Mode: Metro
-Notes: Line B to Colosseo. 10 minutes.
 ```
 
 ### Should I add transfers for every movement?

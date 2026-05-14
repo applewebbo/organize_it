@@ -42,25 +42,26 @@ A **Meal** is any dining event during your trip, including:
 - Example: "Trattoria da Enzo", "Le Bernardin", "Street Food Tour"
 - Max 100 characters
 
-**Start Time**
-- Reservation or planned dining time
-- Example: 12:30, 19:00, 20:30
-- Used for timeline ordering
-
-**End Time**
-- Expected end of meal
-- Example: 14:00, 21:00, 22:00
-- Plan realistic durations (1-2 hours typical)
-
 **Meal Type**
 - Type of meal
 - Options:
-  - **Breakfast** - Morning meal (7:00-11:00 typical)
-  - **Lunch** - Midday meal (12:00-15:00 typical)
-  - **Dinner** - Evening meal (18:00-23:00 typical)
+  - **Breakfast** - Morning meal (7:00–11:00 typical)
+  - **Lunch** - Midday meal (12:00–15:00 typical)
+  - **Dinner** - Evening meal (18:00–23:00 typical)
   - **Snack** - Quick bites, coffee, dessert
+- Shown as a badge on the event card
 
 ### Optional Fields
+
+**Start Time**
+- Reservation or planned dining time
+- Example: 12:30, 19:00, 20:30
+- Used for display ordering within the day
+
+**Duration**
+- Estimated length of the meal
+- Dropdown: Not specified, 30 min, 1h, … up to 7h 30min
+- Typical values: 30–60 min for breakfast/snack, 1–2 h for lunch, 1.5–3 h for dinner
 
 **Address**
 - Restaurant location
@@ -315,22 +316,22 @@ Create meals without assigning to a day:
 
 ### Realistic Timing
 
-**Breakfast**: 30-60 minutes
+**Breakfast**: 30–60 minutes
 ```
-Start: 08:00
-End: 08:45
-```
-
-**Casual lunch**: 1-1.5 hours
-```
-Start: 12:30
-End: 14:00
+Start Time: 08:00
+Duration: 1h
 ```
 
-**Fine dining**: 2-3 hours
+**Casual lunch**: 1–1.5 hours
 ```
-Start: 20:00
-End: 23:00
+Start Time: 12:30
+Duration: 1h 30min
+```
+
+**Fine dining**: 2–3 hours
+```
+Start Time: 20:00
+Duration: 3h
 ```
 
 !!! tip "Add Buffer Time"

@@ -81,9 +81,8 @@ Ogni giorno può contenere più eventi:
 
 - **Esperienze**: Musei, tour, passeggiate, attrazioni
 - **Pasti**: Colazione, pranzo, cena, spuntini
-- **Trasferimenti**: Arrivo, partenza, spostamenti tra luoghi
 
-Gli eventi vengono visualizzati in ordine cronologico in base al loro orario di inizio.
+Gli eventi vengono visualizzati in ordine cronologico in base al loro orario di inizio. Gli eventi senza orario appaiono per ultimi, nell'ordine in cui sono stati creati. Puoi anche riordinarli manualmente (vedi [Riordinare gli Eventi](#riordinare-gli-eventi)).
 
 ### Alloggio in un Giorno
 
@@ -110,9 +109,9 @@ Clicca su un giorno per visualizzare:
 
 - Timeline completa degli eventi
 - Dettagli eventi con espandi/comprimi
-- Avvisi sovrapposizione (se gli eventi sono in conflitto)
 - Navigazione al giorno precedente/successivo
 - Azioni rapide per aggiungere eventi
+- Pulsante per passare tra **vista elenco** e **vista mappa** (in alto a destra)
 
 ### Navigazione Giorno
 
@@ -126,7 +125,7 @@ Quando visualizzi un giorno, puoi:
 
 ## Eventi all'Interno dei Giorni
 
-### Vista Timeline
+### Vista Elenco
 
 Gli eventi vengono visualizzati in ordine cronologico:
 
@@ -135,20 +134,22 @@ Giorno 1 - Venerdì, 14 marzo 2025
 ─────────────────────────────────
 Alloggio: Hotel Forum Roma (Check-in: 15:00)
 
-08:00 - Volo per Roma (Arrivo)
-12:00 - Treno per hotel (Trasferimento)
 16:00 - Tour del Colosseo (Esperienza)
 19:30 - Trattoria da Enzo (Pasto)
 ```
 
-### Eventi Sovrapposti
+### Vista Mappa
 
-Il sistema rileva quando gli eventi si sovrappongono nel tempo:
+Passa alla vista mappa per vedere tutti gli eventi e l'alloggio su una mappa interattiva. Usa il pulsante di cambio vista nell'angolo in alto a destra, oppure imposta la preferenza predefinita nelle impostazioni del profilo.
 
-!!! warning "Conflitto di Orario"
-    Esperienza alle 16:00-18:00 si sovrappone con Pasto alle 17:30
+### Riordinare gli Eventi
 
-Rivedi e regola gli orari degli eventi per evitare conflitti.
+Puoi cambiare manualmente l'ordine di visualizzazione degli eventi all'interno di un giorno:
+
+- **Desktop**: Trascina e rilascia gli eventi nella posizione desiderata
+- **Mobile**: Usa il pulsante **↕ Scambia ordine** su ogni scheda evento per selezionare la posizione di destinazione
+
+L'ordine viene salvato automaticamente e usato sia nella vista elenco che nella vista mappa.
 
 ### Eventi Non Associati
 
@@ -272,6 +273,28 @@ Giorno 1: Hotel ABC (Check-in: 15:00)
 Giorno 2: Hotel ABC (in soggiorno)
 Giorno 3: Hotel ABC (Check-out: 11:00)
 ```
+
+## Viaggi Multi-Destinazione
+
+Se il tuo viaggio tocca più città o regioni, puoi assegnare una **destinazione** a ciascun giorno. I giorni con la stessa destinazione consecutiva vengono raggruppati nella panoramica viaggio.
+
+### Assegnare una Destinazione a un Giorno
+
+1. Apri la pagina dettaglio viaggio
+2. Clicca **Gestisci Destinazioni** (o il badge destinazione su un gruppo di giorni)
+3. Modifica la città per ogni giorno
+4. Salva
+
+### Tappe
+
+Una **tappa** è un gruppo di giorni consecutivi con la stessa destinazione. Puoi creare tappe dal modal delle destinazioni:
+
+1. Clicca **Gestisci Destinazioni**
+2. Usa i controlli tappa per creare, rinominare o eliminare tappe
+3. Ogni tappa mostra la destinazione, la durata e le informazioni sul trasferimento verso la tappa successiva
+
+!!! tip "Distanza e Durata Trasferimento"
+    Quando due tappe consecutive hanno destinazioni geocodificate, Organize It calcola automaticamente la distanza stradale e il tempo di guida stimato tra di esse.
 
 ## Statistiche Giorno
 

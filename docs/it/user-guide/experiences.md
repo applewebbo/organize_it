@@ -43,27 +43,23 @@ Un'**Esperienza** è qualsiasi attività pianificata durante il viaggio, come:
 - Esempio: "Tour del Colosseo", "Museo del Louvre", "Crociera sulla Senna"
 - Massimo 100 caratteri
 
+### Campi Opzionali
+
 **Orario Inizio**
 - Quando inizia l'esperienza
 - Esempio: 09:30, 14:00, 16:30
-- Utilizzato per ordinamento timeline e rilevamento sovrapposizioni
+- Utilizzato per l'ordinamento all'interno del giorno
 
-**Orario Fine**
-- Quando termina l'esperienza
-- Deve essere successivo all'orario di inizio
-- Esempio: 11:30, 16:00, 18:30
-- La durata viene calcolata automaticamente
+**Durata**
+- Durata stimata dell'esperienza
+- Menù a tendina: Non specificata, 30 min, 1h, 1h 30min, … fino a 7h 30min
+- Usata per stimare l'ora di fine nella timeline
 
-**Tipo Esperienza**
-- Categoria dell'esperienza
-- Opzioni:
-  - **Museum** - Musei, gallerie, mostre
-  - **Park** - Parchi, giardini, spazi all'aperto
-  - **Walk** - Tour a piedi, passeggiate auto-guidate
-  - **Sport** - Attività sportive, avventure all'aperto
-  - **Other** - Tutto il resto
-
-### Campi Opzionali
+**Tag / Tipo Esperienza**
+- Una breve etichetta per categorizzare l'esperienza (massimo 20 caratteri)
+- Esempi: "Museo", "Passeggiata", "Sport", "Tempo libero"
+- Il completamento automatico suggerisce tag già usati nei tuoi viaggi
+- Mostrato come badge sulla scheda evento
 
 **Indirizzo**
 - Posizione dell'esperienza
@@ -94,6 +90,8 @@ Un'**Esperienza** è qualsiasi attività pianificata durante il viaggio, come:
 - Può essere lasciato vuoto per creare un'esperienza "non associata"
 
 ## Tipi di Esperienza
+
+I tipi di esperienza sono etichette libere — inserisci qualsiasi valore adatto al tuo viaggio. Valori comuni:
 
 ### Museum
 - Gallerie d'arte
@@ -156,42 +154,22 @@ Un'**Esperienza** è qualsiasi attività pianificata durante il viaggio, come:
 
 ## Gestione del Tempo
 
-### Calcolo Durata
+### Ordinamento all'interno del Giorno
 
-La durata viene calcolata automaticamente dagli orari di inizio e fine:
+Gli eventi sono visualizzati in ordine di **orario di inizio**. Gli eventi senza orario appaiono dopo quelli con orario, ordinati per sequenza di creazione.
 
-```
-Orario Inizio: 14:00
-Orario Fine: 16:30
-Durata: 2 ore 30 minuti
-```
-
-### Sovrapposizioni Orarie
-
-Il sistema rileva quando le esperienze si sovrappongono con altri eventi:
-
-!!! warning "Sovrapposizione Rilevata"
-    Esperienza alle 16:00-18:00 si sovrappone con Pasto alle 17:30
-
-**Sovrapposizioni comuni**:
-- Esperienza sconfina nella prenotazione pasto
-- Esperienze consecutive senza tempo di viaggio
-- Esperienza in conflitto con orari trasferimento
-
-**Soluzioni**:
-- Regola orari inizio/fine
-- Riordina eventi
-- Dividi esperienze lunghe in più sessioni
-- Lascia tempo cuscinetto tra eventi
+Puoi riordinare manualmente gli eventi nella pagina dettaglio giorno tramite **trascinamento** (desktop) o il pulsante **scambia ordine** (mobile).
 
 ### Pianificare Durate Realistiche
 
+Imposta il campo **Durata** con una stima realistica:
+
 ✅ **Buone pratiche**:
-- Visita museo: 2-3 ore
-- Tour a piedi: 2-4 ore
-- Visita parco: 1-2 ore
+- Visita museo: 2–3 ore
+- Tour a piedi: 2–4 ore
+- Visita parco: 1–2 ore
 - Shopping veloce: 1 ora
-- Spettacolo/performance: Durata effettiva + 30 min cuscinetto
+- Spettacolo/performance: durata effettiva + 30 min cuscinetto
 
 ❌ **Troppo ottimistico**:
 - Museo importante: 30 minuti (troppo breve)

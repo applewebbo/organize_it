@@ -42,25 +42,26 @@ Un **Pasto** è qualsiasi evento culinario durante il tuo viaggio, inclusi:
 - Esempio: "Trattoria da Enzo", "Le Bernardin", "Tour Street Food"
 - Massimo 100 caratteri
 
-**Ora Inizio**
-- Orario di prenotazione o previsto per il pasto
-- Esempio: 12:30, 19:00, 20:30
-- Utilizzato per l'ordinamento della timeline
-
-**Ora Fine**
-- Fine prevista del pasto
-- Esempio: 14:00, 21:00, 22:00
-- Pianifica durate realistiche (1-2 ore tipicamente)
-
 **Tipo di Pasto**
 - Tipo di pasto
 - Opzioni:
-  - **Colazione** - Pasto mattutino (tipicamente 7:00-11:00)
-  - **Pranzo** - Pasto a mezzogiorno (tipicamente 12:00-15:00)
-  - **Cena** - Pasto serale (tipicamente 18:00-23:00)
+  - **Colazione** - Pasto mattutino (tipicamente 7:00–11:00)
+  - **Pranzo** - Pasto a mezzogiorno (tipicamente 12:00–15:00)
+  - **Cena** - Pasto serale (tipicamente 18:00–23:00)
   - **Snack** - Spuntini veloci, caffè, dessert
+- Mostrato come badge sulla scheda evento
 
 ### Campi Opzionali
+
+**Ora Inizio**
+- Orario di prenotazione o previsto per il pasto
+- Esempio: 12:30, 19:00, 20:30
+- Utilizzato per l'ordinamento all'interno del giorno
+
+**Durata**
+- Durata stimata del pasto
+- Menù a tendina: Non specificata, 30 min, 1h, … fino a 7h 30min
+- Valori tipici: 30–60 min per colazione/snack, 1–2h per pranzo, 1.5–3h per cena
 
 **Indirizzo**
 - Posizione del ristorante
@@ -315,22 +316,22 @@ Crea pasti senza assegnarli a un giorno:
 
 ### Timing Realistico
 
-**Colazione**: 30-60 minuti
+**Colazione**: 30–60 minuti
 ```
-Inizio: 08:00
-Fine: 08:45
-```
-
-**Pranzo casual**: 1-1.5 ore
-```
-Inizio: 12:30
-Fine: 14:00
+Ora Inizio: 08:00
+Durata: 1h
 ```
 
-**Alta cucina**: 2-3 ore
+**Pranzo casual**: 1–1.5 ore
 ```
-Inizio: 20:00
-Fine: 23:00
+Ora Inizio: 12:30
+Durata: 1h 30min
+```
+
+**Alta cucina**: 2–3 ore
+```
+Ora Inizio: 20:00
+Durata: 3h
 ```
 
 !!! tip "Aggiungi Tempo Extra"

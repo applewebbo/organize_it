@@ -43,27 +43,23 @@ An **Experience** is any planned activity during your trip, such as:
 - Example: "Colosseum Tour", "Louvre Museum", "Seine River Cruise"
 - Max 100 characters
 
+### Optional Fields
+
 **Start Time**
 - When the experience begins
 - Example: 09:30, 14:00, 16:30
-- Used for timeline ordering and overlap detection
+- Used for display ordering within the day
 
-**End Time**
-- When the experience ends
-- Must be after start time
-- Example: 11:30, 16:00, 18:30
-- Duration is automatically calculated
+**Duration**
+- Estimated length of the experience
+- Dropdown: Not specified, 30 min, 1h, 1h 30min, … up to 7h 30min
+- Used to estimate end time on the timeline
 
-**Experience Type**
-- Category of the experience
-- Options:
-  - **Museum** - Museums, galleries, exhibitions
-  - **Park** - Parks, gardens, outdoor spaces
-  - **Walk** - Walking tours, self-guided walks
-  - **Sport** - Sports activities, outdoor adventures
-  - **Other** - Everything else
-
-### Optional Fields
+**Tag / Experience Type**
+- A short label to categorise the experience (max 20 characters)
+- Examples: "Museum", "Walk", "Sport", "Free time"
+- Autocomplete suggests tags already used in your trips
+- Shown as a badge on the event card
 
 **Address**
 - Location of the experience
@@ -94,6 +90,8 @@ An **Experience** is any planned activity during your trip, such as:
 - Can be left blank to create an "unpaired" experience
 
 ## Experience Types
+
+Experience types are free-form tags — type any label that fits your trip. Common values:
 
 ### Museum
 - Art galleries
@@ -156,47 +154,27 @@ An **Experience** is any planned activity during your trip, such as:
 
 ## Time Management
 
-### Duration Calculation
+### Ordering Within a Day
 
-Duration is automatically calculated from start and end times:
+Events are displayed in order of their **start time**. Events without a start time appear after timed ones, sorted by the order you created them.
 
-```
-Start Time: 14:00
-End Time: 16:30
-Duration: 2 hours 30 minutes
-```
-
-### Time Overlaps
-
-The system detects when experiences overlap with other events:
-
-!!! warning "Overlap Detected"
-    Experience at 16:00-18:00 overlaps with Meal at 17:30
-
-**Common overlaps**:
-- Experience runs into meal reservation
-- Back-to-back experiences without travel time
-- Experience conflicts with transfer times
-
-**Solutions**:
-- Adjust start/end times
-- Reorder events
-- Split longer experiences into multiple sessions
-- Leave buffer time between events
+You can manually reorder events on the day detail page via **drag and drop** (desktop) or the **swap order** button (mobile).
 
 ### Planning Realistic Durations
 
+Set the **Duration** field to a realistic estimate:
+
 ✅ **Good practice**:
-- Museum visit: 2-3 hours
-- Walking tour: 2-4 hours
-- Park visit: 1-2 hours
+- Museum visit: 2–3 hours
+- Walking tour: 2–4 hours
+- Park visit: 1–2 hours
 - Quick shopping: 1 hour
-- Show/performance: Actual duration + 30 min buffer
+- Show/performance: actual duration + 30 min buffer
 
 ❌ **Over-optimistic**:
 - Major museum: 30 minutes (too short)
 - Walking tour: 6 hours without breaks
-- Back-to-back without travel time
+- Back-to-back events without travel time
 
 ## Location and Maps
 
@@ -306,8 +284,9 @@ The experience appears in the "Unpaired Events" section. Assign it to a day late
 **Good example**:
 ```
 Name: Colosseum and Roman Forum Tour
-Type: Museum
-Time: 09:00 - 12:30
+Tag: Museum
+Start Time: 09:00
+Duration: 3h 30min
 Address: Piazza del Colosseo, 1, 00184 Rome, Italy
 Notes: Skip-the-line combo ticket. Meeting point: main entrance.
        Includes audio guide. Wear comfortable shoes. Bring water.
@@ -317,8 +296,7 @@ Confirmation: COL-TOUR-2025-0314
 **Incomplete example** (harder to use):
 ```
 Name: Colosseum
-Type: Museum
-Time: 09:00 - 10:00
+Start Time: 09:00
 ```
 
 ### Using Notes Effectively

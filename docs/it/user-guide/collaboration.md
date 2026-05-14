@@ -6,7 +6,7 @@ Organize It ti permette di collaborare ai viaggi con altri utenti. Il proprietar
 
 Quando aggiungi un collaboratore a un viaggio:
 
-- Ottiene **accesso completo in modifica** al viaggio (eventi, alloggi, giorni, link)
+- Può essere assegnato come **Editor** (accesso completo in modifica) o **Visualizzatore** (sola lettura)
 - I suoi contributi vengono contrassegnati con un **badge colorato** sugli eventi e gli alloggi
 - Può vedere il viaggio nella sezione **"Condivisi con me"** nella homepage
 - Il proprietario mantiene la proprietà e può rimuovere i collaboratori in qualsiasi momento
@@ -21,9 +21,21 @@ Puoi aggiungere un collaboratore direttamente dalla pagina di dettaglio del viag
 2. Clicca il pulsante **Gestisci Collaboratori** nell'intestazione del viaggio
 3. Nel campo di ricerca, digita l'indirizzo email del collaboratore (sono supportate le corrispondenze parziali)
 4. Seleziona l'utente dai risultati
-5. Clicca **Aggiungi**
+5. Scegli il ruolo: **Editor** o **Visualizzatore**
+6. Clicca **Aggiungi**
 
 Il collaboratore viene aggiunto immediatamente e riceve una **notifica via email**.
+
+### Aggiungere un Partecipante Nominale (Senza Account)
+
+Puoi aggiungere persone alla lista partecipanti anche se non hanno un account Organize It e non vuoi invitarle via email:
+
+1. Clicca **Gestisci Collaboratori**
+2. Clicca **Aggiungi partecipante nominale**
+3. Inserisci il loro nome
+4. Salva
+
+I partecipanti nominali appaiono nella sezione collaboratori con un badge colorato, ma non possono accedere all'app. È utile per tenere traccia di chi viaggia con te senza dare accesso al viaggio.
 
 !!! info "Assegnazione del Colore"
     A ogni collaboratore viene assegnato automaticamente un colore univoco da una palette (blu, verde, viola, arancione, rosa, teal, rosso, indaco). Questo colore appare come badge sugli eventi e gli alloggi che crea, rendendo facile vedere chi ha contribuito cosa.
@@ -88,7 +100,8 @@ No. Solo il **proprietario** può eliminare o archiviare un viaggio.
 
 ### Cosa può fare un collaboratore?
 
-I collaboratori hanno le stesse autorizzazioni di modifica del proprietario per i contenuti del viaggio (eventi, alloggi, giorni, link), ma non possono eliminare il viaggio, modificarne le date o gestire altri collaboratori.
+- **Editor**: stesse autorizzazioni di modifica del proprietario per i contenuti del viaggio (eventi, alloggi, giorni, link). Non può eliminare il viaggio, modificarne le date o gestire altri collaboratori.
+- **Visualizzatore**: può vedere tutti i contenuti del viaggio ma non può apportare modifiche.
 
 ### Cosa succede agli eventi creati da un collaboratore rimosso?
 

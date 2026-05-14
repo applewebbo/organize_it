@@ -6,7 +6,7 @@ Organize It lets you collaborate on trips with other users. The trip owner can i
 
 When you add a collaborator to a trip:
 
-- They gain **full edit access** to the trip (events, stays, days, links)
+- They can be assigned as **Editor** (full edit access) or **Viewer** (read-only)
 - Their contributions are marked with a **colored badge** on events and stays
 - They can see the trip in their **"Shared with me"** section on the homepage
 - The trip owner retains ownership and can remove collaborators at any time
@@ -21,9 +21,21 @@ You can add a collaborator directly from the trip detail page.
 2. Click the **Manage Collaborators** button in the trip header
 3. In the search field, type the collaborator's email address (partial matches are supported)
 4. Select the user from the results
-5. Click **Add**
+5. Choose their role: **Editor** or **Viewer**
+6. Click **Add**
 
 The collaborator is immediately added and receives an **email notification**.
+
+### Adding a Named Participant (No Account Required)
+
+You can add people to the participants list even if they don't have an Organize It account and you don't want to invite them by email:
+
+1. Click **Manage Collaborators**
+2. Click **Add named participant**
+3. Enter their name
+4. Save
+
+Named participants appear in the collaborators section with a color badge but cannot log in or access the trip. This is useful for tracking who is travelling with you without giving them app access.
 
 !!! info "Color Assignment"
     Each collaborator is automatically assigned a unique color from a palette (blue, green, purple, orange, pink, teal, red, indigo). This color appears as a badge on events and stays they create, making it easy to see who contributed what.
@@ -88,7 +100,8 @@ No. Only the **owner** can delete or archive a trip.
 
 ### What can a collaborator do?
 
-Collaborators have the same edit permissions as the owner for trip content (events, stays, days, links), but cannot delete the trip, change its dates, or manage other collaborators.
+- **Editor**: Same edit permissions as the owner for trip content (events, stays, days, links). Cannot delete the trip, change its dates, or manage other collaborators.
+- **Viewer**: Can view all trip content but cannot make any changes.
 
 ### What happens to events created by a removed collaborator?
 
