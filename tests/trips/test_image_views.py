@@ -11,7 +11,7 @@ pytestmark = pytest.mark.django_db
 class TestSearchTripImages:
     """Tests for search_trip_images view"""
 
-    @patch("trips.views.search_unsplash_photos")
+    @patch("trips.views.trips.search_unsplash_photos")
     def test_search_trip_images_success(
         self, mock_search, client, user_factory, trip_factory
     ):
@@ -38,7 +38,7 @@ class TestSearchTripImages:
         assert b"photo123" in response.content
         mock_search.assert_called_once_with("Paris", per_page=3)
 
-    @patch("trips.views.search_unsplash_photos")
+    @patch("trips.views.trips.search_unsplash_photos")
     def test_search_trip_images_empty_query(self, mock_search, client, user_factory):
         """Test search with empty destination"""
         user = user_factory()
@@ -54,7 +54,7 @@ class TestSearchTripImages:
         assert b"Please enter a destination first" in response.content
         mock_search.assert_not_called()
 
-    @patch("trips.views.search_unsplash_photos")
+    @patch("trips.views.trips.search_unsplash_photos")
     def test_search_trip_images_api_error(self, mock_search, client, user_factory):
         """Test search when Unsplash API returns error"""
         user = user_factory()
@@ -71,7 +71,7 @@ class TestSearchTripImages:
         assert response.status_code == 200
         assert b"Unsplash API error" in response.content
 
-    @patch("trips.views.search_unsplash_photos")
+    @patch("trips.views.trips.search_unsplash_photos")
     def test_search_trip_images_no_results(self, mock_search, client, user_factory):
         """Test search with no results"""
         user = user_factory()

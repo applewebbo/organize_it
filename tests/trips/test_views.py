@@ -920,7 +920,7 @@ class ValidateDatesViewTests(TestCase):
 
 
 class GeocodeAddressViewTests(TestCase):
-    @patch("trips.views.geocode_location")
+    @patch("trips.views.maps.geocode_location")
     def test_geocode_address_post_found(self, mock_geocode_location):
         from django.urls import reverse
 
@@ -943,7 +943,7 @@ class GeocodeAddressViewTests(TestCase):
         assert b"Hotel Roma" in response.content
         assert b"Via Roma 1, Rome" in response.content
 
-    @patch("trips.views.geocode_location")
+    @patch("trips.views.maps.geocode_location")
     def test_geocode_address_post_not_found(self, mock_geocode_location):
         from django.urls import reverse
 
@@ -984,7 +984,7 @@ class GeocodeAddressViewTests(TestCase):
 
 
 class GeocodeCityViewTests(TestCase):
-    @patch("trips.views.geocode_city")
+    @patch("trips.views.maps.geocode_city")
     def test_geocode_city_post_found(self, mock_geocode_city):
         mock_geocode_city.return_value = [
             {
@@ -1003,7 +1003,7 @@ class GeocodeCityViewTests(TestCase):
         assert response.status_code == 200
         assert b"Roma" in response.content
 
-    @patch("trips.views.geocode_city")
+    @patch("trips.views.maps.geocode_city")
     def test_geocode_city_post_not_found(self, mock_geocode_city):
         mock_geocode_city.return_value = []
         user = self.make_user("user")

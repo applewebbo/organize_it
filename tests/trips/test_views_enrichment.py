@@ -34,8 +34,8 @@ class SingleEventViewTest(TestCase):
         assert response.context["event"] == event
 
 
-@patch("trips.views.requests.get")
-@patch("trips.views.requests.post")
+@patch("trips.services.requests.get")
+@patch("trips.services.requests.post")
 class EnrichEventViewTest(TestCase):
     """Test cases for enrich_event view"""
 
@@ -424,8 +424,8 @@ class ConfirmEnrichEventViewTest(TestCase):
         assert event.enriched is False
 
 
-@patch("trips.views.requests.get")
-@patch("trips.views.requests.post")
+@patch("trips.services.requests.get")
+@patch("trips.services.requests.post")
 class EnrichStayViewTest(TestCase):
     """Test cases for enrich_stay view"""
 

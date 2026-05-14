@@ -92,7 +92,7 @@ class MapSearchViewTest(TestCase):
         user = self.make_user("user@example.com")
         trip = TripFactory(author=user)
         with self.login(user):
-            with patch("trips.views.GooglePlacesClient") as MockClient:
+            with patch("trips.views.maps.GooglePlacesClient") as MockClient:
                 MockClient.return_value.search_text.return_value = MOCK_PLACES
                 response = self.post(
                     "trips:map-search",
@@ -119,7 +119,7 @@ class MapSearchViewTest(TestCase):
         user = self.make_user("user@example.com")
         trip = TripFactory(author=user)
         with self.login(user):
-            with patch("trips.views.GooglePlacesClient") as MockClient:
+            with patch("trips.views.maps.GooglePlacesClient") as MockClient:
                 MockClient.return_value.search_text.side_effect = GooglePlacesError(
                     "API error"
                 )
@@ -505,7 +505,7 @@ class TripLocationBiasTest(TestCase):
         )
 
         with self.login(user):
-            with patch("trips.views.GooglePlacesClient") as MockClient:
+            with patch("trips.views.maps.GooglePlacesClient") as MockClient:
                 MockClient.return_value.search_text.return_value = []
                 self.post("trips:map-search", pk=trip.pk, data={"query": "museo"})
 
@@ -524,8 +524,8 @@ class TripLocationBiasTest(TestCase):
         mock_geo.latlng = [45.07, 7.68]
 
         with self.login(user):
-            with patch("trips.views.GooglePlacesClient") as MockClient:
-                with patch("trips.views.geocoder.mapbox", return_value=mock_geo):
+            with patch("trips.views.maps.GooglePlacesClient") as MockClient:
+                with patch("trips.views.maps.geocoder.mapbox", return_value=mock_geo):
                     MockClient.return_value.search_text.return_value = []
                     self.post("trips:map-search", pk=trip.pk, data={"query": "museo"})
 
@@ -542,8 +542,8 @@ class TripLocationBiasTest(TestCase):
         mock_geo.latlng = None  # geocoder finds nothing
 
         with self.login(user):
-            with patch("trips.views.GooglePlacesClient") as MockClient:
-                with patch("trips.views.geocoder.mapbox", return_value=mock_geo):
+            with patch("trips.views.maps.GooglePlacesClient") as MockClient:
+                with patch("trips.views.maps.geocoder.mapbox", return_value=mock_geo):
                     MockClient.return_value.search_text.return_value = []
                     self.post("trips:map-search", pk=trip.pk, data={"query": "museo"})
 
@@ -556,7 +556,7 @@ class TripLocationBiasTest(TestCase):
         trip = TripFactory(author=user, destination="")  # no destination, no events
 
         with self.login(user):
-            with patch("trips.views.GooglePlacesClient") as MockClient:
+            with patch("trips.views.maps.GooglePlacesClient") as MockClient:
                 MockClient.return_value.search_text.return_value = []
                 self.post("trips:map-search", pk=trip.pk, data={"query": "museo"})
 

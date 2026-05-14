@@ -466,7 +466,7 @@ class TestTrainStatusRedirect(TestCase):
         mock_resp = MagicMock()
         mock_resp.ok = True
         mock_resp.text = "2822 - ROMA TERMINI - 23/03/26|2822-S00219-1774220400000"
-        with patch("trips.views.requests.get", return_value=mock_resp):
+        with patch("trips.views.transfers.requests.get", return_value=mock_resp):
             with self.login(user):
                 response = self.client.get(url)
         assert response.status_code == 302
@@ -492,7 +492,9 @@ class TestTrainStatusRedirect(TestCase):
         station_resp.ok = True
         station_resp.json.return_value = [{"id": "S00219", "nomeLungo": "ROMA TERMINI"}]
 
-        with patch("trips.views.requests.get", side_effect=[train_resp, station_resp]):
+        with patch(
+            "trips.views.transfers.requests.get", side_effect=[train_resp, station_resp]
+        ):
             with self.login(user):
                 response = self.client.get(url)
         assert response.status_code == 302
@@ -514,7 +516,8 @@ class TestTrainStatusRedirect(TestCase):
         station_resp.json.return_value = [{"id": "S00219", "nomeLungo": "ROMA TERMINI"}]
 
         with patch(
-            "trips.views.requests.get", side_effect=[Exception("timeout"), station_resp]
+            "trips.views.transfers.requests.get",
+            side_effect=[Exception("timeout"), station_resp],
         ):
             with self.login(user):
                 response = self.client.get(url)
@@ -536,7 +539,7 @@ class TestTrainStatusRedirect(TestCase):
         station_resp.ok = True
         station_resp.json.return_value = [{"id": "S00219", "nomeLungo": "ROMA TERMINI"}]
 
-        with patch("trips.views.requests.get", return_value=station_resp):
+        with patch("trips.views.transfers.requests.get", return_value=station_resp):
             with self.login(user):
                 response = self.client.get(url)
         assert response.status_code == 302
@@ -553,7 +556,9 @@ class TestTrainStatusRedirect(TestCase):
         )
         url = reverse("trips:train-status-redirect", kwargs={"pk": transfer.pk})
 
-        with patch("trips.views.requests.get", side_effect=Exception("timeout")):
+        with patch(
+            "trips.views.transfers.requests.get", side_effect=Exception("timeout")
+        ):
             with self.login(user):
                 response = self.client.get(url)
         assert response.status_code == 302
@@ -574,7 +579,7 @@ class TestTrainStatusRedirect(TestCase):
         station_resp.ok = True
         station_resp.json.return_value = []
 
-        with patch("trips.views.requests.get", return_value=station_resp):
+        with patch("trips.views.transfers.requests.get", return_value=station_resp):
             with self.login(user):
                 response = self.client.get(url)
         assert response.status_code == 302
@@ -599,7 +604,9 @@ class TestTrainStatusRedirect(TestCase):
         station_resp.ok = True
         station_resp.json.return_value = [{"id": "S00219", "nomeLungo": "ROMA TERMINI"}]
 
-        with patch("trips.views.requests.get", side_effect=[train_resp, station_resp]):
+        with patch(
+            "trips.views.transfers.requests.get", side_effect=[train_resp, station_resp]
+        ):
             with self.login(user):
                 response = self.client.get(url)
         assert response.status_code == 302
@@ -619,7 +626,7 @@ class TestTrainStatusRedirect(TestCase):
         station_resp = MagicMock()
         station_resp.ok = False  # Not ok → skip to homepage
 
-        with patch("trips.views.requests.get", return_value=station_resp):
+        with patch("trips.views.transfers.requests.get", return_value=station_resp):
             with self.login(user):
                 response = self.client.get(url)
         assert response.status_code == 302

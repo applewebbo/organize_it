@@ -13,9 +13,9 @@ pytestmark = pytest.mark.django_db
 class TestTripCreateImageHandling:
     """Tests for image handling in trip_create view"""
 
-    @patch("trips.views.process_trip_image")
-    @patch("trips.views.download_unsplash_photo")
-    @patch("trips.views.search_unsplash_photos")
+    @patch("trips.views.trips.process_trip_image")
+    @patch("trips.views.trips.download_unsplash_photo")
+    @patch("trips.views.trips.search_unsplash_photos")
     def test_create_with_unsplash_photo_success(
         self, mock_search, mock_download, mock_process, client, user_factory
     ):
@@ -75,9 +75,9 @@ class TestTripCreateImageHandling:
 class TestTripUpdateImageHandling:
     """Tests for image handling in trip_update view"""
 
-    @patch("trips.views.process_trip_image")
-    @patch("trips.views.download_unsplash_photo")
-    @patch("trips.views.search_unsplash_photos")
+    @patch("trips.views.trips.process_trip_image")
+    @patch("trips.views.trips.download_unsplash_photo")
+    @patch("trips.views.trips.search_unsplash_photos")
     def test_update_with_unsplash_photo_success(
         self,
         mock_search,
@@ -143,7 +143,7 @@ class TestTripUpdateImageHandling:
 class TestTripFileUpload:
     """Tests for direct file upload in trip views"""
 
-    @patch("trips.views.process_trip_image")
+    @patch("trips.views.trips.process_trip_image")
     def test_create_with_file_upload(self, mock_process, client, user_factory):
         """Test creating trip with file upload via FILES"""
         from io import BytesIO
@@ -182,7 +182,7 @@ class TestTripFileUpload:
         # The code path should be hit if FILES contains 'image'
         assert response.status_code in [200, 204, 302]
 
-    @patch("trips.views.process_trip_image")
+    @patch("trips.views.trips.process_trip_image")
     def test_update_with_file_upload(
         self, mock_process, client, trip_factory, user_factory
     ):
@@ -222,9 +222,9 @@ class TestTripFileUpload:
 
         assert response.status_code in [200, 204, 302]
 
-    @patch("trips.views.process_trip_image")
-    @patch("trips.views.download_unsplash_photo")
-    @patch("trips.views.search_unsplash_photos")
+    @patch("trips.views.trips.process_trip_image")
+    @patch("trips.views.trips.download_unsplash_photo")
+    @patch("trips.views.trips.search_unsplash_photos")
     def test_create_file_upload_overrides_unsplash(
         self, mock_search, mock_download, mock_process, client, user_factory
     ):
@@ -285,9 +285,9 @@ class TestTripFileUpload:
         # process_trip_image should be called for file upload (overriding Unsplash)
         assert mock_process.call_count >= 1
 
-    @patch("trips.views.process_trip_image")
-    @patch("trips.views.download_unsplash_photo")
-    @patch("trips.views.search_unsplash_photos")
+    @patch("trips.views.trips.process_trip_image")
+    @patch("trips.views.trips.download_unsplash_photo")
+    @patch("trips.views.trips.search_unsplash_photos")
     def test_update_file_upload_overrides_unsplash(
         self,
         mock_search,
