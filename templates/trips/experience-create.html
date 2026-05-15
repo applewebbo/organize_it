@@ -28,7 +28,8 @@
                         class="btn btn-sm btn-primary"
                         hx-post="{% url 'trips:resolve-maps-link' %}"
                         hx-target="#maps-link-results"
-                        hx-include="[name='maps_link']">{% trans "Search" %}</button>
+                        hx-include="[name='maps_link']"
+                        hx-vals='{"form_type": "experience"}'>{% trans "Search" %}</button>
             </div>
             <div id="maps-link-results"></div>
         </div>

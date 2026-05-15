@@ -564,6 +564,51 @@ _MAPS_PREFIXES = (
     "http://maps.google.com/",
 )
 
+_LODGING_TYPES = frozenset(
+    {
+        "lodging",
+        "hotel",
+        "motel",
+        "hostel",
+        "bed_and_breakfast",
+        "extended_stay_hotel",
+        "resort_hotel",
+        "campground",
+        "inn",
+    }
+)
+
+_FOOD_TYPES = frozenset(
+    {
+        "restaurant",
+        "cafe",
+        "bar",
+        "bakery",
+        "meal_takeaway",
+        "meal_delivery",
+        "coffee_shop",
+        "food",
+        "fast_food_restaurant",
+        "wine_bar",
+        "pub",
+    }
+)
+
+
+def _place_type_warning(form_type: str, place_types: list[str]) -> str | None:
+    """Return a warning code if place types mismatch the form type, else None."""
+    types_set = set(place_types)
+    if form_type == "stay" and not (types_set & _LODGING_TYPES):
+        return "stay_mismatch"
+    if form_type == "meal" and not (types_set & _FOOD_TYPES):
+        return "meal_mismatch"
+    if form_type == "experience":
+        if types_set & _LODGING_TYPES:
+            return "experience_lodging"
+        if types_set & _FOOD_TYPES:
+            return "experience_food"
+    return None
+
 
 @require_http_methods(["POST"])
 def resolve_maps_link(request):
@@ -663,6 +708,9 @@ def resolve_maps_link(request):
             {"error": True},
         )
 
+    form_type = request.POST.get("form_type", "")
+    type_warning = _place_type_warning(form_type, details.types) if form_type else None
+
     place_data_json = json.dumps(
         {
             "name": details.name,
@@ -681,5 +729,6 @@ def resolve_maps_link(request):
         {
             "found": True,
             "place_data_json": place_data_json,
+            "type_warning": type_warning,
         },
     )

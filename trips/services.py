@@ -24,7 +24,7 @@ SEARCH_FIELD_MASK = (
 DETAILS_FIELD_MASK = "websiteUri,internationalPhoneNumber,regularOpeningHours"
 
 # Fields returned for full place details (used by maps link resolver)
-FULL_DETAILS_FIELD_MASK = "displayName,formattedAddress,addressComponents,location,websiteUri,internationalPhoneNumber,regularOpeningHours"
+FULL_DETAILS_FIELD_MASK = "displayName,formattedAddress,addressComponents,location,websiteUri,internationalPhoneNumber,regularOpeningHours,types"
 
 # Cache TTLs in seconds
 _TTL_PLACE_ID = 7 * 24 * 3600  # 7 days — place_id is stable
@@ -56,6 +56,7 @@ class PlaceFullDetails:
     website: str = ""
     phone_number: str = ""
     opening_hours: dict | None = field(default=None)
+    types: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -242,6 +243,7 @@ class GooglePlacesClient:
             website=data.get("websiteUri", ""),
             phone_number=data.get("internationalPhoneNumber", ""),
             opening_hours=convert_google_opening_hours(data.get("regularOpeningHours")),
+            types=data.get("types", []),
         )
         cache.set(cache_key, dataclasses.asdict(result), _TTL_DETAILS)
         return result

@@ -384,6 +384,7 @@ FULL_DETAILS_RESPONSE = {
             },
         ]
     },
+    "types": ["tourist_attraction", "museum", "point_of_interest", "establishment"],
 }
 
 
@@ -473,6 +474,33 @@ class TestGooglePlacesClientGetFullDetails:
         with patch("trips.services.requests.get", side_effect=exc):
             with pytest.raises(GooglePlacesError, match="INVALID_REQUEST"):
                 client.get_full_place_details("ChIJ_place_123")
+
+    def test_returns_types_from_response(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = FULL_DETAILS_RESPONSE
+        mock_resp.raise_for_status.return_value = None
+
+        with patch("trips.services.requests.get", return_value=mock_resp):
+            result = client.get_full_place_details("ChIJ_place_123")
+
+        assert result.types == [
+            "tourist_attraction",
+            "museum",
+            "point_of_interest",
+            "establishment",
+        ]
+
+    def test_types_empty_when_not_in_response(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = {**FULL_DETAILS_RESPONSE, "types": []}
+        mock_resp.raise_for_status.return_value = None
+
+        with patch("trips.services.requests.get", return_value=mock_resp):
+            result = client.get_full_place_details("ChIJ_place_no_types")
+
+        assert result.types == []
 
     def test_cached_on_second_call(self, client, settings):
         settings.GOOGLE_PLACES_API_KEY = "test-key"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-15 09:22+0200\n"
+"POT-Creation-Date: 2026-05-15 10:26+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -131,7 +131,9 @@ msgid "Trip sorting"
 msgstr ""
 
 #: accounts/models.py:125
-msgid "Used to pre-fill the origin/destination field in car transfers. It is not shared or used for any other purpose."
+msgid ""
+"Used to pre-fill the origin/destination field in car transfers. It is not "
+"shared or used for any other purpose."
 msgstr ""
 
 #: accounts/models.py:133
@@ -161,7 +163,9 @@ msgstr ""
 
 #: templates/account/email_confirm.html:13
 #, python-format
-msgid "Please confirm that <a href=\"mailto:%(email)s\">%(email)s</a> is an email address for user %(user_display)s."
+msgid ""
+"Please confirm that <a href=\"mailto:%(email)s\">%(email)s</a> is an email "
+"address for user %(user_display)s."
 msgstr ""
 
 #: templates/account/email_confirm.html:18 templates/trips/event-modal.html:35
@@ -170,12 +174,16 @@ msgstr ""
 
 #: templates/account/email_confirm.html:22
 #, python-format
-msgid "Unable to confirm %(email)s because it is already confirmed by a different account."
+msgid ""
+"Unable to confirm %(email)s because it is already confirmed by a different "
+"account."
 msgstr ""
 
 #: templates/account/email_confirm.html:28
 #, python-format
-msgid "This email confirmation link expired or is invalid. Please <a href=\"%(email_url)s\">issue a new email confirmation request</a>."
+msgid ""
+"This email confirmation link expired or is invalid. Please <a "
+"href=\"%(email_url)s\">issue a new email confirmation request</a>."
 msgstr ""
 
 #: templates/account/includes/home-address-results.html:22
@@ -190,7 +198,8 @@ msgstr ""
 #, python-format
 msgid ""
 "Please sign in with one\n"
-"            of your existing third party accounts. Or, <a href=\"%(signup_url)s\">sign up</a>\n"
+"            of your existing third party accounts. Or, <a "
+"href=\"%(signup_url)s\">sign up</a>\n"
 "            for a %(site_name)s account and sign in below:"
 msgstr ""
 
@@ -204,7 +213,10 @@ msgstr ""
 
 #: templates/account/login.html:48
 #, python-format
-msgid "If you have not created an account yet, then please <a href=\"%(signup_url)s\" class=\"text-blue-600 hover:underline\">Sign up</a> first."
+msgid ""
+"If you have not created an account yet, then please <a "
+"href=\"%(signup_url)s\" class=\"text-blue-600 hover:underline\">Sign up</a> "
+"first."
 msgstr ""
 
 #: templates/account/password_reset.html:5
@@ -215,7 +227,9 @@ msgid "Password Reset"
 msgstr ""
 
 #: templates/account/password_reset.html:23
-msgid "Forgotten your password? Enter your email address below, and we'll send you an email allowing you to reset it."
+msgid ""
+"Forgotten your password? Enter your email address below, and we'll send you "
+"an email allowing you to reset it."
 msgstr ""
 
 #: templates/account/password_reset.html:32
@@ -227,7 +241,9 @@ msgid "Please contact us if you have any trouble resetting your password."
 msgstr ""
 
 #: templates/account/password_reset_done.html:13
-msgid "We have sent you an email. If you have not received it please check your spam folder. Otherwise contact us if you do not receive it in a few minutes."
+msgid ""
+"We have sent you an email. If you have not received it please check your "
+"spam folder. Otherwise contact us if you do not receive it in a few minutes."
 msgstr ""
 
 #: templates/account/password_reset_from_key.html:4
@@ -243,7 +259,10 @@ msgstr ""
 
 #: templates/account/password_reset_from_key.html:25
 #, python-format
-msgid "The password reset link was invalid, possibly because it has already been used.  Please request a <a href=\"%(passwd_reset_url)s\">new password reset</a>."
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a <a href=\"%(passwd_reset_url)s\">new password reset</"
+"a>."
 msgstr ""
 
 #: templates/account/password_reset_from_key.html:36
@@ -272,7 +291,7 @@ msgstr ""
 
 #: templates/account/profile.html:141 templates/trips/event-notes.html:30
 #: templates/trips/experience-create-unpaired.html:25
-#: templates/trips/experience-create.html:59
+#: templates/trips/experience-create.html:60
 #: templates/trips/includes/day-destination-card.html:23
 #: templates/trips/main-transfer-connection-create.html:97
 #: templates/trips/main-transfer-connection-edit.html:73
@@ -286,7 +305,7 @@ msgstr ""
 #: templates/trips/partials/main-transfer-other.html:82
 #: templates/trips/partials/main-transfer-train.html:94
 #: templates/trips/partials/main-transfer-train.html:111
-#: templates/trips/stay-create.html:44 templates/trips/stay-modify.html:19
+#: templates/trips/stay-create.html:45 templates/trips/stay-modify.html:19
 #: templates/trips/stay-note-modify.html:28 templates/trips/stay-notes.html:30
 #: templates/trips/stay-transfer-create.html:65
 #: templates/trips/stay-transfer-edit.html:71
@@ -303,7 +322,8 @@ msgstr ""
 
 #: templates/account/signup.html:19
 #, python-format
-msgid "Already have an account? Then please <a href=\"%(login_url)s\">sign in</a>"
+msgid ""
+"Already have an account? Then please <a href=\"%(login_url)s\">sign in</a>"
 msgstr ""
 
 #: templates/account/verification_sent.html:4
@@ -312,7 +332,11 @@ msgid "Verify Your Email Address"
 msgstr ""
 
 #: templates/account/verification_sent.html:9
-msgid "We have sent an email to you for verification. Follow the link provided to finalize the signup process. If you do not see the verification email in your main inbox, check your spam folder. Please contact us if you do not receive the verification email within a few minutes."
+msgid ""
+"We have sent an email to you for verification. Follow the link provided to "
+"finalize the signup process. If you do not see the verification email in "
+"your main inbox, check your spam folder. Please contact us if you do not "
+"receive the verification email within a few minutes."
 msgstr ""
 
 #: templates/cotton/dropdown.html:7 templates/cotton/dropdown.html:10
@@ -342,7 +366,9 @@ msgid "Ready for your next adventure?"
 msgstr ""
 
 #: templates/cotton/empty_state.html:15
-msgid "Start planning your perfect trip. Organize stays, experiences, meals and transfers all in one place."
+msgid ""
+"Start planning your perfect trip. Organize stays, experiences, meals and "
+"transfers all in one place."
 msgstr ""
 
 #: templates/cotton/empty_state.html:25
@@ -373,7 +399,9 @@ msgid "Trips"
 msgstr ""
 
 #: templates/cotton/quick_guide.html:21
-msgid "A trip is your main container for organizing a journey. Each trip has a destination, dates, and can include multiple days of activities."
+msgid ""
+"A trip is your main container for organizing a journey. Each trip has a "
+"destination, dates, and can include multiple days of activities."
 msgstr ""
 
 #: templates/cotton/quick_guide.html:32
@@ -381,7 +409,9 @@ msgid "Days"
 msgstr ""
 
 #: templates/cotton/quick_guide.html:35
-msgid "Days are automatically generated based on your trip dates. Each day can contain multiple events like experiences, meals, and transfers."
+msgid ""
+"Days are automatically generated based on your trip dates. Each day can "
+"contain multiple events like experiences, meals, and transfers."
 msgstr ""
 
 #: templates/cotton/quick_guide.html:46
@@ -389,7 +419,9 @@ msgid "Stays"
 msgstr ""
 
 #: templates/cotton/quick_guide.html:49
-msgid "Stays are your accommodations during the trip. Add hotels, apartments, hostels, or any place where you'll be staying."
+msgid ""
+"Stays are your accommodations during the trip. Add hotels, apartments, "
+"hostels, or any place where you'll be staying."
 msgstr ""
 
 #: templates/cotton/quick_guide.html:60
@@ -397,7 +429,9 @@ msgid "Experiences"
 msgstr ""
 
 #: templates/cotton/quick_guide.html:63
-msgid "Experiences are activities, tours, museums, walks, and any memorable moment during your trip."
+msgid ""
+"Experiences are activities, tours, museums, walks, and any memorable moment "
+"during your trip."
 msgstr ""
 
 #: templates/cotton/quick_guide.html:74
@@ -405,7 +439,9 @@ msgid "Meals"
 msgstr ""
 
 #: templates/cotton/quick_guide.html:77
-msgid "Meals help you plan where to eat during your trip. Add restaurants, cafes, street food spots, or any dining experience."
+msgid ""
+"Meals help you plan where to eat during your trip. Add restaurants, cafes, "
+"street food spots, or any dining experience."
 msgstr ""
 
 #: templates/cotton/quick_guide.html:89 trips/models.py:351
@@ -413,7 +449,9 @@ msgid "Main Transfers"
 msgstr ""
 
 #: templates/cotton/quick_guide.html:92
-msgid "Main transfers are your arrival and departure journeys. Add flight, train, or other transport details to reach your destination and return home."
+msgid ""
+"Main transfers are your arrival and departure journeys. Add flight, train, "
+"or other transport details to reach your destination and return home."
 msgstr ""
 
 #: templates/cotton/quick_guide.html:103
@@ -421,7 +459,9 @@ msgid "Local Transfers"
 msgstr ""
 
 #: templates/cotton/quick_guide.html:106
-msgid "Local transfers help you move between accommodations and events during your trip. Add transfers between stays or between daily activities."
+msgid ""
+"Local transfers help you move between accommodations and events during your "
+"trip. Add transfers between stays or between daily activities."
 msgstr ""
 
 #: templates/cotton/quick_guide.html:117
@@ -431,7 +471,9 @@ msgid "Collaboration"
 msgstr "Collaborators"
 
 #: templates/cotton/quick_guide.html:120
-msgid "Invite friends or family to co-edit your trip. Each collaborator gets a unique color badge on their contributions so you can see who added what."
+msgid ""
+"Invite friends or family to co-edit your trip. Each collaborator gets a "
+"unique color badge on their contributions so you can see who added what."
 msgstr ""
 
 #: templates/cotton/quick_guide.html:132
@@ -439,7 +481,9 @@ msgid "Sharing"
 msgstr ""
 
 #: templates/cotton/quick_guide.html:135
-msgid "Share a read-only view of your trip with anyone via a secure magic link — no account required to view."
+msgid ""
+"Share a read-only view of your trip with anyone via a secure magic link — no "
+"account required to view."
 msgstr ""
 
 #: templates/cotton/quick_guide.html:142
@@ -455,7 +499,10 @@ msgid "Organize your next trip!"
 msgstr ""
 
 #: templates/includes/anonymous-index.html:9
-msgid "Register experiences, stays and transports. Keep links and notes about them. Organize them by day and look at a map to set up your next journey. Share the journey plan with your friends and family."
+msgid ""
+"Register experiences, stays and transports. Keep links and notes about them. "
+"Organize them by day and look at a map to set up your next journey. Share "
+"the journey plan with your friends and family."
 msgstr ""
 
 #: templates/includes/anonymous-index.html:13
@@ -584,7 +631,9 @@ msgstr ""
 
 #: templates/trips/email/added_as_collaborator_body.html:18
 #, python-format
-msgid "%(email)s has added you as a collaborator on the trip <strong>%(title)s</strong>."
+msgid ""
+"%(email)s has added you as a collaborator on the trip <strong>%(title)s</"
+"strong>."
 msgstr ""
 
 #: templates/trips/email/added_as_collaborator_body.html:20
@@ -601,7 +650,9 @@ msgstr "Open map"
 
 #: templates/trips/email/added_as_collaborator_body.html:25
 #: templates/trips/email/added_as_collaborator_body.txt:8
-msgid "You received this email because someone invited you to collaborate on a trip in Organize It."
+msgid ""
+"You received this email because someone invited you to collaborate on a trip "
+"in Organize It."
 msgstr ""
 
 #: templates/trips/email/added_as_collaborator_body.txt:1
@@ -625,17 +676,23 @@ msgstr ""
 
 #: templates/trips/email/invitation_accepted_body.html:19
 #, python-format
-msgid "%(email)s has accepted your invitation and is now a collaborator on <strong>%(title)s</strong>."
+msgid ""
+"%(email)s has accepted your invitation and is now a collaborator on "
+"<strong>%(title)s</strong>."
 msgstr ""
 
 #: templates/trips/email/invitation_accepted_body.html:25
 #: templates/trips/email/invitation_accepted_body.txt:6
-msgid "You received this email because someone accepted your collaboration invitation in Organize It."
+msgid ""
+"You received this email because someone accepted your collaboration "
+"invitation in Organize It."
 msgstr ""
 
 #: templates/trips/email/invitation_accepted_body.txt:1
 #, python-format
-msgid "%(email)s has accepted your invitation and is now a collaborator on \"%(title)s\"."
+msgid ""
+"%(email)s has accepted your invitation and is now a collaborator on "
+"\"%(title)s\"."
 msgstr ""
 
 #: templates/trips/email/invitation_accepted_subject.txt:1
@@ -654,11 +711,15 @@ msgstr ""
 
 #: templates/trips/email/invitation_body.html:19
 #, python-format
-msgid "%(email)s has invited you to collaborate on the trip <strong>%(title)s</strong>."
+msgid ""
+"%(email)s has invited you to collaborate on the trip <strong>%(title)s</"
+"strong>."
 msgstr ""
 
 #: templates/trips/email/invitation_body.html:22
-msgid "To accept the invitation and join the trip, click the button below. You will need to create an account if you don't have one yet."
+msgid ""
+"To accept the invitation and join the trip, click the button below. You will "
+"need to create an account if you don't have one yet."
 msgstr ""
 
 #: templates/trips/email/invitation_body.html:25
@@ -683,7 +744,9 @@ msgid "%(email)s has invited you to collaborate on the trip \"%(title)s\"."
 msgstr ""
 
 #: templates/trips/email/invitation_body.txt:3
-msgid "To accept the invitation and join the trip, visit the link below. You will need to create an account if you don't have one yet."
+msgid ""
+"To accept the invitation and join the trip, visit the link below. You will "
+"need to create an account if you don't have one yet."
 msgstr ""
 
 #: templates/trips/email/invitation_subject.txt:1
@@ -760,7 +823,8 @@ msgstr ""
 
 #: templates/trips/event-enrich-preview.html:25
 #: templates/trips/stay-enrich-preview.html:17
-msgid "Review the enriched data below. New information is highlighted in green."
+msgid ""
+"Review the enriched data below. New information is highlighted in green."
 msgstr ""
 
 #: templates/trips/event-enrich-preview.html:55
@@ -771,7 +835,7 @@ msgstr ""
 #: templates/trips/event-enrich-preview.html:63
 #: templates/trips/event-modal.html:29
 #: templates/trips/experience-create-unpaired.html:24
-#: templates/trips/experience-create.html:58
+#: templates/trips/experience-create.html:59
 #: templates/trips/includes/trip-destinations-modal.html:60
 #: templates/trips/main-transfer-connection-create.html:96
 #: templates/trips/main-transfer-connection-edit.html:72
@@ -782,7 +846,7 @@ msgstr ""
 #: templates/trips/partials/main-transfer-other.html:63
 #: templates/trips/partials/main-transfer-train.html:92
 #: templates/trips/partials/main-transfer-type.html:63
-#: templates/trips/stay-create.html:47
+#: templates/trips/stay-create.html:48
 #: templates/trips/stay-enrich-preview.html:47
 #: templates/trips/stay-modify.html:18
 #: templates/trips/stay-transfer-create.html:64
@@ -806,7 +870,10 @@ msgid "You are deleting %(name)s permanently."
 msgstr ""
 
 #: templates/trips/event-modal.html:23
-msgid "This action cannot be undone. You can alternatively unpair from this day and reuse later by reassigning to a day of your trip. If you are sure to proceed just click confirm."
+msgid ""
+"This action cannot be undone. You can alternatively unpair from this day and "
+"reuse later by reassigning to a day of your trip. If you are sure to proceed "
+"just click confirm."
 msgstr ""
 
 #: templates/trips/event-modal.html:32
@@ -836,12 +903,12 @@ msgstr "Google Maps"
 msgid "Paste a Google Maps link to auto-fill"
 msgstr "Paste a Google Maps link to auto-fill"
 
-#: templates/trips/experience-create.html:31
-#: templates/trips/meal-create.html:37 templates/trips/stay-create.html:37
+#: templates/trips/experience-create.html:32
+#: templates/trips/meal-create.html:38 templates/trips/stay-create.html:38
 msgid "Search"
 msgstr ""
 
-#: templates/trips/experience-create.html:39
+#: templates/trips/experience-create.html:40
 msgid "Unpaired Experiences"
 msgstr ""
 
@@ -1192,7 +1259,23 @@ msgstr ""
 msgid "Location found! Fields have been pre-filled."
 msgstr "Location found! Fields have been pre-filled."
 
-#: templates/trips/includes/maps-link-prefill.html:14
+#: templates/trips/includes/maps-link-prefill.html:15
+msgid "This place doesn't look like an accommodation."
+msgstr "This place doesn't look like an accommodation."
+
+#: templates/trips/includes/maps-link-prefill.html:17
+msgid "This place doesn't look like a restaurant or café."
+msgstr "This place doesn't look like a restaurant or café."
+
+#: templates/trips/includes/maps-link-prefill.html:19
+msgid "This looks like an accommodation, not an experience."
+msgstr "This looks like an accommodation, not an experience."
+
+#: templates/trips/includes/maps-link-prefill.html:21
+msgid "This looks like a restaurant or café, not an experience."
+msgstr "This looks like a restaurant or café, not an experience."
+
+#: templates/trips/includes/maps-link-prefill.html:31
 msgid "Oops! Location not recognised, fill in the details manually."
 msgstr "Oops! Location not recognised, fill in the details manually."
 
@@ -1393,11 +1476,15 @@ msgid "Are you sure you want to delete this connection?"
 msgstr ""
 
 #: templates/trips/main-transfer-connection-modal.html:53
-msgid "No events or stays available on the first day. Please create an event or stay first, then you can add a connection from your arrival transfer."
+msgid ""
+"No events or stays available on the first day. Please create an event or "
+"stay first, then you can add a connection from your arrival transfer."
 msgstr ""
 
 #: templates/trips/main-transfer-connection-modal.html:55
-msgid "No events or stays available on the last day. Please create an event or stay first, then you can add a connection to your departure transfer."
+msgid ""
+"No events or stays available on the last day. Please create an event or stay "
+"first, then you can add a connection to your departure transfer."
 msgstr ""
 
 #: templates/trips/main-transfer-connection-modal.html:62
@@ -1425,7 +1512,7 @@ msgstr ""
 msgid "Create a new Meal"
 msgstr ""
 
-#: templates/trips/meal-create.html:45
+#: templates/trips/meal-create.html:46
 msgid "Unpaired Meals"
 msgstr ""
 
@@ -1660,7 +1747,9 @@ msgid "Create a New Trip"
 msgstr ""
 
 #: templates/trips/trip-create.html:34
-msgid "Changing the dates may remove some days. Events on removed days will become unpaired and can be reassigned later."
+msgid ""
+"Changing the dates may remove some days. Events on removed days will become "
+"unpaired and can be reassigned later."
 msgstr ""
 
 #: templates/trips/trip-detail.html:12
@@ -1786,7 +1875,9 @@ msgid "City"
 msgstr ""
 
 #: trips/forms.py:352 trips/forms.py:681
-msgid "Enter a valid phone number (with or without international prefix, and at most 2 spaces)."
+msgid ""
+"Enter a valid phone number (with or without international prefix, and at "
+"most 2 spaces)."
 msgstr ""
 
 #: trips/forms.py:357 trips/forms.py:686
@@ -1941,7 +2032,8 @@ msgid "Train Number"
 msgstr ""
 
 #: trips/forms.py:1195
-msgid "Optional. If provided, enables direct train status lookup on Viaggiatreno."
+msgid ""
+"Optional. If provided, enables direct train status lookup on Viaggiatreno."
 msgstr ""
 
 #: trips/forms.py:1328 trips/forms.py:1418

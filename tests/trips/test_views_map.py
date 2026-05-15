@@ -1009,6 +1009,108 @@ class ResolveMapsLinkViewTest(TestCase):
         self.response_405(response)
 
 
+class ResolveMapsMismatchTest(TestCase):
+    """Tests for soft place-type validation in resolve_maps_link (for #321)."""
+
+    SHORT_URL = "https://maps.app.goo.gl/test123"
+    EXPANDED_URL = (
+        "https://www.google.com/maps/place/Test/@45.07,7.68,17z/data=!1sChIJtest321"
+    )
+
+    def _post_with_types(self, form_type, place_types):
+        mock_resp = MagicMock()
+        mock_resp.url = self.EXPANDED_URL
+        details = PlaceFullDetails(
+            place_id="ChIJtest321",
+            name="Test Place",
+            address="Via Test 1",
+            city="Torino",
+            lat=45.07,
+            lng=7.68,
+            types=place_types,
+        )
+        user = self.make_user(f"{form_type}@example.com")
+        with self.login(user):
+            with patch("trips.views.maps.requests.get", return_value=mock_resp):
+                with patch(
+                    "trips.views.maps.GooglePlacesClient.get_full_place_details",
+                    return_value=details,
+                ):
+                    return self.post(
+                        "trips:resolve-maps-link",
+                        data={"maps_link": self.SHORT_URL, "form_type": form_type},
+                    )
+
+    def test_stay_form_with_lodging_no_warning(self):
+        response = self._post_with_types("stay", ["lodging", "hotel", "establishment"])
+        assert response.context["found"] is True
+        assert response.context.get("type_warning") is None
+
+    def test_stay_form_with_non_lodging_shows_warning(self):
+        response = self._post_with_types(
+            "stay", ["restaurant", "food", "establishment"]
+        )
+        assert response.context["found"] is True
+        assert response.context["type_warning"] == "stay_mismatch"
+
+    def test_meal_form_with_restaurant_no_warning(self):
+        response = self._post_with_types(
+            "meal", ["restaurant", "food", "establishment"]
+        )
+        assert response.context["found"] is True
+        assert response.context.get("type_warning") is None
+
+    def test_meal_form_with_non_food_shows_warning(self):
+        response = self._post_with_types("meal", ["lodging", "hotel", "establishment"])
+        assert response.context["found"] is True
+        assert response.context["type_warning"] == "meal_mismatch"
+
+    def test_experience_form_with_museum_no_warning(self):
+        response = self._post_with_types(
+            "experience", ["tourist_attraction", "museum", "establishment"]
+        )
+        assert response.context["found"] is True
+        assert response.context.get("type_warning") is None
+
+    def test_experience_form_with_lodging_shows_warning(self):
+        response = self._post_with_types(
+            "experience", ["lodging", "hotel", "establishment"]
+        )
+        assert response.context["found"] is True
+        assert response.context["type_warning"] == "experience_lodging"
+
+    def test_experience_form_with_restaurant_shows_warning(self):
+        response = self._post_with_types(
+            "experience", ["restaurant", "food", "establishment"]
+        )
+        assert response.context["found"] is True
+        assert response.context["type_warning"] == "experience_food"
+
+    def test_no_form_type_no_warning(self):
+        mock_resp = MagicMock()
+        mock_resp.url = self.EXPANDED_URL
+        user = self.make_user("noform@example.com")
+        with self.login(user):
+            with patch("trips.views.maps.requests.get", return_value=mock_resp):
+                with patch(
+                    "trips.views.maps.GooglePlacesClient.get_full_place_details",
+                    return_value=MOCK_FULL_DETAILS,
+                ):
+                    response = self.post(
+                        "trips:resolve-maps-link",
+                        data={"maps_link": self.SHORT_URL},
+                    )
+        assert response.context["found"] is True
+        assert response.context.get("type_warning") is None
+
+    def test_meal_form_with_cafe_no_warning(self):
+        response = self._post_with_types(
+            "meal", ["cafe", "coffee_shop", "establishment"]
+        )
+        assert response.context["found"] is True
+        assert response.context.get("type_warning") is None
+
+
 class StaySaveSkipsGeocodingWhenCoordsProvidedTest(TestCase):
     def test_save_with_coords_skips_mapbox(self):
         stay = StayFactory.build(
