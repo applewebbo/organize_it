@@ -1,0 +1,16 @@
+{% load i18n %}
+{% if found %}
+    <div x-init="setMapsData({{ place_data_json }})">
+        <div role="alert"
+             class="flex gap-2 items-center p-2 mt-3 text-sm rounded-lg alert alert-success alert-soft">
+            <i class="ph-bold ph-check-circle i-sm"></i>
+            <span>{% trans "Location found! Fields have been pre-filled." %}</span>
+        </div>
+    </div>
+{% elif error %}
+    <div role="alert"
+         class="flex gap-2 items-center p-2 mt-3 text-sm rounded-lg alert alert-error alert-soft">
+        <i class="ph-bold ph-warning i-sm"></i>
+        <span>{% trans "Oops! Location not recognised, fill in the details manually." %}</span>
+    </div>
+{% endif %}

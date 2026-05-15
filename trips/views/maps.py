@@ -1,8 +1,11 @@
 import json
 import logging
 import math
+import re
+import urllib.parse
 
 import geocoder
+import requests
 from django.conf import settings
 from django.contrib import messages
 from django.db.models import Prefetch
@@ -549,5 +552,134 @@ def map_add_stay(request, pk):
             "trip": trip,
             "days_with_events": days_with_events,
             "unassigned_events": unassigned_events,
+        },
+    )
+
+
+_MAPS_PREFIXES = (
+    "https://maps.app.goo.gl/",
+    "https://goo.gl/maps/",
+    "https://www.google.com/maps/",
+    "https://maps.google.com/",
+    "http://maps.google.com/",
+)
+
+
+@require_http_methods(["POST"])
+def resolve_maps_link(request):
+    """HTMX: resolve a Google Maps link server-side and return place details for pre-fill."""
+    url = request.POST.get("maps_link", "").strip()
+
+    if not any(url.startswith(prefix) for prefix in _MAPS_PREFIXES):
+        return TemplateResponse(
+            request,
+            "trips/includes/maps-link-prefill.html",
+            {"error": True},
+        )
+
+    # Full Google Maps URLs don't need an HTTP round-trip
+    is_short_link = url.startswith("https://maps.app.goo.gl/") or url.startswith(
+        "https://goo.gl/maps/"
+    )
+
+    if is_short_link:
+        try:
+            resp = requests.get(
+                url,
+                allow_redirects=True,
+                timeout=10,
+                headers={"User-Agent": "Mozilla/5.0"},
+            )
+            expanded_url = resp.url
+            # Google may redirect to consent page — extract the actual Maps URL
+            if "consent.google.com" in expanded_url:
+                qs = urllib.parse.parse_qs(urllib.parse.urlparse(expanded_url).query)
+                if "continue" in qs:
+                    expanded_url = urllib.parse.unquote(qs["continue"][0])
+        except Exception:
+            return TemplateResponse(
+                request,
+                "trips/includes/maps-link-prefill.html",
+                {"error": True},
+            )
+    else:
+        expanded_url = url
+
+    place_id = None
+    match = re.search(r"!1s(ChIJ[^!]+)", expanded_url)
+    if match:
+        place_id = match.group(1)
+    else:
+        # Fallback: extract name + coords from URL and do a text search
+        name_match = re.search(r"/maps/place/([^/@]+)/?(?:@|$)", expanded_url)
+        # Try !3d/!4d format first, then fall back to @lat,lng in the path
+        lat_match = re.search(r"!3d(-?\d+\.\d+)", expanded_url)
+        lng_match = re.search(r"!4d(-?\d+\.\d+)", expanded_url)
+        if not (lat_match and lng_match):
+            at_match = re.search(r"@(-?\d+\.\d+),(-?\d+\.\d+)", expanded_url)
+            if at_match:
+                lat_match = at_match
+                lng_match = None  # use group(1)/group(2) from at_match below
+                # Reassign to a unified variable for clarity
+                lat_lng_from_at = (float(at_match.group(1)), float(at_match.group(2)))
+            else:
+                lat_lng_from_at = None
+        else:
+            lat_lng_from_at = None
+        if name_match:
+            query = urllib.parse.unquote_plus(name_match.group(1).replace("+", " "))
+            location_bias = None
+            if lat_lng_from_at:
+                location_bias = (*lat_lng_from_at, 500)
+            elif lat_match and lng_match:
+                location_bias = (
+                    float(lat_match.group(1)),
+                    float(lng_match.group(1)),
+                    500,
+                )
+            try:
+                results = GooglePlacesClient().search_text(
+                    query, max_results=1, location_bias=location_bias
+                )
+                if results:
+                    place_id = results[0].place_id
+            except GooglePlacesError:
+                pass
+
+    if not place_id:
+        logger.warning("resolve_maps_link: no place_id found in %s", expanded_url[:200])
+        return TemplateResponse(
+            request,
+            "trips/includes/maps-link-prefill.html",
+            {"error": True},
+        )
+
+    try:
+        details = GooglePlacesClient().get_full_place_details(place_id)
+    except GooglePlacesError:
+        return TemplateResponse(
+            request,
+            "trips/includes/maps-link-prefill.html",
+            {"error": True},
+        )
+
+    place_data_json = json.dumps(
+        {
+            "name": details.name,
+            "address": details.address,
+            "city": details.city,
+            "lat": details.lat,
+            "lng": details.lng,
+            "website": details.website,
+            "phone": details.phone_number,
+            "opening_hours": details.opening_hours,
+        }
+    )
+    return TemplateResponse(
+        request,
+        "trips/includes/maps-link-prefill.html",
+        {
+            "found": True,
+            "place_data_json": place_data_json,
         },
     )

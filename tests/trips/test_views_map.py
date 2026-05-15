@@ -5,10 +5,12 @@ import pytest
 from tests.test import TestCase
 from tests.trips.factories import (
     ExperienceFactory,
+    MealFactory,
+    StayFactory,
     TripFactory,
 )
 from trips.models import Event, Stay
-from trips.services import GooglePlacesError, PlaceResult
+from trips.services import GooglePlacesError, PlaceFullDetails, PlaceResult
 
 pytestmark = pytest.mark.django_db
 
@@ -704,3 +706,374 @@ class SelectDayForEventTest(TestCase):
             "trips:select-day-for-event", pk=trip.pk, category="experience"
         )
         self.response_302(response)
+
+
+MOCK_FULL_DETAILS = PlaceFullDetails(
+    place_id="ChIJ_test_001",
+    name="Museo Egizio",
+    address="Via Accademia delle Scienze 6, 10123 Torino TO, Italia",
+    city="Torino",
+    lat=45.0687,
+    lng=7.6847,
+    website="https://museoegizio.it",
+    phone_number="+39 011 561 7776",
+    opening_hours={
+        "monday": {"open": "09:00", "close": "18:30"},
+        "tuesday": {"open": "09:00", "close": "18:30"},
+    },
+)
+
+MOCK_FULL_DETAILS_NO_HOURS = PlaceFullDetails(
+    place_id="ChIJ_test_002",
+    name="Piazza Castello",
+    address="Piazza Castello, Torino",
+    city="Torino",
+    lat=45.0712,
+    lng=7.6858,
+    website="",
+    phone_number="",
+    opening_hours=None,
+)
+
+
+class ResolveMapsLinkViewTest(TestCase):
+    def test_invalid_url_returns_error(self):
+        user = self.make_user("user@example.com")
+        with self.login(user):
+            response = self.post(
+                "trips:resolve-maps-link",
+                data={"maps_link": "https://example.com/not-a-maps-link"},
+            )
+        self.response_200(response)
+        assert response.context["error"] is True
+
+    def test_full_google_maps_url_no_place_id_returns_error(self):
+        user = self.make_user("user@example.com")
+        with self.login(user):
+            with patch(
+                "trips.views.maps.GooglePlacesClient.search_text",
+                return_value=[],
+            ):
+                response = self.post(
+                    "trips:resolve-maps-link",
+                    data={
+                        "maps_link": "https://www.google.com/maps/place/Foo/@45.0,7.0,17z"
+                    },
+                )
+        self.response_200(response)
+        assert response.context["error"] is True
+
+    def test_full_google_maps_url_success(self):
+        user = self.make_user("user@example.com")
+        with self.login(user):
+            with patch(
+                "trips.views.maps.GooglePlacesClient.search_text",
+                return_value=[
+                    PlaceResult(
+                        place_id="ChIJtest789",
+                        name="Foo",
+                        address="Via Foo",
+                        lat=45.0,
+                        lng=7.0,
+                    )
+                ],
+            ):
+                with patch(
+                    "trips.views.maps.GooglePlacesClient.get_full_place_details",
+                    return_value=MOCK_FULL_DETAILS,
+                ):
+                    response = self.post(
+                        "trips:resolve-maps-link",
+                        data={
+                            "maps_link": "https://www.google.com/maps/place/Foo/@45.0,7.0,17z"
+                        },
+                    )
+        self.response_200(response)
+        assert response.context["found"] is True
+
+    def test_goo_gl_maps_url_success(self):
+        user = self.make_user("user@example.com")
+        mock_resp = MagicMock()
+        mock_resp.url = "https://www.google.com/maps/place/Museo/@45.06,7.68,17z/data=!3m1!4b1!4m6!3m5!1s!1sChIJtest123!8m2!3d45!4d7"
+        with self.login(user):
+            with patch("trips.views.maps.requests.get", return_value=mock_resp):
+                with patch(
+                    "trips.views.maps.GooglePlacesClient.get_full_place_details",
+                    return_value=MOCK_FULL_DETAILS,
+                ):
+                    response = self.post(
+                        "trips:resolve-maps-link",
+                        data={"maps_link": "https://goo.gl/maps/abc123"},
+                    )
+        self.response_200(response)
+        assert response.context["found"] is True
+
+    def test_empty_url_returns_error(self):
+        user = self.make_user("user@example.com")
+        with self.login(user):
+            response = self.post(
+                "trips:resolve-maps-link",
+                data={"maps_link": ""},
+            )
+        self.response_200(response)
+        assert response.context["error"] is True
+
+    def test_redirect_failure_returns_error(self):
+        user = self.make_user("user@example.com")
+        with self.login(user):
+            with patch(
+                "trips.views.maps.requests.get", side_effect=Exception("timeout")
+            ):
+                response = self.post(
+                    "trips:resolve-maps-link",
+                    data={"maps_link": "https://maps.app.goo.gl/abc123"},
+                )
+        self.response_200(response)
+        assert response.context["error"] is True
+
+    def test_no_place_id_in_expanded_url_returns_error(self):
+        user = self.make_user("user@example.com")
+        mock_resp = MagicMock()
+        mock_resp.url = "https://www.google.com/maps/place/No+Place+ID+Here"
+        with self.login(user):
+            with patch("trips.views.maps.requests.get", return_value=mock_resp):
+                response = self.post(
+                    "trips:resolve-maps-link",
+                    data={"maps_link": "https://maps.app.goo.gl/abc123"},
+                )
+        self.response_200(response)
+        assert response.context["error"] is True
+
+    def test_places_api_error_returns_error(self):
+        user = self.make_user("user@example.com")
+        mock_resp = MagicMock()
+        mock_resp.url = "https://www.google.com/maps/place/Museo/@45.06,7.68,17z/data=!3m1!4b1!4m6!3m5!1s!1sChIJtest123!8m2!3d45!4d7"
+        with self.login(user):
+            with patch("trips.views.maps.requests.get", return_value=mock_resp):
+                with patch(
+                    "trips.views.maps.GooglePlacesClient.get_full_place_details",
+                    side_effect=GooglePlacesError("API error"),
+                ):
+                    response = self.post(
+                        "trips:resolve-maps-link",
+                        data={"maps_link": "https://maps.app.goo.gl/abc123"},
+                    )
+        self.response_200(response)
+        assert response.context["error"] is True
+
+    def test_success_returns_details_with_opening_hours(self):
+        import json as _json
+
+        user = self.make_user("user@example.com")
+        mock_resp = MagicMock()
+        mock_resp.url = "https://www.google.com/maps/place/Museo/@45.06,7.68,17z/data=!3m1!4b1!4m6!3m5!1s!1sChIJtest123!8m2!3d45!4d7"
+        with self.login(user):
+            with patch("trips.views.maps.requests.get", return_value=mock_resp):
+                with patch(
+                    "trips.views.maps.GooglePlacesClient.get_full_place_details",
+                    return_value=MOCK_FULL_DETAILS,
+                ):
+                    response = self.post(
+                        "trips:resolve-maps-link",
+                        data={"maps_link": "https://maps.app.goo.gl/abc123"},
+                    )
+        self.response_200(response)
+        assert response.context["found"] is True
+        data = _json.loads(response.context["place_data_json"])
+        assert data["name"] == "Museo Egizio"
+        assert data["opening_hours"] is not None
+
+    def test_success_returns_details_without_opening_hours(self):
+        import json as _json
+
+        user = self.make_user("user@example.com")
+        mock_resp = MagicMock()
+        mock_resp.url = "https://www.google.com/maps/place/Piazza/@45.07,7.68,17z/data=!3m1!4b1!4m6!3m5!1s!1sChIJtest456!8m2!3d45!4d7"
+        with self.login(user):
+            with patch("trips.views.maps.requests.get", return_value=mock_resp):
+                with patch(
+                    "trips.views.maps.GooglePlacesClient.get_full_place_details",
+                    return_value=MOCK_FULL_DETAILS_NO_HOURS,
+                ):
+                    response = self.post(
+                        "trips:resolve-maps-link",
+                        data={"maps_link": "https://maps.app.goo.gl/def456"},
+                    )
+        self.response_200(response)
+        assert response.context["found"] is True
+        data = _json.loads(response.context["place_data_json"])
+        assert data["opening_hours"] is None
+
+    def test_consent_redirect_is_followed(self):
+        """maps.py:593 — consent.google.com redirect extracts the real Maps URL."""
+        import urllib.parse as _up
+
+        real_maps_url = "https://www.google.com/maps/place/Museo/@45.06,7.68,17z/data=!3m1!4b1!4m6!3m5!1s!1sChIJtest123!8m2!3d45!4d7"
+        consent_url = "https://consent.google.com/m?continue=" + _up.quote(
+            real_maps_url
+        )
+        mock_resp = MagicMock()
+        mock_resp.url = consent_url
+        user = self.make_user("user@example.com")
+        with self.login(user):
+            with patch("trips.views.maps.requests.get", return_value=mock_resp):
+                with patch(
+                    "trips.views.maps.GooglePlacesClient.get_full_place_details",
+                    return_value=MOCK_FULL_DETAILS,
+                ):
+                    response = self.post(
+                        "trips:resolve-maps-link",
+                        data={"maps_link": "https://maps.app.goo.gl/abc123"},
+                    )
+        self.response_200(response)
+        assert response.context["found"] is True
+
+    def test_consent_redirect_without_continue_param_returns_error(self):
+        """maps.py:595 false — consent redirect has no 'continue' param → place_id not found."""
+        mock_resp = MagicMock()
+        mock_resp.url = "https://consent.google.com/m?hl=it"
+        user = self.make_user("user@example.com")
+        with self.login(user):
+            with patch("trips.views.maps.requests.get", return_value=mock_resp):
+                response = self.post(
+                    "trips:resolve-maps-link",
+                    data={"maps_link": "https://maps.app.goo.gl/abc123"},
+                )
+        self.response_200(response)
+        assert response.context["error"] is True
+
+    def test_fallback_search_api_error_returns_error(self):
+        """maps.py:638/639 — Places API error during fallback text search."""
+        url = "https://www.google.com/maps/place/Foo/@45.0,7.0,17z"
+        user = self.make_user("user@example.com")
+        with self.login(user):
+            with patch(
+                "trips.views.maps.GooglePlacesClient.search_text",
+                side_effect=GooglePlacesError("API error"),
+            ):
+                response = self.post(
+                    "trips:resolve-maps-link",
+                    data={"maps_link": url},
+                )
+        self.response_200(response)
+        assert response.context["error"] is True
+
+    def test_fallback_uses_3d_4d_coords_as_bias(self):
+        """maps.py:616 false, 632 — URL with !3d/!4d but no ChIJ place_id."""
+        # URL has !3d/!4d coords but hex place_id (not ChIJ) → triggers fallback
+        url = "https://www.google.com/maps/place/Colosseo/@41.89,12.49,17z/data=!4m5!3m4!1s0x12d5e4d8:0xbe9d!8m2!3d41.89!4d12.49"
+        user = self.make_user("user@example.com")
+        with self.login(user):
+            with patch(
+                "trips.views.maps.GooglePlacesClient.search_text",
+                return_value=[
+                    PlaceResult(
+                        place_id="ChIJtest999",
+                        name="Colosseo",
+                        address="Piazza del Colosseo",
+                        lat=41.89,
+                        lng=12.49,
+                    )
+                ],
+            ) as mock_search:
+                with patch(
+                    "trips.views.maps.GooglePlacesClient.get_full_place_details",
+                    return_value=MOCK_FULL_DETAILS,
+                ):
+                    response = self.post(
+                        "trips:resolve-maps-link",
+                        data={"maps_link": url},
+                    )
+        self.response_200(response)
+        assert response.context["found"] is True
+        # location_bias should use !3d/!4d values
+        call_kwargs = mock_search.call_args.kwargs
+        assert call_kwargs["location_bias"] is not None
+
+    def test_fallback_no_name_match_returns_error(self):
+        """maps.py:627 false — URL without /place/ segment → name_match fails."""
+        url = "https://www.google.com/maps/search/?q=foo"
+        user = self.make_user("user@example.com")
+        with self.login(user):
+            response = self.post(
+                "trips:resolve-maps-link",
+                data={"maps_link": url},
+            )
+        self.response_200(response)
+        assert response.context["error"] is True
+
+    def test_get_not_allowed(self):
+        user = self.make_user("user@example.com")
+        with self.login(user):
+            response = self.get("trips:resolve-maps-link")
+        self.response_405(response)
+
+
+class StaySaveSkipsGeocodingWhenCoordsProvidedTest(TestCase):
+    def test_save_with_coords_skips_mapbox(self):
+        stay = StayFactory.build(
+            latitude=45.0687,
+            longitude=7.6847,
+        )
+        with patch("trips.models.geocoder.mapbox") as mock_geo:
+            stay.save()
+        mock_geo.assert_not_called()
+        assert stay.latitude == 45.0687
+        assert stay.longitude == 7.6847
+
+    def test_save_without_coords_calls_mapbox(self):
+        mock_geo = MagicMock()
+        mock_geo.latlng = [45.0687, 7.6847]
+        stay = StayFactory.build(latitude=None, longitude=None)
+        with patch(
+            "trips.models.geocoder.mapbox", return_value=mock_geo
+        ) as mock_mapbox:
+            stay.save()
+        mock_mapbox.assert_called_once()
+        assert stay.latitude == 45.0687
+        assert stay.longitude == 7.6847
+
+
+class EventSaveSkipsGeocodingWhenCoordsProvidedTest(TestCase):
+    def test_experience_save_with_coords_skips_mapbox(self):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        experience = ExperienceFactory.build(
+            trip=trip,
+            latitude=45.0687,
+            longitude=7.6847,
+        )
+        with patch("trips.models.geocoder.mapbox") as mock_geo:
+            experience.save()
+        mock_geo.assert_not_called()
+        assert experience.latitude == 45.0687
+        assert experience.longitude == 7.6847
+
+    def test_meal_save_with_coords_skips_mapbox(self):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        meal = MealFactory.build(
+            trip=trip,
+            latitude=45.0712,
+            longitude=7.6858,
+        )
+        with patch("trips.models.geocoder.mapbox") as mock_geo:
+            meal.save()
+        mock_geo.assert_not_called()
+        assert meal.latitude == 45.0712
+        assert meal.longitude == 7.6858
+
+    def test_experience_save_without_coords_calls_mapbox(self):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        mock_geo = MagicMock()
+        mock_geo.latlng = [45.0687, 7.6847]
+        experience = ExperienceFactory.build(
+            trip=trip,
+            latitude=None,
+            longitude=None,
+        )
+        with patch("trips.models.geocoder.mapbox", return_value=mock_geo):
+            experience.save()
+        assert experience.latitude == 45.0687
+        assert experience.longitude == 7.6847

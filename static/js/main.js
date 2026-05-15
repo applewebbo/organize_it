@@ -301,6 +301,52 @@ document.addEventListener("alpine:init", () => {
                 input.value = value;
                 document.getElementById("tag-results").innerHTML = "";
             }
+        },
+        setMapsData(data) {
+            const HIGHLIGHT_MS = 5000;
+            const highlight = (el) => {
+                if (!el || el.type === "hidden") return;
+                el.style.outline = "2px solid var(--color-success)";
+                el.style.transition = "outline-color 0.4s ease";
+                setTimeout(() => {
+                    el.style.outlineColor = "transparent";
+                    setTimeout(() => { el.style.outline = ""; el.style.transition = ""; }, 400);
+                }, HIGHLIGHT_MS);
+            };
+            const set = (id, val) => {
+                const el = document.getElementById(id);
+                if (el && val !== undefined && val !== null && val !== "") {
+                    el.value = val;
+                    highlight(el);
+                }
+            };
+            set("id_name", data.name);
+            set("id_address", data.address);
+            if (data.city) set("id_city", data.city);
+            if (data.lat !== null) set("id_latitude", data.lat);
+            if (data.lng !== null) set("id_longitude", data.lng);
+            set("id_website", data.website);
+            set("id_phone_number", data.phone);
+            if (data.opening_hours) {
+                const days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+                days.forEach(day => {
+                    const oh = data.opening_hours[day];
+                    const closedEl = document.getElementById(`id_${day}_closed`);
+                    const openEl = document.getElementById(`id_${day}_open`);
+                    const closeEl = document.getElementById(`id_${day}_close`);
+                    if (oh && oh.open && oh.close) {
+                        if (closedEl) { closedEl.checked = false; closedEl.dispatchEvent(new Event("input")); }
+                        if (openEl) { openEl.value = oh.open; highlight(openEl); }
+                        if (closeEl) { closeEl.value = oh.close; highlight(closeEl); }
+                    } else {
+                        if (closedEl) { closedEl.checked = true; closedEl.dispatchEvent(new Event("input")); }
+                    }
+                });
+            }
+            const mapsField = document.getElementById("id_maps_link");
+            if (mapsField) mapsField.value = "";
+            const resultsDiv = document.getElementById("maps-link-results");
+            if (resultsDiv) resultsDiv.innerHTML = "";
         }
     }));
 

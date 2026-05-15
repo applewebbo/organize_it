@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-13 08:29+0200\n"
+"POT-Creation-Date: 2026-05-15 08:52+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -19,55 +19,56 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.8\n"
 
-#: accounts/forms.py:44 accounts/models.py:78
+#: accounts/forms.py:46 accounts/models.py:78
 msgid "First name"
 msgstr "Nome"
 
-#: accounts/forms.py:45 accounts/models.py:84
+#: accounts/forms.py:47 accounts/models.py:84
 msgid "Last name"
 msgstr "Cognome"
 
-#: accounts/forms.py:46 accounts/models.py:120
+#: accounts/forms.py:48 accounts/models.py:120
 msgid "Home address"
 msgstr "Indirizzo di casa"
 
-#: accounts/forms.py:47 accounts/models.py:90
+#: accounts/forms.py:49 accounts/models.py:90
 msgid "Avatar"
 msgstr "Immagine profilo"
 
-#: accounts/forms.py:48 accounts/models.py:99
+#: accounts/forms.py:50 accounts/models.py:99
 msgid "Preferred currency"
 msgstr "Valuta preferita"
 
-#: accounts/forms.py:49
+#: accounts/forms.py:51
 msgid "Email language"
 msgstr "Lingua email"
 
-#: accounts/forms.py:50
+#: accounts/forms.py:52
 msgid "Default event view"
 msgstr "Vista eventi di default"
 
-#: accounts/forms.py:51
+#: accounts/forms.py:53
 msgid "Sort trips by"
 msgstr "Ordine viaggi"
 
-#: accounts/forms.py:52 accounts/models.py:143
+#: accounts/forms.py:54 accounts/models.py:143
 msgid "Use your device's light/dark system setting."
 msgstr "Usa le impostazioni di sistema per il tema chiaro/scuro."
 
-#: accounts/forms.py:53 accounts/models.py:146
+#: accounts/forms.py:55 accounts/models.py:146
 msgid "Show transfer info"
 msgstr "Mostra info trasferimenti"
 
-#: accounts/forms.py:54 accounts/models.py:151
+#: accounts/forms.py:56 accounts/models.py:151
 msgid "Show weather forecast"
 msgstr "Mostra meteo"
 
-#: accounts/forms.py:55
+#: accounts/forms.py:57
 msgid "Favourite trip"
 msgstr "Viaggio preferito"
 
-#: accounts/forms.py:67 trips/forms.py:1318 trips/forms.py:1330
+#: accounts/forms.py:69 templates/account/profile.html:40 trips/forms.py:1329
+#: trips/forms.py:1341
 msgid "Full address (street, city, country)"
 msgstr "Indirizzo completo (via, città, paese)"
 
@@ -129,12 +130,8 @@ msgid "Trip sorting"
 msgstr "Ordine Viaggi"
 
 #: accounts/models.py:125
-msgid ""
-"Used to pre-fill the origin/destination field in car transfers. It is not "
-"shared or used for any other purpose."
-msgstr ""
-"Usato per precompilare il campo origine/destinazione nei trasferimenti in "
-"auto. Non viene condiviso né utilizzato per altri scopi."
+msgid "Used to pre-fill the origin/destination field in car transfers. It is not shared or used for any other purpose."
+msgstr "Usato per precompilare il campo origine/destinazione nei trasferimenti in auto. Non viene condiviso né utilizzato per altri scopi."
 
 #: accounts/models.py:133
 msgid "Language"
@@ -152,7 +149,7 @@ msgstr "Mostra durata e distanza tra le tappe del viaggio."
 msgid "When disabled, weather data is not fetched from the API."
 msgstr "Se disattivo, i dati meteo non vengono recuperati dall’API."
 
-#: accounts/views.py:27
+#: accounts/views.py:29
 msgid "Settings modified succesfully"
 msgstr "Impostazioni salvate"
 
@@ -163,12 +160,8 @@ msgstr "Conferma il tuo indirizzo email"
 
 #: templates/account/email_confirm.html:13
 #, python-format
-msgid ""
-"Please confirm that <a href=\"mailto:%(email)s\">%(email)s</a> is an email "
-"address for user %(user_display)s."
-msgstr ""
-"Per favore conferma che <a href=\"mailto:%(email)s\">%(email)s</a> è "
-"l'indirizzo email per l'utente %(user_display)s."
+msgid "Please confirm that <a href=\"mailto:%(email)s\">%(email)s</a> is an email address for user %(user_display)s."
+msgstr "Per favore conferma che <a href=\"mailto:%(email)s\">%(email)s</a> è l'indirizzo email per l'utente %(user_display)s."
 
 #: templates/account/email_confirm.html:18 templates/trips/event-modal.html:35
 msgid "Confirm"
@@ -176,21 +169,17 @@ msgstr "Conferma"
 
 #: templates/account/email_confirm.html:22
 #, python-format
-msgid ""
-"Unable to confirm %(email)s because it is already confirmed by a different "
-"account."
-msgstr ""
-"Impossibile confermare %(email)s perché l'indirizzo è già stato confermato "
-"per un altro account."
+msgid "Unable to confirm %(email)s because it is already confirmed by a different account."
+msgstr "Impossibile confermare %(email)s perché l'indirizzo è già stato confermato per un altro account."
 
 #: templates/account/email_confirm.html:28
 #, python-format
-msgid ""
-"This email confirmation link expired or is invalid. Please <a "
-"href=\"%(email_url)s\">issue a new email confirmation request</a>."
+msgid "This email confirmation link expired or is invalid. Please <a href=\"%(email_url)s\">issue a new email confirmation request</a>."
+msgstr "Questo link per la conferma dell'indirizzo email è scaduto oppure non è valido. Per favore <a href=\"%(email_url)s\">richiedi un nuovo link</a>."
+
+#: templates/account/includes/home-address-results.html:22
+msgid "Powered by"
 msgstr ""
-"Questo link per la conferma dell'indirizzo email è scaduto oppure non è "
-"valido. Per favore <a href=\"%(email_url)s\">richiedi un nuovo link</a>."
 
 #: templates/account/login.html:14 templates/account/login.html:46
 msgid "Sign In"
@@ -200,13 +189,11 @@ msgstr "Entra"
 #, python-format
 msgid ""
 "Please sign in with one\n"
-"            of your existing third party accounts. Or, <a "
-"href=\"%(signup_url)s\">sign up</a>\n"
+"            of your existing third party accounts. Or, <a href=\"%(signup_url)s\">sign up</a>\n"
 "            for a %(site_name)s account and sign in below:"
 msgstr ""
 "Per favore esegui il login con uno dei\n"
-"            tuoi account di terze parti. Oppure, <a "
-"href=\"%(signup_url)s\">registrati</a>\n"
+"            tuoi account di terze parti. Oppure, <a href=\"%(signup_url)s\">registrati</a>\n"
 "            per un account presso %(site_name)s ed esegui il login qui sotto:"
 
 #: templates/account/login.html:27
@@ -219,14 +206,8 @@ msgstr "Password dimenticata?"
 
 #: templates/account/login.html:48
 #, python-format
-msgid ""
-"If you have not created an account yet, then please <a "
-"href=\"%(signup_url)s\" class=\"text-blue-600 hover:underline\">Sign up</a> "
-"first."
-msgstr ""
-"Se non hai ancora creato un account, allora per favore <a "
-"href=\"%(signup_url)s\" class=\"text-blue-600 hover:underline\">Registrati</"
-"a>  prima."
+msgid "If you have not created an account yet, then please <a href=\"%(signup_url)s\" class=\"text-blue-600 hover:underline\">Sign up</a> first."
+msgstr "Se non hai ancora creato un account, allora per favore <a href=\"%(signup_url)s\" class=\"text-blue-600 hover:underline\">Registrati</a>  prima."
 
 #: templates/account/password_reset.html:5
 #: templates/account/password_reset.html:17
@@ -236,12 +217,8 @@ msgid "Password Reset"
 msgstr "Reset Password"
 
 #: templates/account/password_reset.html:23
-msgid ""
-"Forgotten your password? Enter your email address below, and we'll send you "
-"an email allowing you to reset it."
-msgstr ""
-"Password dimenticata? Inserisci il tuo indirizzo email qua sotto e riceverai "
-"una email con il link per resettare la tua password."
+msgid "Forgotten your password? Enter your email address below, and we'll send you an email allowing you to reset it."
+msgstr "Password dimenticata? Inserisci il tuo indirizzo email qua sotto e riceverai una email con il link per resettare la tua password."
 
 #: templates/account/password_reset.html:32
 msgid "Reset My Password"
@@ -252,12 +229,8 @@ msgid "Please contact us if you have any trouble resetting your password."
 msgstr "Per favore contattaci se hai problemi a resecare la tua password."
 
 #: templates/account/password_reset_done.html:13
-msgid ""
-"We have sent you an email. If you have not received it please check your "
-"spam folder. Otherwise contact us if you do not receive it in a few minutes."
-msgstr ""
-"Ti abbiamo inviato una email. Se non l'hai ricevuta controlla nella cartella "
-"spam. Altrimenti contattaci se non la ricevi entro qualche minuto."
+msgid "We have sent you an email. If you have not received it please check your spam folder. Otherwise contact us if you do not receive it in a few minutes."
+msgstr "Ti abbiamo inviato una email. Se non l'hai ricevuta controlla nella cartella spam. Altrimenti contattaci se non la ricevi entro qualche minuto."
 
 #: templates/account/password_reset_from_key.html:4
 #: templates/account/password_reset_from_key.html:19
@@ -272,14 +245,8 @@ msgstr "Token non valido"
 
 #: templates/account/password_reset_from_key.html:25
 #, python-format
-msgid ""
-"The password reset link was invalid, possibly because it has already been "
-"used.  Please request a <a href=\"%(passwd_reset_url)s\">new password reset</"
-"a>."
-msgstr ""
-"Il link per resettare la password risulta non valido, probabilmente perché è "
-"già stato utilizzato.  Per favore richiedi un<a "
-"href=\"%(passwd_reset_url)s\">nuovo link</a>."
+msgid "The password reset link was invalid, possibly because it has already been used.  Please request a <a href=\"%(passwd_reset_url)s\">new password reset</a>."
+msgstr "Il link per resettare la password risulta non valido, probabilmente perché è già stato utilizzato.  Per favore richiedi un<a href=\"%(passwd_reset_url)s\">nuovo link</a>."
 
 #: templates/account/password_reset_from_key.html:36
 msgid "change password"
@@ -297,17 +264,17 @@ msgstr "Impostazioni"
 msgid "Personal Information"
 msgstr "Informazioni Personali"
 
-#: templates/account/profile.html:51
+#: templates/account/profile.html:63
 msgid "Travel Preferences"
 msgstr "Preferenze di viaggio"
 
-#: templates/account/profile.html:70
+#: templates/account/profile.html:82
 msgid "Display Preferences"
 msgstr "Preferenze di visualizzazione"
 
-#: templates/account/profile.html:129 templates/trips/event-notes.html:30
+#: templates/account/profile.html:141 templates/trips/event-notes.html:30
 #: templates/trips/experience-create-unpaired.html:25
-#: templates/trips/experience-create.html:43
+#: templates/trips/experience-create.html:61
 #: templates/trips/includes/day-destination-card.html:23
 #: templates/trips/main-transfer-connection-create.html:97
 #: templates/trips/main-transfer-connection-edit.html:73
@@ -321,7 +288,7 @@ msgstr "Preferenze di visualizzazione"
 #: templates/trips/partials/main-transfer-other.html:82
 #: templates/trips/partials/main-transfer-train.html:94
 #: templates/trips/partials/main-transfer-train.html:111
-#: templates/trips/stay-create.html:28 templates/trips/stay-modify.html:19
+#: templates/trips/stay-create.html:46 templates/trips/stay-modify.html:19
 #: templates/trips/stay-note-modify.html:28 templates/trips/stay-notes.html:30
 #: templates/trips/stay-transfer-create.html:65
 #: templates/trips/stay-transfer-edit.html:71
@@ -338,10 +305,8 @@ msgstr "Registrati"
 
 #: templates/account/signup.html:19
 #, python-format
-msgid ""
-"Already have an account? Then please <a href=\"%(login_url)s\">sign in</a>"
-msgstr ""
-"Hai già un account? Allora per favore <a href=\"%(login_url)s\">entra</a>"
+msgid "Already have an account? Then please <a href=\"%(login_url)s\">sign in</a>"
+msgstr "Hai già un account? Allora per favore <a href=\"%(login_url)s\">entra</a>"
 
 #: templates/account/verification_sent.html:4
 #: templates/account/verification_sent.html:7
@@ -349,17 +314,8 @@ msgid "Verify Your Email Address"
 msgstr "Verifica il tuo indirizzo email"
 
 #: templates/account/verification_sent.html:9
-msgid ""
-"We have sent an email to you for verification. Follow the link provided to "
-"finalize the signup process. If you do not see the verification email in "
-"your main inbox, check your spam folder. Please contact us if you do not "
-"receive the verification email within a few minutes."
-msgstr ""
-"TI abbiamo inviato una email per la verifica. Segui il link presente nella "
-"email per completare questo processo. Se non vedi la email di verifica nella "
-"casella dei messaggi ricevuti verifica anche nella cartella spam. Non "
-"esitare a contattarci se non ricevi la email di verifica entro qualche "
-"minuto."
+msgid "We have sent an email to you for verification. Follow the link provided to finalize the signup process. If you do not see the verification email in your main inbox, check your spam folder. Please contact us if you do not receive the verification email within a few minutes."
+msgstr "TI abbiamo inviato una email per la verifica. Segui il link presente nella email per completare questo processo. Se non vedi la email di verifica nella casella dei messaggi ricevuti verifica anche nella cartella spam. Non esitare a contattarci se non ricevi la email di verifica entro qualche minuto."
 
 #: templates/cotton/dropdown.html:7 templates/cotton/dropdown.html:10
 #: templates/trips/includes/events-map-fragment.html:12
@@ -369,13 +325,13 @@ msgstr "Aggiungi evento"
 
 #: templates/cotton/dropdown.html:20
 #: templates/trips/includes/events-map-fragment.html:22
-#: templates/trips/includes/events-section.html:75 trips/models.py:501
+#: templates/trips/includes/events-section.html:75 trips/models.py:525
 msgid "Experience"
 msgstr "Esperienza"
 
 #: templates/cotton/dropdown.html:29
 #: templates/trips/includes/events-map-fragment.html:31
-#: templates/trips/includes/events-section.html:84 trips/models.py:502
+#: templates/trips/includes/events-section.html:84 trips/models.py:526
 msgid "Meal"
 msgstr "Pasto"
 
@@ -388,12 +344,8 @@ msgid "Ready for your next adventure?"
 msgstr "Pronto per la tua nuova avventura?"
 
 #: templates/cotton/empty_state.html:15
-msgid ""
-"Start planning your perfect trip. Organize stays, experiences, meals and "
-"transfers all in one place."
-msgstr ""
-"Inizia a organizzare il tuo viaggio perfetto. Pianifica tutti i tuoi "
-"soggiorni, esperienze, pasti e trasferimenti in un unico posto."
+msgid "Start planning your perfect trip. Organize stays, experiences, meals and transfers all in one place."
+msgstr "Inizia a organizzare il tuo viaggio perfetto. Pianifica tutti i tuoi soggiorni, esperienze, pasti e trasferimenti in un unico posto."
 
 #: templates/cotton/empty_state.html:25
 msgid "Create Your First Trip"
@@ -417,9 +369,7 @@ msgstr "Come funziona"
 
 #: templates/cotton/quick_guide.html:6
 msgid "Learn about the key concepts to start organizing your perfect trip."
-msgstr ""
-"Esplora i concetti chiave prima di iniziare a organizzare il tuo viaggio "
-"perfetto."
+msgstr "Esplora i concetti chiave prima di iniziare a organizzare il tuo viaggio perfetto."
 
 #: templates/cotton/quick_guide.html:18 templates/includes/navbar.html:49
 #: templates/includes/navbar.html:72
@@ -427,111 +377,72 @@ msgid "Trips"
 msgstr "Viaggi"
 
 #: templates/cotton/quick_guide.html:21
-msgid ""
-"A trip is your main container for organizing a journey. Each trip has a "
-"destination, dates, and can include multiple days of activities."
-msgstr ""
-"Il viaggio è il contenitore principale della tua vacanza. Ogni viaggio ha "
-"una destinazione, delle date e può includere svariati giorni di attività."
+msgid "A trip is your main container for organizing a journey. Each trip has a destination, dates, and can include multiple days of activities."
+msgstr "Il viaggio è il contenitore principale della tua vacanza. Ogni viaggio ha una destinazione, delle date e può includere svariati giorni di attività."
 
 #: templates/cotton/quick_guide.html:32
 msgid "Days"
 msgstr "Giorni"
 
 #: templates/cotton/quick_guide.html:35
-msgid ""
-"Days are automatically generated based on your trip dates. Each day can "
-"contain multiple events like experiences, meals, and transfers."
-msgstr ""
-"I giorni vengono creati automaticamente in base alle date del tuo viaggio. "
-"Ogni giorno può contenere vari eventi come esperienza, pasti e trasferimenti."
+msgid "Days are automatically generated based on your trip dates. Each day can contain multiple events like experiences, meals, and transfers."
+msgstr "I giorni vengono creati automaticamente in base alle date del tuo viaggio. Ogni giorno può contenere vari eventi come esperienza, pasti e trasferimenti."
 
 #: templates/cotton/quick_guide.html:46
 msgid "Stays"
 msgstr "Soggiorni"
 
 #: templates/cotton/quick_guide.html:49
-msgid ""
-"Stays are your accommodations during the trip. Add hotels, apartments, "
-"hostels, or any place where you'll be staying."
-msgstr ""
-"I soggiorni sono i tuoi alloggi durante il viaggio. Aggiungi hotel, "
-"appartamenti, ostelli e qualunque posto in cui pernotterai."
+msgid "Stays are your accommodations during the trip. Add hotels, apartments, hostels, or any place where you'll be staying."
+msgstr "I soggiorni sono i tuoi alloggi durante il viaggio. Aggiungi hotel, appartamenti, ostelli e qualunque posto in cui pernotterai."
 
 #: templates/cotton/quick_guide.html:60
 msgid "Experiences"
 msgstr "Esperienze"
 
 #: templates/cotton/quick_guide.html:63
-msgid ""
-"Experiences are activities, tours, museums, walks, and any memorable moment "
-"during your trip."
-msgstr ""
-"Le esperienze sono attività, tour, musei, passeggiate e qualsiasi attività "
-"da ricordare durante il tuo viaggio."
+msgid "Experiences are activities, tours, museums, walks, and any memorable moment during your trip."
+msgstr "Le esperienze sono attività, tour, musei, passeggiate e qualsiasi attività da ricordare durante il tuo viaggio."
 
 #: templates/cotton/quick_guide.html:74
 msgid "Meals"
 msgstr "Pasti"
 
 #: templates/cotton/quick_guide.html:77
-msgid ""
-"Meals help you plan where to eat during your trip. Add restaurants, cafes, "
-"street food spots, or any dining experience."
-msgstr ""
-"I pasti ti aiutano a programmare le pause pranzo del tuo viaggio. Aggiungi "
-"ristoranti, bar, punti di ristoro e qualsiasi altra esperienza culinaria."
+msgid "Meals help you plan where to eat during your trip. Add restaurants, cafes, street food spots, or any dining experience."
+msgstr "I pasti ti aiutano a programmare le pause pranzo del tuo viaggio. Aggiungi ristoranti, bar, punti di ristoro e qualsiasi altra esperienza culinaria."
 
-#: templates/cotton/quick_guide.html:89 trips/models.py:327
+#: templates/cotton/quick_guide.html:89 trips/models.py:351
 msgid "Main Transfers"
 msgstr "Trasferimenti principali"
 
 #: templates/cotton/quick_guide.html:92
-msgid ""
-"Main transfers are your arrival and departure journeys. Add flight, train, "
-"or other transport details to reach your destination and return home."
-msgstr ""
-"I trasferimenti principali sono gli spostamenti da e verso la meta del tuo "
-"viaggio. Aggiungi i dettagli del tuo volo, treno o altro mezzo di trasporto "
-"per raggiungere la tua meta oppure tornare a casa."
+msgid "Main transfers are your arrival and departure journeys. Add flight, train, or other transport details to reach your destination and return home."
+msgstr "I trasferimenti principali sono gli spostamenti da e verso la meta del tuo viaggio. Aggiungi i dettagli del tuo volo, treno o altro mezzo di trasporto per raggiungere la tua meta oppure tornare a casa."
 
 #: templates/cotton/quick_guide.html:103
 msgid "Local Transfers"
 msgstr "Trasferimenti giornalieri"
 
 #: templates/cotton/quick_guide.html:106
-msgid ""
-"Local transfers help you move between accommodations and events during your "
-"trip. Add transfers between stays or between daily activities."
-msgstr ""
-"I trasferimenti giornalieri ti aiutano a spostarti fra soggiorni ed eventi "
-"durante il tuo viaggio. Aggiungi i trasferimenti fra soggiorni oppure fra le "
-"attività giornaliere."
+msgid "Local transfers help you move between accommodations and events during your trip. Add transfers between stays or between daily activities."
+msgstr "I trasferimenti giornalieri ti aiutano a spostarti fra soggiorni ed eventi durante il tuo viaggio. Aggiungi i trasferimenti fra soggiorni oppure fra le attività giornaliere."
 
 #: templates/cotton/quick_guide.html:117
 msgid "Collaboration"
 msgstr "Collaborazione"
 
 #: templates/cotton/quick_guide.html:120
-msgid ""
-"Invite friends or family to co-edit your trip. Each collaborator gets a "
-"unique color badge on their contributions so you can see who added what."
-msgstr ""
-"Invita amici o familiari a co-modificare il tuo viaggio. Ogni collaboratore "
-"ottiene un badge colorato univoco sui propri contributi così puoi vedere chi "
-"ha aggiunto cosa."
+msgid "Invite friends or family to co-edit your trip. Each collaborator gets a unique color badge on their contributions so you can see who added what."
+msgstr "Invita amici o familiari a co-modificare il tuo viaggio. Ogni collaboratore ottiene un badge colorato univoco sui propri contributi così puoi vedere chi ha aggiunto cosa."
 
 #: templates/cotton/quick_guide.html:132
 msgid "Sharing"
 msgstr "Condivisione"
 
 #: templates/cotton/quick_guide.html:135
-msgid ""
-"Share a read-only view of your trip with anyone via a secure magic link — no "
-"account required to view."
-msgstr ""
-"Condividi una vista in sola lettura del tuo viaggio con chiunque tramite un "
-"magic link sicuro — nessun account richiesto per visualizzare."
+msgid "Share a read-only view of your trip with anyone via a secure magic link — no account required to view."
+msgstr "Condividi una vista in sola lettura del tuo viaggio con chiunque tramite un magic link sicuro — nessun account richiesto per visualizzare."
 
 #: templates/cotton/quick_guide.html:142
 msgid "Want to learn more? Check out our comprehensive documentation."
@@ -546,15 +457,8 @@ msgid "Organize your next trip!"
 msgstr "Organizza il tuo prossimo viaggio!"
 
 #: templates/includes/anonymous-index.html:9
-msgid ""
-"Register experiences, stays and transports. Keep links and notes about them. "
-"Organize them by day and look at a map to set up your next journey. Share "
-"the journey plan with your friends and family."
-msgstr ""
-"Aggiungi esperienze, soggiorni e trasferimenti. Tieni traccia di links utili "
-"e note. Organizzali per giorno e guardali su una mappa per creare il tuo "
-"prossimo viaggio. Condividi il piano di viaggio con la tua famiglia e i tuoi "
-"amici."
+msgid "Register experiences, stays and transports. Keep links and notes about them. Organize them by day and look at a map to set up your next journey. Share the journey plan with your friends and family."
+msgstr "Aggiungi esperienze, soggiorni e trasferimenti. Tieni traccia di links utili e note. Organizzali per giorno e guardali su una mappa per creare il tuo prossimo viaggio. Condividi il piano di viaggio con la tua famiglia e i tuoi amici."
 
 #: templates/includes/anonymous-index.html:13
 msgid "Get started"
@@ -601,7 +505,7 @@ msgstr "© 2026 WEBBOgrafico - Tutti i diritti riservati"
 #: templates/trips/includes/trip-destinations-modal.html:7
 #: templates/trips/note-modify.html:31 templates/trips/stay-detail.html:111
 #: templates/trips/stay-note-modify.html:35 templates/trips/stay-notes.html:33
-#: templates/trips/swap-event-order-modal.html:14 trips/forms.py:455
+#: templates/trips/swap-event-order-modal.html:14 trips/forms.py:459
 msgid "Close"
 msgstr "Chiudi"
 
@@ -680,12 +584,8 @@ msgstr "Invito alla collaborazione"
 
 #: templates/trips/email/added_as_collaborator_body.html:18
 #, python-format
-msgid ""
-"%(email)s has added you as a collaborator on the trip <strong>%(title)s</"
-"strong>."
-msgstr ""
-"%(email)s ti ha aggiunto come collaboratore al viaggio <strong>%(title)s</"
-"strong>."
+msgid "%(email)s has added you as a collaborator on the trip <strong>%(title)s</strong>."
+msgstr "%(email)s ti ha aggiunto come collaboratore al viaggio <strong>%(title)s</strong>."
 
 #: templates/trips/email/added_as_collaborator_body.html:20
 #: templates/trips/email/added_as_collaborator_body.txt:3
@@ -699,12 +599,8 @@ msgstr "Apri viaggio"
 
 #: templates/trips/email/added_as_collaborator_body.html:25
 #: templates/trips/email/added_as_collaborator_body.txt:8
-msgid ""
-"You received this email because someone invited you to collaborate on a trip "
-"in Organize It."
-msgstr ""
-"Hai ricevuto questa email perché qualcuno ti ha invitato a collaborare a un "
-"viaggio in Organize It."
+msgid "You received this email because someone invited you to collaborate on a trip in Organize It."
+msgstr "Hai ricevuto questa email perché qualcuno ti ha invitato a collaborare a un viaggio in Organize It."
 
 #: templates/trips/email/added_as_collaborator_body.txt:1
 #, python-format
@@ -727,29 +623,18 @@ msgstr "Invito alla collaborazione accettato"
 
 #: templates/trips/email/invitation_accepted_body.html:19
 #, python-format
-msgid ""
-"%(email)s has accepted your invitation and is now a collaborator on "
-"<strong>%(title)s</strong>."
-msgstr ""
-"%(email)s ha accettato il tuo invito ed è ora collaboratore di "
-"<strong>%(title)s</strong>."
+msgid "%(email)s has accepted your invitation and is now a collaborator on <strong>%(title)s</strong>."
+msgstr "%(email)s ha accettato il tuo invito ed è ora collaboratore di <strong>%(title)s</strong>."
 
 #: templates/trips/email/invitation_accepted_body.html:25
 #: templates/trips/email/invitation_accepted_body.txt:6
-msgid ""
-"You received this email because someone accepted your collaboration "
-"invitation in Organize It."
-msgstr ""
-"Hai ricevuto questa email perché qualcuno ha accettato il tuo invito alla "
-"collaborazione in Organize It."
+msgid "You received this email because someone accepted your collaboration invitation in Organize It."
+msgstr "Hai ricevuto questa email perché qualcuno ha accettato il tuo invito alla collaborazione in Organize It."
 
 #: templates/trips/email/invitation_accepted_body.txt:1
 #, python-format
-msgid ""
-"%(email)s has accepted your invitation and is now a collaborator on "
-"\"%(title)s\"."
-msgstr ""
-"%(email)s ha accettato il tuo invito ed è ora collaboratore di \"%(title)s\"."
+msgid "%(email)s has accepted your invitation and is now a collaborator on \"%(title)s\"."
+msgstr "%(email)s ha accettato il tuo invito ed è ora collaboratore di \"%(title)s\"."
 
 #: templates/trips/email/invitation_accepted_subject.txt:1
 #, python-format
@@ -767,19 +652,12 @@ msgstr "Invito alla collaborazione al viaggio"
 
 #: templates/trips/email/invitation_body.html:19
 #, python-format
-msgid ""
-"%(email)s has invited you to collaborate on the trip <strong>%(title)s</"
-"strong>."
-msgstr ""
-"%(email)s ti ha invitato a collaborare al viaggio <strong>%(title)s</strong>."
+msgid "%(email)s has invited you to collaborate on the trip <strong>%(title)s</strong>."
+msgstr "%(email)s ti ha invitato a collaborare al viaggio <strong>%(title)s</strong>."
 
 #: templates/trips/email/invitation_body.html:22
-msgid ""
-"To accept the invitation and join the trip, click the button below. You will "
-"need to create an account if you don't have one yet."
-msgstr ""
-"Per accettare l'invito e unirti al viaggio, clicca il pulsante qui sotto. "
-"Dovrai creare un account se non ne hai già uno."
+msgid "To accept the invitation and join the trip, click the button below. You will need to create an account if you don't have one yet."
+msgstr "Per accettare l'invito e unirti al viaggio, clicca il pulsante qui sotto. Dovrai creare un account se non ne hai già uno."
 
 #: templates/trips/email/invitation_body.html:25
 msgid "Accept invitation"
@@ -803,12 +681,8 @@ msgid "%(email)s has invited you to collaborate on the trip \"%(title)s\"."
 msgstr "%(email)s ti ha invitato a collaborare al viaggio \"%(title)s\"."
 
 #: templates/trips/email/invitation_body.txt:3
-msgid ""
-"To accept the invitation and join the trip, visit the link below. You will "
-"need to create an account if you don't have one yet."
-msgstr ""
-"Per accettare l'invito e unirti al viaggio, visita il link qui sotto. Dovrai "
-"creare un account se non ne hai già uno."
+msgid "To accept the invitation and join the trip, visit the link below. You will need to create an account if you don't have one yet."
+msgstr "Per accettare l'invito e unirti al viaggio, visita il link qui sotto. Dovrai creare un account se non ne hai già uno."
 
 #: templates/trips/email/invitation_subject.txt:1
 #, python-format
@@ -830,8 +704,7 @@ msgstr "Sei stato invitato a vedere \"%(title)s\""
 #: templates/trips/email/viewer_invitation_body.html:18
 #, python-format
 msgid "%(email)s has invited you to view the trip <strong>%(title)s</strong>."
-msgstr ""
-"%(email)s ti ha invitato a vedere il viaggio <strong>%(title)s</strong>."
+msgstr "%(email)s ti ha invitato a vedere il viaggio <strong>%(title)s</strong>."
 
 #: templates/trips/email/viewer_invitation_body.html:20
 msgid "No account required — just click the button below."
@@ -848,8 +721,7 @@ msgstr "%(email)s ti ha invitato a vedere il viaggio \"%(title)s\"."
 
 #: templates/trips/email/viewer_invitation_body.txt:3
 msgid "Click the link below to access the trip. No account required."
-msgstr ""
-"Clicca il link qui sotto per accedere al viaggio. Nessun account richiesto."
+msgstr "Clicca il link qui sotto per accedere al viaggio. Nessun account richiesto."
 
 #: templates/trips/email/viewer_invitation_subject.txt:1
 #, python-format
@@ -864,11 +736,11 @@ msgstr "Arricchisci"
 #: templates/trips/main-transfer-connection-create.html:89
 #: templates/trips/main-transfer-connection-edit.html:65
 #: templates/trips/stay-transfer-create.html:57
-#: templates/trips/stay-transfer-edit.html:57 trips/forms.py:800
-#: trips/forms.py:831 trips/forms.py:884 trips/forms.py:1476
-#: trips/forms.py:1480 trips/forms.py:1543 trips/forms.py:1547
-#: trips/forms.py:1587 trips/forms.py:1591 trips/forms.py:1631
-#: trips/forms.py:1635
+#: templates/trips/stay-transfer-edit.html:57 trips/forms.py:811
+#: trips/forms.py:842 trips/forms.py:895 trips/forms.py:1487
+#: trips/forms.py:1491 trips/forms.py:1554 trips/forms.py:1558
+#: trips/forms.py:1598 trips/forms.py:1602 trips/forms.py:1642
+#: trips/forms.py:1646
 msgid "Notes"
 msgstr "Note"
 
@@ -886,8 +758,7 @@ msgstr "Elimina"
 
 #: templates/trips/event-enrich-preview.html:25
 #: templates/trips/stay-enrich-preview.html:17
-msgid ""
-"Review the enriched data below. New information is highlighted in green."
+msgid "Review the enriched data below. New information is highlighted in green."
 msgstr "Verifica i dati aggiuntivi evidenziati in verde."
 
 #: templates/trips/event-enrich-preview.html:55
@@ -898,7 +769,7 @@ msgstr "Accetta"
 #: templates/trips/event-enrich-preview.html:63
 #: templates/trips/event-modal.html:29
 #: templates/trips/experience-create-unpaired.html:24
-#: templates/trips/experience-create.html:42
+#: templates/trips/experience-create.html:60
 #: templates/trips/includes/trip-destinations-modal.html:60
 #: templates/trips/main-transfer-connection-create.html:96
 #: templates/trips/main-transfer-connection-edit.html:72
@@ -909,7 +780,7 @@ msgstr "Accetta"
 #: templates/trips/partials/main-transfer-other.html:63
 #: templates/trips/partials/main-transfer-train.html:92
 #: templates/trips/partials/main-transfer-type.html:63
-#: templates/trips/stay-create.html:31
+#: templates/trips/stay-create.html:49
 #: templates/trips/stay-enrich-preview.html:47
 #: templates/trips/stay-modify.html:18
 #: templates/trips/stay-transfer-create.html:64
@@ -933,14 +804,8 @@ msgid "You are deleting %(name)s permanently."
 msgstr "Stai eliminando %(name)s in modo permanente."
 
 #: templates/trips/event-modal.html:23
-msgid ""
-"This action cannot be undone. You can alternatively unpair from this day and "
-"reuse later by reassigning to a day of your trip. If you are sure to proceed "
-"just click confirm."
-msgstr ""
-"Questa azione non può essere annullata. In alternativa puoi dissociare "
-"l'evento da questo giorno e riutilizzarlo in seguito assegnandolo a un altro "
-"giorno del viaggio. Se sei sicuro di voler procedere, clicca su Conferma."
+msgid "This action cannot be undone. You can alternatively unpair from this day and reuse later by reassigning to a day of your trip. If you are sure to proceed just click confirm."
+msgstr "Questa azione non può essere annullata. In alternativa puoi dissociare l'evento da questo giorno e riutilizzarlo in seguito assegnandolo a un altro giorno del viaggio. Se sei sicuro di voler procedere, clicca su Conferma."
 
 #: templates/trips/event-modal.html:32
 msgid "Unpair"
@@ -959,7 +824,21 @@ msgstr "Aggiungi Note"
 msgid "Create a new Experience"
 msgstr "Crea una nuova esperienza"
 
-#: templates/trips/experience-create.html:23
+#: templates/trips/experience-create.html:20
+#: templates/trips/meal-create.html:26 templates/trips/stay-create.html:26
+#, fuzzy
+#| msgid "Open in Google Maps"
+msgid "Google Maps link"
+msgstr "Apri in Google Maps"
+
+#: templates/trips/experience-create.html:32
+#: templates/trips/meal-create.html:38 templates/trips/stay-create.html:38
+#, fuzzy
+#| msgid "Search on"
+msgid "Search"
+msgstr "Cerca su"
+
+#: templates/trips/experience-create.html:41
 msgid "Unpaired Experiences"
 msgstr "Esperienze non abbinate"
 
@@ -979,8 +858,7 @@ msgstr "Dati aeroporti da database CSV"
 
 #: templates/trips/includes/airport-results.html:31
 msgid "No airport found. Try searching by name, city, or IATA code."
-msgstr ""
-"Nessun aeroporto trovato. Prova a cercare per nome, città o codice IATA."
+msgstr "Nessun aeroporto trovato. Prova a cercare per nome, città o codice IATA."
 
 #: templates/trips/includes/city-results.html:26
 #, fuzzy
@@ -1124,8 +1002,8 @@ msgstr "Seleziona giorni"
 #: templates/trips/includes/day-destination-card.html:6
 #: templates/trips/includes/day-selector.html:16
 #: templates/trips/includes/day.html:12 templates/trips/includes/day.html:14
-#: templates/trips/shared-trip-detail.html:25 trips/forms.py:753
-#: trips/models.py:484
+#: templates/trips/shared-trip-detail.html:25 trips/forms.py:764
+#: trips/models.py:508
 msgid "Day"
 msgstr "Giorno"
 
@@ -1217,7 +1095,7 @@ msgstr "Nuovo"
 msgid "How to Get There"
 msgstr "Come Arrivare"
 
-#: templates/trips/includes/main-transfers.html:42 trips/models.py:259
+#: templates/trips/includes/main-transfers.html:42 trips/models.py:283
 msgid "Arrival"
 msgstr "Andata"
 
@@ -1299,13 +1177,21 @@ msgstr "Aggiungi trasferimento"
 msgid "No arrival transfer added yet."
 msgstr "Nessun trasferimento di andata aggiunto."
 
-#: templates/trips/includes/main-transfers.html:215 trips/models.py:260
+#: templates/trips/includes/main-transfers.html:215 trips/models.py:284
 msgid "Departure"
 msgstr "Ritorno"
 
 #: templates/trips/includes/main-transfers.html:356
 msgid "No departure transfer added yet."
 msgstr "Nessun trasferimento di ritorno aggiunto."
+
+#: templates/trips/includes/maps-link-prefill.html:15
+msgid "Location found! Fields have been pre-filled."
+msgstr "Luogo trovato! I campi sono stati precompilati."
+
+#: templates/trips/includes/maps-link-prefill.html:21
+msgid "Oops! Location not recognised, fill in the details manually."
+msgstr "Ops! Luogo non riconosciuto, compila i dettagli manualmente."
 
 #: templates/trips/includes/station-results.html:24
 msgid "Station data from CSV database"
@@ -1450,8 +1336,7 @@ msgstr "Questo link è stato revocato"
 
 #: templates/trips/link-revoked.html:10
 msgid "The sharing link you followed has been deactivated by the owner."
-msgstr ""
-"Il link di condivisione che hai seguito è stato disattivato dal proprietario."
+msgstr "Il link di condivisione che hai seguito è stato disattivato dal proprietario."
 
 #: templates/trips/main-transfer-connection-create.html:10
 msgid "Create Connection from Arrival"
@@ -1503,20 +1388,12 @@ msgid "Are you sure you want to delete this connection?"
 msgstr "Sei sicuro di voler eliminare questo trasferimento?"
 
 #: templates/trips/main-transfer-connection-modal.html:53
-msgid ""
-"No events or stays available on the first day. Please create an event or "
-"stay first, then you can add a connection from your arrival transfer."
-msgstr ""
-"Nessun evento o soggiorno disponibile nel primo giorno. Per favore creali "
-"prima di aggiungere un trasferimento dal tuo viaggio di arrivo."
+msgid "No events or stays available on the first day. Please create an event or stay first, then you can add a connection from your arrival transfer."
+msgstr "Nessun evento o soggiorno disponibile nel primo giorno. Per favore creali prima di aggiungere un trasferimento dal tuo viaggio di arrivo."
 
 #: templates/trips/main-transfer-connection-modal.html:55
-msgid ""
-"No events or stays available on the last day. Please create an event or stay "
-"first, then you can add a connection to your departure transfer."
-msgstr ""
-"Nessun evento o soggiorno disponibile nell’ultimo giorno. Per favore creali "
-"prima di aggiungere un trasferimento dal tuo viaggio di ritorno a casa."
+msgid "No events or stays available on the last day. Please create an event or stay first, then you can add a connection to your departure transfer."
+msgstr "Nessun evento o soggiorno disponibile nell’ultimo giorno. Per favore creali prima di aggiungere un trasferimento dal tuo viaggio di ritorno a casa."
 
 #: templates/trips/main-transfer-connection-modal.html:62
 msgid "Select the destination for your arrival connection:"
@@ -1543,7 +1420,7 @@ msgstr "Aggiorna"
 msgid "Create a new Meal"
 msgstr "Crea un nuovo Pasto"
 
-#: templates/trips/meal-create.html:29
+#: templates/trips/meal-create.html:47
 msgid "Unpaired Meals"
 msgstr "Pasti non abbinati"
 
@@ -1563,9 +1440,7 @@ msgstr "Errori di validazione del form:"
 #: templates/trips/partials/main-transfer-other.html:32
 #: templates/trips/partials/main-transfer-train.html:36
 msgid "Fields pre-filled from arrival journey. You can modify them if needed."
-msgstr ""
-"I campi sono stati precompilati con i dati del trasferimento principale di "
-"arrivo. Li puoi modificare se necessario."
+msgstr "I campi sono stati precompilati con i dati del trasferimento principale di arrivo. Li puoi modificare se necessario."
 
 #: templates/trips/partials/main-transfer-car.html:38
 msgid "Arrival by Car"
@@ -1608,20 +1483,20 @@ msgstr "Cerca su"
 msgid "Select the type of transport for this transfer."
 msgstr "Seleziona il mezzo di trasporto per questo trasferimento."
 
-#: templates/trips/partials/main-transfer-type.html:17 trips/models.py:253
+#: templates/trips/partials/main-transfer-type.html:17 trips/models.py:277
 msgid "Plane"
 msgstr "Aeroplano"
 
-#: templates/trips/partials/main-transfer-type.html:29 trips/models.py:254
+#: templates/trips/partials/main-transfer-type.html:29 trips/models.py:278
 msgid "Train"
 msgstr "Treno"
 
-#: templates/trips/partials/main-transfer-type.html:41 trips/models.py:255
+#: templates/trips/partials/main-transfer-type.html:41 trips/models.py:279
 msgid "Car"
 msgstr "Automobile"
 
-#: templates/trips/partials/main-transfer-type.html:57 trips/models.py:256
-#: trips/models.py:878
+#: templates/trips/partials/main-transfer-type.html:57 trips/models.py:280
+#: trips/models.py:904
 msgid "Other"
 msgstr "Altro"
 
@@ -1671,7 +1546,7 @@ msgstr "Condividi questo link"
 msgid "Expires on %(date)s"
 msgstr "Scade il %(date)s"
 
-#: templates/trips/share-link-created.html:35 trips/forms.py:1657
+#: templates/trips/share-link-created.html:35 trips/forms.py:1668
 msgid "Never expires"
 msgstr "Non scade mai"
 
@@ -1683,7 +1558,7 @@ msgstr "Crea un altro"
 msgid "Active share links"
 msgstr "Link di condivisione attivi"
 
-#: templates/trips/share-link-list.html:8 trips/forms.py:1663
+#: templates/trips/share-link-list.html:8 trips/forms.py:1674
 msgid "Label"
 msgstr "Etichetta"
 
@@ -1782,12 +1657,8 @@ msgid "Create a New Trip"
 msgstr "Crea un nuovo viaggio"
 
 #: templates/trips/trip-create.html:34
-msgid ""
-"Changing the dates may remove some days. Events on removed days will become "
-"unpaired and can be reassigned later."
-msgstr ""
-"Modificare le date potrebbe rimuovere alcuni giorni. Gli eventi nei giorni "
-"rimossi diventeranno non assegnati e potranno essere riassegnati in seguito."
+msgid "Changing the dates may remove some days. Events on removed days will become unpaired and can be reassigned later."
+msgstr "Modificare le date potrebbe rimuovere alcuni giorni. Gli eventi nei giorni rimossi diventeranno non assegnati e potranno essere riassegnati in seguito."
 
 #: templates/trips/trip-detail.html:12
 msgid "This trip is archived and cannot be modified."
@@ -1871,8 +1742,7 @@ msgstr "Carica immagine"
 
 #: trips/forms.py:195
 msgid "Please fill in the destination field to search for images"
-msgstr ""
-"Per favore compila il campo destinazione per usufruire della ricerca immagini"
+msgstr "Per favore compila il campo destinazione per usufruire della ricerca immagini"
 
 #: trips/forms.py:235
 msgid "Click to select an image"
@@ -1902,238 +1772,231 @@ msgstr "Non specificata"
 msgid "Duration"
 msgstr "Durata"
 
-#: trips/forms.py:334 trips/forms.py:335 trips/forms.py:382 trips/forms.py:652
-#: trips/forms.py:653 trips/forms.py:698 trips/forms.py:708
+#: trips/forms.py:334 trips/forms.py:335 trips/forms.py:384 trips/forms.py:659
+#: trips/forms.py:660 trips/forms.py:707 trips/forms.py:719
 msgid "Name"
 msgstr "Nome"
 
-#: trips/forms.py:341 trips/forms.py:342 trips/forms.py:383 trips/forms.py:659
-#: trips/forms.py:660
+#: trips/forms.py:341 trips/forms.py:342 trips/forms.py:385 trips/forms.py:666
+#: trips/forms.py:667
 msgid "City"
 msgstr "Città"
 
-#: trips/forms.py:352 trips/forms.py:670
-msgid ""
-"Enter a valid phone number (with or without international prefix, and at "
-"most 2 spaces)."
-msgstr ""
-"Inserisci un numero di telefono valido (con o senza il prefisso "
-"internazionale, massimo 2 spazi)"
+#: trips/forms.py:352 trips/forms.py:677
+msgid "Enter a valid phone number (with or without international prefix, and at most 2 spaces)."
+msgstr "Inserisci un numero di telefono valido (con o senza il prefisso internazionale, massimo 2 spazi)"
 
-#: trips/forms.py:357 trips/forms.py:675
+#: trips/forms.py:357 trips/forms.py:682
 msgid "Phone number can contain at most 2 spaces."
 msgstr "Il numero di telefono può contender al massimo due spazi."
 
-#: trips/forms.py:360 trips/forms.py:361 trips/forms.py:678 trips/forms.py:679
-#: trips/forms.py:704 trips/forms.py:712
+#: trips/forms.py:360 trips/forms.py:361 trips/forms.py:685 trips/forms.py:686
+#: trips/forms.py:715 trips/forms.py:723
 msgid "Phone number"
 msgstr "Numero di telefono"
 
-#: trips/forms.py:377 trips/forms.py:385 trips/forms.py:700 trips/forms.py:714
+#: trips/forms.py:379 trips/forms.py:387 trips/forms.py:709 trips/forms.py:725
 msgid "Address"
 msgstr "Indirizzo"
 
-#: trips/forms.py:378 trips/forms.py:384 trips/forms.py:699 trips/forms.py:713
+#: trips/forms.py:380 trips/forms.py:386 trips/forms.py:708 trips/forms.py:724
 msgid "Website"
 msgstr "Sito Internet"
 
-#: trips/forms.py:379 trips/forms.py:386
+#: trips/forms.py:381 trips/forms.py:388
 msgid "Tag"
 msgstr ""
 
-#: trips/forms.py:431
+#: trips/forms.py:435
 msgid "Monday"
 msgstr "Lunedì"
 
-#: trips/forms.py:432
+#: trips/forms.py:436
 msgid "Tuesday"
 msgstr "Martedì"
 
-#: trips/forms.py:433
+#: trips/forms.py:437
 msgid "Wednesday"
 msgstr "Mercoledì"
 
-#: trips/forms.py:434
+#: trips/forms.py:438
 msgid "Thursday"
 msgstr "Giovedì"
 
-#: trips/forms.py:435
+#: trips/forms.py:439
 msgid "Friday"
 msgstr "Venerdì"
 
-#: trips/forms.py:436
+#: trips/forms.py:440
 msgid "Saturday"
 msgstr "Sabato"
 
-#: trips/forms.py:437
+#: trips/forms.py:441
 msgid "Sunday"
 msgstr "Domenica"
 
-#: trips/forms.py:442 trips/forms.py:537
+#: trips/forms.py:446 trips/forms.py:544
 msgid "Closed"
 msgstr "Chiuso"
 
-#: trips/forms.py:448
+#: trips/forms.py:452
 msgid "Open"
 msgstr "Aperto"
 
-#: trips/forms.py:526
+#: trips/forms.py:533
 msgid "Opening hours"
 msgstr "Orari"
 
-#: trips/forms.py:612 trips/forms.py:617
+#: trips/forms.py:619 trips/forms.py:624
 msgid "Experience type"
 msgstr "Tipo"
 
-#: trips/forms.py:628
+#: trips/forms.py:635
 msgid "Meal Type"
 msgstr "Tipo"
 
-#: trips/forms.py:646
+#: trips/forms.py:653
 msgid "Period of stay"
 msgstr "Periodo di soggiorno"
 
-#: trips/forms.py:709
+#: trips/forms.py:720
 msgid "Check-in"
 msgstr "Check-in"
 
-#: trips/forms.py:710
+#: trips/forms.py:721
 msgid "Check-out"
 msgstr "Check-out"
 
-#: trips/forms.py:711
+#: trips/forms.py:722
 msgid "Cancellation date"
 msgstr "Data di cancellazione gratuita"
 
-#: trips/forms.py:801 trips/forms.py:832
+#: trips/forms.py:812 trips/forms.py:843
 msgid "Add notes..."
 msgstr "Aggiungi note..."
 
-#: trips/forms.py:869
+#: trips/forms.py:880
 msgid "Direction"
 msgstr "Direzione"
 
-#: trips/forms.py:882
+#: trips/forms.py:893
 msgid "Departure Time"
 msgstr "Orario di partenza"
 
-#: trips/forms.py:883
+#: trips/forms.py:894
 msgid "Arrival Time"
 msgstr "Orario di arrivo"
 
-#: trips/forms.py:937
+#: trips/forms.py:948
 msgid "Departure Airport"
 msgstr "Aeroporto di partenza"
 
-#: trips/forms.py:942
+#: trips/forms.py:953
 msgid "Search by name or IATA code (e.g., FCO, Rome)"
 msgstr "Cerca per nome o codice IATA (es. FCO, Roma)"
 
-#: trips/forms.py:947 trips/forms.py:968
+#: trips/forms.py:958 trips/forms.py:979
 msgid "Search for airport by name, city, or IATA code"
 msgstr "Cerca aeroporto per nome, città o codice IATA"
 
-#: trips/forms.py:958
+#: trips/forms.py:969
 msgid "Arrival Airport"
 msgstr "Aeroporto di arrivo"
 
-#: trips/forms.py:963
+#: trips/forms.py:974
 msgid "Search by name or IATA code"
 msgstr "Cerca per nome o codice IATA"
 
-#: trips/forms.py:982
+#: trips/forms.py:993
 msgid "Flight Number"
 msgstr "Volo"
 
-#: trips/forms.py:991
+#: trips/forms.py:1002
 msgid "Terminal"
 msgstr "Terminal"
 
-#: trips/forms.py:1131
+#: trips/forms.py:1142
 msgid "Departure Station"
 msgstr "Stazione di partenza"
 
-#: trips/forms.py:1136 trips/forms.py:1157
+#: trips/forms.py:1147 trips/forms.py:1168
 msgid "Search by station name"
 msgstr "Cerca per nome stazione"
 
-#: trips/forms.py:1141 trips/forms.py:1162
+#: trips/forms.py:1152 trips/forms.py:1173
 msgid "Search for train station by name"
 msgstr "Cerca stazione ferroviaria per nome"
 
-#: trips/forms.py:1152
+#: trips/forms.py:1163
 msgid "Arrival Station"
 msgstr "Stazione di arrivo"
 
-#: trips/forms.py:1175
+#: trips/forms.py:1186
 msgid "Train Number"
 msgstr "Numero treno"
 
-#: trips/forms.py:1180
-msgid ""
-"Optional. If provided, enables direct train status lookup on Viaggiatreno."
-msgstr ""
-"Facoltativo. Se inserito, permette di controllare lo stato del treno su "
-"Viaggiatreno."
+#: trips/forms.py:1191
+msgid "Optional. If provided, enables direct train status lookup on Viaggiatreno."
+msgstr "Facoltativo. Se inserito, permette di controllare lo stato del treno su Viaggiatreno."
 
-#: trips/forms.py:1313 trips/forms.py:1403
+#: trips/forms.py:1324 trips/forms.py:1414
 msgid "Departure Location"
 msgstr "Località di partenza"
 
-#: trips/forms.py:1321 trips/forms.py:1333
+#: trips/forms.py:1332 trips/forms.py:1344
 msgid "Full address for geocoding"
 msgstr "Indirizzo completo per geocoding"
 
-#: trips/forms.py:1325 trips/forms.py:1414
+#: trips/forms.py:1336 trips/forms.py:1425
 msgid "Arrival Location"
 msgstr "Località di arrivo"
 
-#: trips/forms.py:1390
+#: trips/forms.py:1401
 msgid "Vehicle type"
 msgstr "Tipo di mezzo"
 
-#: trips/forms.py:1396
+#: trips/forms.py:1407
 msgid "e.g. Ferry to Venice, Flixbus to Milan"
 msgstr "es. Traghetto per Venezia, Flixbus per Milano"
 
-#: trips/forms.py:1408 trips/forms.py:1419
+#: trips/forms.py:1419 trips/forms.py:1430
 msgid "Full address or location name"
 msgstr "Indirizzo completo o nome località"
 
-#: trips/forms.py:1475 trips/forms.py:1542 trips/forms.py:1586
-#: trips/forms.py:1630
+#: trips/forms.py:1486 trips/forms.py:1553 trips/forms.py:1597
+#: trips/forms.py:1641
 msgid "Transport Mode"
 msgstr "Mezzo di trasporto"
 
-#: trips/forms.py:1511
+#: trips/forms.py:1522
 msgid "From stay and to stay must be different."
 msgstr "I soggiorni di partenza e arrivo devono essere differenti."
 
-#: trips/forms.py:1520
+#: trips/forms.py:1531
 msgid "The from stay already has an outgoing transfer."
 msgstr "Il soggiorno di partenza è già abbinato ad un trasferimento."
 
-#: trips/forms.py:1529
+#: trips/forms.py:1540
 msgid "The to stay already has an incoming transfer."
 msgstr "Il soggiorno di arrivo è già abbinato ad un trasferimento."
 
-#: trips/forms.py:1654
+#: trips/forms.py:1665
 msgid "7 days"
 msgstr "7 giorni"
 
-#: trips/forms.py:1655
+#: trips/forms.py:1666
 msgid "30 days"
 msgstr "30 giorni"
 
-#: trips/forms.py:1656
+#: trips/forms.py:1667
 msgid "90 days"
 msgstr "90 giorni"
 
-#: trips/forms.py:1664
+#: trips/forms.py:1675
 msgid "Optional label to identify this link"
 msgstr "Etichetta opzionale per identificare il link"
 
-#: trips/forms.py:1669
+#: trips/forms.py:1680
 msgid "Expires after"
 msgstr "Scade dopo"
 
@@ -2157,337 +2020,327 @@ msgstr "Completata"
 msgid "Archived"
 msgstr "Archiviata"
 
-#: trips/models.py:302
+#: trips/models.py:326
 msgid "Departure time"
 msgstr "Orario di partenza"
 
-#: trips/models.py:303
+#: trips/models.py:327
 msgid "Arrival time"
 msgstr "Orario di arrivo"
 
-#: trips/models.py:304
+#: trips/models.py:328
 msgid "Additional notes"
 msgstr "Note aggiuntive"
 
-#: trips/models.py:326
+#: trips/models.py:350
 msgid "Main Transfer"
 msgstr "Trasferimento principale"
 
-#: trips/models.py:596
+#: trips/models.py:622
 msgid "Driving"
 msgstr "Auto"
 
-#: trips/models.py:597
+#: trips/models.py:623
 msgid "Walking"
 msgstr "A piedi"
 
-#: trips/models.py:598
+#: trips/models.py:624
 msgid "Bicycling"
 msgstr "Bicicletta"
 
-#: trips/models.py:599
+#: trips/models.py:625
 msgid "Transit"
 msgstr "Mezzi pubblici"
 
-#: trips/models.py:635
+#: trips/models.py:661
 msgid "Stay Transfer"
 msgstr "Trasferimento"
 
-#: trips/models.py:636
+#: trips/models.py:662
 msgid "Stay Transfers"
 msgstr "Trasferimenti"
 
-#: trips/models.py:705
+#: trips/models.py:731
 msgid "Cannot create transfer to the same stay"
 msgstr "Non è possibile creare trasferimenti verso lo stesso soggiorno"
 
-#: trips/models.py:714
+#: trips/models.py:740
 msgid "Stays must be on consecutive days (day N and day N+1)"
-msgstr ""
-"I soggiorni devono essere in giorni consecutivi (giorno N e giorno N+1)"
+msgstr "I soggiorni devono essere in giorni consecutivi (giorno N e giorno N+1)"
 
-#: trips/models.py:720
+#: trips/models.py:746
 msgid "Both stays must belong to the same trip"
 msgstr "Entrambi i soggiorni devono appartenere allo stesso viaggio"
 
-#: trips/models.py:763
+#: trips/models.py:789
 msgid "Main Transfer Connection"
 msgstr "Trasferimento principale"
 
-#: trips/models.py:764
+#: trips/models.py:790
 msgid "Main Transfer Connections"
 msgstr "Trasferimenti principali"
 
-#: trips/models.py:863
+#: trips/models.py:889
 msgid "Either event or stay must be set for the connection"
-msgstr ""
-"Almeno un evento oppure un soggiorno deve essere selezionato per il "
-"trasferimento"
+msgstr "Almeno un evento oppure un soggiorno deve essere selezionato per il trasferimento"
 
-#: trips/models.py:868
+#: trips/models.py:894
 msgid "Cannot set both event and stay - choose only one destination"
-msgstr ""
-"Non è possibile selezionare contemporaneamente un evento e un soggiorno - "
-"per favore scegli una destinazione sola"
+msgstr "Non è possibile selezionare contemporaneamente un evento e un soggiorno - per favore scegli una destinazione sola"
 
-#: trips/models.py:874
+#: trips/models.py:900
 msgid "Museum"
 msgstr "Museo"
 
-#: trips/models.py:875
+#: trips/models.py:901
 msgid "Park"
 msgstr "Parco"
 
-#: trips/models.py:876
+#: trips/models.py:902
 msgid "Walk"
 msgstr "Passeggiata"
 
-#: trips/models.py:877
+#: trips/models.py:903
 msgid "Sport"
 msgstr "Attività sportiva"
 
-#: trips/models.py:893
+#: trips/models.py:919
 msgid "To be defined"
 msgstr "Da definire"
 
-#: trips/models.py:894
+#: trips/models.py:920
 msgid "Breakfast"
 msgstr "Colazione"
 
-#: trips/models.py:895
+#: trips/models.py:921
 msgid "Lunch"
 msgstr "Pranzo"
 
-#: trips/models.py:896
+#: trips/models.py:922
 msgid "Dinner"
 msgstr "Cena"
 
-#: trips/models.py:897
+#: trips/models.py:923
 msgid "Snack"
 msgstr "Spuntino"
 
-#: trips/models.py:914
+#: trips/models.py:940
 msgid "Blue"
 msgstr ""
 
-#: trips/models.py:915
+#: trips/models.py:941
 msgid "Green"
 msgstr ""
 
-#: trips/models.py:916
+#: trips/models.py:942
 msgid "Purple"
 msgstr ""
 
-#: trips/models.py:917
+#: trips/models.py:943
 msgid "Orange"
 msgstr ""
 
-#: trips/models.py:918
+#: trips/models.py:944
 msgid "Pink"
 msgstr ""
 
-#: trips/models.py:919
+#: trips/models.py:945
 msgid "Teal"
 msgstr ""
 
-#: trips/models.py:920
+#: trips/models.py:946
 msgid "Red"
 msgstr ""
 
-#: trips/models.py:921
+#: trips/models.py:947
 msgid "Indigo"
 msgstr ""
 
-#: trips/models.py:1034
+#: trips/models.py:1060
 msgid "View only"
 msgstr "Solo visualizzazione"
 
-#: trips/models.py:1035
+#: trips/models.py:1061
 msgid "Can edit"
 msgstr "Può modificare"
 
-#: trips/views.py:399
+#: trips/views/collaborators.py:393
+msgid "You've joined the trip as a participant."
+msgstr "Sei entrato nel viaggio come partecipante."
+
+#: trips/views/events.py:46 trips/views/events.py:91
+msgid "Experience added successfully"
+msgstr "Esperienza aggiunta correttamente"
+
+#: trips/views/events.py:73 trips/views/events.py:108
+msgid "Meal added successfully"
+msgstr "Pasto aggiunto correttamente"
+
+#: trips/views/events.py:134
+msgid "Event deleted successfully"
+msgstr "Evento eliminato correttamente"
+
+#: trips/views/events.py:152
+msgid "Event unpaired successfully"
+msgstr "Evento scollegato correttamente"
+
+#: trips/views/events.py:171
+msgid "Event paired successfully"
+msgstr "Evento ricollegato correttamente"
+
+#: trips/views/events.py:303 trips/views/stays.py:174
+msgid "Note added successfully"
+msgstr "Nota aggiunta con successo"
+
+#: trips/views/events.py:325 trips/views/stays.py:199
+msgid "Note updated successfully"
+msgstr "Nota modificata correttamente"
+
+#: trips/views/events.py:345 trips/views/stays.py:219
+msgid "Note deleted successfully"
+msgstr "Nota eliminata correttamente"
+
+#: trips/views/events.py:365
+msgid "Event must have a name and an address to be enriched."
+msgstr "L’evento deve avere un nome e un indirizzo per poter procedere con aggiunta dei dati aggiuntivi."
+
+#: trips/views/events.py:379 trips/views/stays.py:255
+msgid "Could not find a matching place."
+msgstr "Non ho trovavo un luogo corrispondente."
+
+#: trips/views/events.py:445
+msgid "Event enriched successfully!"
+msgstr "Dati aggiunti con successo!"
+
+#: trips/views/maps.py:492
+msgid "Event added to trip."
+msgstr "Evento aggiunto al viaggio."
+
+#: trips/views/maps.py:545
+msgid "Stay added to trip."
+msgstr "Soggiorno aggiunto al viaggio."
+
+#: trips/views/stays.py:32 trips/views/stays.py:53
+msgid "Stay added successfully"
+msgstr "Soggiorno aggiunto correttamente"
+
+#: trips/views/stays.py:135
+msgid "Stay deleted successfully"
+msgstr "Soggiorno eliminato correttamente"
+
+#: trips/views/stays.py:243
+msgid "Stay must have a name and an address to be enriched."
+msgstr "L’evento deve avere un nome e un indirizzo per poter procedere con aggiunta dei dati."
+
+#: trips/views/stays.py:350
+msgid "Stay enriched successfully!"
+msgstr "Dati aggiunti con successo!"
+
+#: trips/views/transfers.py:63
+msgid "No next day found for this stay"
+msgstr "Giorno successivo non trovato per questo soggiorno"
+
+#: trips/views/transfers.py:72
+msgid "Both days must have stays to create a transfer"
+msgstr "Entrambi i giorni devono avere un soggiorno per creare un trasferimento"
+
+#: trips/views/transfers.py:84
+msgid "Cannot create transfer between the same stay"
+msgstr "Non è possibile creare trasferimenti con lo stesso soggiorno"
+
+#: trips/views/transfers.py:104
+msgid "Stay transfer created successfully"
+msgstr "Trasferimento modificato con successo"
+
+#: trips/views/transfers.py:135
+msgid "Stay transfer updated successfully"
+msgstr "Trasferimento modificato con successo"
+
+#: trips/views/transfers.py:160
+msgid "Stay transfer deleted successfully"
+msgstr "Trasferimento eliminato con successo"
+
+#: trips/views/transfers.py:197
+msgid "Main transfer updated successfully"
+msgstr "Trasferimento principale modificato con successo"
+
+#: trips/views/transfers.py:248
+msgid "Main transfer deleted successfully"
+msgstr "Trasferimento principale eliminato con successo"
+
+#: trips/views/transfers.py:421
+msgid "A connection already exists for this main transfer"
+msgstr "Esiste già un trasferimento per questo viaggio"
+
+#: trips/views/transfers.py:432
+msgid "Invalid destination type"
+msgstr "Tipo di destinazione non valido"
+
+#: trips/views/transfers.py:443 trips/views/transfers.py:458
+msgid "No days available in this trip"
+msgstr "Nessun giorno disponibile in questo viaggio"
+
+#: trips/views/transfers.py:493
+msgid "Connection created successfully"
+msgstr "Trasferimento salvato con successo"
+
+#: trips/views/transfers.py:524
+msgid "Connection updated successfully"
+msgstr "Trasferimento modificata correttamente"
+
+#: trips/views/transfers.py:544
+msgid "Connection deleted successfully"
+msgstr "Trasferimento eliminata correttamente"
+
+#: trips/views/transfers.py:949
+msgid "Transfer saved successfully!"
+msgstr "Trasferimento salvato con successo!"
+
+#: trips/views/trips.py:250
 #, python-format
 msgid "<strong>%(title)s</strong> added successfully"
 msgstr "<strong>%(title)s</strong> aggiunta correttamente"
 
-#: trips/views.py:422
+#: trips/views/trips.py:273
 #, python-format
 msgid "<strong>%(title)s</strong> deleted successfully"
 msgstr "<strong>%(title)s</strong> eliminata correttamente"
 
-#: trips/views.py:478
+#: trips/views/trips.py:327
 #, python-format
 msgid "<strong>%(title)s</strong> updated successfully"
 msgstr "<strong>%(title)s</strong> modificata correttamente"
 
-#: trips/views.py:504
+#: trips/views/trips.py:353
 #, python-format
 msgid "<strong>%(title)s</strong> archived successfully"
 msgstr "<strong>%(title)s</strong> archiviata correttamente"
 
-#: trips/views.py:519
+#: trips/views/trips.py:368
 #, python-format
 msgid "<strong>%(title)s</strong> unarchived successfully"
 msgstr "<strong>%(title)s</strong> riaperta correttamente"
 
-#: trips/views.py:620 trips/views.py:665
-msgid "Experience added successfully"
-msgstr "Esperienza aggiunta correttamente"
-
-#: trips/views.py:647 trips/views.py:682
-msgid "Meal added successfully"
-msgstr "Pasto aggiunto correttamente"
-
-#: trips/views.py:699 trips/views.py:720
-msgid "Stay added successfully"
-msgstr "Soggiorno aggiunto correttamente"
-
-#: trips/views.py:802
-msgid "Stay deleted successfully"
-msgstr "Soggiorno eliminato correttamente"
-
-#: trips/views.py:836
-msgid "No next day found for this stay"
-msgstr "Giorno successivo non trovato per questo soggiorno"
-
-#: trips/views.py:845
-msgid "Both days must have stays to create a transfer"
-msgstr ""
-"Entrambi i giorni devono avere un soggiorno per creare un trasferimento"
-
-#: trips/views.py:857
-msgid "Cannot create transfer between the same stay"
-msgstr "Non è possibile creare trasferimenti con lo stesso soggiorno"
-
-#: trips/views.py:877
-msgid "Stay transfer created successfully"
-msgstr "Trasferimento modificato con successo"
-
-#: trips/views.py:908
-msgid "Stay transfer updated successfully"
-msgstr "Trasferimento modificato con successo"
-
-#: trips/views.py:933
-msgid "Stay transfer deleted successfully"
-msgstr "Trasferimento eliminato con successo"
-
-#: trips/views.py:970
-msgid "Main transfer updated successfully"
-msgstr "Trasferimento principale modificato con successo"
-
-#: trips/views.py:1021
-msgid "Main transfer deleted successfully"
-msgstr "Trasferimento principale eliminato con successo"
-
-#: trips/views.py:1163
-msgid "Event deleted successfully"
-msgstr "Evento eliminato correttamente"
-
-#: trips/views.py:1181
-msgid "Event unpaired successfully"
-msgstr "Evento scollegato correttamente"
-
-#: trips/views.py:1200
-msgid "Event paired successfully"
-msgstr "Evento ricollegato correttamente"
-
-#: trips/views.py:1283
-msgid "A connection already exists for this main transfer"
-msgstr "Esiste già un trasferimento per questo viaggio"
-
-#: trips/views.py:1294
-msgid "Invalid destination type"
-msgstr "Tipo di destinazione non valido"
-
-#: trips/views.py:1305 trips/views.py:1320
-msgid "No days available in this trip"
-msgstr "Nessun giorno disponibile in questo viaggio"
-
-#: trips/views.py:1358
-msgid "Connection created successfully"
-msgstr "Trasferimento salvato con successo"
-
-#: trips/views.py:1393
-msgid "Connection updated successfully"
-msgstr "Trasferimento modificata correttamente"
-
-#: trips/views.py:1415
-msgid "Connection deleted successfully"
-msgstr "Trasferimento eliminata correttamente"
-
-#: trips/views.py:1523
+#: trips/views/trips.py:401
 msgid "Start date must be after today."
 msgstr "La data di inizio deve essere successiva a quella di oggi."
 
-#: trips/views.py:1527
+#: trips/views/trips.py:405
 msgid "Start date cannot be after end date."
 msgstr "La data di inizio deve essere successiva a quella di fine."
 
-#: trips/views.py:1748 trips/views.py:1822
-msgid "Note added successfully"
-msgstr "Nota aggiunta con successo"
-
-#: trips/views.py:1770 trips/views.py:1847
-msgid "Note updated successfully"
-msgstr "Nota modificata correttamente"
-
-#: trips/views.py:1790 trips/views.py:1867
-msgid "Note deleted successfully"
-msgstr "Nota eliminata correttamente"
-
-#: trips/views.py:1891
-msgid "Stay must have a name and an address to be enriched."
-msgstr ""
-"L’evento deve avere un nome e un indirizzo per poter procedere con aggiunta "
-"dei dati."
-
-#: trips/views.py:1903 trips/views.py:2036
-msgid "Could not find a matching place."
-msgstr "Non ho trovavo un luogo corrispondente."
-
-#: trips/views.py:1998
-msgid "Stay enriched successfully!"
-msgstr "Dati aggiunti con successo!"
-
-#: trips/views.py:2022
-msgid "Event must have a name and an address to be enriched."
-msgstr ""
-"L’evento deve avere un nome e un indirizzo per poter procedere con aggiunta "
-"dei dati aggiuntivi."
-
-#: trips/views.py:2102
-msgid "Event enriched successfully!"
-msgstr "Dati aggiunti con successo!"
-
-#: trips/views.py:2119
+#: trips/views/trips.py:439
 msgid "Please enter a destination first"
 msgstr "Per favore compila prima il campo destinazione"
 
-#: trips/views.py:2129
+#: trips/views/trips.py:449
 msgid "Unsplash API error. Please try again later."
 msgstr "Errore API di Unsplash. Per favore riprova più tardi."
 
-#: trips/views.py:2136
+#: trips/views/trips.py:456
 #, python-brace-format
 msgid "No images found for '{query}'"
 msgstr "Nessuna immagine trovata per '{query}'"
-
-#: trips/views.py:2447
-msgid "Transfer saved successfully!"
-msgstr "Trasferimento salvato con successo!"
-
-#: trips/views.py:2884
-msgid "You've joined the trip as a participant."
-msgstr "Sei entrato nel viaggio come partecipante."
-
-#: trips/views.py:3282
-msgid "Event added to trip."
-msgstr "Evento aggiunto al viaggio."
-
-#: trips/views.py:3335
-msgid "Stay added to trip."
-msgstr "Soggiorno aggiunto al viaggio."
 
 #~ msgid "Main"
 #~ msgstr "Principale"
@@ -2565,17 +2418,13 @@ msgstr "Soggiorno aggiunto al viaggio."
 #~ msgstr "Non è possibile creare trasferimenti verso lo stesso evento"
 
 #~ msgid "Both events must be on the same day for SimpleTransfer"
-#~ msgstr ""
-#~ "Entrambi gli eventi devono avvenire nello stesso giorno per creare un "
-#~ "trasferimento"
+#~ msgstr "Entrambi gli eventi devono avvenire nello stesso giorno per creare un trasferimento"
 
 #~ msgid "Both events must belong to the same trip"
 #~ msgstr "Entrambi gli eventi devono appartenere allo stesso viaggio"
 
 #~ msgid "Event must be assigned to a day to create a transfer"
-#~ msgstr ""
-#~ "Gli eventi devono essere assegnati ad un giorno per creare il "
-#~ "trasferimento"
+#~ msgstr "Gli eventi devono essere assegnati ad un giorno per creare il trasferimento"
 
 #~ msgid "No next event found for this transfer"
 #~ msgstr "Evento successivo non trovato per questo trasferimento"
@@ -2593,8 +2442,7 @@ msgstr "Soggiorno aggiunto al viaggio."
 #~ msgstr "Orari dell'evento modificati correttamente"
 
 #~ msgid "This event overlaps with another event"
-#~ msgstr ""
-#~ "Gli orari di questo evento si sovrappongono con quelli di un altro evento"
+#~ msgstr "Gli orari di questo evento si sovrappongono con quelli di un altro evento"
 
 #~ msgid "Events swapped successfully"
 #~ msgstr "Eventi scambiati correttamente"
@@ -2629,12 +2477,8 @@ msgstr "Soggiorno aggiunto al viaggio."
 #~ msgid "Warning!"
 #~ msgstr "Attenzione!"
 
-#~ msgid ""
-#~ "Changing the dates will unpair all events from deleted days. This action "
-#~ "cannot be undone."
-#~ msgstr ""
-#~ "La modifica delle date eliminerà il collegamento di tutti gli eventi "
-#~ "abbinati ai giorni eliminati. Questa azione è definitiva."
+#~ msgid "Changing the dates will unpair all events from deleted days. This action cannot be undone."
+#~ msgstr "La modifica delle date eliminerà il collegamento di tutti gli eventi abbinati ai giorni eliminati. Questa azione è definitiva."
 
 #~ msgid "Modify Dates"
 #~ msgstr "Modifica date"
@@ -2814,8 +2658,7 @@ msgstr "Soggiorno aggiunto al viaggio."
 #~ msgstr "Taxi"
 
 #~ msgid "Main transfers must have a direction (arrival/departure)"
-#~ msgstr ""
-#~ "I trasferimenti principali devono avere una direzione (andata/ritorno)"
+#~ msgstr "I trasferimenti principali devono avere una direzione (andata/ritorno)"
 
 #~ msgid "Only main transfers can have a direction"
 #~ msgstr "Solo i trasferimenti principali possono avere una direzione"

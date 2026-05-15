@@ -8,6 +8,7 @@ from trips.services import (
     GooglePlacesClient,
     GooglePlacesError,
     PlaceDetails,
+    PlaceFullDetails,
     PlaceResult,
 )
 
@@ -350,3 +351,138 @@ class TestGooglePlacesClientCache:
             client.search_text("query", location_bias=(48.0, 2.0, 1000.0))
 
         assert mock_post.call_count == 2
+
+    def test_search_text_with_language_code(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = SEARCH_RESPONSE
+        mock_resp.raise_for_status.return_value = None
+
+        with patch("trips.services.requests.post", return_value=mock_resp) as mock_post:
+            results = client.search_text("museo egizio", language_code="it")
+
+        assert len(results) == 1
+        payload = mock_post.call_args.kwargs["json"]
+        assert payload["languageCode"] == "it"
+
+
+FULL_DETAILS_RESPONSE = {
+    "displayName": {"text": "Museo Egizio"},
+    "formattedAddress": "Via Accademia delle Scienze 6, 10123 Torino TO, Italia",
+    "addressComponents": [
+        {"types": ["locality"], "longText": "Torino"},
+        {"types": ["country"], "longText": "Italia"},
+    ],
+    "location": {"latitude": 45.0687, "longitude": 7.6847},
+    "websiteUri": "https://museoegizio.it",
+    "internationalPhoneNumber": "+39 011 561 7776",
+    "regularOpeningHours": {
+        "periods": [
+            {
+                "open": {"day": 2, "hour": 9, "minute": 0},
+                "close": {"day": 2, "hour": 19, "minute": 0},
+            },
+        ]
+    },
+}
+
+
+class TestGooglePlacesClientGetFullDetails:
+    def setup_method(self):
+        cache.clear()
+
+    def test_returns_full_place_details(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = FULL_DETAILS_RESPONSE
+        mock_resp.raise_for_status.return_value = None
+
+        with patch("trips.services.requests.get", return_value=mock_resp):
+            result = client.get_full_place_details("ChIJ_place_123")
+
+        assert isinstance(result, PlaceFullDetails)
+        assert result.name == "Museo Egizio"
+        assert (
+            result.address == "Via Accademia delle Scienze 6, 10123 Torino TO, Italia"
+        )
+        assert result.city == "Torino"
+        assert result.lat == 45.0687
+        assert result.lng == 7.6847
+        assert result.website == "https://museoegizio.it"
+        assert result.phone_number == "+39 011 561 7776"
+        assert result.opening_hours is not None
+
+    def test_extracts_city_from_locality_component(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = {
+            **FULL_DETAILS_RESPONSE,
+            "addressComponents": [
+                {"types": ["country"], "longText": "Italia"},
+                {"types": ["locality"], "longText": "Milano"},
+            ],
+        }
+        mock_resp.raise_for_status.return_value = None
+
+        with patch("trips.services.requests.get", return_value=mock_resp):
+            result = client.get_full_place_details("ChIJ_place_456")
+
+        assert result.city == "Milano"
+
+    def test_city_empty_when_no_locality_component(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = {
+            **FULL_DETAILS_RESPONSE,
+            "addressComponents": [{"types": ["country"], "longText": "Italia"}],
+        }
+        mock_resp.raise_for_status.return_value = None
+
+        with patch("trips.services.requests.get", return_value=mock_resp):
+            result = client.get_full_place_details("ChIJ_place_789")
+
+        assert result.city == ""
+
+    def test_raises_on_missing_api_key(self, settings):
+        settings.GOOGLE_PLACES_API_KEY = ""
+        with pytest.raises(GooglePlacesError, match="not configured"):
+            GooglePlacesClient().get_full_place_details("ChIJ_place_123")
+
+    def test_raises_on_timeout(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        with patch(
+            "trips.services.requests.get",
+            side_effect=requests.exceptions.Timeout,
+        ):
+            with pytest.raises(GooglePlacesError, match="timed out"):
+                client.get_full_place_details("ChIJ_place_123")
+
+    def test_raises_on_request_exception(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        exc = requests.RequestException("connection error")
+        exc.response = None
+        with patch("trips.services.requests.get", side_effect=exc):
+            with pytest.raises(GooglePlacesError, match="API error"):
+                client.get_full_place_details("ChIJ_place_123")
+
+    def test_raises_on_request_exception_with_response(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        exc = requests.RequestException("bad request")
+        exc.response = MagicMock()
+        exc.response.text = "INVALID_REQUEST"
+        with patch("trips.services.requests.get", side_effect=exc):
+            with pytest.raises(GooglePlacesError, match="INVALID_REQUEST"):
+                client.get_full_place_details("ChIJ_place_123")
+
+    def test_cached_on_second_call(self, client, settings):
+        settings.GOOGLE_PLACES_API_KEY = "test-key"
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = FULL_DETAILS_RESPONSE
+        mock_resp.raise_for_status.return_value = None
+
+        with patch("trips.services.requests.get", return_value=mock_resp) as mock_get:
+            r1 = client.get_full_place_details("ChIJ_cached_123")
+            r2 = client.get_full_place_details("ChIJ_cached_123")
+
+        assert r1.name == r2.name == "Museo Egizio"
+        assert mock_get.call_count == 1

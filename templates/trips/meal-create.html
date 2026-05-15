@@ -22,6 +22,22 @@
     </div>
     <div class="grid gap-x-1 p-4 sm:grid-cols-4 sm:gap-x-2 md:p-5">
         {% csrf_token %}
+        <div class="mb-3 sm:col-span-4">
+            <label for="id_maps_link" class="block mb-1 text-sm font-medium">{% trans "Google Maps link" %}</label>
+            <div class="flex gap-2">
+                <input type="text"
+                       id="id_maps_link"
+                       name="maps_link"
+                       class="flex-1 input input-bordered input-sm"
+                       placeholder="https://maps.app.goo.gl/ or google.com/maps/...">
+                <button type="button"
+                        class="btn btn-sm btn-primary"
+                        hx-post="{% url 'trips:resolve-maps-link' %}"
+                        hx-target="#maps-link-results"
+                        hx-include="[name='maps_link']">{% trans "Search" %}</button>
+            </div>
+            <div id="maps-link-results"></div>
+        </div>
         {% crispy form %}
     </div>
     {% if unpaired_experiences %}
