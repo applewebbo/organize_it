@@ -1,11 +1,11 @@
 ---
 # organize_it-dhbq
 title: Add Google Maps link auto-fill for experience, meal and stay forms
-status: in-progress
+status: completed
 type: feature
 priority: normal
 created_at: 2026-05-14T07:54:02Z
-updated_at: 2026-05-15T07:16:12Z
+updated_at: 2026-05-15T07:49:34Z
 ---
 
 Helper field at the top of Experience/Meal/Stay modals: paste a maps.app.goo.gl link → HTMX resolves the short URL server-side, extracts place_id, calls Places API, pre-fills name/city/address/coords/website/phone/opening_hours. Field is not saved. Tag/meal type chosen manually. New view: resolve_maps_link. Ref: Codeberg #319.
@@ -29,3 +29,7 @@ Helper field at the top of Experience/Meal/Stay modals: paste a maps.app.goo.gl 
 - Added animated green outline (5 s) on pre-filled fields via inline outline CSS
 - Added IT/EN translations for both success and error messages
 - Full test coverage at 100%
+
+## Summary of Changes
+
+Widened URL validation to accept all Google Maps URL formats (maps.app.goo.gl, goo.gl/maps/, google.com/maps/, maps.google.com/). Fixed field pre-fill by passing place data as JSON (avoiding JS failures with special chars). Added success/error alerts and animated green outline (5 s) on pre-filled fields. Added hidden lat/lng fields in EventForm/StayForm to skip redundant Mapbox geocoding when coordinates come from Google Places. UI: Google Maps field wrapped in card (bg-base-200, border-base-300). Full IT/EN translations. 100% test coverage.
