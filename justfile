@@ -113,6 +113,16 @@ ftest *args:
 cov *args:
     ENVIRONMENT=test uv run pytest -n 4 --reuse-db --dist loadscope --exitfirst --cov=. --cov-report html:htmlcov --cov-report term:skip-covered --cov-fail-under 100 {{ args }}
 
+# Show coverage for a specific test file against a source module (no threshold)
+# Usage: just fcov tests/trips/test_views_map.py trips/views/maps.py
+[group('utility')]
+fcov test_path source="trips":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    # Convert file path to module notation (trips/views/maps.py → trips.views.maps)
+    module=$(echo "{{ source }}" | sed 's|/|.|g' | sed 's|\.py$||')
+    ENVIRONMENT=test uv run pytest --reuse-db --exitfirst --cov="$module" --cov-report term-missing {{ test_path }}
+
 # Run tests excluding mapbox and generate coverage report
 [group('utility')]
 mptest:
