@@ -108,6 +108,11 @@ test *args:
 ftest *args:
     ENVIRONMENT=test uv run pytest -n 4 --reuse-db --dist loadscope --exitfirst {{ args }}
 
+# Run fast tests with coverage report (must reach 100%)
+[group('utility')]
+cov *args:
+    ENVIRONMENT=test uv run pytest -n 4 --reuse-db --dist loadscope --exitfirst --cov=. --cov-report html:htmlcov --cov-report term:skip-covered --cov-fail-under 100 {{ args }}
+
 # Run tests excluding mapbox and generate coverage report
 [group('utility')]
 mptest:
