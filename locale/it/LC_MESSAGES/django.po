@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-15 10:26+0200\n"
+"POT-Creation-Date: 2026-05-15 14:02+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1329,27 +1329,27 @@ msgstr "Ritorno"
 msgid "No departure transfer added yet."
 msgstr "Nessun trasferimento di ritorno aggiunto."
 
-#: templates/trips/includes/maps-link-prefill.html:7
+#: templates/trips/includes/maps-link-prefill.html:10
+msgid "Location found, but this doesn't look like an accommodation."
+msgstr "Luogo trovato, ma non sembra un posto dove dormire."
+
+#: templates/trips/includes/maps-link-prefill.html:12
+msgid "Location found, but this doesn't look like a restaurant or café."
+msgstr "Luogo trovato, ma non sembra un ristorante o un bar."
+
+#: templates/trips/includes/maps-link-prefill.html:14
+msgid "Location found, but this looks like an accommodation."
+msgstr "Luogo trovato, ma sembra un posto dove dormire."
+
+#: templates/trips/includes/maps-link-prefill.html:16
+msgid "Location found, but this looks like a restaurant or café."
+msgstr "Luogo trovato, ma sembra un ristorante o un bar."
+
+#: templates/trips/includes/maps-link-prefill.html:24
 msgid "Location found! Fields have been pre-filled."
-msgstr "Luogo trovato! I campi sono stati precompilati."
+msgstr "Luogo trovato!"
 
-#: templates/trips/includes/maps-link-prefill.html:15
-msgid "This place doesn't look like an accommodation."
-msgstr "Questo luogo non sembra un alloggio."
-
-#: templates/trips/includes/maps-link-prefill.html:17
-msgid "This place doesn't look like a restaurant or café."
-msgstr "Questo luogo non sembra un ristorante o locale."
-
-#: templates/trips/includes/maps-link-prefill.html:19
-msgid "This looks like an accommodation, not an experience."
-msgstr "Questo sembra un alloggio, non un'esperienza."
-
-#: templates/trips/includes/maps-link-prefill.html:21
-msgid "This looks like a restaurant or café, not an experience."
-msgstr "Questo sembra un ristorante o locale, non un'esperienza."
-
-#: templates/trips/includes/maps-link-prefill.html:31
+#: templates/trips/includes/maps-link-prefill.html:32
 msgid "Oops! Location not recognised, fill in the details manually."
 msgstr "Ops! Luogo non riconosciuto, compila i dettagli manualmente."
 
@@ -2534,6 +2534,12 @@ msgstr "Errore API di Unsplash. Per favore riprova più tardi."
 #, python-brace-format
 msgid "No images found for '{query}'"
 msgstr "Nessuna immagine trovata per '{query}'"
+
+#~ msgid "This looks like an accommodation, not an experience."
+#~ msgstr "Questo sembra un alloggio, non un'esperienza."
+
+#~ msgid "This looks like a restaurant or café, not an experience."
+#~ msgstr "Questo sembra un ristorante o locale, non un'esperienza."
 
 #~ msgid "Main"
 #~ msgstr "Principale"

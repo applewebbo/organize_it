@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-15 10:26+0200\n"
+"POT-Creation-Date: 2026-05-15 14:02+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1255,27 +1255,27 @@ msgstr ""
 msgid "No departure transfer added yet."
 msgstr ""
 
-#: templates/trips/includes/maps-link-prefill.html:7
+#: templates/trips/includes/maps-link-prefill.html:10
+msgid "Location found, but this doesn't look like an accommodation."
+msgstr "Location found, but this doesn't look like an accommodation."
+
+#: templates/trips/includes/maps-link-prefill.html:12
+msgid "Location found, but this doesn't look like a restaurant or café."
+msgstr "Location found, but this doesn't look like a restaurant or café."
+
+#: templates/trips/includes/maps-link-prefill.html:14
+msgid "Location found, but this looks like an accommodation."
+msgstr "Location found, but this looks like an accommodation."
+
+#: templates/trips/includes/maps-link-prefill.html:16
+msgid "Location found, but this looks like a restaurant or café."
+msgstr "Location found, but this looks like a restaurant or café."
+
+#: templates/trips/includes/maps-link-prefill.html:24
 msgid "Location found! Fields have been pre-filled."
-msgstr "Location found! Fields have been pre-filled."
+msgstr "Location found!"
 
-#: templates/trips/includes/maps-link-prefill.html:15
-msgid "This place doesn't look like an accommodation."
-msgstr "This place doesn't look like an accommodation."
-
-#: templates/trips/includes/maps-link-prefill.html:17
-msgid "This place doesn't look like a restaurant or café."
-msgstr "This place doesn't look like a restaurant or café."
-
-#: templates/trips/includes/maps-link-prefill.html:19
-msgid "This looks like an accommodation, not an experience."
-msgstr "This looks like an accommodation, not an experience."
-
-#: templates/trips/includes/maps-link-prefill.html:21
-msgid "This looks like a restaurant or café, not an experience."
-msgstr "This looks like a restaurant or café, not an experience."
-
-#: templates/trips/includes/maps-link-prefill.html:31
+#: templates/trips/includes/maps-link-prefill.html:32
 msgid "Oops! Location not recognised, fill in the details manually."
 msgstr "Oops! Location not recognised, fill in the details manually."
 
@@ -2438,6 +2438,12 @@ msgstr ""
 #, python-brace-format
 msgid "No images found for '{query}'"
 msgstr ""
+
+#~ msgid "This looks like an accommodation, not an experience."
+#~ msgstr "This looks like an accommodation, not an experience."
+
+#~ msgid "This looks like a restaurant or café, not an experience."
+#~ msgstr "This looks like a restaurant or café, not an experience."
 
 #~ msgid "Main"
 #~ msgstr "Main"

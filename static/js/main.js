@@ -345,8 +345,6 @@ document.addEventListener("alpine:init", () => {
             }
             const mapsField = document.getElementById("id_maps_link");
             if (mapsField) mapsField.value = "";
-            const resultsDiv = document.getElementById("maps-link-results");
-            if (resultsDiv) resultsDiv.innerHTML = "";
         }
     }));
 

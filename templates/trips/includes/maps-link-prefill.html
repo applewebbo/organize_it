@@ -1,26 +1,27 @@
 {% load i18n %}
 {% if found %}
     <div x-init="setMapsData({{ place_data_json }})">
-        <div role="alert"
-             class="flex gap-2 items-center p-2 mt-3 text-sm rounded-lg alert alert-success alert-soft">
-            <i class="ph-bold ph-check-circle i-sm"></i>
-            <span>{% trans "Location found! Fields have been pre-filled." %}</span>
-        </div>
         {% if type_warning %}
             <div role="alert"
-                 class="flex gap-2 items-center p-2 mt-2 text-sm rounded-lg alert alert-warning alert-soft">
+                 class="flex gap-2 items-center p-2 mt-3 text-sm rounded-lg alert alert-warning alert-soft">
                 <i class="ph-bold ph-warning i-sm"></i>
                 <span>
                     {% if type_warning == "stay_mismatch" %}
-                        {% trans "This place doesn't look like an accommodation." %}
+                        {% trans "Location found, but this doesn't look like an accommodation." %}
                     {% elif type_warning == "meal_mismatch" %}
-                        {% trans "This place doesn't look like a restaurant or café." %}
+                        {% trans "Location found, but this doesn't look like a restaurant or café." %}
                     {% elif type_warning == "experience_lodging" %}
-                        {% trans "This looks like an accommodation, not an experience." %}
+                        {% trans "Location found, but this looks like an accommodation." %}
                     {% elif type_warning == "experience_food" %}
-                        {% trans "This looks like a restaurant or café, not an experience." %}
+                        {% trans "Location found, but this looks like a restaurant or café." %}
                     {% endif %}
                 </span>
+            </div>
+        {% else %}
+            <div role="alert"
+                 class="flex gap-2 items-center p-2 mt-3 text-sm rounded-lg alert alert-success alert-soft">
+                <i class="ph-bold ph-check-circle i-sm"></i>
+                <span>{% trans "Location found! Fields have been pre-filled." %}</span>
             </div>
         {% endif %}
     </div>
