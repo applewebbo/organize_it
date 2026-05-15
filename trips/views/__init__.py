@@ -49,6 +49,7 @@ from trips.views.maps import (
     map_add_meal,
     map_add_stay,
     map_search,
+    resolve_maps_link,
     select_day_for_event,
     trip_destinations,
     trip_events_list,
@@ -208,6 +209,7 @@ __all__ = [
     "map_add_experience",
     "map_add_meal",
     "map_add_stay",
+    "resolve_maps_link",
     # utils
     "view_log_file",
 ]

@@ -106,7 +106,7 @@ test *args:
 # Run fast tests
 [group('utility')]
 ftest *args:
-    ENVIRONMENT=test uv run pytest -n 8 --reuse-db --dist loadscope --exitfirst {{ args }}
+    ENVIRONMENT=test uv run pytest -n 4 --reuse-db --dist loadscope --exitfirst {{ args }}
 
 # Run tests excluding mapbox and generate coverage report
 [group('utility')]

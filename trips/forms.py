@@ -367,6 +367,8 @@ class EventForm(forms.ModelForm):
             "name",
             "city",
             "address",
+            "latitude",
+            "longitude",
             "start_time",
             "duration",
             "website",
@@ -384,6 +386,8 @@ class EventForm(forms.ModelForm):
             "website": forms.TextInput(attrs={"placeholder": _("Website")}),
             "address": forms.TextInput(attrs={"placeholder": _("Address")}),
             "tag": forms.TextInput(attrs={"placeholder": _("Tag"), "maxlength": "20"}),
+            "latitude": forms.HiddenInput(),
+            "longitude": forms.HiddenInput(),
         }
 
     def __init__(self, *args, **kwargs):
@@ -507,9 +511,16 @@ class EventForm(forms.ModelForm):
                 },
             ),
             HTML(TAG_RESULTS_HTML),
-            Field(
-                "type", css_class="select select-primary", wrapper_class="sm:col-span-2"
-            ),
+        ]
+        if "type" in self.fields:
+            layout_fields.append(
+                Field(
+                    "type",
+                    css_class="select select-primary",
+                    wrapper_class="sm:col-span-2",
+                )
+            )
+        layout_fields += [
             Field("website", wrapper_class="sm:col-span-4"),
             Field("phone_number", wrapper_class="sm:col-span-4"),
             HTML(
@@ -690,6 +701,8 @@ class StayForm(forms.ModelForm):
             "phone_number",
             "website",
             "address",
+            "latitude",
+            "longitude",
             "notes",
             "apply_to_days",
         ]
@@ -698,6 +711,8 @@ class StayForm(forms.ModelForm):
             "name": forms.TextInput(attrs={"placeholder": _("Name")}),
             "website": forms.TextInput(attrs={"placeholder": _("Website")}),
             "address": forms.TextInput(attrs={"placeholder": _("Address")}),
+            "latitude": forms.HiddenInput(),
+            "longitude": forms.HiddenInput(),
             "check_in": forms.TimeInput(attrs={"type": "time"}),
             "check_out": forms.TimeInput(attrs={"type": "time"}),
             "cancellation_date": forms.DateInput(attrs={"type": "date"}),

@@ -23,6 +23,9 @@ SEARCH_FIELD_MASK = (
 # Fields returned for place details
 DETAILS_FIELD_MASK = "websiteUri,internationalPhoneNumber,regularOpeningHours"
 
+# Fields returned for full place details (used by maps link resolver)
+FULL_DETAILS_FIELD_MASK = "displayName,formattedAddress,addressComponents,location,websiteUri,internationalPhoneNumber,regularOpeningHours"
+
 # Cache TTLs in seconds
 _TTL_PLACE_ID = 7 * 24 * 3600  # 7 days — place_id is stable
 _TTL_DETAILS = 24 * 3600  # 24 hours — hours/phone change rarely
@@ -40,6 +43,19 @@ class PlaceResult:
     address: str
     lat: float
     lng: float
+
+
+@dataclass
+class PlaceFullDetails:
+    place_id: str
+    name: str = ""
+    address: str = ""
+    city: str = ""
+    lat: float | None = None
+    lng: float | None = None
+    website: str = ""
+    phone_number: str = ""
+    opening_hours: dict | None = field(default=None)
 
 
 @dataclass
@@ -79,22 +95,26 @@ class GooglePlacesClient:
         query: str,
         max_results: int = 10,
         location_bias: tuple[float, float, float] | None = None,
+        language_code: str | None = None,
     ) -> list[PlaceResult]:
         """
         Search places by free-text query.
         location_bias: optional (lat, lng, radius_meters) to bias results geographically.
+        language_code: optional BCP-47 language code for result localisation.
         Returns a list of PlaceResult with minimal fields.
         Raises GooglePlacesError on failure.
         """
         if not self.api_key:
             raise GooglePlacesError("Google Places API key is not configured.")
 
-        cache_key = f"gp:srch:{self._hash(json.dumps([query, max_results, location_bias], sort_keys=True))}"
+        cache_key = f"gp:srch:{self._hash(json.dumps([query, max_results, location_bias, language_code], sort_keys=True))}"
         cached = cache.get(cache_key)
         if cached is not None:
             return [PlaceResult(**r) for r in cached]
 
         payload: dict = {"textQuery": query, "maxResultCount": max_results}
+        if language_code:
+            payload["languageCode"] = language_code
         if location_bias:
             lat, lng, radius = location_bias
             payload["locationBias"] = {
@@ -165,6 +185,60 @@ class GooglePlacesClient:
         data = response.json()
         result = PlaceDetails(
             place_id=place_id,
+            website=data.get("websiteUri", ""),
+            phone_number=data.get("internationalPhoneNumber", ""),
+            opening_hours=convert_google_opening_hours(data.get("regularOpeningHours")),
+        )
+        cache.set(cache_key, dataclasses.asdict(result), _TTL_DETAILS)
+        return result
+
+    def get_full_place_details(
+        self, place_id: str, language_code: str | None = None
+    ) -> PlaceFullDetails:
+        """Fetch full place details: name, address, city, coordinates, website, phone, hours."""
+        if not self.api_key:
+            raise GooglePlacesError("Google Places API key is not configured.")
+
+        cache_key = f"gp:full:{place_id}:{language_code or ''}"
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return PlaceFullDetails(**cached)
+
+        url = PLACES_DETAILS_URL.format(place_id=place_id)
+        params = {"languageCode": language_code} if language_code else {}
+        try:
+            response = requests.get(
+                url,
+                headers=self._headers(FULL_DETAILS_FIELD_MASK),
+                params=params,
+                timeout=self.timeout,
+            )
+            response.raise_for_status()
+        except requests.exceptions.Timeout as exc:
+            raise GooglePlacesError("Google Places API request timed out.") from exc
+        except requests.RequestException as exc:
+            detail = exc.response.text if exc.response is not None else str(exc)
+            logger.error(
+                "Google Places full details error for %s: %s", place_id, detail
+            )
+            raise GooglePlacesError(f"API error: {detail}") from exc
+
+        data = response.json()
+        loc = data.get("location", {})
+
+        city = ""
+        for component in data.get("addressComponents", []):
+            if "locality" in component.get("types", []):
+                city = component.get("longText", "")
+                break
+
+        result = PlaceFullDetails(
+            place_id=place_id,
+            name=data.get("displayName", {}).get("text", ""),
+            address=data.get("formattedAddress", ""),
+            city=city,
+            lat=loc.get("latitude"),
+            lng=loc.get("longitude"),
             website=data.get("websiteUri", ""),
             phone_number=data.get("internationalPhoneNumber", ""),
             opening_hours=convert_google_opening_hours(data.get("regularOpeningHours")),

@@ -166,6 +166,7 @@ htmx_urlpatterns = [
         name="stay-note-delete",
     ),
     path("geocode-address/", views.geocode_address, name="geocode-address"),
+    path("resolve-maps-link/", views.resolve_maps_link, name="resolve-maps-link"),
     path("geocode-city/", views.geocode_city_view, name="geocode-city"),
     path("tag-suggestions/", views.tag_suggestions, name="tag-suggestions"),
     path("transfer-info/<int:day_pk>/", views.transfer_info, name="transfer-info"),

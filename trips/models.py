@@ -228,15 +228,17 @@ class Stay(models.Model):
         """
         Convert address to coordinates for displaying on the map,
         only if the address has changed or coordinates are not set.
+        Skips geocoding when explicit coordinates are already provided.
         """
         old = type(self).objects.get(pk=self.pk) if self.pk else None
         address_changed = old and old.address != self.address
         coords_missing = self.latitude is None or self.longitude is None
+        coords_provided = self.latitude is not None and self.longitude is not None
         complete_address = self.address
         if self.city:
             complete_address = f"{self.address}, {self.city}"
 
-        if address_changed or coords_missing:
+        if not coords_provided and (address_changed or coords_missing):
             g = geocoder.mapbox(
                 complete_address, access_token=settings.MAPBOX_ACCESS_TOKEN
             )
@@ -564,15 +566,17 @@ class Event(models.Model):
         """
         Convert address to coordinates for displaying on the map,
         only if the address has changed or coordinates are not set.
+        Skips geocoding when explicit coordinates are already provided.
         """
         old = type(self).objects.get(pk=self.pk) if self.pk else None
         address_changed = old and old.address != self.address
         coords_missing = self.latitude is None or self.longitude is None
+        coords_provided = self.latitude is not None and self.longitude is not None
         complete_address = self.address
         if self.city:
             complete_address = f"{self.address}, {self.city}"
 
-        if address_changed or coords_missing:
+        if not coords_provided and (address_changed or coords_missing):
             g = geocoder.mapbox(
                 complete_address, access_token=settings.MAPBOX_ACCESS_TOKEN
             )
