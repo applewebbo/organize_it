@@ -671,8 +671,31 @@ def resolve_maps_link(request):
                 lat_lng_from_at = None
         else:
             lat_lng_from_at = None
-        if name_match:
-            query = urllib.parse.unquote_plus(name_match.group(1).replace("+", " "))
+        # Fallback for mobile share links that expand to ?q= format
+        # e.g. https://maps.google.com/maps?q=Place+Name&ll=lat,lng
+        # Excludes generic /search/ URLs which are not specific-place links.
+        q_query = None
+        if not name_match:
+            parsed = urllib.parse.urlparse(expanded_url)
+            qs_params = urllib.parse.parse_qs(parsed.query)
+            q_values = qs_params.get("q", [])
+            if q_values and q_values[0] and "/search" not in parsed.path:
+                q_query = urllib.parse.unquote_plus(q_values[0])
+                ll_values = qs_params.get("ll", [])
+                if ll_values:
+                    try:
+                        ll_parts = ll_values[0].split(",")
+                        lat_lng_from_at = (float(ll_parts[0]), float(ll_parts[1]))
+                    except ValueError, IndexError:
+                        lat_lng_from_at = None
+                else:
+                    lat_lng_from_at = None
+
+        if name_match or q_query:
+            if q_query:
+                query = q_query
+            else:
+                query = urllib.parse.unquote_plus(name_match.group(1).replace("+", " "))
             location_bias = None
             if lat_lng_from_at:
                 location_bias = (*lat_lng_from_at, 500)

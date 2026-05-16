@@ -1008,6 +1008,86 @@ class ResolveMapsLinkViewTest(TestCase):
             response = self.get("trips:resolve-maps-link")
         self.response_405(response)
 
+    def test_mobile_share_link_q_format_success(self):
+        """maps.app.goo.gl?g_st=ic expands to ?q= format → fallback via Places text search."""
+        mock_resp = MagicMock()
+        mock_resp.url = "https://maps.google.com/maps?q=Museo+Egizio&ll=45.0687,7.6847"
+        user = self.make_user("user@example.com")
+        with self.login(user):
+            with patch("trips.views.maps.requests.get", return_value=mock_resp):
+                with patch(
+                    "trips.views.maps.GooglePlacesClient.search_text",
+                    return_value=[
+                        PlaceResult(
+                            place_id="ChIJtest_mobile",
+                            name="Museo Egizio",
+                            address="Via Accademia delle Scienze 6, Torino",
+                            lat=45.0687,
+                            lng=7.6847,
+                        )
+                    ],
+                ) as mock_search:
+                    with patch(
+                        "trips.views.maps.GooglePlacesClient.get_full_place_details",
+                        return_value=MOCK_FULL_DETAILS,
+                    ):
+                        response = self.post(
+                            "trips:resolve-maps-link",
+                            data={
+                                "maps_link": "https://maps.app.goo.gl/e6NRy6mLTXRvNKfW8?g_st=ic"
+                            },
+                        )
+        self.response_200(response)
+        assert response.context["found"] is True
+        call_kwargs = mock_search.call_args.kwargs
+        assert call_kwargs["location_bias"] is not None
+
+    def test_mobile_share_link_q_format_no_ll_success(self):
+        """?q= format without ll= param → text search without location bias."""
+        mock_resp = MagicMock()
+        mock_resp.url = "https://maps.google.com/maps?q=Museo+Egizio"
+        user = self.make_user("user2@example.com")
+        with self.login(user):
+            with patch("trips.views.maps.requests.get", return_value=mock_resp):
+                with patch(
+                    "trips.views.maps.GooglePlacesClient.search_text",
+                    return_value=[
+                        PlaceResult(
+                            place_id="ChIJtest_mobile2",
+                            name="Museo Egizio",
+                            address="Via Accademia delle Scienze 6, Torino",
+                            lat=45.0687,
+                            lng=7.6847,
+                        )
+                    ],
+                ) as mock_search:
+                    with patch(
+                        "trips.views.maps.GooglePlacesClient.get_full_place_details",
+                        return_value=MOCK_FULL_DETAILS,
+                    ):
+                        response = self.post(
+                            "trips:resolve-maps-link",
+                            data={"maps_link": "https://maps.app.goo.gl/abc?g_st=ic"},
+                        )
+        self.response_200(response)
+        assert response.context["found"] is True
+        call_kwargs = mock_search.call_args.kwargs
+        assert call_kwargs["location_bias"] is None
+
+    def test_mobile_share_link_q_format_empty_q_returns_error(self):
+        """?q= format with empty q param → error."""
+        mock_resp = MagicMock()
+        mock_resp.url = "https://maps.google.com/maps?q="
+        user = self.make_user("user3@example.com")
+        with self.login(user):
+            with patch("trips.views.maps.requests.get", return_value=mock_resp):
+                response = self.post(
+                    "trips:resolve-maps-link",
+                    data={"maps_link": "https://maps.app.goo.gl/xyz?g_st=ic"},
+                )
+        self.response_200(response)
+        assert response.context["error"] is True
+
 
 class ResolveMapsMismatchTest(TestCase):
     """Tests for soft place-type validation in resolve_maps_link (for #321)."""
