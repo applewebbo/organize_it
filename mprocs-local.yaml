@@ -1,7 +1,7 @@
 procs:
   web:
-    shell: python manage.py tailwind runserver
+    shell: uv run python manage.py tailwind runserver
   worker:
-    shell: python manage.py qcluster
+    shell: uv run python manage.py qcluster
   mailpit:
     shell: mailpit
