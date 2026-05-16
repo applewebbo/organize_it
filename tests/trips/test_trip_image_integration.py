@@ -72,6 +72,28 @@ class TestTripCreateImageHandling:
         assert response.status_code in [200, 204, 302]
         mock_async_task.assert_not_called()
 
+    @patch("trips.views.trips.async_task")
+    @patch("trips.views.trips.search_unsplash_photos")
+    def test_create_empty_photo_results_does_not_fire_task(
+        self, mock_search, mock_async_task, client, user_factory
+    ):
+        """If Unsplash returns no results, no task is fired."""
+        user = user_factory()
+        client.force_login(user)
+        mock_search.return_value = []
+
+        response = client.post(
+            reverse("trips:trip-create"),
+            {
+                "title": "Test Trip",
+                "destination": "Paris",
+                "selected_photo_id": "photo123",
+            },
+        )
+
+        assert response.status_code in [200, 204, 302]
+        mock_async_task.assert_not_called()
+
 
 class TestTripUpdateImageHandling:
     """Tests for image handling in trip_update view"""
@@ -101,6 +123,33 @@ class TestTripUpdateImageHandling:
         mock_async_task.assert_called_once()
         args = mock_async_task.call_args[0]
         assert args[0] == "trips.tasks.download_trip_unsplash_photo"
+
+
+class TestTripUpdateImageHandlingExtra:
+    """Additional edge-case tests for image handling in trip_update view."""
+
+    @patch("trips.views.trips.async_task")
+    @patch("trips.views.trips.search_unsplash_photos")
+    def test_update_empty_photo_results_does_not_fire_task(
+        self, mock_search, mock_async_task, client, trip_factory, user_factory
+    ):
+        """If Unsplash returns no results during update, no task is fired."""
+        user = user_factory()
+        trip = trip_factory(author=user, destination="Paris")
+        client.force_login(user)
+        mock_search.return_value = []
+
+        response = client.post(
+            reverse("trips:trip-update", kwargs={"pk": trip.pk}),
+            {
+                "title": trip.title,
+                "destination": trip.destination,
+                "selected_photo_id": "photo456",
+            },
+        )
+
+        assert response.status_code in [200, 204, 302]
+        mock_async_task.assert_not_called()
 
 
 class TestTripFileUpload:

@@ -1088,6 +1088,38 @@ class ResolveMapsLinkViewTest(TestCase):
         self.response_200(response)
         assert response.context["error"] is True
 
+    def test_mobile_share_link_q_format_invalid_ll_falls_back(self):
+        """?q= format with malformed ll= values → no location bias, still searches."""
+        mock_resp = MagicMock()
+        mock_resp.url = "https://maps.google.com/maps?q=Museo+Egizio&ll=not,valid"
+        user = self.make_user("user4@example.com")
+        with self.login(user):
+            with patch("trips.views.maps.requests.get", return_value=mock_resp):
+                with patch(
+                    "trips.views.maps.GooglePlacesClient.search_text",
+                    return_value=[
+                        PlaceResult(
+                            place_id="ChIJtest_invalid_ll",
+                            name="Museo Egizio",
+                            address="Via Accademia delle Scienze 6, Torino",
+                            lat=45.0687,
+                            lng=7.6847,
+                        )
+                    ],
+                ) as mock_search:
+                    with patch(
+                        "trips.views.maps.GooglePlacesClient.get_full_place_details",
+                        return_value=MOCK_FULL_DETAILS,
+                    ):
+                        response = self.post(
+                            "trips:resolve-maps-link",
+                            data={"maps_link": "https://maps.app.goo.gl/abc?g_st=ic"},
+                        )
+        self.response_200(response)
+        assert response.context["found"] is True
+        call_kwargs = mock_search.call_args.kwargs
+        assert call_kwargs["location_bias"] is None
+
 
 class ResolveMapsMismatchTest(TestCase):
     """Tests for soft place-type validation in resolve_maps_link (for #321)."""
