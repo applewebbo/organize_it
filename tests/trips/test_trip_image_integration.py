@@ -10,51 +10,29 @@ from django.urls import reverse
 pytestmark = pytest.mark.django_db
 
 
+MOCK_PHOTO = {
+    "id": "photo123",
+    "urls": {"regular": "https://example.com/photo.jpg"},
+    "user": {"name": "Test Photographer", "profile": "https://unsplash.com/@test"},
+    "links": {
+        "html": "https://unsplash.com/photos/photo123",
+        "download_location": "https://api.unsplash.com/download",
+    },
+}
+
+
 class TestTripCreateImageHandling:
     """Tests for image handling in trip_create view"""
 
-    @patch("trips.views.trips.process_trip_image")
-    @patch("trips.views.trips.download_unsplash_photo")
+    @patch("trips.views.trips.async_task")
     @patch("trips.views.trips.search_unsplash_photos")
-    def test_create_with_unsplash_photo_success(
-        self, mock_search, mock_download, mock_process, client, user_factory
+    def test_create_with_unsplash_fires_async_task(
+        self, mock_search, mock_async_task, client, user_factory
     ):
-        """Test creating trip with Unsplash photo selection - full success path"""
+        """Unsplash selection triggers async task instead of blocking download."""
         user = user_factory()
         client.force_login(user)
-
-        # Mock successful Unsplash search
-        mock_search.return_value = [
-            {
-                "id": "photo123",
-                "urls": {"regular": "https://example.com/photo.jpg"},
-                "user": {
-                    "name": "Test Photographer",
-                    "profile": "https://unsplash.com/@test",
-                },
-                "links": {
-                    "html": "https://unsplash.com/photos/photo123",
-                    "download_location": "https://api.unsplash.com/download",
-                },
-            }
-        ]
-
-        # Mock successful download
-        mock_download.return_value = (
-            b"fake_image_data",
-            {"source": "unsplash", "photographer": "Test Photographer"},
-        )
-
-        # Mock successful processing
-        fake_file = InMemoryUploadedFile(
-            BytesIO(b"processed"),
-            "ImageField",
-            "test.jpg",
-            "image/jpeg",
-            1024,
-            None,
-        )
-        mock_process.return_value = fake_file
+        mock_search.return_value = [MOCK_PHOTO]
 
         response = client.post(
             reverse("trips:trip-create"),
@@ -65,65 +43,49 @@ class TestTripCreateImageHandling:
             },
         )
 
-        # Should succeed
         assert response.status_code in [200, 204, 302]
         mock_search.assert_called_once_with("Paris", per_page=10)
-        mock_download.assert_called_once()
-        mock_process.assert_called_once()
+        mock_async_task.assert_called_once()
+        args = mock_async_task.call_args[0]
+        assert args[0] == "trips.tasks.download_trip_unsplash_photo"
+        assert args[2] == MOCK_PHOTO
+
+    @patch("trips.views.trips.async_task")
+    @patch("trips.views.trips.search_unsplash_photos")
+    def test_create_photo_not_found_in_results_does_not_fire_task(
+        self, mock_search, mock_async_task, client, user_factory
+    ):
+        """If selected_photo_id doesn't match any result, no task is fired."""
+        user = user_factory()
+        client.force_login(user)
+        mock_search.return_value = [MOCK_PHOTO]
+
+        response = client.post(
+            reverse("trips:trip-create"),
+            {
+                "title": "Test Trip",
+                "destination": "Paris",
+                "selected_photo_id": "nonexistent",
+            },
+        )
+
+        assert response.status_code in [200, 204, 302]
+        mock_async_task.assert_not_called()
 
 
 class TestTripUpdateImageHandling:
     """Tests for image handling in trip_update view"""
 
-    @patch("trips.views.trips.process_trip_image")
-    @patch("trips.views.trips.download_unsplash_photo")
+    @patch("trips.views.trips.async_task")
     @patch("trips.views.trips.search_unsplash_photos")
-    def test_update_with_unsplash_photo_success(
-        self,
-        mock_search,
-        mock_download,
-        mock_process,
-        client,
-        trip_factory,
-        user_factory,
+    def test_update_with_unsplash_fires_async_task(
+        self, mock_search, mock_async_task, client, trip_factory, user_factory
     ):
-        """Test updating trip with Unsplash photo selection - full success path"""
+        """Unsplash selection in update triggers async task."""
         user = user_factory()
         trip = trip_factory(author=user, destination="Paris")
         client.force_login(user)
-
-        # Mock successful Unsplash search
-        mock_search.return_value = [
-            {
-                "id": "photo456",
-                "urls": {"regular": "https://example.com/photo.jpg"},
-                "user": {
-                    "name": "Test Photographer",
-                    "profile": "https://unsplash.com/@test",
-                },
-                "links": {
-                    "html": "https://unsplash.com/photos/photo456",
-                    "download_location": "https://api.unsplash.com/download",
-                },
-            }
-        ]
-
-        # Mock successful download
-        mock_download.return_value = (
-            b"fake_image_data",
-            {"source": "unsplash", "photographer": "Test Photographer"},
-        )
-
-        # Mock successful processing
-        fake_file = InMemoryUploadedFile(
-            BytesIO(b"processed"),
-            "ImageField",
-            "test.jpg",
-            "image/jpeg",
-            1024,
-            None,
-        )
-        mock_process.return_value = fake_file
+        mock_search.return_value = [{**MOCK_PHOTO, "id": "photo456"}]
 
         response = client.post(
             reverse("trips:trip-update", kwargs={"pk": trip.pk}),
@@ -136,8 +98,9 @@ class TestTripUpdateImageHandling:
 
         assert response.status_code in [200, 204, 302]
         mock_search.assert_called_once_with("Paris", per_page=10)
-        mock_download.assert_called_once()
-        mock_process.assert_called_once()
+        mock_async_task.assert_called_once()
+        args = mock_async_task.call_args[0]
+        assert args[0] == "trips.tasks.download_trip_unsplash_photo"
 
 
 class TestTripFileUpload:
@@ -146,9 +109,6 @@ class TestTripFileUpload:
     @patch("trips.views.trips.process_trip_image")
     def test_create_with_file_upload(self, mock_process, client, user_factory):
         """Test creating trip with file upload via FILES"""
-        from io import BytesIO
-
-        from django.core.files.uploadedfile import InMemoryUploadedFile
 
         user = user_factory()
         client.force_login(user)
@@ -187,9 +147,6 @@ class TestTripFileUpload:
         self, mock_process, client, trip_factory, user_factory
     ):
         """Test updating trip with file upload via FILES"""
-        from io import BytesIO
-
-        from django.core.files.uploadedfile import InMemoryUploadedFile
 
         user = user_factory()
         trip = trip_factory(author=user)
@@ -222,55 +179,17 @@ class TestTripFileUpload:
 
         assert response.status_code in [200, 204, 302]
 
-    @patch("trips.views.trips.process_trip_image")
-    @patch("trips.views.trips.download_unsplash_photo")
-    @patch("trips.views.trips.search_unsplash_photos")
-    def test_create_file_upload_overrides_unsplash(
-        self, mock_search, mock_download, mock_process, client, user_factory
+    @patch("trips.views.trips.async_task")
+    def test_create_file_upload_skips_async_task(
+        self, mock_async_task, client, user_factory
     ):
-        """Test that file upload overrides Unsplash selection in trip_create"""
+        """When a file is uploaded directly, the Unsplash async task is not fired."""
         user = user_factory()
         client.force_login(user)
-
-        # Mock Unsplash search
-        mock_search.return_value = [
-            {
-                "id": "photo123",
-                "urls": {"regular": "https://example.com/photo.jpg"},
-                "user": {
-                    "name": "Test Photographer",
-                    "profile": "https://unsplash.com/@test",
-                },
-                "links": {
-                    "html": "https://unsplash.com/photos/photo123",
-                    "download_location": "https://api.unsplash.com/download",
-                },
-            }
-        ]
-
-        # Mock Unsplash download
-        mock_download.return_value = (
-            b"unsplash_data",
-            {"source": "unsplash", "photographer": "Test Photographer"},
-        )
-
-        # Mock image processing - should be called twice (Unsplash + file upload)
-        processed_file = InMemoryUploadedFile(
-            BytesIO(b"processed_upload"),
-            "ImageField",
-            "upload.jpg",
-            "image/jpeg",
-            1024,
-            None,
-        )
-        mock_process.return_value = processed_file
-
-        # Create uploaded file
         uploaded = SimpleUploadedFile(
             "test.jpg", b"file_content", content_type="image/jpeg"
         )
 
-        # Post with BOTH selected_photo_id AND file upload
         response = client.post(
             reverse("trips:trip-create"),
             data={
@@ -282,65 +201,20 @@ class TestTripFileUpload:
         )
 
         assert response.status_code in [200, 204, 302]
-        # process_trip_image should be called for file upload (overriding Unsplash)
-        assert mock_process.call_count >= 1
+        mock_async_task.assert_not_called()
 
-    @patch("trips.views.trips.process_trip_image")
-    @patch("trips.views.trips.download_unsplash_photo")
-    @patch("trips.views.trips.search_unsplash_photos")
-    def test_update_file_upload_overrides_unsplash(
-        self,
-        mock_search,
-        mock_download,
-        mock_process,
-        client,
-        trip_factory,
-        user_factory,
+    @patch("trips.views.trips.async_task")
+    def test_update_file_upload_skips_async_task(
+        self, mock_async_task, client, trip_factory, user_factory
     ):
-        """Test that file upload overrides Unsplash selection in trip_update"""
+        """When a file is uploaded directly, the Unsplash async task is not fired."""
         user = user_factory()
         trip = trip_factory(author=user, destination="Paris")
         client.force_login(user)
-
-        # Mock Unsplash search
-        mock_search.return_value = [
-            {
-                "id": "photo456",
-                "urls": {"regular": "https://example.com/photo.jpg"},
-                "user": {
-                    "name": "Test Photographer",
-                    "profile": "https://unsplash.com/@test",
-                },
-                "links": {
-                    "html": "https://unsplash.com/photos/photo456",
-                    "download_location": "https://api.unsplash.com/download",
-                },
-            }
-        ]
-
-        # Mock Unsplash download
-        mock_download.return_value = (
-            b"unsplash_data",
-            {"source": "unsplash", "photographer": "Test Photographer"},
-        )
-
-        # Mock image processing
-        processed_file = InMemoryUploadedFile(
-            BytesIO(b"processed_upload"),
-            "ImageField",
-            "upload.jpg",
-            "image/jpeg",
-            1024,
-            None,
-        )
-        mock_process.return_value = processed_file
-
-        # Create uploaded file
         uploaded = SimpleUploadedFile(
             "test.jpg", b"file_content", content_type="image/jpeg"
         )
 
-        # Post with BOTH selected_photo_id AND file upload
         response = client.post(
             reverse("trips:trip-update", kwargs={"pk": trip.pk}),
             data={
@@ -352,5 +226,4 @@ class TestTripFileUpload:
         )
 
         assert response.status_code in [200, 204, 302]
-        # process_trip_image should be called for file upload (overriding Unsplash)
-        assert mock_process.call_count >= 1
+        mock_async_task.assert_not_called()

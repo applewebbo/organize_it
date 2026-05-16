@@ -15,6 +15,32 @@ from trips.weather import fetch_weather_for_trip
 logger = logging.getLogger("task")
 
 
+def download_trip_unsplash_photo(trip_pk, photo_data):
+    """Download and attach an Unsplash photo to a trip."""
+    from trips.utils import download_unsplash_photo, process_trip_image
+
+    try:
+        trip = Trip.objects.get(pk=trip_pk)
+    except Trip.DoesNotExist:
+        logger.warning("download_trip_unsplash_photo: trip %s not found", trip_pk)
+        return
+
+    image_content, metadata = download_unsplash_photo(photo_data)
+    if not image_content:
+        return
+
+    processed_image = process_trip_image(image_content)
+    if not processed_image:
+        return
+
+    photo_id = photo_data.get("id", "unknown")
+    filename = f"trip_{trip_pk}_{photo_id}.jpg"
+    trip.image.save(filename, processed_image, save=False)
+    trip.image_metadata = metadata
+    trip.save(update_fields=["image", "image_metadata"])
+    logger.info("Unsplash photo %s attached to trip %s", photo_id, trip_pk)
+
+
 def populate_trips():
     """
     Populate database with dummy trips for development.

@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
+from django_q.tasks import async_task
 
 from accounts.models import Profile, get_profile
 from trips.forms import TripForm
@@ -24,7 +25,6 @@ from trips.models import (
     TripCollaboration,
 )
 from trips.utils import (
-    download_unsplash_photo,
     geocode_trip_destination,
     get_flight_origin_icao,
     get_trip_for_editor_or_404,
@@ -208,27 +208,7 @@ def trip_create(request):
             trip = form.save(commit=False)
             trip.author = request.user
 
-            # Handle Unsplash photo selection
-            selected_photo_id = form.cleaned_data.get("selected_photo_id")
-            if selected_photo_id:
-                # Search Unsplash to get photo data
-                query = trip.destination
-                photos = search_unsplash_photos(query, per_page=10)
-                if photos:
-                    photo_data = next(
-                        (p for p in photos if p["id"] == selected_photo_id), None
-                    )
-                    if photo_data:
-                        # Download and process image
-                        image_content, metadata = download_unsplash_photo(photo_data)
-                        if image_content:
-                            processed_image = process_trip_image(image_content)
-                            if processed_image:
-                                filename = f"trip_{selected_photo_id}.jpg"
-                                trip.image.save(filename, processed_image, save=False)
-                                trip.image_metadata = metadata
-
-            # Process uploaded image if present (overrides Unsplash)
+            # Process uploaded image if present (synchronous, takes priority)
             if request.FILES.get("image"):  # pragma: no cover
                 processed_image = process_trip_image(request.FILES["image"])
                 if processed_image:
@@ -236,6 +216,21 @@ def trip_create(request):
                     trip.image_metadata = {"source": "upload"}
 
             trip.save()
+
+            # Schedule Unsplash download in background (only when no direct upload)
+            selected_photo_id = form.cleaned_data.get("selected_photo_id")
+            if selected_photo_id and not request.FILES.get("image"):
+                photos = search_unsplash_photos(trip.destination, per_page=10)
+                if photos:
+                    photo_data = next(
+                        (p for p in photos if p["id"] == selected_photo_id), None
+                    )
+                    if photo_data:
+                        async_task(
+                            "trips.tasks.download_trip_unsplash_photo",
+                            trip.pk,
+                            photo_data,
+                        )
             dest_lat = form.cleaned_data.get("destination_latitude")
             dest_lon = form.cleaned_data.get("destination_longitude")
             if dest_lat is not None and dest_lon is not None:
@@ -285,27 +280,7 @@ def trip_update(request, pk):
         if form.is_valid():
             trip = form.save(commit=False)
 
-            # Handle Unsplash photo selection
-            selected_photo_id = form.cleaned_data.get("selected_photo_id")
-            if selected_photo_id:
-                # Search Unsplash to get photo data
-                query = trip.destination
-                photos = search_unsplash_photos(query, per_page=10)
-                if photos:
-                    photo_data = next(
-                        (p for p in photos if p["id"] == selected_photo_id), None
-                    )
-                    if photo_data:
-                        # Download and process image
-                        image_content, metadata = download_unsplash_photo(photo_data)
-                        if image_content:
-                            processed_image = process_trip_image(image_content)
-                            if processed_image:
-                                filename = f"trip_{trip.pk}_{selected_photo_id}.jpg"
-                                trip.image.save(filename, processed_image, save=False)
-                                trip.image_metadata = metadata
-
-            # Process uploaded image if present (overrides Unsplash)
+            # Process uploaded image if present (synchronous, takes priority)
             if request.FILES.get("image"):  # pragma: no cover
                 processed_image = process_trip_image(request.FILES["image"])
                 if processed_image:
@@ -313,6 +288,21 @@ def trip_update(request, pk):
                     trip.image_metadata = {"source": "upload"}
 
             trip.save()
+
+            # Schedule Unsplash download in background (only when no direct upload)
+            selected_photo_id = form.cleaned_data.get("selected_photo_id")
+            if selected_photo_id and not request.FILES.get("image"):
+                photos = search_unsplash_photos(trip.destination, per_page=10)
+                if photos:
+                    photo_data = next(
+                        (p for p in photos if p["id"] == selected_photo_id), None
+                    )
+                    if photo_data:
+                        async_task(
+                            "trips.tasks.download_trip_unsplash_photo",
+                            trip.pk,
+                            photo_data,
+                        )
             dest_lat = form.cleaned_data.get("destination_latitude")
             dest_lon = form.cleaned_data.get("destination_longitude")
             if dest_lat is not None and dest_lon is not None:

@@ -9,12 +9,65 @@ from tests.trips.factories import ExperienceFactory, StayFactory
 from trips.tasks import (
     _get_day_coords,
     calculate_day_transfer,
+    download_trip_unsplash_photo,
     fetch_weather_for_active_trips,
 )
 
 pytestmark = pytest.mark.django_db
 
 TODAY = date.today()
+
+MOCK_PHOTO_DATA = {
+    "id": "photo123",
+    "urls": {"regular": "https://example.com/photo.jpg"},
+    "user": {"name": "Test Photographer", "profile": "https://unsplash.com/@test"},
+    "links": {
+        "html": "https://unsplash.com/photos/photo123",
+        "download_location": "https://api.unsplash.com/download",
+    },
+}
+
+
+class TestDownloadTripUnsplashPhoto:
+    def test_attaches_photo_to_trip(self, user_factory, trip_factory):
+        from io import BytesIO
+
+        from django.core.files.uploadedfile import InMemoryUploadedFile
+
+        user = user_factory()
+        trip = trip_factory(author=user)
+        fake_file = InMemoryUploadedFile(
+            BytesIO(b"processed"), "ImageField", "test.jpg", "image/jpeg", 1024, None
+        )
+
+        with patch("trips.utils.download_unsplash_photo") as mock_dl:
+            with patch("trips.utils.process_trip_image", return_value=fake_file):
+                mock_dl.return_value = (b"img_bytes", {"source": "unsplash"})
+                download_trip_unsplash_photo(trip.pk, MOCK_PHOTO_DATA)
+
+        trip.refresh_from_db()
+        assert trip.image_metadata == {"source": "unsplash"}
+
+    def test_skips_if_trip_not_found(self):
+        download_trip_unsplash_photo(99999, MOCK_PHOTO_DATA)  # no error
+
+    def test_skips_if_download_fails(self, user_factory, trip_factory):
+        user = user_factory()
+        trip = trip_factory(author=user)
+
+        with patch("trips.utils.download_unsplash_photo", return_value=(None, None)):
+            download_trip_unsplash_photo(trip.pk, MOCK_PHOTO_DATA)
+
+        trip.refresh_from_db()
+        assert not trip.image
+
+    def test_skips_if_processing_fails(self, user_factory, trip_factory):
+        user = user_factory()
+        trip = trip_factory(author=user)
+
+        with patch("trips.utils.download_unsplash_photo", return_value=(b"data", {})):
+            with patch("trips.utils.process_trip_image", return_value=None):
+                download_trip_unsplash_photo(trip.pk, MOCK_PHOTO_DATA)
 
 
 class TestFetchWeatherForActiveTrips:
