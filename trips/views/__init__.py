@@ -101,6 +101,7 @@ from trips.views.trips import (
     trip_create,
     trip_delete,
     trip_detail,
+    trip_image_status,
     trip_list,
     trip_unarchive,
     trip_update,
@@ -121,6 +122,7 @@ __all__ = [
     "trip_unarchive",
     "validate_dates",
     "search_trip_images",
+    "trip_image_status",
     "shared_trip_detail",
     # days
     "day_detail",

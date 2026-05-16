@@ -82,18 +82,8 @@
     </div>
     <!-- Center: Trip Image -->
     <figure class="relative w-full h-48 md:h-80">
-        {% if trip.get_image_url %}
-            <img src="{{ trip.get_image_url }}"
-                 alt="{{ trip.title }}"
-                 class="object-cover w-full h-full"
-                 loading="eager">
-        {% else %}
-            <img src="{% static 'img/trip_generic_detail.jpg' %}"
-                 alt="{{ trip.title }}"
-                 class="object-cover w-full h-full"
-                 loading="eager">
-        {% endif %}
-        {% if trip.needs_attribution %}
+        {% include "trips/includes/trip-image.html" with trip=trip image_loading="eager" image_placeholder="img/trip_generic_detail.jpg" %}
+        {% if trip.needs_attribution and not trip.image_metadata.pending %}
             <div class="absolute bottom-3 left-3 py-1 px-2 text-xs text-white rounded bg-black/50">
                 {{ trip.get_attribution_text }}
             </div>

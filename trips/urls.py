@@ -196,6 +196,11 @@ htmx_urlpatterns = [
     ),
     # IMAGE MANAGEMENT
     path("images/search/", views.search_trip_images, name="search-images"),
+    path(
+        "trips/<int:pk>/image-status/",
+        views.trip_image_status,
+        name="trip-image-status",
+    ),
     # COLLABORATION
     path(
         "trips/<int:trip_id>/collaborators/",

@@ -4,7 +4,7 @@ from datetime import date
 from django.contrib import messages
 from django.contrib.auth.decorators import login_not_required
 from django.db.models import Max, Min, Prefetch, Q
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.urls import reverse
@@ -215,10 +215,14 @@ def trip_create(request):
                     trip.image = processed_image
                     trip.image_metadata = {"source": "upload"}
 
-            trip.save()
-
             # Schedule Unsplash download in background (only when no direct upload)
             selected_photo_id = form.cleaned_data.get("selected_photo_id")
+            if selected_photo_id and not request.FILES.get("image"):
+                trip.image = None
+                trip.image_metadata = {"source": "unsplash", "pending": True}
+
+            trip.save()
+
             if selected_photo_id and not request.FILES.get("image"):
                 photos = search_unsplash_photos(trip.destination, per_page=10)
                 if photos:
@@ -287,10 +291,14 @@ def trip_update(request, pk):
                     trip.image = processed_image
                     trip.image_metadata = {"source": "upload"}
 
-            trip.save()
-
             # Schedule Unsplash download in background (only when no direct upload)
             selected_photo_id = form.cleaned_data.get("selected_photo_id")
+            if selected_photo_id and not request.FILES.get("image"):
+                trip.image = None
+                trip.image_metadata = {"source": "unsplash", "pending": True}
+
+            trip.save()
+
             if selected_photo_id and not request.FILES.get("image"):
                 photos = search_unsplash_photos(trip.destination, per_page=10)
                 if photos:
@@ -453,6 +461,21 @@ def search_trip_images(request):
         )
 
     return HttpResponse(status=405)
+
+
+@require_http_methods(["GET"])
+def trip_image_status(request, pk):
+    """HTMX polling endpoint: returns spinner fragment while Unsplash task is pending, image when ready."""
+    from trips.utils import accessible_trips_qs
+
+    trip = get_object_or_404(Trip, pk=pk)
+    if not accessible_trips_qs(request.user).filter(pk=trip.pk).exists():
+        raise Http404
+    return TemplateResponse(
+        request,
+        "trips/includes/trip-image-status-fragment.html",
+        {"trip": trip},
+    )
 
 
 @login_not_required

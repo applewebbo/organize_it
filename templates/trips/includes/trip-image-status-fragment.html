@@ -1,0 +1,17 @@
+{% load static %}
+{% if trip.image_metadata.pending %}
+    <div id="trip-image-{{ trip.pk }}"
+         class="flex justify-center items-center w-full h-full bg-base-200"
+         hx-get="{% url 'trips:trip-image-status' trip.pk %}"
+         hx-trigger="every 3s"
+         hx-target="this"
+         hx-swap="outerHTML">
+        <span class="loading loading-spinner loading-lg text-primary"></span>
+    </div>
+{% else %}
+    <img id="trip-image-{{ trip.pk }}"
+         src="{{ trip.get_image_url|default:'' }}"
+         alt="{{ trip.title }}"
+         class="object-cover w-full h-full"
+         loading="lazy">
+{% endif %}

@@ -227,3 +227,107 @@ class TestTripFileUpload:
 
         assert response.status_code in [200, 204, 302]
         mock_async_task.assert_not_called()
+
+
+class TestTripImagePendingFlag:
+    """Tests for the pending image state and HTMX polling endpoint."""
+
+    @patch("trips.views.trips.async_task")
+    @patch("trips.views.trips.search_unsplash_photos")
+    def test_create_sets_pending_flag(
+        self, mock_search, mock_async_task, client, user_factory
+    ):
+        """Creating a trip with Unsplash sets image_metadata.pending=True and clears image."""
+        user = user_factory()
+        client.force_login(user)
+        mock_search.return_value = [MOCK_PHOTO]
+
+        client.post(
+            reverse("trips:trip-create"),
+            {
+                "title": "Pending Trip",
+                "destination": "Rome",
+                "selected_photo_id": "photo123",
+            },
+        )
+
+        from trips.models import Trip
+
+        trip = Trip.objects.get(title="Pending Trip")
+        assert trip.image_metadata.get("pending") is True
+        assert not trip.image
+
+    @patch("trips.views.trips.async_task")
+    @patch("trips.views.trips.search_unsplash_photos")
+    def test_update_sets_pending_flag_and_clears_old_image(
+        self, mock_search, mock_async_task, client, trip_factory, user_factory
+    ):
+        """Updating a trip with a new Unsplash photo sets pending=True and clears old image."""
+        user = user_factory()
+        trip = trip_factory(
+            author=user, destination="Rome", image_metadata={"source": "upload"}
+        )
+        client.force_login(user)
+        mock_search.return_value = [MOCK_PHOTO]
+
+        client.post(
+            reverse("trips:trip-update", kwargs={"pk": trip.pk}),
+            {
+                "title": trip.title,
+                "destination": trip.destination,
+                "selected_photo_id": "photo123",
+            },
+        )
+
+        trip.refresh_from_db()
+        assert trip.image_metadata.get("pending") is True
+        assert not trip.image
+
+    def test_image_status_pending_returns_spinner(
+        self, client, trip_factory, user_factory
+    ):
+        """Polling endpoint returns spinner when image is still pending."""
+        user = user_factory()
+        trip = trip_factory(
+            author=user, image_metadata={"source": "unsplash", "pending": True}
+        )
+        client.force_login(user)
+
+        response = client.get(
+            reverse("trips:trip-image-status", kwargs={"pk": trip.pk})
+        )
+
+        assert response.status_code == 200
+        assert b"loading-spinner" in response.content
+        assert b"every 3s" in response.content
+
+    def test_image_status_ready_returns_image(self, client, trip_factory, user_factory):
+        """Polling endpoint returns image tag (no spinner) when processing is complete."""
+        user = user_factory()
+        trip = trip_factory(author=user, image_metadata={"source": "unsplash"})
+        client.force_login(user)
+
+        response = client.get(
+            reverse("trips:trip-image-status", kwargs={"pk": trip.pk})
+        )
+
+        assert response.status_code == 200
+        assert b"loading-spinner" not in response.content
+        assert b"every 3s" not in response.content
+
+    def test_image_status_forbidden_for_other_user(
+        self, client, trip_factory, user_factory
+    ):
+        """Non-owner cannot access the image status endpoint."""
+        owner = user_factory()
+        other = user_factory()
+        trip = trip_factory(
+            author=owner, image_metadata={"source": "unsplash", "pending": True}
+        )
+        client.force_login(other)
+
+        response = client.get(
+            reverse("trips:trip-image-status", kwargs={"pk": trip.pk})
+        )
+
+        assert response.status_code == 404
