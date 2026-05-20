@@ -55,7 +55,8 @@ dependencies = [
   "django-cloudinary-storage>=0.3.0",
   "httpx>=0.28.1",
   "pytest-httpx>=0.35.0",
-  "cloudinary>=1.44.1"
+  "cloudinary>=1.44.1",
+  "weasyprint>=68.1"
 ]
 description = "Help you organize your trips and travel plans."
 name = "organize_it"

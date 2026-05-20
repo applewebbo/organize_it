@@ -93,6 +93,7 @@ from trips.views.transfers import (
     transfer_info,
 )
 from trips.views.trips import (
+    export_trip_pdf,
     home,
     search_trip_images,
     shared_trip_detail,
@@ -124,6 +125,7 @@ __all__ = [
     "search_trip_images",
     "trip_image_status",
     "shared_trip_detail",
+    "export_trip_pdf",
     # days
     "day_detail",
     "reorder_events",

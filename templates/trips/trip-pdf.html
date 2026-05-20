@@ -1,0 +1,179 @@
+{% load i18n trip_tags %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="description" content="Trip itinerary">
+        <meta name="keywords" content="trip, itinerary">
+        <title>{{ trip.title }} – Itinerary</title>
+        <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 11pt;
+            color: #1a1a1a;
+            line-height: 1.5;
+            padding: 2cm 2.5cm;
+        }
+        h1 { font-size: 22pt; font-weight: 700; margin-bottom: 4pt; }
+        h2 { font-size: 13pt; font-weight: 700; margin: 18pt 0 6pt; border-bottom: 1.5px solid #333; padding-bottom: 3pt; }
+        h3 { font-size: 11pt; font-weight: 700; margin: 10pt 0 3pt; }
+        .meta { font-size: 9.5pt; color: #555; margin-bottom: 16pt; }
+        .meta span { margin-right: 16pt; }
+        .section { margin-bottom: 20pt; }
+        .transfer-box {
+            background: #f5f5f5;
+            border-left: 3px solid #555;
+            padding: 6pt 10pt;
+            margin: 6pt 0;
+            font-size: 10pt;
+        }
+        .day-header {
+            font-size: 12pt;
+            font-weight: 700;
+            margin: 16pt 0 6pt;
+            padding: 4pt 8pt;
+            background: #eee;
+        }
+        .event {
+            margin: 6pt 0 6pt 12pt;
+            padding: 5pt 8pt;
+            border-left: 2px solid #bbb;
+        }
+        .event-title { font-weight: 600; }
+        .event-meta { font-size: 9pt; color: #555; }
+        .stay-box {
+            margin: 6pt 0;
+            padding: 5pt 10pt;
+            border: 1px solid #ccc;
+            background: #fafafa;
+        }
+        .stay-title { font-weight: 600; }
+        .stay-meta { font-size: 9pt; color: #555; }
+        .stay-transfer {
+            font-size: 9.5pt;
+            color: #444;
+            margin: 3pt 0 3pt 8pt;
+        }
+        .links-list { font-size: 10pt; }
+        .links-list li { margin: 3pt 0; }
+        .notes { font-size: 10pt; white-space: pre-wrap; margin-top: 4pt; color: #333; }
+        .badge {
+            display: inline-block;
+            font-size: 8pt;
+            padding: 1pt 5pt;
+            border-radius: 3pt;
+            background: #ddd;
+            color: #333;
+            margin-right: 4pt;
+        }
+        .page-break { page-break-before: always; }
+        .empty-day { font-size: 9.5pt; color: #888; margin-left: 12pt; }
+        </style>
+    </head>
+    <body>
+        <h1>{{ trip.title }}</h1>
+        <div class="meta">
+            <span>📅 {{ trip.start_date|date:"d F Y" }} – {{ trip.end_date|date:"d F Y" }}</span>
+            <span>📍 {{ trip.destination }}</span>
+        </div>
+        {% if arrival_transfer or departure_transfer %}
+            <div class="section">
+                <h2>{% trans "Main Transfers" %}</h2>
+                {% if arrival_transfer %}
+                    <div class="transfer-box">
+                        <strong>{% trans "Arrival" %}</strong> –
+                        {{ arrival_transfer.get_mode_display }}
+                        {% if arrival_transfer.origin %}
+                            {% trans "from" %} {{ arrival_transfer.origin }}
+                        {% endif %}
+                        {% if arrival_transfer.start_time %}· {{ arrival_transfer.start_time|date:"d/m H:i" }}{% endif %}
+                        {% if arrival_transfer.end_time %}→ {{ arrival_transfer.end_time|date:"d/m H:i" }}{% endif %}
+                        {% if arrival_transfer.notes %}
+                            <br>
+                            <span class="notes">{{ arrival_transfer.notes }}</span>
+                        {% endif %}
+                    </div>
+                {% endif %}
+                {% if departure_transfer %}
+                    <div class="transfer-box">
+                        <strong>{% trans "Departure" %}</strong> –
+                        {{ departure_transfer.get_mode_display }}
+                        {% if departure_transfer.origin %}
+                            {% trans "from" %} {{ departure_transfer.origin }}
+                        {% endif %}
+                        {% if departure_transfer.start_time %}· {{ departure_transfer.start_time|date:"d/m H:i" }}{% endif %}
+                        {% if departure_transfer.end_time %}→ {{ departure_transfer.end_time|date:"d/m H:i" }}{% endif %}
+                        {% if departure_transfer.notes %}
+                            <br>
+                            <span class="notes">{{ departure_transfer.notes }}</span>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+        <div class="section">
+            <h2>{% trans "Days" %}</h2>
+            {% for day in days %}
+                <div class="day-header">
+                    {% trans "Day" %} {{ day.number }} – {{ day.date|date:"l, d F Y" }}
+                    {% if day.destination %}· {{ day.destination }}{% endif %}
+                </div>
+                {% if day.stay %}
+                    <div class="stay-box">
+                        <div class="stay-title">🏨 {{ day.stay.name }}</div>
+                        <div class="stay-meta">
+                            {% if day.stay.address %}{{ day.stay.address }}{% endif %}
+                            {% if day.stay.check_in %}
+                                · {% trans "Check-in" %}: {{ day.stay.check_in|time:"H:i" }}
+                            {% endif %}
+                            {% if day.stay.check_out %}
+                                · {% trans "Check-out" %}: {{ day.stay.check_out|time:"H:i" }}
+                            {% endif %}
+                        </div>
+                        {% if day.stay.notes %}<div class="notes">{{ day.stay.notes }}</div>{% endif %}
+                        {% for st in day.stay.transfer_from.all %}
+                            <div class="stay-transfer">
+                                🚗 {% trans "Transfer to next stay" %}: {{ st.get_transport_mode_display }}
+                                {% if st.departure_time %}· {{ st.departure_time|date:"H:i" }}{% endif %}
+                                {% if st.estimated_duration %}· ~{{ st.estimated_duration }} min{% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% for event in day.events.all %}
+                    <div class="event">
+                        <div class="event-title">
+                            {% if event.category == 2 %}
+                                🎯
+                            {% else %}
+                                🍽️
+                            {% endif %}
+                            {{ event.title }}
+                        </div>
+                        <div class="event-meta">
+                            {% if event.address %}📍 {{ event.address }}{% endif %}
+                            {% if event.estimated_duration %}· ~{{ event.estimated_duration }} min{% endif %}
+                        </div>
+                        {% if event.notes %}<div class="notes">{{ event.notes }}</div>{% endif %}
+                    </div>
+                {% empty %}
+                    <p class="empty-day">{% trans "No events for this day." %}</p>
+                {% endfor %}
+            {% endfor %}
+        </div>
+        {% if links %}
+            <div class="section">
+                <h2>{% trans "Links" %}</h2>
+                <ul class="links-list">
+                    {% for link in links %}
+                        <li>
+                            {% if link.title %}{{ link.title }} –{% endif %}
+                            {{ link.url }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </body>
+</html>

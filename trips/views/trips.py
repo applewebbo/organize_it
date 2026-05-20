@@ -1,17 +1,20 @@
 import logging
 from datetime import date
+from io import BytesIO
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_not_required
 from django.db.models import Max, Min, Prefetch, Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 from django_q.tasks import async_task
+from weasyprint import HTML
 
 from accounts.models import Profile, get_profile
 from trips.forms import TripForm
@@ -506,3 +509,49 @@ def shared_trip_detail(request, token):
         "permission_level": link.permission_level,
     }
     return TemplateResponse(request, "trips/shared-trip-detail.html", context)
+
+
+def export_trip_pdf(request, pk):
+    """Export a trip itinerary as a PDF file."""
+    trip = get_object_or_404(
+        Trip.objects.filter(
+            Q(author=request.user) | Q(collaborators=request.user)
+        ).distinct(),
+        pk=pk,
+    )
+
+    days = (
+        trip.days.prefetch_related(
+            Prefetch("events", queryset=Event.objects.order_by("order", "pk")),
+            "stay",
+        )
+        .select_related("trip")
+        .order_by("number")
+    )
+
+    arrival_transfer = MainTransfer.objects.filter(
+        trip=trip, direction=MainTransfer.Direction.ARRIVAL
+    ).first()
+    departure_transfer = MainTransfer.objects.filter(
+        trip=trip, direction=MainTransfer.Direction.DEPARTURE
+    ).first()
+
+    context = {
+        "trip": trip,
+        "days": days,
+        "arrival_transfer": arrival_transfer,
+        "departure_transfer": departure_transfer,
+        "links": trip.links.all(),
+    }
+
+    html_string = render_to_string("trips/trip-pdf.html", context, request=request)
+    pdf_file = BytesIO()
+    HTML(string=html_string, base_url=request.build_absolute_uri("/")).write_pdf(
+        pdf_file
+    )
+    pdf_file.seek(0)
+
+    filename = f"trip-{trip.pk}-itinerary.pdf"
+    response = HttpResponse(pdf_file, content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+    return response

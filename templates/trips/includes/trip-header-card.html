@@ -31,6 +31,11 @@
                     <i class="ph-bold ph-share-network i-sm" aria-hidden="true"></i>
                 </button>
             {% endif %}
+            <a href="{% url 'trips:trip-export-pdf' trip.pk %}"
+               class="btn btn-xs btn-soft"
+               aria-label="{% trans 'Export PDF' %}">
+                <i class="ph-bold ph-file-pdf i-sm" aria-hidden="true"></i>
+            </a>
         </div>
         <!-- Desktop: Full Layout -->
         <div class="hidden sm:flex sm:gap-2 sm:items-center sm:grow">
@@ -78,6 +83,12 @@
                     <span class="hidden sm:inline">{% trans 'Share' %}</span>
                 </button>
             {% endif %}
+            <a href="{% url 'trips:trip-export-pdf' trip.pk %}"
+               class="btn btn-md btn-soft"
+               aria-label="{% trans 'Export PDF' %}">
+                <i class="ph-bold ph-file-pdf i-lg" aria-hidden="true"></i>
+                <span class="hidden sm:inline">{% trans 'PDF' %}</span>
+            </a>
         </div>
     </div>
     <!-- Center: Trip Image -->
