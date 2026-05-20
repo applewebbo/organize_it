@@ -371,15 +371,15 @@ release-create tag previous_tag="" notes_file="" draft="false" prerelease="false
     echo "Documentation built in site/ directory"
 
 ##########################################################################
-# Beans
+# Tasks
 ##########################################################################
 
-# List active beans (excludes completed and scrapped)
-[group('beans')]
-beans:
-    beans list --ready
+# List all ready/in-progress tasks
+[group('tasks')]
+tasks-list:
+    taskdb list
 
-# List completed beans
-[group('beans')]
-beans_completed:
-    beans list -s completed
+# List completed tasks
+[group('tasks')]
+tasks-done:
+    taskdb list --status done

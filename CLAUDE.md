@@ -48,6 +48,26 @@ git push origin main
 - If you `git add` first and then commit, pre-commit hooks will format the staged files again, causing the commit to fail
 - Running `just lint` first ensures files are already formatted when you stage them
 
+## Task Tracking
+
+Before starting multi-step work, create tasks in `taskdb`.
+
+- Use `taskdb create` for each subtask.
+- Move active work to `in-progress` with `taskdb update <id> --status in-progress`.
+- Add comments as progress notes and decision logs with `taskdb comment <id> "..."`.
+- Mark completed work with `taskdb complete <task-identifier>`.
+- Prefer small, reviewable tasks over large umbrella tasks.
+- In the final commit that fixes the issue, mark the task complete with `taskdb complete <task-identifier>` and include the task file in the same commit.
+
+### Status Flow
+
+| Status | Meaning |
+|--------|---------|
+| `ready` | Task defined, not yet started |
+| `in-progress` | Currently being worked on |
+| `done` | Work finished, pending review/merge |
+| `complete` | Fully closed and merged |
+
 ### Commit Message Guidelines
 
 - Write clear, descriptive commit messages
