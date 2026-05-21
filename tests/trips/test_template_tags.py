@@ -18,6 +18,7 @@ from trips.templatetags.trip_tags import (
     format_duration,
     format_minutes,
     format_opening_hours,
+    format_opening_hours_text,
     has_different_stay,
     is_first_day_of_stay,
     is_first_day_of_trip,
@@ -451,6 +452,64 @@ class TestFormatOpeningHours:
             "</ul>"
         )
         assert format_opening_hours(hours_data) == expected
+
+
+class TestFormatOpeningHoursText:
+    """Tests for format_opening_hours_text template filter (plain-text PDF version)"""
+
+    def test_empty_input(self):
+        assert format_opening_hours_text({}) == ""
+
+    def test_invalid_input_type(self):
+        assert format_opening_hours_text(None) == ""
+        assert format_opening_hours_text("string") == ""
+
+    def test_all_days_same_hours(self):
+        hours_data = {
+            day: {"open": "09:00", "close": "17:00"}
+            for day in [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday",
+            ]
+        }
+        assert format_opening_hours_text(hours_data) == "Lun-Dom: 09:00 – 17:00"
+
+    def test_some_days_closed(self):
+        hours_data = {
+            "monday": {"open": "09:00", "close": "17:00"},
+            "tuesday": {"open": "09:00", "close": "17:00"},
+            "wednesday": {"open": "09:00", "close": "17:00"},
+            "thursday": {"open": "09:00", "close": "17:00"},
+            "friday": {"open": "09:00", "close": "17:00"},
+            "saturday": {"open": "10:00", "close": "14:00"},
+            "sunday": {},
+        }
+        result = format_opening_hours_text(hours_data)
+        assert "Lun-Ven: 09:00 – 17:00" in result
+        assert "Sab: 10:00 – 14:00" in result
+        assert "Dom: Chiuso" in result
+
+    def test_missing_open_close_keys(self):
+        hours_data = {
+            "monday": {"open": "09:00"},
+            "tuesday": {"close": "17:00"},
+            "thursday": {"open": "09:00", "close": "17:00"},
+        }
+        result = format_opening_hours_text(hours_data)
+        assert "Gio: 09:00 – 17:00" in result
+
+    def test_separator_between_groups(self):
+        hours_data = {
+            "monday": {"open": "09:00", "close": "13:00"},
+            "tuesday": {"open": "14:00", "close": "18:00"},
+        }
+        result = format_opening_hours_text(hours_data)
+        assert " · " in result
 
 
 class TestStayTransferTags:

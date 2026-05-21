@@ -5,7 +5,7 @@ title: Export trip itinerary (PDF / iCal)
 labels:
   - feature
 created: '2026-05-20T07:44:13.039+02:00'
-updated: '2026-05-20T08:07:44.540+02:00'
+updated: '2026-05-21T14:39:04.678+02:00'
 ---
 
 ## Description
@@ -18,3 +18,4 @@ Add export functionality for trip itinerary: PDF for printing/sharing, iCal for 
 | Commented At | Comment |
 | --- | --- |
 | 2026-05-20T08:07:44.540+02:00 | Status changed from ready to in-progress |
+| 2026-05-21T14:39:04.678+02:00 | Status changed from in-progress to complete |

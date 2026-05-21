@@ -7,8 +7,8 @@ from django.contrib.messages import get_messages
 from pytest_django.asserts import assertTemplateUsed
 
 from tests.test import TestCase
-from tests.trips.factories import ExperienceFactory, TripFactory
-from trips.models import Trip
+from tests.trips.factories import ExperienceFactory, StayFactory, TripFactory
+from trips.models import Trip, TripCollaboration
 
 pytestmark = pytest.mark.django_db
 
@@ -712,3 +712,59 @@ class DeleteStageView(TestCase):
             )
 
         self.response_404(response)
+
+
+class ExportTripPdfView(TestCase):
+    def test_owner_gets_pdf_response(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+
+        with self.login(user):
+            response = self.get("trips:trip-export-pdf", pk=trip.pk)
+
+        self.response_200(response)
+        assert response["Content-Type"] == "application/pdf"
+        assert "attachment" in response["Content-Disposition"]
+
+    def test_collaborator_gets_pdf_response(self):
+        owner = self.make_user("owner")
+        collaborator = self.make_user("collaborator")
+        trip = TripFactory(author=owner)
+        TripCollaboration.objects.create(
+            trip=trip, user=collaborator, color="blue", added_by=owner
+        )
+
+        with self.login(collaborator):
+            response = self.get("trips:trip-export-pdf", pk=trip.pk)
+
+        self.response_200(response)
+        assert response["Content-Type"] == "application/pdf"
+
+    def test_non_member_gets_404(self):
+        owner = self.make_user("owner")
+        other = self.make_user("other")
+        trip = TripFactory(author=owner)
+
+        with self.login(other):
+            response = self.get("trips:trip-export-pdf", pk=trip.pk)
+
+        self.response_404(response)
+
+    def test_unauthenticated_redirects(self):
+        trip = TripFactory()
+        response = self.get("trips:trip-export-pdf", pk=trip.pk)
+        self.response_302(response)
+
+    def test_trip_with_stay_sets_show_stay(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        stay = StayFactory()
+        day = trip.days.first()
+        day.stay = stay
+        day.save()
+
+        with self.login(user):
+            response = self.get("trips:trip-export-pdf", pk=trip.pk)
+
+        self.response_200(response)
+        assert response["Content-Type"] == "application/pdf"
