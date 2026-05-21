@@ -120,6 +120,47 @@ def format_opening_hours(hours_data):
 
 
 @register.filter
+def format_opening_hours_text(hours_data):
+    """Plain-text version of format_opening_hours for PDF rendering."""
+    if not isinstance(hours_data, dict) or not hours_data:
+        return ""
+
+    day_map_from_name = {
+        "monday": 1,
+        "tuesday": 2,
+        "wednesday": 3,
+        "thursday": 4,
+        "friday": 5,
+        "saturday": 6,
+        "sunday": 0,
+    }
+    day_names = {0: "Dom", 1: "Lun", 2: "Mar", 3: "Mer", 4: "Gio", 5: "Ven", 6: "Sab"}
+    hours_by_day = {i: "Chiuso" for i in range(7)}
+
+    for day_name, times in hours_data.items():
+        day_index = day_map_from_name.get(day_name)
+        if day_index is not None and times.get("open") and times.get("close"):
+            hours_by_day[day_index] = f"{times['open']} – {times['close']}"
+
+    output_lines = []
+    week_order = [1, 2, 3, 4, 5, 6, 0]
+    i = 0
+    while i < 7:
+        start = i
+        current = hours_by_day[week_order[start]]
+        j = i
+        while j + 1 < 7 and hours_by_day[week_order[j + 1]] == current:
+            j += 1
+        s = day_names[week_order[start]]
+        e = day_names[week_order[j]]
+        day_range = s if start == j else f"{s}-{e}"
+        output_lines.append(f"{day_range}: {current}")
+        i = j + 1
+
+    return " · ".join(output_lines)
+
+
+@register.filter
 def next_day(day):
     days = list(day.trip.days.all())
     try:
