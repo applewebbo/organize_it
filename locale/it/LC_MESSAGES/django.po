@@ -1445,6 +1445,12 @@ msgstr "Modifica viaggio"
 msgid "Share trip"
 msgstr "Condividi viaggio"
 
+msgid "Link"
+msgstr "Link"
+
+msgid "Share & Export"
+msgstr "Condividi ed esporta"
+
 #: templates/trips/includes/trip-header-card.html:50
 msgid "Stages"
 msgstr "Tappe"

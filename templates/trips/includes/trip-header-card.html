@@ -22,20 +22,34 @@
                         aria-label="{% trans 'Edit trip' %}">
                     <i class="ph-bold ph-pencil-simple i-sm" aria-hidden="true"></i>
                 </button>
-                <button class="btn btn-xs btn-soft"
-                        hx-get="{% url 'trips:share-link-create' trip.pk %}"
-                        hx-target="#dialog"
-                        hx-swap="innerHTML"
-                        @click="$dispatch('open-modal'); document.activeElement.blur()"
-                        aria-label="{% trans 'Share trip' %}">
+            {% endif %}
+            <div class="dropdown dropdown-end">
+                <button tabindex="0"
+                        class="btn btn-xs btn-soft"
+                        aria-label="{% trans 'Share & Export' %}">
                     <i class="ph-bold ph-share-network i-sm" aria-hidden="true"></i>
                 </button>
-            {% endif %}
-            <a href="{% url 'trips:trip-export-pdf' trip.pk %}"
-               class="btn btn-xs btn-soft"
-               aria-label="{% trans 'Export PDF' %}">
-                <i class="ph-bold ph-file-pdf i-sm" aria-hidden="true"></i>
-            </a>
+                <ul tabindex="0"
+                    class="z-10 p-2 w-48 shadow dropdown-content menu bg-base-100 rounded-box">
+                    {% if trip.status != 5 and request.user == trip.author %}
+                        <li>
+                            <button hx-get="{% url 'trips:share-link-create' trip.pk %}"
+                                    hx-target="#dialog"
+                                    hx-swap="innerHTML"
+                                    @click="$dispatch('open-modal'); document.activeElement.blur()">
+                                <i class="ph-bold ph-link" aria-hidden="true"></i>
+                                {% trans 'Link' %}
+                            </button>
+                        </li>
+                    {% endif %}
+                    <li>
+                        <a href="{% url 'trips:trip-export-pdf' trip.pk %}">
+                            <i class="ph-bold ph-file-pdf" aria-hidden="true"></i>
+                            {% trans 'PDF' %}
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
         <!-- Desktop: Full Layout -->
         <div class="hidden sm:flex sm:gap-2 sm:items-center sm:grow">
@@ -73,22 +87,35 @@
                     <i class="ph-bold ph-pencil-simple i-lg" aria-hidden="true"></i>
                     <span class="hidden sm:inline">{% trans 'Edit' %}</span>
                 </button>
-                <button class="btn btn-md btn-soft"
-                        hx-get="{% url 'trips:share-link-create' trip.pk %}"
-                        hx-target="#dialog"
-                        hx-swap="innerHTML"
-                        @click="$dispatch('open-modal'); document.activeElement.blur()"
-                        aria-label="{% trans 'Share trip' %}">
+            {% endif %}
+            <div class="dropdown dropdown-end">
+                <button tabindex="0"
+                        class="btn btn-md btn-soft"
+                        aria-label="{% trans 'Share & Export' %}">
                     <i class="ph-bold ph-share-network i-lg" aria-hidden="true"></i>
                     <span class="hidden sm:inline">{% trans 'Share' %}</span>
                 </button>
-            {% endif %}
-            <a href="{% url 'trips:trip-export-pdf' trip.pk %}"
-               class="btn btn-md btn-soft"
-               aria-label="{% trans 'Export PDF' %}">
-                <i class="ph-bold ph-file-pdf i-lg" aria-hidden="true"></i>
-                <span class="hidden sm:inline">{% trans 'PDF' %}</span>
-            </a>
+                <ul tabindex="0"
+                    class="z-10 p-2 w-48 shadow dropdown-content menu bg-base-100 rounded-box">
+                    {% if trip.status != 5 and request.user == trip.author %}
+                        <li>
+                            <button hx-get="{% url 'trips:share-link-create' trip.pk %}"
+                                    hx-target="#dialog"
+                                    hx-swap="innerHTML"
+                                    @click="$dispatch('open-modal'); document.activeElement.blur()">
+                                <i class="ph-bold ph-link" aria-hidden="true"></i>
+                                {% trans 'Link' %}
+                            </button>
+                        </li>
+                    {% endif %}
+                    <li>
+                        <a href="{% url 'trips:trip-export-pdf' trip.pk %}">
+                            <i class="ph-bold ph-file-pdf" aria-hidden="true"></i>
+                            {% trans 'PDF' %}
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
     <!-- Center: Trip Image -->

@@ -520,7 +520,7 @@ def export_trip_pdf(request, pk):
         pk=pk,
     )
 
-    days = (
+    days = list(
         trip.days.prefetch_related(
             Prefetch("events", queryset=Event.objects.order_by("order", "pk")),
             "stay",
@@ -528,6 +528,13 @@ def export_trip_pdf(request, pk):
         .select_related("trip")
         .order_by("number")
     )
+    seen_stays: set[int] = set()
+    for day in days:
+        if day.stay_id and day.stay_id not in seen_stays:
+            day.show_stay = True
+            seen_stays.add(day.stay_id)
+        else:
+            day.show_stay = False
 
     arrival_transfer = MainTransfer.objects.filter(
         trip=trip, direction=MainTransfer.Direction.ARRIVAL

@@ -1373,6 +1373,12 @@ msgstr ""
 msgid "Share trip"
 msgstr ""
 
+msgid "Link"
+msgstr "Link"
+
+msgid "Share & Export"
+msgstr "Share & Export"
+
 #: templates/trips/includes/trip-header-card.html:50
 msgid "Stages"
 msgstr "Stages"
