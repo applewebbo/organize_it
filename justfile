@@ -113,7 +113,7 @@ ftest *args:
 # Run fast tests with coverage report (must reach 100%)
 [group('utility')]
 cov *args:
-    ENVIRONMENT=test uv run pytest -n 4 --reuse-db --dist loadscope --exitfirst --cov=. --cov-report html:htmlcov --cov-report term:skip-covered --cov-fail-under 100 {{ args }}
+    ENVIRONMENT=test uv run pytest -n auto --reuse-db --dist loadscope --exitfirst --cov=. --cov-report html:htmlcov --cov-report term:skip-covered --cov-fail-under 100 {{ args }}
 
 # Show coverage for a specific test file against a source module (no threshold)
 # Usage: just fcov tests/trips/test_views_map.py trips/views/maps.py

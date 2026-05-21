@@ -1,0 +1,1 @@
+../../all/00000/00010-self-host-phosphor-icons.md
