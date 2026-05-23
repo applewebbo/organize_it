@@ -1,3 +1,4 @@
+import json
 from unittest.mock import patch
 
 import pytest
@@ -165,6 +166,10 @@ class EventUnpairView(TestCase):
             response = self.put("trips:event-unpair", pk=event.pk)
 
         self.response_204(response)
+        trigger = json.loads(response["HX-Trigger"])
+        assert trigger["unpairedModified"] is True
+        assert trigger[f"dayModified{day.pk}"] is True
+        assert trigger["hide-modal"] is True
         message = list(get_messages(response.wsgi_request))[0].message
         assert message == "Event unpaired successfully"
         event.refresh_from_db()
@@ -184,6 +189,10 @@ class EventPairView(TestCase):
             response = self.put("trips:event-pair", pk=event.pk, day_id=day.pk)
 
         self.response_204(response)
+        trigger = json.loads(response["HX-Trigger"])
+        assert trigger["unpairedModified"] is True
+        assert trigger[f"dayModified{day.pk}"] is True
+        assert trigger["hide-modal"] is True
         message = list(get_messages(response.wsgi_request))[0].message
         assert message == "Event paired successfully"
         event.refresh_from_db()

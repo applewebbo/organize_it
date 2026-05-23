@@ -144,6 +144,7 @@ def event_unpair(request, pk):
     """
     qs = Event.objects.select_related("trip__author")
     event = get_object_or_404(qs, pk=pk, trip__in=editable_trips_qs(request.user))
+    day_pk = event.day_id
     event.day = None
     event.save()
     messages.add_message(
@@ -151,7 +152,18 @@ def event_unpair(request, pk):
         messages.SUCCESS,
         _("Event unpaired successfully"),
     )
-    return HttpResponse(status=204, headers={"HX-Refresh": "true"})
+    return HttpResponse(
+        status=204,
+        headers={
+            "HX-Trigger": json.dumps(
+                {
+                    "unpairedModified": True,
+                    f"dayModified{day_pk}": True,
+                    "hide-modal": True,
+                }
+            )
+        },
+    )
 
 
 def event_pair(request, pk, day_id):
@@ -170,7 +182,18 @@ def event_pair(request, pk, day_id):
         messages.SUCCESS,
         _("Event paired successfully"),
     )
-    return HttpResponse(status=204, headers={"HX-Trigger": "unpairedModified"})
+    return HttpResponse(
+        status=204,
+        headers={
+            "HX-Trigger": json.dumps(
+                {
+                    "unpairedModified": True,
+                    f"dayModified{day.pk}": True,
+                    "hide-modal": True,
+                }
+            )
+        },
+    )
 
 
 def event_pair_choice(request, pk):
