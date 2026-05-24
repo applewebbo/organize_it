@@ -426,7 +426,7 @@ def _trip_location_bias(trip) -> tuple[float, float, float] | None:
         clat = sum(c[0] for c in all_coords) / len(all_coords)
         clng = sum(c[1] for c in all_coords) / len(all_coords)
         max_dist = max(_haversine_m(clat, clng, c[0], c[1]) for c in all_coords)
-        radius = min(max(max_dist * 1.5, 10_000), 500_000)
+        radius = min(max(max_dist * 1.5, 10_000), 50_000)
         return clat, clng, radius
     # Fallback: geocode the trip destination
     if trip.destination:

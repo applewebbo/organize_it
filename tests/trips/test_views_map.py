@@ -517,6 +517,33 @@ class TripLocationBiasTest(TestCase):
         assert lat == 45.07
         assert lng == 7.68
 
+    def test_location_bias_radius_capped_at_50km(self):
+        """radius must never exceed 50,000 m (Google Places API limit)."""
+        user = self.make_user("bias_cap@example.com")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        # Two events ~900 km apart — without cap radius would far exceed 50 km
+        for lat, lng in [(41.9, 12.5), (48.85, 2.35)]:
+            Event.objects.create(
+                trip=trip,
+                day=day,
+                name="Event",
+                address="addr",
+                latitude=lat,
+                longitude=lng,
+                category=Event.Category.EXPERIENCE,
+            )
+
+        with self.login(user):
+            with patch("trips.views.maps.GooglePlacesClient") as MockClient:
+                MockClient.return_value.search_text.return_value = []
+                self.post("trips:map-search", pk=trip.pk, data={"query": "museo"})
+
+        _, _, radius = MockClient.return_value.search_text.call_args.kwargs[
+            "location_bias"
+        ]
+        assert radius <= 50_000
+
     def test_search_falls_back_to_geocoding_destination(self):
         """Covers _trip_location_bias fallback to geocoder (lines 3048, 3050)."""
         user = self.make_user("user@example.com")
