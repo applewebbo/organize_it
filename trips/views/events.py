@@ -17,6 +17,7 @@ from trips.utils import (
     editable_trips_qs,
     get_event_instance,
     get_trip_for_editor_or_404,
+    get_trip_stages,
 )
 from trips.views.days import _day_city
 
@@ -79,6 +80,7 @@ def add_meal(request, day_id):
 
 def add_experience_to_trip(request, trip_pk):
     trip = get_trip_for_editor_or_404(trip_pk, request.user)
+    stages = get_trip_stages(trip)
     form = ExperienceForm(
         request.POST or None, initial={"city": trip.destination}, geocode=True
     )
@@ -91,12 +93,13 @@ def add_experience_to_trip(request, trip_pk):
             request, messages.SUCCESS, _("Experience added successfully")
         )
         return HttpResponse(status=204, headers={"HX-Trigger": "unpairedModified"})
-    context = {"form": form, "trip": trip}
+    context = {"form": form, "trip": trip, "stages": stages}
     return TemplateResponse(request, "trips/experience-create-unpaired.html", context)
 
 
 def add_meal_to_trip(request, trip_pk):
     trip = get_trip_for_editor_or_404(trip_pk, request.user)
+    stages = get_trip_stages(trip)
     form = MealForm(
         request.POST or None, initial={"city": trip.destination}, geocode=True
     )
@@ -107,7 +110,7 @@ def add_meal_to_trip(request, trip_pk):
         meal.save()
         messages.add_message(request, messages.SUCCESS, _("Meal added successfully"))
         return HttpResponse(status=204, headers={"HX-Trigger": "unpairedModified"})
-    context = {"form": form, "trip": trip}
+    context = {"form": form, "trip": trip, "stages": stages}
     return TemplateResponse(request, "trips/meal-create-unpaired.html", context)
 
 
@@ -142,9 +145,10 @@ def event_unpair(request, pk):
     Unpair an event from its day by setting the day relation to null.
     Only the trip author can unpair events.
     """
-    qs = Event.objects.select_related("trip__author")
+    qs = Event.objects.select_related("trip__author", "day")
     event = get_object_or_404(qs, pk=pk, trip__in=editable_trips_qs(request.user))
     day_pk = event.day_id
+    event.city = event.day.destination or event.trip.destination
     event.day = None
     event.save()
     messages.add_message(
@@ -199,11 +203,19 @@ def event_pair(request, pk, day_id):
 def event_pair_choice(request, pk):
     """
     Provide a list of days to pair with the selected event.
-    Only days from the same trip are shown.
+    If the event has a city matching a trip stage, only days from that stage are shown.
     """
     event = get_object_or_404(Event, pk=pk, trip__in=accessible_trips_qs(request.user))
     trip = event.trip
-    days = trip.days.all()
+    if event.city:
+        if event.city == trip.destination:
+            days = trip.days.filter(
+                models.Q(destination=event.city) | models.Q(destination="")
+            )
+        else:
+            days = trip.days.filter(destination=event.city)
+    else:
+        days = trip.days.all()
 
     context = {
         "event": event,

@@ -2547,6 +2547,18 @@ msgstr "Stima del tempo di guida:"
 msgid "min"
 msgstr "min"
 
+#: templates/trips/experience-create-unpaired.html templates/trips/meal-create-unpaired.html
+msgid "Stage"
+msgstr "Tappa"
+
+#: templates/trips/experience-create-unpaired.html templates/trips/meal-create-unpaired.html
+msgid "— no stage —"
+msgstr "— nessuna tappa —"
+
+#: templates/trips/includes/events-section.html
+msgid "No stage"
+msgstr "Nessuna tappa"
+
 #~ msgid "This looks like an accommodation, not an experience."
 #~ msgstr "Questo sembra un alloggio, non un'esperienza."
 

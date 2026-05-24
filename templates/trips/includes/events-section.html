@@ -88,11 +88,30 @@
                 </div>
             </div>
             {% if unpaired_events %}
-                <ul class="flex flex-wrap gap-3 justify-center mt-4" x-data>
-                    {% for event in unpaired_events %}
-                        <c-unpaired-event :event="event" :days="trip.days.all" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}" />
+                {% if has_custom_stages %}
+                    {% for group in grouped_unpaired_events %}
+                        <div class="mt-4">
+                            <p class="mb-2 text-xs font-semibold tracking-wide uppercase text-base-content/50">
+                                {% if group.destination %}
+                                    {{ group.destination }}
+                                {% else %}
+                                    {% trans 'No stage' %}
+                                {% endif %}
+                            </p>
+                            <ul class="flex flex-wrap gap-3 justify-center" x-data>
+                                {% for event in group.events %}
+                                    <c-unpaired-event :event="event" :days="trip.days.all" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}" />
+                                {% endfor %}
+                            </ul>
+                        </div>
                     {% endfor %}
-                </ul>
+                {% else %}
+                    <ul class="flex flex-wrap gap-3 justify-center mt-4" x-data>
+                        {% for event in unpaired_events %}
+                            <c-unpaired-event :event="event" :days="trip.days.all" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}" />
+                        {% endfor %}
+                    </ul>
+                {% endif %}
             {% else %}
                 <div class="py-6 text-center text-base-content/50">
                     <i class="ph-bold ph-calendar-blank i-lg" aria-hidden="true"></i>

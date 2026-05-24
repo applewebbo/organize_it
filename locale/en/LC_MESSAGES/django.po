@@ -2451,6 +2451,18 @@ msgstr "Driving time estimate:"
 msgid "min"
 msgstr "min"
 
+#: templates/trips/experience-create-unpaired.html templates/trips/meal-create-unpaired.html
+msgid "Stage"
+msgstr "Stage"
+
+#: templates/trips/experience-create-unpaired.html templates/trips/meal-create-unpaired.html
+msgid "— no stage —"
+msgstr "— no stage —"
+
+#: templates/trips/includes/events-section.html
+msgid "No stage"
+msgstr "No stage"
+
 #~ msgid "This looks like an accommodation, not an experience."
 #~ msgstr "This looks like an accommodation, not an experience."
 

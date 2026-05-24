@@ -45,6 +45,36 @@ def get_trip_stages(trip):
     return result
 
 
+def group_unpaired_events_by_stage(stages, unpaired_events):
+    """
+    Group unpaired events by stage destination.
+    Returns list of dicts: [{"destination": str|None, "events": [...], "is_main": bool}]
+    Events whose city matches no stage go into a None-destination group.
+    Only groups with at least one event are returned.
+    """
+    events_list = list(unpaired_events)
+    stage_dests = {s["destination"] for s in stages}
+    groups = []
+    for stage in stages:
+        stage_events = [e for e in events_list if e.city == stage["destination"]]
+        if stage_events:
+            groups.append(
+                {
+                    "destination": stage["destination"],
+                    "events": stage_events,
+                    "is_main": stage["is_main"],
+                }
+            )
+    no_stage_events = [
+        e for e in events_list if not e.city or e.city not in stage_dests
+    ]
+    if no_stage_events:
+        groups.append(
+            {"destination": None, "events": no_stage_events, "is_main": False}
+        )
+    return groups
+
+
 def group_days_by_destination(days):
     """
     Group an ordered list of Day objects into consecutive destination blocks.

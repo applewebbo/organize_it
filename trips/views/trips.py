@@ -32,8 +32,10 @@ from trips.utils import (
     get_flight_origin_icao,
     get_trip_for_editor_or_404,
     get_trip_for_owner_or_404,
+    get_trip_stages,
     get_trips,
     group_days_by_destination,
+    group_unpaired_events_by_stage,
     process_trip_image,
     search_unsplash_photos,
 )
@@ -136,6 +138,8 @@ def trip_detail(request, pk):
         pk=pk,
     )
     unpaired_events = trip.all_events.filter(day__isnull=True)
+    stages = get_trip_stages(trip)
+    grouped_unpaired_events = group_unpaired_events_by_stage(stages, unpaired_events)
 
     # Get unique stays ordered by first day date
     stays = (
@@ -167,6 +171,8 @@ def trip_detail(request, pk):
         "trip": trip,
         "stays": stays,
         "unpaired_events": unpaired_events,
+        "grouped_unpaired_events": grouped_unpaired_events,
+        "has_custom_stages": any(not s["is_main"] for s in stages),
         "arrival_transfer": arrival_transfer,
         "departure_transfer": departure_transfer,
         "both_transfers_exist": arrival_transfer is not None
