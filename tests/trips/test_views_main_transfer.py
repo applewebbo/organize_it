@@ -1027,3 +1027,78 @@ class TestOtherTransferView(TestCase):
 
         transfer.refresh_from_db()
         assert transfer.last_modified_by is None  # not set on update
+
+
+class TestEstimateCarDuration(TestCase):
+    """Tests for estimate_car_duration view"""
+
+    def test_returns_duration_when_mapbox_succeeds(self):
+        """Returns HTML with duration when geocoding and route call succeed"""
+        from unittest.mock import MagicMock, patch
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        url = reverse("trips:estimate-car-duration", kwargs={"trip_id": trip.pk})
+
+        mock_geocode = MagicMock()
+        mock_geocode.latlng = [41.9, 12.5]
+
+        with self.login(user):
+            with (
+                patch("trips.views.transfers.geocoder") as mock_geocoder,
+                patch("trips.views.transfers.fetch_route") as mock_route,
+            ):
+                mock_geocoder.mapbox.return_value = mock_geocode
+                mock_route.return_value = (150, 220)
+                response = self.client.get(
+                    url,
+                    {
+                        "origin_address": "Via Roma 1, Rome",
+                        "destination_address": "Via Milano 10, Milan",
+                    },
+                )
+
+        assert response.status_code == 200
+        assert b"150" in response.content or b"2h" in response.content
+
+    def test_returns_empty_when_addresses_missing(self):
+        """Returns empty fragment when addresses not provided"""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        url = reverse("trips:estimate-car-duration", kwargs={"trip_id": trip.pk})
+
+        with self.login(user):
+            response = self.client.get(url)
+
+        assert response.status_code == 200
+
+    def test_returns_empty_when_geocoding_fails(self):
+        """Returns empty fragment when geocoding fails"""
+        from unittest.mock import MagicMock, patch
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        url = reverse("trips:estimate-car-duration", kwargs={"trip_id": trip.pk})
+
+        mock_geocode = MagicMock()
+        mock_geocode.latlng = None
+
+        with self.login(user):
+            with patch("trips.views.transfers.geocoder") as mock_geocoder:
+                mock_geocoder.mapbox.return_value = mock_geocode
+                response = self.client.get(
+                    url,
+                    {
+                        "origin_address": "Unknown Place XYZ",
+                        "destination_address": "Another Unknown Place",
+                    },
+                )
+
+        assert response.status_code == 200
+
+    def test_requires_authentication(self):
+        """Returns 302 redirect for unauthenticated users"""
+        trip = TripFactory()
+        url = reverse("trips:estimate-car-duration", kwargs={"trip_id": trip.pk})
+        response = self.client.get(url)
+        assert response.status_code == 302

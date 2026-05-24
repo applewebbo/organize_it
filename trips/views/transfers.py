@@ -3,7 +3,9 @@ import logging
 from datetime import date
 from urllib.parse import quote as urlquote
 
+import geocoder
 import requests
+from django.conf import settings
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
@@ -32,6 +34,7 @@ from trips.models import (
 from trips.utils import (
     accessible_trips_qs,
     editable_trips_qs,
+    fetch_route,
     get_airport_by_iata,
     get_flight_origin_icao,
     get_trip_for_editor_or_404,
@@ -979,3 +982,36 @@ def save_main_transfer(request, trip_id):
     }
 
     return TemplateResponse(request, template_map[transport_type], context)
+
+
+def estimate_car_duration(request, trip_id):
+    """Return estimated driving duration between two addresses for car transfer forms."""
+    get_trip_for_editor_or_404(trip_id, request.user)
+
+    origin = request.GET.get("origin_address", "").strip()
+    destination = request.GET.get("destination_address", "").strip()
+
+    duration_minutes = None
+    distance_km = None
+
+    if origin and destination:
+        g1 = geocoder.mapbox(origin, access_token=settings.MAPBOX_ACCESS_TOKEN)
+        g2 = geocoder.mapbox(destination, access_token=settings.MAPBOX_ACCESS_TOKEN)
+        if g1.latlng and g2.latlng:
+            lat1, lng1 = g1.latlng
+            lat2, lng2 = g2.latlng
+            result = fetch_route(lat1, lng1, lat2, lng2)
+            if result:
+                duration_minutes, distance_km = result
+
+    hours = duration_minutes // 60 if duration_minutes else None
+    mins = duration_minutes % 60 if duration_minutes else None
+    context = {
+        "duration_minutes": duration_minutes,
+        "distance_km": distance_km,
+        "hours": hours,
+        "mins": mins,
+    }
+    return TemplateResponse(
+        request, "trips/partials/car-duration-estimate.html", context
+    )

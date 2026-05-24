@@ -448,6 +448,29 @@ def geocode_city(query):
     return []
 
 
+def fetch_route(lat1, lng1, lat2, lng2):
+    """Call Mapbox Directions API. Returns (duration_minutes, distance_km) or None on failure."""
+    url = (
+        f"https://api.mapbox.com/directions/v5/mapbox/driving/"
+        f"{lng1},{lat1};{lng2},{lat2}"
+    )
+    try:
+        resp = requests.get(
+            url, params={"access_token": settings.MAPBOX_ACCESS_TOKEN}, timeout=10
+        )
+        resp.raise_for_status()
+        data = resp.json()
+    except Exception as e:
+        logger.error(
+            f"Mapbox Directions API error ({lat1},{lng1})→({lat2},{lng2}): {e}"
+        )
+        return None
+    if data.get("routes"):
+        route = data["routes"][0]
+        return round(route["duration"] / 60), round(route["distance"] / 1000)
+    return None
+
+
 def select_best_result(results, name, city):
     """Select the best result from Nominatim results based on custom scoring"""
     if not results:

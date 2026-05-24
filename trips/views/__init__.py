@@ -81,6 +81,7 @@ from trips.views.transfers import (
     edit_main_transfer,
     edit_main_transfer_connection,
     edit_stay_transfer,
+    estimate_car_duration,
     flight_status_redirect,
     get_trip_addresses,
     main_transfer_connection_modal,
@@ -184,6 +185,7 @@ __all__ = [
     "departure_transfer_modal",
     "main_transfer_step",
     "save_main_transfer",
+    "estimate_car_duration",
     # collaborators
     "share_link_create",
     "share_link_list",

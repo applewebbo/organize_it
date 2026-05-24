@@ -41,10 +41,11 @@
                 {% endif %}
             </h4>
         </div>
-        <!-- Departure location -->
-        <div class="sm:col-span-4">{{ form.origin_address|as_crispy_field }}</div>
-        <!-- Arrival location -->
-        <div class="sm:col-span-4">
+        <!-- Address fields + duration estimate -->
+        <div class="sm:col-span-4"
+             x-data
+             @change.debounce.800ms="$dispatch('car-estimate-requested')">
+            {{ form.origin_address|as_crispy_field }}
             {{ form.destination_address|as_crispy_field }}
             {# Quick-fill suggestions #}
             {% if quick_fill_locations %}
@@ -52,7 +53,7 @@
                     {% for loc in quick_fill_locations %}
                         <button type="button"
                                 class="btn btn-sm btn-outline {% if loc.type == 'stay' %}btn-neutral{% elif loc.type == 'meal' %}btn-warning{% elif loc.type == 'experience' %}btn-success{% else %}btn-neutral{% endif %}"
-                                onclick="document.getElementById('id_destination_address').value = '{{ loc.address|escapejs }}'">
+                                @click="document.getElementById('id_destination_address').value = '{{ loc.address|escapejs }}'; $nextTick(() => $dispatch('car-estimate-requested'))">
                             <i class="ph-bold {% if loc.type == 'stay' %}ph-bed{% elif loc.type == 'meal' %}ph-fork-knife{% else %}ph-images{% endif %}"></i>
                             {{ loc.label }}
                             <i class="ph-bold ph-plus"></i>
@@ -60,6 +61,19 @@
                     {% endfor %}
                 </div>
             {% endif %}
+            {# Duration estimate: triggered by custom event #}
+            <div class="flex gap-2 items-center mt-2 min-h-6">
+                <span id="duration-loading"
+                      class="htmx-indicator loading loading-spinner loading-xs text-primary"
+                      aria-hidden="true"></span>
+                <div id="duration-estimate"
+                     hx-get="{% url 'trips:estimate-car-duration' trip.pk %}"
+                     hx-trigger="car-estimate-requested from:body"
+                     hx-include="[name='origin_address'],[name='destination_address']"
+                     hx-target="#duration-estimate"
+                     hx-swap="innerHTML"
+                     hx-indicator="#duration-loading"></div>
+            </div>
         </div>
         <!-- Start time -->
         <div class="sm:col-span-2">{{ form.start_time|as_crispy_field }}</div>

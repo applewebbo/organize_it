@@ -2445,6 +2445,12 @@ msgstr ""
 msgid "No images found for '{query}'"
 msgstr ""
 
+msgid "Driving time estimate:"
+msgstr "Driving time estimate:"
+
+msgid "min"
+msgstr "min"
+
 #~ msgid "This looks like an accommodation, not an experience."
 #~ msgstr "This looks like an accommodation, not an experience."
 

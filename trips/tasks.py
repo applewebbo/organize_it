@@ -3,13 +3,13 @@
 import logging
 from datetime import date, timedelta
 
-import requests
 from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.core import management
 from django.utils import timezone
 
 from trips.models import Day, MainTransfer, Trip
+from trips.utils import fetch_route
 from trips.weather import fetch_weather_for_trip
 
 logger = logging.getLogger("task")
@@ -81,29 +81,6 @@ def _get_day_coords(day):
     return None, None
 
 
-def _fetch_route(lat1, lng1, lat2, lng2):
-    """Call Mapbox Directions API. Returns (duration_minutes, distance_km) or None on failure."""
-    url = (
-        f"https://api.mapbox.com/directions/v5/mapbox/driving/"
-        f"{lng1},{lat1};{lng2},{lat2}"
-    )
-    try:
-        resp = requests.get(
-            url, params={"access_token": settings.MAPBOX_ACCESS_TOKEN}, timeout=10
-        )
-        resp.raise_for_status()
-        data = resp.json()
-    except Exception as e:
-        logger.error(
-            f"Mapbox Directions API error ({lat1},{lng1})→({lat2},{lng2}): {e}"
-        )
-        return None
-    if data.get("routes"):
-        route = data["routes"][0]
-        return round(route["duration"] / 60), round(route["distance"] / 1000)
-    return None
-
-
 def _get_home_coords(trip):
     """Return (lat, lng) from trip author's profile home address, or (None, None)."""
     profile = getattr(trip.author, "profile", None)
@@ -152,7 +129,7 @@ def calculate_day_transfer(day_pk):
             lat1, lng1 = _get_home_coords(day.trip)
             lat2, lng2 = _get_day_coords(day)
             if lat1 is not None and lat2 is not None:
-                result = _fetch_route(lat1, lng1, lat2, lng2)
+                result = fetch_route(lat1, lng1, lat2, lng2)
                 if result:
                     Day.objects.filter(pk=day_pk).update(
                         transfer_duration_from_prev=result[0],
@@ -180,7 +157,7 @@ def calculate_day_transfer(day_pk):
                 transfer_duration_from_prev=None, transfer_distance_from_prev=None
             )
         else:
-            result = _fetch_route(lat1, lng1, lat2, lng2)
+            result = fetch_route(lat1, lng1, lat2, lng2)
             if result:
                 Day.objects.filter(pk=day_pk).update(
                     transfer_duration_from_prev=result[0],
@@ -216,7 +193,7 @@ def calculate_day_transfer(day_pk):
         )
         return
 
-    result = _fetch_route(lat1, lng1, lat2, lng2)
+    result = fetch_route(lat1, lng1, lat2, lng2)
     if result:
         Day.objects.filter(pk=day_pk).update(
             transfer_to_home_duration=result[0], transfer_to_home_distance=result[1]

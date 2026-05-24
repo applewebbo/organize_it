@@ -919,6 +919,8 @@ class MainTransferBaseForm(forms.ModelForm):
         self.trip = kwargs.pop("trip", None)
         kwargs.pop("home_address", None)  # Consumed by car/other subforms; ignored here
         super().__init__(*args, **kwargs)
+        self.fields["start_time"].required = True
+        self.fields["end_time"].required = True
 
     def save(self, commit=True):
         instance = super().save(commit=False)
@@ -1358,6 +1360,8 @@ class CarMainTransferForm(MainTransferBaseForm):
         kwargs.pop("autocomplete", None)
         home_address = kwargs.pop("home_address", "")
         super().__init__(*args, **kwargs)
+        self.fields["start_time"].required = False
+        self.fields["end_time"].required = False
 
         # Populate fields if editing
         if self.instance and self.instance.pk:

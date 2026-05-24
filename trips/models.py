@@ -323,8 +323,8 @@ class MainTransfer(models.Model):
     destination_longitude = models.FloatField(null=True, blank=True)
 
     # Common fields
-    start_time = models.TimeField(help_text=_("Departure time"))
-    end_time = models.TimeField(help_text=_("Arrival time"))
+    start_time = models.TimeField(null=True, blank=True, help_text=_("Departure time"))
+    end_time = models.TimeField(null=True, blank=True, help_text=_("Arrival time"))
     notes = models.TextField(blank=True, help_text=_("Additional notes"))
 
     # Type-specific data (JSONField for flexibility)

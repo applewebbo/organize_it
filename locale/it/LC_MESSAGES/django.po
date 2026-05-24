@@ -2541,6 +2541,12 @@ msgstr "Errore API di Unsplash. Per favore riprova più tardi."
 msgid "No images found for '{query}'"
 msgstr "Nessuna immagine trovata per '{query}'"
 
+msgid "Driving time estimate:"
+msgstr "Stima del tempo di guida:"
+
+msgid "min"
+msgstr "min"
+
 #~ msgid "This looks like an accommodation, not an experience."
 #~ msgstr "Questo sembra un alloggio, non un'esperienza."
 

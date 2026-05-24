@@ -1,0 +1,19 @@
+{% load i18n %}
+{% if duration_minutes %}
+    <div class="flex gap-2 items-center py-2 px-3 mt-2 text-sm rounded-md border border-base-300 bg-base-200 text-base-content/80">
+        <i class="ph-bold ph-car-profile i-sm shrink-0 text-base-content/60"
+           aria-hidden="true"></i>
+        <span>
+            {% trans "Driving time estimate:" %}
+            <strong>
+                {% if hours %}{{ hours }}h{% endif %}
+                {% if mins %}
+                    {{ mins }}min
+                {% elif not hours %}
+                    0min
+                {% endif %}
+            </strong>
+            ({{ distance_km }} km)
+        </span>
+    </div>
+{% endif %}

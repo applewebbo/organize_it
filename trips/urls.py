@@ -195,6 +195,11 @@ htmx_urlpatterns = [
         views.save_main_transfer,
         name="save-main-transfer",
     ),
+    path(
+        "trips/<int:trip_id>/main-transfer/car-duration-estimate",
+        views.estimate_car_duration,
+        name="estimate-car-duration",
+    ),
     # IMAGE MANAGEMENT
     path("images/search/", views.search_trip_images, name="search-images"),
     path(

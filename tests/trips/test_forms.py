@@ -1092,6 +1092,67 @@ class TestCarMainTransferForm:
         assert form.fields["origin_address"].initial is None
         assert form.fields["destination_address"].initial is None
 
+    def test_start_time_is_optional(self):
+        """Car transfer form is valid without start_time"""
+        from trips.forms import CarMainTransferForm
+
+        trip = TripFactory()
+        form_data = {
+            "direction": "1",
+            "origin_address": "Via Roma 1, Rome",
+            "destination_address": "Via Milano 10, Milan",
+        }
+        form = CarMainTransferForm(form_data, trip=trip)
+        assert form.is_valid(), form.errors
+
+    def test_end_time_is_optional(self):
+        """Car transfer form is valid without end_time"""
+        from trips.forms import CarMainTransferForm
+
+        trip = TripFactory()
+        form_data = {
+            "direction": "1",
+            "start_time": "08:00",
+            "origin_address": "Via Roma 1, Rome",
+            "destination_address": "Via Milano 10, Milan",
+        }
+        form = CarMainTransferForm(form_data, trip=trip)
+        assert form.is_valid(), form.errors
+
+    def test_save_without_times(self):
+        """Car transfer saves correctly without start_time and end_time"""
+        from trips.forms import CarMainTransferForm
+        from trips.models import MainTransfer
+
+        trip = TripFactory()
+        form_data = {
+            "direction": "1",
+            "origin_address": "Via Roma 1, Rome",
+            "destination_address": "Via Milano 10, Milan",
+        }
+        form = CarMainTransferForm(form_data, trip=trip)
+        assert form.is_valid(), form.errors
+        transfer = form.save(commit=True)
+        assert transfer.pk is not None
+        assert transfer.start_time is None
+        assert transfer.end_time is None
+        assert MainTransfer.objects.filter(pk=transfer.pk).exists()
+
+    def test_flight_form_still_requires_times(self):
+        """Flight transfer form still requires start_time and end_time"""
+        from trips.forms import FlightMainTransferForm
+
+        trip = TripFactory()
+        form_data = {
+            "direction": "1",
+            "origin_airport": "Rome Fiumicino",
+            "destination_airport": "Milan Malpensa",
+        }
+        form = FlightMainTransferForm(form_data, trip=trip)
+        assert not form.is_valid()
+        assert "start_time" in form.errors
+        assert "end_time" in form.errors
+
 
 class TestOtherMainTransferForm:
     def test_form_initialization(self):
