@@ -15,9 +15,46 @@ default:
     uv sync
 # Update dependencies and pre-commit hooks
 [group('setup')]
-@update_all: lock
+@update_all: lock update_phosphor
     uv sync --all-extras --upgrade
     uvx --with pre-commit-uv prek auto-update
+
+# Download or update self-hosted Phosphor Icons (bold variant)
+[group('setup')]
+update_phosphor:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    STATIC_DIR="static/icons/phosphor/bold"
+    VERSION_FILE="static/icons/phosphor/.version"
+
+    NPM_META=$(curl -sf https://registry.npmjs.org/@phosphor-icons/web/latest)
+    LATEST=$(echo "$NPM_META" | python3 -c "import sys,json; print(json.load(sys.stdin)['version'])")
+    TARBALL=$(echo "$NPM_META" | python3 -c "import sys,json; print(json.load(sys.stdin)['dist']['tarball'])")
+
+    CURRENT=""
+    if [ -f "$VERSION_FILE" ]; then
+        CURRENT=$(cat "$VERSION_FILE")
+    fi
+
+    if [ "$CURRENT" = "$LATEST" ]; then
+        echo "✓ Phosphor Icons $LATEST already up to date"
+        exit 0
+    fi
+
+    echo "⬇️  Updating Phosphor Icons: ${CURRENT:-none} → $LATEST"
+
+    TMP_DIR=$(mktemp -d)
+    trap "rm -rf $TMP_DIR" EXIT
+
+    curl -sf "$TARBALL" | tar -xz -C "$TMP_DIR"
+
+    mkdir -p "$STATIC_DIR"
+    cp "$TMP_DIR/package/src/bold/style.css" "$STATIC_DIR/"
+    find "$TMP_DIR/package/src/bold" \( -name "*.woff2" -o -name "*.woff" -o -name "*.ttf" \) -exec cp {} "$STATIC_DIR/" \;
+
+    mkdir -p "$(dirname "$VERSION_FILE")"
+    echo "$LATEST" > "$VERSION_FILE"
+    echo "✓ Phosphor Icons $LATEST installed in $STATIC_DIR"
 
 # Update a specific package
 [group('setup')]
