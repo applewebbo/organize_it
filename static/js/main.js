@@ -260,18 +260,19 @@ function initSortableLists() {
                         body: JSON.stringify({ order }),
                     });
                 } else {
-                    // Cross-day move
+                    // Cross-day move: onEnd fires on both source and target sortables,
+                    // so only act when this callback belongs to the source list.
+                    if (el !== evt.from) return;
                     const eventId = evt.item.dataset.eventId;
                     const fromDayId = evt.from.dataset.dayId;
                     const targetDayId = evt.to.dataset.dayId;
                     fetch(`/events/${eventId}/move/${targetDayId}/`, {
                         method: "POST",
                         headers: { "X-CSRFToken": csrfToken },
-                    }).then((resp) => {
-                        if (resp.ok) {
-                            htmx.trigger(document.body, `dayModified${fromDayId}`);
-                            htmx.trigger(document.body, `dayModified${targetDayId}`);
-                        }
+                    }).then(() => {
+                        // Refresh both days regardless of outcome to keep DOM in sync
+                        htmx.trigger(document.body, `dayModified${fromDayId}`);
+                        htmx.trigger(document.body, `dayModified${targetDayId}`);
                     });
                 }
             },
