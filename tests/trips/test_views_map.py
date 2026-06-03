@@ -1318,3 +1318,72 @@ class EventSaveSkipsGeocodingWhenCoordsProvidedTest(TestCase):
             experience.save()
         assert experience.latitude == 45.0687
         assert experience.longitude == 7.6847
+
+
+class TripMapStagesContextTest(TestCase):
+    """trip_map view passes stage context variables."""
+
+    def test_map_view_passes_stages_context(self):
+        user = self.make_user("stages_ctx@example.com")
+        trip = TripFactory(author=user)
+        with self.login(user):
+            response = self.get("trips:trip-map", pk=trip.pk)
+        self.response_200(response)
+        assert "stages" in response.context
+        assert "has_custom_stages" in response.context
+
+    def test_has_custom_stages_false_when_only_main_stage(self):
+        user = self.make_user("no_custom@example.com")
+        trip = TripFactory(author=user, destination="Roma")
+        with self.login(user):
+            response = self.get("trips:trip-map", pk=trip.pk)
+        assert response.context["has_custom_stages"] is False
+
+    def test_has_custom_stages_true_when_custom_stage_exists(self):
+        user = self.make_user("has_custom@example.com")
+        trip = TripFactory(author=user, destination="Roma")
+        day = trip.days.first()
+        day.destination = "Firenze"
+        day.save()
+        with self.login(user):
+            response = self.get("trips:trip-map", pk=trip.pk)
+        assert response.context["has_custom_stages"] is True
+
+
+class MapSearchStageBiasTest(TestCase):
+    """map_search uses stage_destination to set location_bias."""
+
+    def test_search_without_stage_uses_trip_bias(self):
+        user = self.make_user("no_stage@example.com")
+        trip = TripFactory(author=user)
+        with self.login(user):
+            with patch("trips.views.maps.GooglePlacesClient") as MockClient:
+                with patch("trips.views.maps._trip_location_bias") as mock_trip_bias:
+                    with patch(
+                        "trips.views.maps._stage_location_bias"
+                    ) as mock_stage_bias:
+                        MockClient.return_value.search_text.return_value = []
+                        mock_trip_bias.return_value = (45.0, 7.0, 10_000)
+                        self.post(
+                            "trips:map-search", pk=trip.pk, data={"query": "museo"}
+                        )
+        mock_trip_bias.assert_called_once_with(trip)
+        mock_stage_bias.assert_not_called()
+
+    def test_search_with_stage_uses_stage_bias(self):
+        user = self.make_user("with_stage@example.com")
+        trip = TripFactory(author=user, destination="Roma")
+        day = trip.days.first()
+        day.destination = "Firenze"
+        day.save()
+        with self.login(user):
+            with patch("trips.views.maps.GooglePlacesClient") as MockClient:
+                with patch("trips.views.maps._stage_location_bias") as mock_stage_bias:
+                    MockClient.return_value.search_text.return_value = []
+                    mock_stage_bias.return_value = (43.7, 11.25, 10_000)
+                    self.post(
+                        "trips:map-search",
+                        pk=trip.pk,
+                        data={"query": "museo", "stage_destination": "Firenze"},
+                    )
+        mock_stage_bias.assert_called_once_with(trip, "Firenze")

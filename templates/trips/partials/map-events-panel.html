@@ -1,10 +1,11 @@
 {% load i18n l10n trip_tags %}
 {% if days_with_events or unassigned_events %}
     {% for day_data in days_with_events %}
-        <div class="mb-3">
-            <p class="px-1 mb-1 text-xs font-semibold tracking-wide uppercase text-base-content/50">
-                {% blocktrans with date=day_data.day.date cnt=forloop.counter %}Day {{ cnt }} — {{ date }}{% endblocktrans %}
-            </p>
+        <div class="mb-4 break-inside-avoid">
+            <div class="flex gap-2 items-baseline mb-2">
+                <span class="text-sm font-bold text-primary">{% trans 'Day' %} {{ forloop.counter }}</span>
+                <span class="text-xs text-base-content/60">{{ day_data.day.date }}</span>
+            </div>
             <ul class="space-y-1">
                 {% if day_data.stay %}
                     <li data-role="trip-event"
@@ -31,7 +32,7 @@
                         data-lat="{{ event.latitude|unlocalize }}"
                         data-lng="{{ event.longitude|unlocalize }}"
                         class="map-sidebar-item flex gap-2 items-center p-2 rounded-md cursor-pointer transition-colors hover:bg-base-200 {% if not event.latitude %}opacity-50{% endif %}">
-                        <i class="shrink-0 text-base {{ event|event_icon_color }} ph-bold {{ event|event_icon }} i-sm"></i>
+                        <i class="{{ event|event_icon_color }} shrink-0 ph-bold ph-{{ event|event_icon }} i-sm"></i>
                         <div class="min-w-0 grow">
                             <p class="text-sm font-medium truncate">{{ event.name }}</p>
                             {% if event.address %}<p class="text-xs truncate text-base-content/50">{{ event.address }}</p>{% endif %}
@@ -45,8 +46,10 @@
         </div>
     {% endfor %}
     {% if unassigned_events %}
-        <div class="mb-3">
-            <p class="px-1 mb-1 text-xs font-semibold tracking-wide uppercase text-base-content/50">{% trans 'Unassigned' %}</p>
+        <div class="mb-4 break-inside-avoid">
+            <div class="flex gap-2 items-center mb-2">
+                <span class="py-0.5 px-2 text-xs font-bold rounded-full bg-base-300 text-base-content/70">{% trans 'Unassigned' %}</span>
+            </div>
             <ul class="space-y-1">
                 {% for event in unassigned_events %}
                     <li data-role="trip-event"
@@ -56,7 +59,7 @@
                         data-lat="{{ event.latitude|unlocalize }}"
                         data-lng="{{ event.longitude|unlocalize }}"
                         class="map-sidebar-item flex gap-2 items-center p-2 rounded-md cursor-pointer transition-colors hover:bg-base-200 {% if not event.latitude %}opacity-50{% endif %}">
-                        <i class="text-base shrink-0 text-base-content/40 ph-bold {{ event|event_icon }} i-sm"></i>
+                        <i class="shrink-0 text-base-content/40 ph-bold ph-{{ event|event_icon }} i-sm"></i>
                         <div class="min-w-0 grow">
                             <p class="text-sm font-medium truncate">{{ event.name }}</p>
                             {% if event.address %}<p class="text-xs truncate text-base-content/50">{{ event.address }}</p>{% endif %}

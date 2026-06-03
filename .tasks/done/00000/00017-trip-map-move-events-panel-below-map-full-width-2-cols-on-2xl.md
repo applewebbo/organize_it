@@ -1,0 +1,1 @@
+../../all/00000/00017-trip-map-move-events-panel-below-map-full-width-2-cols-on-2xl.md

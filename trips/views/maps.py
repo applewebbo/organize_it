@@ -115,6 +115,7 @@ def trip_map(request, pk):
 
     days_with_events, unassigned_events = _build_map_events_context(trip)
     map_items = _build_map_json(days_with_events, unassigned_events)
+    stages = get_trip_stages(trip)
     return TemplateResponse(
         request,
         "trips/trip-map.html",
@@ -123,6 +124,8 @@ def trip_map(request, pk):
             "days_with_events": days_with_events,
             "unassigned_events": unassigned_events,
             "map_items_json": json.dumps(map_items),
+            "stages": stages,
+            "has_custom_stages": any(not s["is_main"] for s in stages),
         },
     )
 
@@ -436,6 +439,36 @@ def _trip_location_bias(trip) -> tuple[float, float, float] | None:
     return None
 
 
+def _stage_location_bias(
+    trip, stage_destination: str
+) -> tuple[float, float, float] | None:
+    """Return location_bias centred on events/days belonging to a specific stage."""
+    coords = list(
+        Event.objects.filter(
+            trip=trip,
+            day__destination=stage_destination,
+            latitude__isnull=False,
+            longitude__isnull=False,
+        ).values_list("latitude", "longitude")
+    )
+    day_coords = list(
+        trip.days.filter(destination=stage_destination)
+        .exclude(destination_latitude=None)
+        .values_list("destination_latitude", "destination_longitude")
+    )
+    all_coords = coords + day_coords
+    if all_coords:
+        clat = sum(c[0] for c in all_coords) / len(all_coords)
+        clng = sum(c[1] for c in all_coords) / len(all_coords)
+        max_dist = max(_haversine_m(clat, clng, c[0], c[1]) for c in all_coords)
+        return clat, clng, min(max(max_dist * 1.5, 10_000), 50_000)
+    # Fallback: geocode the stage destination name
+    g = geocoder.mapbox(stage_destination, key=settings.MAPBOX_ACCESS_TOKEN)
+    if g.latlng:
+        return g.latlng[0], g.latlng[1], 50_000
+    return _trip_location_bias(trip)
+
+
 @require_http_methods(["POST"])
 def map_search(request, pk):
     """HTMX endpoint: search Google Places and return results partial."""
@@ -444,13 +477,19 @@ def map_search(request, pk):
         raise Http404
 
     query = request.POST.get("query", "").strip()
+    stage_destination = request.POST.get("stage_destination", "").strip()
     results = []
     error = None
 
     if query:
         client = GooglePlacesClient()
+        location_bias = (
+            _stage_location_bias(trip, stage_destination)
+            if stage_destination
+            else _trip_location_bias(trip)
+        )
         try:
-            results = client.search_text(query, location_bias=_trip_location_bias(trip))
+            results = client.search_text(query, location_bias=location_bias)
         except GooglePlacesError as e:
             error = str(e)
 

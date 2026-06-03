@@ -7,54 +7,77 @@
     <link rel="stylesheet" href="{% static 'css/leaflet.css' %}" />
 {% endblock extra_head %}
 {% block content %}
-    <div class="mb-4">
-        <a href="{% url 'trips:trip-detail' trip.pk %}"
-           class="gap-1 btn btn-sm btn-ghost">
-            <i class="ph-bold ph-arrow-left i-sm"></i>
-            {{ trip.title }}
-        </a>
+    {# ── Mini-header ── #}
+    <div class="overflow-hidden mb-4 shadow card card-border bg-base-100">
+        <div class="flex gap-2 justify-between items-center p-3 sm:p-6">
+            <div class="flex gap-2 items-center min-w-0 grow">
+                <h1 class="text-2xl font-semibold tracking-tight truncate">{{ trip.title }}</h1>
+            </div>
+            <div class="flex gap-2 shrink-0">
+                <a href="{% url 'trips:trip-detail' trip.pk %}"
+                   class="gap-1.5 btn btn-md btn-soft btn-primary"
+                   aria-label="{% trans 'Back to events' %}">
+                    <i class="ph-bold ph-rows i-lg" aria-hidden="true"></i>
+                    {% trans 'Events' %}
+                </a>
+            </div>
+        </div>
     </div>
-    <div class="flex flex-col gap-0 rounded-xl border lg:flex-row h-[calc(100vh-8rem)] overflow-clip border-base-300">
-        {# ── Left sidebar ── #}
-        <aside class="flex overflow-y-auto flex-col w-full border-b lg:w-80 lg:border-b-0 lg:border-r border-base-300 shrink-0">
-            {# Search form #}
-            <div class="p-3 border-b border-base-300">
-                <form hx-post="{% url 'trips:map-search' trip.pk %}"
-                      hx-target="#search-results-panel"
-                      hx-swap="innerHTML"
-                      hx-indicator="#search-spinner"
-                      hx-disabled-elt="button[type='submit']">
-                    {% csrf_token %}
-                    <div class="flex gap-2">
-                        <input type="search"
-                               name="query"
-                               placeholder="{% trans 'Search a place…' %}"
-                               autocomplete="off"
-                               required
-                               class="w-full input input-sm input-bordered" />
-                        <button type="submit" class="btn btn-sm btn-primary">
-                            <i class="ph-bold ph-magnifying-glass i-sm htmx-hide-on-request"></i>
-                            <span id="search-spinner"
-                                  class="loading loading-spinner loading-xs htmx-indicator"></span>
-                        </button>
-                    </div>
-                </form>
-            </div>
-            {# Search results panel #}
-            <div id="search-results-panel" class="overflow-y-auto flex-1 p-3">
-                {% include "trips/partials/map-search-results.html" with results=None query=None %}
-            </div>
-            {# Divider #}
-            <div class="py-1 px-3 text-xs font-semibold tracking-wide uppercase border-t border-base-300 bg-base-200 text-base-content/50">
-                {% trans 'Trip events' %}
+    {# ── Map + sidebar ── #}
+    <div class="overflow-hidden mb-4 shadow card card-border bg-base-100">
+        <div class="flex flex-col lg:flex-row h-[calc(100vh-10rem)]">
+            {# Left sidebar: search only #}
+            <aside class="flex flex-col w-full border-b lg:w-80 lg:border-b-0 lg:border-r border-base-300 shrink-0">
+                {# Title + Search form #}
+                <div class="p-3 border-b border-base-300">
+                    <h2 class="mb-2 text-base font-semibold">{% trans 'Search Places' %}</h2>
+                    <form hx-post="{% url 'trips:map-search' trip.pk %}"
+                          hx-target="#search-results-panel"
+                          hx-swap="innerHTML"
+                          hx-indicator="#search-spinner"
+                          hx-disabled-elt="button[type='submit']">
+                        {% csrf_token %}
+                        {% if has_custom_stages %}
+                            <select name="stage_destination"
+                                    class="mb-2 w-full select select-sm select-bordered">
+                                <option value="">{% trans '— all stages —' %}</option>
+                                {% for stage in stages %}<option value="{{ stage.destination }}">{{ stage.destination }}</option>{% endfor %}
+                            </select>
+                        {% endif %}
+                        <div class="flex gap-2">
+                            <input type="search"
+                                   name="query"
+                                   placeholder="{% trans 'Search a place…' %}"
+                                   autocomplete="off"
+                                   required
+                                   class="w-full input input-sm input-bordered" />
+                            <button type="submit" class="btn btn-sm btn-primary">
+                                <i class="ph-bold ph-magnifying-glass i-sm htmx-hide-on-request"></i>
+                                <span id="search-spinner"
+                                      class="loading loading-spinner loading-xs htmx-indicator"></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                {# Search results #}
+                <div id="search-results-panel" class="overflow-y-auto flex-1 p-3">
+                    {% include "trips/partials/map-search-results.html" with results=None query=None %}
+                </div>
+            </aside>
+            {# ── Map ── #}
+            <div id="trip-map" class="flex-1 min-h-64"></div>
+        </div>
+    </div>
+    {# ── Events below map ── #}
+    <div class="shadow card card-border bg-base-100">
+        <div class="p-4 sm:p-6 card-body">
+            <div class="flex gap-2 items-center">
+                <h2 class="text-xl font-medium sm:text-2xl">{% trans 'Trip events' %}</h2>
                 <span id="save-spinner"
-                      class="float-right loading loading-spinner loading-xs htmx-indicator"></span>
+                      class="loading loading-spinner loading-xs htmx-indicator"></span>
             </div>
-            {# Existing events panel #}
-            <div id="events-panel" class="overflow-y-auto flex-1 p-3">{% include "trips/partials/map-events-panel.html" %}</div>
-        </aside>
-        {# ── Map ── #}
-        <div id="trip-map" class="flex-1 min-h-64"></div>
+            <div id="events-panel" class="lg:gap-x-6 lg:columns-2">{% include "trips/partials/map-events-panel.html" %}</div>
+        </div>
     </div>
 {% endblock content %}
 {% block script %}
