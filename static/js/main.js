@@ -227,6 +227,7 @@ function initSortableLists() {
         });
         const reorderUrl = el.dataset.reorderUrl;
         Sortable.create(el, {
+            group: "trip-events",
             animation: 150,
             filter: "button, a",
             preventOnFilter: false,
@@ -236,25 +237,43 @@ function initSortableLists() {
                     li.style.cursor = "grabbing";
                 });
             },
-            onEnd() {
+            onEnd(evt) {
                 el.querySelectorAll("[data-event-id]").forEach((li) => {
                     li.style.cursor = "grab";
                 });
-                const order = [...el.querySelectorAll("[data-event-id]")].map(
-                    (li) => li.dataset.eventId
-                );
                 const csrfToken = document.cookie
                     .split("; ")
                     .find((c) => c.startsWith("csrftoken="))
                     ?.split("=")[1] || "";
-                fetch(reorderUrl, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRFToken": csrfToken,
-                    },
-                    body: JSON.stringify({ order }),
-                });
+
+                if (evt.from === evt.to) {
+                    // Same-day reorder
+                    const order = [...el.querySelectorAll("[data-event-id]")].map(
+                        (li) => li.dataset.eventId
+                    );
+                    fetch(reorderUrl, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": csrfToken,
+                        },
+                        body: JSON.stringify({ order }),
+                    });
+                } else {
+                    // Cross-day move
+                    const eventId = evt.item.dataset.eventId;
+                    const fromDayId = evt.from.dataset.dayId;
+                    const targetDayId = evt.to.dataset.dayId;
+                    fetch(`/events/${eventId}/move/${targetDayId}/`, {
+                        method: "POST",
+                        headers: { "X-CSRFToken": csrfToken },
+                    }).then((resp) => {
+                        if (resp.ok) {
+                            htmx.trigger(document.body, `dayModified${fromDayId}`);
+                            htmx.trigger(document.body, `dayModified${targetDayId}`);
+                        }
+                    });
+                }
             },
         });
     });

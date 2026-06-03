@@ -1,11 +1,13 @@
 import json
 import logging
 
+from django.contrib import messages
 from django.db import transaction
 from django.db.models import Prefetch
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
 from accounts.models import get_profile
@@ -208,4 +210,54 @@ def swap_event_order(request, event_id):
     return HttpResponse(
         status=204,
         headers={"HX-Trigger": f"dayModified{event.day.pk}"},
+    )
+
+
+@require_http_methods(["POST"])
+def move_event_to_day(request, event_id, day_id):
+    """Move a paired event to a different day (cross-day drag & drop or mobile button)."""
+    event = get_object_or_404(
+        Event,
+        pk=event_id,
+        day__isnull=False,
+        trip__in=editable_trips_qs(request.user),
+    )
+    old_day_pk = event.day_id
+    new_day = get_object_or_404(Day, pk=day_id, trip=event.trip)
+
+    if old_day_pk == new_day.pk:
+        return HttpResponse(status=204)
+
+    event.day = new_day
+    event.order = Event.objects.filter(day=new_day).count()
+    event.save(update_fields=["day", "order"])
+
+    messages.add_message(request, messages.SUCCESS, _("Event moved successfully"))
+    return HttpResponse(
+        status=204,
+        headers={
+            "HX-Trigger": json.dumps(
+                {
+                    f"dayModified{old_day_pk}": True,
+                    f"dayModified{new_day.pk}": True,
+                }
+            )
+        },
+    )
+
+
+@require_http_methods(["GET"])
+def move_event_day_modal(request, event_id):
+    """Mobile: show day picker to move a paired event to a different day."""
+    event = get_object_or_404(
+        Event,
+        pk=event_id,
+        day__isnull=False,
+        trip__in=editable_trips_qs(request.user),
+    )
+    days = event.trip.days.exclude(pk=event.day_id).order_by("number")
+    return TemplateResponse(
+        request,
+        "trips/move-event-day-modal.html",
+        {"event": event, "days": days},
     )

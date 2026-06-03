@@ -122,6 +122,16 @@ htmx_urlpatterns = [
         views.swap_event_order_modal,
         name="swap-event-order-modal",
     ),
+    path(
+        "events/<int:event_id>/move/<int:day_id>/",
+        views.move_event_to_day,
+        name="move-event-to-day",
+    ),
+    path(
+        "events/<int:event_id>/move-day/modal/",
+        views.move_event_day_modal,
+        name="move-event-day-modal",
+    ),
     # MAIN TRANSFER CONNECTIONS
     path(
         "main-transfer-connections/<int:main_transfer_pk>/modal",

@@ -15,6 +15,8 @@ from trips.views.collaborators import (
 )
 from trips.views.days import (
     day_detail,
+    move_event_day_modal,
+    move_event_to_day,
     reorder_events,
     swap_event_order,
     swap_event_order_modal,
@@ -132,6 +134,8 @@ __all__ = [
     "reorder_events",
     "swap_event_order_modal",
     "swap_event_order",
+    "move_event_to_day",
+    "move_event_day_modal",
     # events
     "add_experience",
     "add_meal",
