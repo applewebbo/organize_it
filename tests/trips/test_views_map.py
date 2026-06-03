@@ -1350,6 +1350,482 @@ class TripMapStagesContextTest(TestCase):
         assert response.context["has_custom_stages"] is True
 
 
+class TripDestinationsViewTest(TestCase):
+    def test_owner_gets_destinations_modal(self):
+        user = self.make_user("owner@example.com")
+        trip = TripFactory(author=user)
+        with self.login(user):
+            response = self.get("trips:trip-destinations", trip_pk=trip.pk)
+        self.response_200(response)
+        assert response.context["trip"] == trip
+        assert "stages" in response.context
+
+    def test_other_user_gets_404(self):
+        owner = self.make_user("owner@example.com")
+        other = self.make_user("other@example.com")
+        trip = TripFactory(author=owner)
+        with self.login(other):
+            response = self.get("trips:trip-destinations", trip_pk=trip.pk)
+        self.response_404(response)
+
+    def test_unauthenticated_redirects(self):
+        trip = TripFactory()
+        response = self.get("trips:trip-destinations", trip_pk=trip.pk)
+        self.response_302(response)
+
+
+class CreateStageViewTest(TestCase):
+    def test_get_returns_create_stage_form(self):
+        user = self.make_user("owner@example.com")
+        trip = TripFactory(author=user)
+        with self.login(user):
+            response = self.get("trips:create-stage", trip_pk=trip.pk)
+        self.response_200(response)
+        assert response.context["trip"] == trip
+        assert "days" in response.context
+
+    def test_post_creates_stage_with_destination(self):
+        user = self.make_user("owner@example.com")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        with self.login(user):
+            response = self.post(
+                "trips:create-stage",
+                trip_pk=trip.pk,
+                data={"destination": "Firenze", "days": [day.pk]},
+            )
+        self.response_200(response)
+        day.refresh_from_db()
+        assert day.destination == "Firenze"
+
+    def test_post_with_coords_updates_day(self):
+        user = self.make_user("owner@example.com")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        with self.login(user):
+            self.post(
+                "trips:create-stage",
+                trip_pk=trip.pk,
+                data={
+                    "destination": "Firenze",
+                    "destination_latitude": "43.7696",
+                    "destination_longitude": "11.2558",
+                    "days": [day.pk],
+                },
+            )
+        day.refresh_from_db()
+        assert day.destination == "Firenze"
+        assert day.destination_latitude == 43.7696
+
+    def test_post_with_invalid_coords_ignores_coords(self):
+        user = self.make_user("owner@example.com")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        with self.login(user):
+            self.post(
+                "trips:create-stage",
+                trip_pk=trip.pk,
+                data={
+                    "destination": "Firenze",
+                    "destination_latitude": "not-a-float",
+                    "destination_longitude": "also-not",
+                    "days": [day.pk],
+                },
+            )
+        day.refresh_from_db()
+        assert day.destination == "Firenze"
+        assert day.destination_latitude is None
+
+    def test_post_without_destination_does_nothing(self):
+        user = self.make_user("owner@example.com")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        original_destination = day.destination
+        with self.login(user):
+            self.post(
+                "trips:create-stage",
+                trip_pk=trip.pk,
+                data={"destination": "", "days": [day.pk]},
+            )
+        day.refresh_from_db()
+        assert day.destination == original_destination
+
+    def test_post_with_already_staged_day_skips_update(self):
+        """Covers 252->268: affected_numbers is empty when all days already in custom stage."""
+        from datetime import date, timedelta
+
+        user = self.make_user("staged_day@example.com")
+        trip = TripFactory(
+            author=user,
+            destination="Roma",
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+        )
+        day = trip.days.first()
+        day.destination = "Firenze"
+        day.save()
+        with self.login(user):
+            self.post(
+                "trips:create-stage",
+                trip_pk=trip.pk,
+                data={"destination": "Napoli", "days": [day.pk]},
+            )
+        day.refresh_from_db()
+        assert day.destination == "Firenze"
+
+    def test_post_with_last_day_no_next_day(self):
+        """Covers 266->268: first_of_next is None when last day of trip is selected."""
+        from datetime import date, timedelta
+
+        user = self.make_user("last_day@example.com")
+        trip = TripFactory(
+            author=user,
+            destination="Roma",
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+        )
+        last_day = trip.days.order_by("number").last()
+        with self.login(user):
+            self.post(
+                "trips:create-stage",
+                trip_pk=trip.pk,
+                data={"destination": "Firenze", "days": [last_day.pk]},
+            )
+        last_day.refresh_from_db()
+        assert last_day.destination == "Firenze"
+
+    def test_non_editor_gets_404(self):
+        owner = self.make_user("owner@example.com")
+        other = self.make_user("other@example.com")
+        trip = TripFactory(author=owner)
+        with self.login(other):
+            response = self.get("trips:create-stage", trip_pk=trip.pk)
+        self.response_404(response)
+
+
+class DeleteStageViewTest(TestCase):
+    def test_post_deletes_stage_and_unassigns_events(self):
+        user = self.make_user("owner@example.com")
+        trip = TripFactory(author=user, destination="Roma")
+        day = trip.days.first()
+        day.destination = "Firenze"
+        day.save()
+        Event.objects.create(
+            trip=trip,
+            day=day,
+            name="Test Uffizi",
+            address="Via Roma",
+            category=Event.Category.EXPERIENCE,
+        )
+        with self.login(user):
+            response = self.post(
+                "trips:delete-stage",
+                trip_pk=trip.pk,
+                data={"destination": "Firenze"},
+            )
+        self.response_200(response)
+        day.refresh_from_db()
+        assert day.destination == "Roma"
+        assert Event.objects.get(name="Test Uffizi").day is None
+
+    def test_post_with_main_destination_does_nothing(self):
+        user = self.make_user("owner@example.com")
+        trip = TripFactory(author=user, destination="Roma")
+        with self.login(user):
+            response = self.post(
+                "trips:delete-stage",
+                trip_pk=trip.pk,
+                data={"destination": "Roma"},
+            )
+        self.response_200(response)
+
+    def test_post_without_destination_does_nothing(self):
+        user = self.make_user("owner@example.com")
+        trip = TripFactory(author=user)
+        with self.login(user):
+            response = self.post(
+                "trips:delete-stage",
+                trip_pk=trip.pk,
+                data={"destination": ""},
+            )
+        self.response_200(response)
+
+    def test_delete_stage_with_next_day(self):
+        """Covers async_task for first_of_next when a subsequent day exists."""
+        user = self.make_user("owner@example.com")
+        trip = TripFactory(author=user, destination="Roma")
+        days = list(trip.days.order_by("number"))
+        days[0].destination = "Firenze"
+        days[0].save()
+        with self.login(user):
+            self.post(
+                "trips:delete-stage",
+                trip_pk=trip.pk,
+                data={"destination": "Firenze"},
+            )
+        days[0].refresh_from_db()
+        assert days[0].destination == "Roma"
+
+    def test_get_returns_destinations_modal(self):
+        """Covers 289->312: GET request to delete_stage (non-POST branch)."""
+        user = self.make_user("owner_get@example.com")
+        trip = TripFactory(author=user)
+        with self.login(user):
+            response = self.get("trips:delete-stage", trip_pk=trip.pk)
+        self.response_200(response)
+        assert "stages" in response.context
+
+    def test_delete_last_stage_no_next_day(self):
+        """Covers 310->312: first_of_next is None when stage includes the last trip day."""
+        from datetime import date, timedelta
+
+        user = self.make_user("del_last@example.com")
+        trip = TripFactory(
+            author=user,
+            destination="Roma",
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+        )
+        last_day = trip.days.order_by("number").last()
+        last_day.destination = "Firenze"
+        last_day.save()
+        with self.login(user):
+            response = self.post(
+                "trips:delete-stage",
+                trip_pk=trip.pk,
+                data={"destination": "Firenze"},
+            )
+        self.response_200(response)
+        last_day.refresh_from_db()
+        assert last_day.destination == "Roma"
+
+    def test_non_editor_gets_404(self):
+        owner = self.make_user("owner@example.com")
+        other = self.make_user("other@example.com")
+        trip = TripFactory(author=owner)
+        with self.login(other):
+            response = self.post(
+                "trips:delete-stage",
+                trip_pk=trip.pk,
+                data={"destination": "Firenze"},
+            )
+        self.response_404(response)
+
+
+class UpdateDayDestinationViewTest(TestCase):
+    def test_get_returns_day_destination_card(self):
+        user = self.make_user("owner@example.com")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        with self.login(user):
+            response = self.get(
+                "trips:update-day-destination", trip_pk=trip.pk, day_pk=day.pk
+            )
+        self.response_200(response)
+        assert response.context["day"] == day
+
+    def test_post_updates_day_destination(self):
+        user = self.make_user("owner@example.com")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        with self.login(user):
+            response = self.post(
+                "trips:update-day-destination",
+                trip_pk=trip.pk,
+                day_pk=day.pk,
+                data={"destination": "Venezia"},
+            )
+        self.response_204(response)
+        day.refresh_from_db()
+        assert day.destination == "Venezia"
+
+    def test_non_editor_gets_404(self):
+        owner = self.make_user("owner@example.com")
+        other = self.make_user("other@example.com")
+        trip = TripFactory(author=owner)
+        day = trip.days.first()
+        with self.login(other):
+            response = self.get(
+                "trips:update-day-destination", trip_pk=trip.pk, day_pk=day.pk
+            )
+        self.response_404(response)
+
+
+class GeocodeAddressViewTest(TestCase):
+    def test_post_with_name_and_city_returns_results(self):
+        user = self.make_user("user@example.com")
+        mock_results = [
+            {"display_name": "Via Roma 1, Torino", "lat": "45.07", "lon": "7.68"}
+        ]
+        with self.login(user):
+            with patch("trips.views.maps.geocode_location", return_value=mock_results):
+                response = self.post(
+                    "trips:geocode-address",
+                    data={"name": "Via Roma", "city": "Torino"},
+                )
+        self.response_200(response)
+        assert response.context["found"] is True
+
+    def test_post_with_no_results_returns_not_found(self):
+        user = self.make_user("user@example.com")
+        with self.login(user):
+            with patch("trips.views.maps.geocode_location", return_value=[]):
+                response = self.post(
+                    "trips:geocode-address",
+                    data={"name": "Posto Inesistente", "city": "Torino"},
+                )
+        self.response_200(response)
+        assert response.context["found"] is False
+
+    def test_post_without_name_returns_not_found(self):
+        user = self.make_user("user@example.com")
+        with self.login(user):
+            response = self.post(
+                "trips:geocode-address",
+                data={"name": "", "city": "Torino"},
+            )
+        self.response_200(response)
+        assert response.context["found"] is False
+
+    def test_get_returns_not_found(self):
+        user = self.make_user("user@example.com")
+        with self.login(user):
+            response = self.get("trips:geocode-address")
+        self.response_200(response)
+        assert response.context["found"] is False
+
+
+class GeocodeCityViewTest(TestCase):
+    def test_post_with_query_returns_results(self):
+        user = self.make_user("user@example.com")
+        mock_cities = [
+            {"display_name": "Firenze, Toscana, Italia", "lat": "43.77", "lon": "11.25"}
+        ]
+        with self.login(user):
+            with patch("trips.views.maps.geocode_city", return_value=mock_cities):
+                response = self.post(
+                    "trips:geocode-city",
+                    data={"destination": "Firenze"},
+                )
+        self.response_200(response)
+        assert response.context["found"] is True
+
+    def test_post_empty_query_returns_not_found(self):
+        user = self.make_user("user@example.com")
+        with self.login(user):
+            response = self.post(
+                "trips:geocode-city",
+                data={"destination": ""},
+            )
+        self.response_200(response)
+        assert response.context["found"] is False
+
+    def test_get_returns_not_found(self):
+        user = self.make_user("user@example.com")
+        with self.login(user):
+            response = self.get("trips:geocode-city")
+        self.response_200(response)
+        assert response.context["found"] is False
+
+
+class StageBiasInternalTest(TestCase):
+    """Direct tests for _stage_location_bias internal branches via map_search."""
+
+    def test_stage_bias_uses_event_coords(self):
+        """Stage has events with coords → centroid computed from them."""
+        user = self.make_user("stage_event@example.com")
+        trip = TripFactory(author=user, destination="Roma")
+        day = trip.days.first()
+        day.destination = "Firenze"
+        day.save()
+        Event.objects.create(
+            trip=trip,
+            day=day,
+            name="Uffizi",
+            address="Piazzale degli Uffizi, Firenze",
+            latitude=43.768,
+            longitude=11.255,
+            category=Event.Category.EXPERIENCE,
+        )
+        with self.login(user):
+            with patch("trips.views.maps.GooglePlacesClient") as MockClient:
+                MockClient.return_value.search_text.return_value = []
+                self.post(
+                    "trips:map-search",
+                    pk=trip.pk,
+                    data={"query": "museo", "stage_destination": "Firenze"},
+                )
+        call_kwargs = MockClient.return_value.search_text.call_args.kwargs
+        assert call_kwargs["location_bias"] is not None
+        lat, _, _ = call_kwargs["location_bias"]
+        assert abs(lat - 43.768) < 0.01
+
+    def test_stage_bias_uses_day_destination_coords(self):
+        """Stage has no events but day has destination coords → centroid from day."""
+        user = self.make_user("stage_day@example.com")
+        trip = TripFactory(author=user, destination="Roma")
+        day = trip.days.first()
+        day.destination = "Firenze"
+        day.destination_latitude = 43.77
+        day.destination_longitude = 11.25
+        day.save()
+        with self.login(user):
+            with patch("trips.views.maps.GooglePlacesClient") as MockClient:
+                MockClient.return_value.search_text.return_value = []
+                self.post(
+                    "trips:map-search",
+                    pk=trip.pk,
+                    data={"query": "museo", "stage_destination": "Firenze"},
+                )
+        call_kwargs = MockClient.return_value.search_text.call_args.kwargs
+        assert call_kwargs["location_bias"] is not None
+
+    def test_stage_bias_geocoder_fallback(self):
+        """No coords for stage → geocoder fallback used."""
+        user = self.make_user("stage_geocoder@example.com")
+        trip = TripFactory(author=user, destination="Roma")
+        day = trip.days.first()
+        day.destination = "Firenze"
+        day.save()
+        mock_geo = MagicMock()
+        mock_geo.latlng = [43.77, 11.25]
+        with self.login(user):
+            with patch("trips.views.maps.GooglePlacesClient") as MockClient:
+                with patch("trips.views.maps.geocoder.mapbox", return_value=mock_geo):
+                    MockClient.return_value.search_text.return_value = []
+                    self.post(
+                        "trips:map-search",
+                        pk=trip.pk,
+                        data={"query": "museo", "stage_destination": "Firenze"},
+                    )
+        call_kwargs = MockClient.return_value.search_text.call_args.kwargs
+        assert call_kwargs["location_bias"] is not None
+        assert call_kwargs["location_bias"][2] == 50_000
+
+    def test_stage_bias_falls_back_to_trip_bias_when_geocoder_fails(self):
+        """Stage geocoder fails → falls back to _trip_location_bias."""
+        user = self.make_user("stage_fallback@example.com")
+        trip = TripFactory(author=user, destination="Roma")
+        day = trip.days.first()
+        day.destination = "Firenze"
+        day.save()
+        mock_geo_fail = MagicMock()
+        mock_geo_fail.latlng = None
+        with self.login(user):
+            with patch("trips.views.maps.GooglePlacesClient") as MockClient:
+                with patch(
+                    "trips.views.maps.geocoder.mapbox", return_value=mock_geo_fail
+                ):
+                    MockClient.return_value.search_text.return_value = []
+                    self.post(
+                        "trips:map-search",
+                        pk=trip.pk,
+                        data={"query": "museo", "stage_destination": "Firenze"},
+                    )
+        call_kwargs = MockClient.return_value.search_text.call_args.kwargs
+        assert "location_bias" in call_kwargs
+
+
 class MapSearchStageBiasTest(TestCase):
     """map_search uses stage_destination to set location_bias."""
 
