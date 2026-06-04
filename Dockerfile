@@ -52,25 +52,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
   && mv /root/.local/bin/uv /usr/local/bin/uv
 
-# copy project
 WORKDIR /app
-COPY . /app
 
 # activate virtual env
 ARG VIRTUAL_ENV=/app/.venv
 ENV PATH=/app/.venv/bin:$PATH
 
-# install dependencies
-COPY pyproject.toml ./
-COPY uv.lock ./
+# install dependencies (layer cached as long as pyproject.toml/uv.lock unchanged)
+COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev --no-install-project
 
-# copy project (se vuoi evitare doppia COPY, puoi rimuovere questa se non ti serve)
-WORKDIR /app
+# copy project
 COPY . /app
-
-# Procfile for hivemind
-COPY Procfile /app/Procfile
 
 # create logs directory
 RUN mkdir -p /app/logs
