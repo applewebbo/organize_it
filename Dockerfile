@@ -20,6 +20,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     lsb-release \
     gnupg \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libcairo2 \
+    libgdk-pixbuf-2.0-0 \
+    libfontconfig1 \
+    libffi8 \
   # Install hivemind (static binary)
   && HIVEMIND_VERSION="1.1.0" \
   && ARCH="$(dpkg --print-architecture)" \
