@@ -4,7 +4,7 @@ slug: trip-map-move-events-panel-below-map-full-width-2-cols-on-2xl
 title: 'trip-map: move events panel below map, full width, 2 cols on 2xl'
 labels: []
 created: '2026-05-24T10:29:21.553+02:00'
-updated: '2026-05-24T11:21:07.765+02:00'
+updated: '2026-06-04T09:05:55.680+02:00'
 ---
 
 ## Task Comments
@@ -13,3 +13,4 @@ updated: '2026-05-24T11:21:07.765+02:00'
 | --- | --- |
 | 2026-05-24T10:55:28.799+02:00 | Status changed from ready to in-progress |
 | 2026-05-24T11:21:07.765+02:00 | Status changed from in-progress to done |
+| 2026-06-04T09:05:55.680+02:00 | Status changed from done to complete |
