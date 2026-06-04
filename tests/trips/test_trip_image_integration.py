@@ -302,7 +302,7 @@ class TestTripImagePendingFlag:
 
         from trips.models import Trip
 
-        trip = Trip.objects.get(title="Pending Trip")
+        trip = Trip.objects.get(title="Pending Trip", author=user)
         assert trip.image_metadata.get("pending") is True
         assert not trip.image
 
