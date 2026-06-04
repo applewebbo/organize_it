@@ -257,7 +257,7 @@ class TestCalculateDayTransfer:
     def test_does_nothing_if_day_not_found(self):
         calculate_day_transfer(99999)
 
-    @patch("trips.tasks.requests.get")
+    @patch("trips.utils.requests.get")
     def test_saves_duration_and_distance_from_api(
         self, mock_get, user_factory, trip_factory
     ):
@@ -280,7 +280,7 @@ class TestCalculateDayTransfer:
         assert days[1].transfer_duration_from_prev == 120
         assert days[1].transfer_distance_from_prev == 270
 
-    @patch("trips.tasks.requests.get")
+    @patch("trips.utils.requests.get")
     def test_handles_api_error_gracefully(self, mock_get, user_factory, trip_factory):
         user = user_factory()
         trip = trip_factory(author=user)
@@ -296,7 +296,7 @@ class TestCalculateDayTransfer:
         days[1].refresh_from_db()
         assert days[1].transfer_duration_from_prev is None
 
-    @patch("trips.tasks.requests.get")
+    @patch("trips.utils.requests.get")
     def test_handles_empty_routes(self, mock_get, user_factory, trip_factory):
         user = user_factory()
         trip = trip_factory(author=user)
@@ -315,7 +315,7 @@ class TestCalculateDayTransfer:
 
     # --- Home address tests (issue #309) ---
 
-    @patch("trips.tasks.requests.get")
+    @patch("trips.utils.requests.get")
     def test_uses_home_as_origin_for_day1_without_arrival_transfer(
         self, mock_get, user_factory, trip_factory
     ):
@@ -388,7 +388,7 @@ class TestCalculateDayTransfer:
         day1.refresh_from_db()
         assert day1.transfer_duration_from_prev is None
 
-    @patch("trips.tasks.requests.get")
+    @patch("trips.utils.requests.get")
     def test_saves_to_home_for_last_day_without_departure_transfer(
         self, mock_get, user_factory, trip_factory
     ):

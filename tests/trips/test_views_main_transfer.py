@@ -1096,6 +1096,36 @@ class TestEstimateCarDuration(TestCase):
 
         assert response.status_code == 200
 
+    def test_returns_empty_when_route_api_fails(self):
+        """Returns empty fragment when fetch_route returns None"""
+        from unittest.mock import MagicMock, patch
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        url = reverse("trips:estimate-car-duration", kwargs={"trip_id": trip.pk})
+
+        mock_geocode = MagicMock()
+        mock_geocode.latlng = [41.9, 12.5]
+
+        with self.login(user):
+            with (
+                patch("trips.views.transfers.geocoder") as mock_geocoder,
+                patch("trips.views.transfers.fetch_route") as mock_route,
+            ):
+                mock_geocoder.mapbox.return_value = mock_geocode
+                mock_route.return_value = None
+                response = self.client.get(
+                    url,
+                    {
+                        "origin_address": "Via Roma 1, Rome",
+                        "destination_address": "Via Milano 10, Milan",
+                    },
+                )
+
+        assert response.status_code == 200
+        assert response.context["duration_minutes"] is None
+        assert response.context["distance_km"] is None
+
     def test_requires_authentication(self):
         """Returns 302 redirect for unauthenticated users"""
         trip = TripFactory()

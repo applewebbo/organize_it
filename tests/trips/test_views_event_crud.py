@@ -223,7 +223,9 @@ class EventPairChoiceView(TestCase):
         user = self.make_user("user")
         trip = TripFactory(author=user)
         day = trip.days.first()
-        event = EventFactory(day=day)  # Event is already paired
+        event = EventFactory(
+            day=day, city=""
+        )  # Event is already paired, no city filter
 
         with self.login(user):
             response = self.get("trips:event-pair-choice", pk=event.pk)
