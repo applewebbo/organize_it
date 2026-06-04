@@ -9,6 +9,12 @@ python manage.py migrate
 echo "Translating..."
 python manage.py compilemessages -l it -l en
 
+echo "Building production css files..."
+python manage.py tailwind build
+
+echo "Collecting static files..."
+python manage.py collectstatic --no-input
+
 # Start the web server and tasks worker
 echo "Starting hivemind.."
 exec hivemind /app/Procfile

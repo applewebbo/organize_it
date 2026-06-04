@@ -75,12 +75,6 @@ COPY Procfile /app/Procfile
 # create logs directory
 RUN mkdir -p /app/logs
 
-# build tailwind CSS and collect static files at image build time
-RUN SECRET_KEY=build-placeholder ENVIRONMENT=dev MAPBOX_ACCESS_TOKEN=placeholder \
-    python manage.py tailwind build && \
-    SECRET_KEY=build-placeholder ENVIRONMENT=dev MAPBOX_ACCESS_TOKEN=placeholder \
-    python manage.py collectstatic --no-input
-
 # expose port for granian
 EXPOSE 80
 
