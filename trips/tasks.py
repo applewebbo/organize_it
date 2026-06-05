@@ -308,6 +308,79 @@ def backup_database():
         raise
 
 
+def _build_checklist_url(trip):
+    """Build absolute URL for the trip checklist page."""
+    from django.urls import reverse
+
+    hosts = [h for h in settings.ALLOWED_HOSTS if h not in ("*",)]
+    domain = hosts[0] if hosts else "localhost:8000"
+    scheme = "https" if settings.ENVIRONMENT == "prod" else "http"
+    path = reverse("trips:trip-checklist", kwargs={"pk": trip.pk})
+    return f"{scheme}://{domain}{path}"
+
+
+def _send_checklist_reminder_email(trip, pending, today):
+    from django.core.mail import EmailMultiAlternatives
+    from django.template.loader import render_to_string
+    from django.utils.translation import override as translation_override
+
+    recipient_language = getattr(trip.author.profile, "language", "en")
+    context = {
+        "trip": trip,
+        "pending_items": pending,
+        "days_to_departure": (trip.start_date - today).days,
+        "trip_url": _build_checklist_url(trip),
+    }
+    with translation_override(recipient_language):
+        subject = render_to_string(
+            "trips/email/checklist_reminder_subject.txt", context
+        ).strip()
+        text_body = render_to_string("trips/email/checklist_reminder_body.txt", context)
+        html_body = render_to_string(
+            "trips/email/checklist_reminder_body.html", context
+        )
+    msg = EmailMultiAlternatives(
+        subject=subject, body=text_body, to=[trip.author.email]
+    )
+    msg.attach_alternative(html_body, "text/html")
+    msg.send()
+    Trip.objects.filter(pk=trip.pk).update(checklist_reminder_sent_at=today)
+    logger.info(
+        f"Checklist reminder sent for trip '{trip.title}' to {trip.author.email}"
+    )
+
+
+def send_checklist_reminders():
+    """Send checklist reminder emails for trips whose reminder day matches today."""
+    try:
+        logger.info("Starting send_checklist_reminders task")
+        today = timezone.now().date()
+        trips = (
+            Trip.objects.filter(
+                checklist_reminder_days__isnull=False,
+                start_date__isnull=False,
+            )
+            .exclude(checklist_reminder_sent_at=today)
+            .select_related("author__profile")
+        )
+        sent = 0
+        for trip in trips:
+            trigger_date = trip.start_date - timedelta(
+                days=trip.checklist_reminder_days
+            )
+            if trigger_date == today:
+                pending = trip.checklist_items.filter(completed=False)
+                if pending.exists():
+                    _send_checklist_reminder_email(trip, list(pending), today)
+                    sent += 1
+        result_msg = f"Checklist reminders sent: {sent}"
+        logger.info(f"send_checklist_reminders completed: {result_msg}")
+        return result_msg
+    except Exception as e:
+        logger.error(f"Error in send_checklist_reminders task: {e}", exc_info=True)
+        raise
+
+
 def fetch_weather_for_active_trips():
     """
     Fetch and cache weather forecasts for all IMPENDING and IN_PROGRESS trips.

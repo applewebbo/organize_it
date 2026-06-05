@@ -1,0 +1,12 @@
+{% load i18n %}{% blocktrans with title=trip.title days=days_to_departure %}Your trip "{{ title }}" departs in {{ days }} day(s) and you still have pending checklist items.{% endblocktrans %}
+
+{% trans "Pending items:" %}
+{% for item in pending_items %}
+- {{ item.text }}
+{% endfor %}
+
+{% trans "Open your checklist:" %}
+{{ trip_url }}
+
+---
+{% trans "You received this email because you set a checklist reminder in Organize It." %}

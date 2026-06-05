@@ -159,6 +159,9 @@ media/
 #  CLAUDE
 .claude/
 
+# PLANS
+plans/
+
 # QWEN
 .qwen/
 # Added by code-review-graph

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags i18n %}
+{% block page_title %}
+    {% trans "Checklist" %} — {{ trip.title }}
+{% endblock page_title %}
+{% block content %}
+    <div class="mx-auto max-w-2xl">
+        <!-- Back link -->
+        <div class="mb-4">
+            <a href="{% url 'trips:trip-detail' trip.pk %}"
+               class="gap-1 btn btn-ghost btn-sm">
+                <i class="ph ph-arrow-left"></i>
+                {{ trip.title }}
+            </a>
+        </div>
+        <!-- Header -->
+        <div class="mb-6 shadow card bg-base-100">
+            <div class="card-body">
+                <h1 class="flex gap-2 items-center text-2xl font-semibold card-title">
+                    <i class="ph ph-check-square text-primary"></i>
+                    {% trans "Pre-departure Checklist" %}
+                </h1>
+                {% with total=items.count done=items|dictsortreversed:"completed"|length %}
+                    {% with completed_count=items.filter.count %}{% endwith %}
+                {% endwith %}
+            </div>
+        </div>
+        <!-- Add item form -->
+        <div class="mb-4 shadow card bg-base-100">
+            <div class="card-body">
+                <form hx-post="{% url 'trips:checklist-item-add' trip.pk %}"
+                      hx-target="#checklist-list"
+                      hx-swap="outerHTML"
+                      hx-on::after-request="this.reset()">
+                    {% csrf_token %}
+                    <div class="flex gap-2">
+                        <input type="text"
+                               name="text"
+                               class="flex-1 input input-bordered"
+                               placeholder="{% trans 'Add an item…' %}"
+                               required
+                               autocomplete="off">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ph ph-plus"></i>
+                            {% trans "Add" %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- Checklist items -->
+        {% include "trips/includes/checklist-list.html" %}
+        <!-- Email reminder (author only) -->
+        {% if is_author and trip.start_date %}
+            {% include "trips/includes/checklist-reminder-card.html" %}
+        {% endif %}
+    </div>
+{% endblock content %}

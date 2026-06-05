@@ -325,4 +325,26 @@ urlpatterns += [
         views.update_day_destination,
         name="update-day-destination",
     ),
+    # checklist
+    path("trips/<int:pk>/checklist/", views.trip_checklist, name="trip-checklist"),
+    path(
+        "trips/<int:trip_pk>/checklist/add/",
+        views.checklist_item_add,
+        name="checklist-item-add",
+    ),
+    path(
+        "checklist/<int:pk>/toggle/",
+        views.checklist_item_toggle,
+        name="checklist-item-toggle",
+    ),
+    path(
+        "checklist/<int:pk>/delete/",
+        views.checklist_item_delete,
+        name="checklist-item-delete",
+    ),
+    path(
+        "trips/<int:trip_pk>/checklist/reminder/",
+        views.checklist_reminder_set,
+        name="checklist-reminder-set",
+    ),
 ]

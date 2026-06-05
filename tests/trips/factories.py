@@ -1038,3 +1038,12 @@ class StayTransferFactory(factory.django.DjangoModelFactory):
     # Optional time fields
     departure_time = None
     estimated_duration = None
+
+
+class ChecklistItemFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "trips.ChecklistItem"
+
+    trip = factory.SubFactory(TripFactory)
+    text = factory.Faker("sentence", nb_words=4)
+    completed = False

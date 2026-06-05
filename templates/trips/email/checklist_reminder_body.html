@@ -1,0 +1,33 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>{% trans "Checklist reminder" %}</title>
+        <meta name="description" content="{% trans 'Checklist reminder' %}">
+        <meta name="keywords" content="checklist, reminder, trip">
+        <style>
+    body { font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 24px; }
+    .btn { display: inline-block; padding: 10px 20px; background-color: #4f46e5; color: #fff; text-decoration: none; border-radius: 6px; font-weight: bold; }
+    ul { padding-left: 20px; }
+    li { margin: 6px 0; }
+    .footer { margin-top: 32px; font-size: 12px; color: #888; }
+        </style>
+    </head>
+    <body>
+        <h2>{% trans "Checklist reminder" %}</h2>
+        <p>
+            {% blocktrans with title=trip.title days=days_to_departure %}Your trip <strong>{{ title }}</strong> departs in <strong>{{ days }}</strong> day(s) and you still have pending checklist items.{% endblocktrans %}
+        </p>
+        <h3>{% trans "Pending items:" %}</h3>
+        <ul>
+            {% for item in pending_items %}<li>{{ item.text }}</li>{% endfor %}
+        </ul>
+        <p>
+            <a href="{{ trip_url }}" class="btn">{% trans "Open checklist" %}</a>
+        </p>
+        <div class="footer">
+            <p>{% trans "You received this email because you set a checklist reminder in Organize It." %}</p>
+        </div>
+    </body>
+</html>

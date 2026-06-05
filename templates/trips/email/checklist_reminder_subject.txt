@@ -1,0 +1,1 @@
+{% load i18n %}{% blocktrans with title=trip.title days=days_to_departure %}Checklist reminder: "{{ title }}" departs in {{ days }} day(s){% endblocktrans %}

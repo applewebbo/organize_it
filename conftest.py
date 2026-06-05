@@ -2,6 +2,7 @@ from pytest_factoryboy import register
 
 from tests.accounts.factories import UserFactory
 from tests.trips.factories import (
+    ChecklistItemFactory,
     EventFactory,
     ExperienceFactory,
     LinkFactory,
@@ -19,3 +20,4 @@ register(StayFactory)
 register(ExperienceFactory)
 register(EventFactory)
 register(MainTransferFactory)
+register(ChecklistItemFactory)

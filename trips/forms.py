@@ -11,6 +11,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
 from .models import (
+    ChecklistItem,
     Day,
     Event,
     Experience,
@@ -1711,3 +1712,41 @@ class ShareLinkCreateForm(forms.Form):
             label=label,
             expires_at=expires_at,
         )
+
+
+class ChecklistItemForm(forms.ModelForm):
+    class Meta:
+        model = ChecklistItem
+        fields = ["text"]
+        widgets = {
+            "text": forms.TextInput(attrs={"placeholder": _("Add an item…")}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.label_class = "hidden"
+        self.fields["text"].label = ""
+
+
+class ChecklistReminderForm(forms.Form):
+    REMINDER_CHOICES = [
+        ("", _("Off")),
+        (1, _("1 day before")),
+        (3, _("3 days before")),
+        (7, _("7 days before")),
+        (14, _("14 days before")),
+        (30, _("30 days before")),
+    ]
+
+    reminder_days = forms.ChoiceField(
+        choices=REMINDER_CHOICES,
+        required=False,
+        label=_("Email reminder"),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag = False

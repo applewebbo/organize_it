@@ -51,6 +51,8 @@ class Trip(models.Model):
     image_metadata = models.JSONField(
         default=dict, blank=True, help_text="Image source and attribution data"
     )
+    checklist_reminder_days = models.PositiveSmallIntegerField(null=True, blank=True)
+    checklist_reminder_sent_at = models.DateField(null=True, blank=True)
 
     class Meta:
         ordering = ("status",)
@@ -101,6 +103,14 @@ class Trip(models.Model):
             photographer = self.image_metadata.get("photographer", "Unknown")
             return f"Photo by {photographer} on Unsplash"
         return None
+
+    @property
+    def checklist_total(self):
+        return self.checklist_items.count()
+
+    @property
+    def checklist_completed(self):
+        return self.checklist_items.filter(completed=True).count()
 
 
 @receiver(pre_save, sender="trips.Trip")
@@ -1095,3 +1105,21 @@ class ShareLink(models.Model):
 
     def get_absolute_url(self) -> str:
         return reverse("trips:shared-trip", kwargs={"token": self.id})
+
+
+class ChecklistItem(models.Model):
+    trip = models.ForeignKey(
+        Trip, on_delete=models.CASCADE, related_name="checklist_items"
+    )
+    text = models.CharField(max_length=500)
+    completed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["completed", "created_at"]
+        verbose_name = "Checklist Item"
+        verbose_name_plural = "Checklist Items"
+
+    def __str__(self) -> str:
+        return f"{self.text} [{self.trip.title}]"

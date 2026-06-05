@@ -1,0 +1,24 @@
+{% load i18n %}
+<div id="checklist-list" class="space-y-2">
+    {% for item in items %}
+        <div id="checklist-item-{{ item.pk }}"
+             class="flex gap-3 items-center p-3 rounded-lg bg-base-200">
+            <input type="checkbox"
+                   class="checkbox checkbox-sm checkbox-primary"
+                   {% if item.completed %}checked{% endif %}
+                   hx-put="{% url 'trips:checklist-item-toggle' item.pk %}"
+                   hx-target="#checklist-list"
+                   hx-swap="outerHTML">
+            <span class="flex-1 {% if item.completed %}line-through opacity-50{% endif %}">{{ item.text }}</span>
+            <button class="btn btn-ghost btn-xs text-error"
+                    hx-delete="{% url 'trips:checklist-item-delete' item.pk %}"
+                    hx-target="#checklist-list"
+                    hx-swap="outerHTML"
+                    hx-confirm="{% trans 'Delete this item?' %}">
+                <i class="ph ph-trash"></i>
+            </button>
+        </div>
+    {% empty %}
+        <p class="py-4 text-center text-base-content/50">{% trans "No items yet. Add your first checklist item above." %}</p>
+    {% endfor %}
+</div>

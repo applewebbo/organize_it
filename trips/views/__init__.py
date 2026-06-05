@@ -1,3 +1,10 @@
+from trips.views.checklist import (
+    checklist_item_add,
+    checklist_item_delete,
+    checklist_item_toggle,
+    checklist_reminder_set,
+    trip_checklist,
+)
 from trips.views.collaborators import (
     accept_invitation,
     add_collaborator,
@@ -220,6 +227,12 @@ __all__ = [
     "map_add_meal",
     "map_add_stay",
     "resolve_maps_link",
+    # checklist
+    "trip_checklist",
+    "checklist_item_add",
+    "checklist_item_toggle",
+    "checklist_item_delete",
+    "checklist_reminder_set",
     # utils
     "view_log_file",
 ]
