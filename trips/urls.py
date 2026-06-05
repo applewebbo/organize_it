@@ -326,6 +326,11 @@ urlpatterns += [
         name="update-day-destination",
     ),
     # checklist
+    path(
+        "trips/<int:trip_pk>/checklist/card/",
+        views.checklist_card,
+        name="checklist-card",
+    ),
     path("trips/<int:pk>/checklist/", views.trip_checklist, name="trip-checklist"),
     path(
         "trips/<int:trip_pk>/checklist/add/",

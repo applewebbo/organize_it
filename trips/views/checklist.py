@@ -12,6 +12,28 @@ from trips.utils import accessible_trips_qs, editable_trips_qs
 
 
 @login_required
+def checklist_card(request, trip_pk):
+    trip = get_object_or_404(accessible_trips_qs(request.user), pk=trip_pk)
+    items = list(trip.checklist_items.all())
+    is_editable = (
+        trip.author == request.user
+        or trip.collaborators.filter(pk=request.user.pk).exists()
+    )
+    completed_count = sum(1 for i in items if i.completed)
+    return TemplateResponse(
+        request,
+        "trips/includes/checklist-card.html",
+        {
+            "trip": trip,
+            "items": items,
+            "completed_count": completed_count,
+            "total_count": len(items),
+            "add_form": ChecklistItemForm() if is_editable else None,
+        },
+    )
+
+
+@login_required
 def trip_checklist(request, pk):
     trip = get_object_or_404(accessible_trips_qs(request.user), pk=pk)
     items = trip.checklist_items.all()

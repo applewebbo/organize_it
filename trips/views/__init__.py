@@ -1,4 +1,5 @@
 from trips.views.checklist import (
+    checklist_card,
     checklist_item_add,
     checklist_item_delete,
     checklist_item_toggle,
@@ -228,6 +229,7 @@ __all__ = [
     "map_add_stay",
     "resolve_maps_link",
     # checklist
+    "checklist_card",
     "trip_checklist",
     "checklist_item_add",
     "checklist_item_toggle",

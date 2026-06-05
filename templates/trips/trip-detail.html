@@ -35,30 +35,11 @@
     {% include 'trips/includes/events-section.html' %}
 {% endpartialdef %}
 <!-- Checklist Section -->
-<section id="checklist" class="mb-8">
-    <div class="shadow card bg-base-100">
-        <div class="card-body">
-            <div class="flex justify-between items-center">
-                <h2 class="flex gap-2 items-center text-xl font-semibold card-title">
-                    <i class="ph ph-check-square text-primary"></i>
-                    {% trans "Checklist" %}
-                    {% if trip.checklist_total > 0 %}
-                        <span class="badge badge-outline badge-sm">{{ trip.checklist_completed }}/{{ trip.checklist_total }}</span>
-                    {% endif %}
-                </h2>
-                <a href="{% url 'trips:trip-checklist' trip.pk %}"
-                   class="btn btn-sm btn-primary btn-soft">{% trans "Open" %}</a>
-            </div>
-            {% if trip.checklist_total > 0 %}
-                <p class="text-sm text-base-content/60">
-                    {% blocktrans with done=trip.checklist_completed total=trip.checklist_total %}{{ done }} of {{ total }} items completed{% endblocktrans %}
-                </p>
-            {% else %}
-                <p class="text-sm text-base-content/50">{% trans "No checklist items yet." %}</p>
-            {% endif %}
-        </div>
-    </div>
-</section>
+<div id="checklist-card-container"
+     class="mb-8"
+     hx-get="{% url 'trips:checklist-card' trip.pk %}"
+     hx-trigger="load, checklistModified from:body"
+     hx-swap="innerHTML"></div>
 <!-- END Checklist Section -->
 <!-- Collaborators Section -->
 {% with collaborations=trip.collaborations.all %}

@@ -592,6 +592,27 @@ msgstr "%(done)s di %(total)s elementi completati"
 msgid "No checklist items yet."
 msgstr "Nessun elemento nella checklist."
 
+msgid "To do"
+msgstr "Da fare"
+
+msgid "Done"
+msgstr "Completati"
+
+msgid "Nothing to do."
+msgstr "Niente da fare."
+
+msgid "Nothing done yet."
+msgstr "Niente completato."
+
+msgid "Mark as done"
+msgstr "Segna come completato"
+
+msgid "Mark as to do"
+msgstr "Segna come da fare"
+
+msgid "Manage"
+msgstr "Gestisci"
+
 #: templates/includes/auth-index.html:58
 msgid "Other Trips"
 msgstr "Altri Viaggi"

@@ -1,0 +1,64 @@
+{% load i18n %}
+<div class="shadow card bg-base-100">
+    <div class="card-body">
+        <h2 class="flex gap-2 items-center text-xl font-semibold card-title">
+            <i class="ph ph-check-square text-primary"></i>
+            {% trans "Checklist" %}
+            {% if total_count > 0 %}
+                <span class="badge badge-outline badge-sm">{{ completed_count }}/{{ total_count }}</span>
+            {% endif %}
+        </h2>
+        {% if add_form %}
+            <form hx-post="{% url 'trips:checklist-item-add' trip.pk %}"
+                  hx-swap="none"
+                  class="flex gap-2 mt-2">
+                {% csrf_token %}
+                <input type="text"
+                       name="text"
+                       placeholder="{% trans 'Add an item…' %}"
+                       class="flex-1 input input-sm input-bordered"
+                       required>
+                <button type="submit" class="gap-1 btn btn-sm btn-primary">
+                    <i class="ph ph-plus"></i>
+                    {% trans "Add" %}
+                </button>
+            </form>
+        {% endif %}
+        {% if items %}
+            <div class="grid grid-cols-1 gap-3 mt-3 sm:grid-cols-2">
+                <div class="p-3 rounded-xl bg-base-200">
+                    <p class="mb-2 text-xs font-semibold tracking-wide uppercase text-base-content/50">{% trans "To do" %}</p>
+                    <div class="space-y-0.5">
+                        {% for item in items %}
+                            {% if not item.completed %}
+                                <button class="flex gap-2 items-center py-1 px-2 w-full text-sm text-left rounded-lg transition-colors hover:bg-base-300"
+                                        hx-put="{% url 'trips:checklist-item-toggle' item.pk %}"
+                                        hx-swap="none">
+                                    <i class="ph ph-circle text-base-content/40 shrink-0"></i>
+                                    <span class="flex-1 truncate text-base-content">{{ item.text }}</span>
+                                </button>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="p-3 rounded-xl bg-base-200">
+                    <p class="mb-2 text-xs font-semibold tracking-wide uppercase text-base-content/50">{% trans "Done" %}</p>
+                    <div class="space-y-0.5">
+                        {% for item in items %}
+                            {% if item.completed %}
+                                <button class="flex gap-2 items-center py-1 px-2 w-full text-sm text-left rounded-lg transition-colors hover:bg-base-300"
+                                        hx-put="{% url 'trips:checklist-item-toggle' item.pk %}"
+                                        hx-swap="none">
+                                    <i class="ph ph-check-circle text-success shrink-0"></i>
+                                    <span class="flex-1 truncate text-base-content">{{ item.text }}</span>
+                                </button>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <p class="mt-2 text-sm text-base-content/50">{% trans "No checklist items yet." %}</p>
+        {% endif %}
+    </div>
+</div>

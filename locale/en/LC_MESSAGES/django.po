@@ -534,6 +534,27 @@ msgstr ""
 msgid "No checklist items yet."
 msgstr ""
 
+msgid "To do"
+msgstr ""
+
+msgid "Done"
+msgstr ""
+
+msgid "Nothing to do."
+msgstr ""
+
+msgid "Nothing done yet."
+msgstr ""
+
+msgid "Mark as done"
+msgstr ""
+
+msgid "Mark as to do"
+msgstr ""
+
+msgid "Manage"
+msgstr ""
+
 #: templates/includes/auth-index.html:58
 msgid "Other Trips"
 msgstr ""

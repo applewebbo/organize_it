@@ -166,7 +166,7 @@ class TestChecklistOrdering:
 
 
 class TestChecklistBadge:
-    def test_trip_detail_shows_badge_counts(
+    def test_checklist_card_shows_badge_counts(
         self, client, user_factory, trip_factory, checklist_item_factory
     ):
         user = user_factory()
@@ -174,7 +174,7 @@ class TestChecklistBadge:
         checklist_item_factory(trip=trip, completed=True)
         checklist_item_factory(trip=trip, completed=False)
         client.force_login(user)
-        response = client.get(reverse("trips:trip-detail", args=[trip.pk]))
+        response = client.get(reverse("trips:checklist-card", args=[trip.pk]))
         assert response.status_code == 200
         assert b"1/2" in response.content
 
