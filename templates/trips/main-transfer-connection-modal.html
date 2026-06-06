@@ -74,9 +74,7 @@
                                 <i class="ph-bold ph-bed i-xl text-slate-500"></i>
                                 <span class="font-medium">{{ available_stay.name }}</span>
                             </div>
-                            <div class="text-sm text-base-content/70">
-                                {% if available_stay.address %}{{ available_stay.address }}{% endif %}
-                            </div>
+                            <div class="text-sm text-base-content/70">{% if available_stay.address %}{{ available_stay.address }}{% endif %}</div>
                         </button>
                     {% endif %}
                     {% if available_event %}

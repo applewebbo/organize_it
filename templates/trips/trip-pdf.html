@@ -187,7 +187,9 @@
                                     {% trans "Check-out" %}: {{ day.stay.check_out|time:"H:i" }}
                                 {% endif %}
                             </div>
-                            {% if day.stay.notes %}<div class="notes">{{ day.stay.notes }}</div>{% endif %}
+                            {% if day.stay.notes %}
+                                <div class="notes">{{ day.stay.notes }}</div>
+                            {% endif %}
                             {% for st in day.stay.transfer_from.all %}
                                 <div class="stay-transfer">
                                     <svg class="ico" viewBox="0 0 256 256">
