@@ -192,24 +192,29 @@ def get_trips(user):
     # Determine "latest trip" with smart logic only if NO favorite
     latest_trip = None
     if not fav_trip and base_qs.exists():
-        # Queryset with prefetch for the detail view
-        latest_qs = base_qs.prefetch_related(
-            Prefetch(
-                "days__events",
-                queryset=Event.objects.all().order_by("order", "pk"),
-            ),
-            "days__stay__transfer_from",
-            "days__stay__transfer_to",
-            "main_transfers",
-        ).select_related("author")
-
+        # Find the trip ID first without heavy prefetches
         # Priority: IN_PROGRESS > IMPENDING (by start_date) > others
         latest_trip = (
-            latest_qs.filter(status=Trip.Status.IN_PROGRESS).first()
-            or latest_qs.filter(status=Trip.Status.IMPENDING)
+            base_qs.filter(status=Trip.Status.IN_PROGRESS).first()
+            or base_qs.filter(status=Trip.Status.IMPENDING)
             .order_by("start_date")
             .first()
-            or latest_qs.order_by("status", "start_date").first()
+            or base_qs.order_by("status", "start_date").first()
+        )
+
+        # Now fetch only the selected trip with all related data
+        latest_trip = (
+            Trip.objects.prefetch_related(
+                Prefetch(
+                    "days__events",
+                    queryset=Event.objects.all().order_by("order", "pk"),
+                ),
+                "days__stay__transfer_from",
+                "days__stay__transfer_to",
+                "main_transfers",
+            )
+            .select_related("author")
+            .get(pk=latest_trip.pk)
         )
 
         unpaired_events = latest_trip.all_events.filter(day__isnull=True)

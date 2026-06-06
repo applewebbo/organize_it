@@ -490,7 +490,7 @@ def trip_image_status(request, pk):
 @login_not_required
 def shared_trip_detail(request, token):
     """Public read-only view for a shared trip. No login required."""
-    link = get_object_or_404(ShareLink, id=token)
+    link = get_object_or_404(ShareLink.objects.select_related("trip"), id=token)
 
     if not link.is_valid:
         if link.expires_at:

@@ -570,6 +570,8 @@ class Event(models.Model):
         ordering = ["order", "pk"]
         indexes = [
             models.Index(fields=["trip_id"]),
+            models.Index(fields=["day_id", "order"]),
+            models.Index(fields=["city"]),
         ]
 
     def save(self, *args, **kwargs):
