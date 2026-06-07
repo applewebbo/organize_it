@@ -1,0 +1,1 @@
+{% load i18n %}{% blocktranslate with title=trip.title %}Weather Forecast for your trip: {{ title }}{% endblocktranslate %}

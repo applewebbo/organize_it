@@ -1,0 +1,18 @@
+{% load i18n %}
+{% blocktranslate with title=trip.title %}Your trip "{{ title }}" is approaching!{% endblocktranslate %}
+
+{% trans "Here is the weather forecast for the first days of your journey:" %}
+
+{% for day in days %}
+{% trans "Day" %} {{ day.number }} ({{ day.date }}):
+{% if day.weather_data %}
+  - {% trans "Max:" %} {{ day.weather_data.temperature_2m_max|floatformat:"0" }}°C
+  - {% trans "Min:" %} {{ day.weather_data.temperature_2m_min|floatformat:"0" }}°C
+{% else %}
+  {% trans "No data available." %}
+{% endif %}
+{% endfor %}
+
+{% trans "View your trip details here:" %} {{ trip_url }}
+
+{% trans "Enjoy your trip!" %}

@@ -408,3 +408,73 @@ def fetch_weather_for_active_trips():
             f"Error in fetch_weather_for_active_trips task: {e}", exc_info=True
         )
         raise
+
+
+def _build_trip_url(trip):
+    """Build absolute URL for the trip detail page."""
+    from django.urls import reverse
+
+    hosts = [h for h in settings.ALLOWED_HOSTS if h not in ("*",)]
+    domain = hosts[0] if hosts else "localhost:8000"
+    scheme = "https" if settings.ENVIRONMENT == "prod" else "http"
+    path = reverse("trips:trip-detail", kwargs={"pk": trip.pk})
+    return f"{scheme}://{domain}{path}"
+
+
+def _send_weather_reminder_email(trip, today):
+    from django.core.mail import EmailMultiAlternatives
+    from django.template.loader import render_to_string
+    from django.utils.translation import override as translation_override
+
+    recipient_language = getattr(trip.author.profile, "language", "en")
+    days_with_weather = trip.days.filter(weather_data__isnull=False).order_by("number")[
+        :3
+    ]
+    if not days_with_weather.exists():
+        return
+
+    context = {
+        "trip": trip,
+        "days": days_with_weather,
+        "trip_url": _build_trip_url(trip),
+    }
+    with translation_override(recipient_language):
+        subject = render_to_string(
+            "trips/email/weather_reminder_subject.txt", context
+        ).strip()
+        text_body = render_to_string("trips/email/weather_reminder_body.txt", context)
+        html_body = render_to_string("trips/email/weather_reminder_body.html", context)
+    msg = EmailMultiAlternatives(
+        subject=subject, body=text_body, to=[trip.author.email]
+    )
+    msg.attach_alternative(html_body, "text/html")
+    msg.send()
+    Trip.objects.filter(pk=trip.pk).update(weather_reminder_sent_at=today)
+    logger.info(f"Weather reminder sent for trip '{trip.title}' to {trip.author.email}")
+
+
+def send_weather_reminders():
+    """Send weather reminder emails 3 days before departure."""
+    try:
+        logger.info("Starting send_weather_reminders task")
+        today = timezone.now().date()
+        target_start_date = today + timedelta(days=3)
+
+        trips = (
+            Trip.objects.prefetch_related("days")
+            .filter(start_date=target_start_date)
+            .exclude(weather_reminder_sent_at=today)
+            .select_related("author__profile")
+        )
+        sent = 0
+        for trip in trips:
+            if getattr(trip.author.profile, "show_weather", True):
+                _send_weather_reminder_email(trip, today)
+                sent += 1
+
+        result_msg = f"Weather reminders sent: {sent}"
+        logger.info(f"send_weather_reminders completed: {result_msg}")
+        return result_msg
+    except Exception as e:
+        logger.error(f"Error in send_weather_reminders task: {e}", exc_info=True)
+        raise
