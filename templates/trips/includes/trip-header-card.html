@@ -48,6 +48,13 @@
                             {% trans 'PDF' %}
                         </a>
                     </li>
+                    <li>
+                        <a href="{% url 'trips:trip-ical' trip.calendar_token %}"
+                           target="_blank">
+                            <i class="ph-bold ph-calendar-plus" aria-hidden="true"></i>
+                            {% trans 'Sync (iCal)' %}
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -112,6 +119,13 @@
                         <a href="{% url 'trips:trip-export-pdf' trip.pk %}">
                             <i class="ph-bold ph-file-pdf" aria-hidden="true"></i>
                             {% trans 'PDF' %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'trips:trip-ical' trip.calendar_token %}"
+                           target="_blank">
+                            <i class="ph-bold ph-calendar-plus" aria-hidden="true"></i>
+                            {% trans 'Sync (iCal)' %}
                         </a>
                     </li>
                 </ul>

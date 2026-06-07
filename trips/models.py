@@ -53,6 +53,9 @@ class Trip(models.Model):
     )
     checklist_reminder_days = models.PositiveSmallIntegerField(null=True, blank=True)
     checklist_reminder_sent_at = models.DateField(null=True, blank=True)
+    calendar_token = models.UUIDField(
+        default=uuid.uuid4, editable=False, unique=True, null=True
+    )
 
     class Meta:
         ordering = ("status",)

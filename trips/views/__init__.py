@@ -50,6 +50,7 @@ from trips.views.events import (
     single_event,
     tag_suggestions,
 )
+from trips.views.ical import export_trip_ical
 from trips.views.maps import (
     create_stage,
     delete_stage,
@@ -235,6 +236,8 @@ __all__ = [
     "checklist_item_toggle",
     "checklist_item_delete",
     "checklist_reminder_set",
+    # ical
+    "export_trip_ical",
     # utils
     "view_log_file",
 ]

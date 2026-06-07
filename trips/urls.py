@@ -285,6 +285,7 @@ htmx_urlpatterns = [
 urlpatterns += htmx_urlpatterns
 urlpatterns += [
     path("share/<uuid:token>/", views.shared_trip_detail, name="shared-trip"),
+    path("ical/<uuid:calendar_token>/", views.export_trip_ical, name="trip-ical"),
     # Unified trip map
     path("trips/<int:pk>/map/", views.trip_map, name="trip-map"),
     path("trips/<int:pk>/map/search/", views.map_search, name="map-search"),
