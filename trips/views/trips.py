@@ -12,6 +12,7 @@ from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import override as translation_override
 from django.views.decorators.http import require_http_methods
 from django_q.tasks import async_task
 from weasyprint import HTML
@@ -517,15 +518,8 @@ def shared_trip_detail(request, token):
     return TemplateResponse(request, "trips/shared-trip-detail.html", context)
 
 
-def export_trip_pdf(request, pk):
-    """Export a trip itinerary as a PDF file."""
-    trip = get_object_or_404(
-        Trip.objects.filter(
-            Q(author=request.user) | Q(collaborators=request.user)
-        ).distinct(),
-        pk=pk,
-    )
-
+def build_pdf_export_context(trip):
+    """Build the template context for the trip PDF export."""
     days = list(
         trip.days.prefetch_related(
             Prefetch("events", queryset=Event.objects.order_by("order", "pk")),
@@ -535,12 +529,14 @@ def export_trip_pdf(request, pk):
         .order_by("number")
     )
     seen_stays: set[int] = set()
+    events_count = 0
     for day in days:
         if day.stay_id and day.stay_id not in seen_stays:
             day.show_stay = True
             seen_stays.add(day.stay_id)
         else:
             day.show_stay = False
+        events_count += len(day.events.all())
 
     arrival_transfer = MainTransfer.objects.filter(
         trip=trip, direction=MainTransfer.Direction.ARRIVAL
@@ -548,16 +544,48 @@ def export_trip_pdf(request, pk):
     departure_transfer = MainTransfer.objects.filter(
         trip=trip, direction=MainTransfer.Direction.DEPARTURE
     ).first()
+    main_transfers = [mt for mt in (arrival_transfer, departure_transfer) if mt]
+    links = list(trip.links.all())
 
-    context = {
+    summary = {
+        "days": len(days),
+        "events": events_count,
+        "stays": len(seen_stays),
+        "links": len(links),
+    }
+
+    trip_image_url = None
+    if trip.image:
+        try:
+            trip_image_url = f"file://{trip.image.path}"
+        except NotImplementedError, ValueError:
+            trip_image_url = trip.image.url
+
+    return {
         "trip": trip,
+        "trip_image_url": trip_image_url,
         "days": days,
         "arrival_transfer": arrival_transfer,
         "departure_transfer": departure_transfer,
-        "links": trip.links.all(),
+        "main_transfers": main_transfers,
+        "links": links,
+        "summary": summary,
     }
 
-    html_string = render_to_string("trips/trip-pdf.html", context, request=request)
+
+def export_trip_pdf(request, pk):
+    """Export a trip itinerary as a PDF file."""
+    trip = get_object_or_404(
+        Trip.objects.filter(
+            Q(author=request.user) | Q(collaborators=request.user)
+        ).distinct(),
+        pk=pk,
+    )
+
+    context = build_pdf_export_context(trip)
+    language = get_profile(request.user).language or "en"
+    with translation_override(language):
+        html_string = render_to_string("trips/trip-pdf.html", context, request=request)
     pdf_file = BytesIO()
     HTML(string=html_string, base_url=request.build_absolute_uri("/")).write_pdf(
         pdf_file

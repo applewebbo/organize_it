@@ -4,11 +4,21 @@ from unittest.mock import patch
 
 import pytest
 from django.contrib.messages import get_messages
+from django.template.loader import render_to_string
+from django.utils import translation
 from pytest_django.asserts import assertTemplateUsed
 
 from tests.test import TestCase
-from tests.trips.factories import ExperienceFactory, StayFactory, TripFactory
+from tests.trips.factories import (
+    ExperienceFactory,
+    LinkFactory,
+    MainTransferFactory,
+    MealFactory,
+    StayFactory,
+    TripFactory,
+)
 from trips.models import Trip, TripCollaboration
+from trips.views.trips import build_pdf_export_context
 
 pytestmark = pytest.mark.django_db
 
@@ -768,3 +778,105 @@ class ExportTripPdfView(TestCase):
 
         self.response_200(response)
         assert response["Content-Type"] == "application/pdf"
+
+    def test_context_includes_summary_counts(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        ExperienceFactory(trip=trip, day=day)
+        MealFactory(trip=trip, day=day)
+        stay = StayFactory()
+        day.stay = stay
+        day.save()
+        trip.links.add(LinkFactory(author=user))
+
+        context = build_pdf_export_context(trip)
+
+        summary = context["summary"]
+        assert summary["days"] == trip.days.count()
+        assert summary["events"] == 2
+        assert summary["stays"] == 1
+        assert summary["links"] == 1
+
+    def test_context_summary_empty_trip(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+
+        context = build_pdf_export_context(trip)
+
+        summary = context["summary"]
+        assert summary["events"] == 0
+        assert summary["stays"] == 0
+        assert summary["links"] == 0
+
+    def test_trip_image_resolved_as_absolute_file_url(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        trip.image = SimpleUploadedFile(
+            "cover.jpg", b"fakejpegbytes", content_type="image/jpeg"
+        )
+        trip.save()
+
+        context = build_pdf_export_context(trip)
+
+        assert context["trip_image_url"].startswith("file://")
+        assert context["trip_image_url"].endswith(trip.image.name)
+
+    def test_trip_image_absent_returns_none(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+
+        context = build_pdf_export_context(trip)
+
+        assert context["trip_image_url"] is None
+
+    def test_template_renders_main_transfer_details(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        MainTransferFactory(
+            trip=trip,
+            direction=1,
+            type=1,
+            origin_name="Bologna Airport",
+            destination_name="Venice Marco Polo",
+            start_time=datetime.time(10, 0),
+            end_time=datetime.time(12, 0),
+        )
+        context = build_pdf_export_context(trip)
+
+        html = render_to_string("trips/trip-pdf.html", context)
+
+        assert "Bologna Airport" in html
+        assert "Venice Marco Polo" in html
+        assert "10:00" in html
+        assert "12:00" in html
+
+    def test_template_renders_stay_phone_and_website(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        stay = StayFactory(
+            phone_number="+39 0412345678", website="https://hotel.example"
+        )
+        day = trip.days.first()
+        day.stay = stay
+        day.save()
+        context = build_pdf_export_context(trip)
+
+        html = render_to_string("trips/trip-pdf.html", context)
+
+        assert "+39 0412345678" in html
+        assert "hotel.example" in html
+
+    def test_template_uses_active_language_and_page_footer(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        context = build_pdf_export_context(trip)
+
+        with translation.override("it"):
+            html = render_to_string("trips/trip-pdf.html", context)
+
+        assert 'lang="it"' in html
+        assert "counter(page)" in html
+        assert "counter(pages)" in html

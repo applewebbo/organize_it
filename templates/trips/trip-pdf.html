@@ -1,19 +1,95 @@
 {% load i18n trip_tags %}
+{% get_current_language as LANGUAGE_CODE %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
     <head>
         <meta charset="UTF-8">
         <meta name="description" content="Trip itinerary">
         <meta name="keywords" content="trip, itinerary">
-        <title>{{ trip.title }} – Itinerary</title>
+        <title>{{ trip.title }} – {% trans "Itinerary" %}</title>
         <style>
-        @page { margin: 1.2cm 1.8cm; }
+        @page {
+            margin: 1.2cm 1.8cm;
+            @bottom-right {
+                content: "{% trans 'Page' %} " counter(page) " {% trans 'of' %} " counter(pages);
+                font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+                font-size: 8pt;
+                color: #888;
+            }
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             font-size: 10pt;
             color: #1a1a1a;
             line-height: 1.4;
+        }
+        .trip-header {
+            margin-bottom: 10pt;
+        }
+        .trip-hero {
+            width: 100%;
+            height: 130pt;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 4pt;
+            display: table;
+            margin-bottom: 4pt;
+        }
+        .trip-hero-overlay {
+            display: table-cell;
+            vertical-align: bottom;
+            background: rgba(40, 40, 40, 0.55);
+            padding: 10pt 12pt;
+            border-radius: 4pt;
+            color: #ffffff;
+        }
+        .trip-hero-title {
+            color: #ffffff;
+            font-size: 20pt;
+            font-weight: 700;
+            margin: 0 0 2pt 0;
+            line-height: 1.1;
+        }
+        .trip-hero-meta {
+            color: #ffffff;
+            font-size: 9pt;
+        }
+        .trip-hero-line { display: block; margin-top: 2pt; }
+        .trip-hero-meta svg.ico { fill: #ffffff; }
+        .summary-box {
+            display: table;
+            width: 100%;
+            margin: 8pt 0 12pt;
+            border: 1px solid #ddd;
+            background: #fafafa;
+            padding: 6pt 0;
+            border-radius: 4pt;
+        }
+        .summary-item {
+            display: table-cell;
+            text-align: center;
+            font-size: 9pt;
+            color: #555;
+            border-right: 1px solid #e5e5e5;
+            padding: 0 4pt;
+        }
+        .summary-item:last-child { border-right: none; }
+        .summary-value {
+            display: block;
+            font-size: 14pt;
+            font-weight: 700;
+            color: #1a1a1a;
+            line-height: 1.1;
+        }
+        .summary-label {
+            display: block;
+            font-size: 7.5pt;
+            text-transform: uppercase;
+            letter-spacing: 0.3pt;
+            color: #666;
+            margin-top: 1pt;
         }
         h1 { font-size: 20pt; font-weight: 700; margin-bottom: 2pt; }
         h2 { font-size: 12pt; font-weight: 700; margin: 12pt 0 4pt; border-bottom: 1.5px solid #333; padding-bottom: 2pt; }
@@ -27,7 +103,10 @@
             padding: 4pt 8pt;
             margin: 4pt 0;
             font-size: 9.5pt;
+            border-radius: 4pt;
         }
+        .transfer-line { margin: 1pt 0; }
+        .transfer-extra { font-size: 8.5pt; color: #555; }
         .day-header {
             font-size: 11pt;
             font-weight: 700;
@@ -35,6 +114,7 @@
             padding: 3pt 6pt;
             background: #eee;
             page-break-after: avoid;
+            border-radius: 4pt;
         }
         .day-block {
             page-break-inside: avoid;
@@ -70,6 +150,7 @@
             padding: 4pt 8pt;
             border: 1px solid #ccc;
             background: #fafafa;
+            border-radius: 4pt;
         }
         .stay-title { font-weight: 600; }
         .stay-meta { font-size: 8.5pt; color: #555; }
@@ -85,7 +166,7 @@
             display: inline-block;
             font-size: 7.5pt;
             padding: 1pt 4pt;
-            border-radius: 3pt;
+            border-radius: 4pt;
             background: #ddd;
             color: #333;
             margin-right: 3pt;
@@ -104,52 +185,98 @@
         </style>
     </head>
     <body>
-        <h1>{{ trip.title }}</h1>
-        <div class="meta">
-            <span>
-                <svg class="ico" viewBox="0 0 256 256">
-                    <path d="M208,28H188V24a12,12,0,0,0-24,0v4H92V24a12,12,0,0,0-24,0v4H48A20,20,0,0,0,28,48V208a20,20,0,0,0,20,20H208a20,20,0,0,0,20-20V48A20,20,0,0,0,208,28ZM68,52a12,12,0,0,0,24,0h72a12,12,0,0,0,24,0h16V76H52V52ZM52,204V100H204V204Z" />
-                </svg>
-            {{ trip.start_date|date:"d F Y" }} – {{ trip.end_date|date:"d F Y" }}</span>
-            <span>
-                <svg class="ico" viewBox="0 0 256 256">
-                    <path d="M128,60a44,44,0,1,0,44,44A44.05,44.05,0,0,0,128,60Zm0,64a20,20,0,1,1,20-20A20,20,0,0,1,128,124Zm0-112a92.1,92.1,0,0,0-92,92c0,77.36,81.64,135.4,85.12,137.83a12,12,0,0,0,13.76,0,259,259,0,0,0,42.18-39C205.15,170.57,220,136.37,220,104A92.1,92.1,0,0,0,128,12Zm31.3,174.71A249.35,249.35,0,0,1,128,216.89a249.35,249.35,0,0,1-31.3-30.18C80,167.37,60,137.31,60,104a68,68,0,0,1,136,0C196,137.31,176,167.37,159.3,186.71Z" />
-                </svg>
-            {{ trip.destination }}</span>
+        <div class="trip-header">
+            {% if trip_image_url %}
+                <div class="trip-hero"
+                     style="background-image: url('{{ trip_image_url }}')">
+                    <div class="trip-hero-overlay">
+                        <h1 class="trip-hero-title">{{ trip.title }}</h1>
+                        <div class="trip-hero-meta">
+                            <div class="trip-hero-line">{{ trip.start_date|date:"d F Y" }} – {{ trip.end_date|date:"d F Y" }}</div>
+                            <div class="trip-hero-line">{{ trip.destination }}</div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <h1>{{ trip.title }}</h1>
+                <div class="meta">
+                    <span>
+                        <svg class="ico" viewBox="0 0 256 256">
+                            <path d="M208,28H188V24a12,12,0,0,0-24,0v4H92V24a12,12,0,0,0-24,0v4H48A20,20,0,0,0,28,48V208a20,20,0,0,0,20,20H208a20,20,0,0,0,20-20V48A20,20,0,0,0,208,28ZM68,52a12,12,0,0,0,24,0h72a12,12,0,0,0,24,0h16V76H52V52ZM52,204V100H204V204Z" />
+                        </svg>
+                    {{ trip.start_date|date:"d F Y" }} – {{ trip.end_date|date:"d F Y" }}</span>
+                    <span>
+                        <svg class="ico" viewBox="0 0 256 256">
+                            <path d="M128,60a44,44,0,1,0,44,44A44.05,44.05,0,0,0,128,60Zm0,64a20,20,0,1,1,20-20A20,20,0,0,1,128,124Zm0-112a92.1,92.1,0,0,0-92,92c0,77.36,81.64,135.4,85.12,137.83a12,12,0,0,0,13.76,0,259,259,0,0,0,42.18-39C205.15,170.57,220,136.37,220,104A92.1,92.1,0,0,0,128,12Zm31.3,174.71A249.35,249.35,0,0,1,128,216.89a249.35,249.35,0,0,1-31.3-30.18C80,167.37,60,137.31,60,104a68,68,0,0,1,136,0C196,137.31,176,167.37,159.3,186.71Z" />
+                        </svg>
+                    {{ trip.destination }}</span>
+                </div>
+            {% endif %}
+        </div>
+        <div class="summary-box">
+            <div class="summary-item">
+                <span class="summary-value">{{ summary.days }}</span>
+                <span class="summary-label">{% trans "Days" %}</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-value">{{ summary.events }}</span>
+                <span class="summary-label">{% trans "Events" %}</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-value">{{ summary.stays }}</span>
+                <span class="summary-label">{% trans "Stays" %}</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-value">{{ summary.links }}</span>
+                <span class="summary-label">{% trans "Links" %}</span>
+            </div>
         </div>
         {% if arrival_transfer or departure_transfer %}
             <div class="section">
                 <h2>{% trans "Main Transfers" %}</h2>
-                {% if arrival_transfer %}
+                {% for mt in main_transfers %}
                     <div class="transfer-box">
-                        <strong>{% trans "Arrival" %}</strong> –
-                        {{ arrival_transfer.get_mode_display }}
-                        {% if arrival_transfer.origin %}
-                            {% trans "from" %} {{ arrival_transfer.origin }}
+                        <div class="transfer-line">
+                            <strong>
+                                {% if mt.direction == 1 %}
+                                    {% trans "Outbound" %}
+                                {% else %}
+                                    {% trans "Return" %}
+                                {% endif %}
+                            </strong>
+                            – {{ mt.get_type_display }}
+                            {% if mt.start_time %}· {{ mt.start_time|time:"H:i" }}{% endif %}
+                            {% if mt.end_time %}→ {{ mt.end_time|time:"H:i" }}{% endif %}
+                        </div>
+                        <div class="transfer-line">
+                            {% if mt.origin_name or mt.origin_address %}
+                                {{ mt.origin_name|default:mt.origin_address }}
+                                {% if mt.origin_code %}({{ mt.origin_code }}){% endif %}
+                            {% endif %}
+                            {% if mt.destination_name or mt.destination_address %}
+                                → {{ mt.destination_name|default:mt.destination_address }}
+                                {% if mt.destination_code %}({{ mt.destination_code }}){% endif %}
+                            {% endif %}
+                        </div>
+                        {% if mt.company or mt.flight_number or mt.train_number or mt.terminal %}
+                            <div class="transfer-line transfer-extra">
+                                {% if mt.company %}{{ mt.company }}{% endif %}
+                                {% if mt.flight_number %}
+                                    {% trans "Flight" %} {{ mt.flight_number }}
+                                {% endif %}
+                                {% if mt.train_number %}
+                                    {% trans "Train" %} {{ mt.train_number }}
+                                {% endif %}
+                                {% if mt.terminal %}
+                                    {% trans "Terminal" %} {{ mt.terminal }}
+                                {% endif %}
+                            </div>
                         {% endif %}
-                        {% if arrival_transfer.start_time %}· {{ arrival_transfer.start_time|date:"d/m H:i" }}{% endif %}
-                        {% if arrival_transfer.end_time %}→ {{ arrival_transfer.end_time|date:"d/m H:i" }}{% endif %}
-                        {% if arrival_transfer.notes %}
-                            <br>
-                            <span class="notes">{{ arrival_transfer.notes }}</span>
+                        {% if mt.notes %}
+                            <div class="notes">{{ mt.notes }}</div>
                         {% endif %}
                     </div>
-                {% endif %}
-                {% if departure_transfer %}
-                    <div class="transfer-box">
-                        <strong>{% trans "Departure" %}</strong> –
-                        {{ departure_transfer.get_mode_display }}
-                        {% if departure_transfer.origin %}
-                            {% trans "from" %} {{ departure_transfer.origin }}
-                        {% endif %}
-                        {% if departure_transfer.start_time %}· {{ departure_transfer.start_time|date:"d/m H:i" }}{% endif %}
-                        {% if departure_transfer.end_time %}→ {{ departure_transfer.end_time|date:"d/m H:i" }}{% endif %}
-                        {% if departure_transfer.notes %}
-                            <br>
-                            <span class="notes">{{ departure_transfer.notes }}</span>
-                        {% endif %}
-                    </div>
-                {% endif %}
+                {% endfor %}
             </div>
         {% endif %}
         <div class="section">
@@ -185,6 +312,18 @@
                                         <path d="M124,216a12,12,0,0,1-12,12H48a12,12,0,0,1-12-12V40A12,12,0,0,1,48,28h64a12,12,0,0,1,0,24H60V204h52A12,12,0,0,1,124,216Zm108.49-96.49-40-40a12,12,0,0,0-17,17L195,116H112a12,12,0,0,0,0,24h83l-19.52,19.51a12,12,0,0,0,17,17l40-40A12,12,0,0,0,232.49,119.51Z" />
                                     </svg>
                                     {% trans "Check-out" %}: {{ day.stay.check_out|time:"H:i" }}
+                                {% endif %}
+                                {% if day.stay.phone_number %}
+                                    <svg class="ico" viewBox="0 0 256 256">
+                                        <path d="M224,154.8l-47.09-21.11-.18-.08a19.94,19.94,0,0,0-19,1.75,13.08,13.08,0,0,0-1.12.84l-22.31,19c-13-7.05-26.43-20.37-33.49-33.21l19.06-22.66a11.76,11.76,0,0,0,.85-1.15,20,20,0,0,0,1.66-18.83,1.42,1.42,0,0,1-.08-.18L101.2,32A20.06,20.06,0,0,0,80.42,20.15,60.27,60.27,0,0,0,28,80c0,81.61,66.39,148,148,148a60.27,60.27,0,0,0,59.85-52.42A20.06,20.06,0,0,0,224,154.8ZM176,204A124.15,124.15,0,0,1,52,80,36.29,36.29,0,0,1,80.48,44.46l18.82,42L80.14,109.28a12,12,0,0,0-.86,1.16A20,20,0,0,0,78,130.08c9.42,19.28,28.83,38.56,48.31,48A20,20,0,0,0,146,176.63a11.63,11.63,0,0,0,1.11-.85l22.43-19.07,42,18.81A36.29,36.29,0,0,1,176,204Z" />
+                                    </svg>
+                                    {{ day.stay.phone_number }}
+                                {% endif %}
+                                {% if day.stay.website %}
+                                    <svg class="ico" viewBox="0 0 256 256">
+                                        <path d="M137.54,186.36a8,8,0,0,1,0,11.31l-9.94,10A56,56,0,0,1,48.38,128.4L72.5,104.28A56,56,0,0,1,149.31,102a8,8,0,1,1-10.64,12,40,40,0,0,0-54.85,1.63L59.7,139.72a40,40,0,0,0,56.57,56.56l9.94-9.93A8,8,0,0,1,137.54,186.36Zm70.08-138a56.08,56.08,0,0,0-79.22,0l-9.94,9.95a8,8,0,0,0,11.32,11.31l9.94-9.94a40,40,0,0,1,56.57,56.56L172.18,140.4A40,40,0,0,1,117.33,142,8,8,0,1,0,106.69,154a56,56,0,0,0,76.81-2.26l24.12-24.12A56.08,56.08,0,0,0,207.62,48.38Z" />
+                                    </svg>
+                                    {{ day.stay.website }}
                                 {% endif %}
                             </div>
                             {% if day.stay.notes %}
@@ -234,7 +373,7 @@
                                     </div>
                                 {% endif %}
                             </div>
-                            {% if event.phone_number or event.opening_hours or event.notes %}
+                            {% if event.phone_number or event.opening_hours or event.notes or event.website %}
                                 <div class="event-notes">
                                     {% if event.phone_number %}
                                         <p class="note-wrap">
@@ -250,6 +389,14 @@
                                                 <path d="M128,20A108,108,0,1,0,236,128,108.12,108.12,0,0,0,128,20Zm0,192a84,84,0,1,1,84-84A84.09,84.09,0,0,1,128,212Zm68-84a12,12,0,0,1-12,12H128a12,12,0,0,1-12-12V72a12,12,0,0,1,24,0v44h44A12,12,0,0,1,196,128Z" />
                                             </svg>
                                             {{ event.opening_hours|format_opening_hours_text }}
+                                        </p>
+                                    {% endif %}
+                                    {% if event.website %}
+                                        <p class="note-wrap">
+                                            <svg class="ico" viewBox="0 0 256 256">
+                                                <path d="M137.54,186.36a8,8,0,0,1,0,11.31l-9.94,10A56,56,0,0,1,48.38,128.4L72.5,104.28A56,56,0,0,1,149.31,102a8,8,0,1,1-10.64,12,40,40,0,0,0-54.85,1.63L59.7,139.72a40,40,0,0,0,56.57,56.56l9.94-9.93A8,8,0,0,1,137.54,186.36Zm70.08-138a56.08,56.08,0,0,0-79.22,0l-9.94,9.95a8,8,0,0,0,11.32,11.31l9.94-9.94a40,40,0,0,1,56.57,56.56L172.18,140.4A40,40,0,0,1,117.33,142,8,8,0,1,0,106.69,154a56,56,0,0,0,76.81-2.26l24.12-24.12A56.08,56.08,0,0,0,207.62,48.38Z" />
+                                            </svg>
+                                            {{ event.website }}
                                         </p>
                                     {% endif %}
                                     {% if event.notes %}
