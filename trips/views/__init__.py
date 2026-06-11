@@ -1,3 +1,11 @@
+from trips.views.attachments import (
+    attachment_delete,
+    attachment_preview,
+    attachment_stream,
+    attachment_upload,
+    attachment_upload_modal,
+    attachments_card,
+)
 from trips.views.checklist import (
     checklist_card,
     checklist_item_add,
@@ -240,4 +248,11 @@ __all__ = [
     "export_trip_ical",
     # utils
     "view_log_file",
+    # attachments
+    "attachments_card",
+    "attachment_upload_modal",
+    "attachment_upload",
+    "attachment_delete",
+    "attachment_stream",
+    "attachment_preview",
 ]

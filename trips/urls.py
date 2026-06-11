@@ -353,4 +353,34 @@ urlpatterns += [
         views.checklist_reminder_set,
         name="checklist-reminder-set",
     ),
+    path(
+        "attachments/card/<int:trip_pk>/",
+        views.attachments_card,
+        name="attachments-card",
+    ),
+    path(
+        "attachments/upload-modal/<int:trip_pk>/<str:category>/",
+        views.attachment_upload_modal,
+        name="attachment-upload-modal",
+    ),
+    path(
+        "attachments/upload/<int:trip_pk>/<str:category>/",
+        views.attachment_upload,
+        name="attachment-upload",
+    ),
+    path(
+        "attachments/<int:pk>/delete/",
+        views.attachment_delete,
+        name="attachment-delete",
+    ),
+    path(
+        "attachments/<int:pk>/file/",
+        views.attachment_stream,
+        name="attachment-stream",
+    ),
+    path(
+        "attachments/<int:pk>/preview/",
+        views.attachment_preview,
+        name="attachment-preview",
+    ),
 ]

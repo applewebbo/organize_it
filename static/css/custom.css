@@ -103,6 +103,23 @@ select ~ .pointer-events-none {
   background-color: rgba(0, 0, 0, 0.08);
 }
 
+.btn-stay-card {
+  background-color: rgb(241 245 249); /* slate-100 */
+  color: rgb(71 85 105); /* slate-600 */
+  border-color: rgb(203 213 225); /* slate-300 */
+}
+.btn-stay-card:hover {
+  background-color: rgb(226 232 240); /* slate-200 */
+}
+[data-theme="dark"] .btn-stay-card {
+  background-color: rgb(51 65 85); /* slate-700 */
+  color: rgb(226 232 240); /* slate-200 */
+  border-color: rgb(71 85 105); /* slate-600 */
+}
+[data-theme="dark"] .btn-stay-card:hover {
+  background-color: rgb(71 85 105); /* slate-600 */
+}
+
 /* ── Trip Map Pins ── */
 .map-pin {
   display: flex;

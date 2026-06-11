@@ -41,6 +41,13 @@
          hx-trigger="load, checklistModified from:body"
          hx-swap="innerHTML"></div>
     <!-- END Checklist Section -->
+    <!-- Documents Section -->
+    <div id="attachments-card-container"
+         class="mb-8"
+         hx-get="{% url 'trips:attachments-card' trip.pk %}"
+         hx-trigger="load, attachmentsModified from:body"
+         hx-swap="innerHTML"></div>
+    <!-- END Documents Section -->
     <!-- Collaborators Section -->
     {% with collaborations=trip.collaborations.all %}
         {% if request.user == trip.author or collaborations %}

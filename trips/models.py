@@ -4,6 +4,8 @@ from urllib.parse import quote
 
 import geocoder
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import post_save, pre_save
@@ -1129,3 +1131,85 @@ class ChecklistItem(models.Model):
 
     def __str__(self) -> str:
         return f"{self.text} [{self.trip.title}]"
+
+
+def _attachment_upload_path(instance, filename):
+    ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else "bin"
+    return f"attachments/{instance.content_type_id}/{instance.object_id}/{uuid.uuid4().hex}.{ext}"
+
+
+class Attachment(models.Model):
+    ALLOWED_MIME_TYPES = {
+        "application/pdf",
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+    }
+    MAX_FILE_SIZE = 2 * 1024 * 1024  # 2 MB
+    MAX_PER_TRIP = 5
+    MAX_PER_SUB_ENTITY = 2
+
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey("content_type", "object_id")
+
+    file = models.FileField(upload_to=_attachment_upload_path)
+    original_name = models.CharField(max_length=255)
+    mime_type = models.CharField(max_length=100)
+    size = models.PositiveIntegerField()
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    uploaded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="uploaded_attachments",
+    )
+    include_in_pdf = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-uploaded_at"]
+        indexes = [
+            models.Index(fields=["content_type", "object_id"]),
+        ]
+
+    def __str__(self) -> str:
+        return self.original_name
+
+    @property
+    def is_pdf(self) -> bool:
+        return self.mime_type == "application/pdf"
+
+    @property
+    def is_image(self) -> bool:
+        return self.mime_type.startswith("image/")
+
+    def _normalize_event_content_type(self):
+        obj = self.content_object
+        if obj is not None and isinstance(obj, Event) and type(obj) is not Event:
+            self.content_type = ContentType.objects.get_for_model(Event)
+
+    def save(self, *args, **kwargs):
+        self._normalize_event_content_type()
+        super().save(*args, **kwargs)
+
+    def clean(self):
+        super().clean()
+        self._normalize_event_content_type()
+        if self.mime_type not in self.ALLOWED_MIME_TYPES:
+            raise ValidationError({"mime_type": _("File type not allowed.")})
+        if self.size and self.size > self.MAX_FILE_SIZE:
+            raise ValidationError({"file": _("File exceeds the 2 MB size limit.")})
+        if self.content_type_id and self.object_id:
+            model = self.content_type.model_class()
+            siblings = Attachment.objects.filter(
+                content_type=self.content_type, object_id=self.object_id
+            )
+            if self.pk:
+                siblings = siblings.exclude(pk=self.pk)
+            limit = (
+                self.MAX_PER_TRIP
+                if model and model.__name__ == "Trip"
+                else self.MAX_PER_SUB_ENTITY
+            )
+            if siblings.count() >= limit:
+                raise ValidationError(_("Attachment limit reached for this item."))

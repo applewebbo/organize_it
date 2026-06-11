@@ -1,0 +1,63 @@
+{% load i18n %}
+<div class="shadow card bg-base-100">
+    <div class="card-body">
+        <h2 class="flex gap-2 items-center text-xl font-semibold card-title">
+            <i class="ph ph-paperclip text-primary"></i>
+            {% trans "Documents" %}
+            {% if total_count > 0 %}
+                <span class="badge badge-outline badge-sm">{{ total_count }}</span>
+            {% endif %}
+        </h2>
+        <div class="grid grid-cols-1 gap-3 mt-3 sm:grid-cols-2 lg:grid-cols-4">
+            {% for cat in categories %}
+                <div class="flex flex-col p-3 rounded-xl bg-base-200">
+                    <div class="flex gap-2 justify-between items-center mb-2">
+                        <h3 class="flex gap-2 items-center text-sm font-semibold text-base-content/80">
+                            <i class="ph-bold {{ cat.icon }} text-primary" aria-hidden="true"></i>
+                            {{ cat.label }}
+                            {% if cat.attachments %}<span class="badge badge-outline badge-sm">{{ cat.attachments|length }}</span>{% endif %}
+                        </h3>
+                        {% if trip.status != 5 and cat.enabled %}
+                            <button class="btn btn-xs btn-soft btn-primary"
+                                    x-data
+                                    hx-get="{% url 'trips:attachment-upload-modal' trip.pk cat.key %}"
+                                    hx-target="#dialog"
+                                    hx-swap="innerHTML"
+                                    @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                    aria-label="{% trans 'Add document' %}">
+                                <i class="ph-bold ph-plus i-sm"></i>
+                            </button>
+                        {% endif %}
+                    </div>
+                    {% if cat.attachments %}
+                        <ul class="space-y-1">
+                            {% for att in cat.attachments %}
+                                <li class="flex gap-2 items-center py-1 px-2 text-sm rounded-lg bg-base-100">
+                                    <i class="ph {% if att.is_pdf %}ph-file-pdf{% else %}ph-image{% endif %} text-primary shrink-0"
+                                       aria-hidden="true"></i>
+                                    <button class="flex-1 text-left truncate link link-hover"
+                                            x-data
+                                            hx-get="{% url 'trips:attachment-preview' att.pk %}"
+                                            hx-target="#dialog"
+                                            hx-swap="innerHTML"
+                                            @click="$dispatch('open-modal'); document.activeElement.blur()">
+                                        {{ att.original_name }}
+                                    </button>
+                                    <button class="btn btn-xs btn-error btn-soft"
+                                            hx-delete="{% url 'trips:attachment-delete' att.pk %}"
+                                            hx-confirm="{% trans 'Delete this document?' %}"
+                                            hx-swap="none"
+                                            aria-label="{% trans 'Delete document' %}">
+                                        <i class="ph-bold ph-trash" aria-hidden="true"></i>
+                                    </button>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-xs text-base-content/50">{% trans "No documents yet." %}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>

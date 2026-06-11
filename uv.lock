@@ -1188,6 +1188,7 @@ dependencies = [
   {name = "icalendar"},
   {name = "pillow"},
   {name = "psycopg", extra = ["binary"]},
+  {name = "pypdf"},
   {name = "pytest-httpx"},
   {name = "redis"},
   {name = "requests"},
@@ -1253,6 +1254,7 @@ requires-dist = [
   {name = "icalendar", specifier = ">=7.1.2"},
   {name = "pillow", specifier = ">=12.0.0"},
   {name = "psycopg", extras = ["binary"], specifier = ">=3.2.1"},
+  {name = "pypdf", specifier = ">=6.13.1"},
   {name = "pytest-httpx", specifier = ">=0.35.0"},
   {name = "redis", specifier = ">=6.2.0"},
   {name = "requests", specifier = ">=2.32.5"},
@@ -1460,6 +1462,15 @@ source = {registry = "https://pypi.org/simple"}
 version = "10.21.3"
 wheels = [
   {url = "https://files.pythonhosted.org/packages/7e/85/545a951eecc270fcd688288c600017e2050a1aacb56c711d208586d3e470/pymdown_extensions-10.21.3-py3-none-any.whl", hash = "sha256:d7a5d08014fc571e80ca21dd6f854e31f94c489800350564d55d15b3c41e76b6", size = 269002, upload-time = "2026-05-13T12:57:30.296Z"}
+]
+
+[[package]]
+name = "pypdf"
+sdist = {url = "https://files.pythonhosted.org/packages/15/d9/9d12fa0d9660d03320725ff686c961b645a4218940a82296e1272d9e1ff0/pypdf-6.13.1.tar.gz", hash = "sha256:4841d8a4c1589e5833915dc0c7ddfacff80a2e0bcbeb5d1e681fecaa1674b03a", size = 6477811, upload-time = "2026-06-08T11:01:49.344Z"}
+source = {registry = "https://pypi.org/simple"}
+version = "6.13.1"
+wheels = [
+  {url = "https://files.pythonhosted.org/packages/fe/dd/8f03e0a5788a5d1feb4550617c3e6db5e9099eaee248a3e482ddaeacbbb0/pypdf-6.13.1-py3-none-any.whl", hash = "sha256:e555e4ce3f561ef069307622f1374136ba964ca6ca24f24158701decaf83ed9b", size = 346259, upload-time = "2026-06-08T11:01:47.741Z"}
 ]
 
 [[package]]

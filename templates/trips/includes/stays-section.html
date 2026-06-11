@@ -80,6 +80,19 @@
                                     {% endif %}
                                 </div>
                             </div>
+                            {% if trip.status != 5 %}
+                                <div class="flex justify-end py-2 px-4 mt-auto border-t border-slate-300 dark:border-slate-700">
+                                    <button class="btn btn-xs btn-stay-card sm:btn-sm"
+                                            hx-get="{% url 'trips:attachment-upload-modal' trip.pk 'stay' %}?object_id={{ stay.pk }}"
+                                            hx-target="#dialog"
+                                            hx-swap="innerHTML"
+                                            @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                            title="{% trans 'Add document' %}">
+                                        <i class="ph-bold ph-paperclip"></i>
+                                        <span class="hidden sm:inline">{% trans "Add document" %}</span>
+                                    </button>
+                                </div>
+                            {% endif %}
                         </li>
                     {% endfor %}
                 </ul>

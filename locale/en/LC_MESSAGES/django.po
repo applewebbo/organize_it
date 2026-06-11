@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-09 15:03+0200\n"
+"POT-Creation-Date: 2026-06-10 15:10+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -426,6 +426,27 @@ msgstr ""
 msgid "Details"
 msgstr ""
 
+msgid "Download"
+msgstr ""
+
+msgid "Add document"
+msgstr "Add document"
+
+msgid "Allowed: PDF, JPEG, PNG, WEBP. Max 2 MB."
+msgstr ""
+
+msgid "Attach to"
+msgstr ""
+
+msgid "File"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Upload"
+msgstr ""
+
 msgid "Checklist"
 msgstr ""
 
@@ -680,9 +701,6 @@ msgstr ""
 msgid "Accept"
 msgstr ""
 
-msgid "Cancel"
-msgstr ""
-
 msgid "Back"
 msgstr ""
 
@@ -737,6 +755,18 @@ msgstr ""
 
 msgid "No airport found. Try searching by name, city, or IATA code."
 msgstr ""
+
+msgid "Documents"
+msgstr ""
+
+msgid "Delete this document?"
+msgstr "Delete this document?"
+
+msgid "Delete document"
+msgstr ""
+
+msgid "No documents yet."
+msgstr "No documents yet."
 
 msgid "To do"
 msgstr ""
@@ -1769,6 +1799,34 @@ msgstr ""
 
 msgid "Can edit"
 msgstr ""
+
+msgid "File type not allowed."
+msgstr ""
+
+msgid "File exceeds the 2 MB size limit."
+msgstr ""
+
+msgid "Attachment limit reached for this item."
+msgstr ""
+
+msgid "This trip"
+msgstr "This trip"
+
+msgid "Trip"
+msgstr ""
+
+msgid "Transfer"
+msgstr ""
+
+#, fuzzy
+#| msgid "Events"
+msgid "Event"
+msgstr "Events"
+
+#, fuzzy
+#| msgid "Add document"
+msgid "Document"
+msgstr "Add document"
 
 msgid "Reminder saved"
 msgstr ""

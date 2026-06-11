@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-09 15:03+0200\n"
+"POT-Creation-Date: 2026-06-10 15:10+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -484,6 +484,27 @@ msgstr "Mezzo di Trasporto"
 msgid "Details"
 msgstr "Dettagli"
 
+msgid "Download"
+msgstr ""
+
+msgid "Add document"
+msgstr "Aggiungi allegato"
+
+msgid "Allowed: PDF, JPEG, PNG, WEBP. Max 2 MB."
+msgstr "Consentiti: PDF, JPEG, PNG, WEBP. Max 2 MB."
+
+msgid "Attach to"
+msgstr "Allega a"
+
+msgid "File"
+msgstr "File"
+
+msgid "Cancel"
+msgstr "Annulla"
+
+msgid "Upload"
+msgstr "Carica"
+
 msgid "Checklist"
 msgstr "Checklist"
 
@@ -766,9 +787,6 @@ msgstr "Verifica i dati aggiuntivi evidenziati in verde."
 msgid "Accept"
 msgstr "Accetta"
 
-msgid "Cancel"
-msgstr "Annulla"
-
 msgid "Back"
 msgstr "Indietro"
 
@@ -829,6 +847,18 @@ msgstr "Dati aeroporti da database CSV"
 msgid "No airport found. Try searching by name, city, or IATA code."
 msgstr ""
 "Nessun aeroporto trovato. Prova a cercare per nome, città o codice IATA."
+
+msgid "Documents"
+msgstr "Allegati"
+
+msgid "Delete this document?"
+msgstr "Vuoi eliminare questo allegato?"
+
+msgid "Delete document"
+msgstr "Elimina allegato"
+
+msgid "No documents yet."
+msgstr "Nessun allegato."
 
 msgid "To do"
 msgstr "Da fare"
@@ -1880,6 +1910,30 @@ msgstr "Solo visualizzazione"
 msgid "Can edit"
 msgstr "Può modificare"
 
+msgid "File type not allowed."
+msgstr "Tipo di file non consentito."
+
+msgid "File exceeds the 2 MB size limit."
+msgstr "Il file supera il limite di 2 MB."
+
+msgid "Attachment limit reached for this item."
+msgstr "Limite di allegati raggiunto per questo elemento."
+
+msgid "This trip"
+msgstr "Questo viaggio"
+
+msgid "Trip"
+msgstr "Viaggio"
+
+msgid "Transfer"
+msgstr "Trasferimento"
+
+msgid "Event"
+msgstr "Evento"
+
+msgid "Document"
+msgstr "Allegato"
+
 msgid "Reminder saved"
 msgstr "Promemoria salvato"
 
@@ -2308,9 +2362,6 @@ msgstr "Nessuna immagine trovata per '{query}'"
 
 #~ msgid "Train Operator Website"
 #~ msgstr "Sito web operatore ferroviario"
-
-#~ msgid "Transfer"
-#~ msgstr "Trasferimento"
 
 #~ msgid "You have no trips yet!"
 #~ msgstr "Non hai creato ancora nessun viaggio!"

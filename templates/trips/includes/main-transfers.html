@@ -155,6 +155,16 @@
                                         </a>
                                     {% endif %}
                                     <button class="btn btn-xs btn-soft"
+                                            x-data
+                                            hx-get="{% url 'trips:attachment-upload-modal' trip.pk 'main' %}?object_id={{ arrival_transfer.pk }}"
+                                            hx-target="#dialog"
+                                            hx-swap="innerHTML"
+                                            @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                            title="{% trans 'Add document' %}">
+                                        <i class="ph-bold ph-paperclip"></i>
+                                        <span class="hidden sm:inline">{% trans "Add document" %}</span>
+                                    </button>
+                                    <button class="btn btn-xs btn-soft"
                                             hx-get="{% url 'trips:main-transfer-connection-modal' arrival_transfer.pk %}"
                                             hx-target="#dialog"
                                             hx-swap="innerHTML"
@@ -166,7 +176,17 @@
                                 </div>
                             </div>
                         {% else %}
-                            <div class="flex justify-end">
+                            <div class="flex gap-1 justify-end">
+                                <button class="btn btn-xs btn-soft"
+                                        x-data
+                                        hx-get="{% url 'trips:attachment-upload-modal' trip.pk 'main' %}?object_id={{ arrival_transfer.pk }}"
+                                        hx-target="#dialog"
+                                        hx-swap="innerHTML"
+                                        @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                        title="{% trans 'Add document' %}">
+                                    <i class="ph-bold ph-paperclip"></i>
+                                    <span class="hidden sm:inline">{% trans "Add document" %}</span>
+                                </button>
                                 <button class="btn btn-xs btn-soft"
                                         hx-get="{% url 'trips:main-transfer-connection-modal' arrival_transfer.pk %}"
                                         hx-target="#dialog"
@@ -328,6 +348,16 @@
                                         </a>
                                     {% endif %}
                                     <button class="btn btn-xs btn-soft"
+                                            x-data
+                                            hx-get="{% url 'trips:attachment-upload-modal' trip.pk 'main' %}?object_id={{ departure_transfer.pk }}"
+                                            hx-target="#dialog"
+                                            hx-swap="innerHTML"
+                                            @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                            title="{% trans 'Add document' %}">
+                                        <i class="ph-bold ph-paperclip"></i>
+                                        <span class="hidden sm:inline">{% trans "Add document" %}</span>
+                                    </button>
+                                    <button class="btn btn-xs btn-soft"
                                             hx-get="{% url 'trips:main-transfer-connection-modal' departure_transfer.pk %}"
                                             hx-target="#dialog"
                                             hx-swap="innerHTML"
@@ -339,7 +369,17 @@
                                 </div>
                             </div>
                         {% else %}
-                            <div class="flex justify-end">
+                            <div class="flex gap-1 justify-end">
+                                <button class="btn btn-xs btn-soft"
+                                        x-data
+                                        hx-get="{% url 'trips:attachment-upload-modal' trip.pk 'main' %}?object_id={{ departure_transfer.pk }}"
+                                        hx-target="#dialog"
+                                        hx-swap="innerHTML"
+                                        @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                        title="{% trans 'Add document' %}">
+                                    <i class="ph-bold ph-paperclip"></i>
+                                    <span class="hidden sm:inline">{% trans "Add document" %}</span>
+                                </button>
                                 <button class="btn btn-xs btn-soft"
                                         hx-get="{% url 'trips:main-transfer-connection-modal' departure_transfer.pk %}"
                                         hx-target="#dialog"
