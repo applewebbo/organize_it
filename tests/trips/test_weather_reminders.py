@@ -23,18 +23,20 @@ def test_send_weather_reminders_sends_email(
     trip_factory, today, target_date, mailoutbox
 ):
     trip = trip_factory(start_date=target_date)
+    trip.author.profile.language = "en"
+    trip.author.profile.save()
     # create days with weather data
     Day.objects.create(
         trip=trip,
         number=1,
         date=target_date,
-        weather_data={"temperature_2m_max": 25, "temperature_2m_min": 15},
+        weather_data={"temperature_max": 25, "temperature_min": 15},
     )
     Day.objects.create(
         trip=trip,
         number=2,
         date=target_date + datetime.timedelta(days=1),
-        weather_data={"temperature_2m_max": 24, "temperature_2m_min": 14},
+        weather_data={"temperature_max": 24, "temperature_min": 14},
     )
 
     result = send_weather_reminders()
@@ -48,6 +50,28 @@ def test_send_weather_reminders_sends_email(
     # Check that weather_reminder_sent_at was updated
     trip.refresh_from_db()
     assert trip.weather_reminder_sent_at == today
+
+
+def test_send_weather_reminders_uses_italian_for_italian_user(
+    trip_factory, today, target_date, mailoutbox
+):
+    trip = trip_factory(start_date=target_date)
+    trip.author.profile.language = "it"
+    trip.author.profile.save()
+    Day.objects.create(
+        trip=trip,
+        number=1,
+        date=target_date,
+        weather_data={"temperature_max": 25, "temperature_min": 15},
+    )
+
+    send_weather_reminders()
+
+    assert len(mailoutbox) == 1
+    assert mailoutbox[0].subject.startswith("Previsioni meteo")
+    assert "si avvicina" in mailoutbox[0].body
+    assert "25" in mailoutbox[0].body
+    assert "15" in mailoutbox[0].body
 
 
 def test_send_weather_reminders_wrong_date(
@@ -99,7 +123,7 @@ def test_send_weather_reminders_user_opt_out(
         trip=trip,
         number=1,
         date=target_date,
-        weather_data={"temperature_2m_max": 25, "temperature_2m_min": 15},
+        weather_data={"temperature_max": 25, "temperature_min": 15},
     )
 
     result = send_weather_reminders()

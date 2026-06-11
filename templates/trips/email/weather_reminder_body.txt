@@ -6,8 +6,8 @@
 {% for day in days %}
 {% trans "Day" %} {{ day.number }} ({{ day.date }}):
 {% if day.weather_data %}
-  - {% trans "Max:" %} {{ day.weather_data.temperature_2m_max|floatformat:"0" }}°C
-  - {% trans "Min:" %} {{ day.weather_data.temperature_2m_min|floatformat:"0" }}°C
+  - {% trans "Max:" %} {{ day.weather_data.temperature_max|floatformat:"0" }}°C
+  - {% trans "Min:" %} {{ day.weather_data.temperature_min|floatformat:"0" }}°C
 {% else %}
   {% trans "No data available." %}
 {% endif %}

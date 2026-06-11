@@ -718,8 +718,6 @@ msgstr "Sei stato invitato a vedere il viaggio \"%(title)s\""
 msgid "Weather reminder"
 msgstr "Promemoria email"
 
-#, fuzzy
-#| msgid "Weather forecast"
 msgid "Weather Forecast"
 msgstr "Previsioni meteo"
 
@@ -728,48 +726,40 @@ msgid ""
 "Your trip <strong>%(title)s</strong> is approaching! Here is the weather "
 "forecast for the first days of your journey:"
 msgstr ""
+"Il tuo viaggio <strong>%(title)s</strong> si avvicina! Ecco le previsioni "
+"meteo per i primi giorni:"
 
 msgid "Day"
 msgstr "Giorno"
 
 msgid "Max:"
-msgstr ""
+msgstr "Max:"
 
 msgid "Min:"
-msgstr ""
+msgstr "Min:"
 
-#, fuzzy
-#| msgid "Forecast unavailable"
 msgid "No data available."
-msgstr "Previsioni non disponibili"
+msgstr "Dati non disponibili."
 
-#, fuzzy
-#| msgid ""
-#| "You received this email because you set a checklist reminder in Organize "
-#| "It."
 msgid "You received this email because you have a trip departing in 3 days."
-msgstr ""
-"Hai ricevuto questa email perché hai impostato un promemoria checklist su "
-"Organize It."
+msgstr "Hai ricevuto questa email perché hai un viaggio in partenza tra 3 giorni."
 
 #, python-format
 msgid "Your trip \"%(title)s\" is approaching!"
-msgstr ""
+msgstr "Il tuo viaggio \"%(title)s\" si avvicina!"
 
 msgid "Here is the weather forecast for the first days of your journey:"
-msgstr ""
+msgstr "Ecco le previsioni meteo per i primi giorni del viaggio:"
 
 msgid "View your trip details here:"
-msgstr ""
+msgstr "Visualizza i dettagli del viaggio qui:"
 
-#, fuzzy
-#| msgid "Organize your next trip!"
 msgid "Enjoy your trip!"
-msgstr "Organizza il tuo prossimo viaggio!"
+msgstr "Buon viaggio!"
 
 #, python-format
 msgid "Weather Forecast for your trip: %(title)s"
-msgstr ""
+msgstr "Previsioni meteo per il tuo viaggio: %(title)s"
 
 msgid "Enrich"
 msgstr "Arricchisci"
