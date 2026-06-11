@@ -159,6 +159,18 @@ class TestAttachmentModel:
         assert img.is_image is True
         assert img.is_pdf is False
 
+    def test_str(self):
+        trip = TripFactory()
+        att = Attachment.objects.create(
+            content_object=trip,
+            file=_file(),
+            original_name="boarding.pdf",
+            mime_type="application/pdf",
+            size=10,
+            uploaded_by=trip.author,
+        )
+        assert str(att) == "boarding.pdf"
+
     def test_is_pdf_helper(self):
         trip = TripFactory()
         pdf = Attachment(
@@ -581,3 +593,127 @@ class AttachmentUploadModalView(TestCase):
                 category="bogus",
             )
         self.response_404(response)
+
+
+class AttachmentMissingCoverage(TestCase):
+    def test_modal_404_for_non_int_object_id(self):
+        user = self.make_user("owner")
+        trip = TripFactory(author=user)
+        with self.login(user):
+            response = self.get(
+                "trips:attachment-upload-modal",
+                trip_pk=trip.pk,
+                category="trip",
+                data={"object_id": "abc"},
+            )
+        self.response_404(response)
+
+    def test_upload_without_file_returns_400(self):
+        user = self.make_user("owner")
+        trip = TripFactory(author=user)
+        with self.login(user):
+            response = self.post(
+                "trips:attachment-upload",
+                trip_pk=trip.pk,
+                category="trip",
+                data={"object_id": trip.pk},
+            )
+        assert response.status_code == 400
+
+    def test_upload_to_main_transfer(self):
+        user = self.make_user("owner")
+        trip = TripFactory(author=user)
+        mt = MainTransferFactory(trip=trip, direction=1)
+        with self.login(user):
+            response = self.post(
+                "trips:attachment-upload",
+                trip_pk=trip.pk,
+                category="main",
+                data={"object_id": mt.pk, "file": _file()},
+            )
+        assert response.status_code == 204
+        assert Attachment.objects.filter(object_id=mt.pk).exists()
+
+    def test_card_for_empty_trip(self):
+        user = self.make_user("owner")
+        trip = TripFactory(author=user)
+        with self.login(user):
+            response = self.get("trips:attachments-card", trip_pk=trip.pk)
+        self.response_200(response)
+        assert response.context["total_count"] == 0
+
+    def test_preview_title_for_stay(self):
+        user = self.make_user("owner")
+        trip = TripFactory(author=user)
+        stay = StayFactory(name="Hotel Test")
+        day = trip.days.first()
+        day.stay = stay
+        day.save()
+        att = Attachment.objects.create(
+            content_object=stay,
+            file=_file(),
+            original_name="v.pdf",
+            mime_type="application/pdf",
+            size=10,
+            uploaded_by=user,
+        )
+        with self.login(user):
+            response = self.get("trips:attachment-preview", pk=att.pk)
+        assert response.context["title"] == "Hotel Test"
+
+    def test_preview_title_for_main_transfer(self):
+        user = self.make_user("owner")
+        trip = TripFactory(author=user)
+        mt = MainTransferFactory(trip=trip, direction=1)
+        att = Attachment.objects.create(
+            content_object=mt,
+            file=_file(),
+            original_name="v.pdf",
+            mime_type="application/pdf",
+            size=10,
+            uploaded_by=user,
+        )
+        with self.login(user):
+            response = self.get("trips:attachment-preview", pk=att.pk)
+        assert mt.get_direction_display() in response.context["title"]
+
+    def test_preview_title_for_event(self):
+        user = self.make_user("owner")
+        trip = TripFactory(author=user)
+        event = ExperienceFactory(trip=trip)
+        att = Attachment.objects.create(
+            content_object=event,
+            file=_file(),
+            original_name="v.pdf",
+            mime_type="application/pdf",
+            size=10,
+            uploaded_by=user,
+        )
+        with self.login(user):
+            response = self.get("trips:attachment-preview", pk=att.pk)
+        assert event.name in response.context["title"]
+
+    def test_preview_title_with_multiple_siblings_shows_index(self):
+        user = self.make_user("owner")
+        trip = TripFactory(author=user)
+        att1 = Attachment.objects.create(
+            content_object=trip,
+            file=_file(),
+            original_name="a.pdf",
+            mime_type="application/pdf",
+            size=10,
+            uploaded_by=user,
+        )
+        att2 = Attachment.objects.create(
+            content_object=trip,
+            file=_file(),
+            original_name="b.pdf",
+            mime_type="application/pdf",
+            size=10,
+            uploaded_by=user,
+        )
+        with self.login(user):
+            r1 = self.get("trips:attachment-preview", pk=att1.pk)
+            r2 = self.get("trips:attachment-preview", pk=att2.pk)
+        assert "1" in r1.context["title"]
+        assert "2" in r2.context["title"]

@@ -31,16 +31,14 @@ def _trip_for_object(obj):
         return obj
     if isinstance(obj, (Event, MainTransfer)):
         return obj.trip
-    if isinstance(obj, Stay):
-        day = obj.days.select_related("trip").first()
-        return day.trip if day else None
-    return None
+    day = obj.days.select_related("trip").first()
+    return day.trip if day else None
 
 
 def _user_can_access(user, trip):
-    if trip is None:
-        return False
-    return trip.author_id == user.id or trip.collaborators.filter(pk=user.pk).exists()
+    return trip is not None and (
+        trip.author_id == user.id or trip.collaborators.filter(pk=user.pk).exists()
+    )
 
 
 def _get_attachment_or_404(pk, user):
@@ -98,14 +96,12 @@ def _targets_for_category(trip, category):
     if category == "stay":
         stays = Stay.objects.filter(days__trip=trip).distinct().order_by("name")
         return [(s.pk, s.name) for s in stays]
-    if category == "event":
-        return [
-            (e.pk, e.name)
-            for e in trip.all_events.select_related("day").order_by(
-                "day__date", "order", "pk"
-            )
-        ]
-    return []
+    return [
+        (e.pk, e.name)
+        for e in trip.all_events.select_related("day").order_by(
+            "day__date", "order", "pk"
+        )
+    ]
 
 
 @login_required
@@ -241,10 +237,8 @@ def _attachment_title(att):
         name = obj.name
     elif isinstance(obj, MainTransfer):
         name = obj.get_direction_display()
-    elif isinstance(obj, Event):
-        name = obj.name
     else:
-        return att.original_name
+        name = obj.name
     siblings = list(
         Attachment.objects.filter(
             content_type=att.content_type, object_id=att.object_id

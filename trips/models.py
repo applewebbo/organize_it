@@ -1199,17 +1199,12 @@ class Attachment(models.Model):
             raise ValidationError({"mime_type": _("File type not allowed.")})
         if self.size and self.size > self.MAX_FILE_SIZE:
             raise ValidationError({"file": _("File exceeds the 2 MB size limit.")})
-        if self.content_type_id and self.object_id:
-            model = self.content_type.model_class()
-            siblings = Attachment.objects.filter(
-                content_type=self.content_type, object_id=self.object_id
-            )
-            if self.pk:
-                siblings = siblings.exclude(pk=self.pk)
-            limit = (
-                self.MAX_PER_TRIP
-                if model and model.__name__ == "Trip"
-                else self.MAX_PER_SUB_ENTITY
-            )
-            if siblings.count() >= limit:
-                raise ValidationError(_("Attachment limit reached for this item."))
+        model = self.content_type.model_class()
+        siblings = Attachment.objects.filter(
+            content_type=self.content_type, object_id=self.object_id
+        ).exclude(pk=self.pk)
+        limit = (
+            self.MAX_PER_TRIP if model.__name__ == "Trip" else self.MAX_PER_SUB_ENTITY
+        )
+        if siblings.count() >= limit:
+            raise ValidationError(_("Attachment limit reached for this item."))

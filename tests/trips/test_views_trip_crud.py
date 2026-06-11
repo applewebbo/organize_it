@@ -824,6 +824,24 @@ class ExportTripPdfView(TestCase):
         assert context["trip_image_url"].startswith("file://")
         assert context["trip_image_url"].endswith(trip.image.name)
 
+    def test_trip_image_falls_back_to_url_when_path_not_supported(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        trip.image = SimpleUploadedFile(
+            "cover.jpg", b"fakejpegbytes", content_type="image/jpeg"
+        )
+        trip.save()
+
+        with patch(
+            "django.core.files.storage.FileSystemStorage.path",
+            side_effect=NotImplementedError,
+        ):
+            context = build_pdf_export_context(trip)
+
+        assert context["trip_image_url"] == trip.image.url
+
     def test_trip_image_absent_returns_none(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)

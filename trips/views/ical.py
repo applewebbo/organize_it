@@ -57,8 +57,6 @@ def export_trip_ical(request, calendar_token):
     for stay_data in stays_dict.values():
         stay = stay_data["stay"]
         dates = sorted(stay_data["days"])
-        if not dates:
-            continue
         start_date = dates[0]
         end_date = dates[-1] + datetime.timedelta(days=1)
 
