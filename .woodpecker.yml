@@ -72,3 +72,21 @@ steps:
       from_secret: FORGEJO_TOKEN
   depends_on:
   - test
+
+- name: notify-telegram
+  image: appleboy/drone-telegram
+  settings:
+    token:
+      from_secret: TELEGRAM_TOKEN
+    to:
+      from_secret: TELEGRAM_CHAT_ID
+    format: markdown
+    message: |
+      ❌ *CI failed*
+      Repo: `${CI_REPO}`
+      Branch: `${CI_COMMIT_BRANCH}`
+      Commit: `${CI_COMMIT_SHA:0:8}` by ${CI_COMMIT_AUTHOR}
+      Message: ${CI_COMMIT_MESSAGE}
+      [Open pipeline](${CI_PIPELINE_URL})
+  when:
+    status: failure
