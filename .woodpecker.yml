@@ -14,7 +14,7 @@ steps:
   - uv sync
 
       # Compile translation files
-  - ENVIRONMENT=test uv run python manage.py compilemessages
+  - ENVIRONMENT=test uv run python manage.py compilemessages -l it -l en
 
       # Run tests (excluding mapbox tests that require external API)
   - ENVIRONMENT=test uv run pytest -n 8 --reuse-db --dist loadscope --exitfirst -m "not mapbox"
