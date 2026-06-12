@@ -62,6 +62,21 @@ ENV PATH=/app/.venv/bin:$PATH
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev --no-install-project
 
+# pre-download Tailwind CSS CLI to avoid runtime download (~120MB) on startup
+# IMPORTANT: keep TAILWIND_VERSION aligned with django-tailwind-cli expected version
+# (the release skill verifies this on every release)
+ARG TAILWIND_VERSION=2.8.3
+RUN mkdir -p /app/.django_tailwind_cli \
+  && ARCH="$(dpkg --print-architecture)" \
+  && case "$ARCH" in \
+       amd64)  TW_ARCH="x64" ;; \
+       arm64)  TW_ARCH="arm64" ;; \
+       *) echo "Unsupported arch: $ARCH" >&2; exit 1 ;; \
+     esac \
+  && curl -fsSL "https://github.com/dobicinaitis/tailwind-cli-extra/releases/download/v${TAILWIND_VERSION}/tailwindcss-extra-linux-${TW_ARCH}" \
+     -o "/app/.django_tailwind_cli/tailwindcss-extra-linux-${TW_ARCH}-${TAILWIND_VERSION}" \
+  && chmod +x "/app/.django_tailwind_cli/tailwindcss-extra-linux-${TW_ARCH}-${TAILWIND_VERSION}"
+
 # copy project
 COPY . /app
 
