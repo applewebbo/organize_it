@@ -62,6 +62,7 @@ def test_send_weather_reminders_sends_email(
     assert mailoutbox[0].subject == f"Weather Forecast for your trip: {trip.title}"
     assert "25" in mailoutbox[0].body
     assert "15" in mailoutbox[0].body
+    assert mailoutbox[0].from_email == "Organize It <noreply@test.local>"
 
     # Check that weather_reminder_sent_at was updated
     trip.refresh_from_db()

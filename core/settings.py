@@ -319,6 +319,10 @@ if ENVIRONMENT == "dev":
     EMAIL_HOST = env("EMAIL_HOST", default="localhost")
     EMAIL_PORT = env.int("EMAIL_PORT", default=1025)
     EMAIL_USE_TLS = False
+    DEFAULT_FROM_EMAIL = env(
+        "DEFAULT_FROM_EMAIL",
+        default="Organize It <noreply@localhost>",
+    )
     INTERNAL_IPS = [
         "127.0.0.1",
     ]
@@ -382,7 +386,10 @@ elif ENVIRONMENT == "prod":
 
     # DJANGO_ANYMAIL
     EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
-    DEFAULT_FROM_EMAIL = "info@mg.webbografico.com"
+    DEFAULT_FROM_EMAIL = env(
+        "DEFAULT_FROM_EMAIL",
+        default="Organize It <info@mg.webbografico.com>",
+    )
     ADMIN_EMAIL = env("ADMIN_EMAIL")
 
     ANYMAIL = {
@@ -442,6 +449,7 @@ elif ENVIRONMENT == "test":
     PASSWORD_HASHERS = ("django.contrib.auth.hashers.MD5PasswordHasher",)
 
     EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+    DEFAULT_FROM_EMAIL = "Organize It <noreply@test.local>"
 
     # DJANGO-Q configuration for testing (synchronous)
     Q_CLUSTER = {
