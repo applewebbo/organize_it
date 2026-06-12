@@ -14,13 +14,25 @@ The forecast is fetched periodically in the background, so it is fresh without s
 
 ## Weather email reminder
 
-Three days before departure, the trip author receives an automatic **weather forecast email** summarising the conditions expected during the trip.
+Three days before departure, the trip **author and all registered collaborators** receive an automatic **weather forecast email** summarising the conditions expected during the trip.
 
 ### When it is sent
 
 - **3 days** before the trip's start date
 - Only **once** per trip (a flag is stored after sending)
-- Only if the author has weather features enabled on their profile
+- Sent to every eligible recipient in a single message (author in `To`, collaborators in `Bcc` so addresses are not exposed)
+
+### Who receives it
+
+- The trip **author**
+- All **accepted collaborators** with a registered account on Organize It
+
+A recipient is included only if:
+
+- their email address is **verified**, and
+- their profile preference **Show weather** is enabled
+
+If the author has the preference disabled but a collaborator has it enabled, the email is still sent to that collaborator. Participants added by name or email only (without an account) are not included.
 
 ### What it contains
 
@@ -28,11 +40,11 @@ Three days before departure, the trip author receives an automatic **weather for
 - A day-by-day forecast with high/low temperatures and condition
 - A direct link to the trip
 
-The email is localised: Italian for users with Italian as their account language, English otherwise. Temperatures are always shown in °C.
+The email is localised in the **author's language** for all recipients (single render, single send). Temperatures are always shown in °C.
 
 ### Disabling the reminder
 
-The reminder is tied to the **Show weather** preference in your profile. Disable that option to stop receiving weather emails for all your trips.
+The reminder is tied to the **Show weather** preference in your profile. Disable that option to stop receiving weather emails for all your trips, whether you are the author or a collaborator.
 
 !!! info "One trip at a time"
     There is no per-trip switch yet. If you want a profile-wide off, use the profile setting. A per-trip toggle is on the roadmap.
@@ -58,7 +70,7 @@ The reminder is skipped if:
 
 ### Can collaborators receive the reminder?
 
-No, only the **author** of the trip receives it.
+Yes. Every accepted collaborator with a verified email and the **Show weather** preference enabled receives the same email as the author. The author is shown in the `To` field; collaborators are added in `Bcc` so addresses are not disclosed.
 
 ### Where does the forecast data come from?
 

@@ -14,13 +14,25 @@ Le previsioni vengono recuperate periodicamente in background, così sono fresch
 
 ## Email di promemoria meteo
 
-Tre giorni prima della partenza, l'autore del viaggio riceve un'email automatica con il **riepilogo delle previsioni** per il viaggio.
+Tre giorni prima della partenza, l'**autore del viaggio e tutti i collaboratori registrati** ricevono un'email automatica con il **riepilogo delle previsioni** per il viaggio.
 
 ### Quando viene inviata
 
 - **3 giorni** prima della data di inizio del viaggio
 - Solo **una volta** per viaggio (un flag viene memorizzato dopo l'invio)
-- Solo se l'autore ha le funzioni meteo abilitate sul profilo
+- Inviata a tutti i destinatari idonei in un unico messaggio (autore in `A`, collaboratori in `Ccn` così gli indirizzi non vengono esposti)
+
+### Chi la riceve
+
+- L'**autore** del viaggio
+- Tutti i **collaboratori accettati** con un account registrato su Organize It
+
+Un destinatario viene incluso solo se:
+
+- il suo indirizzo email è **verificato**, e
+- la preferenza di profilo **Mostra meteo** è attiva
+
+Se l'autore ha la preferenza disattivata ma un collaboratore l'ha attiva, l'email viene comunque inviata a quel collaboratore. I partecipanti aggiunti solo per nome o email (senza un account) non vengono inclusi.
 
 ### Cosa contiene
 
@@ -28,11 +40,11 @@ Tre giorni prima della partenza, l'autore del viaggio riceve un'email automatica
 - Previsioni giorno per giorno con temperature massime/minime e condizioni
 - Un link diretto al viaggio
 
-L'email è localizzata: italiano per gli utenti che hanno l'italiano come lingua dell'account, inglese altrimenti. Le temperature sono sempre in °C.
+L'email è localizzata nella **lingua dell'autore** per tutti i destinatari (singolo rendering, singolo invio). Le temperature sono sempre in °C.
 
 ### Disattivare il promemoria
 
-Il promemoria è legato alla preferenza **Mostra meteo** del profilo. Disattiva questa opzione per smettere di ricevere email meteo per tutti i tuoi viaggi.
+Il promemoria è legato alla preferenza **Mostra meteo** del profilo. Disattiva questa opzione per smettere di ricevere email meteo per tutti i tuoi viaggi, sia come autore sia come collaboratore.
 
 !!! info "Un viaggio alla volta"
     Non c'è ancora un interruttore per singolo viaggio. Se vuoi disattivare a livello globale, usa l'impostazione del profilo. Un'opzione per singolo viaggio è in roadmap.
@@ -58,7 +70,7 @@ Il promemoria viene saltato se:
 
 ### I collaboratori ricevono il promemoria?
 
-No, solo l'**autore** del viaggio lo riceve.
+Sì. Ogni collaboratore accettato con email verificata e preferenza **Mostra meteo** attiva riceve la stessa email dell'autore. L'autore appare nel campo `A`; i collaboratori vengono aggiunti in `Ccn` così gli indirizzi non vengono divulgati.
 
 ### Da dove vengono i dati delle previsioni?
 

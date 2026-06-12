@@ -421,18 +421,52 @@ def _build_trip_url(trip):
     return f"{scheme}://{domain}{path}"
 
 
+def _eligible_weather_recipients(trip):
+    """Return email addresses eligible to receive the weather reminder.
+
+    Includes the trip author plus accepted (registered) collaborators, filtered by:
+    - profile.show_weather is True
+    - the user has a verified email address (allauth)
+    Author is always first if eligible, to keep them in the visible `to` field.
+    """
+    from allauth.account.models import EmailAddress
+
+    candidates = [trip.author]
+    candidates.extend(
+        c.user for c in trip.collaborations.select_related("user__profile") if c.user
+    )
+    verified_user_ids = set(
+        EmailAddress.objects.filter(
+            user__in=[u.pk for u in candidates],
+            verified=True,
+        ).values_list("user_id", flat=True)
+    )
+    recipients = []
+    for user in candidates:
+        if not getattr(getattr(user, "profile", None), "show_weather", True):
+            continue
+        if user.pk not in verified_user_ids:
+            continue
+        if user.email and user.email not in recipients:
+            recipients.append(user.email)
+    return recipients
+
+
 def _send_weather_reminder_email(trip, today):
     from django.core.mail import EmailMultiAlternatives
     from django.template.loader import render_to_string
     from django.utils.translation import override as translation_override
 
-    recipient_language = getattr(trip.author.profile, "language", "en")
+    recipients = _eligible_weather_recipients(trip)
+    if not recipients:
+        return False
     days_with_weather = trip.days.filter(weather_data__isnull=False).order_by("number")[
         :3
     ]
     if not days_with_weather.exists():
-        return
+        return False
 
+    recipient_language = getattr(trip.author.profile, "language", "en")
     context = {
         "trip": trip,
         "days": days_with_weather,
@@ -445,12 +479,15 @@ def _send_weather_reminder_email(trip, today):
         text_body = render_to_string("trips/email/weather_reminder_body.txt", context)
         html_body = render_to_string("trips/email/weather_reminder_body.html", context)
     msg = EmailMultiAlternatives(
-        subject=subject, body=text_body, to=[trip.author.email]
+        subject=subject, body=text_body, to=[recipients[0]], bcc=recipients[1:]
     )
     msg.attach_alternative(html_body, "text/html")
     msg.send()
     Trip.objects.filter(pk=trip.pk).update(weather_reminder_sent_at=today)
-    logger.info(f"Weather reminder sent for trip '{trip.title}' to {trip.author.email}")
+    logger.info(
+        f"Weather reminder sent for trip '{trip.title}' to {len(recipients)} recipient(s)"
+    )
+    return True
 
 
 def send_weather_reminders():
@@ -461,15 +498,14 @@ def send_weather_reminders():
         target_start_date = today + timedelta(days=3)
 
         trips = (
-            Trip.objects.prefetch_related("days")
+            Trip.objects.prefetch_related("days", "collaborations__user__profile")
             .filter(start_date=target_start_date)
             .exclude(weather_reminder_sent_at=today)
             .select_related("author__profile")
         )
         sent = 0
         for trip in trips:
-            if getattr(trip.author.profile, "show_weather", True):
-                _send_weather_reminder_email(trip, today)
+            if _send_weather_reminder_email(trip, today):
                 sent += 1
 
         result_msg = f"Weather reminders sent: {sent}"
