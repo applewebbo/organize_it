@@ -390,3 +390,29 @@ class TestProfileHomeAddressWithCoords(TestCase):
         assert profile.home_address == "1 Rue de Rivoli, Paris"
         assert profile.home_address_latitude == 48.8566
         assert profile.home_address_longitude == 2.3522
+
+
+class TestPrefilledPasswordReset(TestCase):
+    def test_prefill_email_from_query_string(self):
+        response = self.get("account_reset_password", data={"email": "foo@bar.com"})
+        self.response_200(response)
+        assert response.context["form"].initial.get("email") == "foo@bar.com"
+        assert b'value="foo@bar.com"' in response.content
+
+    def test_no_query_string_renders_empty(self):
+        response = self.get("account_reset_password")
+        self.response_200(response)
+        assert "email" not in response.context["form"].initial
+        assert b'value="foo@bar.com"' not in response.content
+
+    def test_empty_query_string_renders_empty(self):
+        response = self.get("account_reset_password", data={"email": "   "})
+        self.response_200(response)
+        assert "email" not in response.context["form"].initial
+
+    def test_email_value_is_escaped(self):
+        response = self.get(
+            "account_reset_password", data={"email": '"><script>x</script>'}
+        )
+        self.response_200(response)
+        assert b"<script>x</script>" not in response.content

@@ -41,7 +41,11 @@
                     {% endif %}
                     <div class="mb-3 text-sm text-right">
                         <a class="text-blue-600 hover:underline"
-                           href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
+                           href="{% url 'account_reset_password' %}"
+                           data-reset-url="{% url 'account_reset_password' %}"
+                           onclick="const v=document.querySelector('input[name=login]')?.value.trim();if(v)this.href=this.dataset.resetUrl+'?email='+encodeURIComponent(v);">
+                            {% trans "Forgot Password?" %}
+                        </a>
                     </div>
                     <button type="submit" class="w-full btn btn-primary">{% trans "Sign In" %}</button>
                     <p class="text-sm font-light text-gray-500 dark:text-gray-400">

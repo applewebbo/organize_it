@@ -1,3 +1,4 @@
+from allauth.account.views import PasswordResetView
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
@@ -10,6 +11,20 @@ from trips.services import GooglePlacesClient, GooglePlacesError
 
 from .forms import ProfileUpdateForm
 from .models import Profile
+
+
+class PrefilledPasswordResetView(PasswordResetView):
+    """Password reset that prefills the email from the ``email`` query string."""
+
+    def get_initial(self):
+        initial = super().get_initial() or {}
+        email = self.request.GET.get("email", "").strip()
+        if email:
+            initial["email"] = email
+        return initial
+
+
+prefilled_password_reset = PrefilledPasswordResetView.as_view()
 
 
 def profile(request):
