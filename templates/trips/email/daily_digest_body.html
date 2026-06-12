@@ -1,4 +1,5 @@
 {% load i18n %}
+{# djlint:off H021,H013,H014 #}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -6,76 +7,137 @@
         <title>{% trans "Today on your trip" %}</title>
         <meta name="description" content="{% trans 'Today on your trip' %}">
         <meta name="keywords" content="trip, daily, digest">
-        <style>
-    body { font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 24px; }
-    .btn { display: inline-block; padding: 10px 20px; background-color: #4f46e5; color: #fff; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 16px; }
-    .section { margin: 16px 0; padding: 12px; border: 1px solid #eee; border-radius: 8px; background-color: #fafafa; }
-    .section h3 { margin: 0 0 8px 0; font-size: 15px; }
-    ul { margin: 4px 0 0 0; padding-left: 20px; }
-    .footer { margin-top: 32px; font-size: 12px; color: #888; }
-        </style>
     </head>
-    <body>
-        <h2>{% blocktranslate with title=trip.title %}Today on your trip "{{ title }}"{% endblocktranslate %}</h2>
-        <p>
-            <strong>{% blocktranslate with number=day.number total=total_days %}Day {{ number }} of {{ total }}{% endblocktranslate %}</strong>
-            — {{ day.date|date:"SHORT_DATE_FORMAT" }}
-        </p>
-        {% if day.weather_data %}
-            <div class="section">
-                <h3>☀️ {% trans "Weather" %}</h3>
-                {% trans "Max:" %} {{ day.weather_data.temperature_max|floatformat:"0" }}°C •
-                ❄️ {% trans "Min:" %} {{ day.weather_data.temperature_min|floatformat:"0" }}°C
-            </div>
-        {% endif %}
-        {% if main_transfers %}
-            <div class="section">
-                <h3>✈️ {% trans "Transfers" %}</h3>
-                <ul>
-                    {% for t in main_transfers %}
-                        <li>
-                            <strong>{{ t.get_direction_display }}</strong> ({{ t.get_type_display }}):
-                            {{ t.origin_name|default:t.origin_address }} → {{ t.destination_name|default:t.destination_address }}
-                            {% if t.start_time %}— {{ t.start_time|time:"H:i" }}{% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
-        {% if check_in or check_out %}
-            <div class="section">
-                <h3>🏨 {% trans "Accommodation" %}</h3>
-                <ul>
-                    {% if check_in %}
-                        <li><strong>{% trans "Check-in:" %}</strong> {{ stay.name }} — {{ stay.address }}</li>
-                    {% endif %}
-                    {% if check_out %}
-                        <li><strong>{% trans "Check-out:" %}</strong> {{ stay.name }}</li>
-                    {% endif %}
-                </ul>
-            </div>
-        {% endif %}
-        <div class="section">
-            <h3>📅 {% trans "Events" %}</h3>
-            {% if events %}
-                <ul>
-                    {% for event in events %}
-                        <li>
-                            {% if event.start_time %}<strong>{{ event.start_time|time:"H:i" }}</strong> —{% endif %}
-                            {{ event.name }}
-                            {% if event.address %}<em>({{ event.address }})</em>{% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>{% trans "No events scheduled for today." %}</p>
-            {% endif %}
-        </div>
-        <p>
-            <a href="{{ trip_url }}" class="btn">{% trans "Open the trip" %}</a>
-        </p>
-        <div class="footer">
-            <p>{% trans "You received this email because you have an active trip and the daily digest enabled in your profile." %}</p>
-        </div>
+    <body style="margin:0;padding:0;background-color:#ffffff;">
+        <table role="presentation"
+               width="100%"
+               cellpadding="0"
+               cellspacing="0"
+               border="0"
+               style="background-color:#ffffff">
+            <tr>
+                <td align="center" style="padding:24px;">
+                    <table role="presentation"
+                           width="600"
+                           cellpadding="0"
+                           cellspacing="0"
+                           border="0"
+                           style="max-width:600px;
+                                  width:100%;
+                                  font-family:Arial,Helvetica,sans-serif;
+                                  color:#333333">
+                        <tr>
+                            <td style="padding:0 0 12px 0;
+                                       font-size:20px;
+                                       font-weight:bold;
+                                       color:#333333">
+                                {% blocktranslate with title=trip.title %}Today on your trip "{{ title }}"{% endblocktranslate %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:0 0 16px 0;font-size:14px;color:#555555;">
+                                <strong>{% blocktranslate with number=day.number total=total_days %}Day {{ number }} of {{ total }}{% endblocktranslate %}</strong>
+                                — {{ day.date|date:"SHORT_DATE_FORMAT" }}
+                            </td>
+                        </tr>
+                        {% if day.weather_data %}
+                            <tr>
+                                <td style="padding:12px;
+                                           border:1px solid #eeeeee;
+                                           background-color:#fafafa;
+                                           font-size:14px">
+                                    <p style="margin:0 0 6px 0;font-weight:bold;font-size:15px;">☀️ {% trans "Weather" %}</p>
+                                    {% trans "Max:" %} {{ day.weather_data.temperature_max|floatformat:"0" }}°C •
+                                    ❄️ {% trans "Min:" %} {{ day.weather_data.temperature_min|floatformat:"0" }}°C
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="height:12px;line-height:12px;">&nbsp;</td>
+                            </tr>
+                        {% endif %}
+                        {% if main_transfers %}
+                            <tr>
+                                <td style="padding:12px;
+                                           border:1px solid #eeeeee;
+                                           background-color:#fafafa;
+                                           font-size:14px">
+                                    <p style="margin:0 0 6px 0;font-weight:bold;font-size:15px;">✈️ {% trans "Transfers" %}</p>
+                                    {% for t in main_transfers %}
+                                        <p style="margin:4px 0 0 0;">
+                                            <strong>{{ t.get_direction_display }}</strong> ({{ t.get_type_display }}):
+                                            {{ t.origin_name|default:t.origin_address }} → {{ t.destination_name|default:t.destination_address }}
+                                            {% if t.start_time %}— {{ t.start_time|time:"H:i" }}{% endif %}
+                                        </p>
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="height:12px;line-height:12px;">&nbsp;</td>
+                            </tr>
+                        {% endif %}
+                        {% if check_in or check_out %}
+                            <tr>
+                                <td style="padding:12px;
+                                           border:1px solid #eeeeee;
+                                           background-color:#fafafa;
+                                           font-size:14px">
+                                    <p style="margin:0 0 6px 0;font-weight:bold;font-size:15px;">🏨 {% trans "Accommodation" %}</p>
+                                    {% if check_in %}
+                                        <p style="margin:4px 0 0 0;">
+                                            <strong>{% trans "Check-in:" %}</strong> {{ stay.name }} — {{ stay.address }}
+                                        </p>
+                                    {% endif %}
+                                    {% if check_out %}
+                                        <p style="margin:4px 0 0 0;">
+                                            <strong>{% trans "Check-out:" %}</strong> {{ stay.name }}
+                                        </p>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="height:12px;line-height:12px;">&nbsp;</td>
+                            </tr>
+                        {% endif %}
+                        <tr>
+                            <td style="padding:12px;
+                                       border:1px solid #eeeeee;
+                                       background-color:#fafafa;
+                                       font-size:14px">
+                                <p style="margin:0 0 6px 0;font-weight:bold;font-size:15px;">📅 {% trans "Events" %}</p>
+                                {% if events %}
+                                    {% for event in events %}
+                                        <p style="margin:4px 0 0 0;">
+                                            {% if event.start_time %}<strong>{{ event.start_time|time:"H:i" }}</strong> —{% endif %}
+                                            {{ event.name }}
+                                            {% if event.address %}<em>({{ event.address }})</em>{% endif %}
+                                        </p>
+                                    {% endfor %}
+                                {% else %}
+                                    <p style="margin:0;">{% trans "No events scheduled for today." %}</p>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:24px 0 0 0;">
+                                <a href="{{ trip_url }}"
+                                   style="display:inline-block;
+                                          padding:10px 20px;
+                                          background-color:#4f46e5;
+                                          color:#ffffff;
+                                          font-weight:bold;
+                                          font-family:Arial,Helvetica,sans-serif;
+                                          font-size:14px">{% trans "Open the trip" %}</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:32px 0 0 0;font-size:12px;color:#888888;">
+                                {% trans "You received this email because you have an active trip and the daily digest enabled in your profile." %}
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
     </body>
 </html>
+{# djlint:on #}

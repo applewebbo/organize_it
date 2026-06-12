@@ -1,4 +1,5 @@
 {% load i18n %}
+{# djlint:off H021,H013,H014 #}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -6,35 +7,78 @@
         <title>{% trans "Weather reminder" %}</title>
         <meta name="description" content="{% trans 'Weather reminder' %}">
         <meta name="keywords" content="weather, reminder, trip">
-        <style>
-    body { font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 24px; }
-    .btn { display: inline-block; padding: 10px 20px; background-color: #4f46e5; color: #fff; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 16px; }
-    .weather-day { margin: 12px 0; padding: 12px; border: 1px solid #eee; border-radius: 8px; background-color: #fafafa; }
-    .weather-day strong { display: block; margin-bottom: 4px; font-size: 16px; }
-    .footer { margin-top: 32px; font-size: 12px; color: #888; }
-        </style>
     </head>
-    <body>
-        <h2>{% trans "Weather Forecast" %}</h2>
-        <p>
-            {% blocktrans with title=trip.title %}Your trip <strong>{{ title }}</strong> is approaching! Here is the weather forecast for the first days of your journey:{% endblocktrans %}
-        </p>
-        {% for day in days %}
-            <div class="weather-day">
-                <strong>{% trans "Day" %} {{ day.number }} ({{ day.date|date:"SHORT_DATE_FORMAT" }})</strong>
-                {% if day.weather_data %}
-                    ☀️ {% trans "Max:" %} {{ day.weather_data.temperature_max|floatformat:"0" }}°C •
-                    ❄️ {% trans "Min:" %} {{ day.weather_data.temperature_min|floatformat:"0" }}°C
-                {% else %}
-                    {% trans "No data available." %}
-                {% endif %}
-            </div>
-        {% endfor %}
-        <p>
-            <a href="{{ trip_url }}" class="btn">{% trans "Open trip" %}</a>
-        </p>
-        <div class="footer">
-            <p>{% trans "You received this email because you have a trip departing in 3 days." %}</p>
-        </div>
+    <body style="margin:0;padding:0;background-color:#ffffff;">
+        <table role="presentation"
+               width="100%"
+               cellpadding="0"
+               cellspacing="0"
+               border="0"
+               style="background-color:#ffffff">
+            <tr>
+                <td align="center" style="padding:24px;">
+                    <table role="presentation"
+                           width="600"
+                           cellpadding="0"
+                           cellspacing="0"
+                           border="0"
+                           style="max-width:600px;
+                                  width:100%;
+                                  font-family:Arial,Helvetica,sans-serif;
+                                  color:#333333">
+                        <tr>
+                            <td style="padding:0 0 12px 0;
+                                       font-size:20px;
+                                       font-weight:bold;
+                                       color:#333333">{% trans "Weather Forecast" %}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:0 0 16px 0;font-size:14px;color:#555555;">
+                                {% blocktrans with title=trip.title %}Your trip <strong>{{ title }}</strong> is approaching! Here is the weather forecast for the first days of your journey:{% endblocktrans %}
+                            </td>
+                        </tr>
+                        {% for day in days %}
+                            <tr>
+                                <td style="padding:12px;
+                                           border:1px solid #eeeeee;
+                                           background-color:#fafafa;
+                                           font-size:14px">
+                                    <p style="margin:0 0 6px 0;font-weight:bold;font-size:15px;">
+                                        {% trans "Day" %} {{ day.number }} ({{ day.date|date:"SHORT_DATE_FORMAT" }})
+                                    </p>
+                                    {% if day.weather_data %}
+                                        ☀️ {% trans "Max:" %} {{ day.weather_data.temperature_max|floatformat:"0" }}°C •
+                                        ❄️ {% trans "Min:" %} {{ day.weather_data.temperature_min|floatformat:"0" }}°C
+                                    {% else %}
+                                        {% trans "No data available." %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="height:12px;line-height:12px;">&nbsp;</td>
+                            </tr>
+                        {% endfor %}
+                        <tr>
+                            <td style="padding:12px 0 0 0;">
+                                <a href="{{ trip_url }}"
+                                   style="display:inline-block;
+                                          padding:10px 20px;
+                                          background-color:#4f46e5;
+                                          color:#ffffff;
+                                          font-weight:bold;
+                                          font-family:Arial,Helvetica,sans-serif;
+                                          font-size:14px">{% trans "Open trip" %}</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:32px 0 0 0;font-size:12px;color:#888888;">
+                                {% trans "You received this email because you have a trip departing in 3 days." %}
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
     </body>
 </html>
+{# djlint:on #}
