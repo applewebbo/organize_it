@@ -78,13 +78,13 @@ Funziona perfettamente su desktop, tablet e dispositivi mobili.
 
     [:octicons-arrow-right-24: Domande Frequenti](faq.md)
 
--   :material-github:{ .lg .middle } __Open Source__
+-   :material-git:{ .lg .middle } __Open Source__
 
     ---
 
-    Contribuisci o segnala problemi su GitHub.
+    Contribuisci o segnala problemi su Codeberg.
 
-    [:octicons-arrow-right-24: Repository GitHub](https://github.com/applewebbo/organize_it)
+    [:octicons-arrow-right-24: Repository Codeberg](https://codeberg.org/webbografico/organize_it)
 
 </div>
 
@@ -108,14 +108,14 @@ Organize It è costruito con tecnologie web moderne:
 
 Organize It è open source! I contributi sono benvenuti:
 
-- Segnala bug o richiedi funzionalità su [GitHub Issues](https://github.com/applewebbo/organize_it/issues)
+- Segnala bug o richiedi funzionalità sulle [Issues di Codeberg](https://codeberg.org/webbografico/organize_it/issues)
 - Invia pull request per migliorare il codice
 - Migliora la documentazione
 - Condividi il tuo feedback
 
 ## Licenza
 
-Controlla il [repository GitHub](https://github.com/applewebbo/organize_it) per informazioni sulla licenza.
+Controlla il [repository Codeberg](https://codeberg.org/webbografico/organize_it) per informazioni sulla licenza.
 
 ---
 

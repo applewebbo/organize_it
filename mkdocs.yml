@@ -52,6 +52,10 @@ nav:
   - Experiences: user-guide/experiences.md
   - Meals: user-guide/meals.md
   - Transfers: user-guide/transfers.md
+  - Checklist: user-guide/checklist.md
+  - Documents & Attachments: user-guide/attachments.md
+  - Export & Calendar Sync: user-guide/export.md
+  - Weather: user-guide/weather.md
   - Collaboration: user-guide/collaboration.md
 - FAQ: faq.md
 

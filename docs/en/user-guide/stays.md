@@ -353,10 +353,7 @@ Try:
 
 ### Can I attach documents to a stay?
 
-Currently, document attachments are not supported. You can:
-- Add links to confirmation emails (via Trip Links)
-- Add confirmation numbers in the field
-- Add file URLs in notes
+Yes. You can attach up to 2 PDFs or images (max 2 MB each) — voucher, receipt, apartment instructions — to each stay from the **Documents** card on the trip page. See the [Documents & Attachments guide](attachments.md).
 
 ## Related Guides
 

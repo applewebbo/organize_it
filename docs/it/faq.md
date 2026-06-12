@@ -175,7 +175,7 @@ I viaggi archiviati sono nascosti dalla lista viaggi principale. Usa il filtro p
 
 ### Posso condividere viaggi con altri?
 
-La condivisione viaggi non è attualmente supportata ma è pianificata per una versione futura.
+Sì. Puoi generare un link di sola lettura dall'intestazione del viaggio. Vedi la [Guida alla collaborazione](user-guide/collaboration.md).
 
 ### Posso duplicare un viaggio?
 
@@ -183,11 +183,11 @@ La duplicazione viaggi non è attualmente supportata ma è pianificata per una v
 
 ### Posso esportare il mio viaggio?
 
-L'esportazione viaggi (PDF, calendario ICS) è pianificata per una versione futura.
+Sì. Puoi esportare un PDF offline e iscriverti a un feed iCal dal menu **Condividi & Esporta** sulla pagina del viaggio. Vedi la [Guida Esportazione e Calendario](user-guide/export.md).
 
 ### Posso aggiungere co-viaggiatori a un viaggio?
 
-La collaborazione multi-utente sui viaggi è pianificata per una versione futura.
+Sì. Puoi invitare collaboratori via email e modificare il viaggio insieme a loro. Vedi la [Guida alla collaborazione](user-guide/collaboration.md).
 
 ### Come aggiungo un'immagine di copertina?
 
@@ -261,15 +261,11 @@ No, ogni evento deve essere creato individualmente. Gli eventi ricorrenti non so
 
 ### Posso aggiungere foto agli eventi?
 
-Gli allegati foto agli eventi sono pianificati per una versione futura.
+Una galleria fotografica dei ricordi di viaggio non è attualmente supportata. La sezione **Documenti** è pensata per documenti cartacei (biglietti, voucher, prenotazioni), non per foto di viaggio. Vedi la [Guida Documenti e Allegati](user-guide/attachments.md) se devi allegare un'immagine di un biglietto o un PDF.
 
 ### Posso allegare file o documenti?
 
-Gli allegati file diretti non sono attualmente supportati. Puoi:
-
-- Aggiungere link a email di conferma (Link Viaggio)
-- Memorizzare numeri conferma nei campi evento
-- Aggiungere URL nelle note
+Sì. Puoi allegare PDF e immagini al viaggio, ai trasferimenti, agli alloggi e agli eventi dalla card **Documenti** nella pagina del viaggio. Vedi la [Guida Documenti e Allegati](user-guide/attachments.md) per limiti e dettagli.
 
 ### Posso contrassegnare eventi come completati?
 
@@ -425,17 +421,13 @@ I tuoi dati sono archiviati in sicurezza in un database e backuppati regolarment
 
 ### Posso esportare i miei dati?
 
-L'esportazione dati è pianificata per una versione futura. I formati di esportazione includeranno probabilmente:
-
-- JSON (tutti i dati)
-- PDF (itinerario stampabile)
-- ICS (formato calendario)
+Sì. Puoi esportare il tuo viaggio come **PDF** offline stampabile e iscriverti a un feed **ICS** da qualsiasi app di calendario. Entrambi sono disponibili dal menu **Condividi & Esporta** sulla pagina del viaggio — vedi la [Guida Esportazione e Calendario](user-guide/export.md). Un export completo dell'account (JSON) è ancora in roadmap.
 
 ### Come segnalo un bug?
 
-Segnala bug su GitHub:
+Segnala bug su Codeberg:
 
-1. Visita [https://github.com/applewebbo/organize_it/issues](https://github.com/applewebbo/organize_it/issues)
+1. Visita [https://codeberg.org/webbografico/organize_it/issues](https://codeberg.org/webbografico/organize_it/issues)
 2. Clicca **New Issue**
 3. Descrivi il bug:
    - Cosa hai fatto
@@ -446,9 +438,9 @@ Segnala bug su GitHub:
 
 ### Come richiedo una funzionalità?
 
-Richiedi funzionalità su GitHub Issues:
+Richiedi funzionalità sulle Issues di Codeberg:
 
-1. Visita [https://github.com/applewebbo/organize_it/issues](https://github.com/applewebbo/organize_it/issues)
+1. Visita [https://codeberg.org/webbografico/organize_it/issues](https://codeberg.org/webbografico/organize_it/issues)
 2. Clicca **New Issue**
 3. Descrivi la funzionalità:
    - Cosa vuoi fare
@@ -458,7 +450,7 @@ Richiedi funzionalità su GitHub Issues:
 
 ### Organize It è open source?
 
-Controlla il repository GitHub per informazioni sulla licenza: [https://github.com/applewebbo/organize_it](https://github.com/applewebbo/organize_it)
+Controlla il repository Codeberg per informazioni sulla licenza: [https://codeberg.org/webbografico/organize_it](https://codeberg.org/webbografico/organize_it)
 
 ### Posso contribuire a Organize It?
 
@@ -496,7 +488,7 @@ I dati sono conservati finché il tuo account è attivo. Se elimini il tuo accou
 
 ### Posso scaricare tutti i miei dati?
 
-L'esportazione/download dati è pianificato per una versione futura.
+Puoi esportare ogni viaggio singolarmente come PDF o iscriverti al suo feed iCal (vedi la [Guida Esportazione e Calendario](user-guide/export.md)). Un download completo dei dati a livello di account è in roadmap.
 
 ## Risoluzione Problemi
 
@@ -565,4 +557,4 @@ Non trovi risposta alla tua domanda?
 
 - [Guida Primi Passi](getting-started/installation.md)
 - [Guida Utente](user-guide/trips.md)
-- [Repository GitHub](https://github.com/applewebbo/organize_it)
+- [Repository Codeberg](https://codeberg.org/webbografico/organize_it)

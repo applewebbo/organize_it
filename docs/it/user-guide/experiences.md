@@ -396,7 +396,7 @@ Attualmente non c'è uno stato "completato". Questa funzionalità è pianificata
 
 ### Posso aggiungere foto a un'esperienza?
 
-Gli allegati foto per eventi sono pianificati per una versione futura.
+Una galleria fotografica di viaggio non è attualmente supportata. Se devi allegare la scansione di un biglietto o un PDF di prenotazione all'esperienza, usa invece la sezione **Documenti** — vedi la [Guida Documenti e Allegati](attachments.md).
 
 ### Posso duplicare un'esperienza?
 

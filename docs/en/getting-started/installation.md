@@ -16,7 +16,7 @@ Before you begin, ensure you have the following installed:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/applewebbo/organize_it.git
+git clone https://codeberg.org/webbografico/organize_it.git
 cd organize_it
 ```
 

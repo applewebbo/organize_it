@@ -355,7 +355,7 @@ Non c'è limite al numero di viaggi che puoi creare.
 
 ### Posso esportare il mio viaggio?
 
-L'esportazione viaggi (PDF, ICS) è pianificata per una versione futura. (Richiesta funzionalità: #XX)
+Sì. Dal menu **Condividi & Esporta** nell'intestazione del viaggio puoi scaricare un **PDF** offline dell'itinerario e copiare l'URL di un feed **iCal** a cui iscriverti da qualsiasi app di calendario. Vedi la [Guida Esportazione e Calendario](export.md).
 
 ### Cosa succede agli eventi quando cambio le date del viaggio?
 
@@ -368,6 +368,10 @@ Gli eventi vengono riassegnati automaticamente al giorno corrispondente più vic
 - [Esperienze](experiences.md) - Pianifica attività
 - [Pasti](meals.md) - Aggiungi prenotazioni ristoranti
 - [Trasferimenti](transfers.md) - Gestisci i trasporti
+- [Checklist](checklist.md) - Lista delle cose da fare prima di partire
+- [Documenti e Allegati](attachments.md) - Biglietti, voucher e altri file
+- [Esportazione e Calendario](export.md) - PDF e feed iCal
+- [Meteo](weather.md) - Previsioni e promemoria email
 
 ---
 

@@ -353,10 +353,7 @@ Prova:
 
 ### Posso allegare documenti a un alloggio?
 
-Attualmente gli allegati documenti non sono supportati. Puoi:
-- Aggiungere link alle email di conferma (tramite Link Viaggio)
-- Aggiungere numeri di conferma nel campo
-- Aggiungere URL file nelle note
+Sì. Puoi allegare fino a 2 PDF o immagini (max 2 MB ciascuno) — voucher, ricevuta, istruzioni dell'appartamento — a ciascun alloggio dalla card **Documenti** sulla pagina del viaggio. Vedi la [Guida Documenti e Allegati](attachments.md).
 
 ## Guide Correlate
 

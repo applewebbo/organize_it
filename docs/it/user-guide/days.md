@@ -151,6 +151,15 @@ Puoi cambiare manualmente l'ordine di visualizzazione degli eventi all'interno d
 
 L'ordine viene salvato automaticamente e usato sia nella vista elenco che nella vista mappa.
 
+### Spostare Eventi tra Giorni (Drag & Drop)
+
+Gli eventi possono anche essere riassegnati a un giorno diverso con un solo gesto, senza aprire il form di modifica.
+
+- **Desktop**: Trascina la card dell'evento e rilasciala sul contenitore di un altro giorno — l'evento viene spostato in quel giorno e riordinato con gli eventi esistenti.
+- **Mobile**: Su ogni card evento, usa il pulsante **Sposta in giorno**. Un piccolo selettore ti permette di scegliere il giorno di destinazione; alla conferma l'evento viene spostato.
+
+Il nuovo giorno, il nuovo ordine ed eventuali variazioni di associazione vengono salvati automaticamente. Se l'evento non aveva un giorno (era *non associato*), rilasciandolo su un giorno viene associato; puoi anche trascinare un evento nell'area *Eventi Non Associati* per rimuovere l'assegnazione del giorno.
+
 ### Eventi Non Associati
 
 Gli eventi senza assegnazione a un giorno appaiono in una sezione speciale "Eventi Non Associati" in fondo alla pagina viaggio. Puoi:

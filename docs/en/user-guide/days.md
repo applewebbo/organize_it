@@ -151,6 +151,15 @@ You can manually change the display order of events within a day:
 
 The order is saved automatically and used for display in both list and map view.
 
+### Moving Events Across Days (Drag & Drop)
+
+Events can also be reassigned to a different day with a single gesture, without opening the edit form.
+
+- **Desktop**: Drag the event card and drop it onto another day's container — the event is moved to that day and re-ordered with the existing events.
+- **Mobile**: On each event card, use the **Move to day** button. A small picker lets you pick the destination day; on confirm the event is moved.
+
+The new day, the new order and any cleared/added day relationship are saved automatically. If the event had no day before (it was *unpaired*), dropping it on a day pairs it; you can also drag an event out to the *Unpaired Events* area to remove its day assignment.
+
 ### Unpaired Events
 
 Events without a day assignment appear in a special "Unpaired Events" section at the bottom of the trip page. You can:

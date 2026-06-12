@@ -78,13 +78,13 @@ Works seamlessly on desktop, tablet, and mobile devices.
 
     [:octicons-arrow-right-24: FAQ](faq.md)
 
--   :material-github:{ .lg .middle } __Open Source__
+-   :material-git:{ .lg .middle } __Open Source__
 
     ---
 
-    Contribute or report issues on GitHub.
+    Contribute or report issues on Codeberg.
 
-    [:octicons-arrow-right-24: GitHub Repository](https://github.com/applewebbo/organize_it)
+    [:octicons-arrow-right-24: Codeberg Repository](https://codeberg.org/webbografico/organize_it)
 
 </div>
 
@@ -108,14 +108,14 @@ Organize It is built with modern web technologies:
 
 Organize It is open source! Contributions are welcome:
 
-- Report bugs or request features on [GitHub Issues](https://github.com/applewebbo/organize_it/issues)
+- Report bugs or request features on [Codeberg Issues](https://codeberg.org/webbografico/organize_it/issues)
 - Submit pull requests to improve the code
 - Improve documentation
 - Share your feedback
 
 ## License
 
-Check the [GitHub repository](https://github.com/applewebbo/organize_it) for license information.
+Check the [Codeberg repository](https://codeberg.org/webbografico/organize_it) for license information.
 
 ---
 

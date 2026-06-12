@@ -358,7 +358,7 @@ There is no limit on the number of trips you can create.
 
 ### Can I export my trip?
 
-Trip export (PDF, ICS) is planned for a future release. (Feature request: #XX)
+Yes. From the **Share & Export** menu on the trip header you can download an offline **PDF** of the itinerary and copy the URL of an **iCal** feed to subscribe to from any calendar app. See the [Export & Calendar Sync guide](export.md).
 
 ### What happens to events when I change trip dates?
 
@@ -371,6 +371,10 @@ Events are automatically reassigned to the closest matching day. Events outside 
 - [Experiences](experiences.md) - Plan activities
 - [Meals](meals.md) - Add restaurant reservations
 - [Transfers](transfers.md) - Manage transportation
+- [Checklist](checklist.md) - Pre-departure to-do list
+- [Documents & Attachments](attachments.md) - Tickets, vouchers and more
+- [Export & Calendar Sync](export.md) - PDF export and iCal feed
+- [Weather](weather.md) - Forecast and reminder email
 
 ---
 

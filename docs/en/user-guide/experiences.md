@@ -396,7 +396,7 @@ Currently, there's no "completed" status. This feature is planned for future rel
 
 ### Can I add photos to an experience?
 
-Photo attachments for events are planned for a future release.
+A travel-photo gallery is not currently supported. If you need to attach a ticket scan or a reservation PDF to the experience, use the **Documents** section instead — see the [Documents & Attachments guide](attachments.md).
 
 ### Can I duplicate an experience?
 

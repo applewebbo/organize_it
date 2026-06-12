@@ -695,7 +695,9 @@ Includi nelle note trasferimento partenza o crea evento separato.
 
 ### Posso allegare biglietti/conferme?
 
-Attualmente, no allegati file diretti. Opzioni:
+Sì. Puoi allegare fino a 2 PDF o immagini (max 2 MB ciascuno) — carte d'imbarco, biglietti del treno, e-ticket — a ciascun trasferimento principale dalla card **Documenti** sulla pagina del viaggio. Vedi la [Guida Documenti e Allegati](attachments.md).
+
+Opzioni aggiuntive:
 - Aggiungi **URL Biglietto** *(trasferimenti auto e altro)* per e-ticket
 - Usa sezione **Link** viaggio per pagine prenotazione
 - Memorizza numeri conferma nelle note

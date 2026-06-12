@@ -175,7 +175,7 @@ Archived trips are hidden from the main trip list. Use the filter to view archiv
 
 ### Can I share trips with others?
 
-Trip sharing is not currently supported but is planned for a future release.
+Yes. You can generate a read-only share link from the trip header. See the [Collaboration guide](user-guide/collaboration.md).
 
 ### Can I duplicate a trip?
 
@@ -183,11 +183,11 @@ Trip duplication is not currently supported but is planned for a future release.
 
 ### Can I export my trip?
 
-Trip export (PDF, ICS calendar) is planned for a future release.
+Yes. You can export an offline PDF and subscribe to an iCal feed from the **Share & Export** menu on the trip page. See the [Export & Calendar Sync guide](user-guide/export.md).
 
 ### Can I add co-travelers to a trip?
 
-Multi-user trip collaboration is planned for a future release.
+Yes. You can invite collaborators by email and they will be able to edit the trip together with you. See the [Collaboration guide](user-guide/collaboration.md).
 
 ### How do I add a cover image?
 
@@ -261,15 +261,11 @@ No, each event must be created individually. Recurring events are not currently 
 
 ### Can I add photos to events?
 
-Event photo attachments are planned for a future release.
+A trip-memory photo gallery is not currently supported. The **Documents** section is meant for paperwork (tickets, vouchers, reservations), not for travel photos. See the [Documents & Attachments guide](user-guide/attachments.md) if you need to attach a ticket image or a PDF.
 
 ### Can I attach files or documents?
 
-Direct file attachments are not currently supported. You can:
-
-- Add links to confirmation emails (Trip Links)
-- Store confirmation numbers in event fields
-- Add URLs in notes
+Yes. You can attach PDFs and images to the trip, transfers, stays and events from the **Documents** card on the trip page. See the [Documents & Attachments guide](user-guide/attachments.md) for limits and details.
 
 ### Can I mark events as completed?
 
@@ -425,17 +421,13 @@ Your data is safely stored in a database and backed up regularly. Temporary outa
 
 ### Can I export my data?
 
-Data export is planned for a future release. Export formats will likely include:
-
-- JSON (all data)
-- PDF (printable itinerary)
-- ICS (calendar format)
+Yes. You can export your trip as a printable offline **PDF** and subscribe to an **ICS** calendar feed from any calendar app. Both are available from the **Share & Export** menu on the trip page — see the [Export & Calendar Sync guide](user-guide/export.md). A full account/data export (JSON) is still on the roadmap.
 
 ### How do I report a bug?
 
-Report bugs on GitHub:
+Report bugs on Codeberg:
 
-1. Visit [https://github.com/applewebbo/organize_it/issues](https://github.com/applewebbo/organize_it/issues)
+1. Visit [https://codeberg.org/webbografico/organize_it/issues](https://codeberg.org/webbografico/organize_it/issues)
 2. Click **New Issue**
 3. Describe the bug:
    - What you did
@@ -446,9 +438,9 @@ Report bugs on GitHub:
 
 ### How do I request a feature?
 
-Request features on GitHub Issues:
+Request features on Codeberg Issues:
 
-1. Visit [https://github.com/applewebbo/organize_it/issues](https://github.com/applewebbo/organize_it/issues)
+1. Visit [https://codeberg.org/webbografico/organize_it/issues](https://codeberg.org/webbografico/organize_it/issues)
 2. Click **New Issue**
 3. Describe the feature:
    - What you want to do
@@ -458,7 +450,7 @@ Request features on GitHub Issues:
 
 ### Is Organize It open source?
 
-Check the GitHub repository for license information: [https://github.com/applewebbo/organize_it](https://github.com/applewebbo/organize_it)
+Check the Codeberg repository for license information: [https://codeberg.org/webbografico/organize_it](https://codeberg.org/webbografico/organize_it)
 
 ### Can I contribute to Organize It?
 
@@ -496,7 +488,7 @@ Data is retained as long as your account is active. If you delete your account, 
 
 ### Can I download all my data?
 
-Data export/download is planned for a future release.
+You can export each trip individually as a PDF or subscribe to its iCal feed (see the [Export & Calendar Sync guide](user-guide/export.md)). A full account-level data download is on the roadmap.
 
 ## Troubleshooting
 
@@ -565,4 +557,4 @@ Can't find an answer to your question?
 
 - [Getting Started Guide](getting-started/installation.md)
 - [User Guide](user-guide/trips.md)
-- [GitHub Repository](https://github.com/applewebbo/organize_it)
+- [Codeberg Repository](https://codeberg.org/webbografico/organize_it)

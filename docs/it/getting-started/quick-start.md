@@ -145,6 +145,6 @@ Ora che hai configurato il tuo primo viaggio, esplora:
 
 - Consulta le [Domande Frequenti](../faq.md) per domande comuni
 - Leggi la [Guida Utente](../user-guide/trips.md) dettagliata
-- Segnala problemi su [GitHub](https://github.com/applewebbo/organize_it/issues)
+- Segnala problemi su [Codeberg](https://codeberg.org/webbografico/organize_it/issues)
 
 Buona pianificazione! ✈️

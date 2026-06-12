@@ -695,7 +695,9 @@ Include in departure transfer notes or create separate event.
 
 ### Can I attach tickets/confirmations?
 
-Currently, no direct file attachments. Options:
+Yes. You can attach up to 2 PDFs or images (max 2 MB each) — boarding passes, train tickets, e-tickets — to each main transfer from the **Documents** card on the trip page. See the [Documents & Attachments guide](attachments.md).
+
+Additional options:
 - Add **Ticket URL** *(car and other transfers)* for e-tickets
 - Use trip **Links** section for booking pages
 - Store confirmation numbers in notes
