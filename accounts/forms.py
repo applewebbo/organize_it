@@ -40,6 +40,7 @@ class ProfileUpdateForm(forms.ModelForm):
             "use_system_theme",
             "show_transfer_info",
             "show_weather",
+            "notify_daily_digest",
             "fav_trip",
         )
         labels = {
@@ -54,6 +55,7 @@ class ProfileUpdateForm(forms.ModelForm):
             "use_system_theme": _("Use your device's light/dark system setting."),
             "show_transfer_info": _("Show transfer info"),
             "show_weather": _("Show weather forecast"),
+            "notify_daily_digest": _("Daily digest email"),
             "fav_trip": _("Favourite trip"),
         }
         widgets = {
@@ -85,6 +87,9 @@ class ProfileUpdateForm(forms.ModelForm):
                 attrs={"class": "checkbox checkbox-sm"}
             ),
             "show_weather": forms.CheckboxInput(
+                attrs={"class": "checkbox checkbox-sm"}
+            ),
+            "notify_daily_digest": forms.CheckboxInput(
                 attrs={"class": "checkbox checkbox-sm"}
             ),
             "fav_trip": forms.Select(attrs={"class": "select select-bordered w-full"}),

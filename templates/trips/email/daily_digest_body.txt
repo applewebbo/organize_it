@@ -1,0 +1,22 @@
+{% load i18n %}
+{% blocktranslate with title=trip.title %}Today on your trip "{{ title }}"{% endblocktranslate %}
+{% blocktranslate with number=day.number total=total_days %}Day {{ number }} of {{ total }}{% endblocktranslate %} ({{ day.date }})
+
+{% if day.weather_data %}{% trans "Weather:" %}
+  - {% trans "Max:" %} {{ day.weather_data.temperature_max|floatformat:"0" }}°C
+  - {% trans "Min:" %} {{ day.weather_data.temperature_min|floatformat:"0" }}°C
+{% endif %}
+{% if main_transfers %}{% trans "Transfers:" %}
+{% for t in main_transfers %}  - {{ t.get_direction_display }} ({{ t.get_type_display }}): {{ t.origin_name|default:t.origin_address }} → {{ t.destination_name|default:t.destination_address }}{% if t.start_time %} — {{ t.start_time|time:"H:i" }}{% endif %}
+{% endfor %}{% endif %}
+{% if check_in or check_out %}{% trans "Accommodation:" %}
+{% if check_in %}  - {% trans "Check-in:" %} {{ stay.name }} ({{ stay.address }})
+{% endif %}{% if check_out %}  - {% trans "Check-out:" %} {{ stay.name }}
+{% endif %}{% endif %}
+{% if events %}{% trans "Events:" %}
+{% for event in events %}  - {% if event.start_time %}{{ event.start_time|time:"H:i" }} — {% endif %}{{ event.name }}{% if event.address %} ({{ event.address }}){% endif %}
+{% endfor %}{% else %}{% trans "No events scheduled for today." %}
+{% endif %}
+{% trans "Open the trip:" %} {{ trip_url }}
+
+{% trans "Enjoy your day!" %}

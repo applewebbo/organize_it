@@ -75,3 +75,27 @@ Yes. Every accepted collaborator with a verified email and the **Show weather** 
 ### Where does the forecast data come from?
 
 From the configured weather provider on the backend. Accuracy depends on the provider and the distance to the destination — short-term forecasts (1–3 days) are typically reliable, while longer-range ones are indicative only.
+
+## Daily digest email
+
+While the trip is **in progress**, you receive a **daily summary email** for the current day with:
+
+- Trip title and "Day X of N" header
+- **Weather forecast** for the day (max/min)
+- **Events** scheduled for today, in chronological order
+- **Stay** check-in / check-out notices
+- **Main transfers** (arrival on day 1, departure on the last day)
+- A direct link to the trip
+
+The email is sent **once per day** to the trip author and to every accepted **collaborator** with a verified email address. The author is in the `To` field; collaborators are added in `Bcc`.
+
+### Opt-out
+
+Open your **profile** and turn off **Daily digest email**. The setting is per user: you stop receiving the digest for every trip you author or collaborate on.
+
+### When the email is not sent
+
+- The trip is not in progress (status `IN_PROGRESS` or `IMPENDING` on the first day)
+- The digest has already been sent for the day (idempotent)
+- Your email address is not verified
+- You disabled **Daily digest email** in your profile

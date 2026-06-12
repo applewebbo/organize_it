@@ -75,3 +75,27 @@ Sì. Ogni collaboratore accettato con email verificata e preferenza **Mostra met
 ### Da dove vengono i dati delle previsioni?
 
 Dal provider meteo configurato sul backend. L'accuratezza dipende dal provider e dalla distanza dalla destinazione — le previsioni a breve termine (1–3 giorni) sono generalmente affidabili, mentre quelle a lungo termine sono solo indicative.
+
+## Email riepilogo giornaliero
+
+Mentre il viaggio è **in corso**, ricevi un'**email di riepilogo giornaliera** per il giorno corrente con:
+
+- Titolo del viaggio e intestazione "Giorno X di N"
+- **Previsioni meteo** del giorno (max/min)
+- **Eventi** programmati per oggi, in ordine cronologico
+- **Alloggio**: avvisi di check-in / check-out
+- **Trasferimenti principali** (arrivo il giorno 1, partenza l'ultimo giorno)
+- Un link diretto al viaggio
+
+L'email viene inviata **una volta al giorno** all'autore del viaggio e a ogni **collaboratore** accettato con email verificata. L'autore è nel campo `A`; i collaboratori vengono aggiunti in `Ccn`.
+
+### Disattivazione
+
+Apri il tuo **profilo** e disattiva **Email riepilogo giornaliero**. L'impostazione è per utente: smetti di ricevere il riepilogo per ogni viaggio in cui sei autore o collaboratore.
+
+### Quando l'email non viene inviata
+
+- Il viaggio non è in corso (stato `IN_PROGRESS` oppure `IMPENDING` il primo giorno)
+- Il riepilogo è già stato inviato per la giornata (idempotente)
+- L'indirizzo email non è verificato
+- Hai disattivato **Email riepilogo giornaliero** nel profilo

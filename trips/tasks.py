@@ -490,6 +490,151 @@ def _send_weather_reminder_email(trip, today):
     return True
 
 
+def _eligible_digest_recipients(trip):
+    """Return email addresses eligible to receive the daily digest.
+
+    Author + accepted collaborators, filtered by:
+    - profile.notify_daily_digest is True
+    - the user has a verified email (allauth)
+    Author is first if eligible, to keep them in the visible ``to`` field.
+    """
+    from allauth.account.models import EmailAddress
+
+    candidates = [trip.author]
+    candidates.extend(
+        c.user for c in trip.collaborations.select_related("user__profile") if c.user
+    )
+    verified_user_ids = set(
+        EmailAddress.objects.filter(
+            user__in=[u.pk for u in candidates], verified=True
+        ).values_list("user_id", flat=True)
+    )
+    recipients = []
+    for user in candidates:
+        if not getattr(getattr(user, "profile", None), "notify_daily_digest", True):
+            continue
+        if user.pk not in verified_user_ids:
+            continue
+        if user.email and user.email not in recipients:
+            recipients.append(user.email)
+    return recipients
+
+
+def _get_digest_day_context(trip, today):
+    """Collect everything relevant for the digest of ``today`` in ``trip``.
+
+    Returns a dict with day, events, stay info and main transfers, or None
+    if today's date is outside the trip date range.
+    """
+    day = (
+        trip.days.prefetch_related("events", "stay")
+        .filter(date=today)
+        .select_related("stay")
+        .first()
+    )
+    if day is None:
+        return None
+
+    events = list(day.events.all().order_by("start_time", "order", "pk"))
+
+    stay = day.stay
+    check_in = False
+    check_out = False
+    if stay is not None:
+        stay_days = list(stay.days.order_by("number").values_list("date", flat=True))
+        if stay_days:
+            check_in = stay_days[0] == today
+            check_out = stay_days[-1] == today
+
+    arrival = trip.main_transfers.filter(
+        direction=MainTransfer.Direction.ARRIVAL
+    ).first()
+    departure = trip.main_transfers.filter(
+        direction=MainTransfer.Direction.DEPARTURE
+    ).first()
+    main_transfers = []
+    if arrival and trip.start_date == today:
+        main_transfers.append(arrival)
+    if departure and trip.end_date == today:
+        main_transfers.append(departure)
+
+    total_days = trip.days.count()
+    return {
+        "day": day,
+        "events": events,
+        "stay": stay,
+        "check_in": check_in,
+        "check_out": check_out,
+        "main_transfers": main_transfers,
+        "total_days": total_days,
+    }
+
+
+def _send_daily_digest_email(trip, today):
+    from django.core.mail import EmailMultiAlternatives
+    from django.template.loader import render_to_string
+    from django.utils.translation import override as translation_override
+
+    recipients = _eligible_digest_recipients(trip)
+    if not recipients:
+        return False
+
+    day_context = _get_digest_day_context(trip, today)
+    if day_context is None:
+        return False
+
+    recipient_language = getattr(trip.author.profile, "language", "en")
+    context = {
+        "trip": trip,
+        "today": today,
+        "trip_url": _build_trip_url(trip),
+        **day_context,
+    }
+    with translation_override(recipient_language):
+        subject = render_to_string(
+            "trips/email/daily_digest_subject.txt", context
+        ).strip()
+        text_body = render_to_string("trips/email/daily_digest_body.txt", context)
+        html_body = render_to_string("trips/email/daily_digest_body.html", context)
+    msg = EmailMultiAlternatives(
+        subject=subject, body=text_body, to=[recipients[0]], bcc=recipients[1:]
+    )
+    msg.attach_alternative(html_body, "text/html")
+    msg.send()
+    Trip.objects.filter(pk=trip.pk).update(daily_digest_sent_on=today)
+    logger.info(
+        f"Daily digest sent for trip '{trip.title}' to {len(recipients)} recipient(s)"
+    )
+    return True
+
+
+def send_daily_digests():
+    """Send the daily 'today on your trip' digest for active trips."""
+    try:
+        logger.info("Starting send_daily_digests task")
+        today = timezone.now().date()
+        trips = (
+            Trip.objects.filter(
+                status__in=[Trip.Status.IMPENDING, Trip.Status.IN_PROGRESS],
+                start_date__lte=today,
+                end_date__gte=today,
+            )
+            .exclude(daily_digest_sent_on=today)
+            .select_related("author__profile")
+            .prefetch_related("days", "collaborations__user__profile", "main_transfers")
+        )
+        sent = 0
+        for trip in trips:
+            if _send_daily_digest_email(trip, today):
+                sent += 1
+        result_msg = f"Daily digests sent: {sent}"
+        logger.info(f"send_daily_digests completed: {result_msg}")
+        return result_msg
+    except Exception as e:
+        logger.error(f"Error in send_daily_digests task: {e}", exc_info=True)
+        raise
+
+
 def send_weather_reminders():
     """Send weather reminder emails 3 days before departure."""
     try:

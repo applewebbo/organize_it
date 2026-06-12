@@ -152,6 +152,11 @@ class Profile(models.Model):
         default=True,
         help_text=_("When disabled, weather data is not fetched from the API."),
     )
+    notify_daily_digest = models.BooleanField(
+        _("Daily digest email"),
+        default=True,
+        help_text=_("Receive a daily summary email of your trip plan during the trip."),
+    )
 
     def save(self, *args, **kwargs):
         old = Profile.objects.filter(pk=self.pk).first()

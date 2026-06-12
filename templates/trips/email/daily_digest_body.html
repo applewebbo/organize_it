@@ -1,0 +1,81 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>{% trans "Today on your trip" %}</title>
+        <meta name="description" content="{% trans 'Today on your trip' %}">
+        <meta name="keywords" content="trip, daily, digest">
+        <style>
+    body { font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 24px; }
+    .btn { display: inline-block; padding: 10px 20px; background-color: #4f46e5; color: #fff; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 16px; }
+    .section { margin: 16px 0; padding: 12px; border: 1px solid #eee; border-radius: 8px; background-color: #fafafa; }
+    .section h3 { margin: 0 0 8px 0; font-size: 15px; }
+    ul { margin: 4px 0 0 0; padding-left: 20px; }
+    .footer { margin-top: 32px; font-size: 12px; color: #888; }
+        </style>
+    </head>
+    <body>
+        <h2>{% blocktranslate with title=trip.title %}Today on your trip "{{ title }}"{% endblocktranslate %}</h2>
+        <p>
+            <strong>{% blocktranslate with number=day.number total=total_days %}Day {{ number }} of {{ total }}{% endblocktranslate %}</strong>
+            — {{ day.date|date:"SHORT_DATE_FORMAT" }}
+        </p>
+        {% if day.weather_data %}
+            <div class="section">
+                <h3>☀️ {% trans "Weather" %}</h3>
+                {% trans "Max:" %} {{ day.weather_data.temperature_max|floatformat:"0" }}°C •
+                ❄️ {% trans "Min:" %} {{ day.weather_data.temperature_min|floatformat:"0" }}°C
+            </div>
+        {% endif %}
+        {% if main_transfers %}
+            <div class="section">
+                <h3>✈️ {% trans "Transfers" %}</h3>
+                <ul>
+                    {% for t in main_transfers %}
+                        <li>
+                            <strong>{{ t.get_direction_display }}</strong> ({{ t.get_type_display }}):
+                            {{ t.origin_name|default:t.origin_address }} → {{ t.destination_name|default:t.destination_address }}
+                            {% if t.start_time %}— {{ t.start_time|time:"H:i" }}{% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        {% if check_in or check_out %}
+            <div class="section">
+                <h3>🏨 {% trans "Accommodation" %}</h3>
+                <ul>
+                    {% if check_in %}
+                        <li><strong>{% trans "Check-in:" %}</strong> {{ stay.name }} — {{ stay.address }}</li>
+                    {% endif %}
+                    {% if check_out %}
+                        <li><strong>{% trans "Check-out:" %}</strong> {{ stay.name }}</li>
+                    {% endif %}
+                </ul>
+            </div>
+        {% endif %}
+        <div class="section">
+            <h3>📅 {% trans "Events" %}</h3>
+            {% if events %}
+                <ul>
+                    {% for event in events %}
+                        <li>
+                            {% if event.start_time %}<strong>{{ event.start_time|time:"H:i" }}</strong> —{% endif %}
+                            {{ event.name }}
+                            {% if event.address %}<em>({{ event.address }})</em>{% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>{% trans "No events scheduled for today." %}</p>
+            {% endif %}
+        </div>
+        <p>
+            <a href="{{ trip_url }}" class="btn">{% trans "Open the trip" %}</a>
+        </p>
+        <div class="footer">
+            <p>{% trans "You received this email because you have an active trip and the daily digest enabled in your profile." %}</p>
+        </div>
+    </body>
+</html>

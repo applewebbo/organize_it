@@ -136,6 +136,16 @@
                         {% endif %}
                         <p class="mt-1 text-xs italic text-base-content/50">{{ profile_form.show_weather.help_text }}</p>
                     </div>
+                    <div>
+                        <label class="flex gap-3 items-center cursor-pointer">
+                            {{ profile_form.notify_daily_digest }}
+                            <span>{{ profile_form.notify_daily_digest.label }}</span>
+                        </label>
+                        {% if profile_form.notify_daily_digest.errors %}
+                            <div class="mt-1 text-sm text-error">{{ profile_form.notify_daily_digest.errors }}</div>
+                        {% endif %}
+                        <p class="mt-1 text-xs italic text-base-content/50">{{ profile_form.notify_daily_digest.help_text }}</p>
+                    </div>
                 </div>
                 <div class="flex justify-end mt-6">
                     <button type="submit" class="btn btn-sm btn-soft btn-primary">{% trans "Save" %}</button>
