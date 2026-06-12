@@ -23,7 +23,7 @@ repos:
   # FORMATTERS (before)
   # -------------------------
 - repo: https://github.com/djlint/djLint
-  rev: v1.39.0
+  rev: v1.39.2
   hooks:
   - id: djlint-reformat-django
     files: ^templates/.*\.html$
@@ -40,7 +40,7 @@ repos:
     types_or: [html]
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.15.16
+  rev: v0.15.17
   hooks:
   - id: ruff-format
 
@@ -56,14 +56,14 @@ repos:
   # LINTERS (after)
   # -------------------------
 - repo: https://github.com/djlint/djLint
-  rev: v1.39.0
+  rev: v1.39.2
   hooks:
   - id: djlint-django
     files: ^templates/.*\.html$
     exclude: ^templates/tailwind/field\.html$
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.15.16
+  rev: v0.15.17
   hooks:
   - id: ruff
     args: [--fix, --exit-non-zero-on-fix]
