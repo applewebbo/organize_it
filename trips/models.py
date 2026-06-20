@@ -1029,19 +1029,6 @@ class TripCollaboration(models.Model):
         unique_together = ("trip", "user")
         ordering = ("added_at",)
 
-    def duration_in_days(self) -> int:
-        if self.start_date and self.end_date:
-            return days_between(self.start_date, self.end_date) + 1
-        return 0
-
-    @property
-    def is_multi_destination(self):
-        """Returns True if the trip has days with different destinations."""
-        if not self.pk:
-            return False
-        destinations = set(self.days.values_list("destination", flat=True))
-        return len(destinations) > 1
-
     def __str__(self) -> str:
         label = self.display_name
         return f"{label} → {self.trip.title} ({self.color})"
