@@ -405,7 +405,8 @@ def validate_dates(request):
         return HttpResponse("")
 
     # Check if start_date is before today
-    if start_date_obj and start_date_obj < date.today():
+    trip_id = request.GET.get("trip_id")
+    if not trip_id and start_date_obj and start_date_obj < date.today():
         errors.append(_("Start date must be after today."))
 
     # Check if start_date is after end_date

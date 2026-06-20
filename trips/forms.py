@@ -69,6 +69,8 @@ class TripForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         validate_url = reverse("trips:validate-dates")
+        if self.instance and self.instance.pk:
+            validate_url += f"?trip_id={self.instance.pk}"
         htmx_attrs = {
             "hx-post": validate_url,
             "hx-trigger": "change",

@@ -66,8 +66,20 @@ def export_trip_ical(request, calendar_token):
         event.add("dtend", end_date)
         if stay.address:
             event.add("location", stay.address)
+        description_parts = []
         if stay.notes:
-            event.add("description", stay.notes)
+            description_parts.append(stay.notes)
+        if stay.check_in:
+            description_parts.append(f"Check-in: {stay.check_in.strftime('%H:%M')}")
+        if stay.check_out:
+            description_parts.append(f"Check-out: {stay.check_out.strftime('%H:%M')}")
+        if stay.phone_number:
+            description_parts.append(f"Phone: {stay.phone_number}")
+        if stay.website:
+            description_parts.append(f"Website: {stay.website}")
+
+        if description_parts:
+            event.add("description", "\n\n".join(description_parts))
         cal.add_component(event)
 
     # 3. Add Events
@@ -86,8 +98,25 @@ def export_trip_ical(request, calendar_token):
                 event.add("dtend", dt_end)
                 if ev.address:
                     event.add("location", ev.address)
+
+                description_parts = []
                 if ev.notes:
-                    event.add("description", ev.notes)
+                    description_parts.append(ev.notes)
+                if ev.phone_number:
+                    description_parts.append(f"Phone: {ev.phone_number}")
+                if ev.website:
+                    description_parts.append(f"Website: {ev.website}")
+                if ev.opening_hours:
+                    description_parts.append("Opening Hours:")
+                    for idx, day_name in enumerate(
+                        ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+                    ):
+                        hours = ev.opening_hours.get(str(idx))
+                        if hours:
+                            description_parts.append(f"{day_name}: {hours}")
+
+                if description_parts:
+                    event.add("description", "\n\n".join(description_parts))
                 cal.add_component(event)
 
     response = HttpResponse(cal.to_ical(), content_type="text/calendar")

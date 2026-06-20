@@ -1,32 +1,35 @@
 {% load i18n trip_tags %}
 <div class="flex flex-col gap-5 sm:gap-3">
     {% if show_transfer_info and from_home_duration %}
-        <div class="flex flex-wrap gap-3 justify-center items-center mb-1 text-sm text-base-content/50">
-            <span>{% trans "Home" %}</span>
-            <i class="ph-bold ph-arrow-right i-sm" aria-hidden="true"></i>
-            <span>{{ from_home_destination }}</span>
-            <span>·</span>
-            <i class="ph-bold ph-clock i-sm" aria-hidden="true"></i>
-            <span>~{{ from_home_duration|format_minutes }}</span>
-            <span>·</span>
-            <i class="ph-bold ph-car i-sm" aria-hidden="true"></i>
-            <span>~{{ from_home_distance }} km</span>
+        <div class="flex flex-col gap-1.5 items-center py-3 px-4 mx-auto mb-4 w-full max-w-sm text-sm rounded-xl border text-base-content/80 bg-info/10 border-info/20">
+            <div class="flex gap-2 items-center font-medium">
+                <span class="text-center truncate">{% trans "Home" %}</span>
+                <i class="ph-bold ph-arrow-right text-info shrink-0" aria-hidden="true"></i>
+                <span class="text-center truncate">{{ from_home_destination }}</span>
+            </div>
+            <div class="flex gap-4 items-center text-xs opacity-80">
+                <div class="flex gap-1.5 items-center"
+                     title="{% trans 'Estimated driving time' %}">
+                    <i class="ph-bold ph-car shrink-0" aria-hidden="true"></i>
+                    <span>~{{ from_home_duration|format_minutes }}</span>
+                </div>
+                <div class="flex gap-1.5 items-center"
+                     title="{% trans 'Estimated driving distance' %}">
+                    <i class="ph-bold ph-map-pin-line shrink-0" aria-hidden="true"></i>
+                    <span>~{{ from_home_distance }} km</span>
+                </div>
+            </div>
         </div>
     {% endif %}
     {% if day_groups %}
         {% for group in day_groups %}
-            {% with dest=group.destination|default:trip.destination %}
-                {% if forloop.first and dest != trip.destination %}
-                    <div class="text-sm uppercase divider text-base-content/50">{{ dest }}</div>
-                {% endif %}
-            {% endwith %}
+            {% with dest=group.destination|default:trip.destination %}{% endwith %}
             {% for day in group.days %}
                 {% include 'trips/includes/day.html' with day=day %}
                 {% if not forloop.last %}<hr class="pb-2 sm:hidden border-base-300">{% endif %}
             {% endfor %}
             {% if group.next_destination %}
                 {% with from_dest=group.destination|default:trip.destination %}
-                    <div class="mb-1 text-sm uppercase divider text-base-content/50">{{ group.next_destination }}</div>
                     {% if show_transfer_info %}
                         {% include 'trips/includes/transfer-info.html' with day_pk=group.last_day_pk from_dest=from_dest next_destination=group.next_destination transfer_duration=group.transfer_duration transfer_distance=group.transfer_distance %}
                     {% endif %}
@@ -40,16 +43,24 @@
         {% endfor %}
     {% endif %}
     {% if show_transfer_info and to_home_duration %}
-        <div class="flex flex-wrap gap-3 justify-center items-center mt-1 text-sm text-base-content/50">
-            <span>{{ to_home_destination }}</span>
-            <i class="ph-bold ph-arrow-right i-sm" aria-hidden="true"></i>
-            <span>{% trans "Home" %}</span>
-            <span>·</span>
-            <i class="ph-bold ph-clock i-sm" aria-hidden="true"></i>
-            <span>~{{ to_home_duration|format_minutes }}</span>
-            <span>·</span>
-            <i class="ph-bold ph-car i-sm" aria-hidden="true"></i>
-            <span>~{{ to_home_distance }} km</span>
+        <div class="flex flex-col gap-1.5 items-center py-3 px-4 mx-auto mt-4 w-full max-w-sm text-sm rounded-xl border text-base-content/80 bg-info/10 border-info/20">
+            <div class="flex gap-2 items-center font-medium">
+                <span class="text-center truncate">{{ to_home_destination }}</span>
+                <i class="ph-bold ph-arrow-right text-info shrink-0" aria-hidden="true"></i>
+                <span class="text-center truncate">{% trans "Home" %}</span>
+            </div>
+            <div class="flex gap-4 items-center text-xs opacity-80">
+                <div class="flex gap-1.5 items-center"
+                     title="{% trans 'Estimated driving time' %}">
+                    <i class="ph-bold ph-car shrink-0" aria-hidden="true"></i>
+                    <span>~{{ to_home_duration|format_minutes }}</span>
+                </div>
+                <div class="flex gap-1.5 items-center"
+                     title="{% trans 'Estimated driving distance' %}">
+                    <i class="ph-bold ph-map-pin-line shrink-0" aria-hidden="true"></i>
+                    <span>~{{ to_home_distance }} km</span>
+                </div>
+            </div>
         </div>
     {% endif %}
 </div>

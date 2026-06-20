@@ -75,23 +75,34 @@
                                 <td style="height:12px;line-height:12px;">&nbsp;</td>
                             </tr>
                         {% endif %}
-                        {% if check_in or check_out %}
+                        {% if stay %}
                             <tr>
                                 <td style="padding:12px;
                                            border:1px solid #eeeeee;
                                            background-color:#fafafa;
                                            font-size:14px">
                                     <p style="margin:0 0 6px 0;font-weight:bold;font-size:15px;">🏨 {% trans "Accommodation" %}</p>
-                                    {% if check_in %}
-                                        <p style="margin:4px 0 0 0;">
-                                            <strong>{% trans "Check-in:" %}</strong> {{ stay.name }} — {{ stay.address }}
-                                        </p>
-                                    {% endif %}
-                                    {% if check_out %}
-                                        <p style="margin:4px 0 0 0;">
-                                            <strong>{% trans "Check-out:" %}</strong> {{ stay.name }}
-                                        </p>
-                                    {% endif %}
+                                    <p style="margin:4px 0 0 0;">
+                                        <strong>{% trans "Stay:" %}</strong>
+                                        {% if stay.website %}
+                                            <a href="{{ stay.website }}">{{ stay.name }}</a>
+                                        {% else %}
+                                            {{ stay.name }}
+                                        {% endif %}
+                                        {% if stay.google_maps_directions_url %}
+                                            — <a href="{{ stay.google_maps_directions_url }}">{{ stay.address }}</a>
+                                        {% elif stay.address %}
+                                            — {{ stay.address }}
+                                        {% endif %}
+                                        {% if stay.phone_number %}({{ stay.phone_number }}){% endif %}
+                                    </p>
+                                    <p style="margin:4px 0 0 0; font-size: 13px; color: #666;">
+                                        <strong>{% trans "Check-in:" %}</strong> {{ stay_start_date|date:"SHORT_DATE_FORMAT" }}
+                                        {% if stay.check_in %}{{ stay.check_in|time:"H:i" }}{% endif %}
+                                        &nbsp;|&nbsp;
+                                        <strong>{% trans "Check-out:" %}</strong> {{ stay_end_date|date:"SHORT_DATE_FORMAT" }}
+                                        {% if stay.check_out %}{{ stay.check_out|time:"H:i" }}{% endif %}
+                                    </p>
                                 </td>
                             </tr>
                             <tr>
@@ -108,8 +119,21 @@
                                     {% for event in events %}
                                         <p style="margin:4px 0 0 0;">
                                             {% if event.start_time %}<strong>{{ event.start_time|time:"H:i" }}</strong> —{% endif %}
-                                            {{ event.name }}
-                                            {% if event.address %}<em>({{ event.address }})</em>{% endif %}
+                                            {% if event.website %}
+                                                <a href="{{ event.website }}">{{ event.name }}</a>
+                                            {% else %}
+                                                {{ event.name }}
+                                            {% endif %}
+                                            {% if event.google_maps_directions_url %}
+                                                <em>(<a href="{{ event.google_maps_directions_url }}">{{ event.address }}</a>)</em>
+                                            {% elif event.address %}
+                                                <em>({{ event.address }})</em>
+                                            {% endif %}
+                                            {% if event.phone_number %}({{ event.phone_number }}){% endif %}
+                                            {% if event.notes %}
+                                                <br>
+                                                <small style="color: #666;">{{ event.notes|truncatechars:100 }}</small>
+                                            {% endif %}
                                         </p>
                                     {% endfor %}
                                 {% else %}

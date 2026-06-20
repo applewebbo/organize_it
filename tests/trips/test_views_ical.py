@@ -198,7 +198,15 @@ def test_export_trip_ical_stay_without_address_or_notes(tp, trip, stay_factory):
     trip.end_date = datetime.date(2025, 1, 1)
     trip.save()
     day = Day.objects.create(trip=trip, number=1, date=datetime.date(2025, 1, 1))
-    stay = stay_factory(name="Bare Stay", address="", notes="")
+    stay = stay_factory(
+        name="Bare Stay",
+        address="",
+        notes="",
+        check_in=None,
+        check_out=None,
+        phone_number="",
+        website="",
+    )
     day.stay = stay
     day.save()
     url = reverse("trips:trip-ical", kwargs={"calendar_token": trip.calendar_token})
@@ -222,6 +230,9 @@ def test_export_trip_ical_event_without_address_or_notes(tp, trip, event_factory
         name="Bare event",
         address="",
         notes="",
+        website="",
+        phone_number="",
+        opening_hours=None,
     )
     url = reverse("trips:trip-ical", kwargs={"calendar_token": trip.calendar_token})
     response = tp.get(url)

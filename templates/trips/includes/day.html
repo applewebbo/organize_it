@@ -5,18 +5,26 @@
      hx-trigger="dayModified{{ day.pk }} from:body"
      hx-target="#day-{{ day.pk }}"
      hx-swap="outerHTML">
-    <div class="flex justify-between items-center">
-        <div class="flex gap-2 items-center">
-            <h3 class="text-base font-semibold">
-                {% if day.date %}
-                    {{ day.date|date:"j F" }} <span class="font-normal text-base-content/50 ms-0.5">{% trans 'Day' %} {{ day.number }}</span>
-                {% else %}
-                    {% trans 'Day' %} {{ day.number }}
+    <div class="flex justify-between items-start">
+        <div class="flex flex-col gap-1.5">
+            <div class="flex flex-wrap gap-2 items-center">
+                <h3 class="text-base font-semibold">
+                    {% if day.date %}
+                        {{ day.date|date:"j F" }} <span class="font-normal text-base-content/50 ms-0.5">{% trans 'Day' %} {{ day.number }}</span>
+                    {% else %}
+                        {% trans 'Day' %} {{ day.number }}
+                    {% endif %}
+                </h3>
+                {% if day.trip.is_multi_destination %}
+                    <span class="text-sm font-medium uppercase text-base-content/50">
+                        —
+                        {% with dest=day.destination|default:day.trip.destination %}{{ dest }}{% endwith %}
+                    </span>
                 {% endif %}
-            </h3>
+            </div>
             {% if day.stay %}
-                <span class="inline-flex gap-1.5 items-center py-1 px-2.5 text-xs font-medium rounded-md ms-1 bg-base-300 text-base-content/70 dark:bg-base-200/50">
-                    <i class="ph-bold ph-bed i-sm"></i><span class="hidden sm:inline">{{ day.stay.name }}</span>
+                <span class="inline-flex gap-1.5 items-center py-1 px-2.5 max-w-full text-xs font-medium rounded-md bg-base-300 text-base-content/70 w-fit dark:bg-base-200/50">
+                    <i class="ph-bold ph-bed i-sm shrink-0"></i><span class="break-words line-clamp-2">{{ day.stay.name }}</span>
                 </span>
             {% endif %}
         </div>

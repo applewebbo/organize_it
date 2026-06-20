@@ -1,19 +1,26 @@
 {% load i18n trip_tags %}
 <div id="transfer-info-{{ day_pk }}"
-     class="flex gap-3 justify-center items-center mb-4 text-sm text-base-content/50"
+     class="flex flex-col gap-1.5 items-center py-3 px-4 mx-auto mb-4 w-full max-w-sm text-sm rounded-xl border text-base-content/80 bg-info/10 border-info/20"
      {% if not transfer_duration %} hx-get="{% url 'trips:transfer-info' day_pk %}" hx-trigger="every 4s" hx-target="#transfer-info-{{ day_pk }}" hx-swap="outerHTML" {% endif %}>
-    <span>{{ from_dest }}</span>
-    <i class="ph-bold ph-arrow-right i-sm" aria-hidden="true"></i>
-    <span>{{ next_destination }}</span>
+    <div class="flex gap-2 items-center font-medium">
+        <span class="text-center truncate">{{ from_dest }}</span>
+        <i class="ph-bold ph-arrow-right text-info shrink-0" aria-hidden="true"></i>
+        <span class="text-center truncate">{{ next_destination }}</span>
+    </div>
     {% if transfer_duration %}
-        <span>·</span>
-        <i class="ph-bold ph-clock i-sm" aria-hidden="true"></i>
-        <span>~{{ transfer_duration|format_minutes }}</span>
-        <span>·</span>
-        <i class="ph-bold ph-car i-sm" aria-hidden="true"></i>
-        <span>~{{ transfer_distance }} km</span>
+        <div class="flex gap-4 items-center text-xs opacity-80">
+            <div class="flex gap-1.5 items-center"
+                 title="{% trans 'Estimated driving time' %}">
+                <i class="ph-bold ph-car shrink-0" aria-hidden="true"></i>
+                <span>~{{ transfer_duration|format_minutes }}</span>
+            </div>
+            <div class="flex gap-1.5 items-center"
+                 title="{% trans 'Estimated driving distance' %}">
+                <i class="ph-bold ph-map-pin-line shrink-0" aria-hidden="true"></i>
+                <span>~{{ transfer_distance }} km</span>
+            </div>
+        </div>
     {% else %}
-        <span>·</span>
-        <span class="loading loading-spinner loading-xs"></span>
+        <span class="mt-1 loading loading-spinner loading-xs"></span>
     {% endif %}
 </div>

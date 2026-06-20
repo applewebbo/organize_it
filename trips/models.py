@@ -119,6 +119,14 @@ class Trip(models.Model):
     def checklist_completed(self):
         return self.checklist_items.filter(completed=True).count()
 
+    @property
+    def is_multi_destination(self):
+        """Returns True if the trip has days with different destinations."""
+        if not self.pk:
+            return False
+        destinations = set(self.days.values_list("destination", flat=True))
+        return len(destinations) > 1
+
 
 @receiver(pre_save, sender="trips.Trip")
 def capture_trip_old_destination(sender, instance, **kwargs):
@@ -267,6 +275,18 @@ class Stay(models.Model):
     def __str__(self) -> str:
         first_day = self.days.first()
         return f"{self.name} - {first_day.trip.title}" if first_day else self.name
+
+    @property
+    def google_maps_directions_url(self):
+        """Google Maps directions URL from current location to this stay's address."""
+        address = self.address or ""
+        if self.city:
+            address = f"{address}, {self.city}"
+        if address.strip():
+            return f"https://www.google.com/maps/dir/?api=1&destination={quote(address.strip())}"
+        if self.latitude and self.longitude:
+            return f"https://www.google.com/maps/dir/?api=1&destination={self.latitude},{self.longitude}"
+        return None
 
 
 @receiver(post_save, sender=Stay)
@@ -1008,6 +1028,19 @@ class TripCollaboration(models.Model):
     class Meta:
         unique_together = ("trip", "user")
         ordering = ("added_at",)
+
+    def duration_in_days(self) -> int:
+        if self.start_date and self.end_date:
+            return days_between(self.start_date, self.end_date) + 1
+        return 0
+
+    @property
+    def is_multi_destination(self):
+        """Returns True if the trip has days with different destinations."""
+        if not self.pk:
+            return False
+        destinations = set(self.days.values_list("destination", flat=True))
+        return len(destinations) > 1
 
     def __str__(self) -> str:
         label = self.display_name

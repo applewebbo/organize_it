@@ -540,11 +540,15 @@ def _get_digest_day_context(trip, today):
     stay = day.stay
     check_in = False
     check_out = False
+    stay_start_date = None
+    stay_end_date = None
     if stay is not None:
         stay_days = list(stay.days.order_by("number").values_list("date", flat=True))
         if stay_days:
             check_in = stay_days[0] == today
             check_out = stay_days[-1] == today
+            stay_start_date = stay_days[0]
+            stay_end_date = stay_days[-1]
 
     arrival = trip.main_transfers.filter(
         direction=MainTransfer.Direction.ARRIVAL
@@ -565,6 +569,8 @@ def _get_digest_day_context(trip, today):
         "stay": stay,
         "check_in": check_in,
         "check_out": check_out,
+        "stay_start_date": stay_start_date,
+        "stay_end_date": stay_end_date,
         "main_transfers": main_transfers,
         "total_days": total_days,
     }

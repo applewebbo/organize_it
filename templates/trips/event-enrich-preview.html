@@ -3,7 +3,7 @@
     <div class="flex gap-1 items-center">
         <h3 id="event-title"
             class="text-xl font-semibold text-gray-900 dark:text-white">{{ event.name }}</h3>
-        {% if event.category == 3 %}
+        {% if event.category == 3 and event.type != 0 %}
             <span class="badge badge-outline badge-sm badge-info ms-2 align-sub">{{ event.get_type_display }}</span>
         {% endif %}
         {% if event.tag %}
