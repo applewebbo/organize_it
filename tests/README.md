@@ -70,7 +70,7 @@ from tests.trips.factories import TripFactory
 pytestmark = pytest.mark.django_db
 
 
-class TripDetailView(TestCase):
+class TestTripDetailView(TestCase):
     def test_get(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)
@@ -118,7 +118,7 @@ All view tests inherit from `tests.test.TestCase`, which extends `django-test-pl
 from tests.test import TestCase
 
 
-class MyViewTest(TestCase):
+class TestMyView(TestCase):
     """
     Available methods:
     - self.make_user(username) - Create and return user
@@ -351,7 +351,7 @@ def test_geocoding(mock_geocoder):
 ### 3. Test Both Success and Failure Paths
 
 ```python
-class TripCreateView(TestCase):
+class TestTripCreateView(TestCase):
     def test_post_success(self):
         # Test successful creation
         pass
@@ -365,7 +365,22 @@ class TripCreateView(TestCase):
         pass
 ```
 
-### 4. Use Descriptive Test Names
+### 4. Name Test Classes with the `Test` Prefix
+
+All test classes use the pytest-idiomatic `Test` prefix (e.g. `TestTripDetailView`,
+`TestGeocodeLocation`). Do not use a `View`/`Test`/`Tests` suffix or an unprefixed
+name. Factories (`*Factory`) and the shared `tests.test.TestCase` base are excluded.
+
+```python
+# Good
+class TestTripCreateView(TestCase): ...
+
+# Avoid
+class TripCreateView(TestCase): ...
+class TripCreateViewTest(TestCase): ...
+```
+
+### 5. Use Descriptive Test Names
 
 ```python
 # Good: Describes what is being tested
@@ -377,7 +392,7 @@ def test_status(self):
     pass
 ```
 
-### 5. Organize Tests by Feature, Not by Model
+### 6. Organize Tests by Feature, Not by Model
 
 The `test_views.py` split demonstrates this:
 - `test_views_trip_crud.py` - Trip operations
@@ -385,7 +400,7 @@ The `test_views.py` split demonstrates this:
 - `test_views_notes.py` - Notes feature
 - `test_views_enrichment.py` - Google Places feature
 
-### 6. Keep Tests Independent
+### 7. Keep Tests Independent
 
 Each test should be able to run in isolation:
 
@@ -398,12 +413,12 @@ def test_trip_list(self):
     # ... test ...
 
 # Avoid: Depends on other tests
-class TripTests(TestCase):
+class TestTrip(TestCase):
     def setUp(self):
         self.trip = TripFactory()  # Shared state
 ```
 
-### 7. Use Time Machine for Date Tests
+### 8. Use Time Machine for Date Tests
 
 ```python
 import time_machine
@@ -420,7 +435,7 @@ def test_trip_status_at_specific_date(self):
 ### Testing Views with Authentication
 
 ```python
-class TripUpdateView(TestCase):
+class TestTripUpdateView(TestCase):
     def test_get(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)

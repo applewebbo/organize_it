@@ -29,7 +29,7 @@ def _create_event(trip, day, name="Test Event"):
     )
 
 
-class MoveEventToDayViewTest(TestCase):
+class TestMoveEventToDayView(TestCase):
     def test_owner_can_move_event_to_another_day(self):
         user = self.make_user("owner@example.com")
         trip = _make_trip_with_two_days(user)
@@ -152,7 +152,7 @@ class MoveEventToDayViewTest(TestCase):
         self.response_405(response)
 
 
-class MoveEventDayModalViewTest(TestCase):
+class TestMoveEventDayModalView(TestCase):
     def test_owner_gets_day_list(self):
         user = self.make_user("owner@example.com")
         trip = _make_trip_with_two_days(user)

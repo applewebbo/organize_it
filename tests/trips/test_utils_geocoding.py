@@ -10,7 +10,7 @@ from trips.utils import generate_cache_key, geocode_location
 pytestmark = pytest.mark.django_db
 
 
-class RateLimitCheckTests(TestCase):
+class TestRateLimitCheck(TestCase):
     def test_rate_limit_check_waits_if_called_too_soon(self):
         """Should sleep if called within 1 second of last request."""
 
@@ -34,7 +34,7 @@ class RateLimitCheckTests(TestCase):
         assert elapsed < 0.5  # Should not wait
 
 
-class GenerateCacheKeyTests(TestCase):
+class TestGenerateCacheKey(TestCase):
     def test_generate_cache_key_basic(self):
         key = generate_cache_key("Hotel Milano", "Milan")
         assert key.startswith("geocode_")
@@ -46,7 +46,7 @@ class GenerateCacheKeyTests(TestCase):
         assert len(key) < 100  # Should not be excessively long
 
 
-class GeocodeLocationTests(TestCase):
+class TestGeocodeLocation(TestCase):
     @patch("trips.utils.requests.get")
     def test_geocode_location_returns_sorted_addresses(self, mock_get):
         from trips.utils import geocode_location
@@ -137,7 +137,7 @@ class GeocodeLocationTests(TestCase):
         assert not mock_get.called
 
 
-class GeocodeLocationAddressFormatTests(TestCase):
+class TestGeocodeLocationAddressFormat(TestCase):
     def test_address_format_with_only_street_and_city(self):
         with patch("trips.utils.requests.get") as mock_get:
             mock_get.return_value.status_code = 200
@@ -207,7 +207,7 @@ class GeocodeLocationAddressFormatTests(TestCase):
             assert addresses[0]["address"] == "Via Firenze 22"
 
 
-class SelectBestResultTests(TestCase):
+class TestSelectBestResult(TestCase):
     def test_select_best_result_returns_none_for_empty(self):
         from trips.utils import select_best_result
 

@@ -17,7 +17,7 @@ from trips.forms import ExperienceForm, MealForm
 pytestmark = pytest.mark.django_db
 
 
-class AddExperienceView(TestCase):
+class TestAddExperienceView(TestCase):
     @patch("geocoder.mapbox")
     def test_post(self, mock_geocoder):
         mock_geocoder.return_value.ok = True
@@ -84,7 +84,7 @@ class AddExperienceView(TestCase):
         assert response.context["form"].initial["city"] == "Roma"
 
 
-class AddMealView(TestCase):
+class TestAddMealView(TestCase):
     @patch("geocoder.mapbox")
     def test_post(self, mock_geocoder):
         mock_geocoder.return_value.ok = True
@@ -139,7 +139,7 @@ class AddMealView(TestCase):
         assert response.context["form"].initial["city"] == "Napoli"
 
 
-class EventDeleteView(TestCase):
+class TestEventDeleteView(TestCase):
     def test_delete(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)
@@ -155,7 +155,7 @@ class EventDeleteView(TestCase):
         assert event.day.events.count() == 0
 
 
-class EventUnpairView(TestCase):
+class TestEventUnpairView(TestCase):
     def test_unpair(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)
@@ -176,7 +176,7 @@ class EventUnpairView(TestCase):
         assert event.day is None
 
 
-class EventPairView(TestCase):
+class TestEventPairView(TestCase):
     def test_pair(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)
@@ -199,7 +199,7 @@ class EventPairView(TestCase):
         assert event.day == day
 
 
-class EventPairChoiceView(TestCase):
+class TestEventPairChoiceView(TestCase):
     """Test cases for event pair choice view"""
 
     def test_get_pair_choice(self):
@@ -234,7 +234,7 @@ class EventPairChoiceView(TestCase):
         assert list(response.context["days"]) == list(trip.days.all())
 
 
-class EventModalView(TestCase):
+class TestEventModalView(TestCase):
     """Test cases for event modal view"""
 
     def test_get_modal(self):
@@ -252,7 +252,7 @@ class EventModalView(TestCase):
         assert response.context["event"] == event
 
 
-class EventModifyView(TestCase):
+class TestEventModifyView(TestCase):
     def test_get_experience(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)
@@ -349,7 +349,7 @@ class EventModifyView(TestCase):
         assert event.name == "Updated Meal"
 
 
-class AddExperienceToTripView(TestCase):
+class TestAddExperienceToTripView(TestCase):
     @patch("geocoder.mapbox")
     def test_post(self, mock_geocoder):
         mock_geocoder.return_value.ok = True
@@ -413,7 +413,7 @@ class AddExperienceToTripView(TestCase):
         self.response_404(response)
 
 
-class AddMealToTripView(TestCase):
+class TestAddMealToTripView(TestCase):
     @patch("geocoder.mapbox")
     def test_post(self, mock_geocoder):
         mock_geocoder.return_value.ok = True

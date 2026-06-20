@@ -17,7 +17,7 @@ from tests.trips.factories import (
 pytestmark = pytest.mark.django_db
 
 
-class SingleEventViewTest(TestCase):
+class TestSingleEventView(TestCase):
     """Test cases for single_event view"""
 
     def test_get_single_event_success(self):
@@ -36,7 +36,7 @@ class SingleEventViewTest(TestCase):
 
 @patch("trips.services.requests.get")
 @patch("trips.services.requests.post")
-class EnrichEventViewTest(TestCase):
+class TestEnrichEventView(TestCase):
     """Test cases for enrich_event view"""
 
     def setUp(self):
@@ -295,7 +295,7 @@ class EnrichEventViewTest(TestCase):
         )
 
 
-class ConfirmEnrichEventViewTest(TestCase):
+class TestConfirmEnrichEventView(TestCase):
     """Test cases for confirm_enrich_event view"""
 
     def test_confirm_enrich_event_success(self):
@@ -426,7 +426,7 @@ class ConfirmEnrichEventViewTest(TestCase):
 
 @patch("trips.services.requests.get")
 @patch("trips.services.requests.post")
-class EnrichStayViewTest(TestCase):
+class TestEnrichStayView(TestCase):
     """Test cases for enrich_stay view"""
 
     def setUp(self):
@@ -673,7 +673,7 @@ class EnrichStayViewTest(TestCase):
         assert response.context["show_preview"] is True
 
 
-class ConfirmEnrichStayViewTest(TestCase):
+class TestConfirmEnrichStayView(TestCase):
     """Test cases for confirm_enrich_stay view"""
 
     def test_confirm_enrich_stay_success(self):

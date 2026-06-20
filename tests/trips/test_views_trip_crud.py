@@ -23,7 +23,7 @@ from trips.views.trips import build_pdf_export_context
 pytestmark = pytest.mark.django_db
 
 
-class TripCreateView(TestCase):
+class TestTripCreateView(TestCase):
     def test_get(self):
         user = self.make_user("user")
 
@@ -113,7 +113,7 @@ class TripCreateView(TestCase):
         assert Trip.objects.filter(author=user).count() == 0
 
 
-class TripDeleteView(TestCase):
+class TestTripDeleteView(TestCase):
     def test_delete(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)
@@ -127,7 +127,7 @@ class TripDeleteView(TestCase):
         assert Trip.objects.filter(author=user).count() == 0
 
 
-class TripUpdateView(TestCase):
+class TestTripUpdateView(TestCase):
     def test_get(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)
@@ -197,7 +197,7 @@ class TripUpdateView(TestCase):
         self.response_200(response)
 
 
-class TripArchiveView(TestCase):
+class TestTripArchiveView(TestCase):
     def test_archive(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)
@@ -241,7 +241,7 @@ class TripArchiveView(TestCase):
         assert Trip.objects.filter(author=user, status=5).count() == 1
 
 
-class TripUnarchiveView(TestCase):
+class TestTripUnarchiveView(TestCase):
     def test_unarchive(self):
         user = self.make_user("user")
         trip = TripFactory(
@@ -261,7 +261,7 @@ class TripUnarchiveView(TestCase):
         assert trip.status == Trip.Status.COMPLETED
 
 
-class TripDestinationsView(TestCase):
+class TestTripDestinationsView(TestCase):
     def test_get_modal(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)
@@ -296,7 +296,7 @@ class TripDestinationsView(TestCase):
         self.response_404(response)
 
 
-class UpdateDayDestinationView(TestCase):
+class TestUpdateDayDestinationView(TestCase):
     def test_post_updates_destination(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)
@@ -346,7 +346,7 @@ class UpdateDayDestinationView(TestCase):
         self.assertTemplateUsed(response, "trips/includes/day-destination-card.html")
 
 
-class CreateStageView(TestCase):
+class TestCreateStageView(TestCase):
     def test_get_returns_create_stage_modal(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)
@@ -590,7 +590,7 @@ class CreateStageView(TestCase):
         assert last_day.destination == "LastCity"
 
 
-class DeleteStageView(TestCase):
+class TestDeleteStageView(TestCase):
     def test_post_resets_days_to_trip_destination(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)
@@ -724,7 +724,7 @@ class DeleteStageView(TestCase):
         self.response_404(response)
 
 
-class ExportTripPdfView(TestCase):
+class TestExportTripPdfView(TestCase):
     def test_owner_gets_pdf_response(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)

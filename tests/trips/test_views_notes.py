@@ -7,7 +7,7 @@ from tests.trips.factories import EventFactory, StayFactory, TripFactory
 pytestmark = pytest.mark.django_db
 
 
-class EventNotesView(TestCase):
+class TestEventNotesView(TestCase):
     def test_event_notes_with_note(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)
@@ -39,7 +39,7 @@ class EventNotesView(TestCase):
         assert response.context["form"].initial["notes"] == ""
 
 
-class StayNotesView(TestCase):
+class TestStayNotesView(TestCase):
     def test_stay_notes_with_note(self):
         """
         Test stay_notes view when the stay has a note.
@@ -81,7 +81,7 @@ class StayNotesView(TestCase):
         assert response.context["form"].initial["notes"] == ""
 
 
-class NoteCreateView(TestCase):
+class TestNoteCreateView(TestCase):
     def test_note_create_success(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)
@@ -114,7 +114,7 @@ class NoteCreateView(TestCase):
         assert event.notes == ""
 
 
-class NoteModifyView(TestCase):
+class TestNoteModifyView(TestCase):
     def test_note_modify_success(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)
@@ -147,7 +147,7 @@ class NoteModifyView(TestCase):
         assert event.notes == "Some note"
 
 
-class NoteDeleteView(TestCase):
+class TestNoteDeleteView(TestCase):
     def test_note_delete_success(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)
@@ -162,7 +162,7 @@ class NoteDeleteView(TestCase):
         assert event.notes == ""
 
 
-class StayNoteCreateView(TestCase):
+class TestStayNoteCreateView(TestCase):
     def test_stay_note_create_success(self):
         """
         Test successful creation of a note for a stay.
@@ -202,7 +202,7 @@ class StayNoteCreateView(TestCase):
         assert stay.notes == ""
 
 
-class StayNoteModifyView(TestCase):
+class TestStayNoteModifyView(TestCase):
     def test_stay_note_modify_success(self):
         """
         Test successful modification of a note for a stay.
@@ -242,7 +242,7 @@ class StayNoteModifyView(TestCase):
         assert stay.notes == "Original stay note"
 
 
-class StayNoteDeleteView(TestCase):
+class TestStayNoteDeleteView(TestCase):
     def test_stay_note_delete_success(self):
         """
         Test successful deletion of a note for a stay.

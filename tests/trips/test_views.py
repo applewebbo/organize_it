@@ -23,7 +23,7 @@ from tests.trips.factories import (
 pytestmark = pytest.mark.django_db
 
 
-class HomeView(TestCase):
+class TestHomeView(TestCase):
     def test_get(self):
         response = self.get("trips:home")
         self.response_200(response)
@@ -261,7 +261,7 @@ class HomeView(TestCase):
             assert session.get("show_guide", False) is False
 
 
-class TripListView(TestCase):
+class TestTripListView(TestCase):
     def test_get(self):
         user = self.make_user("user")
 
@@ -452,7 +452,7 @@ class TripListView(TestCase):
         assert archived_shared not in response.context["shared_trips"]
 
 
-class TripDetailView(TestCase):
+class TestTripDetailView(TestCase):
     """Test cases for trip detail view"""
 
     def test_get_trip_detail_success(self):
@@ -554,7 +554,7 @@ class TripDetailView(TestCase):
         assert response.context["to_home_destination"] is None
 
 
-class DayDetailView(TestCase):
+class TestDayDetailView(TestCase):
     """Test cases for day detail view"""
 
     def test_get_day_detail_success(self):
@@ -818,7 +818,7 @@ class TestViewLogFile(TestCase):
         assert response.status_code == 302
 
 
-class ValidateDatesViewTests(TestCase):
+class TestValidateDatesView(TestCase):
     """
     Tests for the validate_dates function-based view.
     """
@@ -919,7 +919,7 @@ class ValidateDatesViewTests(TestCase):
         assert response.content == b""
 
 
-class GeocodeAddressViewTests(TestCase):
+class TestGeocodeAddressView(TestCase):
     @patch("trips.views.maps.geocode_location")
     def test_geocode_address_post_found(self, mock_geocode_location):
         from django.urls import reverse
@@ -983,7 +983,7 @@ class GeocodeAddressViewTests(TestCase):
         )
 
 
-class GeocodeCityViewTests(TestCase):
+class TestGeocodeCityView(TestCase):
     @patch("trips.views.maps.geocode_city")
     def test_geocode_city_post_found(self, mock_geocode_city):
         mock_geocode_city.return_value = [
@@ -1028,7 +1028,7 @@ class GeocodeCityViewTests(TestCase):
         assert response.status_code == 200
 
 
-class TransferInfoViewTests(TestCase):
+class TestTransferInfoView(TestCase):
     def test_returns_fragment_with_data(self):
         from datetime import date, timedelta
 
@@ -1420,7 +1420,7 @@ class TestGetTripAddresses(TestCase):
         assert "Vatican Museum" in content
 
 
-class TagSuggestionsViewTests(TestCase):
+class TestTagSuggestionsView(TestCase):
     def test_returns_matching_tags(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)

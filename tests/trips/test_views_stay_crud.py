@@ -12,7 +12,7 @@ from trips.models import Stay
 pytestmark = pytest.mark.django_db
 
 
-class AddStayView(TestCase):
+class TestAddStayView(TestCase):
     @patch("geocoder.mapbox")
     def test_post(self, mock_geocoder):
         mock_geocoder.return_value.ok = True
@@ -117,7 +117,7 @@ class AddStayView(TestCase):
             assert day.stay is None
 
 
-class StayDetailView(TestCase):
+class TestStayDetailView(TestCase):
     def test_get(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)
@@ -153,7 +153,7 @@ class StayDetailView(TestCase):
         assert response.context["last_day"] == days[-1]
 
 
-class StayModifyView(TestCase):
+class TestStayModifyView(TestCase):
     @patch("geocoder.mapbox")
     def test_post(self, mock_geocoder):
         mock_geocoder.return_value.ok = True
@@ -204,7 +204,7 @@ class StayModifyView(TestCase):
         assertTemplateUsed(response, "trips/stay-modify.html")
 
 
-class StayDeleteView(TestCase):
+class TestStayDeleteView(TestCase):
     def test_get(self):
         user = self.make_user("user")
         trip = TripFactory(author=user)
@@ -360,7 +360,7 @@ class StayDeleteView(TestCase):
             assert day.stay == new_stay
 
 
-class AddStayForTripView(TestCase):
+class TestAddStayForTripView(TestCase):
     @patch("geocoder.mapbox")
     def test_post_valid(self, mock_geocoder):
         mock_geocoder.return_value.ok = True

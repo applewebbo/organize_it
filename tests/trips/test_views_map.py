@@ -36,7 +36,7 @@ MOCK_PLACES = [
 ]
 
 
-class TripMapViewTest(TestCase):
+class TestTripMapView(TestCase):
     def test_get_map_page_owner(self):
         user = self.make_user("owner@example.com")
         trip = TripFactory(author=user)
@@ -89,7 +89,7 @@ class TripMapViewTest(TestCase):
         assert response.context["unassigned_events"].count() == 1
 
 
-class MapSearchViewTest(TestCase):
+class TestMapSearchView(TestCase):
     def test_search_returns_results(self):
         user = self.make_user("user@example.com")
         trip = TripFactory(author=user)
@@ -153,7 +153,7 @@ class MapSearchViewTest(TestCase):
         self.response_405(response)
 
 
-class MapAddExperienceViewTest(TestCase):
+class TestMapAddExperienceView(TestCase):
     def test_add_experience_creates_event(self):
         user = self.make_user("user@example.com")
         trip = TripFactory(author=user)
@@ -236,7 +236,7 @@ class MapAddExperienceViewTest(TestCase):
         assert Event.objects.filter(trip=trip).count() == 0
 
 
-class MapAddMealViewTest(TestCase):
+class TestMapAddMealView(TestCase):
     def test_add_meal_creates_meal_event(self):
         user = self.make_user("user@example.com")
         trip = TripFactory(author=user)
@@ -275,7 +275,7 @@ class MapAddMealViewTest(TestCase):
         assert Event.objects.filter(trip=trip).count() == 0
 
 
-class MapAddStayViewTest(TestCase):
+class TestMapAddStayView(TestCase):
     def test_add_stay_creates_stay(self):
         user = self.make_user("user@example.com")
         trip = TripFactory(author=user)
@@ -375,7 +375,7 @@ class MapAddStayViewTest(TestCase):
         assert Stay.objects.count() == 0
 
 
-class BuildMapJsonTest(TestCase):
+class TestBuildMapJson(TestCase):
     """Tests for _build_map_json branches: stay/event/unassigned with coordinates."""
 
     def test_map_json_includes_stay_and_events_with_coords(self):
@@ -488,7 +488,7 @@ class BuildMapJsonTest(TestCase):
         assert "No Coords Unassigned" not in names
 
 
-class TripLocationBiasTest(TestCase):
+class TestTripLocationBias(TestCase):
     """Tests for _trip_location_bias branches via map_search."""
 
     def test_search_uses_coords_from_existing_events(self):
@@ -593,7 +593,7 @@ class TripLocationBiasTest(TestCase):
         assert call_kwargs["location_bias"] is None
 
 
-class MapAddExperienceLatLngTest(TestCase):
+class TestMapAddExperienceLatLng(TestCase):
     """Covers line 3104: 'if lat and lng' false branch (no coords provided)."""
 
     def test_add_experience_without_lat_lng(self):
@@ -641,7 +641,7 @@ class MapAddExperienceLatLngTest(TestCase):
         assert event.longitude is None
 
 
-class TripEventsMapFragmentTest(TestCase):
+class TestTripEventsMapFragment(TestCase):
     def test_owner_gets_map_fragment(self):
         user = self.make_user("owner@example.com")
         trip = TripFactory(author=user)
@@ -664,7 +664,7 @@ class TripEventsMapFragmentTest(TestCase):
         self.response_302(response)
 
 
-class TripEventsListFragmentTest(TestCase):
+class TestTripEventsListFragment(TestCase):
     def test_owner_gets_list_fragment(self):
         user = self.make_user("owner@example.com")
         trip = TripFactory(author=user)
@@ -687,7 +687,7 @@ class TripEventsListFragmentTest(TestCase):
         self.response_302(response)
 
 
-class SelectDayForEventTest(TestCase):
+class TestSelectDayForEvent(TestCase):
     def test_owner_gets_day_selector_experience(self):
         user = self.make_user("owner@example.com")
         trip = TripFactory(author=user)
@@ -763,7 +763,7 @@ MOCK_FULL_DETAILS_NO_HOURS = PlaceFullDetails(
 )
 
 
-class ResolveMapsLinkViewTest(TestCase):
+class TestResolveMapsLinkView(TestCase):
     def test_invalid_url_returns_error(self):
         user = self.make_user("user@example.com")
         with self.login(user):
@@ -1148,7 +1148,7 @@ class ResolveMapsLinkViewTest(TestCase):
         assert call_kwargs["location_bias"] is None
 
 
-class ResolveMapsMismatchTest(TestCase):
+class TestResolveMapsMismatch(TestCase):
     """Tests for soft place-type validation in resolve_maps_link (for #321)."""
 
     SHORT_URL = "https://maps.app.goo.gl/test123"
@@ -1250,7 +1250,7 @@ class ResolveMapsMismatchTest(TestCase):
         assert response.context.get("type_warning") is None
 
 
-class StaySaveSkipsGeocodingWhenCoordsProvidedTest(TestCase):
+class TestStaySaveSkipsGeocodingWhenCoordsProvided(TestCase):
     def test_save_with_coords_skips_mapbox(self):
         stay = StayFactory.build(
             latitude=45.0687,
@@ -1275,7 +1275,7 @@ class StaySaveSkipsGeocodingWhenCoordsProvidedTest(TestCase):
         assert stay.longitude == 7.6847
 
 
-class EventSaveSkipsGeocodingWhenCoordsProvidedTest(TestCase):
+class TestEventSaveSkipsGeocodingWhenCoordsProvided(TestCase):
     def test_experience_save_with_coords_skips_mapbox(self):
         user = self.make_user("user@example.com")
         trip = TripFactory(author=user)
@@ -1320,7 +1320,7 @@ class EventSaveSkipsGeocodingWhenCoordsProvidedTest(TestCase):
         assert experience.longitude == 7.6847
 
 
-class TripMapStagesContextTest(TestCase):
+class TestTripMapStagesContext(TestCase):
     """trip_map view passes stage context variables."""
 
     def test_map_view_passes_stages_context(self):
@@ -1350,7 +1350,7 @@ class TripMapStagesContextTest(TestCase):
         assert response.context["has_custom_stages"] is True
 
 
-class TripDestinationsViewTest(TestCase):
+class TestTripDestinationsView(TestCase):
     def test_owner_gets_destinations_modal(self):
         user = self.make_user("owner@example.com")
         trip = TripFactory(author=user)
@@ -1374,7 +1374,7 @@ class TripDestinationsViewTest(TestCase):
         self.response_302(response)
 
 
-class CreateStageViewTest(TestCase):
+class TestCreateStageView(TestCase):
     def test_get_returns_create_stage_form(self):
         user = self.make_user("owner@example.com")
         trip = TripFactory(author=user)
@@ -1503,7 +1503,7 @@ class CreateStageViewTest(TestCase):
         self.response_404(response)
 
 
-class DeleteStageViewTest(TestCase):
+class TestDeleteStageView(TestCase):
     def test_post_deletes_stage_and_unassigns_events(self):
         user = self.make_user("owner@example.com")
         trip = TripFactory(author=user, destination="Roma")
@@ -1612,7 +1612,7 @@ class DeleteStageViewTest(TestCase):
         self.response_404(response)
 
 
-class UpdateDayDestinationViewTest(TestCase):
+class TestUpdateDayDestinationView(TestCase):
     def test_get_returns_day_destination_card(self):
         user = self.make_user("owner@example.com")
         trip = TripFactory(author=user)
@@ -1651,7 +1651,7 @@ class UpdateDayDestinationViewTest(TestCase):
         self.response_404(response)
 
 
-class GeocodeAddressViewTest(TestCase):
+class TestGeocodeAddressView(TestCase):
     def test_post_with_name_and_city_returns_results(self):
         user = self.make_user("user@example.com")
         mock_results = [
@@ -1695,7 +1695,7 @@ class GeocodeAddressViewTest(TestCase):
         assert response.context["found"] is False
 
 
-class GeocodeCityViewTest(TestCase):
+class TestGeocodeCityView(TestCase):
     def test_post_with_query_returns_results(self):
         user = self.make_user("user@example.com")
         mock_cities = [
@@ -1728,7 +1728,7 @@ class GeocodeCityViewTest(TestCase):
         assert response.context["found"] is False
 
 
-class StageBiasInternalTest(TestCase):
+class TestStageBiasInternal(TestCase):
     """Direct tests for _stage_location_bias internal branches via map_search."""
 
     def test_stage_bias_uses_event_coords(self):
@@ -1826,7 +1826,7 @@ class StageBiasInternalTest(TestCase):
         assert "location_bias" in call_kwargs
 
 
-class MapSearchStageBiasTest(TestCase):
+class TestMapSearchStageBias(TestCase):
     """map_search uses stage_destination to set location_bias."""
 
     def test_search_without_stage_uses_trip_bias(self):

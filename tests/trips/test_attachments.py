@@ -189,7 +189,7 @@ def _ct(obj):
     return ContentType.objects.get_for_model(obj).pk
 
 
-class AttachmentUploadView(TestCase):
+class TestAttachmentUploadView(TestCase):
     def test_owner_can_upload_to_trip(self):
         user = self.make_user("owner")
         trip = TripFactory(author=user)
@@ -334,7 +334,7 @@ class AttachmentUploadView(TestCase):
         assert response.status_code == 400
 
 
-class AttachmentDeleteView(TestCase):
+class TestAttachmentDeleteView(TestCase):
     def test_owner_can_delete(self):
         user = self.make_user("owner")
         trip = TripFactory(author=user)
@@ -369,7 +369,7 @@ class AttachmentDeleteView(TestCase):
         assert Attachment.objects.filter(pk=att.pk).exists()
 
 
-class AttachmentStreamView(TestCase):
+class TestAttachmentStreamView(TestCase):
     def test_owner_can_stream(self):
         user = self.make_user("owner")
         trip = TripFactory(author=user)
@@ -459,7 +459,7 @@ class AttachmentStreamView(TestCase):
         response.close()
 
 
-class AttachmentPreviewView(TestCase):
+class TestAttachmentPreviewView(TestCase):
     def test_owner_gets_preview_modal(self):
         user = self.make_user("owner")
         trip = TripFactory(author=user)
@@ -477,7 +477,7 @@ class AttachmentPreviewView(TestCase):
         assertTemplateUsed(response, "trips/attachments/preview-modal.html")
 
 
-class AttachmentsCardView(TestCase):
+class TestAttachmentsCardView(TestCase):
     def test_card_loads_with_trip_and_subentity_attachments(self):
         user = self.make_user("owner")
         trip = TripFactory(author=user)
@@ -511,7 +511,7 @@ class AttachmentsCardView(TestCase):
         self.response_404(response)
 
 
-class AttachmentUploadModalView(TestCase):
+class TestAttachmentUploadModalView(TestCase):
     def test_owner_can_get_upload_modal_trip(self):
         user = self.make_user("owner")
         trip = TripFactory(author=user)
@@ -595,7 +595,7 @@ class AttachmentUploadModalView(TestCase):
         self.response_404(response)
 
 
-class AttachmentMissingCoverage(TestCase):
+class TestAttachmentMissingCoverage(TestCase):
     def test_modal_404_for_non_int_object_id(self):
         user = self.make_user("owner")
         trip = TripFactory(author=user)
