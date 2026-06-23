@@ -16,7 +16,7 @@ from django.shortcuts import get_object_or_404
 from PIL import Image
 
 from accounts.models import get_profile
-from trips.models import Event, MainTransfer, Stay, StayTransfer, Trip
+from trips.models import Event, MainTransfer, Stay, Trip
 
 
 def get_trip_stages(trip):
@@ -169,8 +169,6 @@ def get_trips(user):
                     "days__events",
                     queryset=Event.objects.all().order_by("order", "pk"),
                 ),
-                "days__stay__transfer_from",
-                "days__stay__transfer_to",
                 "main_transfers",
             )
             .select_related("author")
@@ -209,8 +207,6 @@ def get_trips(user):
                     "days__events",
                     queryset=Event.objects.all().order_by("order", "pk"),
                 ),
-                "days__stay__transfer_from",
-                "days__stay__transfer_to",
                 "main_transfers",
             )
             .select_related("author")
@@ -1315,117 +1311,3 @@ def get_station_by_id(station_id):
         if station["id"] == str(station_id):
             return station
     return None
-
-
-# ============================================================================
-
-
-# ============================================================================
-# StayTransfer Helper Functions
-# ============================================================================
-
-
-def get_day_stay_transfers(day):
-    """
-    Get StayTransfers related to a given day (either as from_day or to_day).
-
-    Args:
-        day: Day object
-
-    Returns:
-        QuerySet of StayTransfer objects related to this day
-    """
-    return StayTransfer.objects.filter(Q(from_day=day) | Q(to_day=day)).select_related(
-        "from_stay", "to_stay", "from_day", "to_day"
-    )
-
-
-def get_next_day_stay(day):
-    """
-    Get the Stay for the next day (day N+1).
-
-    Args:
-        day: Day object
-
-    Returns:
-        Stay object if next day has a stay, None otherwise
-    """
-    next_day = day.trip.days.filter(number=day.number + 1).first()
-    if next_day:
-        return next_day.stay
-    return None
-
-
-def can_add_stay_transfer(day):
-    """
-    Check if a StayTransfer can be added from this day to the next day.
-
-    Conditions:
-    - Next day (N+1) must exist
-    - Next day must have a Stay
-    - Next day Stay must be different from current day Stay
-    - No StayTransfer already exists from current Stay
-
-    Args:
-        day: Day object (day N)
-
-    Returns:
-        Boolean - True if transfer can be added, False otherwise
-    """
-    # Check if current day has a stay
-    if not day.stay:
-        return False
-
-    # Check if next day exists
-    next_day = day.trip.days.filter(number=day.number + 1).first()
-    if not next_day:
-        return False
-
-    # Check if next day has a stay
-    if not next_day.stay:
-        return False
-
-    # Check if stays are different
-    if day.stay == next_day.stay:
-        return False
-
-    # Check if StayTransfer doesn't already exist
-    if hasattr(day.stay, "transfer_from"):
-        return False
-
-    return True
-
-
-def validate_stay_transfer(from_stay, to_stay):
-    """
-    Validate that a StayTransfer between two stays is valid.
-
-    Args:
-        from_stay: Stay object (origin)
-        to_stay: Stay object (destination)
-
-    Returns:
-        Tuple (is_valid: bool, error_message: str or None)
-    """
-    if not from_stay or not to_stay:
-        return False, "Both stays are required"
-
-    if from_stay == to_stay:
-        return False, "Cannot create transfer to the same stay"
-
-    # Get days for both stays
-    from_day = from_stay.days.first()
-    to_day = to_stay.days.first()
-
-    if not from_day or not to_day:
-        return False, "Both stays must be assigned to days"
-
-    # Check if stays belong to same trip
-    if from_day.trip != to_day.trip:
-        return False, "Stays must belong to the same trip"
-
-    # Check if days are consecutive
-    if to_day.number != from_day.number + 1:
-        return False, "Stays must be on consecutive days (day N and day N+1)"
-
-    return True, None

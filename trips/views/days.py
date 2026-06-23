@@ -15,7 +15,6 @@ from trips.models import (
     Day,
     Event,
     Stay,
-    StayTransfer,
     TripCollaboration,
 )
 from trips.utils import accessible_trips_qs, create_day_map, editable_trips_qs
@@ -59,40 +58,11 @@ def day_detail(request, pk):
     else:
         show_map = profile.default_map_view == "map"
 
-    # Check if there's a StayTransfer from this day to the next
-    # Use explicit DB query to avoid Django's reverse relation caching issues
-    # Only show transfer_out on the last day of the stay (when next day has different stay)
     next_day = day.next_day
-    is_last_day_of_stay = not next_day or not next_day.stay or next_day.stay != day.stay
-    stay_transfer_out = (
-        StayTransfer.objects.filter(from_stay=day.stay).first()
-        if day.stay and is_last_day_of_stay
-        else None
-    )
-
-    # Check if there's a StayTransfer to this day from the previous
-    stay_transfer_in = (
-        StayTransfer.objects.filter(to_stay=day.stay).first() if day.stay else None
-    )
-
-    # Check if can add StayTransfer (next day exists, both have stays, different stays)
-    can_add_stay_transfer = False
-    if (
-        next_day
-        and day.stay
-        and hasattr(next_day, "stay")
-        and next_day.stay
-        and day.stay != next_day.stay
-        and not stay_transfer_out
-    ):
-        can_add_stay_transfer = True
 
     context = {
         "day": day,
         "show_map": show_map,
-        "stay_transfer_out": stay_transfer_out,
-        "stay_transfer_in": stay_transfer_in,
-        "can_add_stay_transfer": can_add_stay_transfer,
         "next_day": next_day,
         "show_weather": profile.show_weather,
     }
@@ -124,8 +94,6 @@ def day_detail(request, pk):
             "last_day": is_last_day,
             "arrival_transfer": arrival_transfer,
             "departure_transfer": departure_transfer,
-            "can_add_stay_transfer": can_add_stay_transfer,
-            "stay_transfer_out": stay_transfer_out,
             "day": day,
         }
         if not (prev_day and prev_day.stay and prev_day.stay == stay):

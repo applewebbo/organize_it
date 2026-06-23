@@ -21,7 +21,6 @@ from .models import (
     Meal,
     ShareLink,
     Stay,
-    StayTransfer,
     Trip,
 )
 from .widgets import TransportModeRadioSelect
@@ -1483,117 +1482,6 @@ class OtherMainTransferForm(MainTransferBaseForm):
 
 
 # ============================================================================
-# StayTransfer Forms
-# ============================================================================
-
-
-class StayTransferCreateForm(forms.ModelForm):
-    """Form for creating a StayTransfer between stays of consecutive days (auto-populates from/to stays)"""
-
-    class Meta:
-        model = StayTransfer
-        fields = ["transport_mode", "notes"]
-        labels = {
-            "transport_mode": _("Transport Mode"),
-            "notes": _("Notes"),
-        }
-        widgets = {
-            "transport_mode": TransportModeRadioSelect(),
-            "notes": forms.Textarea(attrs={"rows": 3, "placeholder": _("Notes")}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        self.from_stay = kwargs.pop("from_stay", None)
-        self.to_stay = kwargs.pop("to_stay", None)
-
-        # Create instance with from_stay and to_stay already set to avoid validation errors
-        if "instance" not in kwargs and self.from_stay and self.to_stay:
-            kwargs["instance"] = StayTransfer(
-                from_stay=self.from_stay, to_stay=self.to_stay
-            )
-
-        super().__init__(*args, **kwargs)
-
-        self.helper = FormHelper()
-        self.helper.form_tag = False
-
-        self.fields["transport_mode"].choices = StayTransfer.TransportMode.choices
-
-        self.helper.layout = Layout(
-            Field("transport_mode", wrapper_class="col-span-full"),
-            Field("notes", wrapper_class="col-span-full"),
-        )
-
-    def clean(self):
-        cleaned_data = super().clean()
-
-        if self.from_stay and self.to_stay:  # pragma: no branch
-            # Check that stays are different
-            if self.from_stay == self.to_stay:
-                raise ValidationError(_("From stay and to stay must be different."))
-
-            # Check that from_stay doesn't already have an outgoing transfer (excluding current instance)
-            # Use explicit DB query to avoid Django's reverse relation caching issues
-            from_qs = StayTransfer.objects.filter(from_stay=self.from_stay)
-            if self.instance.pk:
-                from_qs = from_qs.exclude(pk=self.instance.pk)
-            if from_qs.exists():
-                raise ValidationError(
-                    _("The from stay already has an outgoing transfer.")
-                )
-
-            # Check that to_stay doesn't already have an incoming transfer (excluding current instance)
-            to_qs = StayTransfer.objects.filter(to_stay=self.to_stay)
-            if self.instance.pk:
-                to_qs = to_qs.exclude(pk=self.instance.pk)
-            if to_qs.exists():
-                raise ValidationError(
-                    _("The to stay already has an incoming transfer.")
-                )
-
-        return cleaned_data
-
-
-class StayTransferEditForm(forms.ModelForm):
-    """Form for editing an existing StayTransfer"""
-
-    class Meta:
-        model = StayTransfer
-        fields = ["transport_mode", "notes"]
-        labels = {
-            "transport_mode": _("Transport Mode"),
-            "notes": _("Notes"),
-        }
-        widgets = {
-            "transport_mode": TransportModeRadioSelect(),
-            "notes": forms.Textarea(attrs={"rows": 3, "placeholder": _("Notes")}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.helper = FormHelper()
-        self.helper.form_tag = False
-
-        self.fields["transport_mode"].choices = StayTransfer.TransportMode.choices
-
-        self.helper.layout = Layout(
-            Field("transport_mode", wrapper_class="col-span-full"),
-            Field("notes", wrapper_class="col-span-full"),
-        )
-
-    def save(self, commit=True):
-        """Override save to handle estimated_duration conversion"""
-        instance = super().save(commit=False)
-
-        # estimated_duration is already a timedelta from clean_estimated_duration
-        if commit:
-            instance.save()
-
-        return instance
-
-
-# ============================================================================
 # MainTransferConnection Forms
 # ============================================================================
 
@@ -1634,7 +1522,9 @@ class MainTransferConnectionForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_tag = False
 
-        self.fields["transport_mode"].choices = StayTransfer.TransportMode.choices
+        self.fields[
+            "transport_mode"
+        ].choices = MainTransferConnection.TransportMode.choices
 
         self.helper.layout = Layout(
             Field("transport_mode", wrapper_class="col-span-full"),
@@ -1663,7 +1553,9 @@ class MainTransferConnectionEditForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_tag = False
 
-        self.fields["transport_mode"].choices = StayTransfer.TransportMode.choices
+        self.fields[
+            "transport_mode"
+        ].choices = MainTransferConnection.TransportMode.choices
 
         self.helper.layout = Layout(
             Field("transport_mode", wrapper_class="col-span-full"),

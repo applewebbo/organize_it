@@ -654,147 +654,6 @@ def update_event_trip(sender, instance, **kwargs):
             instance.trip = instance.day.trip
 
 
-class StayTransfer(models.Model):
-    """Transfer between stays on consecutive days (when different)"""
-
-    class TransportMode(models.TextChoices):
-        DRIVING = "driving", _("Driving")
-        WALKING = "walking", _("Walking")
-        BICYCLING = "bicycling", _("Bicycling")
-        TRANSIT = "transit", _("Transit")
-
-    # 1-to-1 relationships (max 1 transfer in/out per stay)
-    from_stay = models.OneToOneField(
-        Stay, on_delete=models.CASCADE, related_name="transfer_from"
-    )
-    to_stay = models.OneToOneField(
-        Stay, on_delete=models.CASCADE, related_name="transfer_to"
-    )
-
-    # Auto-populated from stays
-    from_day = models.ForeignKey(
-        Day, on_delete=models.CASCADE, related_name="stay_transfers_from"
-    )
-    to_day = models.ForeignKey(
-        Day, on_delete=models.CASCADE, related_name="stay_transfers_to"
-    )
-    trip = models.ForeignKey(
-        Trip, on_delete=models.CASCADE, related_name="stay_transfers"
-    )
-
-    # Transfer details
-    transport_mode = models.CharField(
-        max_length=50, choices=TransportMode.choices, default=TransportMode.DRIVING
-    )
-    notes = models.TextField(blank=True)
-
-    # Optional time fields
-    departure_time = models.TimeField(blank=True, null=True)
-    estimated_duration = models.DurationField(blank=True, null=True)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        db_table = "trips_stay_transfer"
-        verbose_name = _("Stay Transfer")
-        verbose_name_plural = _("Stay Transfers")
-        ordering = ["from_day__number"]
-        constraints = [
-            models.CheckConstraint(
-                condition=~models.Q(from_stay=models.F("to_stay")),
-                name="stay_transfer_different_stays",
-            )
-        ]
-        indexes = [
-            models.Index(fields=["from_day", "to_day"]),
-            models.Index(fields=["trip"]),
-        ]
-
-    def __str__(self):
-        return f"{self.from_stay.name} → {self.to_stay.name}"
-
-    @property
-    def from_location(self):
-        """Get from_stay location name"""
-        return self.from_stay.name
-
-    @property
-    def to_location(self):
-        """Get to_stay location name"""
-        return self.to_stay.name
-
-    @property
-    def from_coordinates(self):
-        """Get from_stay coordinates as tuple"""
-        return (self.from_stay.latitude, self.from_stay.longitude)
-
-    @property
-    def to_coordinates(self):
-        """Get to_stay coordinates as tuple"""
-        return (self.to_stay.latitude, self.to_stay.longitude)
-
-    @property
-    def arrival_time(self):
-        """Calculate arrival time if departure_time and estimated_duration present"""
-        if self.departure_time and self.estimated_duration:
-            from datetime import datetime
-
-            start = datetime.combine(datetime.today(), self.departure_time)
-            arrival = start + self.estimated_duration
-            return arrival.time()
-        return None
-
-    @property
-    def google_maps_url(self):
-        """Generate Google Maps URL from addresses with travel mode"""
-        from_address = self.from_stay.address
-        to_address = self.to_stay.address
-
-        if from_address and to_address:
-            return (
-                f"https://www.google.com/maps/dir/?api=1"
-                f"&origin={quote(from_address)}"
-                f"&destination={quote(to_address)}"
-                f"&travelmode={self.transport_mode}"
-            )
-        return None
-
-    def clean(self):
-        """Validate StayTransfer constraints"""
-        super().clean()
-
-        # Check from_stay != to_stay
-        if self.from_stay_id and self.to_stay_id:
-            if self.from_stay_id == self.to_stay_id:
-                raise ValidationError(_("Cannot create transfer to the same stay"))
-
-        # Check consecutive days
-        if hasattr(self, "from_day") and hasattr(self, "to_day"):
-            from_day_num = self.from_day.number
-            to_day_num = self.to_day.number
-
-            if to_day_num != from_day_num + 1:
-                raise ValidationError(
-                    _("Stays must be on consecutive days (day N and day N+1)")
-                )
-
-        # Check same trip
-        if hasattr(self, "from_day") and hasattr(self, "to_day"):
-            if self.from_day.trip_id != self.to_day.trip_id:
-                raise ValidationError(_("Both stays must belong to the same trip"))
-
-    def save(self, *args, **kwargs):
-        """Auto-populate days and trip from stays"""
-        # Get last day for from_stay (departure day - last day of the stay)
-        self.from_day = self.from_stay.days.order_by("date").last()
-        # Get first day for to_stay (arrival day - first day of the stay)
-        self.to_day = self.to_stay.days.order_by("date").first()
-        # Set trip from from_day
-        self.trip = self.from_day.trip
-        super().save(*args, **kwargs)
-
-
 class MainTransferConnection(models.Model):
     """
     Connection between a MainTransfer and the first/last event or stay.
@@ -802,6 +661,12 @@ class MainTransferConnection(models.Model):
     - For DEPARTURE: transfer goes FROM event/stay TO main_transfer origin
     Direction is determined by main_transfer.direction field.
     """
+
+    class TransportMode(models.TextChoices):
+        DRIVING = "driving", _("Driving")
+        WALKING = "walking", _("Walking")
+        BICYCLING = "bicycling", _("Bicycling")
+        TRANSIT = "transit", _("Transit")
 
     main_transfer = models.OneToOneField(
         MainTransfer, on_delete=models.CASCADE, related_name="connection"
@@ -815,8 +680,8 @@ class MainTransferConnection(models.Model):
 
     transport_mode = models.CharField(
         max_length=50,
-        choices=StayTransfer.TransportMode.choices,
-        default=StayTransfer.TransportMode.DRIVING,
+        choices=TransportMode.choices,
+        default=TransportMode.DRIVING,
     )
     notes = models.TextField(blank=True)
 

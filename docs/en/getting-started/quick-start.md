@@ -96,8 +96,6 @@ Repeat for meals and other activities!
 2. Choose the transfer type:
    - **Arrival** - Getting to your first stay
    - **Departure** - Leaving your last stay
-   - **Stay Transfer** - Moving between accommodations
-   - **Simple Transfer** - Moving between events
 3. Fill in details:
    - Transport mode (flight, train, car, etc.)
    - Departure and arrival times

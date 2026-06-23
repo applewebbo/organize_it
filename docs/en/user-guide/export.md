@@ -20,7 +20,6 @@ The PDF is a complete, printable version of your trip designed to work **offline
 - Day-by-day itinerary with all events in order
 - Stays with address and check-in/check-out
 - Main transfers (arrival/departure) with times and details
-- Local and inter-stay transfers
 - Pre-departure [checklist](checklist.md) items
 - Useful links
 

@@ -27,8 +27,6 @@ from trips.templatetags.trip_tags import (
     next_day,
     phone_format,
     prev_day,
-    stay_transfer_in,
-    stay_transfer_out,
     user_display_name,
 )
 
@@ -510,119 +508,6 @@ class TestFormatOpeningHoursText:
         }
         result = format_opening_hours_text(hours_data)
         assert " · " in result
-
-
-class TestStayTransferTags:
-    """Tests for stay transfer template tags"""
-
-    def test_stay_transfer_out_no_stay(self):
-        """Test stay_transfer_out returns None when day has no stay"""
-        trip = TripFactory()
-        day = trip.days.first()
-        day.stay = None
-        assert stay_transfer_out(day) is None
-
-    def test_stay_transfer_out_not_last_day_of_stay(self):
-        """Test stay_transfer_out returns None when not last day of multi-day stay"""
-        from trips.models import StayTransfer
-
-        trip = TripFactory()
-        days = list(trip.days.all())
-        stay1 = StayFactory()
-        stay2 = StayFactory()
-
-        # Set same stay for first two days
-        days[0].stay = stay1
-        days[0].save()
-        days[1].stay = stay1
-        days[1].save()
-        days[2].stay = stay2
-        days[2].save()
-
-        # Create a transfer from stay1 to stay2
-        StayTransfer.objects.create(
-            from_stay=stay1, to_stay=stay2, transport_mode="driving"
-        )
-
-        # First day should return None (not last day of stay)
-        assert stay_transfer_out(days[0]) is None
-
-    def test_stay_transfer_out_last_day_of_stay(self):
-        """Test stay_transfer_out returns transfer on last day of stay"""
-        from trips.models import StayTransfer
-
-        trip = TripFactory()
-        days = list(trip.days.all())
-        stay1 = StayFactory()
-        stay2 = StayFactory()
-
-        # Set same stay for first two days
-        days[0].stay = stay1
-        days[0].save()
-        days[1].stay = stay1
-        days[1].save()
-        days[2].stay = stay2
-        days[2].save()
-
-        # Create a transfer from stay1 to stay2
-        transfer = StayTransfer.objects.create(
-            from_stay=stay1, to_stay=stay2, transport_mode="driving"
-        )
-
-        # Second day (last day of stay1) should return the transfer
-        assert stay_transfer_out(days[1]) == transfer
-
-    def test_stay_transfer_out_no_transfer(self):
-        """Test stay_transfer_out returns None when last day of stay but no transfer exists"""
-        trip = TripFactory()
-        days = list(trip.days.all())
-        stay = StayFactory()
-
-        days[0].stay = stay
-        days[0].save()
-        # No StayTransfer created
-        assert stay_transfer_out(days[0]) is None
-
-    def test_stay_transfer_in_no_stay(self):
-        """Test stay_transfer_in returns None when day has no stay"""
-        trip = TripFactory()
-        day = trip.days.first()
-        day.stay = None
-        assert stay_transfer_in(day) is None
-
-    def test_stay_transfer_in_with_transfer(self):
-        """Test stay_transfer_in returns transfer when exists"""
-        from trips.models import StayTransfer
-
-        trip = TripFactory()
-        days = list(trip.days.all())
-        stay1 = StayFactory()
-        stay2 = StayFactory()
-
-        days[0].stay = stay1
-        days[0].save()
-        days[1].stay = stay2
-        days[1].save()
-
-        # Create a transfer from stay1 to stay2
-        transfer = StayTransfer.objects.create(
-            from_stay=stay1, to_stay=stay2, transport_mode="driving"
-        )
-
-        # Day with stay2 should return the transfer
-        assert stay_transfer_in(days[1]) == transfer
-
-    def test_stay_transfer_in_no_transfer(self):
-        """Test stay_transfer_in returns None when no transfer exists"""
-        trip = TripFactory()
-        days = list(trip.days.all())
-        stay = StayFactory()
-
-        days[0].stay = stay
-        days[0].save()
-
-        # No transfer created
-        assert stay_transfer_in(days[0]) is None
 
 
 class TestIsLastDayEdgeCases:

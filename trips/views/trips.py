@@ -124,9 +124,7 @@ def trip_detail(request, pk):
         ),
         Prefetch(
             "days__stay",
-            queryset=Stay.objects.select_related("author").prefetch_related(
-                "transfer_from", "transfer_to"
-            ),
+            queryset=Stay.objects.select_related("author"),
         ),
         Prefetch(
             "collaborations",

@@ -334,11 +334,9 @@ Try:
 
 ## Transfer Questions
 
-### What are the different types of transfers?
+### What are transfers?
 
-1. **Main Transfers**: Arrival and departure (flights, trains to/from destination)
-2. **Stay Transfers**: Moving between accommodations
-3. **Simple Transfers**: Moving between events on the same day
+**Main Transfers** are your arrival and departure (flights, trains, cars to/from the destination). You can also connect a main transfer to your first or last event or stay.
 
 ### Do I need to add transfers for every movement?
 

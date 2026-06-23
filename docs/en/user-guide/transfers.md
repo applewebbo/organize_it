@@ -1,13 +1,10 @@
 # Transfers
 
-Transfers represent all transportation during your trip - from flights and trains to walking between attractions. Organize It helps you track arrival, departure, and inter-destination movement.
+Transfers represent your journey to and from the trip destination - flights, trains, cars, and more. Organize It helps you track arrival and departure, including the connection to your first or last point of the trip.
 
 ## What is a Transfer?
 
-A **Transfer** is any movement from one location to another during your trip. There are two types:
-
-1. **Main Transfers** - Arrival and departure (flights, trains to/from destination)
-2. **Stay Transfers** - Moving between different accommodations
+A **Main Transfer** is your arrival to or departure from the trip destination (flights, trains, cars to/from the destination). You can also connect a main transfer to your first or last event or stay.
 
 ## Main Transfers
 
@@ -414,81 +411,6 @@ Include in connection notes:
     - Specific timing constraints
     - Unfamiliar routes in foreign cities
 
-## Stay Transfers
-
-Movement between different accommodations during your trip.
-
-### When to Use Stay Transfers
-
-Create a stay transfer when:
-- Changing hotels mid-trip
-- Moving from one city to another
-- Switching from hotel to vacation rental
-
-**Example Scenario**:
-```
-Day 1-3: Hotel in Rome
-Day 4: Travel day - Move to Florence
-Day 5-7: Hotel in Florence
-```
-
-Add a stay transfer from Rome hotel to Florence hotel on Day 4.
-
-### Creating a Stay Transfer
-
-1. Navigate to the day when you're moving
-2. Click **Add Transfer** → **Stay Transfer**
-3. Select:
-   - **From Stay**: Current accommodation
-   - **To Stay**: Next accommodation
-4. Fill in details
-5. Save
-
-### Stay Transfer Fields
-
-**From Stay**
-- The accommodation you're leaving
-- Auto-populated with checkout time
-
-**To Stay**
-- The accommodation you're moving to
-- Auto-populated with check-in time
-
-**Transport Mode**
-- How you're traveling
-- Options:
-  - **Driving** - Car, taxi, rental
-  - **Walking** - On foot (short distances)
-  - **Bicycling** - Bike, e-scooter
-  - **Transit** - Public transportation (bus, metro, train)
-
-**Departure Time** (optional)
-- When you leave the first stay
-- Often matches checkout time
-
-**Arrival Time** (optional)
-- When you reach the next stay
-- Should be before check-in time
-
-**Notes**
-- Additional information
-- Example: "Taxi pre-booked. €50 fixed rate. Driver: Marco +39 123 456 7890"
-
-### Stay Transfer Example
-
-```
-From Stay: Hotel Forum Roma
-To Stay: Hotel Brunelleschi (Florence)
-Transport Mode: Transit
-Departure Time: 11:00 (after checkout)
-Arrival Time: 14:30 (before 15:00 check-in)
-Notes: Train from Roma Termini to Firenze SMN.
-       Freccia Rossa #9352. Booking: TRENITALIA-123456
-       Metro to Termini from hotel (20 min)
-       Walk from SMN to hotel (15 min)
-       Total journey: ~3.5 hours
-```
-
 ## Transport Modes
 
 ### Driving
@@ -606,15 +528,6 @@ Train Number: 9352 (fill in the dedicated field for live status)
 Platform: TBD (check 20 min before)
 Seat: Coach 5, Seat 22A
 Booking: TRENITALIA-123456
-```
-
-**For stay transfers, include**:
-```
-Checkout: 11:00 (bags held by hotel until 14:00)
-Transport: Pre-booked taxi, €50 fixed
-Driver: Marco +39 123 456 7890
-Drop-off: New hotel, Via Example 123
-Arrival: ~14:30 (check-in 15:00)
 ```
 
 ### Simple Transfer Planning

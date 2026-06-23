@@ -43,22 +43,6 @@ htmx_urlpatterns = [
     path("stays/<int:pk>/modify", views.stay_modify, name="stay-modify"),
     path("stays/<int:pk>/delete", views.stay_delete, name="stay-delete"),
     path("stays/<int:stay_id>/enrich/", views.enrich_stay, name="enrich-stay"),
-    # STAY TRANSFERS
-    path(
-        "stay-transfers/<int:from_day_id>/create",
-        views.create_stay_transfer,
-        name="create-stay-transfer",
-    ),
-    path(
-        "stay-transfers/<int:pk>/edit",
-        views.edit_stay_transfer,
-        name="edit-stay-transfer",
-    ),
-    path(
-        "stay-transfers/<int:pk>/delete",
-        views.delete_stay_transfer,
-        name="delete-stay-transfer",
-    ),
     # MAIN TRANSFERS
     path(
         "main-transfers/<int:pk>/edit",

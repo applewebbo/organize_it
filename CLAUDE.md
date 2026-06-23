@@ -153,9 +153,7 @@ The app has two main Django apps: `accounts` and `trips`.
   - `Meal` - Restaurants, food experiences (`category=3`)
 - `Trip` (1) → (many) `Event` via `all_events` - Direct trip→event relationship (includes orphaned events)
 - `MainTransfer` - Arrival/departure transfers for a trip (plane, train, car, other). Has `start_time`/`end_time`. Max one per direction per trip.
-- `SimpleTransfer` - Transfer between two consecutive `Event` objects on the same day. Links `from_event` → `to_event` (OneToOne each side).
-- `StayTransfer` - Transfer between two `Stay` objects on consecutive days. Has optional `departure_time` and `estimated_duration`.
-- `MainTransferConnection` - Links a `MainTransfer` to either an `Event` or a `Stay` (the first/last point of the trip).
+- `MainTransferConnection` - Links a `MainTransfer` to either an `Event` or a `Stay` (the first/last point of the trip). Has its own `TransportMode` enum (driving/walking/bicycling/transit).
 
 **Key Model Behaviors:**
 - Trip status auto-updates based on dates (NOT_STARTED → IMPENDING → IN_PROGRESS → COMPLETED → ARCHIVED)

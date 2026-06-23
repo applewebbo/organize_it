@@ -6,7 +6,6 @@ from .models import (
     Link,
     Meal,
     Stay,
-    StayTransfer,
     Trip,
 )
 
@@ -33,11 +32,6 @@ class DayAdmin(admin.ModelAdmin):
     ]
     search_fields = ["destination", "trip__title"]
     list_filter = ["trip"]
-
-
-@admin.register(StayTransfer)
-class StayTransferAdmin(admin.ModelAdmin):
-    list_display = ["__str__", "from_day", "to_day", "transport_mode"]
 
 
 @admin.register(Experience)

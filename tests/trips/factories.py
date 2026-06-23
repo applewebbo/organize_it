@@ -1006,40 +1006,6 @@ class MainTransferFactory(factory.django.DjangoModelFactory):
     type_specific_data = factory.LazyFunction(dict)
 
 
-class StayTransferFactory(factory.django.DjangoModelFactory):
-    """Factory for StayTransfer (transfers between stays on consecutive days)"""
-
-    class Meta:
-        model = "trips.StayTransfer"
-
-    class Params:
-        # Create trip with consecutive days having different stays
-        trip = factory.SubFactory(TripFactory)
-
-    # Create two different stays
-    from_stay = factory.SubFactory(StayFactory)
-    to_stay = factory.SubFactory(StayFactory)
-
-    # Days must be consecutive (will be set via post_generation)
-    from_day = None
-    to_day = None
-    trip = factory.SelfAttribute("from_day.trip")
-
-    # Transfer details
-    transport_mode = factory.Faker(
-        "random_element", elements=["car", "train", "plane", "bus"]
-    )
-    notes = factory.Maybe(
-        factory.Faker("pybool"),
-        factory.Faker("sentence", nb_words=6),
-        "",
-    )
-
-    # Optional time fields
-    departure_time = None
-    estimated_duration = None
-
-
 class ChecklistItemFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "trips.ChecklistItem"

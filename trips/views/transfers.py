@@ -19,8 +19,6 @@ from trips.forms import (
     MainTransferConnectionEditForm,
     MainTransferConnectionForm,
     OtherMainTransferForm,
-    StayTransferCreateForm,
-    StayTransferEditForm,
     TrainMainTransferForm,
 )
 from trips.models import (
@@ -29,7 +27,6 @@ from trips.models import (
     MainTransfer,
     MainTransferConnection,
     Stay,
-    StayTransfer,
 )
 from trips.utils import (
     accessible_trips_qs,
@@ -44,129 +41,6 @@ from trips.utils import (
 )
 
 logger = logging.getLogger(__name__)
-
-
-def create_stay_transfer(request, from_day_id):
-    """
-    Create a StayTransfer between stays of consecutive days.
-    The from_stay and to_stay are auto-populated from the days.
-    The button to create a transfer only appears on the last day of a stay
-    (where next_day has a different stay), so next_day is the correct to_day.
-    """
-    from_day = get_object_or_404(
-        Day, pk=from_day_id, trip__in=editable_trips_qs(request.user)
-    )
-
-    # Get the next day - the button only appears when next_day exists and has different stay
-    to_day = from_day.next_day
-    if not to_day:
-        messages.add_message(
-            request,
-            messages.ERROR,
-            _("No next day found for this stay"),
-        )
-        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
-
-    # Check if both days have stays
-    if not from_day.stay or not to_day.stay:
-        messages.add_message(
-            request,
-            messages.ERROR,
-            _("Both days must have stays to create a transfer"),
-        )
-        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
-
-    from_stay = from_day.stay
-    to_stay = to_day.stay
-
-    # Check if stays are different (can't transfer from/to same stay)
-    if from_stay == to_stay:
-        messages.add_message(
-            request,
-            messages.ERROR,
-            _("Cannot create transfer between the same stay"),
-        )
-        return HttpResponse(status=204, headers={"HX-Trigger": "tripModified"})
-
-    form = StayTransferCreateForm(
-        request.POST or None,
-        from_stay=from_stay,
-        to_stay=to_stay,
-    )
-
-    if form.is_valid():
-        stay_transfer = form.save(commit=False)
-        # from_stay and to_event are already set by the form's __init__
-        stay_transfer.from_day = from_day
-        stay_transfer.to_day = to_day
-        stay_transfer.trip = from_day.trip
-        stay_transfer.save()
-        messages.add_message(
-            request,
-            messages.SUCCESS,
-            _("Stay transfer created successfully"),
-        )
-        # Trigger both days to refresh
-        triggers = {f"dayModified{from_day.pk}": {}, f"dayModified{to_day.pk}": {}}
-        return HttpResponse(status=204, headers={"HX-Trigger": json.dumps(triggers)})
-
-    context = {
-        "form": form,
-        "from_day": from_day,
-        "to_day": to_day,
-        "from_stay": from_stay,
-        "to_stay": to_stay,
-    }
-    return TemplateResponse(request, "trips/stay-transfer-create.html", context)
-
-
-def edit_stay_transfer(request, pk):
-    """Edit an existing StayTransfer"""
-    qs = StayTransfer.objects.select_related(
-        "from_stay", "to_stay", "from_day__trip__author", "to_day", "trip"
-    )
-    stay_transfer = get_object_or_404(
-        qs, pk=pk, trip__in=editable_trips_qs(request.user)
-    )
-    form = StayTransferEditForm(request.POST or None, instance=stay_transfer)
-
-    if form.is_valid():
-        form.save()
-        messages.add_message(
-            request,
-            messages.SUCCESS,
-            _("Stay transfer updated successfully"),
-        )
-        # Trigger both days to refresh
-        triggers = {
-            f"dayModified{stay_transfer.from_day.pk}": {},
-            f"dayModified{stay_transfer.to_day.pk}": {},
-        }
-        return HttpResponse(status=204, headers={"HX-Trigger": json.dumps(triggers)})
-
-    context = {"form": form, "stay_transfer": stay_transfer}
-    return TemplateResponse(request, "trips/stay-transfer-edit.html", context)
-
-
-def delete_stay_transfer(request, pk):
-    """Delete a StayTransfer"""
-    qs = StayTransfer.objects.select_related("from_day__trip__author", "to_day")
-    stay_transfer = get_object_or_404(
-        qs, pk=pk, trip__in=editable_trips_qs(request.user)
-    )
-    from_day_id = stay_transfer.from_day.pk
-    to_day_id = stay_transfer.to_day.pk
-    stay_transfer.delete()
-    messages.add_message(
-        request,
-        messages.SUCCESS,
-        _("Stay transfer deleted successfully"),
-    )
-    # Trigger refresh of both days to update their UI
-    return HttpResponse(
-        status=204,
-        headers={"HX-Trigger": f"dayModified{from_day_id}, dayModified{to_day_id}"},
-    )
 
 
 def edit_main_transfer(request, pk):

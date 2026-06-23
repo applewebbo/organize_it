@@ -1397,158 +1397,17 @@ class TestMainTransferConnectionForm:
         assert form.instance.transport_mode == "walking"
 
 
-class TestStayTransferCreateForm:
-    """Tests for StayTransferCreateForm"""
-
-    def test_form_creates_instance_with_stays(self):
-        """Form creates instance pre-populated with from_stay and to_stay"""
-        from trips.forms import StayTransferCreateForm
-
-        stay1 = StayFactory()
-        stay2 = StayFactory()
-
-        form = StayTransferCreateForm(from_stay=stay1, to_stay=stay2)
-
-        assert form.instance.from_stay == stay1
-        assert form.instance.to_stay == stay2
-
-    def test_form_valid_with_valid_data(self):
-        """Form is valid when transport_mode provided and stays are different"""
-        from trips.forms import StayTransferCreateForm
-
-        stay1 = StayFactory()
-        stay2 = StayFactory()
-
-        form = StayTransferCreateForm(
-            data={"transport_mode": "driving", "notes": ""},
-            from_stay=stay1,
-            to_stay=stay2,
-        )
-
-        assert form.is_valid()
-
-    def test_form_invalid_duplicate_from_stay(self):
-        """Form is invalid if from_stay already has an outgoing transfer"""
-        from datetime import date, timedelta
-
-        from trips.forms import StayTransferCreateForm
-        from trips.models import StayTransfer, Trip
-
-        user_trip = Trip.objects.create(
-            author=TripFactory().author,
-            title="T",
-            destination="Roma",
-            start_date=date.today(),
-            end_date=date.today() + timedelta(days=3),
-        )
-        days = list(user_trip.days.order_by("date"))
-        stay1 = StayFactory(day=days[0])
-        stay2 = StayFactory(day=days[1])
-        stay3 = StayFactory()
-
-        # Create existing transfer using stay1 as from_stay
-        StayTransfer.objects.create(
-            from_stay=stay1,
-            to_stay=stay2,
-            from_day=days[0],
-            to_day=days[1],
-            trip=user_trip,
-            transport_mode="driving",
-        )
-
-        form = StayTransferCreateForm(
-            data={"transport_mode": "driving", "notes": ""},
-            from_stay=stay1,
-            to_stay=stay3,
-        )
-
-        assert not form.is_valid()
-
-    def test_form_invalid_duplicate_to_stay(self):
-        """Form is invalid if to_stay already has an incoming transfer"""
-        from datetime import date, timedelta
-
-        from trips.forms import StayTransferCreateForm
-        from trips.models import StayTransfer, Trip
-
-        user_trip = Trip.objects.create(
-            author=TripFactory().author,
-            title="T",
-            destination="Roma",
-            start_date=date.today(),
-            end_date=date.today() + timedelta(days=5),
-        )
-        days = list(user_trip.days.order_by("date"))
-        stay1 = StayFactory(day=days[0])
-        stay2 = StayFactory(day=days[1])
-        stay3 = StayFactory(day=days[2])
-
-        # Create existing transfer using stay2 as to_stay (stay1 -> stay2)
-        StayTransfer.objects.create(
-            from_stay=stay1,
-            to_stay=stay2,
-            from_day=days[0],
-            to_day=days[1],
-            trip=user_trip,
-            transport_mode="driving",
-        )
-
-        # Now try to create another transfer into stay2 (stay3 -> stay2)
-        form = StayTransferCreateForm(
-            data={"transport_mode": "driving", "notes": ""},
-            from_stay=stay3,
-            to_stay=stay2,
-        )
-
-        assert not form.is_valid()
-
-    def test_edit_form_excludes_self_from_duplicate_check(self):
-        """Edit form doesn't flag existing transfer as duplicate of itself"""
-        from datetime import date, timedelta
-
-        from trips.forms import StayTransferCreateForm
-        from trips.models import StayTransfer, Trip
-
-        user_trip = Trip.objects.create(
-            author=TripFactory().author,
-            title="T",
-            destination="Roma",
-            start_date=date.today(),
-            end_date=date.today() + timedelta(days=3),
-        )
-        days = list(user_trip.days.order_by("date"))
-        stay1 = StayFactory(day=days[0])
-        stay2 = StayFactory(day=days[1])
-
-        transfer = StayTransfer.objects.create(
-            from_stay=stay1,
-            to_stay=stay2,
-            from_day=days[0],
-            to_day=days[1],
-            trip=user_trip,
-            transport_mode="driving",
-        )
-
-        # Edit form with same stays should be valid (excludes self)
-        form = StayTransferCreateForm(
-            data={"transport_mode": "transit", "notes": ""},
-            instance=transfer,
-            from_stay=stay1,
-            to_stay=stay2,
-        )
-
-        assert form.is_valid()
-
-
 class TestTransportModeRadioSelectWidget:
     """Tests for TransportModeRadioSelect custom widget"""
 
     def test_render_produces_radio_inputs(self):
         """Widget renders radio inputs for all transport choices"""
-        from trips.models import StayTransfer
+        from trips.models import MainTransferConnection
         from trips.widgets import TransportModeRadioSelect
 
-        widget = TransportModeRadioSelect(choices=StayTransfer.TransportMode.choices)
+        widget = TransportModeRadioSelect(
+            choices=MainTransferConnection.TransportMode.choices
+        )
         html = widget.render("transport_mode", "driving")
 
         assert 'type="radio"' in html
@@ -1559,76 +1418,24 @@ class TestTransportModeRadioSelectWidget:
 
     def test_render_marks_selected_value(self):
         """Widget marks selected value as checked"""
-        from trips.models import StayTransfer
+        from trips.models import MainTransferConnection
         from trips.widgets import TransportModeRadioSelect
 
-        widget = TransportModeRadioSelect(choices=StayTransfer.TransportMode.choices)
+        widget = TransportModeRadioSelect(
+            choices=MainTransferConnection.TransportMode.choices
+        )
         html = widget.render("transport_mode", "transit")
 
         assert 'checked="checked"' in html
 
     def test_render_with_no_value(self):
         """Widget renders with None value (defaults to driving)"""
-        from trips.models import StayTransfer
+        from trips.models import MainTransferConnection
         from trips.widgets import TransportModeRadioSelect
 
-        widget = TransportModeRadioSelect(choices=StayTransfer.TransportMode.choices)
+        widget = TransportModeRadioSelect(
+            choices=MainTransferConnection.TransportMode.choices
+        )
         html = widget.render("transport_mode", None)
 
         assert 'type="radio"' in html
-
-    def test_form_invalid_same_stays(self):
-        """Form is invalid if from_stay equals to_stay"""
-        from trips.forms import StayTransferCreateForm
-
-        stay = StayFactory()
-
-        form = StayTransferCreateForm(
-            data={"transport_mode": "driving", "notes": ""},
-            from_stay=stay,
-            to_stay=stay,
-        )
-
-        assert not form.is_valid()
-
-
-class TestStayTransferEditForm:
-    """Tests for StayTransferEditForm"""
-
-    def test_save_with_commit_false(self):
-        """save(commit=False) returns unsaved instance"""
-        from datetime import date, timedelta
-
-        from trips.forms import StayTransferEditForm
-        from trips.models import StayTransfer, Trip
-
-        user_trip = Trip.objects.create(
-            author=TripFactory().author,
-            title="T",
-            destination="Roma",
-            start_date=date.today(),
-            end_date=date.today() + timedelta(days=3),
-        )
-        days = list(user_trip.days.order_by("date"))
-        stay1 = StayFactory(day=days[0])
-        stay2 = StayFactory(day=days[1])
-        transfer = StayTransfer.objects.create(
-            from_stay=stay1,
-            to_stay=stay2,
-            from_day=days[0],
-            to_day=days[1],
-            trip=user_trip,
-            transport_mode="driving",
-        )
-
-        form = StayTransferEditForm(
-            data={"transport_mode": "transit", "notes": ""},
-            instance=transfer,
-        )
-        assert form.is_valid()
-        instance = form.save(commit=False)
-
-        assert instance.transport_mode == "transit"
-        # Not saved yet — original value still in DB
-        transfer.refresh_from_db()
-        assert transfer.transport_mode == "driving"
