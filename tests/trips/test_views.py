@@ -127,6 +127,25 @@ class TestHomeView(TestCase):
             f"{scaled} with 4 meals/day"
         )
 
+    def test_home_does_not_requery_days_for_first_last(self):
+        """Home must reuse prefetched days instead of re-querying first/last day."""
+        user = self.make_user("user")
+        fav_trip = TripFactory(
+            author=user, start_date=date(2024, 1, 1), end_date=date(2024, 1, 4)
+        )
+        user.profile.fav_trip = fav_trip
+        user.profile.save()
+
+        with self.login(user):
+            with CaptureQueriesContext(connection) as ctx:
+                response = self.get("trips:home")
+
+        self.response_200(response)
+        day_queries = sum(
+            1 for q in ctx.captured_queries if 'FROM "trips_day"' in q["sql"]
+        )
+        assert day_queries == 1, f"expected 1 trips_day query, got {day_queries}"
+
     def test_get_with_unpaired_events(self):
 
         from trips.models import Experience

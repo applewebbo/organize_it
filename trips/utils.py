@@ -249,12 +249,12 @@ def get_trips(user):
             .order_by("first_day_date")
         )
 
-    day_groups = (
-        group_days_by_destination(featured_trip.days.all()) if featured_trip else None
-    )
+    # Day is ordered by "number" by default, so reuse the prefetched days
+    featured_days = list(featured_trip.days.all()) if featured_trip else []
+    day_groups = group_days_by_destination(featured_days) if featured_trip else None
 
-    first_day = featured_trip.days.order_by("number").first() if featured_trip else None
-    last_day = featured_trip.days.order_by("number").last() if featured_trip else None
+    first_day = featured_days[0] if featured_days else None
+    last_day = featured_days[-1] if featured_days else None
 
     return {
         "fav_trip": fav_trip,
