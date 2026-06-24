@@ -22,7 +22,7 @@ from tests.trips.factories import (
     StayFactory,
     TripFactory,
 )
-from trips.models import TripCollaboration
+from trips.models import MainTransfer, TripCollaboration
 
 pytestmark = pytest.mark.django_db
 
@@ -585,6 +585,24 @@ class TestTripDetailView(TestCase):
             f"N+1 detected: {baseline} queries with 1 meal/day vs "
             f"{scaled} with 4 meals/day"
         )
+
+    def test_trip_detail_fetches_transfers_in_single_query(self):
+        """Transfers must be fetched in one query with the connection joined."""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        MainTransferFactory(trip=trip, direction=MainTransfer.Direction.ARRIVAL)
+        MainTransferFactory(trip=trip, direction=MainTransfer.Direction.DEPARTURE)
+
+        with self.login(user):
+            with CaptureQueriesContext(connection) as ctx:
+                response = self.get("trips:trip-detail", pk=trip.pk)
+
+        self.response_200(response)
+        sqls = [q["sql"] for q in ctx.captured_queries]
+        transfer_q = sum(1 for s in sqls if 'FROM "trips_main_transfer"' in s)
+        conn_q = sum(1 for s in sqls if 'FROM "trips_main_transfer_connection"' in s)
+        assert transfer_q == 1, f"expected 1 transfer query, got {transfer_q}"
+        assert conn_q == 0, f"expected connection joined, got {conn_q} queries"
 
     def test_home_transfer_context_without_main_transfers(self):
         """from_home_* and to_home_* are in context when no main transfers."""

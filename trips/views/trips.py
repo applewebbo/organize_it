@@ -151,23 +151,29 @@ def trip_detail(request, pk):
         .order_by("first_day_date")
     )
 
-    # Get main transfers
-    arrival_transfer = MainTransfer.objects.filter(
-        trip=trip, direction=MainTransfer.Direction.ARRIVAL
-    ).first()
-    departure_transfer = MainTransfer.objects.filter(
-        trip=trip, direction=MainTransfer.Direction.DEPARTURE
-    ).first()
+    # Get main transfers in a single query, joining the connection destination
+    transfers = list(
+        MainTransfer.objects.filter(trip=trip).select_related(
+            "connection__event", "connection__stay"
+        )
+    )
+    arrival_transfer = next(
+        (t for t in transfers if t.direction == MainTransfer.Direction.ARRIVAL), None
+    )
+    departure_transfer = next(
+        (t for t in transfers if t.direction == MainTransfer.Direction.DEPARTURE), None
+    )
 
     # Check user preference for default view
     profile = get_profile(request.user)
     show_map = profile.default_map_view == "map"
 
-    days = trip.days.all()
+    # Day is ordered by "number" by default, so reuse the prefetched days
+    days = list(trip.days.all())
     day_groups = group_days_by_destination(days)
 
-    first_day = trip.days.order_by("number").first()
-    last_day = trip.days.order_by("number").last()
+    first_day = days[0] if days else None
+    last_day = days[-1] if days else None
 
     context = {
         "trip": trip,
