@@ -1,6 +1,6 @@
 {% load i18n %}
 <div class="flex items-center"
-     x-data="themeSwitcher({{ user.profile.use_system_theme|yesno:'true,false' }})">
+     x-data="themeSwitcher({{ use_system_theme|yesno:'true,false' }})">
     <label class="swap swap-rotate">
         <input type="checkbox"
                class="theme-controller"

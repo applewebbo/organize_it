@@ -102,6 +102,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "core.context_processors.app_version",
+                "accounts.context_processors.user_theme",
             ],
             "builtins": [
                 "django_cotton.templatetags.cotton",

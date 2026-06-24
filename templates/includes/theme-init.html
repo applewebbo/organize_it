@@ -3,7 +3,7 @@
 <script>
 // Apply theme on page load (before Alpine.js initializes)
 (function() {
-    const useSystemTheme = {{ user.profile.use_system_theme|default:'false'|yesno:'true,false' }};
+    const useSystemTheme = {{ use_system_theme|default:'false'|yesno:'true,false' }};
 
     function applyTheme(theme) {
         document.documentElement.setAttribute('data-theme', theme);

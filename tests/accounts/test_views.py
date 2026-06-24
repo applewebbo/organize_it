@@ -2,6 +2,8 @@
 from unittest.mock import patch
 
 import pytest
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
 
 from accounts.models import Profile
 from tests.test import TestCase
@@ -37,6 +39,22 @@ class TestProfileView(TestCase):
         # Check the status code and template used
         self.response_200()
         assert "account/profile.html" in [t.name for t in response.templates]
+
+    def test_profile_does_not_duplicate_user_query(self):
+        """The profile/settings page must not re-query the user (select_related)."""
+        user = self.make_user("user")
+
+        with self.login(user):
+            with CaptureQueriesContext(connection) as ctx:
+                response = self.get("accounts:profile")
+
+        self.response_200(response)
+        customuser_queries = sum(
+            1 for q in ctx.captured_queries if 'FROM "accounts_customuser"' in q["sql"]
+        )
+        assert customuser_queries == 1, (
+            f"expected 1 accounts_customuser query, got {customuser_queries}"
+        )
 
     def test_avatar_widget_renders(self):
         """Test that avatar widget renders with images"""

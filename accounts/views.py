@@ -28,7 +28,9 @@ prefilled_password_reset = PrefilledPasswordResetView.as_view()
 
 
 def profile(request):
-    profile = get_object_or_404(Profile, user=request.user)
+    profile = get_object_or_404(
+        Profile.objects.select_related("user"), user=request.user
+    )
     form = ProfileUpdateForm(instance=profile)
     context = {
         "user": request.user,
