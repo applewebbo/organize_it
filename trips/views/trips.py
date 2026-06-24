@@ -87,6 +87,7 @@ def trip_list(request):
     shared_trips = (
         Trip.objects.filter(collaborators=request.user)
         .exclude(status=5)
+        .select_related("author__profile")
         .prefetch_related("days")
     )
 

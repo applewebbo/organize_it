@@ -22,6 +22,7 @@ from tests.trips.factories import (
     StayFactory,
     TripFactory,
 )
+from trips.models import TripCollaboration
 
 pytestmark = pytest.mark.django_db
 
@@ -319,6 +320,36 @@ class TestTripListView(TestCase):
 
         self.response_200(response)
         assert "trips/trip-list.html" not in [t.name for t in response.templates]
+
+    @time_machine.travel("2026-06-24")
+    def test_trip_list_query_count_is_stable_with_more_trips(self):
+        """N+1 guard: trips list query count must not grow with the number of trips."""
+
+        def count_queries(username, n):
+            user = self.make_user(username)
+            owner = self.make_user(f"{username}_owner")
+            for _ in range(n):
+                # Own in-progress trip triggers the trip_day_one_weather tag
+                TripFactory(
+                    author=user,
+                    start_date=date(2026, 6, 23),
+                    end_date=date(2026, 6, 26),
+                )
+                # Shared trip renders the author's profile
+                shared = TripFactory(author=owner)
+                TripCollaboration.objects.create(
+                    trip=shared, user=user, color="green", added_by=owner
+                )
+            with self.login(user):
+                with CaptureQueriesContext(connection) as ctx:
+                    self.get("trips:trip-list")
+            return len(ctx.captured_queries)
+
+        baseline = count_queries("user_small", 1)
+        scaled = count_queries("user_large", 4)
+        assert scaled == baseline, (
+            f"N+1 detected: {baseline} queries with 1 trip vs {scaled} with 4"
+        )
 
     def test_trip_list_sorted_by_date_asc_default(self):
         """Test trip list uses date_asc sorting by default"""

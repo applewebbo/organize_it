@@ -366,7 +366,9 @@ def weather_summary(trip):
 @register.simple_tag
 def trip_day_one_weather(trip):
     """Return weather_data for the first day of a trip (for list badge)."""
-    first_day = trip.days.order_by("number").first()
+    # Day is ordered by "number" by default, so reuse the prefetched days
+    days = list(trip.days.all())
+    first_day = days[0] if days else None
     if first_day:
         return first_day.weather_data
     return None
