@@ -471,15 +471,14 @@ wheels = [
 
 [[package]]
 dependencies = [
-  {name = "django"},
-  {name = "sqlparse"}
+  {name = "django"}
 ]
-name = "django-debug-toolbar"
-sdist = {url = "https://files.pythonhosted.org/packages/1e/ac/3ac674f99c64bfbcd9ae3d7f5f3577f23ea52884e5ac36842e1f024dce03/django_debug_toolbar-7.0.0.tar.gz", hash = "sha256:ef7494c5b459c149e87cc2da88d86e944064945e86bd7b2d879093586b5fefbf", size = 359560, upload-time = "2026-06-19T00:21:23.346Z"}
+name = "django-devbar"
+sdist = {url = "https://files.pythonhosted.org/packages/0c/ec/63ecc60a34f30381f9ce0e2fa7745250c8ea5118ea1568f498d8d6da69dc/django_devbar-0.7.0.tar.gz", hash = "sha256:6abd24023bd145f5abf97339913399b8c1dbef2fced0be06916c35286659f68d", size = 9360, upload-time = "2026-02-16T18:28:32.573Z"}
 source = {registry = "https://pypi.org/simple"}
-version = "7.0.0"
+version = "0.7.0"
 wheels = [
-  {url = "https://files.pythonhosted.org/packages/4b/ab/684a56624f9ed35127e203e52d2c241f3b7b70d37cfa8cb2ba4fc8e1e8d7/django_debug_toolbar-7.0.0-py3-none-any.whl", hash = "sha256:656161388ce48384276342eeb16d532113ec670816fa1546cc3753730aa51b3d", size = 302038, upload-time = "2026-06-19T00:21:21.531Z"}
+  {url = "https://files.pythonhosted.org/packages/a5/71/a41c3e41a04ea3d49fa7f3d81a00dfb9878fc3a17a6d7e9212abdb5f82be/django_devbar-0.7.0-py3-none-any.whl", hash = "sha256:3c9f43a03aab79af747c37f2b34c16cd2d0306c97dd7277bf2839833240eadd4", size = 11681, upload-time = "2026-02-16T18:28:31.164Z"}
 ]
 
 [[package]]
@@ -1169,7 +1168,6 @@ dependencies = [
   {name = "django-cotton"},
   {name = "django-crispy-forms"},
   {name = "django-dbbackup"},
-  {name = "django-debug-toolbar"},
   {name = "django-environ"},
   {name = "django-extensions"},
   {name = "django-htmx"},
@@ -1202,6 +1200,7 @@ version = "2026.8.4"
 dev = [
   {name = "coverage"},
   {name = "django-coverage-plugin"},
+  {name = "django-devbar"},
   {name = "django-test-plus"},
   {name = "django-watchfiles"},
   {name = "djlint"},
@@ -1235,7 +1234,6 @@ requires-dist = [
   {name = "django-cotton", specifier = ">=2.0.0"},
   {name = "django-crispy-forms", specifier = ">=2.3"},
   {name = "django-dbbackup", specifier = ">=5.0.1"},
-  {name = "django-debug-toolbar", specifier = ">=5.1.0"},
   {name = "django-environ", specifier = ">=0.11.2"},
   {name = "django-extensions"},
   {name = "django-htmx", specifier = ">=1.19.0"},
@@ -1265,6 +1263,7 @@ requires-dist = [
 dev = [
   {name = "coverage", specifier = ">=7.6.1"},
   {name = "django-coverage-plugin", specifier = ">=3.1.0"},
+  {name = "django-devbar", specifier = ">=0.7.0"},
   {name = "django-test-plus", specifier = ">=2.2.4"},
   {name = "django-watchfiles", specifier = ">=1.4.0"},
   {name = "djlint", specifier = ">=1.35.2"},

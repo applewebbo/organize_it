@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "crispy_tailwind",
     "crispy_forms",
-    "debug_toolbar",
     "django_browser_reload",
     "django_cotton.apps.SimpleAppConfig",
     "django_extensions",
@@ -77,7 +76,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
     "django_browser_reload.middleware.BrowserReloadMiddleware",
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = "core.urls"
@@ -350,6 +348,10 @@ if ENVIRONMENT == "dev":
     INSTALLED_APPS += [
         "django_watchfiles",
     ]
+
+    # django-devbar: insert middleware right after SecurityMiddleware
+    _security_idx = MIDDLEWARE.index("django.middleware.security.SecurityMiddleware")
+    MIDDLEWARE.insert(_security_idx + 1, "django_devbar.DevBarMiddleware")
 
     # DJANGO-Q configuration for development
     Q_CLUSTER = {

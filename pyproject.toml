@@ -2,6 +2,7 @@
 dev = [
   "coverage>=7.6.1",
   "django-coverage-plugin>=3.1.0",
+  "django-devbar>=0.7.0",
   "django-test-plus>=2.2.4",
   "django-watchfiles>=1.4.0",
   "djlint>=1.35.2",
@@ -42,7 +43,6 @@ dependencies = [
   "granian[pname]>=2.2.0",
   "django-extensions",
   "django-browser-reload>=1.18.0",
-  "django-debug-toolbar>=5.1.0",
   "uvloop>=0.21.0",
   "django-anymail[mailgun]>=13.0",
   "croniter>=6.0.0",
