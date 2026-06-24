@@ -531,6 +531,30 @@ class TestTripDetailView(TestCase):
         assertTemplateUsed(response, "trips/trip-detail.html")
         assert response.context["trip"] == trip
 
+    def test_trip_detail_query_count_is_stable_with_more_events(self):
+        """N+1 guard: trip-detail query count must not grow with events/stays."""
+
+        def count_queries(username, meals_per_day):
+            user = self.make_user(username)
+            trip = TripFactory(
+                author=user, start_date=date(2024, 1, 1), end_date=date(2024, 1, 4)
+            )
+            for day in trip.days.all():
+                StayFactory(day=day)
+                for _ in range(meals_per_day):
+                    MealFactory(day=day, trip=trip)
+            with self.login(user):
+                with CaptureQueriesContext(connection) as ctx:
+                    self.get("trips:trip-detail", pk=trip.pk)
+            return len(ctx.captured_queries)
+
+        baseline = count_queries("user_small", meals_per_day=1)
+        scaled = count_queries("user_large", meals_per_day=4)
+        assert scaled == baseline, (
+            f"N+1 detected: {baseline} queries with 1 meal/day vs "
+            f"{scaled} with 4 meals/day"
+        )
+
     def test_home_transfer_context_without_main_transfers(self):
         """from_home_* and to_home_* are in context when no main transfers."""
         from accounts.models import Profile
@@ -603,6 +627,28 @@ class TestDayDetailView(TestCase):
         assert response.context["day"] == day
         assert "show_map" in response.context
         assert response.context["show_map"] is False
+
+    def test_day_detail_query_count_is_stable_with_more_events(self):
+        """N+1 guard: day-detail query count must not grow with the day's events."""
+
+        def count_queries(username, meals):
+            user = self.make_user(username)
+            trip = TripFactory(
+                author=user, start_date=date(2024, 1, 1), end_date=date(2024, 1, 2)
+            )
+            day = trip.days.first()
+            for _ in range(meals):
+                MealFactory(day=day, trip=trip)
+            with self.login(user):
+                with CaptureQueriesContext(connection) as ctx:
+                    self.get("trips:day-detail", pk=day.pk)
+            return len(ctx.captured_queries)
+
+        baseline = count_queries("user_small", meals=1)
+        scaled = count_queries("user_large", meals=5)
+        assert scaled == baseline, (
+            f"N+1 detected: {baseline} queries with 1 meal vs {scaled} with 5 meals"
+        )
 
     def test_get_day_detail_with_map_preference(self):
         """Test day detail respects user's map view preference"""

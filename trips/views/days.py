@@ -35,13 +35,16 @@ def day_detail(request, pk):
     qs = Day.objects.prefetch_related(
         Prefetch(
             "events",
-            queryset=Event.objects.order_by("order", "pk"),
+            queryset=Event.objects.select_related("experience", "meal").order_by(
+                "order", "pk"
+            ),
         ),
         Prefetch(
             "stay",
             queryset=Stay.objects.select_related("author"),
         ),
         "trip__main_transfers",
+        "trip__days",
         Prefetch(
             "trip__collaborations",
             queryset=TripCollaboration.objects.all(),
