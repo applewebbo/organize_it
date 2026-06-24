@@ -7,16 +7,6 @@
         "serve"
       ],
       "type": "stdio"
-    },
-    "playwright": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@playwright/mcp@latest",
-        "--browser",
-        "webkit"
-      ],
-      "type": "stdio"
     }
   }
 }
