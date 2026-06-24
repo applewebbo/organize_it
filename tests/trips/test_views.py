@@ -6,7 +6,9 @@ from unittest.mock import patch
 
 import pytest
 import time_machine
+from django.db import connection
 from django.test import override_settings
+from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 from django.utils import timezone
 from pytest_django.asserts import assertTemplateUsed
@@ -16,6 +18,7 @@ from tests.trips.factories import (
     EventFactory,
     ExperienceFactory,
     MainTransferFactory,
+    MealFactory,
     StayFactory,
     TripFactory,
 )
@@ -96,6 +99,32 @@ class TestHomeView(TestCase):
         self.response_200(response)
         assert response.context["fav_trip"] == fav_trip
         assert len(response.context["fav_trip"].days.all()) == 3
+
+    def test_home_query_count_is_stable_with_more_events(self):
+        """N+1 guard: home query count must not grow with events/stays per day."""
+
+        def count_queries(username, meals_per_day):
+            user = self.make_user(username)
+            fav_trip = TripFactory(
+                author=user, start_date=date(2024, 1, 1), end_date=date(2024, 1, 4)
+            )
+            user.profile.fav_trip = fav_trip
+            user.profile.save()
+            for day in fav_trip.days.all():
+                StayFactory(day=day)
+                for _ in range(meals_per_day):
+                    MealFactory(day=day, trip=fav_trip)
+            with self.login(user):
+                with CaptureQueriesContext(connection) as ctx:
+                    self.get("trips:home")
+            return len(ctx.captured_queries)
+
+        baseline = count_queries("user_small", meals_per_day=1)
+        scaled = count_queries("user_large", meals_per_day=4)
+        assert scaled == baseline, (
+            f"N+1 detected: {baseline} queries with 1 meal/day vs "
+            f"{scaled} with 4 meals/day"
+        )
 
     def test_get_with_unpaired_events(self):
 

@@ -167,7 +167,13 @@ def get_trips(user):
             Trip.objects.prefetch_related(
                 Prefetch(
                     "days__events",
-                    queryset=Event.objects.all().order_by("order", "pk"),
+                    queryset=Event.objects.select_related(
+                        "experience", "meal"
+                    ).order_by("order", "pk"),
+                ),
+                Prefetch(
+                    "days__stay",
+                    queryset=Stay.objects.select_related("author"),
                 ),
                 "main_transfers",
             )
@@ -205,7 +211,13 @@ def get_trips(user):
             Trip.objects.prefetch_related(
                 Prefetch(
                     "days__events",
-                    queryset=Event.objects.all().order_by("order", "pk"),
+                    queryset=Event.objects.select_related(
+                        "experience", "meal"
+                    ).order_by("order", "pk"),
+                ),
+                Prefetch(
+                    "days__stay",
+                    queryset=Stay.objects.select_related("author"),
                 ),
                 "main_transfers",
             )

@@ -124,7 +124,8 @@ class Trip(models.Model):
         """Returns True if the trip has days with different destinations."""
         if not self.pk:
             return False
-        destinations = set(self.days.values_list("destination", flat=True))
+        # Reuse prefetched days when available to avoid extra queries
+        destinations = {day.destination for day in self.days.all()}
         return len(destinations) > 1
 
 
