@@ -21,7 +21,7 @@
                     </button>
                 {% endif %}
             </div>
-            <ul class="flex flex-wrap gap-3 mt-3">
+            <ul class="flex flex-wrap gap-3 mt-2 sm:mt-3">
                 <li class="flex gap-3 items-center py-3 px-6 rounded-xl border border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/10">
                     {% if trip.author.profile.avatar %}
                         <img src="{% static 'img/avatars/' %}{{ trip.author.profile.avatar }}"

@@ -4,13 +4,13 @@
         <h3 id="event-title"
             class="text-xl font-semibold text-gray-900 dark:text-white">{{ event.name }}</h3>
         {% if event.category == 3 and event.type != 0 %}
-            <span class="badge badge-outline badge-sm badge-info ms-2 align-sub">
+            <span class="hidden sm:inline-flex badge badge-outline badge-sm badge-info ms-2 align-sub">
                 <i class="ph-bold {{ event|event_type_icon }}" aria-hidden="true"></i>
                 <span class="ml-1">{{ event.get_type_display }}</span>
             </span>
         {% endif %}
         {% if event.tag %}
-            <span class="badge badge-outline badge-sm badge-info ms-1 align-sub">{{ event.tag|capfirst }}</span>
+            <span class="badge badge-outline badge-sm badge-info ms-1 align-sub {% if event.category == 2 %}hidden sm:inline-flex{% endif %}">{{ event.tag|capfirst }}</span>
         {% endif %}
     </div>
     <button type="button"
@@ -29,42 +29,44 @@
             </div>
         </div>
         {% partialdef 'event-detail' inline %}
-            <div class="grid gap-1 p-4 sm:gap-2 md:p-5">
-                {% if event.category == 1 %}
-                    {% include 'trips/includes/transport-detail.html' %}
-                {% elif event.category == 2 %}
-                    {% include 'trips/includes/experience-detail.html' %}
-                {% elif event.category == 3 %}
-                    {% include 'trips/includes/meal-detail.html' %}
-                {% endif %}
-                {% if error_message %}
-                    <div role="alert"
-                         class="mt-4 alert alert-error alert-soft"
-                         x-cloak
-                         x-data="{ show: true }"
-                         x-show="show"
-                         x-init="setTimeout(() => show = false, 4000)">{{ error_message }}</div>
-                {% elif success_message %}
-                    <div role="alert"
-                         class="mt-4 alert alert-success alert-soft"
-                         x-cloak
-                         x-data="{ show: true }"
-                         x-show="show"
-                         x-init="setTimeout(() => show = false, 4000)">{{ success_message }}</div>
-                {% endif %}
-            </div>
+            {% if event.category == 1 or event.website or event.phone_number or event.opening_hours or event.notes or error_message or success_message %}
+                <div class="grid gap-1 p-4 sm:gap-2 md:p-5">
+                    {% if event.category == 1 %}
+                        {% include 'trips/includes/transport-detail.html' %}
+                    {% elif event.category == 2 %}
+                        {% include 'trips/includes/experience-detail.html' %}
+                    {% elif event.category == 3 %}
+                        {% include 'trips/includes/meal-detail.html' %}
+                    {% endif %}
+                    {% if error_message %}
+                        <div role="alert"
+                             class="mt-4 alert alert-error alert-soft"
+                             x-cloak
+                             x-data="{ show: true }"
+                             x-show="show"
+                             x-init="setTimeout(() => show = false, 4000)">{{ error_message }}</div>
+                    {% elif success_message %}
+                        <div role="alert"
+                             class="mt-4 alert alert-success alert-soft"
+                             x-cloak
+                             x-data="{ show: true }"
+                             x-show="show"
+                             x-init="setTimeout(() => show = false, 4000)">{{ success_message }}</div>
+                    {% endif %}
+                </div>
+            {% endif %}
         {% endpartialdef 'event-detail' %}
     </div>
-    <div class="flex gap-2 justify-end items-center p-4 px-8 rounded-b md:p-5">
+    <div class="grid grid-cols-2 gap-2 p-4 rounded-b sm:flex sm:justify-center md:p-5">
         {% if event.category != 1 and not event.enriched %}
             <button type="button"
-                    class="flex justify-center items-center btn btn-secondary btn-soft"
+                    class="btn btn-secondary btn-soft"
                     hx-post="{% url 'trips:enrich-event' event.id %}"
                     hx-indicator="#enrich-overlay"
                     hx-swap="innerHTML"
                     hx-target="#dialog">
-                <i class="text-xl sm:hidden ph-bold ph-list-plus"></i>
-                <span class="hidden sm:inline">{% trans 'Enrich' %}</span>
+                <i class="ph-bold ph-list-plus"></i>
+                <span>{% trans 'Enrich' %}</span>
             </button>
         {% endif %}
         <button type="button"
@@ -72,30 +74,30 @@
                 hx-get="{% url 'trips:event-notes' event.pk %}"
                 hx-target="#dialog"
                 hx-swap="innerHTML">
-            <i class="text-xl sm:hidden ph-bold ph-note"></i>
-            <span class="hidden sm:inline">{% trans 'Notes' %}</span>
+            <i class="ph-bold ph-note"></i>
+            <span>{% trans 'Notes' %}</span>
         </button>
         <button type="button"
                 class="btn btn-success btn-soft"
                 hx-get="{% url 'trips:event-modify' event.pk %}"
                 hx-target="#dialog"
                 hx-swap="innerHTML">
-            <i class="text-xl sm:hidden ph-bold ph-pencil-line"></i>
-            <span class="hidden sm:inline">{% trans 'Edit' %}</span>
+            <i class="ph-bold ph-pencil-line"></i>
+            <span>{% trans 'Edit' %}</span>
         </button>
         <button type="button"
                 class="btn btn-error btn-soft"
                 hx-get="{% url 'trips:event-modal' event.pk %}"
                 hx-target="#dialog"
                 hx-swap="innerHTML">
-            <i class="text-xl sm:hidden ph-bold ph-trash"></i>
-            <span class="hidden sm:inline">{% trans 'Delete' %}</span>
+            <i class="ph-bold ph-trash"></i>
+            <span>{% trans 'Delete' %}</span>
         </button>
         <button type="button"
                 x-on:click="openModal = false"
                 class="btn btn-soft btn-neutral">
-            <i class="text-xl sm:hidden ph-bold ph-x-circle"></i>
-            <span class="hidden sm:inline">{% trans 'Close' %}</span>
+            <i class="ph-bold ph-x-circle"></i>
+            <span>{% trans 'Close' %}</span>
         </button>
     </div>
 </div>

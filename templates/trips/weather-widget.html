@@ -1,6 +1,6 @@
 {% load i18n %}
 {% if weather %}
-    <div class="flex flex-wrap gap-y-1 gap-x-4 items-center py-2 px-3 mt-2 text-sm rounded-lg border border-base-300 bg-base-200/50 text-base-content/70">
+    <div class="flex flex-wrap gap-y-1 gap-x-2 items-center py-2 px-3 mt-2 text-sm rounded-lg border border-base-300 bg-base-200/50 text-base-content/70">
         <span class="flex gap-1 items-center font-medium">
             <i class="ph-bold {{ weather.weather_icon }} text-base"></i>
             {{ weather.temperature_max|floatformat:0 }}° / {{ weather.temperature_min|floatformat:0 }}°

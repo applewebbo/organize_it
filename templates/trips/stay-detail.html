@@ -17,107 +17,55 @@
                 <span class="loading loading-bars loading-lg text-primary"></span>
             </div>
         </div>
-        <div class="grid gap-1 p-4 sm:gap-2 md:p-5">
-            <ul class="leading-10">
-                <li class="flex gap-2 items-start mt-1">
-                    <i class="mt-1 ph-bold ph-map-pin i-md text-base-content/60 shrink-0"></i>
-                    <div class="flex flex-col">
-                        <span>{{ stay.address }}</span>
-                        {% if stay.google_maps_directions_url %}
-                            <a href="{{ stay.google_maps_directions_url }}"
-                               target="_blank"
-                               class="block mt-0.5 text-sm link text-primary w-fit"
-                               aria-label="{% trans 'Get directions' %}">{% trans 'Get directions' %}</a>
-                        {% endif %}
-                    </div>
-                </li>
-                {% if stay.check_in %}
-                    <li class="flex gap-2 items-center">
-                        <i class="ph-bold ph-sign-in i-md text-base-content/60"></i>{{ first_day.date|date:"SHORT_DATE_FORMAT" }} {% trans 'from' %} {{ stay.check_in|time:"H:i" }}
-                    </li>
-                {% endif %}
-                {% if stay.check_out %}
-                    <li class="flex gap-2 items-center">
-                        <i class="ph-bold ph-sign-out i-md text-base-content/60"></i>{{ last_day.date|date:"SHORT_DATE_FORMAT" }} {% trans 'before' %} {{ stay.check_out|time:"H:i" }}
-                    </li>
-                {% endif %}
-                {% if stay.website %}
-                    <li class="flex gap-2 items-center">
-                        <i class="ph-bold ph-browser i-md text-base-content/60"></i><a href="{{ stay.website }}" class="link">{{ stay.website|truncatechars:38 }}</a>
-                    </li>
-                {% endif %}
-                {% if stay.phone_number %}
-                    <li class="flex gap-2 items-center">
-                        <i class="ph-bold ph-phone i-md text-base-content/60"></i>{{ stay.phone_number|phone_format }}
-                    </li>
-                {% endif %}
-                {% if stay.opening_hours %}
-                    <li class="flex gap-2 items-center">
-                        <i class="ph-bold ph-door-open i-md text-base-content/60"></i>{{ stay.opening_hours|format_opening_hours }}
-                    </li>
-                {% endif %}
-                {% if stay.cancellation_date %}
-                    <li class="flex gap-2 items-center">
-                        <i class="ph-bold ph-calendar-x i-md text-base-content/60"></i>
-                        {{ stay.cancellation_date }}
-                    </li>
-                {% endif %}
-                {% if stay.notes %}
-                    <li class="flex gap-2 items-start">
-                        <i class="mt-1 ph-bold ph-note i-md text-base-content/60 shrink-0"></i>{{ stay.notes }}
-                    </li>
-                {% endif %}
-            </ul>
-            {% if error_message %}
-                <div role="alert"
-                     class="mt-4 alert alert-error alert-soft"
-                     x-cloak
-                     x-data="{ show: true }"
-                     x-show="show"
-                     x-init="setTimeout(() => show = false, 4000)">{{ error_message }}</div>
-            {% elif success_message %}
-                <div role="alert"
-                     class="mt-4 alert alert-success alert-soft"
-                     x-cloak
-                     x-data="{ show: true }"
-                     x-show="show"
-                     x-init="setTimeout(() => show = false, 4000)">{{ success_message }}</div>
-            {% endif %}
-        </div>
-    </div>
-    <div class="flex justify-end items-center p-4 px-8 rounded-b md:p-5">
-        {% if not stay.enriched %}
-            <button type="button"
-                    class="ms-2 btn btn-secondary btn-soft"
-                    hx-post="{% url 'trips:enrich-stay' stay.id %}"
-                    hx-indicator="#enrich-overlay"
-                    hx-swap="innerHTML"
-                    hx-target="#dialog">
-                <i class="text-xl sm:hidden ph-bold ph-list-plus"></i>
-                <span class="hidden sm:inline">{% trans 'Enrich' %}</span>
-            </button>
+        {% if error_message %}
+            <div role="alert"
+                 class="mx-4 mt-4 md:mx-5 alert alert-error alert-soft"
+                 x-cloak
+                 x-data="{ show: true }"
+                 x-show="show"
+                 x-init="setTimeout(() => show = false, 4000)">{{ error_message }}</div>
+        {% elif success_message %}
+            <div role="alert"
+                 class="mx-4 mt-4 md:mx-5 alert alert-success alert-soft"
+                 x-cloak
+                 x-data="{ show: true }"
+                 x-show="show"
+                 x-init="setTimeout(() => show = false, 4000)">{{ success_message }}</div>
         {% endif %}
-        <button type="button"
-                class="ms-2 btn btn-success btn-soft"
-                hx-get="{% url 'trips:stay-modify' stay.pk %}"
-                hx-target="#stay-details"
-                hx-swap="innerHTML">
-            <i class="text-xl sm:hidden ph-bold ph-pencil-line"></i>
-            <span class="hidden sm:inline">{% trans 'Edit' %}</span>
-        </button>
-        <button type="button"
-                class="ms-2 btn btn-error btn-soft"
-                hx-get="{% url 'trips:stay-delete' stay.pk %}"
-                hx-target="#stay-details"
-                hx-swap="innerHTML">
-            <i class="text-xl sm:hidden ph-bold ph-trash"></i>
-            <span class="hidden sm:inline">{% trans 'Delete' %}</span>
-        </button>
-        <button type="button"
-                x-on:click="openModal = false{% if modified %}; location.reload(){% endif %}"
-                class="ms-2 btn btn-soft btn-neutral">
-            <i class="text-xl sm:hidden ph-bold ph-x-circle"></i>
-            <span class="hidden sm:inline">{% trans 'Close' %}</span>
-        </button>
+        <div class="grid grid-cols-2 gap-2 p-4 rounded-b sm:flex sm:justify-center md:p-5">
+            {% if not stay.enriched %}
+                <button type="button"
+                        class="btn btn-secondary btn-soft"
+                        hx-post="{% url 'trips:enrich-stay' stay.id %}"
+                        hx-indicator="#enrich-overlay"
+                        hx-swap="innerHTML"
+                        hx-target="#dialog">
+                    <i class="ph-bold ph-list-plus"></i>
+                    <span>{% trans 'Enrich' %}</span>
+                </button>
+            {% endif %}
+            <button type="button"
+                    class="btn btn-success btn-soft"
+                    hx-get="{% url 'trips:stay-modify' stay.pk %}"
+                    hx-target="#stay-details"
+                    hx-swap="innerHTML">
+                <i class="ph-bold ph-pencil-line"></i>
+                <span>{% trans 'Edit' %}</span>
+            </button>
+            <button type="button"
+                    class="btn btn-error btn-soft"
+                    hx-get="{% url 'trips:stay-delete' stay.pk %}"
+                    hx-target="#stay-details"
+                    hx-swap="innerHTML">
+                <i class="ph-bold ph-trash"></i>
+                <span>{% trans 'Delete' %}</span>
+            </button>
+            <button type="button"
+                    x-on:click="openModal = false{% if modified %}; location.reload(){% endif %}"
+                    class="btn btn-soft btn-neutral">
+                <i class="ph-bold ph-x-circle"></i>
+                <span>{% trans 'Close' %}</span>
+            </button>
+        </div>
     </div>
 </div>

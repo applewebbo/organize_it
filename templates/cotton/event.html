@@ -1,21 +1,27 @@
 {% load i18n %}
 <div class="relative flex flex-col h-full rounded-lg border {{ border_color }} {{ bg_color }} overflow-hidden">
+    <div class="flex absolute right-0 top-1/2 justify-end pr-4 w-1/2 -translate-y-1/2 pointer-events-none select-none sm:hidden"
+         aria-hidden="true">
+        <i class="ph-bold ph-{{ icon }} text-[4rem] {{ icon_color }} opacity-[0.07]"></i>
+    </div>
     <i class="hidden absolute top-1 right-1 pointer-events-none sm:block ph-bold ph-dots-six-vertical text-base-content/20"
        aria-hidden="true"></i>
     <div class="py-3 px-2 sm:px-4 grow">
         <div class="flex items-start">
             <div class="flex flex-col gap-1 items-center">
-                <div class="{{ icon_color }} bg-slate-50 dark:bg-slate-700 mt-0.5 p-1 sm:p-1.5 rounded-md border-2 {{ border_color }} ">
+                <div class="{{ icon_color }} hidden bg-slate-50 dark:bg-slate-700 mt-0.5 p-1 sm:p-1.5 rounded-md border-2 sm:block {{ border_color }} ">
                     <i class="ph-bold ph-{{ icon }} i-sm sm:i-lg"></i>
                 </div>
-                {% if meal_badge %}<span class="badge badge-xs badge-warning text-warning-content truncate max-w-[100px]"
-      title="{{ meal_badge }}">{{ meal_badge }}</span>{% endif %}
+                {% if meal_badge %}
+                    <span class="hidden sm:inline-flex badge badge-xs badge-warning text-warning-content truncate max-w-[100px]"
+                          title="{{ meal_badge }}">{{ meal_badge }}</span>
+                {% endif %}
                 {% if event.tag %}
-                    <span class="text-white bg-emerald-800 border-emerald-800 badge badge-xs truncate max-w-[100px]"
+                    <span class="text-white bg-emerald-800 border-emerald-800 badge badge-xs h-auto max-w-[100px] py-0.5 text-center leading-tight whitespace-normal break-words line-clamp-2 {% if event.category == 2 %}max-sm:hidden{% endif %}"
                           title="{{ event.tag }}">{{ event.tag|capfirst }}</span>
                 {% endif %}
             </div>
-            <div class="ms-2" x-data>
+            <div class="sm:ms-2" x-data>
                 <div class="flex gap-2 items-center">
                     <h2 class="{{ icon_color }} font-semibold text-base sm:text-lg"
                         title="{{ event.name }}">
@@ -33,15 +39,23 @@
                     {{ collab_badge }}
                 </div>
                 <div class="{{ icon_color }} flex items-center gap-x-2">{{ slot }}</div>
-                {% if event.notes %}
+                {% if event.address %}
                     <p class="flex gap-1.5 items-center mt-0.5 leading-tight text-sm {{ icon_color }} opacity-70">
-                        <i class="ph-bold ph-note shrink-0" aria-hidden="true"></i>{{ event.notes|truncatechars:40 }}
+                        <i class="ph-bold ph-map-pin shrink-0" aria-hidden="true"></i>{{ event.address|truncatechars:40 }}
                     </p>
                 {% endif %}
             </div>
         </div>
-        {% if event.day.trip.status != 5 and event.google_maps_directions_url or swap_url or move_day_url %}
-            <div class="flex flex-row gap-2 justify-end mt-2 me-2" x-data>
+        {% if meal_badge or event.category == 2 and event.tag or event.day.trip.status != 5 and event.google_maps_directions_url or swap_url or move_day_url %}
+            <div class="flex flex-row gap-2 justify-end items-center mt-2 sm:hidden me-2"
+                 x-data>
+                {% if meal_badge %}
+                    <span class="badge badge-xs badge-warning text-warning-content truncate max-w-[100px] me-auto"
+                          title="{{ meal_badge }}">{{ meal_badge }}</span>
+                {% elif event.category == 2 and event.tag %}
+                    <span class="text-white bg-emerald-800 border-emerald-800 badge badge-xs truncate max-w-[140px] me-auto"
+                          title="{{ event.tag }}">{{ event.tag|capfirst }}</span>
+                {% endif %}
                 {% if event.google_maps_directions_url %}
                     <a class="btn btn-xs btn-soft sm:hidden {{ border_color }} {{ bg_color }} dark:hover:bg-slate-900/10 hover:bg-white/50"
                        href="{{ event.google_maps_directions_url }}"
