@@ -22,34 +22,34 @@
                 {% endif %}
             </div>
             <ul class="flex flex-wrap gap-3 mt-2 sm:mt-3">
-                <li class="flex gap-3 items-center py-3 px-6 rounded-xl border border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/10">
+                <li class="flex gap-3 items-center py-1.5 px-2.5 rounded-lg border border-red-200 sm:py-3 sm:px-6 dark:border-red-800 bg-red-50/50 dark:bg-red-900/10">
                     {% if trip.author.profile.avatar %}
                         <img src="{% static 'img/avatars/' %}{{ trip.author.profile.avatar }}"
                              alt=""
-                             class="mx-2 w-8 h-8">
+                             class="hidden mx-2 w-8 h-8 sm:block">
                     {% else %}
                         <img src="{% static 'img/avatars/generic.png' %}"
                              alt=""
-                             class="mx-2 w-8 h-8">
+                             class="hidden mx-2 w-8 h-8 sm:block">
                     {% endif %}
                     <div>
-                        <span class="text-sm font-medium">{{ trip.author|user_display_name }}</span>
+                        <span class="text-xs font-medium sm:text-sm">{{ trip.author|user_display_name }}</span>
                         <span class="block text-xs text-red-600 dark:text-red-400">{% trans "Organizer" %}</span>
                     </div>
                 </li>
                 {% for collab in collaborations %}
-                    <li class="flex gap-3 items-center py-3 px-6 rounded-xl border {% if collab.can_edit %} border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/10 {% elif collab.is_named_only %} border-base-300 bg-base-200/50 {% else %} border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-900/10 {% endif %}">
+                    <li class="flex gap-3 items-center py-1.5 px-2.5 rounded-lg border sm:py-3 sm:px-6 {% if collab.can_edit %} border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/10 {% elif collab.is_named_only %} border-base-300 bg-base-200/50 {% else %} border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-900/10 {% endif %}">
                         {% if collab.user and collab.user.profile.avatar %}
                             <img src="{% static 'img/avatars/' %}{{ collab.user.profile.avatar }}"
                                  alt=""
-                                 class="mx-2 w-8 h-8">
+                                 class="hidden mx-2 w-8 h-8 sm:block">
                         {% else %}
                             <img src="{% static 'img/avatars/generic.png' %}"
                                  alt=""
-                                 class="mx-2 w-8 h-8">
+                                 class="hidden mx-2 w-8 h-8 sm:block">
                         {% endif %}
                         <div>
-                            <span class="text-sm font-medium">
+                            <span class="text-xs font-medium sm:text-sm">
                                 {% if collab.user %}
                                     {% if collab.user.profile.first_name %}
                                         {{ collab.user.profile.first_name }}

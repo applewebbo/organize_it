@@ -9,22 +9,22 @@
         </li>
     {% endif %}
     {% if enriched_data.website %}
-        <li class="flex gap-2 items-center py-1 px-2 rounded bg-success/10">
-            <i class="ph-bold ph-globe i-md text-success"></i>
+        <li class="flex gap-2 items-center py-1 px-2 min-w-0 rounded bg-success/10">
+            <i class="ph-bold ph-globe i-md text-success shrink-0"></i>
             <a href="{{ enriched_data.website }}"
-               class="font-semibold link text-success">{{ enriched_data.website|truncatechars:38 }}</a>
-            <span class="ml-auto badge badge-success badge-xs">{% trans 'New' %}</span>
+               class="min-w-0 font-semibold truncate link text-success">{{ enriched_data.website }}</a>
+            <span class="gap-1 ml-auto badge badge-success badge-xs shrink-0"><i class="ph-bold ph-sparkle"></i><span class="hidden sm:inline">{% trans 'New' %}</span></span>
         </li>
     {% elif event.website %}
-        <li class="flex gap-2 items-center">
-            <i class="ph-bold ph-globe i-md text-base-content/60"></i><a href="{{ event.website }}" class="link">{{ event.website|truncatechars:38 }}</a>
+        <li class="flex gap-2 items-center min-w-0">
+            <i class="ph-bold ph-globe i-md text-base-content/60 shrink-0"></i><a href="{{ event.website }}" class="min-w-0 truncate link">{{ event.website }}</a>
         </li>
     {% endif %}
     {% if enriched_data.phone_number %}
         <li class="flex gap-2 items-center py-1 px-2 rounded bg-success/10">
             <i class="ph-bold ph-phone i-md text-success"></i>
             <span class="font-semibold text-success">{{ enriched_data.phone_number }}</span>
-            <span class="ml-auto badge badge-success badge-xs">{% trans 'New' %}</span>
+            <span class="gap-1 ml-auto badge badge-success badge-xs shrink-0"><i class="ph-bold ph-sparkle"></i><span class="hidden sm:inline">{% trans 'New' %}</span></span>
         </li>
     {% elif event.phone_number %}
         <li class="flex gap-2 items-center">
@@ -35,7 +35,7 @@
         <li class="flex gap-2 items-center py-1 px-2 rounded bg-success/10">
             <i class="ph-bold ph-door-open i-md text-success"></i>
             <span class="font-semibold text-success">{{ enriched_data.opening_hours|format_opening_hours }}</span>
-            <span class="ml-auto badge badge-success badge-xs">{% trans 'New' %}</span>
+            <span class="gap-1 ml-auto badge badge-success badge-xs shrink-0"><i class="ph-bold ph-sparkle"></i><span class="hidden sm:inline">{% trans 'New' %}</span></span>
         </li>
     {% elif event.opening_hours %}
         <li class="flex gap-2 items-center">

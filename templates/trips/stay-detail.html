@@ -32,6 +32,37 @@
                  x-show="show"
                  x-init="setTimeout(() => show = false, 4000)">{{ success_message }}</div>
         {% endif %}
+        {% if stay.address or stay.website or stay.phone_number or stay.opening_hours or stay.cancellation_date %}
+            <div class="grid gap-1 p-4 sm:gap-2 md:p-5">
+                <ul class="min-w-0 leading-10">
+                    {% if stay.address %}
+                        <li class="flex gap-2 items-center min-w-0">
+                            <i class="ph-bold ph-map-pin i-md text-base-content/60 shrink-0"></i><span class="min-w-0">{{ stay.address }}</span>
+                        </li>
+                    {% endif %}
+                    {% if stay.website %}
+                        <li class="flex gap-2 items-center min-w-0">
+                            <i class="ph-bold ph-browser i-md text-base-content/60 shrink-0"></i><a href="{{ stay.website }}" class="min-w-0 truncate link">{{ stay.website }}</a>
+                        </li>
+                    {% endif %}
+                    {% if stay.phone_number %}
+                        <li class="flex gap-2 items-center">
+                            <i class="ph-bold ph-phone i-md text-base-content/60 shrink-0"></i>{{ stay.phone_number|phone_format }}
+                        </li>
+                    {% endif %}
+                    {% if stay.opening_hours %}
+                        <li class="flex gap-2 items-center">
+                            <i class="ph-bold ph-door-open i-md text-base-content/60 shrink-0"></i>{{ stay.opening_hours|format_opening_hours }}
+                        </li>
+                    {% endif %}
+                    {% if stay.cancellation_date %}
+                        <li class="flex gap-2 items-center">
+                            <i class="ph-bold ph-calendar-x i-md text-base-content/60 shrink-0"></i>{{ stay.cancellation_date }}
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        {% endif %}
         <div class="grid grid-cols-2 gap-2 p-4 rounded-b sm:flex sm:justify-center md:p-5">
             {% if not stay.enriched %}
                 <button type="button"

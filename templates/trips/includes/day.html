@@ -23,9 +23,21 @@
                 {% endif %}
             </div>
             {% if day.stay %}
-                <span class="inline-flex gap-1.5 items-center py-1 px-2.5 max-w-full text-xs font-medium rounded-md bg-base-300 text-base-content/70 w-fit dark:bg-base-200/50">
-                    <i class="ph-bold ph-bed i-sm shrink-0"></i><span class="break-words line-clamp-2">{{ day.stay.name }}</span>
-                </span>
+                {% if day.trip.status != 5 %}
+                    <button type="button"
+                            x-data
+                            hx-get="{% url 'trips:stay-detail' day.stay.pk %}"
+                            hx-target="#dialog"
+                            hx-swap="innerHTML"
+                            @click="$dispatch('open-modal'); document.activeElement.blur()"
+                            class="inline-flex gap-1.5 items-center py-1 px-2.5 max-w-full text-xs font-medium text-left rounded-md cursor-pointer bg-base-300 text-base-content/70 w-fit dark:bg-base-200/50 hover:bg-base-300/70">
+                        <i class="ph-bold ph-bed i-sm shrink-0"></i><span class="break-words line-clamp-2">{{ day.stay.name }}</span>
+                    </button>
+                {% else %}
+                    <span class="inline-flex gap-1.5 items-center py-1 px-2.5 max-w-full text-xs font-medium rounded-md bg-base-300 text-base-content/70 w-fit dark:bg-base-200/50">
+                        <i class="ph-bold ph-bed i-sm shrink-0"></i><span class="break-words line-clamp-2">{{ day.stay.name }}</span>
+                    </span>
+                {% endif %}
             {% endif %}
         </div>
         <c-dropdown :day="day" />

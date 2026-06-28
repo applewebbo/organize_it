@@ -52,14 +52,11 @@
     <section class="shadow card card-border bg-base-100">
         <div class="p-4 sm:p-6 card-body">
             <div class="flex justify-between items-center">
-                <div>
-                    <h2 class="text-xl font-medium sm:text-2xl">{% trans 'Other Things to Do' %}</h2>
-                    <p class="mt-1 text-sm text-base-content/60">{% trans 'Here you find events not yet assigned to a specific day' %}</p>
-                </div>
+                <h2 class="text-xl font-medium sm:text-2xl">{% trans 'Other Things to Do' %}</h2>
                 <div class="dropdown dropdown-end" x-data>
                     <div tabindex="0"
                          role="button"
-                         class="btn btn-sm btn-outline btn-primary"
+                         class="btn btn-xs btn-soft btn-primary sm:btn-sm"
                          aria-haspopup="menu">
                         <i class="ph-bold ph-plus i-sm" aria-hidden="true"></i>
                         <span class="hidden sm:inline">{% trans 'Add event' %}</span>
@@ -87,6 +84,10 @@
                     </ul>
                 </div>
             </div>
+            <p class="mt-1 text-xs text-base-content/50">
+                <i class="ph-bold ph-info i-sm" aria-hidden="true"></i>
+                {% trans 'Here you find events not yet assigned to a specific day' %}
+            </p>
             {% if unpaired_events %}
                 {% if has_custom_stages %}
                     {% for group in grouped_unpaired_events %}
