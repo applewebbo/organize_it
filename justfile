@@ -195,10 +195,10 @@ issues state="open":
 issue number:
     fj issue view {{number}}
 
-# Add comment to issue
+# Add comment to issue from a markdown file (usage: just issue-comment 360 /path/to/comment.md)
 [group('codeberg')]
-issue-comment number text:
-    fj issue comment {{number}} "{{text}}"
+issue-comment number file:
+    fj issue comment {{number}} --body-file {{file}}
 
 # Mark a checkbox step as done in issue body
 [group('codeberg')]
