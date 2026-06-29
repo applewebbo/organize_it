@@ -1,6 +1,7 @@
 import pytest
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from django.template.loader import render_to_string
 from django.test import RequestFactory
 
 from accounts.context_processors import user_theme
@@ -14,6 +15,14 @@ def test_app_version_context_processor():
     request = RequestFactory().get("/")
     context = app_version(request)
     assert context == {"APP_VERSION": settings.APP_VERSION}
+
+
+def test_footer_version_links_to_releases():
+    html = render_to_string(
+        "includes/footer.html", {"APP_VERSION": settings.APP_VERSION}
+    )
+    assert "https://codeberg.org/webbografico/organize_it/releases" in html
+    assert f"v{settings.APP_VERSION}" in html
 
 
 def test_user_theme_anonymous():
