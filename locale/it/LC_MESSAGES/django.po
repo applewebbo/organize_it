@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-27 08:35+0200\n"
+"POT-Creation-Date: 2026-06-29 15:40+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -347,6 +347,7 @@ msgid "Signup"
 msgstr "Registrati"
 
 #: templates/account/signup.html:16 templates/account/signup.html:32
+#: templates/includes/footer.html:64
 msgid "Sign Up"
 msgstr "Registrati"
 
@@ -377,19 +378,19 @@ msgstr ""
 
 #: templates/cotton/dropdown.html:7 templates/cotton/dropdown.html:10
 #: templates/trips/includes/events-map-fragment.html:12
-#: templates/trips/includes/events-section.html:65
+#: templates/trips/includes/events-section.html:62
 msgid "Add event"
 msgstr "Aggiungi evento"
 
 #: templates/cotton/dropdown.html:20
 #: templates/trips/includes/events-map-fragment.html:22
-#: templates/trips/includes/events-section.html:75 trips/models.py:563
+#: templates/trips/includes/events-section.html:72 trips/models.py:563
 msgid "Experience"
 msgstr "Esperienza"
 
 #: templates/cotton/dropdown.html:29
 #: templates/trips/includes/events-map-fragment.html:31
-#: templates/trips/includes/events-section.html:84 trips/models.py:564
+#: templates/trips/includes/events-section.html:81 trips/models.py:564
 msgid "Meal"
 msgstr "Pasto"
 
@@ -413,7 +414,7 @@ msgstr ""
 msgid "Create Your First Trip"
 msgstr "Crea il tuo primo viaggio"
 
-#: templates/cotton/event.html:50 templates/cotton/event_list_item.html:34
+#: templates/cotton/event.html:64 templates/cotton/event_list_item.html:34
 #: templates/trips/includes/stays-section.html:94
 #: templates/trips/includes/stays-section.html:96
 #, fuzzy
@@ -421,13 +422,13 @@ msgstr "Crea il tuo primo viaggio"
 msgid "Get directions"
 msgstr "Direzione"
 
-#: templates/cotton/event.html:60
+#: templates/cotton/event.html:74
 #, fuzzy
 #| msgid "Add event"
 msgid "Reorder event"
 msgstr "Aggiungi evento"
 
-#: templates/cotton/event.html:71
+#: templates/cotton/event.html:85
 #, fuzzy
 #| msgid "Create another"
 msgid "Move to another day"
@@ -443,8 +444,8 @@ msgstr ""
 "Esplora i concetti chiave prima di iniziare a organizzare il tuo viaggio "
 "perfetto."
 
-#: templates/cotton/quick_guide.html:18 templates/includes/navbar.html:49
-#: templates/includes/navbar.html:72
+#: templates/cotton/quick_guide.html:18 templates/includes/footer.html:35
+#: templates/includes/navbar.html:49 templates/includes/navbar.html:72
 msgid "Trips"
 msgstr "Viaggi"
 
@@ -638,63 +639,94 @@ msgstr "Parti da qui"
 msgid "Other Trips"
 msgstr "Altri Viaggi"
 
-#: templates/includes/auth-index.html:62 templates/trips/event-detail.html:84
-#: templates/trips/includes/main-transfers.html:171
-#: templates/trips/includes/main-transfers.html:346
+#: templates/includes/auth-index.html:65 templates/trips/event-detail.html:86
+#: templates/trips/includes/main-transfers.html:170
+#: templates/trips/includes/main-transfers.html:345
 #: templates/trips/includes/note.html:8
 #: templates/trips/includes/trip-header-card.html:95
 #: templates/trips/main-transfer-connection-modal.html:37
-#: templates/trips/stay-detail.html:53 templates/trips/trip-list.html:89
+#: templates/trips/stay-detail.html:84 templates/trips/trip-list.html:89
 #: templates/trips/trip-list.html:165
 msgid "Edit"
 msgstr "Modifica"
 
-#: templates/includes/auth-index.html:76
+#: templates/includes/auth-index.html:79
 msgid "Toggle guide visibility"
 msgstr "Attiva/disattiva la visibilità della guida"
 
-#: templates/includes/auth-index.html:80
+#: templates/includes/auth-index.html:83
 msgid "Hide Guide"
 msgstr "Nascondi guida"
 
-#: templates/includes/auth-index.html:82
+#: templates/includes/auth-index.html:85
 msgid "Show Guide"
 msgstr "Mostra guida"
 
-#: templates/includes/footer.html:7
-msgid "© 2026 WEBBOgrafico - All right reserved"
-msgstr "© 2026 WEBBOgrafico - Tutti i diritti riservati"
+#: templates/includes/footer.html:10
+msgid "Organize your next trip, on your own or with others."
+msgstr "Organizza il tuo prossimo viaggio, da solo o in compagnia"
+
+#: templates/includes/footer.html:13
+msgid "Built with Django, HTMX & TailwindCSS."
+msgstr "Realizzato con Django, HTMX e TailwindCSS."
+
+#: templates/includes/footer.html:16
+msgid "© 2026 WEBBOgrafico"
+msgstr "© 2026 WEBBOgrafico"
+
+#: templates/includes/footer.html:22
+msgid "Footer menu"
+msgstr "Menu del footer"
+
+#: templates/includes/footer.html:23
+msgid "Menu"
+msgstr "Menu"
+
+#: templates/includes/footer.html:28
+#: templates/trips/includes/events-list-fragment.html:6
+#: templates/trips/includes/events-list-fragment.html:50
+msgid "Home"
+msgstr "Home"
+
+#: templates/includes/footer.html:42 templates/includes/navbar.html:54
+#: templates/includes/navbar.html:77
+msgid "Settings"
+msgstr "Impostazioni"
+
+#: templates/includes/footer.html:50 templates/includes/navbar.html:23
+msgid "Logout"
+msgstr "Esci"
+
+#: templates/includes/footer.html:58 templates/includes/navbar.html:27
+msgid "Login"
+msgstr "Entra"
+
+#: templates/includes/footer.html:73
+msgid "Documentation"
+msgstr "Documentazione"
+
+#: templates/includes/footer.html:81
+msgid "Source code"
+msgstr "Codice del progetto"
 
 #: templates/includes/messages.html:20
 #: templates/trips/attachments/preview-modal.html:15
 #: templates/trips/attachments/upload-modal.html:15
-#: templates/trips/event-detail.html:98 templates/trips/event-notes.html:33
+#: templates/trips/event-detail.html:100 templates/trips/event-notes.html:33
 #: templates/trips/includes/collab-modal.html:7
 #: templates/trips/includes/create-stage-modal.html:15
 #: templates/trips/includes/note.html:13
 #: templates/trips/includes/trip-destinations-modal.html:7
 #: templates/trips/move-event-day-modal.html:14
-#: templates/trips/note-modify.html:31 templates/trips/stay-detail.html:67
+#: templates/trips/note-modify.html:31 templates/trips/stay-detail.html:98
 #: templates/trips/stay-note-modify.html:35 templates/trips/stay-notes.html:33
 #: templates/trips/swap-event-order-modal.html:14 trips/forms.py:461
 msgid "Close"
 msgstr "Chiudi"
 
-#: templates/includes/navbar.html:23
-msgid "Logout"
-msgstr "Esci"
-
-#: templates/includes/navbar.html:27
-msgid "Login"
-msgstr "Entra"
-
 #: templates/includes/navbar.html:34
 msgid "Open main menu"
 msgstr "Apri il menu principale"
-
-#: templates/includes/navbar.html:54 templates/includes/navbar.html:77
-msgid "Settings"
-msgstr "Impostazioni"
 
 #: templates/trips/arrival-transfer-modal.html:5
 msgid "Add Arrival Transfer"
@@ -726,10 +758,10 @@ msgstr ""
 
 #: templates/trips/attachments/upload-modal.html:11
 #: templates/trips/includes/attachments-card.html:27
-#: templates/trips/includes/main-transfers.html:149
-#: templates/trips/includes/main-transfers.html:151
-#: templates/trips/includes/main-transfers.html:324
-#: templates/trips/includes/main-transfers.html:326
+#: templates/trips/includes/main-transfers.html:148
+#: templates/trips/includes/main-transfers.html:150
+#: templates/trips/includes/main-transfers.html:323
+#: templates/trips/includes/main-transfers.html:325
 #: templates/trips/includes/stays-section.html:104
 #: templates/trips/includes/stays-section.html:106
 msgid "Add document"
@@ -786,8 +818,8 @@ msgstr "Aggiungi un elemento…"
 #: templates/trips/includes/collab-modal.html:66
 #: templates/trips/includes/collab-modal.html:87
 #: templates/trips/includes/collab-search-result.html:17
-#: templates/trips/includes/main-transfers.html:92
-#: templates/trips/includes/main-transfers.html:267
+#: templates/trips/includes/main-transfers.html:91
+#: templates/trips/includes/main-transfers.html:266
 #: templates/trips/main-transfer-form.html:28
 msgid "Add"
 msgstr "Aggiungi"
@@ -1223,11 +1255,11 @@ msgstr "Buon viaggio!"
 msgid "Weather Forecast for your trip: %(title)s"
 msgstr "Previsioni meteo per il tuo viaggio: %(title)s"
 
-#: templates/trips/event-detail.html:67 templates/trips/stay-detail.html:44
+#: templates/trips/event-detail.html:69 templates/trips/stay-detail.html:75
 msgid "Enrich"
 msgstr "Arricchisci"
 
-#: templates/trips/event-detail.html:76
+#: templates/trips/event-detail.html:78
 #: templates/trips/main-transfer-connection-create.html:89
 #: templates/trips/main-transfer-connection-edit.html:65 trips/forms.py:817
 #: trips/forms.py:848 trips/forms.py:901 trips/forms.py:1497
@@ -1235,12 +1267,12 @@ msgstr "Arricchisci"
 msgid "Notes"
 msgstr "Note"
 
-#: templates/trips/event-detail.html:92 templates/trips/event-modal.html:3
-#: templates/trips/includes/main-transfers.html:179
-#: templates/trips/includes/main-transfers.html:354
+#: templates/trips/event-detail.html:94 templates/trips/event-modal.html:3
+#: templates/trips/includes/main-transfers.html:178
+#: templates/trips/includes/main-transfers.html:353
 #: templates/trips/includes/note.html:12
 #: templates/trips/main-transfer-connection-modal.html:44
-#: templates/trips/stay-detail.html:61 templates/trips/stay-note-modify.html:32
+#: templates/trips/stay-detail.html:92 templates/trips/stay-note-modify.html:32
 #: templates/trips/trip-list.html:75 templates/trips/trip-list.html:215
 msgid "Delete"
 msgstr "Elimina"
@@ -1397,7 +1429,6 @@ msgstr "Nessun account trovato."
 
 #: templates/trips/includes/collab-inline.html:11
 #: templates/trips/includes/collab-modal.html:4
-#: templates/trips/includes/collaborators-section.html:5
 msgid "Participants"
 msgstr "Chi partecipa"
 
@@ -1447,7 +1478,6 @@ msgid "Remove"
 msgstr "Rimuovi"
 
 #: templates/trips/includes/collab-modal-list.html:57
-#: templates/trips/includes/collaborators-section.html:37
 msgid "No participants yet."
 msgstr "Nessun partecipante."
 
@@ -1460,7 +1490,6 @@ msgid "Search editor by email"
 msgstr "Cerca editor per email"
 
 #: templates/trips/includes/collab-modal.html:40
-#: templates/trips/includes/collaborators-section.html:47
 msgid "Search by email…"
 msgstr "Cerca per email…"
 
@@ -1492,14 +1521,6 @@ msgstr "Nessun account trovato."
 msgid "Invite by email"
 msgstr "Invita per email"
 
-#: templates/trips/includes/collaborators-section.html:28
-msgid "Remove participant"
-msgstr "Rimuovi partecipante"
-
-#: templates/trips/includes/collaborators-section.html:42
-msgid "Add participant by email"
-msgstr "Aggiungi partecipante per email"
-
 #: templates/trips/includes/create-stage-modal.html:12
 msgid "New Stage"
 msgstr "Nuova tappa"
@@ -1529,7 +1550,7 @@ msgid "Destination for day"
 msgstr "Destinazione non trovata"
 
 #: templates/trips/includes/day-list-content.html:42
-#: templates/trips/includes/events-section.html:118
+#: templates/trips/includes/events-section.html:119
 msgid "Nothing to do here."
 msgstr "Niente da fare qui."
 
@@ -1548,11 +1569,6 @@ msgstr "Seleziona un giorno per il pasto"
 #: templates/trips/includes/day-selector.html:20
 msgid "No days in this trip."
 msgstr "Nessun giorno in questo viaggio."
-
-#: templates/trips/includes/events-list-fragment.html:6
-#: templates/trips/includes/events-list-fragment.html:50
-msgid "Home"
-msgstr "Casa"
 
 #: templates/trips/includes/events-list-fragment.html:12
 #: templates/trips/includes/events-list-fragment.html:54
@@ -1578,15 +1594,15 @@ msgstr "Cose da Fare"
 msgid "Map view is not available on mobile devices."
 msgstr "La vista mappa non è disponibile su dispositivi mobili."
 
-#: templates/trips/includes/events-section.html:56
+#: templates/trips/includes/events-section.html:55
 msgid "Other Things to Do"
 msgstr "Altre Cose da Fare"
 
-#: templates/trips/includes/events-section.html:57
+#: templates/trips/includes/events-section.html:89
 msgid "Here you find events not yet assigned to a specific day"
 msgstr "Qui trovi gli eventi non ancora abbinati ad un giorno specifico"
 
-#: templates/trips/includes/events-section.html:98
+#: templates/trips/includes/events-section.html:99
 msgid "No stage"
 msgstr "Nessuna tappa"
 
@@ -1607,106 +1623,106 @@ msgstr "Nuovo"
 msgid "How to Get There"
 msgstr "Come Arrivare"
 
-#: templates/trips/includes/main-transfers.html:42 trips/models.py:321
+#: templates/trips/includes/main-transfers.html:41 trips/models.py:321
 msgid "Arrival"
 msgstr "Andata"
 
-#: templates/trips/includes/main-transfers.html:53
-#: templates/trips/includes/main-transfers.html:57
-#: templates/trips/includes/main-transfers.html:228
-#: templates/trips/includes/main-transfers.html:232
+#: templates/trips/includes/main-transfers.html:52
+#: templates/trips/includes/main-transfers.html:56
+#: templates/trips/includes/main-transfers.html:227
+#: templates/trips/includes/main-transfers.html:231
 msgid "Train status"
 msgstr "Stato treno"
 
-#: templates/trips/includes/main-transfers.html:53
-#: templates/trips/includes/main-transfers.html:59
-#: templates/trips/includes/main-transfers.html:228
-#: templates/trips/includes/main-transfers.html:234
+#: templates/trips/includes/main-transfers.html:52
+#: templates/trips/includes/main-transfers.html:58
+#: templates/trips/includes/main-transfers.html:227
+#: templates/trips/includes/main-transfers.html:233
 msgid "Station departures"
 msgstr "Partenze dalla stazione"
 
-#: templates/trips/includes/main-transfers.html:72
-#: templates/trips/includes/main-transfers.html:76
-#: templates/trips/includes/main-transfers.html:247
-#: templates/trips/includes/main-transfers.html:251
+#: templates/trips/includes/main-transfers.html:71
+#: templates/trips/includes/main-transfers.html:75
+#: templates/trips/includes/main-transfers.html:246
+#: templates/trips/includes/main-transfers.html:250
 msgid "Flight status"
 msgstr "Stato volo"
 
-#: templates/trips/includes/main-transfers.html:72
-#: templates/trips/includes/main-transfers.html:78
-#: templates/trips/includes/main-transfers.html:247
-#: templates/trips/includes/main-transfers.html:253
+#: templates/trips/includes/main-transfers.html:71
+#: templates/trips/includes/main-transfers.html:77
+#: templates/trips/includes/main-transfers.html:246
+#: templates/trips/includes/main-transfers.html:252
 msgid "Airport departures"
 msgstr "Partenze dall'aeroporto"
 
-#: templates/trips/includes/main-transfers.html:100
-#: templates/trips/includes/main-transfers.html:107
-#: templates/trips/includes/main-transfers.html:275
-#: templates/trips/includes/main-transfers.html:282
+#: templates/trips/includes/main-transfers.html:99
+#: templates/trips/includes/main-transfers.html:106
+#: templates/trips/includes/main-transfers.html:274
+#: templates/trips/includes/main-transfers.html:281
 msgid "From:"
 msgstr "Da:"
 
-#: templates/trips/includes/main-transfers.html:103
-#: templates/trips/includes/main-transfers.html:110
-#: templates/trips/includes/main-transfers.html:278
-#: templates/trips/includes/main-transfers.html:285
+#: templates/trips/includes/main-transfers.html:102
+#: templates/trips/includes/main-transfers.html:109
+#: templates/trips/includes/main-transfers.html:277
+#: templates/trips/includes/main-transfers.html:284
 msgid "To:"
 msgstr "A:"
 
-#: templates/trips/includes/main-transfers.html:114
-#: templates/trips/includes/main-transfers.html:289
+#: templates/trips/includes/main-transfers.html:113
+#: templates/trips/includes/main-transfers.html:288
 msgid "Departure:"
 msgstr "Partenza:"
 
-#: templates/trips/includes/main-transfers.html:117
-#: templates/trips/includes/main-transfers.html:292
+#: templates/trips/includes/main-transfers.html:116
+#: templates/trips/includes/main-transfers.html:291
 msgid "Arrival:"
 msgstr "Arrivo:"
 
-#: templates/trips/includes/main-transfers.html:135
-#: templates/trips/includes/main-transfers.html:310
+#: templates/trips/includes/main-transfers.html:134
+#: templates/trips/includes/main-transfers.html:309
 msgid "Open in Google Maps"
 msgstr "Apri in Google Maps"
 
-#: templates/trips/includes/main-transfers.html:159
-#: templates/trips/includes/main-transfers.html:334
+#: templates/trips/includes/main-transfers.html:158
+#: templates/trips/includes/main-transfers.html:333
 msgid "Edit connection"
 msgstr "Modifica trasferimento"
 
-#: templates/trips/includes/main-transfers.html:159
-#: templates/trips/includes/main-transfers.html:334
+#: templates/trips/includes/main-transfers.html:158
+#: templates/trips/includes/main-transfers.html:333
 msgid "Add connection"
 msgstr "Aggiungi trasferimento"
 
-#: templates/trips/includes/main-transfers.html:161
-#: templates/trips/includes/main-transfers.html:336
+#: templates/trips/includes/main-transfers.html:160
+#: templates/trips/includes/main-transfers.html:335
 msgid "Transfer"
 msgstr "Trasferimento"
 
-#: templates/trips/includes/main-transfers.html:169
-#: templates/trips/includes/main-transfers.html:344
+#: templates/trips/includes/main-transfers.html:168
+#: templates/trips/includes/main-transfers.html:343
 msgid "Edit transfer"
 msgstr "Modifica trasferimento"
 
-#: templates/trips/includes/main-transfers.html:176
-#: templates/trips/includes/main-transfers.html:351
+#: templates/trips/includes/main-transfers.html:175
+#: templates/trips/includes/main-transfers.html:350
 msgid "Are you sure you want to delete this main transfer?"
 msgstr "Sei sicuro di voler eliminare questo trasferimento?"
 
-#: templates/trips/includes/main-transfers.html:177
-#: templates/trips/includes/main-transfers.html:352
+#: templates/trips/includes/main-transfers.html:176
+#: templates/trips/includes/main-transfers.html:351
 msgid "Delete transfer"
 msgstr "Elimina trasferimento"
 
-#: templates/trips/includes/main-transfers.html:185
+#: templates/trips/includes/main-transfers.html:184
 msgid "No arrival transfer added yet."
 msgstr "Nessun trasferimento di andata aggiunto."
 
-#: templates/trips/includes/main-transfers.html:217 trips/models.py:322
+#: templates/trips/includes/main-transfers.html:216 trips/models.py:322
 msgid "Departure"
 msgstr "Ritorno"
 
-#: templates/trips/includes/main-transfers.html:360
+#: templates/trips/includes/main-transfers.html:359
 msgid "No departure transfer added yet."
 msgstr "Nessun trasferimento di ritorno aggiunto."
 
@@ -2969,6 +2985,12 @@ msgstr "Errore API di Unsplash. Per favore riprova più tardi."
 #, python-brace-format
 msgid "No images found for '{query}'"
 msgstr "Nessuna immagine trovata per '{query}'"
+
+#~ msgid "Remove participant"
+#~ msgstr "Rimuovi partecipante"
+
+#~ msgid "Add participant by email"
+#~ msgstr "Aggiungi partecipante per email"
 
 #~ msgid "Profile"
 #~ msgstr "Profilo"

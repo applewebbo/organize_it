@@ -1,15 +1,88 @@
-{% load i18n %}
-<div class="container mx-auto mt-2 md:mt-4">
-    <footer class="p-4">
-        <div class="py-3 px-4 w-full text-center">
-            <aside>
-                <p class="text-sm text-slate-600 dark:text-slate-200">
-                    {% trans '© 2026 WEBBOgrafico - All right reserved' %}&nbsp;-&nbsp;<a href="https://codeberg.org/webbografico/organize_it/releases"
+{% load static i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+<footer class="mt-6 border-t md:mt-10 bg-base-200 border-base-300">
+    <div class="container py-10 px-4 mx-auto">
+        <div class="grid grid-cols-1 gap-10 mx-auto w-full max-w-4xl sm:grid-cols-2">
+            <aside class="flex flex-col gap-3">
+                <a href="{% url 'trips:home' %}" class="flex items-center">
+                    <span class="text-xl font-semibold text-base-content">Organizeit!</span>
+                </a>
+                <p class="max-w-xs text-sm text-base-content/70">{% trans 'Organize your next trip, on your own or with others.' %}</p>
+                <p class="text-sm text-base-content/60">
+                    <i class="ph-bold ph-stack" aria-hidden="true"></i>
+                    {% trans 'Built with Django, HTMX & TailwindCSS.' %}
+                </p>
+                <p class="mt-1 text-xs text-base-content/50">
+                    {% trans '© 2026 WEBBOgrafico' %}&nbsp;-&nbsp;<a href="https://codeberg.org/webbografico/organize_it/releases"
    target="_blank"
    rel="noopener noreferrer"
-   class="italic link link-hover">v{{ APP_VERSION }}</a>
+   class="inline-flex gap-1 items-center link link-hover"><i class="ph-bold ph-tag" aria-hidden="true"></i>v{{ APP_VERSION }}</a>
                 </p>
             </aside>
+            <nav aria-label="{% trans 'Footer menu' %}" class="flex flex-col gap-3">
+                <h6 class="text-sm font-semibold tracking-wide uppercase text-base-content/80">{% trans 'Menu' %}</h6>
+                <ul class="grid grid-cols-1 gap-y-2 gap-x-6 text-sm sm:grid-cols-2">
+                    <li>
+                        <a href="{% url 'trips:home' %}"
+                           class="inline-flex gap-2 items-center link link-hover text-base-content/80">
+                            <i class="ph-bold ph-house text-base-content/50" aria-hidden="true"></i>{% trans 'Home' %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'trips:trip-list' %}"
+                           class="inline-flex gap-2 items-center link link-hover text-base-content/80">
+                            <i class="ph-bold ph-suitcase-rolling text-base-content/50"
+                               aria-hidden="true"></i>{% trans 'Trips' %}
+                        </a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li>
+                            <a href="{% url 'accounts:profile' %}"
+                               class="inline-flex gap-2 items-center link link-hover text-base-content/80">
+                                <i class="ph-bold ph-gear text-base-content/50" aria-hidden="true"></i>{% trans 'Settings' %}
+                            </a>
+                        </li>
+                        <li>
+                            <form action="{% url 'account_logout' %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit"
+                                        class="inline-flex gap-2 items-center link link-hover text-base-content/80">
+                                    <i class="ph-bold ph-sign-out text-base-content/50" aria-hidden="true"></i>{% trans 'Logout' %}
+                                </button>
+                            </form>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a href="{% url 'account_login' %}"
+                               class="inline-flex gap-2 items-center link link-hover text-base-content/80">
+                                <i class="ph-bold ph-sign-in text-base-content/50" aria-hidden="true"></i>{% trans 'Login' %}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'account_signup' %}"
+                               class="inline-flex gap-2 items-center link link-hover text-base-content/80">
+                                <i class="ph-bold ph-user-plus text-base-content/50" aria-hidden="true"></i>{% trans 'Sign Up' %}
+                            </a>
+                        </li>
+                    {% endif %}
+                    <li>
+                        <a href="https://webbografico.codeberg.page/organize_it/{{ LANGUAGE_CODE|slice:':2' }}/"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="inline-flex gap-2 items-center link link-hover text-base-content/80">
+                            <i class="ph-bold ph-book-open text-base-content/50" aria-hidden="true"></i>{% trans 'Documentation' %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://codeberg.org/webbografico/organize_it"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="inline-flex gap-2 items-center link link-hover text-base-content/80">
+                            <i class="ph-bold ph-code text-base-content/50" aria-hidden="true"></i>{% trans 'Source code' %}
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
-    </footer>
-</div>
+    </div>
+</footer>
