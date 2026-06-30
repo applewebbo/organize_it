@@ -1,4 +1,14 @@
 from suggestions.schemas import SuggestionPrefs, TripContext
+from trips.models import Experience, Meal
+
+# Legend so the model emits valid per-kind `type` ids (kind "stay" has no type).
+_TYPE_LEGEND = "; ".join(
+    [
+        "experience type ids: "
+        + ", ".join(f"{c.value}={c.label}" for c in Experience.Type),
+        "meal type ids: " + ", ".join(f"{c.value}={c.label}" for c in Meal.Type),
+    ]
+)
 
 # Intro line per language; everything else is data the model can read in any
 # language, so we only localise the instruction wrapper.
@@ -35,5 +45,9 @@ def build_prompt(context: TripContext, prefs: SuggestionPrefs) -> str:
     lines.append(
         "For each suggestion provide a real name and a precise postal address "
         "so it can be located on a map."
+    )
+    lines.append(
+        "Set the integer 'type' field from this legend (omit it for stays): "
+        + _TYPE_LEGEND
     )
     return "\n".join(lines)

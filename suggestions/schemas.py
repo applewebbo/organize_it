@@ -30,12 +30,17 @@ class Suggestion(BaseModel):
     type: int | None = None
 
     @model_validator(mode="after")
-    def validate_type_for_kind(self):
+    def normalize_type_for_kind(self):
+        # The provider JSON schema cannot express the per-kind valid integers,
+        # so the model may return an out-of-range or missing type. Coerce an
+        # invalid type to None instead of raising: rejecting the item would make
+        # the whole structured response fail to parse, and the type only drives a
+        # display label (accept endpoints persist the category, not the type).
         if self.kind is SuggestionKind.EXPERIENCE and self.type not in EXPERIENCE_TYPES:
-            raise ValueError(f"Invalid experience type: {self.type}")
-        if self.kind is SuggestionKind.MEAL and self.type not in MEAL_TYPES:
-            raise ValueError(f"Invalid meal type: {self.type}")
-        if self.kind is SuggestionKind.STAY:
+            self.type = None
+        elif self.kind is SuggestionKind.MEAL and self.type not in MEAL_TYPES:
+            self.type = None
+        elif self.kind is SuggestionKind.STAY:
             self.type = None
         return self
 

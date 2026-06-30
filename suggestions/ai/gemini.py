@@ -5,7 +5,7 @@ from suggestions.ai.base import AISuggestionError
 from suggestions.prompts import build_prompt
 from suggestions.schemas import Suggestion, SuggestionPrefs, TripContext
 
-DEFAULT_MODEL = "gemini-2.0-flash"
+DEFAULT_MODEL = "gemini-2.5-flash"
 
 
 class GeminiProvider:
@@ -30,6 +30,10 @@ class GeminiProvider:
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
                     response_schema=list[Suggestion],
+                    # Disable "thinking" (default-on for 2.5 models): with
+                    # structured output it can consume the whole output budget
+                    # and return an empty/truncated response.
+                    thinking_config=types.ThinkingConfig(thinking_budget=0),
                 ),
             )
         except Exception as exc:  # SDK/network errors -> single error type

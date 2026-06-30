@@ -25,6 +25,9 @@ class TestGeminiProvider:
 
         assert result == [suggestion]
         mock_client_cls.assert_called_once_with(api_key="api-key")
+        # thinking disabled so structured output is not starved of tokens
+        config = mock_client.models.generate_content.call_args.kwargs["config"]
+        assert config.thinking_config.thinking_budget == 0
 
     @patch("suggestions.ai.gemini.genai.Client")
     def test_generate_wraps_sdk_errors(self, mock_client_cls):
