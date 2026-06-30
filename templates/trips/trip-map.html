@@ -28,66 +28,80 @@
         <div class="flex flex-col lg:flex-row h-[calc(100vh-10rem)]">
             {# Left sidebar: search only #}
             <aside class="flex flex-col w-full border-b lg:w-80 lg:border-b-0 lg:border-r border-base-300 shrink-0">
-                {# Title + Search form #}
+                {# Search / AI suggestions tabs #}
                 <div class="p-3 border-b border-base-300">
-                    <h2 class="mb-2 text-base font-semibold">{% trans 'Search Places' %}</h2>
-                    <form hx-post="{% url 'trips:map-search' trip.pk %}"
-                          hx-target="#search-results-panel"
-                          hx-swap="innerHTML"
-                          hx-indicator="#search-spinner"
-                          hx-disabled-elt="button[type='submit']">
-                        {% csrf_token %}
-                        {% if has_custom_stages %}
-                            <select name="stage_destination"
-                                    class="mb-2 w-full select select-sm select-bordered">
-                                <option value="">{% trans '— all stages —' %}</option>
-                                {% for stage in stages %}<option value="{{ stage.destination }}">{{ stage.destination }}</option>{% endfor %}
-                            </select>
-                        {% endif %}
-                        <div class="flex gap-2">
-                            <input type="search"
-                                   name="query"
-                                   placeholder="{% trans 'Search a place…' %}"
-                                   autocomplete="off"
-                                   required
-                                   class="w-full input input-sm input-bordered" />
-                            <button type="submit" class="btn btn-sm btn-primary">
-                                <i class="ph-bold ph-magnifying-glass i-sm htmx-hide-on-request"></i>
-                                <span id="search-spinner"
-                                      class="loading loading-spinner loading-xs htmx-indicator"></span>
-                            </button>
+                    <div role="tablist" class="tabs tabs-border tabs-sm">
+                        {# Tab 1: manual search #}
+                        <input type="radio"
+                               name="map_panel_tab"
+                               role="tab"
+                               class="tab"
+                               aria-label="{% trans 'Search' %}"
+                               checked />
+                        <div role="tabpanel" class="pt-3 tab-content">
+                            <form hx-post="{% url 'trips:map-search' trip.pk %}"
+                                  hx-target="#search-results-panel"
+                                  hx-swap="innerHTML"
+                                  hx-indicator="#search-spinner"
+                                  hx-disabled-elt="button[type='submit']">
+                                {% csrf_token %}
+                                {% if has_custom_stages %}
+                                    <select name="stage_destination"
+                                            class="mb-2 w-full select select-sm select-bordered">
+                                        <option value="">{% trans '— all stages —' %}</option>
+                                        {% for stage in stages %}<option value="{{ stage.destination }}">{{ stage.destination }}</option>{% endfor %}
+                                    </select>
+                                {% endif %}
+                                <div class="flex gap-2">
+                                    <input type="search"
+                                           name="query"
+                                           placeholder="{% trans 'Search a place…' %}"
+                                           autocomplete="off"
+                                           required
+                                           class="w-full input input-sm input-bordered" />
+                                    <button type="submit" class="btn btn-sm btn-primary">
+                                        <i class="ph-bold ph-magnifying-glass i-sm htmx-hide-on-request"></i>
+                                        <span id="search-spinner"
+                                              class="loading loading-spinner loading-xs htmx-indicator"></span>
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-                    </form>
-                    {# AI suggestions #}
-                    <div class="pt-3 mt-3 border-t border-base-300">
-                        <h2 class="mb-2 text-base font-semibold">{% trans 'AI suggestions' %}</h2>
-                        <form hx-post="{% url 'suggestions:generate' trip.pk %}"
-                              hx-target="#search-results-panel"
-                              hx-swap="innerHTML"
-                              hx-indicator="#ai-spinner"
-                              hx-disabled-elt="button[type='submit']">
-                            {% csrf_token %}
-                            <input type="text"
-                                   name="notes"
-                                   placeholder="{% trans 'Notes for this trip (optional)…' %}"
-                                   autocomplete="off"
-                                   class="mb-2 w-full input input-sm input-bordered" />
-                            <div class="flex gap-2">
-                                <button type="submit" class="flex-1 btn btn-sm btn-secondary">
-                                    <i class="ph-bold ph-sparkle i-sm htmx-hide-on-request"></i>
-                                    <span id="ai-spinner"
-                                          class="loading loading-spinner loading-xs htmx-indicator"></span>
-                                    {% trans 'Generate' %}
-                                </button>
-                                <button type="submit"
-                                        name="refresh"
-                                        value="1"
-                                        class="btn btn-sm btn-outline"
-                                        title="{% trans 'Regenerate' %}">
-                                    <i class="ph-bold ph-arrows-clockwise i-sm"></i>
-                                </button>
-                            </div>
-                        </form>
+                        {# Tab 2: AI suggestions #}
+                        <input type="radio"
+                               name="map_panel_tab"
+                               role="tab"
+                               class="tab"
+                               aria-label="{% trans 'AI suggestions' %}" />
+                        <div role="tabpanel" class="pt-3 tab-content">
+                            <form hx-post="{% url 'suggestions:generate' trip.pk %}"
+                                  hx-target="#search-results-panel"
+                                  hx-swap="innerHTML"
+                                  hx-indicator="#ai-spinner"
+                                  hx-disabled-elt="button[type='submit']">
+                                {% csrf_token %}
+                                <input type="text"
+                                       name="notes"
+                                       placeholder="{% trans 'Notes for this trip (optional)…' %}"
+                                       autocomplete="off"
+                                       class="mb-2 w-full input input-sm input-bordered" />
+                                <div class="flex gap-2">
+                                    <button type="submit" class="flex-1 btn btn-sm btn-secondary">
+                                        <i class="ph-bold ph-sparkle i-sm htmx-hide-on-request"></i>
+                                        <span id="ai-spinner"
+                                              class="loading loading-spinner loading-xs htmx-indicator"></span>
+                                        {% trans 'Generate' %}
+                                    </button>
+                                    <button type="submit"
+                                            name="refresh"
+                                            value="1"
+                                            class="btn btn-sm btn-outline"
+                                            title="{% trans 'Regenerate' %}">
+                                        <i class="ph-bold ph-arrows-clockwise i-sm"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
                 {# Search results #}

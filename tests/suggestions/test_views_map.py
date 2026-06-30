@@ -5,7 +5,6 @@ import pytest
 from suggestions.ai.base import AISuggestionError
 from suggestions.schemas import Suggestion
 from suggestions.services import GroundedSuggestion
-from suggestions.views import _type_label
 from tests.test import TestCase
 from tests.trips.factories import TripFactory
 from trips.models import Event, Stay
@@ -28,11 +27,6 @@ def _grounded(kind, name, type_value=None):
         longitude=12.5,
         place_id=f"place_{name}",
     )
-
-
-def test_type_label_fallback():
-    # defensive branch: a non experience/meal kind with a type yields no label
-    assert _type_label("stay", 5) == ""
 
 
 class TestGenerateView(TestCase):

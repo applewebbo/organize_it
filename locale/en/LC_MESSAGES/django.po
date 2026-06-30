@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-30 12:48+0200\n"
+"POT-Creation-Date: 2026-06-30 21:47+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -762,19 +762,19 @@ msgstr ""
 msgid "Check your AI settings"
 msgstr ""
 
-#: templates/suggestions/map-suggestions-results.html:35
-#: templates/trips/arrival-transfer-modal.html:23
-#: templates/trips/departure-transfer-modal.html:23
-msgid "Details"
-msgstr ""
-
-#: templates/suggestions/map-suggestions-results.html:52
+#: templates/suggestions/map-suggestions-results.html:37
 #, fuzzy
 #| msgid "Stay added to trip."
 msgid "Add to trip"
 msgstr "Stay added to trip."
 
-#: templates/suggestions/map-suggestions-results.html:64
+#: templates/suggestions/map-suggestions-results.html:51
+#: templates/trips/arrival-transfer-modal.html:23
+#: templates/trips/departure-transfer-modal.html:23
+msgid "Details"
+msgstr ""
+
+#: templates/suggestions/map-suggestions-results.html:60
 #, fuzzy
 #| msgid "No results found"
 msgid "No suggestions found"
@@ -783,7 +783,7 @@ msgstr "No results found"
 #: templates/suggestions/settings.html:10
 #: templates/suggestions/suggestion-modal.html:4
 #: templates/trips/includes/events-section.html:90
-#: templates/trips/trip-map.html:63
+#: templates/trips/trip-map.html:75
 msgid "AI suggestions"
 msgstr ""
 
@@ -799,31 +799,31 @@ msgstr ""
 msgid "Added"
 msgstr ""
 
-#: templates/suggestions/suggestion-details.html:9 trips/forms.py:382
+#: templates/suggestions/suggestion-details.html:12 trips/forms.py:382
 #: trips/forms.py:388 trips/forms.py:714 trips/forms.py:730
 msgid "Website"
 msgstr ""
 
-#: templates/suggestions/suggestion-details.html:18
+#: templates/suggestions/suggestion-details.html:21
 msgid "No extra details available."
 msgstr ""
 
 #: templates/suggestions/suggestion-modal.html:19
-#: templates/trips/trip-map.html:72
+#: templates/trips/trip-map.html:85
 msgid "Notes for this trip (optional)…"
 msgstr ""
 
-#: templates/suggestions/suggestion-modal.html:26
-#: templates/trips/trip-map.html:79
+#: templates/suggestions/suggestion-modal.html:27
+#: templates/trips/trip-map.html:93
 msgid "Generate"
 msgstr ""
 
-#: templates/suggestions/suggestion-modal.html:30
-#: templates/trips/trip-map.html:85
+#: templates/suggestions/suggestion-modal.html:31
+#: templates/trips/trip-map.html:99
 msgid "Regenerate"
 msgstr ""
 
-#: templates/suggestions/suggestion-modal.html:37
+#: templates/suggestions/suggestion-modal.html:38
 msgid "Generate suggestions for your trip"
 msgstr ""
 
@@ -1424,6 +1424,7 @@ msgstr "Paste a Google Maps link to auto-fill"
 
 #: templates/trips/experience-create.html:32
 #: templates/trips/meal-create.html:38 templates/trips/stay-create.html:38
+#: templates/trips/trip-map.html:39
 msgid "Search"
 msgstr ""
 
@@ -2179,7 +2180,9 @@ msgid "No results found"
 msgstr "No results found"
 
 #: templates/trips/partials/map-search-results.html:79
-msgid "Search for a place to add it to your trip"
+#, fuzzy
+#| msgid "Search for a place to add it to your trip"
+msgid "Find places to add to your trip"
 msgstr "Search for a place to add it to your trip"
 
 #: templates/trips/share-link-created.html:4
@@ -2346,19 +2349,15 @@ msgstr ""
 msgid "Back to events"
 msgstr "Back to events"
 
-#: templates/trips/trip-map.html:33
-msgid "Search Places"
-msgstr "Search Places"
-
-#: templates/trips/trip-map.html:43
+#: templates/trips/trip-map.html:51
 msgid "— all stages —"
 msgstr "— all stages —"
 
-#: templates/trips/trip-map.html:50
+#: templates/trips/trip-map.html:58
 msgid "Search a place…"
 msgstr "Search a place…"
 
-#: templates/trips/trip-map.html:105
+#: templates/trips/trip-map.html:120
 msgid "Trip events"
 msgstr "Trip events"
 
@@ -3031,6 +3030,9 @@ msgstr ""
 #, python-brace-format
 msgid "No images found for '{query}'"
 msgstr ""
+
+#~ msgid "Search Places"
+#~ msgstr "Search Places"
 
 #~ msgid "Remove participant"
 #~ msgstr "Remove participant"

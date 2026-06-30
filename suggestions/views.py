@@ -9,7 +9,7 @@ from suggestions.ai.base import AISuggestionError
 from suggestions.forms import AICredentialsForm, SuggestionPreferencesForm
 from suggestions.models import AICredentials, SuggestionPreferences
 from suggestions.services import generate_suggestions
-from trips.models import Event, Experience, Meal, Stay, Trip
+from trips.models import Event, Stay, Trip
 from trips.services import GooglePlacesClient, GooglePlacesError
 from trips.utils import accessible_trips_qs
 
@@ -29,26 +29,24 @@ _ACCEPT_CATEGORY = {
     "experience": Event.Category.EXPERIENCE,
     "meal": Event.Category.MEAL,
 }
-
-
-def _type_label(kind: str, type_value) -> str:
-    if type_value is None:
-        return ""
-    if kind == "experience":
-        return Experience.Type(type_value).label
-    if kind == "meal":
-        return Meal.Type(type_value).label
-    return ""
+# Per-kind icon + colour, matching the project's "Add event" dropdown / map pins.
+_KIND_ICON = {
+    "experience": ("ph-map-pin", "text-green-500"),
+    "meal": ("ph-fork-knife", "text-yellow-500"),
+    "stay": ("ph-bed", "text-sky-500"),
+}
 
 
 def _to_card(grounded, add_urls) -> dict:
     suggestion = grounded.suggestion
     kind = suggestion.kind.value
+    icon, icon_color = _KIND_ICON[kind]
     return {
         "kind": kind,
         "name": suggestion.name,
         "description": suggestion.description,
-        "type_label": _type_label(kind, suggestion.type),
+        "icon": icon,
+        "icon_color": icon_color,
         "address": grounded.address,
         "city": grounded.city,
         "lat": grounded.latitude,

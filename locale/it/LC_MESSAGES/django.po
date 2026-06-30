@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-30 12:48+0200\n"
+"POT-Creation-Date: 2026-06-30 21:47+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -826,24 +826,24 @@ msgstr "Apri il menu principale"
 msgid "Check your AI settings"
 msgstr "Controlla le impostazioni AI"
 
-#: templates/suggestions/map-suggestions-results.html:35
+#: templates/suggestions/map-suggestions-results.html:37
+msgid "Add to trip"
+msgstr "Aggiungi al viaggio"
+
+#: templates/suggestions/map-suggestions-results.html:51
 #: templates/trips/arrival-transfer-modal.html:23
 #: templates/trips/departure-transfer-modal.html:23
 msgid "Details"
 msgstr "Dettagli"
 
-#: templates/suggestions/map-suggestions-results.html:52
-msgid "Add to trip"
-msgstr "Aggiungi al viaggio"
-
-#: templates/suggestions/map-suggestions-results.html:64
+#: templates/suggestions/map-suggestions-results.html:60
 msgid "No suggestions found"
 msgstr "Nessun suggerimento trovato"
 
 #: templates/suggestions/settings.html:10
 #: templates/suggestions/suggestion-modal.html:4
 #: templates/trips/includes/events-section.html:90
-#: templates/trips/trip-map.html:63
+#: templates/trips/trip-map.html:75
 msgid "AI suggestions"
 msgstr "Suggerimenti AI"
 
@@ -859,31 +859,31 @@ msgstr "Una chiave è già configurata."
 msgid "Added"
 msgstr "Aggiunto"
 
-#: templates/suggestions/suggestion-details.html:9 trips/forms.py:382
+#: templates/suggestions/suggestion-details.html:12 trips/forms.py:382
 #: trips/forms.py:388 trips/forms.py:714 trips/forms.py:730
 msgid "Website"
 msgstr "Sito Internet"
 
-#: templates/suggestions/suggestion-details.html:18
+#: templates/suggestions/suggestion-details.html:21
 msgid "No extra details available."
 msgstr "Nessun dettaglio aggiuntivo disponibile."
 
 #: templates/suggestions/suggestion-modal.html:19
-#: templates/trips/trip-map.html:72
+#: templates/trips/trip-map.html:85
 msgid "Notes for this trip (optional)…"
 msgstr "Note per questo viaggio (facoltativo)…"
 
-#: templates/suggestions/suggestion-modal.html:26
-#: templates/trips/trip-map.html:79
+#: templates/suggestions/suggestion-modal.html:27
+#: templates/trips/trip-map.html:93
 msgid "Generate"
 msgstr "Genera"
 
-#: templates/suggestions/suggestion-modal.html:30
-#: templates/trips/trip-map.html:85
+#: templates/suggestions/suggestion-modal.html:31
+#: templates/trips/trip-map.html:99
 msgid "Regenerate"
 msgstr "Rigenera"
 
-#: templates/suggestions/suggestion-modal.html:37
+#: templates/suggestions/suggestion-modal.html:38
 msgid "Generate suggestions for your trip"
 msgstr "Genera suggerimenti per il tuo viaggio"
 
@@ -1498,10 +1498,9 @@ msgstr "Incolla un link Google Maps per precompilare"
 
 #: templates/trips/experience-create.html:32
 #: templates/trips/meal-create.html:38 templates/trips/stay-create.html:38
-#, fuzzy
-#| msgid "Search on"
+#: templates/trips/trip-map.html:39
 msgid "Search"
-msgstr "Cerca su"
+msgstr "Cerca"
 
 #: templates/trips/experience-create.html:40
 msgid "Unpaired Experiences"
@@ -2262,8 +2261,8 @@ msgid "No results found"
 msgstr "Nessun risultato trovato"
 
 #: templates/trips/partials/map-search-results.html:79
-msgid "Search for a place to add it to your trip"
-msgstr "Cerca un luogo per aggiungerlo al tuo viaggio"
+msgid "Find places to add to your trip"
+msgstr "Trova luoghi da aggiungere al tuo viaggio"
 
 #: templates/trips/share-link-created.html:4
 #: templates/trips/share-link-modal.html:4
@@ -2433,19 +2432,15 @@ msgstr "Vedi"
 msgid "Back to events"
 msgstr "Torna agli eventi"
 
-#: templates/trips/trip-map.html:33
-msgid "Search Places"
-msgstr "Cerca Luoghi"
-
-#: templates/trips/trip-map.html:43
+#: templates/trips/trip-map.html:51
 msgid "— all stages —"
 msgstr "— tutte le tappe —"
 
-#: templates/trips/trip-map.html:50
+#: templates/trips/trip-map.html:58
 msgid "Search a place…"
 msgstr "Cerca un luogo…"
 
-#: templates/trips/trip-map.html:105
+#: templates/trips/trip-map.html:120
 msgid "Trip events"
 msgstr "Eventi del viaggio"
 
@@ -3127,6 +3122,9 @@ msgstr "Errore API di Unsplash. Per favore riprova più tardi."
 #, python-brace-format
 msgid "No images found for '{query}'"
 msgstr "Nessuna immagine trovata per '{query}'"
+
+#~ msgid "Search Places"
+#~ msgstr "Cerca Luoghi"
 
 #~ msgid "Remove participant"
 #~ msgstr "Rimuovi partecipante"
