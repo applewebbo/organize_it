@@ -1,0 +1,158 @@
+from unittest.mock import MagicMock, patch
+
+import pytest
+
+from suggestions.ai.base import AISuggestionError
+from suggestions.schemas import Suggestion, SuggestionPrefs, TripContext
+from suggestions.services import (
+    GroundedSuggestion,
+    build_trip_context,
+    generate_suggestions,
+    merge_preferences,
+)
+from tests.suggestions.factories import (
+    AICredentialsFactory,
+    SuggestionPreferencesFactory,
+)
+from tests.trips.factories import TripFactory
+from trips.services import GooglePlacesError, PlaceResult
+
+pytestmark = pytest.mark.django_db
+
+PLACE = PlaceResult(
+    place_id="ChIJ_grounded",
+    name="Trattoria",
+    address="Via Roma 1, Roma, Italy",
+    lat=41.9,
+    lng=12.5,
+)
+
+
+class TestBuildTripContext:
+    def test_maps_trip_fields(self):
+        trip = TripFactory(destination="Roma")
+        context = build_trip_context(trip, language="it")
+        assert isinstance(context, TripContext)
+        assert context.destination == "Roma"
+        assert context.start_date == trip.start_date
+        assert context.language == "it"
+
+
+class TestMergePreferences:
+    def test_defaults_when_nothing_provided(self):
+        prefs = merge_preferences(None, None)
+        assert prefs == SuggestionPrefs()
+
+    def test_uses_user_defaults(self):
+        defaults = SuggestionPreferencesFactory.build(
+            favored_experience_types=[1, 2],
+            dietary="vegan",
+            pace="relaxed",
+            budget="high",
+            notes="no crowds",
+        )
+        prefs = merge_preferences(defaults, None)
+        assert prefs.dietary == "vegan"
+        assert prefs.favored_experience_types == [1, 2]
+        assert prefs.notes == "no crowds"
+
+    def test_overrides_win_field_by_field(self):
+        defaults = SuggestionPreferencesFactory.build(dietary="vegan", budget="low")
+        prefs = merge_preferences(defaults, {"budget": "high"})
+        assert prefs.dietary == "vegan"
+        assert prefs.budget == "high"
+
+    def test_notes_are_concatenated(self):
+        defaults = SuggestionPreferencesFactory.build(notes="no crowds")
+        prefs = merge_preferences(defaults, {"notes": "with kids"})
+        assert prefs.notes == "no crowds\nwith kids"
+
+    def test_extra_notes_without_defaults(self):
+        prefs = merge_preferences(None, {"notes": "with kids"})
+        assert prefs.notes == "with kids"
+
+
+class TestGenerateSuggestions:
+    def _provider_returning(self, suggestions):
+        provider = MagicMock()
+        provider.generate.return_value = suggestions
+        return provider
+
+    def test_raises_without_credentials(self):
+        user = TripFactory().author
+        trip = TripFactory(author=user)
+        with pytest.raises(AISuggestionError):
+            generate_suggestions(user, trip)
+
+    def test_raises_with_empty_key(self):
+        creds = AICredentialsFactory(api_key_encrypted="")
+        trip = TripFactory(author=creds.user)
+        with pytest.raises(AISuggestionError):
+            generate_suggestions(creds.user, trip)
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_happy_path_grounds_with_location_bias(
+        self, mock_get_provider, mock_client
+    ):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        # bypass save() so the auto-geocoding does not overwrite coordinates
+        TripFactory._meta.model.objects.filter(pk=trip.pk).update(
+            destination_latitude=41.9, destination_longitude=12.5
+        )
+        trip.refresh_from_db()
+        suggestion = Suggestion(kind="meal", name="Trattoria", type=3, city="Roma")
+        mock_get_provider.return_value = self._provider_returning([suggestion])
+        mock_client.return_value.search_text.return_value = [PLACE]
+
+        results = generate_suggestions(creds.user, trip, language="it")
+
+        assert len(results) == 1
+        grounded = results[0]
+        assert isinstance(grounded, GroundedSuggestion)
+        assert grounded.place_id == "ChIJ_grounded"
+        assert grounded.latitude == 41.9
+        # location bias passed because the trip has coordinates
+        _, kwargs = mock_client.return_value.search_text.call_args
+        assert kwargs["location_bias"] == (41.9, 12.5, 50000)
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_without_coordinates_no_location_bias(self, mock_get_provider, mock_client):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        TripFactory._meta.model.objects.filter(pk=trip.pk).update(
+            destination_latitude=None, destination_longitude=None
+        )
+        trip.refresh_from_db()
+        suggestion = Suggestion(kind="experience", name="Colosseo", type=1)
+        mock_get_provider.return_value = self._provider_returning([suggestion])
+        mock_client.return_value.search_text.return_value = [PLACE]
+
+        generate_suggestions(creds.user, trip)
+
+        _, kwargs = mock_client.return_value.search_text.call_args
+        assert kwargs["location_bias"] is None
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_ungrounded_suggestion_is_skipped(self, mock_get_provider, mock_client):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        suggestion = Suggestion(kind="stay", name="Unknown Hotel")
+        mock_get_provider.return_value = self._provider_returning([suggestion])
+        mock_client.return_value.search_text.return_value = []
+
+        assert generate_suggestions(creds.user, trip) == []
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_places_error_skips_suggestion(self, mock_get_provider, mock_client):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        suggestion = Suggestion(kind="experience", name="Park", type=2)
+        mock_get_provider.return_value = self._provider_returning([suggestion])
+        mock_client.return_value.search_text.side_effect = GooglePlacesError("boom")
+
+        assert generate_suggestions(creds.user, trip) == []
