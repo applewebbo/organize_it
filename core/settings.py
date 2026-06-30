@@ -287,6 +287,9 @@ DATE_INPUT_FORMATS = [
 GOOGLE_PLACES_API_KEY = env("GOOGLE_PLACES_API_KEY", default="")
 UNSPLASH_ACCESS_KEY = env("UNSPLASH_ACCESS_KEY", default="")
 
+# Fernet key used to encrypt BYOK AI credentials at rest (suggestions app)
+FIELD_ENCRYPTION_KEY = env("FIELD_ENCRYPTION_KEY", default="")
+
 # DJANGO-DBBACKUP with Django Storages
 STORAGES = {
     "default": {
@@ -451,6 +454,9 @@ elif ENVIRONMENT == "test":
     }
 
     PASSWORD_HASHERS = ("django.contrib.auth.hashers.MD5PasswordHasher",)
+
+    # Fixed Fernet key so encrypted-field tests are deterministic
+    FIELD_ENCRYPTION_KEY = "X96Gmf2WBHNi4IfGu474va9oI32nCcRONTmK9hLuoSc="
 
     EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
     DEFAULT_FROM_EMAIL = "Organize It <noreply@test.local>"
