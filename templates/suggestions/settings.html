@@ -1,0 +1,75 @@
+{% load i18n %}
+<div id="ai-settings"
+     class="mx-auto mt-8 max-w-2xl shadow card card-border bg-base-100">
+    <form method="post"
+          class="card-body"
+          hx-post="{% url 'suggestions:settings' %}"
+          hx-target="#ai-settings"
+          hx-swap="outerHTML">
+        {% csrf_token %}
+        <h2 class="mb-4 text-xl font-semibold text-center sm:text-left">{% trans "AI suggestions" %}</h2>
+        {% if saved %}
+            <div class="mb-4 alert alert-success alert-soft">
+                <span>{% trans "AI settings saved successfully" %}</span>
+            </div>
+        {% endif %}
+        <div class="mb-4">
+            <label for="{{ credentials_form.provider.id_for_label }}"
+                   class="block mb-2 font-medium">{{ credentials_form.provider.label }}</label>
+            {{ credentials_form.provider }}
+            {% if credentials_form.provider.errors %}
+                <div class="mt-1 text-sm text-error">{{ credentials_form.provider.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="mb-6">
+            <label for="{{ credentials_form.api_key_encrypted.id_for_label }}"
+                   class="block mb-2 font-medium">{{ credentials_form.api_key_encrypted.label }}</label>
+            {{ credentials_form.api_key_encrypted }}
+            <p class="mt-1 text-xs italic text-base-content/50">
+                {% if has_credentials %}
+                    {% trans "A key is already configured." %}
+                {% endif %}
+                {{ credentials_form.api_key_encrypted.help_text }}
+            </p>
+            {% if credentials_form.api_key_encrypted.errors %}
+                <div class="mt-1 text-sm text-error">{{ credentials_form.api_key_encrypted.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="mb-4">
+            <label class="block mb-2 font-medium">{{ preferences_form.favored_experience_types.label }}</label>
+            <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {% for checkbox in preferences_form.favored_experience_types %}
+                    <label class="flex gap-2 items-center cursor-pointer">
+                        {{ checkbox.tag }}
+                        <span>{{ checkbox.choice_label }}</span>
+                    </label>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-3">
+            <div>
+                <label for="{{ preferences_form.dietary.id_for_label }}"
+                       class="block mb-2 font-medium">{{ preferences_form.dietary.label }}</label>
+                {{ preferences_form.dietary }}
+            </div>
+            <div>
+                <label for="{{ preferences_form.pace.id_for_label }}"
+                       class="block mb-2 font-medium">{{ preferences_form.pace.label }}</label>
+                {{ preferences_form.pace }}
+            </div>
+            <div>
+                <label for="{{ preferences_form.budget.id_for_label }}"
+                       class="block mb-2 font-medium">{{ preferences_form.budget.label }}</label>
+                {{ preferences_form.budget }}
+            </div>
+        </div>
+        <div class="mb-4">
+            <label for="{{ preferences_form.notes.id_for_label }}"
+                   class="block mb-2 font-medium">{{ preferences_form.notes.label }}</label>
+            {{ preferences_form.notes }}
+        </div>
+        <div class="flex justify-end mt-2">
+            <button type="submit" class="btn btn-sm btn-soft btn-primary">{% trans "Save" %}</button>
+        </div>
+    </form>
+</div>

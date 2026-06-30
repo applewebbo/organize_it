@@ -152,5 +152,13 @@
                 </div>
             </form>
         </div>
+        <div class="mx-auto mt-8 max-w-2xl"
+             hx-get="{% url 'suggestions:settings' %}"
+             hx-trigger="load"
+             hx-swap="outerHTML">
+            <div class="flex justify-center py-8">
+                <span class="loading loading-spinner loading-md"></span>
+            </div>
+        </div>
     </div>
 {% endblock content %}

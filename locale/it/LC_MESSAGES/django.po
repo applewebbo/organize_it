@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-29 15:40+0200\n"
+"POT-Creation-Date: 2026-06-30 10:57+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -92,11 +92,11 @@ msgstr "Superuser deve avere is_superuser=True."
 msgid "email address"
 msgstr "indirizzo email"
 
-#: accounts/models.py:52 core/settings.py:231
+#: accounts/models.py:52 core/settings.py:232
 msgid "Italian"
 msgstr "Italiano"
 
-#: accounts/models.py:53 core/settings.py:232
+#: accounts/models.py:53 core/settings.py:233
 msgid "English"
 msgstr "Inglese"
 
@@ -166,6 +166,98 @@ msgstr ""
 #: accounts/views.py:46
 msgid "Settings modified succesfully"
 msgstr "Impostazioni salvate"
+
+#: suggestions/forms.py:14
+msgid "API key"
+msgstr "Chiave API"
+
+#: suggestions/forms.py:21
+msgid "Stored encrypted. Leave blank to keep the current key."
+msgstr "Memorizzata cifrata. Lascia vuoto per mantenere la chiave attuale."
+
+#: suggestions/forms.py:28
+msgid "Provider"
+msgstr "Provider"
+
+#: suggestions/forms.py:45
+msgid "Favoured experience types"
+msgstr "Tipi di esperienza preferiti"
+
+#: suggestions/forms.py:55
+msgid "Dietary preference"
+msgstr "Preferenza alimentare"
+
+#: suggestions/forms.py:56
+msgid "Pace"
+msgstr "Ritmo"
+
+#: suggestions/forms.py:57
+msgid "Budget"
+msgstr "Budget"
+
+#: suggestions/forms.py:58 templates/trips/event-detail.html:78
+#: templates/trips/main-transfer-connection-create.html:89
+#: templates/trips/main-transfer-connection-edit.html:65 trips/forms.py:817
+#: trips/forms.py:848 trips/forms.py:901 trips/forms.py:1497
+#: trips/forms.py:1501 trips/forms.py:1543 trips/forms.py:1547
+msgid "Notes"
+msgstr "Note"
+
+#: suggestions/forms.py:68
+msgid "e.g. avoid tourist traps, travelling with kids"
+msgstr "es. evitare le trappole per turisti, in viaggio con bambini"
+
+#: suggestions/models.py:13
+msgid "Google Gemini"
+msgstr "Google Gemini"
+
+#: suggestions/models.py:30 suggestions/models.py:31
+msgid "AI credentials"
+msgstr "Credenziali AI"
+
+#: suggestions/models.py:41
+msgid "No preference"
+msgstr "Nessuna preferenza"
+
+#: suggestions/models.py:42
+msgid "Vegetarian"
+msgstr "Vegetariano"
+
+#: suggestions/models.py:43
+msgid "Vegan"
+msgstr "Vegano"
+
+#: suggestions/models.py:44
+msgid "Gluten-free"
+msgstr "Senza glutine"
+
+#: suggestions/models.py:47
+msgid "Relaxed"
+msgstr "Rilassato"
+
+#: suggestions/models.py:48
+msgid "Moderate"
+msgstr "Moderato"
+
+#: suggestions/models.py:49
+msgid "Packed"
+msgstr "Intenso"
+
+#: suggestions/models.py:52
+msgid "Low"
+msgstr "Basso"
+
+#: suggestions/models.py:53
+msgid "Medium"
+msgstr "Medio"
+
+#: suggestions/models.py:54
+msgid "High"
+msgstr "Alto"
+
+#: suggestions/models.py:80 suggestions/models.py:81
+msgid "Suggestion preferences"
+msgstr "Preferenze suggerimenti"
 
 #: templates/account/email_confirm.html:5
 #: templates/account/email_confirm.html:8
@@ -320,7 +412,8 @@ msgstr "Preferenze di viaggio"
 msgid "Display Preferences"
 msgstr "Preferenze di visualizzazione"
 
-#: templates/account/profile.html:151 templates/trips/event-notes.html:30
+#: templates/account/profile.html:151 templates/suggestions/settings.html:71
+#: templates/trips/event-notes.html:30
 #: templates/trips/experience-create-unpaired.html:35
 #: templates/trips/experience-create.html:60
 #: templates/trips/includes/checklist-reminder-card.html:24
@@ -727,6 +820,18 @@ msgstr "Chiudi"
 #: templates/includes/navbar.html:34
 msgid "Open main menu"
 msgstr "Apri il menu principale"
+
+#: templates/suggestions/settings.html:9
+msgid "AI suggestions"
+msgstr "Suggerimenti AI"
+
+#: templates/suggestions/settings.html:12
+msgid "AI settings saved successfully"
+msgstr "Impostazioni AI salvate correttamente"
+
+#: templates/suggestions/settings.html:29
+msgid "A key is already configured."
+msgstr "Una chiave è già configurata."
 
 #: templates/trips/arrival-transfer-modal.html:5
 msgid "Add Arrival Transfer"
@@ -1258,14 +1363,6 @@ msgstr "Previsioni meteo per il tuo viaggio: %(title)s"
 #: templates/trips/event-detail.html:69 templates/trips/stay-detail.html:75
 msgid "Enrich"
 msgstr "Arricchisci"
-
-#: templates/trips/event-detail.html:78
-#: templates/trips/main-transfer-connection-create.html:89
-#: templates/trips/main-transfer-connection-edit.html:65 trips/forms.py:817
-#: trips/forms.py:848 trips/forms.py:901 trips/forms.py:1497
-#: trips/forms.py:1501 trips/forms.py:1543 trips/forms.py:1547
-msgid "Notes"
-msgstr "Note"
 
 #: templates/trips/event-detail.html:94 templates/trips/event-modal.html:3
 #: templates/trips/includes/main-transfers.html:178
@@ -3270,14 +3367,8 @@ msgstr "Nessuna immagine trovata per '{query}'"
 #~ msgid "Dates updated successfully"
 #~ msgstr "Date modificate correttamente"
 
-#~ msgid "Google Places API key is not configured."
-#~ msgstr "API di Google Places non è configurata correttamente."
-
 #~ msgid "Google Places API request timed out."
 #~ msgstr "La richiesta API di Google Places è scaduta."
-
-#~ msgid "Booking Reference"
-#~ msgstr "Codice prenotazione"
 
 #~ msgid "View Ticket"
 #~ msgstr "Vedi biglietto"
@@ -3320,9 +3411,6 @@ msgstr "Nessuna immagine trovata per '{query}'"
 
 #~ msgid "Company Website"
 #~ msgstr "Sito web compagnia"
-
-#~ msgid "Booking/reservation reference"
-#~ msgstr "Riferimento prenotazione"
 
 #~ msgid "Link to ticket or booking"
 #~ msgstr "Link al biglietto o alla prenotazione"
