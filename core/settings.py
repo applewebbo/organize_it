@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     # INTERNAL_APP
     "trips",
     "accounts",
+    "suggestions",
 ]
 
 MIDDLEWARE = [
