@@ -1,0 +1,24 @@
+{% load i18n %}
+{% if error %}
+    <p class="mt-1 text-xs text-error">{{ error }}</p>
+{% elif place %}
+    <div class="mt-2 space-y-1 text-xs text-base-content/70">
+        {% if place.website %}
+            <p>
+                <i class="ph-bold ph-globe i-xs"></i>
+                <a href="{{ place.website }}"
+                   target="_blank"
+                   rel="noopener"
+                   class="link link-primary">{% trans "Website" %}</a>
+            </p>
+        {% endif %}
+        {% if place.phone_number %}
+            <p>
+                <i class="ph-bold ph-phone i-xs"></i> {{ place.phone_number }}
+            </p>
+        {% endif %}
+        {% if not place.website and not place.phone_number %}
+            <p>{% trans "No extra details available." %}</p>
+        {% endif %}
+    </div>
+{% endif %}

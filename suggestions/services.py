@@ -1,4 +1,8 @@
+import hashlib
+import json
 from dataclasses import dataclass
+
+from django.core.cache import cache
 
 from suggestions.ai.base import AISuggestionError
 from suggestions.ai.factory import get_provider
@@ -9,6 +13,19 @@ from trips.services import GooglePlacesClient, GooglePlacesError
 
 # Radius (meters) used to bias Google Places search around the destination.
 _GROUNDING_RADIUS = 50000
+
+# Generated suggestions are cached for a day to spare the free-tier quota.
+_CACHE_TTL = 24 * 3600
+
+
+def _cache_key(trip: Trip, preferences: SuggestionPrefs, language: str) -> str:
+    payload = json.dumps(
+        {"trip": trip.pk, "lang": language, "prefs": preferences.model_dump()},
+        sort_keys=True,
+        default=str,
+    )
+    digest = hashlib.sha256(payload.encode()).hexdigest()[:16]
+    return f"ai_sugg:{trip.pk}:{digest}"
 
 
 @dataclass
@@ -110,22 +127,32 @@ def generate_suggestions(
     trip: Trip,
     overrides: dict | None = None,
     language: str = "en",
+    force_refresh: bool = False,
 ) -> list[GroundedSuggestion]:
     """Full orchestration: provider call + validation + Google Places grounding.
 
-    The API key is decrypted only here, immediately before the provider call.
-    Suggestions that cannot be grounded are skipped.
+    Results are cached per trip + preferences for a day so reopening the modal
+    or pressing "Generate" again does not spend quota; ``force_refresh`` (the
+    "Regenerate" button) bypasses the cache. The API key is decrypted only
+    here, immediately before the provider call. Ungrounded suggestions are
+    skipped.
     """
     credentials = AICredentials.objects.filter(user=user).first()
     if credentials is None or not credentials.api_key_encrypted:
         raise AISuggestionError("No AI credentials configured")
 
-    provider = get_provider(credentials.provider, credentials.api_key_encrypted)
     context = build_trip_context(trip, language=language)
     preferences = merge_preferences(
         SuggestionPreferences.objects.filter(user=user).first(), overrides
     )
 
+    key = _cache_key(trip, preferences, language)
+    if not force_refresh:
+        cached = cache.get(key)
+        if cached is not None:
+            return cached
+
+    provider = get_provider(credentials.provider, credentials.api_key_encrypted)
     suggestions = provider.generate(context, preferences)
 
     client = GooglePlacesClient()
@@ -134,4 +161,6 @@ def generate_suggestions(
         result = _ground(suggestion, context, client)
         if result is not None:
             grounded.append(result)
+
+    cache.set(key, grounded, _CACHE_TTL)
     return grounded

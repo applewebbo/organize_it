@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-30 10:57+0200\n"
+"POT-Creation-Date: 2026-06-30 12:48+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -167,35 +167,35 @@ msgstr ""
 msgid "Settings modified succesfully"
 msgstr "Impostazioni salvate"
 
-#: suggestions/forms.py:14
+#: suggestions/forms.py:13
 msgid "API key"
 msgstr "Chiave API"
 
-#: suggestions/forms.py:21
+#: suggestions/forms.py:19
 msgid "Stored encrypted. Leave blank to keep the current key."
 msgstr "Memorizzata cifrata. Lascia vuoto per mantenere la chiave attuale."
 
-#: suggestions/forms.py:28
+#: suggestions/forms.py:25
 msgid "Provider"
 msgstr "Provider"
 
-#: suggestions/forms.py:45
+#: suggestions/forms.py:40
 msgid "Favoured experience types"
 msgstr "Tipi di esperienza preferiti"
 
-#: suggestions/forms.py:55
+#: suggestions/forms.py:50
 msgid "Dietary preference"
 msgstr "Preferenza alimentare"
 
-#: suggestions/forms.py:56
+#: suggestions/forms.py:51
 msgid "Pace"
 msgstr "Ritmo"
 
-#: suggestions/forms.py:57
+#: suggestions/forms.py:52
 msgid "Budget"
 msgstr "Budget"
 
-#: suggestions/forms.py:58 templates/trips/event-detail.html:78
+#: suggestions/forms.py:53 templates/trips/event-detail.html:78
 #: templates/trips/main-transfer-connection-create.html:89
 #: templates/trips/main-transfer-connection-edit.html:65 trips/forms.py:817
 #: trips/forms.py:848 trips/forms.py:901 trips/forms.py:1497
@@ -203,7 +203,7 @@ msgstr "Budget"
 msgid "Notes"
 msgstr "Note"
 
-#: suggestions/forms.py:68
+#: suggestions/forms.py:63
 msgid "e.g. avoid tourist traps, travelling with kids"
 msgstr "es. evitare le trappole per turisti, in viaggio con bambini"
 
@@ -412,7 +412,7 @@ msgstr "Preferenze di viaggio"
 msgid "Display Preferences"
 msgstr "Preferenze di visualizzazione"
 
-#: templates/account/profile.html:151 templates/suggestions/settings.html:71
+#: templates/account/profile.html:151 templates/suggestions/settings.html:72
 #: templates/trips/event-notes.html:30
 #: templates/trips/experience-create-unpaired.html:35
 #: templates/trips/experience-create.html:60
@@ -803,6 +803,7 @@ msgid "Source code"
 msgstr "Codice del progetto"
 
 #: templates/includes/messages.html:20
+#: templates/suggestions/suggestion-modal.html:8
 #: templates/trips/attachments/preview-modal.html:15
 #: templates/trips/attachments/upload-modal.html:15
 #: templates/trips/event-detail.html:100 templates/trips/event-notes.html:33
@@ -821,17 +822,70 @@ msgstr "Chiudi"
 msgid "Open main menu"
 msgstr "Apri il menu principale"
 
-#: templates/suggestions/settings.html:9
+#: templates/suggestions/map-suggestions-results.html:6
+msgid "Check your AI settings"
+msgstr "Controlla le impostazioni AI"
+
+#: templates/suggestions/map-suggestions-results.html:35
+#: templates/trips/arrival-transfer-modal.html:23
+#: templates/trips/departure-transfer-modal.html:23
+msgid "Details"
+msgstr "Dettagli"
+
+#: templates/suggestions/map-suggestions-results.html:52
+msgid "Add to trip"
+msgstr "Aggiungi al viaggio"
+
+#: templates/suggestions/map-suggestions-results.html:64
+msgid "No suggestions found"
+msgstr "Nessun suggerimento trovato"
+
+#: templates/suggestions/settings.html:10
+#: templates/suggestions/suggestion-modal.html:4
+#: templates/trips/includes/events-section.html:90
+#: templates/trips/trip-map.html:63
 msgid "AI suggestions"
 msgstr "Suggerimenti AI"
 
-#: templates/suggestions/settings.html:12
+#: templates/suggestions/settings.html:13
 msgid "AI settings saved successfully"
 msgstr "Impostazioni AI salvate correttamente"
 
-#: templates/suggestions/settings.html:29
+#: templates/suggestions/settings.html:30
 msgid "A key is already configured."
 msgstr "Una chiave è già configurata."
+
+#: templates/suggestions/suggestion-added.html:4
+msgid "Added"
+msgstr "Aggiunto"
+
+#: templates/suggestions/suggestion-details.html:9 trips/forms.py:382
+#: trips/forms.py:388 trips/forms.py:714 trips/forms.py:730
+msgid "Website"
+msgstr "Sito Internet"
+
+#: templates/suggestions/suggestion-details.html:18
+msgid "No extra details available."
+msgstr "Nessun dettaglio aggiuntivo disponibile."
+
+#: templates/suggestions/suggestion-modal.html:19
+#: templates/trips/trip-map.html:72
+msgid "Notes for this trip (optional)…"
+msgstr "Note per questo viaggio (facoltativo)…"
+
+#: templates/suggestions/suggestion-modal.html:26
+#: templates/trips/trip-map.html:79
+msgid "Generate"
+msgstr "Genera"
+
+#: templates/suggestions/suggestion-modal.html:30
+#: templates/trips/trip-map.html:85
+msgid "Regenerate"
+msgstr "Rigenera"
+
+#: templates/suggestions/suggestion-modal.html:37
+msgid "Generate suggestions for your trip"
+msgstr "Genera suggerimenti per il tuo viaggio"
 
 #: templates/trips/arrival-transfer-modal.html:5
 msgid "Add Arrival Transfer"
@@ -851,11 +905,6 @@ msgstr "Chiudi la finestra"
 #: templates/trips/departure-transfer-modal.html:22
 msgid "Type"
 msgstr "Mezzo di Trasporto"
-
-#: templates/trips/arrival-transfer-modal.html:23
-#: templates/trips/departure-transfer-modal.html:23
-msgid "Details"
-msgstr "Dettagli"
 
 #: templates/trips/attachments/preview-modal.html:10
 msgid "Download"
@@ -1647,7 +1696,7 @@ msgid "Destination for day"
 msgstr "Destinazione non trovata"
 
 #: templates/trips/includes/day-list-content.html:42
-#: templates/trips/includes/events-section.html:119
+#: templates/trips/includes/events-section.html:128
 msgid "Nothing to do here."
 msgstr "Niente da fare qui."
 
@@ -1695,11 +1744,11 @@ msgstr "La vista mappa non è disponibile su dispositivi mobili."
 msgid "Other Things to Do"
 msgstr "Altre Cose da Fare"
 
-#: templates/trips/includes/events-section.html:89
+#: templates/trips/includes/events-section.html:98
 msgid "Here you find events not yet assigned to a specific day"
 msgstr "Qui trovi gli eventi non ancora abbinati ad un giorno specifico"
 
-#: templates/trips/includes/events-section.html:99
+#: templates/trips/includes/events-section.html:108
 msgid "No stage"
 msgstr "Nessuna tappa"
 
@@ -2396,7 +2445,7 @@ msgstr "— tutte le tappe —"
 msgid "Search a place…"
 msgstr "Cerca un luogo…"
 
-#: templates/trips/trip-map.html:75
+#: templates/trips/trip-map.html:105
 msgid "Trip events"
 msgstr "Eventi del viaggio"
 
@@ -2535,10 +2584,6 @@ msgstr "Numero di telefono"
 #: trips/forms.py:381 trips/forms.py:389 trips/forms.py:715 trips/forms.py:731
 msgid "Address"
 msgstr "Indirizzo"
-
-#: trips/forms.py:382 trips/forms.py:388 trips/forms.py:714 trips/forms.py:730
-msgid "Website"
-msgstr "Sito Internet"
 
 #: trips/forms.py:383 trips/forms.py:390
 msgid "Tag"

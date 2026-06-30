@@ -156,3 +156,35 @@ class TestGenerateSuggestions:
         mock_client.return_value.search_text.side_effect = GooglePlacesError("boom")
 
         assert generate_suggestions(creds.user, trip) == []
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_second_call_uses_cache(self, mock_get_provider, mock_client):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        provider = self._provider_returning(
+            [Suggestion(kind="experience", name="X", type=1)]
+        )
+        mock_get_provider.return_value = provider
+        mock_client.return_value.search_text.return_value = [PLACE]
+
+        generate_suggestions(creds.user, trip)
+        generate_suggestions(creds.user, trip)
+
+        assert provider.generate.call_count == 1
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_force_refresh_bypasses_cache(self, mock_get_provider, mock_client):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        provider = self._provider_returning(
+            [Suggestion(kind="experience", name="X", type=1)]
+        )
+        mock_get_provider.return_value = provider
+        mock_client.return_value.search_text.return_value = [PLACE]
+
+        generate_suggestions(creds.user, trip)
+        generate_suggestions(creds.user, trip, force_refresh=True)
+
+        assert provider.generate.call_count == 2

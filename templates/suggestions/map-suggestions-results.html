@@ -1,0 +1,66 @@
+{% load i18n l10n %}
+{% if error %}
+    <div class="m-3 alert alert-warning alert-soft">
+        <div>
+            <p>{{ error }}</p>
+            <a href="{% url 'accounts:profile' %}" class="link link-primary">{% trans "Check your AI settings" %}</a>
+        </div>
+    </div>
+{% elif cards %}
+    <ul class="space-y-2">
+        {% for card in cards %}
+            <li data-role="place-result"
+                data-place-id="{{ card.place_id }}"
+                data-name="{{ card.name }}"
+                data-address="{{ card.address }}"
+                data-lat="{{ card.lat|unlocalize }}"
+                data-lng="{{ card.lng|unlocalize }}"
+                class="p-3 rounded-lg border transition-colors border-base-300 bg-base-100 hover:bg-base-200">
+                <div class="flex gap-2 justify-between items-start">
+                    <div class="min-w-0">
+                        <div class="flex gap-2 items-center">
+                            <p class="font-semibold truncate">{{ card.name }}</p>
+                            {% if card.type_label %}
+                                <span class="badge badge-sm badge-ghost shrink-0">{{ card.type_label }}</span>
+                            {% endif %}
+                        </div>
+                        {% if card.description %}<p class="mt-1 text-sm text-base-content/70">{{ card.description }}</p>{% endif %}
+                        <p class="mt-1 text-sm truncate text-base-content/60">{{ card.address }}</p>
+                        <button type="button"
+                                class="mt-1 btn btn-xs btn-ghost"
+                                hx-get="{% url 'suggestions:details' trip.pk %}?place_id={{ card.place_id }}"
+                                hx-target="closest li find [data-role='place-details']"
+                                hx-swap="innerHTML">
+                            <i class="ph-bold ph-info i-xs"></i>
+                            {% trans "Details" %}
+                        </button>
+                        <div data-role="place-details"></div>
+                    </div>
+                    <div class="shrink-0">
+                        <form hx-post="{% url card.add_url trip.pk %}"
+                              {% if add_target %}hx-target="{{ add_target }}"{% endif %}
+                              hx-swap="{{ add_swap }}"
+                              hx-indicator="#save-spinner">
+                            {% csrf_token %}
+                            <input type="hidden" name="google_place_id" value="{{ card.place_id }}">
+                            <input type="hidden" name="name" value="{{ card.name }}">
+                            <input type="hidden" name="address" value="{{ card.address }}">
+                            <input type="hidden" name="lat" value="{{ card.lat|unlocalize }}">
+                            <input type="hidden" name="lng" value="{{ card.lng|unlocalize }}">
+                            <button type="submit"
+                                    class="btn btn-xs btn-outline btn-success"
+                                    title="{% trans 'Add to trip' %}">
+                                <i class="ph-bold ph-plus i-xs"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <div class="py-8 text-center text-base-content/50">
+        <i class="mb-2 ph-bold ph-sparkle i-lg"></i>
+        <p>{% trans 'No suggestions found' %}</p>
+    </div>
+{% endif %}

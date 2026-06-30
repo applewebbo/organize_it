@@ -1,0 +1,41 @@
+{% load i18n %}
+<div class="p-4 sm:p-6">
+    <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold">{% trans 'AI suggestions' %}</h3>
+        <button type="button"
+                @click="$dispatch('hide-modal')"
+                class="btn btn-sm btn-circle btn-ghost"
+                aria-label="{% trans 'Close' %}">✕</button>
+    </div>
+    <form hx-post="{% url 'suggestions:generate' trip.pk %}"
+          hx-target="#ai-modal-results"
+          hx-swap="innerHTML"
+          hx-indicator="#ai-modal-spinner"
+          hx-disabled-elt="button[type='submit']">
+        {% csrf_token %}
+        <input type="hidden" name="context" value="modal">
+        <input type="text"
+               name="notes"
+               placeholder="{% trans 'Notes for this trip (optional)…' %}"
+               autocomplete="off"
+               class="mb-2 w-full input input-sm input-bordered" />
+        <div class="flex gap-2">
+            <button type="submit" class="flex-1 btn btn-sm btn-secondary">
+                <i class="ph-bold ph-sparkle i-sm htmx-hide-on-request"></i>
+                <span id="ai-modal-spinner"
+                      class="loading loading-spinner loading-xs htmx-indicator"></span>
+                {% trans 'Generate' %}
+            </button>
+            <button type="submit" name="refresh" value="1" class="btn btn-sm btn-outline">
+                <i class="ph-bold ph-arrows-clockwise i-sm"></i>
+                {% trans 'Regenerate' %}
+            </button>
+        </div>
+    </form>
+    <div id="ai-modal-results" class="overflow-y-auto mt-4 max-h-96">
+        <div class="py-8 text-center text-base-content/50">
+            <i class="mb-2 ph-bold ph-sparkle i-lg"></i>
+            <p>{% trans 'Generate suggestions for your trip' %}</p>
+        </div>
+    </div>
+</div>

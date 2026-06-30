@@ -58,6 +58,37 @@
                             </button>
                         </div>
                     </form>
+                    {# AI suggestions #}
+                    <div class="pt-3 mt-3 border-t border-base-300">
+                        <h2 class="mb-2 text-base font-semibold">{% trans 'AI suggestions' %}</h2>
+                        <form hx-post="{% url 'suggestions:generate' trip.pk %}"
+                              hx-target="#search-results-panel"
+                              hx-swap="innerHTML"
+                              hx-indicator="#ai-spinner"
+                              hx-disabled-elt="button[type='submit']">
+                            {% csrf_token %}
+                            <input type="text"
+                                   name="notes"
+                                   placeholder="{% trans 'Notes for this trip (optional)…' %}"
+                                   autocomplete="off"
+                                   class="mb-2 w-full input input-sm input-bordered" />
+                            <div class="flex gap-2">
+                                <button type="submit" class="flex-1 btn btn-sm btn-secondary">
+                                    <i class="ph-bold ph-sparkle i-sm htmx-hide-on-request"></i>
+                                    <span id="ai-spinner"
+                                          class="loading loading-spinner loading-xs htmx-indicator"></span>
+                                    {% trans 'Generate' %}
+                                </button>
+                                <button type="submit"
+                                        name="refresh"
+                                        value="1"
+                                        class="btn btn-sm btn-outline"
+                                        title="{% trans 'Regenerate' %}">
+                                    <i class="ph-bold ph-arrows-clockwise i-sm"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
                 {# Search results #}
                 <div id="search-results-panel" class="overflow-y-auto flex-1 p-3">
