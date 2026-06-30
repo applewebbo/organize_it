@@ -1,0 +1,61 @@
+from datetime import date
+from enum import Enum
+
+from pydantic import BaseModel, Field, model_validator
+
+from trips.models import Experience, Meal
+
+
+class SuggestionKind(str, Enum):
+    EXPERIENCE = "experience"
+    MEAL = "meal"
+    STAY = "stay"
+
+
+# Valid `type` values per kind, derived from the Django models so the schema
+# stays in sync with Experience.Type / Meal.Type.
+EXPERIENCE_TYPES = {choice.value for choice in Experience.Type}
+MEAL_TYPES = {choice.value for choice in Meal.Type}
+
+
+class Suggestion(BaseModel):
+    """A single AI-proposed experience, meal or stay. Returned by every
+    provider and validated before it reaches the review UI."""
+
+    kind: SuggestionKind
+    name: str = Field(min_length=1)
+    description: str = ""
+    address: str = ""
+    city: str = ""
+    type: int | None = None
+
+    @model_validator(mode="after")
+    def validate_type_for_kind(self):
+        if self.kind is SuggestionKind.EXPERIENCE and self.type not in EXPERIENCE_TYPES:
+            raise ValueError(f"Invalid experience type: {self.type}")
+        if self.kind is SuggestionKind.MEAL and self.type not in MEAL_TYPES:
+            raise ValueError(f"Invalid meal type: {self.type}")
+        if self.kind is SuggestionKind.STAY:
+            self.type = None
+        return self
+
+
+class TripContext(BaseModel):
+    """Context about the trip fed to the prompt."""
+
+    destination: str
+    latitude: float | None = None
+    longitude: float | None = None
+    start_date: date | None = None
+    end_date: date | None = None
+    language: str = "en"
+
+
+class SuggestionPrefs(BaseModel):
+    """Merged user + per-trip preferences fed to the prompt."""
+
+    favored_experience_types: list[int] = Field(default_factory=list)
+    dietary: str = "none"
+    pace: str = "moderate"
+    budget: str = "medium"
+    notes: str = ""
