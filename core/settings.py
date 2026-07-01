@@ -1,9 +1,18 @@
 import logging
 import os
+import warnings
 from pathlib import Path
 
 import environ
 from django.utils.translation import gettext_lazy as _
+
+# Silence a DeprecationWarning raised by google-genai on Python 3.14+ (it relies
+# on a typing internal slated for removal); upstream library issue, not ours.
+warnings.filterwarnings(
+    "ignore",
+    message=".*_UnionGenericAlias.*",
+    category=DeprecationWarning,
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

@@ -85,6 +85,10 @@ profile = "django"
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "core.settings"
 'addopts' = "--reuse-db --nomigrations"
+filterwarnings = [
+  # google-genai uses a typing internal deprecated on Python 3.14+; upstream issue.
+  "ignore:.*_UnionGenericAlias.*:DeprecationWarning"
+]
 markers = [
   "mapbox: requires Mapbox API key"
 ]
