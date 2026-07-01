@@ -1,3 +1,5 @@
+import logging
+
 from google import genai
 from google.genai import types
 
@@ -5,11 +7,17 @@ from suggestions.ai.base import AISuggestionError
 from suggestions.prompts import build_prompt
 from suggestions.schemas import Suggestion, SuggestionPrefs, TripContext
 
+logger = logging.getLogger(__name__)
+
 DEFAULT_MODEL = "gemini-3.1-flash-lite"
 
 
 def _error_kind(exc: Exception) -> str:
     """Classify an SDK/network error into an AISuggestionError kind."""
+    # A valid API key is ASCII; a key with non-ASCII characters blows up while
+    # the SDK encodes the auth header, before any request -> bad key = config.
+    if isinstance(exc, UnicodeEncodeError):
+        return AISuggestionError.CONFIG
     code = getattr(exc, "code", None)
     text = str(exc)
     if code == 429 or "RESOURCE_EXHAUSTED" in text:
@@ -53,7 +61,11 @@ class GeminiProvider:
                 ),
             )
         except Exception as exc:  # SDK/network errors -> single error type
-            raise AISuggestionError(str(exc), kind=_error_kind(exc)) from exc
+            kind = _error_kind(exc)
+            # Log the raw provider error (code/status/message) so the real cause
+            # is visible server-side; the user only sees the vague, safe message.
+            logger.warning("Gemini generate_content failed (kind=%s): %s", kind, exc)
+            raise AISuggestionError(str(exc), kind=kind) from exc
 
         suggestions = response.parsed
         if not suggestions:

@@ -72,6 +72,19 @@ class TestGeminiProvider:
         assert exc_info.value.kind == AISuggestionError.CONFIG
 
     @patch("suggestions.ai.gemini.genai.Client")
+    def test_generate_classifies_non_ascii_key_as_config(self, mock_client_cls):
+        # A key with accented characters fails while encoding the auth header.
+        mock_client = mock_client_cls.return_value
+        mock_client.models.generate_content.side_effect = UnicodeEncodeError(
+            "ascii", "ò", 0, 1, "ordinal not in range(128)"
+        )
+
+        provider = GeminiProvider("api-key")
+        with pytest.raises(AISuggestionError) as exc_info:
+            provider.generate(CONTEXT, PREFS)
+        assert exc_info.value.kind == AISuggestionError.CONFIG
+
+    @patch("suggestions.ai.gemini.genai.Client")
     def test_generate_raises_on_empty(self, mock_client_cls):
         mock_client = mock_client_cls.return_value
         mock_client.models.generate_content.return_value = MagicMock(parsed=None)
