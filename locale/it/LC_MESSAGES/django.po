@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-01 07:43+0200\n"
+"POT-Creation-Date: 2026-07-01 08:51+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -92,11 +92,11 @@ msgstr "Superuser deve avere is_superuser=True."
 msgid "email address"
 msgstr "indirizzo email"
 
-#: accounts/models.py:52 core/settings.py:232
+#: accounts/models.py:52 core/settings.py:241
 msgid "Italian"
 msgstr "Italiano"
 
-#: accounts/models.py:53 core/settings.py:233
+#: accounts/models.py:53 core/settings.py:242
 msgid "English"
 msgstr "Inglese"
 
@@ -826,8 +826,8 @@ msgstr "Apri il menu principale"
 msgid ""
 "AI suggestions are not configured yet. Add a valid API key to get started."
 msgstr ""
-"I suggerimenti AI non sono ancora configurati. Aggiungi una chiave API valida "
-"per iniziare."
+"I suggerimenti AI non sono ancora configurati. Aggiungi una chiave API "
+"valida per iniziare."
 
 #: templates/suggestions/map-suggestions-results.html:7
 msgid "Check your AI settings"
@@ -835,23 +835,25 @@ msgstr "Controlla le impostazioni AI"
 
 #: templates/suggestions/map-suggestions-results.html:9
 msgid "You have reached the AI provider usage limit. Please try again later."
-msgstr "Hai raggiunto il limite di utilizzo del provider AI. Riprova più tardi."
+msgstr ""
+"Hai raggiunto il limite di utilizzo del provider AI. Riprova più tardi."
 
 #: templates/suggestions/map-suggestions-results.html:11
 msgid "Something went wrong while generating suggestions. Please try again."
-msgstr "Qualcosa è andato storto durante la generazione dei suggerimenti. Riprova."
+msgstr ""
+"Qualcosa è andato storto durante la generazione dei suggerimenti. Riprova."
 
-#: templates/suggestions/map-suggestions-results.html:43
+#: templates/suggestions/map-suggestions-results.html:46
 msgid "Add to trip"
 msgstr "Aggiungi al viaggio"
 
-#: templates/suggestions/map-suggestions-results.html:57
+#: templates/suggestions/map-suggestions-results.html:60
 #: templates/trips/arrival-transfer-modal.html:23
 #: templates/trips/departure-transfer-modal.html:23
 msgid "Details"
 msgstr "Dettagli"
 
-#: templates/suggestions/map-suggestions-results.html:66
+#: templates/suggestions/map-suggestions-results.html:69
 msgid "No suggestions found"
 msgstr "Nessun suggerimento trovato"
 
@@ -870,9 +872,9 @@ msgstr "Impostazioni AI salvate correttamente"
 msgid "A key is already configured."
 msgstr "Una chiave è già configurata."
 
-#: templates/suggestions/suggestion-added.html:4
-msgid "Added"
-msgstr "Aggiunto"
+#: templates/suggestions/suggestion-added.html:5
+msgid "Added to your trip"
+msgstr "Aggiunto al viaggio"
 
 #: templates/suggestions/suggestion-details.html:12 trips/forms.py:382
 #: trips/forms.py:388 trips/forms.py:714 trips/forms.py:730
@@ -3137,6 +3139,9 @@ msgstr "Errore API di Unsplash. Per favore riprova più tardi."
 #, python-brace-format
 msgid "No images found for '{query}'"
 msgstr "Nessuna immagine trovata per '{query}'"
+
+#~ msgid "Added"
+#~ msgstr "Aggiunto"
 
 #~ msgid "Search Places"
 #~ msgstr "Cerca Luoghi"

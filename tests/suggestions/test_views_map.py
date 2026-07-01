@@ -242,6 +242,25 @@ class TestAcceptViews(TestCase):
         event = Event.objects.get(trip=trip, name="Trattoria")
         assert event.category == Event.Category.MEAL
 
+    def test_accept_replaces_card_with_success_message(self):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        response = self._post(user, trip, "experience", {"name": "Colosseo"})
+        content = response.content.decode()
+        assert "Added to your trip" in content
+        # modal context (no context field): no out-of-band events panel refresh
+        assert "hx-swap-oob" not in content
+
+    def test_accept_map_context_refreshes_events_panel(self):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        response = self._post(
+            user, trip, "experience", {"name": "Colosseo", "context": "map"}
+        )
+        content = response.content.decode()
+        assert 'id="events-panel"' in content
+        assert "hx-swap-oob" in content
+
     def test_accept_stay_creates_stay(self):
         user = self.make_user("user@example.com")
         trip = TripFactory(author=user)

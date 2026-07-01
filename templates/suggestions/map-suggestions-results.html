@@ -29,10 +29,13 @@
                     <p class="font-semibold truncate grow">{{ card.name }}</p>
                     <form hx-post="{% url card.add_url trip.pk %}"
                           class="shrink-0"
-                          {% if add_target %}hx-target="{{ add_target }}"{% endif %}
-                          hx-swap="{{ add_swap }}"
+                          hx-target="closest li"
+                          hx-swap="outerHTML"
                           hx-indicator="#save-spinner">
                         {% csrf_token %}
+                        <input type="hidden"
+                               name="context"
+                               value="{% if is_modal %}modal{% else %}map{% endif %}">
                         <input type="hidden" name="google_place_id" value="{{ card.place_id }}">
                         <input type="hidden" name="name" value="{{ card.name }}">
                         <input type="hidden" name="address" value="{{ card.address }}">

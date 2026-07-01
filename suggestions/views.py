@@ -12,15 +12,12 @@ from suggestions.services import generate_suggestions
 from trips.models import Event, Stay, Trip
 from trips.services import GooglePlacesClient, GooglePlacesError
 from trips.utils import accessible_trips_qs
+from trips.views.maps import _build_map_events_context
 
-# Desktop map panel reuses the trips add endpoints (they re-render the map
-# events panel); the mobile modal uses dedicated accept endpoints.
-_MAP_ADD_URL = {
-    "experience": "trips:map-add-experience",
-    "meal": "trips:map-add-meal",
-    "stay": "trips:map-add-stay",
-}
-_MODAL_ADD_URL = {
+# Both the desktop map panel and the mobile modal accept a suggestion through
+# these endpoints: the accepted card is replaced by a success message, and the
+# map events panel is refreshed out-of-band on the desktop.
+_ACCEPT_URL = {
     "experience": "suggestions:accept-experience",
     "meal": "suggestions:accept-meal",
     "stay": "suggestions:accept-stay",
@@ -118,14 +115,13 @@ def generate(request, pk):
         overrides["notes"] = notes
     language = get_profile(request.user).language
 
-    add_urls = _MODAL_ADD_URL if is_modal else _MAP_ADD_URL
     cards = []
     error_kind = None
     try:
         suggestions = generate_suggestions(
             request.user, trip, overrides, language, force_refresh
         )
-        cards = [_to_card(s, add_urls) for s in suggestions]
+        cards = [_to_card(s, _ACCEPT_URL) for s in suggestions]
     except AISuggestionError as exc:
         error_kind = exc.kind
 
@@ -137,8 +133,6 @@ def generate(request, pk):
             "cards": cards,
             "error_kind": error_kind,
             "is_modal": is_modal,
-            "add_target": "" if is_modal else "#events-panel",
-            "add_swap": "outerHTML" if is_modal else "innerHTML",
         },
     )
 
@@ -183,10 +177,23 @@ def _accept(request, pk, kind):
                 pass
         obj.save()
 
+    context = {}
+    # On the desktop map panel, refresh the events list out-of-band so the newly
+    # added (orphaned) item shows immediately; the mobile modal has no panel and
+    # relies on the unpairedModified trigger to reload the trip detail section.
+    if request.POST.get("context") == "map":
+        days_with_events, unassigned_events = _build_map_events_context(trip)
+        context = {
+            "trip": trip,
+            "days_with_events": days_with_events,
+            "unassigned_events": unassigned_events,
+            "refresh_events_panel": True,
+        }
+
     return TemplateResponse(
         request,
         "suggestions/suggestion-added.html",
-        {},
+        context,
         headers={"HX-Trigger": "unpairedModified"},
     )
 
