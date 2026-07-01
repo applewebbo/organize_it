@@ -114,6 +114,64 @@ class TestGenerateView(TestCase):
         assert "/accounts/profile/" not in content
 
     @patch("suggestions.views.generate_suggestions")
+    def test_hides_already_added_by_place_id(self, mock_generate):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        Event.objects.create(
+            trip=trip,
+            name="Something else",
+            place_id="place_Colosseo",
+            category=Event.Category.EXPERIENCE,
+        )
+        mock_generate.return_value = [
+            _grounded("experience", "Colosseo", 1),
+            _grounded("meal", "Trattoria", 3),
+        ]
+        with self.login(user):
+            response = self.post("suggestions:generate", pk=trip.pk)
+        content = response.content.decode()
+        assert "Colosseo" not in content
+        assert "Trattoria" in content
+
+    @patch("suggestions.views.generate_suggestions")
+    def test_hides_already_added_by_name(self, mock_generate):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        Event.objects.create(
+            trip=trip, name="Colosseo", category=Event.Category.EXPERIENCE
+        )
+        mock_generate.return_value = [
+            _grounded("experience", "  colosseo ", 1),
+            _grounded("meal", "Trattoria", 3),
+        ]
+        with self.login(user):
+            response = self.post("suggestions:generate", pk=trip.pk)
+        content = response.content.decode()
+        assert "Trattoria" in content
+        assert "No suggestions found" not in content
+        # the already-added experience card is gone
+        assert content.count('data-role="place-result"') == 1
+
+    @patch("suggestions.views.generate_suggestions")
+    def test_hides_already_added_stay_by_author(self, mock_generate):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        Stay.objects.create(name="Hotel Roma", place_id="place_Hotel Roma", author=user)
+        # a second orphaned stay without place_id, matched by name only
+        Stay.objects.create(name="Ostello Blu", author=user)
+        mock_generate.return_value = [
+            _grounded("stay", "Hotel Roma"),
+            _grounded("stay", "Ostello Blu"),
+            _grounded("meal", "Trattoria", 3),
+        ]
+        with self.login(user):
+            response = self.post("suggestions:generate", pk=trip.pk)
+        content = response.content.decode()
+        assert "Hotel Roma" not in content
+        assert "Ostello Blu" not in content
+        assert "Trattoria" in content
+
+    @patch("suggestions.views.generate_suggestions")
     def test_no_suggestions(self, mock_generate):
         user = self.make_user("user@example.com")
         trip = TripFactory(author=user)

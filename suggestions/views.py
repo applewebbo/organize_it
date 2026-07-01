@@ -34,6 +34,31 @@ _KIND_ICON = {
 }
 
 
+def _added_keys(trip, user) -> tuple[set, set]:
+    """Collect identifiers of places already present in the trip.
+
+    Events are matched within the trip; stays are orphaned (no day) when
+    accepted, so they are matched by author instead. Returns a set of
+    ``place_id`` values and a set of normalized names.
+    """
+    place_ids, names = set(), set()
+    for pid, name in Event.objects.filter(trip=trip).values_list("place_id", "name"):
+        if pid:
+            place_ids.add(pid)
+        names.add(name.strip().casefold())
+    for pid, name in Stay.objects.filter(author=user).values_list("place_id", "name"):
+        if pid:
+            place_ids.add(pid)
+        names.add(name.strip().casefold())
+    return place_ids, names
+
+
+def _is_already_added(grounded, place_ids, names) -> bool:
+    if grounded.place_id and grounded.place_id in place_ids:
+        return True
+    return grounded.suggestion.name.strip().casefold() in names
+
+
 def _to_card(grounded, add_urls) -> dict:
     suggestion = grounded.suggestion
     kind = suggestion.kind.value
@@ -121,7 +146,15 @@ def generate(request, pk):
         suggestions = generate_suggestions(
             request.user, trip, overrides, language, force_refresh
         )
-        cards = [_to_card(s, _ACCEPT_URL) for s in suggestions]
+        # Filter out suggestions already added to the trip (e.g. served from the
+        # cache after being accepted in a previous session) so they are not shown
+        # again as fresh suggestions.
+        place_ids, names = _added_keys(trip, request.user)
+        cards = [
+            _to_card(s, _ACCEPT_URL)
+            for s in suggestions
+            if not _is_already_added(s, place_ids, names)
+        ]
     except AISuggestionError as exc:
         error_kind = exc.kind
 
