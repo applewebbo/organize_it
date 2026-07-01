@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-30 21:47+0200\n"
+"POT-Creation-Date: 2026-07-01 07:43+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -759,22 +759,35 @@ msgid "Open main menu"
 msgstr ""
 
 #: templates/suggestions/map-suggestions-results.html:6
+msgid ""
+"AI suggestions are not configured yet. Add a valid API key to get started."
+msgstr ""
+
+#: templates/suggestions/map-suggestions-results.html:7
 msgid "Check your AI settings"
 msgstr ""
 
-#: templates/suggestions/map-suggestions-results.html:37
+#: templates/suggestions/map-suggestions-results.html:9
+msgid "You have reached the AI provider usage limit. Please try again later."
+msgstr ""
+
+#: templates/suggestions/map-suggestions-results.html:11
+msgid "Something went wrong while generating suggestions. Please try again."
+msgstr ""
+
+#: templates/suggestions/map-suggestions-results.html:43
 #, fuzzy
 #| msgid "Stay added to trip."
 msgid "Add to trip"
 msgstr "Stay added to trip."
 
-#: templates/suggestions/map-suggestions-results.html:51
+#: templates/suggestions/map-suggestions-results.html:57
 #: templates/trips/arrival-transfer-modal.html:23
 #: templates/trips/departure-transfer-modal.html:23
 msgid "Details"
 msgstr ""
 
-#: templates/suggestions/map-suggestions-results.html:60
+#: templates/suggestions/map-suggestions-results.html:66
 #, fuzzy
 #| msgid "No results found"
 msgid "No suggestions found"

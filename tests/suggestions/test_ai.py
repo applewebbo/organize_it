@@ -11,6 +11,14 @@ CONTEXT = TripContext(destination="Rome")
 PREFS = SuggestionPrefs()
 
 
+class _ApiError(Exception):
+    """Mimics a google-genai APIError carrying an HTTP status code."""
+
+    def __init__(self, message, code=None):
+        super().__init__(message)
+        self.code = code
+
+
 class TestGeminiProvider:
     @patch("suggestions.ai.gemini.genai.Client")
     def test_generate_success(self, mock_client_cls):
@@ -35,8 +43,33 @@ class TestGeminiProvider:
         mock_client.models.generate_content.side_effect = RuntimeError("boom")
 
         provider = GeminiProvider("api-key")
-        with pytest.raises(AISuggestionError):
+        with pytest.raises(AISuggestionError) as exc_info:
             provider.generate(CONTEXT, PREFS)
+        assert exc_info.value.kind == AISuggestionError.GENERIC
+
+    @patch("suggestions.ai.gemini.genai.Client")
+    def test_generate_classifies_quota_error(self, mock_client_cls):
+        mock_client = mock_client_cls.return_value
+        mock_client.models.generate_content.side_effect = _ApiError(
+            "429 RESOURCE_EXHAUSTED", code=429
+        )
+
+        provider = GeminiProvider("api-key")
+        with pytest.raises(AISuggestionError) as exc_info:
+            provider.generate(CONTEXT, PREFS)
+        assert exc_info.value.kind == AISuggestionError.QUOTA
+
+    @patch("suggestions.ai.gemini.genai.Client")
+    def test_generate_classifies_config_error(self, mock_client_cls):
+        mock_client = mock_client_cls.return_value
+        mock_client.models.generate_content.side_effect = _ApiError(
+            "API_KEY_INVALID", code=400
+        )
+
+        provider = GeminiProvider("api-key")
+        with pytest.raises(AISuggestionError) as exc_info:
+            provider.generate(CONTEXT, PREFS)
+        assert exc_info.value.kind == AISuggestionError.CONFIG
 
     @patch("suggestions.ai.gemini.genai.Client")
     def test_generate_raises_on_empty(self, mock_client_cls):
@@ -44,8 +77,9 @@ class TestGeminiProvider:
         mock_client.models.generate_content.return_value = MagicMock(parsed=None)
 
         provider = GeminiProvider("api-key")
-        with pytest.raises(AISuggestionError):
+        with pytest.raises(AISuggestionError) as exc_info:
             provider.generate(CONTEXT, PREFS)
+        assert exc_info.value.kind == AISuggestionError.GENERIC
 
 
 class TestFactory:

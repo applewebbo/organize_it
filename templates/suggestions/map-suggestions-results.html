@@ -1,9 +1,15 @@
 {% load i18n l10n %}
-{% if error %}
+{% if error_kind %}
     <div class="m-3 alert alert-warning alert-soft">
         <div>
-            <p>{{ error }}</p>
-            <a href="{% url 'accounts:profile' %}" class="link link-primary">{% trans "Check your AI settings" %}</a>
+            {% if error_kind == 'config' %}
+                <p>{% trans "AI suggestions are not configured yet. Add a valid API key to get started." %}</p>
+                <a href="{% url 'accounts:profile' %}" class="link link-primary">{% trans "Check your AI settings" %}</a>
+            {% elif error_kind == 'quota' %}
+                <p>{% trans "You have reached the AI provider usage limit. Please try again later." %}</p>
+            {% else %}
+                <p>{% trans "Something went wrong while generating suggestions. Please try again." %}</p>
+            {% endif %}
         </div>
     </div>
 {% elif cards %}

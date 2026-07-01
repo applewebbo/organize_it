@@ -120,14 +120,14 @@ def generate(request, pk):
 
     add_urls = _MODAL_ADD_URL if is_modal else _MAP_ADD_URL
     cards = []
-    error = None
+    error_kind = None
     try:
         suggestions = generate_suggestions(
             request.user, trip, overrides, language, force_refresh
         )
         cards = [_to_card(s, add_urls) for s in suggestions]
     except AISuggestionError as exc:
-        error = str(exc)
+        error_kind = exc.kind
 
     return TemplateResponse(
         request,
@@ -135,7 +135,7 @@ def generate(request, pk):
         {
             "trip": trip,
             "cards": cards,
-            "error": error,
+            "error_kind": error_kind,
             "is_modal": is_modal,
             "add_target": "" if is_modal else "#events-panel",
             "add_swap": "outerHTML" if is_modal else "innerHTML",

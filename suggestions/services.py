@@ -139,7 +139,9 @@ def generate_suggestions(
     """
     credentials = AICredentials.objects.filter(user=user).first()
     if credentials is None or not credentials.api_key_encrypted:
-        raise AISuggestionError("No AI credentials configured")
+        raise AISuggestionError(
+            "No AI credentials configured", kind=AISuggestionError.CONFIG
+        )
 
     context = build_trip_context(trip, language=language)
     preferences = merge_preferences(

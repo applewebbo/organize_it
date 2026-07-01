@@ -74,16 +74,44 @@ class TestGenerateView(TestCase):
         assert args[2] == {"notes": "with kids"}
 
     @patch("suggestions.views.generate_suggestions")
-    def test_handles_error(self, mock_generate):
+    def test_config_error_shows_settings_link(self, mock_generate):
         user = self.make_user("user@example.com")
         trip = TripFactory(author=user)
-        mock_generate.side_effect = AISuggestionError("No AI credentials configured")
+        mock_generate.side_effect = AISuggestionError(
+            "boom", kind=AISuggestionError.CONFIG
+        )
         with self.login(user):
             response = self.post("suggestions:generate", pk=trip.pk)
         self.response_200(response)
         content = response.content.decode()
-        assert "No AI credentials configured" in content
         assert "/accounts/profile/" in content
+        assert "not configured" in content
+
+    @patch("suggestions.views.generate_suggestions")
+    def test_quota_error_message(self, mock_generate):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        mock_generate.side_effect = AISuggestionError(
+            "429", kind=AISuggestionError.QUOTA
+        )
+        with self.login(user):
+            response = self.post("suggestions:generate", pk=trip.pk)
+        self.response_200(response)
+        content = response.content.decode()
+        assert "usage limit" in content
+        assert "/accounts/profile/" not in content
+
+    @patch("suggestions.views.generate_suggestions")
+    def test_generic_error_message(self, mock_generate):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        mock_generate.side_effect = AISuggestionError("boom")
+        with self.login(user):
+            response = self.post("suggestions:generate", pk=trip.pk)
+        self.response_200(response)
+        content = response.content.decode()
+        assert "Something went wrong" in content
+        assert "/accounts/profile/" not in content
 
     @patch("suggestions.views.generate_suggestions")
     def test_no_suggestions(self, mock_generate):
