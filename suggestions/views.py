@@ -11,7 +11,7 @@ from suggestions.models import AICredentials, SuggestionPreferences
 from suggestions.services import generate_suggestions, get_cached_suggestions
 from trips.models import Event, Stay, Trip
 from trips.services import GooglePlacesClient, GooglePlacesError
-from trips.utils import accessible_trips_qs
+from trips.utils import accessible_trips_qs, get_trip_stages
 from trips.views.maps import _build_map_events_context
 
 # Both the desktop map panel and the mobile modal accept a suggestion through
@@ -143,6 +143,7 @@ def generate(request, pk):
     trip = _get_accessible_trip(request, pk)
     is_modal = request.POST.get("context") == "modal"
     force_refresh = bool(request.POST.get("refresh"))
+    stage = request.POST.get("stage_destination", "").strip() or None
 
     overrides = {}
     notes = request.POST.get("notes", "").strip()
@@ -154,7 +155,7 @@ def generate(request, pk):
     error_kind = None
     try:
         suggestions = generate_suggestions(
-            request.user, trip, overrides, language, force_refresh
+            request.user, trip, overrides, language, force_refresh, stage
         )
         # Filter out suggestions already added to the trip (e.g. served from the
         # cache after being accepted in a previous session) so they are not shown
@@ -217,10 +218,17 @@ def suggestion_modal(request, pk):
     language = get_profile(request.user).language
     suggestions = get_cached_suggestions(request.user, trip, language=language)
     cards = _build_visible_cards(trip, request.user, suggestions or [])
+    stages = get_trip_stages(trip)
     return TemplateResponse(
         request,
         "suggestions/suggestion-modal.html",
-        {"trip": trip, "cards": cards, "has_cache": suggestions is not None},
+        {
+            "trip": trip,
+            "cards": cards,
+            "has_cache": suggestions is not None,
+            "stages": stages,
+            "has_custom_stages": any(not s["is_main"] for s in stages),
+        },
     )
 
 

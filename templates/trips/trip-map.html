@@ -86,6 +86,13 @@
                                   hx-indicator="#ai-spinner"
                                   hx-disabled-elt="button[type='submit']">
                                 {% csrf_token %}
+                                {% if has_custom_stages %}
+                                    <select name="stage_destination"
+                                            class="mb-2 w-full select select-sm select-bordered">
+                                        <option value="">{% trans '— all stages —' %}</option>
+                                        {% for stage in stages %}<option value="{{ stage.destination }}">{{ stage.destination }}</option>{% endfor %}
+                                    </select>
+                                {% endif %}
                                 <input type="text"
                                        name="notes"
                                        placeholder="{% trans 'Notes for this trip (optional)…' %}"

@@ -18,14 +18,41 @@ _GROUNDING_RADIUS = 50000
 _CACHE_TTL = 24 * 3600
 
 
-def _cache_key(trip: Trip, preferences: SuggestionPrefs, language: str) -> str:
+def _cache_key(
+    trip: Trip,
+    preferences: SuggestionPrefs,
+    language: str,
+    stage: str | None = None,
+) -> str:
     payload = json.dumps(
-        {"trip": trip.pk, "lang": language, "prefs": preferences.model_dump()},
+        {
+            "trip": trip.pk,
+            "lang": language,
+            "prefs": preferences.model_dump(),
+            "stage": stage,
+        },
         sort_keys=True,
         default=str,
     )
     digest = hashlib.sha256(payload.encode()).hexdigest()[:16]
     return f"ai_sugg:{trip.pk}:{digest}"
+
+
+def _apply_stage(context: TripContext, trip: Trip, stage: str) -> None:
+    """Scope the context to a single stage: use its name as the destination and
+    centre the location bias on the stage's days."""
+    context.destination = stage
+    coords = list(
+        trip.days.filter(destination=stage)
+        .exclude(destination_latitude=None)
+        .values_list("destination_latitude", "destination_longitude")
+    )
+    if coords:
+        context.latitude = sum(c[0] for c in coords) / len(coords)
+        context.longitude = sum(c[1] for c in coords) / len(coords)
+    else:
+        context.latitude = None
+        context.longitude = None
 
 
 @dataclass
@@ -129,6 +156,7 @@ def generate_suggestions(
     overrides: dict | None = None,
     language: str = "en",
     force_refresh: bool = False,
+    stage: str | None = None,
 ) -> list[GroundedSuggestion]:
     """Full orchestration: provider call + validation + Google Places grounding.
 
@@ -145,11 +173,13 @@ def generate_suggestions(
         )
 
     context = build_trip_context(trip, language=language)
+    if stage:
+        _apply_stage(context, trip, stage)
     preferences = merge_preferences(
         SuggestionPreferences.objects.filter(user=user).first(), overrides
     )
 
-    key = _cache_key(trip, preferences, language)
+    key = _cache_key(trip, preferences, language, stage)
     if not force_refresh:
         cached = cache.get(key)
         if cached is not None:
@@ -176,6 +206,7 @@ def get_cached_suggestions(
     trip: Trip,
     overrides: dict | None = None,
     language: str = "en",
+    stage: str | None = None,
 ) -> list[GroundedSuggestion] | None:
     """Return cached suggestions for this trip + preferences, or None.
 
@@ -186,5 +217,5 @@ def get_cached_suggestions(
     preferences = merge_preferences(
         SuggestionPreferences.objects.filter(user=user).first(), overrides
     )
-    key = _cache_key(trip, preferences, language)
+    key = _cache_key(trip, preferences, language, stage)
     return cache.get(key)

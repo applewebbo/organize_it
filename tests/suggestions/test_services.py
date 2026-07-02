@@ -213,6 +213,49 @@ class TestGenerateSuggestions:
         assert mock_client.return_value.search_text.call_count == 2
         assert len(results) == 2
 
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_stage_scopes_destination_and_bias(self, mock_get_provider, mock_client):
+        from trips.models import Day
+
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        Day.objects.filter(trip=trip).update(
+            destination="Firenze",
+            destination_latitude=43.77,
+            destination_longitude=11.25,
+        )
+        provider = self._provider_returning(
+            [Suggestion(kind="experience", name="Uffizi", type=1)]
+        )
+        mock_get_provider.return_value = provider
+        mock_client.return_value.search_text.return_value = [PLACE]
+
+        generate_suggestions(creds.user, trip, stage="Firenze")
+
+        context = provider.generate.call_args.args[0]
+        assert context.destination == "Firenze"
+        assert context.latitude == 43.77
+        _, kwargs = mock_client.return_value.search_text.call_args
+        assert kwargs["location_bias"] == (43.77, 11.25, 50000)
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_stage_uses_separate_cache_key(self, mock_get_provider, mock_client):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        provider = self._provider_returning(
+            [Suggestion(kind="experience", name="X", type=1)]
+        )
+        mock_get_provider.return_value = provider
+        mock_client.return_value.search_text.return_value = [PLACE]
+
+        generate_suggestions(creds.user, trip)
+        generate_suggestions(creds.user, trip, stage="Firenze")
+
+        # a stage-scoped request is cached under a different key
+        assert provider.generate.call_count == 2
+
 
 class TestGetCachedSuggestions:
     def test_returns_none_when_nothing_cached(self):

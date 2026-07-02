@@ -74,6 +74,19 @@ class TestGenerateView(TestCase):
         assert args[2] == {"notes": "with kids"}
 
     @patch("suggestions.views.generate_suggestions")
+    def test_forwards_stage(self, mock_generate):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        mock_generate.return_value = []
+        with self.login(user):
+            self.post(
+                "suggestions:generate",
+                pk=trip.pk,
+                data={"stage_destination": "Firenze"},
+            )
+        assert mock_generate.call_args.args[5] == "Firenze"
+
+    @patch("suggestions.views.generate_suggestions")
     def test_config_error_shows_settings_link(self, mock_generate):
         user = self.make_user("user@example.com")
         trip = TripFactory(author=user)
@@ -321,6 +334,19 @@ class TestModalView(TestCase):
             response = self.get("suggestions:modal", pk=trip.pk)
         self.response_200(response)
         assert "Colosseo" in response.content.decode()
+
+    def test_modal_shows_stage_selector_for_multistage(self):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        from trips.models import Day, Trip
+
+        Trip.objects.filter(pk=trip.pk).update(destination="Roma")
+        # give the last day a different destination to form a custom stage
+        last_day = trip.days.order_by("number").last()
+        Day.objects.filter(pk=last_day.pk).update(destination="Firenze")
+        with self.login(user):
+            response = self.get("suggestions:modal", pk=trip.pk)
+        assert 'name="stage_destination"' in response.content.decode()
 
     @patch("suggestions.views.get_cached_suggestions")
     def test_modal_without_cache_shows_prompt(self, mock_cached):

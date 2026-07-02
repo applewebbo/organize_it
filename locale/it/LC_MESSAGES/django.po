@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-02 07:56+0200\n"
+"POT-Creation-Date: 2026-07-02 09:12+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -151,8 +151,16 @@ msgstr "Ritmo"
 msgid "Budget"
 msgstr "Budget"
 
+#, fuzzy
+#| msgid "Your last suggestions"
+msgid "Number of suggestions"
+msgstr "I tuoi ultimi suggerimenti"
+
 msgid "Notes"
 msgstr "Note"
+
+msgid "How many suggestions to request per generation."
+msgstr ""
 
 msgid "e.g. avoid tourist traps, travelling with kids"
 msgstr "es. evitare le trappole per turisti, in viaggio con bambini"
@@ -604,6 +612,15 @@ msgstr "Chiudi"
 msgid "Open main menu"
 msgstr "Apri il menu principale"
 
+msgid "Regenerate"
+msgstr "Rigenera"
+
+msgid "Generate"
+msgstr "Genera"
+
+msgid "Generating uses your AI provider quota."
+msgstr "La generazione consuma la quota del tuo provider AI."
+
 msgid ""
 "AI suggestions are not configured yet. Add a valid API key to get started."
 msgstr ""
@@ -654,17 +671,11 @@ msgstr "Sito Internet"
 msgid "No extra details available."
 msgstr "Nessun dettaglio aggiuntivo disponibile."
 
+msgid "— all stages —"
+msgstr "— tutte le tappe —"
+
 msgid "Notes for this trip (optional)…"
 msgstr "Note per questo viaggio (facoltativo)…"
-
-msgid "Regenerate"
-msgstr "Rigenera"
-
-msgid "Generate"
-msgstr "Genera"
-
-msgid "Generating uses your AI provider quota."
-msgstr "La generazione consuma la quota del tuo provider AI."
 
 msgid "Add Arrival Transfer"
 msgstr "Aggiungi trasferimento di andata"
@@ -1720,9 +1731,6 @@ msgstr "Vedi"
 
 msgid "Back to events"
 msgstr "Torna agli eventi"
-
-msgid "— all stages —"
-msgstr "— tutte le tappe —"
 
 msgid "Search a place…"
 msgstr "Cerca un luogo…"
