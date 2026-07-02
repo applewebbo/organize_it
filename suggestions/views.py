@@ -8,7 +8,7 @@ from accounts.models import get_profile
 from suggestions.ai.base import AISuggestionError
 from suggestions.forms import AICredentialsForm, SuggestionPreferencesForm
 from suggestions.models import AICredentials, SuggestionPreferences
-from suggestions.services import generate_suggestions
+from suggestions.services import generate_suggestions, get_cached_suggestions
 from trips.models import Event, Stay, Trip
 from trips.services import GooglePlacesClient, GooglePlacesError
 from trips.utils import accessible_trips_qs
@@ -57,6 +57,16 @@ def _is_already_added(grounded, place_ids, names) -> bool:
     if grounded.place_id and grounded.place_id in place_ids:
         return True
     return grounded.suggestion.name.strip().casefold() in names
+
+
+def _build_visible_cards(trip, user, suggestions) -> list[dict]:
+    """Turn grounded suggestions into cards, dropping ones already in the trip."""
+    place_ids, names = _added_keys(trip, user)
+    return [
+        _to_card(s, _ACCEPT_URL)
+        for s in suggestions
+        if not _is_already_added(s, place_ids, names)
+    ]
 
 
 def _to_card(grounded, add_urls) -> dict:
@@ -149,12 +159,7 @@ def generate(request, pk):
         # Filter out suggestions already added to the trip (e.g. served from the
         # cache after being accepted in a previous session) so they are not shown
         # again as fresh suggestions.
-        place_ids, names = _added_keys(trip, request.user)
-        cards = [
-            _to_card(s, _ACCEPT_URL)
-            for s in suggestions
-            if not _is_already_added(s, place_ids, names)
-        ]
+        cards = _build_visible_cards(trip, request.user, suggestions)
     except AISuggestionError as exc:
         error_kind = exc.kind
 
@@ -166,6 +171,36 @@ def generate(request, pk):
             "cards": cards,
             "error_kind": error_kind,
             "is_modal": is_modal,
+            # A successful generation populated the cache, so the map button
+            # becomes "Regenerate"; on error it stays "Generate".
+            "has_cache": error_kind is None,
+        },
+    )
+
+
+@login_required
+@require_GET
+def cached(request, pk):
+    """HTMX: render the last cached suggestions without spending quota.
+
+    Powers "show my last results" when the map AI tab is activated or the
+    modal is reopened; falls back to a prompt inviting the user to generate.
+    """
+    trip = _get_accessible_trip(request, pk)
+    language = get_profile(request.user).language
+    suggestions = get_cached_suggestions(request.user, trip, language=language)
+    cards = _build_visible_cards(trip, request.user, suggestions or [])
+    return TemplateResponse(
+        request,
+        "suggestions/map-suggestions-results.html",
+        {
+            "trip": trip,
+            "cards": cards,
+            "error_kind": None,
+            "is_modal": request.GET.get("context") == "modal",
+            "from_cache": True,
+            "awaiting_generation": suggestions is None,
+            "has_cache": suggestions is not None,
         },
     )
 
@@ -173,10 +208,19 @@ def generate(request, pk):
 @login_required
 @require_GET
 def suggestion_modal(request, pk):
-    """HTMX: render the AI suggestions modal shell (mobile entry point)."""
+    """HTMX: render the AI suggestions modal shell (mobile entry point).
+
+    Pre-populates the results with the last cached suggestions (if any) so
+    reopening the modal shows them without spending quota.
+    """
     trip = _get_accessible_trip(request, pk)
+    language = get_profile(request.user).language
+    suggestions = get_cached_suggestions(request.user, trip, language=language)
+    cards = _build_visible_cards(trip, request.user, suggestions or [])
     return TemplateResponse(
-        request, "suggestions/suggestion-modal.html", {"trip": trip}
+        request,
+        "suggestions/suggestion-modal.html",
+        {"trip": trip, "cards": cards, "has_cache": suggestions is not None},
     )
 
 

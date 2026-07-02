@@ -182,6 +182,74 @@ class TestGenerateView(TestCase):
         assert "No suggestions found" in response.content.decode()
 
 
+class TestCachedView(TestCase):
+    def test_requires_login(self):
+        trip = TripFactory()
+        response = self.get("suggestions:cached", pk=trip.pk)
+        self.response_302(response)
+
+    def test_other_user_forbidden(self):
+        owner = self.make_user("owner@example.com")
+        other = self.make_user("other@example.com")
+        trip = TripFactory(author=owner)
+        with self.login(other):
+            response = self.get("suggestions:cached", pk=trip.pk)
+        self.response_404(response)
+
+    @patch("suggestions.views.get_cached_suggestions")
+    def test_no_cache_shows_generate_prompt(self, mock_cached):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        mock_cached.return_value = None
+        with self.login(user):
+            response = self.get("suggestions:cached", pk=trip.pk)
+        self.response_200(response)
+        content = response.content.decode()
+        assert "Generate suggestions" in content
+        assert "No suggestions found" not in content
+
+    @patch("suggestions.views.get_cached_suggestions")
+    def test_renders_cached_cards(self, mock_cached):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        mock_cached.return_value = [_grounded("experience", "Colosseo", 1)]
+        with self.login(user):
+            response = self.get("suggestions:cached", pk=trip.pk)
+        self.response_200(response)
+        assert "Colosseo" in response.content.decode()
+
+    @patch("suggestions.views.get_cached_suggestions")
+    def test_cached_hides_already_added(self, mock_cached):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        Event.objects.create(
+            trip=trip, name="Colosseo", category=Event.Category.EXPERIENCE
+        )
+        mock_cached.return_value = [
+            _grounded("experience", "Colosseo", 1),
+            _grounded("meal", "Trattoria", 3),
+        ]
+        with self.login(user):
+            response = self.get("suggestions:cached", pk=trip.pk)
+        content = response.content.decode()
+        assert "Colosseo" not in content
+        assert "Trattoria" in content
+
+    @patch("suggestions.views.get_cached_suggestions")
+    def test_cached_modal_context_uses_accept_endpoints(self, mock_cached):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        mock_cached.return_value = [_grounded("experience", "Colosseo", 1)]
+        with self.login(user):
+            response = self.get(
+                "suggestions:cached", pk=trip.pk, data={"context": "modal"}
+            )
+        assert (
+            f"/suggestions/trip/{trip.pk}/accept/experience/"
+            in response.content.decode()
+        )
+
+
 class TestDetailsView(TestCase):
     @patch("suggestions.views.GooglePlacesClient")
     def test_returns_place_details(self, mock_client):
@@ -243,6 +311,26 @@ class TestModalView(TestCase):
         with self.login(other):
             response = self.get("suggestions:modal", pk=trip.pk)
         self.response_404(response)
+
+    @patch("suggestions.views.get_cached_suggestions")
+    def test_modal_shows_cached_on_open(self, mock_cached):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        mock_cached.return_value = [_grounded("experience", "Colosseo", 1)]
+        with self.login(user):
+            response = self.get("suggestions:modal", pk=trip.pk)
+        self.response_200(response)
+        assert "Colosseo" in response.content.decode()
+
+    @patch("suggestions.views.get_cached_suggestions")
+    def test_modal_without_cache_shows_prompt(self, mock_cached):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        mock_cached.return_value = None
+        with self.login(user):
+            response = self.get("suggestions:modal", pk=trip.pk)
+        self.response_200(response)
+        assert "Generate suggestions" in response.content.decode()
 
     @patch("suggestions.views.generate_suggestions")
     def test_generate_modal_uses_accept_endpoints(self, mock_generate):

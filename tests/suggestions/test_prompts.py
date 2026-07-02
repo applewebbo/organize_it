@@ -36,3 +36,9 @@ class TestBuildPrompt:
         assert "Dates:" not in prompt
         assert "Favoured experience type ids:" not in prompt
         assert "Extra notes:" not in prompt
+
+    def test_requests_the_configured_result_count(self):
+        prompt = build_prompt(
+            TripContext(destination="Rome"), SuggestionPrefs(result_count=11)
+        )
+        assert "about 11 suggestions" in prompt

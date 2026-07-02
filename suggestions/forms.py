@@ -1,7 +1,12 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from suggestions.models import AICredentials, SuggestionPreferences
+from suggestions.models import (
+    MAX_RESULT_COUNT,
+    MIN_RESULT_COUNT,
+    AICredentials,
+    SuggestionPreferences,
+)
 from trips.models import Experience
 
 
@@ -45,17 +50,35 @@ class SuggestionPreferencesForm(forms.ModelForm):
 
     class Meta:
         model = SuggestionPreferences
-        fields = ("favored_experience_types", "dietary", "pace", "budget", "notes")
+        fields = (
+            "favored_experience_types",
+            "dietary",
+            "pace",
+            "budget",
+            "result_count",
+            "notes",
+        )
         labels = {
             "dietary": _("Dietary preference"),
             "pace": _("Pace"),
             "budget": _("Budget"),
+            "result_count": _("Number of suggestions"),
             "notes": _("Notes"),
+        }
+        help_texts = {
+            "result_count": _("How many suggestions to request per generation."),
         }
         widgets = {
             "dietary": forms.Select(attrs={"class": "select select-bordered w-full"}),
             "pace": forms.Select(attrs={"class": "select select-bordered w-full"}),
             "budget": forms.Select(attrs={"class": "select select-bordered w-full"}),
+            "result_count": forms.NumberInput(
+                attrs={
+                    "class": "input input-bordered w-full",
+                    "min": MIN_RESULT_COUNT,
+                    "max": MAX_RESULT_COUNT,
+                }
+            ),
             "notes": forms.Textarea(
                 attrs={
                     "class": "w-full textarea textarea-bordered",

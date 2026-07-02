@@ -70,6 +70,7 @@ def merge_preferences(
             pace=defaults.pace,
             budget=defaults.budget,
             notes=defaults.notes,
+            result_count=defaults.result_count,
         )
 
     for field in ("favored_experience_types", "dietary", "pace", "budget"):
@@ -159,10 +160,31 @@ def generate_suggestions(
 
     client = GooglePlacesClient()
     grounded = []
-    for suggestion in suggestions:
+    # Cap the number we try to ground so a verbose model response cannot trigger
+    # an unbounded number of Google Places calls.
+    for suggestion in suggestions[: preferences.result_count]:
         result = _ground(suggestion, context, client)
         if result is not None:
             grounded.append(result)
 
     cache.set(key, grounded, _CACHE_TTL)
     return grounded
+
+
+def get_cached_suggestions(
+    user,
+    trip: Trip,
+    overrides: dict | None = None,
+    language: str = "en",
+) -> list[GroundedSuggestion] | None:
+    """Return cached suggestions for this trip + preferences, or None.
+
+    Peeks the cache without ever calling the AI provider, so it spends no
+    quota. Used to re-show the last generated results when the panel/modal is
+    reopened.
+    """
+    preferences = merge_preferences(
+        SuggestionPreferences.objects.filter(user=user).first(), overrides
+    )
+    key = _cache_key(trip, preferences, language)
+    return cache.get(key)

@@ -20,22 +20,28 @@
                autocomplete="off"
                class="mb-2 w-full input input-sm input-bordered" />
         <div class="flex gap-2">
-            <button type="submit" class="flex-1 btn btn-sm btn-secondary">
-                <i class="ph-bold ph-sparkle i-sm htmx-hide-on-request"></i>
-                <span id="ai-modal-spinner"
-                      class="loading loading-spinner loading-xs htmx-indicator"></span>
-                {% trans 'Generate' %}
-            </button>
-            <button type="submit" name="refresh" value="1" class="btn btn-sm btn-outline">
-                <i class="ph-bold ph-arrows-clockwise i-sm"></i>
-                {% trans 'Regenerate' %}
-            </button>
+            {% if has_cache %}
+                <button type="submit"
+                        name="refresh"
+                        value="1"
+                        class="flex-1 btn btn-sm btn-secondary">
+                    <i class="ph-bold ph-arrows-clockwise i-sm htmx-hide-on-request"></i>
+                    <span id="ai-modal-spinner"
+                          class="loading loading-spinner loading-xs htmx-indicator"></span>
+                    {% trans 'Regenerate' %}
+                </button>
+            {% else %}
+                <button type="submit" class="flex-1 btn btn-sm btn-secondary">
+                    <i class="ph-bold ph-sparkle i-sm htmx-hide-on-request"></i>
+                    <span id="ai-modal-spinner"
+                          class="loading loading-spinner loading-xs htmx-indicator"></span>
+                    {% trans 'Generate' %}
+                </button>
+            {% endif %}
         </div>
+        <p class="mt-1 text-xs text-base-content/50">{% trans 'Generating uses your AI provider quota.' %}</p>
     </form>
     <div id="ai-modal-results" class="overflow-y-auto mt-4 max-h-96">
-        <div class="py-8 text-center text-base-content/50">
-            <i class="mb-2 ph-bold ph-sparkle i-lg"></i>
-            <p>{% trans 'Generate suggestions for your trip' %}</p>
-        </div>
+        {% include "suggestions/map-suggestions-results.html" with cards=cards is_modal=True from_cache=has_cache awaiting_generation=has_cache|yesno:",True" %}
     </div>
 </div>

@@ -64,3 +64,4 @@ class SuggestionPrefs(BaseModel):
     pace: str = "moderate"
     budget: str = "medium"
     notes: str = ""
+    result_count: int = 8

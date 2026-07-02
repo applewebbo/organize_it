@@ -11,6 +11,7 @@ BASE_DATA = {
     "dietary": "none",
     "pace": "moderate",
     "budget": "medium",
+    "result_count": 8,
 }
 
 

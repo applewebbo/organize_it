@@ -1,0 +1,22 @@
+{% load i18n %}
+<div class="flex gap-2">
+    {% if has_cache %}
+        <button type="submit"
+                name="refresh"
+                value="1"
+                class="flex-1 btn btn-sm btn-secondary">
+            <i class="ph-bold ph-arrows-clockwise i-sm htmx-hide-on-request"></i>
+            <span id="ai-spinner"
+                  class="loading loading-spinner loading-xs htmx-indicator"></span>
+            {% trans 'Regenerate' %}
+        </button>
+    {% else %}
+        <button type="submit" class="flex-1 btn btn-sm btn-secondary">
+            <i class="ph-bold ph-sparkle i-sm htmx-hide-on-request"></i>
+            <span id="ai-spinner"
+                  class="loading loading-spinner loading-xs htmx-indicator"></span>
+            {% trans 'Generate' %}
+        </button>
+    {% endif %}
+</div>
+<p class="mt-1 text-xs text-base-content/50">{% trans 'Generating uses your AI provider quota.' %}</p>

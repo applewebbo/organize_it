@@ -1,8 +1,14 @@
 from django.conf import settings
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from suggestions.fields import EncryptedTextField
+
+# Bounds for the per-user number of suggestions requested per generation.
+MIN_RESULT_COUNT = 3
+MAX_RESULT_COUNT = 15
+DEFAULT_RESULT_COUNT = 8
 
 
 class AICredentials(models.Model):
@@ -75,6 +81,13 @@ class SuggestionPreferences(models.Model):
         default=Budget.MEDIUM,
     )
     notes = models.TextField(blank=True)
+    result_count = models.PositiveSmallIntegerField(
+        default=DEFAULT_RESULT_COUNT,
+        validators=[
+            MinValueValidator(MIN_RESULT_COUNT),
+            MaxValueValidator(MAX_RESULT_COUNT),
+        ],
+    )
 
     class Meta:
         verbose_name = _("Suggestion preferences")

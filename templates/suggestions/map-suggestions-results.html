@@ -1,4 +1,8 @@
 {% load i18n l10n %}
+{% if not is_modal %}
+    {# Keep the map AI-tab buttons in sync with cache state (Generate vs Regenerate). #}
+    <div id="ai-generate-actions" hx-swap-oob="true">{% include "suggestions/ai-map-actions.html" %}</div>
+{% endif %}
 {% if error_kind %}
     <div class="m-3 alert alert-warning alert-soft">
         <div>
@@ -13,6 +17,12 @@
         </div>
     </div>
 {% elif cards %}
+    {% if from_cache %}
+        <p class="flex gap-1 items-center mb-2 text-xs text-base-content/50">
+            <i class="ph-bold ph-clock-counter-clockwise i-xs"></i>
+            {% trans 'Your last suggestions' %}
+        </p>
+    {% endif %}
     <ul class="space-y-2">
         {% for card in cards %}
             <li data-role="place-result"
@@ -63,6 +73,11 @@
             </li>
         {% endfor %}
     </ul>
+{% elif awaiting_generation %}
+    <div class="py-8 text-center text-base-content/50">
+        <i class="mb-2 ph-bold ph-sparkle i-lg"></i>
+        <p>{% trans 'Generate suggestions for your trip' %}</p>
+    </div>
 {% else %}
     <div class="py-8 text-center text-base-content/50">
         <i class="mb-2 ph-bold ph-sparkle i-lg"></i>

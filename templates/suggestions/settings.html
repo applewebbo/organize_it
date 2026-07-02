@@ -64,6 +64,15 @@
             </div>
         </div>
         <div class="mb-4">
+            <label for="{{ preferences_form.result_count.id_for_label }}"
+                   class="block mb-2 font-medium">{{ preferences_form.result_count.label }}</label>
+            {{ preferences_form.result_count }}
+            <p class="mt-1 text-xs italic text-base-content/50">{{ preferences_form.result_count.help_text }}</p>
+            {% if preferences_form.result_count.errors %}
+                <div class="mt-1 text-sm text-error">{{ preferences_form.result_count.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="mb-4">
             <label for="{{ preferences_form.notes.id_for_label }}"
                    class="block mb-2 font-medium">{{ preferences_form.notes.label }}</label>
             {{ preferences_form.notes }}

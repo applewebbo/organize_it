@@ -16,6 +16,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
 from accounts.models import get_profile
+from suggestions.services import get_cached_suggestions
 from trips.models import Day, Event, MainTransfer, Stay, Trip
 from trips.services import GooglePlacesClient, GooglePlacesError
 from trips.utils import (
@@ -116,6 +117,10 @@ def trip_map(request, pk):
     days_with_events, unassigned_events = _build_map_events_context(trip)
     map_items = _build_map_json(days_with_events, unassigned_events)
     stages = get_trip_stages(trip)
+    language = get_profile(request.user).language
+    has_cache = (
+        get_cached_suggestions(request.user, trip, language=language) is not None
+    )
     return TemplateResponse(
         request,
         "trips/trip-map.html",
@@ -126,6 +131,7 @@ def trip_map(request, pk):
             "map_items_json": json.dumps(map_items),
             "stages": stages,
             "has_custom_stages": any(not s["is_main"] for s in stages),
+            "has_cache": has_cache,
         },
     )
 

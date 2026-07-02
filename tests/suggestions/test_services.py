@@ -8,6 +8,7 @@ from suggestions.services import (
     GroundedSuggestion,
     build_trip_context,
     generate_suggestions,
+    get_cached_suggestions,
     merge_preferences,
 )
 from tests.suggestions.factories import (
@@ -70,6 +71,11 @@ class TestMergePreferences:
     def test_extra_notes_without_defaults(self):
         prefs = merge_preferences(None, {"notes": "with kids"})
         assert prefs.notes == "with kids"
+
+    def test_uses_user_result_count(self):
+        defaults = SuggestionPreferencesFactory.build(result_count=12)
+        prefs = merge_preferences(defaults, None)
+        assert prefs.result_count == 12
 
 
 class TestGenerateSuggestions:
@@ -188,3 +194,50 @@ class TestGenerateSuggestions:
         generate_suggestions(creds.user, trip, force_refresh=True)
 
         assert provider.generate.call_count == 2
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_caps_grounding_to_result_count(self, mock_get_provider, mock_client):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        SuggestionPreferencesFactory(user=creds.user, result_count=2)
+        trip = TripFactory(author=creds.user)
+        provider = self._provider_returning(
+            [Suggestion(kind="experience", name=f"X{i}", type=1) for i in range(5)]
+        )
+        mock_get_provider.return_value = provider
+        mock_client.return_value.search_text.return_value = [PLACE]
+
+        results = generate_suggestions(creds.user, trip)
+
+        # only result_count suggestions are grounded (one Places call each)
+        assert mock_client.return_value.search_text.call_count == 2
+        assert len(results) == 2
+
+
+class TestGetCachedSuggestions:
+    def test_returns_none_when_nothing_cached(self):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        assert get_cached_suggestions(creds.user, trip) is None
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_returns_cached_without_calling_provider(
+        self, mock_get_provider, mock_client
+    ):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        provider = MagicMock()
+        provider.generate.return_value = [
+            Suggestion(kind="experience", name="X", type=1)
+        ]
+        mock_get_provider.return_value = provider
+        mock_client.return_value.search_text.return_value = [PLACE]
+
+        generate_suggestions(creds.user, trip)
+        cached = get_cached_suggestions(creds.user, trip)
+
+        assert cached is not None
+        assert len(cached) == 1
+        # peeking the cache does not spend quota
+        assert provider.generate.call_count == 1

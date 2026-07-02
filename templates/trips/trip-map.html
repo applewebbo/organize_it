@@ -37,6 +37,9 @@
                                role="tab"
                                class="tab"
                                aria-label="{% trans 'Search' %}"
+                               hx-get="{% url 'trips:map-search' trip.pk %}"
+                               hx-target="#search-results-panel"
+                               hx-swap="innerHTML"
                                checked />
                         <div role="tabpanel" class="pt-3 tab-content">
                             <form hx-post="{% url 'trips:map-search' trip.pk %}"
@@ -72,7 +75,10 @@
                                name="map_panel_tab"
                                role="tab"
                                class="tab"
-                               aria-label="{% trans 'AI suggestions' %}" />
+                               aria-label="{% trans 'AI suggestions' %}"
+                               hx-get="{% url 'suggestions:cached' trip.pk %}"
+                               hx-target="#search-results-panel"
+                               hx-swap="innerHTML" />
                         <div role="tabpanel" class="pt-3 tab-content">
                             <form hx-post="{% url 'suggestions:generate' trip.pk %}"
                                   hx-target="#search-results-panel"
@@ -85,21 +91,7 @@
                                        placeholder="{% trans 'Notes for this trip (optional)…' %}"
                                        autocomplete="off"
                                        class="mb-2 w-full input input-sm input-bordered" />
-                                <div class="flex gap-2">
-                                    <button type="submit" class="flex-1 btn btn-sm btn-secondary">
-                                        <i class="ph-bold ph-sparkle i-sm htmx-hide-on-request"></i>
-                                        <span id="ai-spinner"
-                                              class="loading loading-spinner loading-xs htmx-indicator"></span>
-                                        {% trans 'Generate' %}
-                                    </button>
-                                    <button type="submit"
-                                            name="refresh"
-                                            value="1"
-                                            class="btn btn-sm btn-outline"
-                                            title="{% trans 'Regenerate' %}">
-                                        <i class="ph-bold ph-arrows-clockwise i-sm"></i>
-                                    </button>
-                                </div>
+                                <div id="ai-generate-actions">{% include "suggestions/ai-map-actions.html" %}</div>
                             </form>
                         </div>
                     </div>

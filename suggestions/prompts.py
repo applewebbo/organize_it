@@ -43,6 +43,10 @@ def build_prompt(context: TripContext, prefs: SuggestionPrefs) -> str:
         lines.append(f"Extra notes: {prefs.notes}")
     lines.append("")
     lines.append(
+        f"Propose about {prefs.result_count} suggestions in total, spanning "
+        "experiences, meals and stays."
+    )
+    lines.append(
         "For each suggestion provide a real name and a precise postal address "
         "so it can be located on a map."
     )
