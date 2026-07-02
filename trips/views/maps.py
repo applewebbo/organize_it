@@ -21,6 +21,7 @@ from trips.models import Day, Event, MainTransfer, Stay, Trip
 from trips.services import GooglePlacesClient, GooglePlacesError
 from trips.utils import (
     accessible_trips_qs,
+    build_categorized_event,
     create_trip_map,
     editable_trips_qs,
     geocode_city,
@@ -516,12 +517,12 @@ def _map_add_event(request, pk, category):
     lng = request.POST.get("lng", "").strip()
 
     if name:
-        event = Event(
+        event = build_categorized_event(
+            category,
             trip=trip,
             name=name,
             address=address,
             place_id=place_id,
-            category=category,
             last_modified_by=request.user,
         )
         if lat and lng:

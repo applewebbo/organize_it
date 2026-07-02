@@ -1,0 +1,1 @@
+../../all/00000/00036-fix-368-sti-child-for-suggestionmap-search-events.md

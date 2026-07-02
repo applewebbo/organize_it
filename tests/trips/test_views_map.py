@@ -9,7 +9,7 @@ from tests.trips.factories import (
     StayFactory,
     TripFactory,
 )
-from trips.models import Event, Stay
+from trips.models import Event, Experience, Meal, Stay
 from trips.services import GooglePlacesError, PlaceFullDetails, PlaceResult
 
 pytestmark = pytest.mark.django_db
@@ -177,6 +177,11 @@ class TestMapAddExperienceView(TestCase):
         assert event.latitude == 45.0687
         assert event.longitude == 7.6847
         assert event.day is None
+        # STI child row exists so the event-detail modal works (#368)
+        assert Experience.objects.filter(pk=event.pk).exists()
+        with self.login(user):
+            detail = self.get("trips:event-detail", pk=event.pk)
+        self.response_200(detail)
 
     def test_add_experience_invalid_coords_are_skipped(self):
         user = self.make_user("user@example.com")
@@ -255,6 +260,11 @@ class TestMapAddMealView(TestCase):
         self.response_200(response)
         event = Event.objects.get(trip=trip, name="Ristorante Da Luigi")
         assert event.category == Event.Category.MEAL
+        # STI child row exists so the event-detail modal works (#368)
+        assert Meal.objects.filter(pk=event.pk).exists()
+        with self.login(user):
+            detail = self.get("trips:event-detail", pk=event.pk)
+        self.response_200(detail)
 
     def test_add_meal_empty_name_creates_nothing(self):
         user = self.make_user("user@example.com")

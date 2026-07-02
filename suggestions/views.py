@@ -11,7 +11,7 @@ from suggestions.models import AICredentials, SuggestionPreferences
 from suggestions.services import generate_suggestions, get_cached_suggestions
 from trips.models import Event, Stay, Trip
 from trips.services import GooglePlacesClient, GooglePlacesError
-from trips.utils import accessible_trips_qs, get_trip_stages
+from trips.utils import accessible_trips_qs, build_categorized_event, get_trip_stages
 from trips.views.maps import _build_map_events_context
 
 # Both the desktop map panel and the mobile modal accept a suggestion through
@@ -247,12 +247,12 @@ def _accept(request, pk, kind):
                 name=name, address=address or "", place_id=place_id, author=request.user
             )
         else:
-            obj = Event(
+            obj = build_categorized_event(
+                _ACCEPT_CATEGORY[kind],
                 trip=trip,
                 name=name,
                 address=address,
                 place_id=place_id,
-                category=_ACCEPT_CATEGORY[kind],
                 last_modified_by=request.user,
             )
         if lat and lng:

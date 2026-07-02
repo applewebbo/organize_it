@@ -7,7 +7,7 @@ from suggestions.schemas import Suggestion
 from suggestions.services import GroundedSuggestion
 from tests.test import TestCase
 from tests.trips.factories import TripFactory
-from trips.models import Event, Stay
+from trips.models import Event, Experience, Meal, Stay
 from trips.services import GooglePlacesError, PlaceFullDetails
 
 pytestmark = pytest.mark.django_db
@@ -426,6 +426,11 @@ class TestAcceptViews(TestCase):
         assert event.category == Event.Category.EXPERIENCE
         assert event.day is None
         assert event.latitude == 41.9
+        # STI child row exists so the event-detail modal works (#368)
+        assert Experience.objects.filter(pk=event.pk).exists()
+        with self.login(user):
+            detail = self.get("trips:event-detail", pk=event.pk)
+        self.response_200(detail)
 
     def test_accept_meal_creates_event(self):
         user = self.make_user("user@example.com")
@@ -435,6 +440,11 @@ class TestAcceptViews(TestCase):
         )
         event = Event.objects.get(trip=trip, name="Trattoria")
         assert event.category == Event.Category.MEAL
+        # STI child row exists so the event-detail modal works (#368)
+        assert Meal.objects.filter(pk=event.pk).exists()
+        with self.login(user):
+            detail = self.get("trips:event-detail", pk=event.pk)
+        self.response_200(detail)
 
     def test_accept_replaces_card_with_success_message(self):
         user = self.make_user("user@example.com")

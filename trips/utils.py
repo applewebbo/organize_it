@@ -16,7 +16,7 @@ from django.shortcuts import get_object_or_404
 from PIL import Image
 
 from accounts.models import get_profile
-from trips.models import Event, MainTransfer, Stay, Trip
+from trips.models import Event, Experience, MainTransfer, Meal, Stay, Trip
 
 
 def get_trip_stages(trip):
@@ -1148,6 +1148,17 @@ def convert_google_opening_hours(google_hours):
                     "close": close_time,
                 }
     return custom_hours if custom_hours else None
+
+
+def build_categorized_event(category, **fields):
+    """Build the proper STI child (Experience/Meal) for the given category.
+
+    The map place-search and AI-suggestion accept flows must create a real
+    Experience/Meal so every event has its STI child row; a plain ``Event``
+    would break the event-detail modal (see get_event_instance).
+    """
+    model = {Event.Category.EXPERIENCE: Experience, Event.Category.MEAL: Meal}
+    return model[category](**fields)
 
 
 def get_event_instance(event):
