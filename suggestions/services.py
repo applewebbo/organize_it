@@ -1,6 +1,7 @@
 import hashlib
 import json
 from dataclasses import dataclass
+from math import asin, cos, radians, sin, sqrt
 
 from django.core.cache import cache
 
@@ -36,6 +37,16 @@ def _cache_key(
     )
     digest = hashlib.sha256(payload.encode()).hexdigest()[:16]
     return f"ai_sugg:{trip.pk}:{digest}"
+
+
+def _haversine_m(lat1: float, lng1: float, lat2: float, lng2: float) -> float:
+    """Great-circle distance in metres between two lat/lng points."""
+    r = 6371000
+    p1, p2 = radians(lat1), radians(lat2)
+    dp = radians(lat2 - lat1)
+    dl = radians(lng2 - lng1)
+    a = sin(dp / 2) ** 2 + cos(p1) * cos(p2) * sin(dl / 2) ** 2
+    return 2 * r * asin(sqrt(a))
 
 
 def _apply_stage(context: TripContext, trip: Trip, stage: str) -> None:
@@ -140,6 +151,15 @@ def _ground(
         return None
 
     place = results[0]
+    # locationBias is a soft hint: Google may still return a stronger text match
+    # in another city (e.g. a same-named restaurant hundreds of km away). Reject
+    # grounded places that fall outside the bias radius so results stay scoped to
+    # the destination / selected stage.
+    if location_bias is not None:
+        lat0, lng0, radius = location_bias
+        if _haversine_m(lat0, lng0, place.lat, place.lng) > radius:
+            return None
+
     return GroundedSuggestion(
         suggestion=suggestion,
         address=place.address,

@@ -158,6 +158,31 @@ class TestGenerateSuggestions:
 
     @patch("suggestions.services.GooglePlacesClient")
     @patch("suggestions.services.get_provider")
+    def test_grounded_result_outside_radius_is_skipped(
+        self, mock_get_provider, mock_client
+    ):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        # bias centred on Florence, but Places returns a place in Palermo (~400km)
+        TripFactory._meta.model.objects.filter(pk=trip.pk).update(
+            destination_latitude=43.77, destination_longitude=11.25
+        )
+        trip.refresh_from_db()
+        suggestion = Suggestion(kind="meal", name="La Raccolta", type=3)
+        mock_get_provider.return_value = self._provider_returning([suggestion])
+        far_place = PlaceResult(
+            place_id="ChIJ_palermo",
+            name="La Raccolta",
+            address="Via Antonio de Saliba, 6, 90145 Palermo PA",
+            lat=38.15,
+            lng=13.33,
+        )
+        mock_client.return_value.search_text.return_value = [far_place]
+
+        assert generate_suggestions(creds.user, trip) == []
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
     def test_places_error_skips_suggestion(self, mock_get_provider, mock_client):
         creds = AICredentialsFactory(user=TripFactory().author)
         trip = TripFactory(author=creds.user)
