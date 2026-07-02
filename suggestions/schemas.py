@@ -65,3 +65,5 @@ class SuggestionPrefs(BaseModel):
     budget: str = "medium"
     notes: str = ""
     result_count: int = 8
+    # Empty means "all kinds"; otherwise restrict to these SuggestionKind values.
+    kinds: list[str] = Field(default_factory=list)

@@ -42,10 +42,16 @@ def build_prompt(context: TripContext, prefs: SuggestionPrefs) -> str:
     if prefs.notes:
         lines.append(f"Extra notes: {prefs.notes}")
     lines.append("")
+    kind_labels = {"experience": "experiences", "meal": "meals", "stay": "stays"}
+    if prefs.kinds:
+        spanning = ", ".join(kind_labels[k] for k in prefs.kinds)
+    else:
+        spanning = "experiences, meals and stays"
     lines.append(
-        f"Propose about {prefs.result_count} suggestions in total, spanning "
-        "experiences, meals and stays."
+        f"Propose about {prefs.result_count} suggestions in total, spanning {spanning}."
     )
+    if prefs.kinds:
+        lines.append(f"Only propose suggestions of these kinds: {spanning}.")
     lines.append(
         "For each suggestion provide a real name and a precise postal address "
         "so it can be located on a map."

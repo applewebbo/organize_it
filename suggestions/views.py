@@ -149,6 +149,9 @@ def generate(request, pk):
     notes = request.POST.get("notes", "").strip()
     if notes:
         overrides["notes"] = notes
+    kinds = request.POST.getlist("kinds")
+    if kinds:
+        overrides["kinds"] = kinds
     language = get_profile(request.user).language
 
     cards = []

@@ -77,6 +77,10 @@ class TestMergePreferences:
         prefs = merge_preferences(defaults, None)
         assert prefs.result_count == 12
 
+    def test_kinds_override(self):
+        prefs = merge_preferences(None, {"kinds": ["meal", "stay"]})
+        assert prefs.kinds == ["meal", "stay"]
+
 
 class TestGenerateSuggestions:
     def _provider_returning(self, suggestions):
@@ -212,6 +216,27 @@ class TestGenerateSuggestions:
         # only result_count suggestions are grounded (one Places call each)
         assert mock_client.return_value.search_text.call_count == 2
         assert len(results) == 2
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_kinds_filter_discards_other_kinds(self, mock_get_provider, mock_client):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        provider = self._provider_returning(
+            [
+                Suggestion(kind="experience", name="Exp", type=1),
+                Suggestion(kind="meal", name="Meal", type=3),
+                Suggestion(kind="stay", name="Hotel"),
+            ]
+        )
+        mock_get_provider.return_value = provider
+        mock_client.return_value.search_text.return_value = [PLACE]
+
+        results = generate_suggestions(creds.user, trip, overrides={"kinds": ["meal"]})
+
+        # only the meal suggestion survives, so a single Places call is made
+        assert mock_client.return_value.search_text.call_count == 1
+        assert [r.suggestion.kind.value for r in results] == ["meal"]
 
     @patch("suggestions.services.GooglePlacesClient")
     @patch("suggestions.services.get_provider")

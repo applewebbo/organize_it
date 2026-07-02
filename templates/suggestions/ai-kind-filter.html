@@ -1,0 +1,31 @@
+{% load i18n %}
+{# Kind selector: no box checked means "all kinds". #}
+<div class="flex flex-wrap gap-y-1 gap-x-3 mb-2 text-xs">
+    <label class="flex gap-1.5 items-center cursor-pointer">
+        <input type="checkbox"
+               name="kinds"
+               value="experience"
+               class="checkbox checkbox-xs checkbox-success"
+               checked />
+        <i class="text-green-500 ph-bold ph-map-pin i-xs"></i>
+        {% trans 'Experiences' %}
+    </label>
+    <label class="flex gap-1.5 items-center cursor-pointer">
+        <input type="checkbox"
+               name="kinds"
+               value="meal"
+               class="checkbox checkbox-xs checkbox-warning"
+               checked />
+        <i class="text-yellow-500 ph-bold ph-fork-knife i-xs"></i>
+        {% trans 'Meals' %}
+    </label>
+    <label class="flex gap-1.5 items-center cursor-pointer">
+        <input type="checkbox"
+               name="kinds"
+               value="stay"
+               class="checkbox checkbox-xs checkbox-info"
+               checked />
+        <i class="ph-bold ph-bed i-xs text-sky-500"></i>
+        {% trans 'Stays' %}
+    </label>
+</div>

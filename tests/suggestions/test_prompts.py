@@ -42,3 +42,16 @@ class TestBuildPrompt:
             TripContext(destination="Rome"), SuggestionPrefs(result_count=11)
         )
         assert "about 11 suggestions" in prompt
+
+    def test_spans_all_kinds_by_default(self):
+        prompt = build_prompt(TripContext(destination="Rome"), SuggestionPrefs())
+        assert "spanning experiences, meals and stays." in prompt
+        assert "Only propose" not in prompt
+
+    def test_restricts_to_selected_kinds(self):
+        prompt = build_prompt(
+            TripContext(destination="Rome"),
+            SuggestionPrefs(kinds=["meal", "stay"]),
+        )
+        assert "Only propose suggestions of these kinds: meals, stays." in prompt
+        assert "spanning meals, stays." in prompt

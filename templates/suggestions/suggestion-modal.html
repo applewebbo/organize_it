@@ -26,6 +26,7 @@
                placeholder="{% trans 'Notes for this trip (optional)…' %}"
                autocomplete="off"
                class="mb-2 w-full input input-sm input-bordered" />
+        {% include "suggestions/ai-kind-filter.html" %}
         <div class="flex gap-2">
             {% if has_cache %}
                 <button type="submit"

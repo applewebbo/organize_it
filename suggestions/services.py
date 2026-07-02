@@ -100,7 +100,7 @@ def merge_preferences(
             result_count=defaults.result_count,
         )
 
-    for field in ("favored_experience_types", "dietary", "pace", "budget"):
+    for field in ("favored_experience_types", "dietary", "pace", "budget", "kinds"):
         if overrides.get(field) is not None:
             setattr(merged, field, overrides[field])
 
@@ -187,6 +187,11 @@ def generate_suggestions(
 
     provider = get_provider(credentials.provider, credentials.api_key_encrypted)
     suggestions = provider.generate(context, preferences)
+
+    # Drop kinds the user did not ask for before grounding, so discarded kinds
+    # do not consume the result_count budget or trigger Google Places calls.
+    if preferences.kinds:
+        suggestions = [s for s in suggestions if s.kind.value in preferences.kinds]
 
     client = GooglePlacesClient()
     grounded = []

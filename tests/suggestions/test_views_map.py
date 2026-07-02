@@ -87,6 +87,28 @@ class TestGenerateView(TestCase):
         assert mock_generate.call_args.args[5] == "Firenze"
 
     @patch("suggestions.views.generate_suggestions")
+    def test_forwards_kinds_as_overrides(self, mock_generate):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        mock_generate.return_value = []
+        with self.login(user):
+            self.post(
+                "suggestions:generate",
+                pk=trip.pk,
+                data={"kinds": ["meal", "stay"]},
+            )
+        assert mock_generate.call_args.args[2] == {"kinds": ["meal", "stay"]}
+
+    @patch("suggestions.views.generate_suggestions")
+    def test_omits_kinds_when_none_selected(self, mock_generate):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        mock_generate.return_value = []
+        with self.login(user):
+            self.post("suggestions:generate", pk=trip.pk)
+        assert "kinds" not in mock_generate.call_args.args[2]
+
+    @patch("suggestions.views.generate_suggestions")
     def test_config_error_shows_settings_link(self, mock_generate):
         user = self.make_user("user@example.com")
         trip = TripFactory(author=user)
