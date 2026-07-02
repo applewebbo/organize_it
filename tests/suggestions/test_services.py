@@ -238,8 +238,28 @@ class TestGenerateSuggestions:
 
         results = generate_suggestions(creds.user, trip)
 
-        # only result_count suggestions are grounded (one Places call each)
+        # grounding stops as soon as result_count results are collected
         assert mock_client.return_value.search_text.call_count == 2
+        assert len(results) == 2
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_overfetch_compensates_grounding_failures(
+        self, mock_get_provider, mock_client
+    ):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        SuggestionPreferencesFactory(user=creds.user, result_count=2)
+        trip = TripFactory(author=creds.user)
+        provider = self._provider_returning(
+            [Suggestion(kind="experience", name=f"X{i}", type=1) for i in range(4)]
+        )
+        mock_get_provider.return_value = provider
+        # first two candidates fail to ground, the next two succeed
+        mock_client.return_value.search_text.side_effect = [[], [], [PLACE], [PLACE]]
+
+        results = generate_suggestions(creds.user, trip)
+
+        # we keep grounding past the failures until result_count is reached
         assert len(results) == 2
 
     @patch("suggestions.services.GooglePlacesClient")

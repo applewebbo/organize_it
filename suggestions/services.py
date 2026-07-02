@@ -18,6 +18,12 @@ _GROUNDING_RADIUS = 50000
 # Generated suggestions are cached for a day to spare the free-tier quota.
 _CACHE_TTL = 24 * 3600
 
+# Ask the model for more candidates than requested so that grounding rejections
+# (place not found, outside the bias radius) still leave enough to reach the
+# user's target count. Grounding stops as soon as the target is met, so the
+# extra candidates cost nothing when grounding succeeds cleanly.
+_OVERFETCH_FACTOR = 3
+
 
 def _cache_key(
     trip: Trip,
@@ -206,7 +212,11 @@ def generate_suggestions(
             return cached
 
     provider = get_provider(credentials.provider, credentials.api_key_encrypted)
-    suggestions = provider.generate(context, preferences)
+    # Over-request so grounding rejections still leave enough to hit the target.
+    fetch_prefs = preferences.model_copy(
+        update={"result_count": preferences.result_count * _OVERFETCH_FACTOR}
+    )
+    suggestions = provider.generate(context, fetch_prefs)
 
     # Drop kinds the user did not ask for before grounding, so discarded kinds
     # do not consume the result_count budget or trigger Google Places calls.
@@ -215,9 +225,11 @@ def generate_suggestions(
 
     client = GooglePlacesClient()
     grounded = []
-    # Cap the number we try to ground so a verbose model response cannot trigger
-    # an unbounded number of Google Places calls.
-    for suggestion in suggestions[: preferences.result_count]:
+    # Ground candidates until we reach the requested count; stopping early keeps
+    # Google Places calls bounded when grounding succeeds cleanly.
+    for suggestion in suggestions:
+        if len(grounded) >= preferences.result_count:
+            break
         result = _ground(suggestion, context, client)
         if result is not None:
             grounded.append(result)
