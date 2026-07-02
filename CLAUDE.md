@@ -77,6 +77,31 @@ Before starting multi-step work, create tasks in `taskdb`.
   - `Co-Authored-By: Claude <noreply@anthropic.com>`
 - Keep commit messages concise and focused on the changes made
 
+## Issue & Release Management (Codeberg)
+
+Issues and releases live on Codeberg and are managed through `just` recipes (backed by the `fj` CLI). **Use these commands directly — do not run `just --list` / help to rediscover them each time.** Write all issue content in English.
+
+| Command | Purpose |
+|---------|---------|
+| `just issues [state]` | List issues (`state` defaults to `open`; use `closed`/`all`) |
+| `just issue <n>` | View a single issue (title + body + comments) |
+| `just issue-create "<title>" "<body>"` | Create an issue |
+| `just issue-edit-body <n> <file>` | Replace an issue body from a **file** |
+| `just issue-comment <n> <file>` | Add a comment from a file |
+| `just issue-close <n>` / `just issue-reopen <n>` | Close / reopen |
+| `just issue-label <n> <labels…>` | Assign existing labels |
+| `just issue-label-create <n> <name>` | Create a label and assign it (use this; plain `issue-label` fails if the label doesn't exist) |
+| `just release-list` / `just release-show <tag>` | Inspect releases |
+| `just release-create <tag> [prev_tag] [notes_file] [draft] [prerelease]` | Create a release |
+
+**Editing/creating bodies — avoid the backtick trap:**
+- Passing a body as a shell argument (`just issue-create "t" "…`code`…"`) makes the shell execute anything in backticks. For any body containing backticks/backslashes/`$`, **write it to a temp file first and use `just issue-edit-body <n> <file>`** (which reads the file safely). Typical flow: create with a placeholder body, then set the real body from a file.
+- To fetch an existing body for editing, read `CODEBERG_API_TOKEN` from `.env` and GET `/api/v1/repos/webbografico/organize_it/issues/<n>` (`.body`).
+
+**Conventions:**
+- Issue bodies use only bullet/numbered lists — never task-list checkboxes (`- [ ]`).
+- Reference issues in commits with `for #<n>` (never `fix #<n>`); close issues manually at release.
+
 ## Project Overview
 
 Organize It is a Django-based web application for organizing trips and travel plans. Built with Django 6.0+, TailwindCSS (with DaisyUI), HTMX, and Alpine.js, it provides a modern, reactive user experience without heavy frontend frameworks.
