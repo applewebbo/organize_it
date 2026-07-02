@@ -151,16 +151,14 @@ msgstr "Ritmo"
 msgid "Budget"
 msgstr "Budget"
 
-#, fuzzy
-#| msgid "Your last suggestions"
 msgid "Number of suggestions"
-msgstr "I tuoi ultimi suggerimenti"
+msgstr "Numero di suggerimenti"
 
 msgid "Notes"
 msgstr "Note"
 
 msgid "How many suggestions to request per generation."
-msgstr ""
+msgstr "Quanti suggerimenti richiedere a ogni generazione."
 
 msgid "e.g. avoid tourist traps, travelling with kids"
 msgstr "es. evitare le trappole per turisti, in viaggio con bambini"
