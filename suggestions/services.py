@@ -45,6 +45,17 @@ def _cache_key(
     return f"ai_sugg:{trip.pk}:{digest}"
 
 
+def _last_key(user, trip: Trip) -> str:
+    """Key for the most recent generation, independent of the prefs/stage used.
+
+    Reopening the panel or modal cannot reconstruct the exact prefs-based key
+    (kinds, notes, stage are chosen at generation time), so the latest results
+    are also stored under this stable pointer for the "show my last results"
+    peek.
+    """
+    return f"ai_sugg_last:{trip.pk}:{user.pk}"
+
+
 def _haversine_m(lat1: float, lng1: float, lat2: float, lng2: float) -> float:
     """Great-circle distance in metres between two lat/lng points."""
     r = 6371000
@@ -209,6 +220,7 @@ def generate_suggestions(
     if not force_refresh:
         cached = cache.get(key)
         if cached is not None:
+            cache.set(_last_key(user, trip), cached, _CACHE_TTL)
             return cached
 
     provider = get_provider(credentials.provider, credentials.api_key_encrypted)
@@ -235,24 +247,15 @@ def generate_suggestions(
             grounded.append(result)
 
     cache.set(key, grounded, _CACHE_TTL)
+    cache.set(_last_key(user, trip), grounded, _CACHE_TTL)
     return grounded
 
 
-def get_cached_suggestions(
-    user,
-    trip: Trip,
-    overrides: dict | None = None,
-    language: str = "en",
-    stage: str | None = None,
-) -> list[GroundedSuggestion] | None:
-    """Return cached suggestions for this trip + preferences, or None.
+def get_cached_suggestions(user, trip: Trip) -> list[GroundedSuggestion] | None:
+    """Return the most recently generated suggestions for this trip, or None.
 
     Peeks the cache without ever calling the AI provider, so it spends no
     quota. Used to re-show the last generated results when the panel/modal is
-    reopened.
+    reopened, regardless of the prefs/stage that produced them.
     """
-    preferences = merge_preferences(
-        SuggestionPreferences.objects.filter(user=user).first(), overrides
-    )
-    key = _cache_key(trip, preferences, language, stage)
-    return cache.get(key)
+    return cache.get(_last_key(user, trip))

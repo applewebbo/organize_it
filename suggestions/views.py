@@ -191,8 +191,7 @@ def cached(request, pk):
     modal is reopened; falls back to a prompt inviting the user to generate.
     """
     trip = _get_accessible_trip(request, pk)
-    language = get_profile(request.user).language
-    suggestions = get_cached_suggestions(request.user, trip, language=language)
+    suggestions = get_cached_suggestions(request.user, trip)
     cards = _build_visible_cards(trip, request.user, suggestions or [])
     return TemplateResponse(
         request,
@@ -218,8 +217,7 @@ def suggestion_modal(request, pk):
     reopening the modal shows them without spending quota.
     """
     trip = _get_accessible_trip(request, pk)
-    language = get_profile(request.user).language
-    suggestions = get_cached_suggestions(request.user, trip, language=language)
+    suggestions = get_cached_suggestions(request.user, trip)
     cards = _build_visible_cards(trip, request.user, suggestions or [])
     stages = get_trip_stages(trip)
     return TemplateResponse(

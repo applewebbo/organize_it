@@ -354,3 +354,29 @@ class TestGetCachedSuggestions:
         assert len(cached) == 1
         # peeking the cache does not spend quota
         assert provider.generate.call_count == 1
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_returns_last_results_regardless_of_prefs(
+        self, mock_get_provider, mock_client
+    ):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        provider = MagicMock()
+        provider.generate.return_value = [
+            Suggestion(kind="meal", name="Trattoria", type=3)
+        ]
+        mock_get_provider.return_value = provider
+        mock_client.return_value.search_text.return_value = [PLACE]
+
+        # generated with per-request kinds/notes overrides
+        generate_suggestions(
+            creds.user,
+            trip,
+            overrides={"kinds": ["meal"], "notes": "with kids"},
+        )
+
+        # reopening the panel/modal peeks without knowing those overrides
+        cached = get_cached_suggestions(creds.user, trip)
+        assert cached is not None
+        assert len(cached) == 1
