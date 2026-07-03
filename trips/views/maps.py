@@ -55,15 +55,19 @@ def _build_map_events_context(trip):
     return days_with_events, unassigned_events
 
 
-def _build_map_json(days_with_events, unassigned_events):
+def _build_map_json(days_with_events, unassigned_events, trip):
     """
     Serialize all map items to a JSON-safe list for the Leaflet JS module.
-    Each item has: kind, name, address, lat, lng, day_index (0=unassigned).
+    Each item has: kind, name, address, lat, lng, day_index (0=unassigned),
+    stage (destination name the item belongs to, so the client can fit the map
+    tightly to a stage's own markers).
     """
     items = []
     seen_stay_pks = set()
 
     for idx, day_data in enumerate(days_with_events, start=1):
+        day = day_data["day"]
+        stage = day.destination or trip.destination
         stay = day_data["stay"]
         if stay and stay.pk not in seen_stay_pks and stay.latitude and stay.longitude:
             seen_stay_pks.add(stay.pk)
@@ -75,6 +79,7 @@ def _build_map_json(days_with_events, unassigned_events):
                     "lat": stay.latitude,
                     "lng": stay.longitude,
                     "day_index": idx,
+                    "stage": stage,
                 }
             )
         for event in day_data["events"]:
@@ -87,6 +92,7 @@ def _build_map_json(days_with_events, unassigned_events):
                         "lat": event.latitude,
                         "lng": event.longitude,
                         "day_index": idx,
+                        "stage": stage,
                     }
                 )
 
@@ -100,6 +106,7 @@ def _build_map_json(days_with_events, unassigned_events):
                     "lat": event.latitude,
                     "lng": event.longitude,
                     "day_index": 0,
+                    "stage": None,
                 }
             )
 
@@ -177,7 +184,7 @@ def trip_map(request, pk):
         raise Http404
 
     days_with_events, unassigned_events = _build_map_events_context(trip)
-    map_items = _build_map_json(days_with_events, unassigned_events)
+    map_items = _build_map_json(days_with_events, unassigned_events, trip)
     stages = get_trip_stages(trip)
     has_cache = get_cached_suggestions(request.user, trip) is not None
     return TemplateResponse(

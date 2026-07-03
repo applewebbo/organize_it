@@ -506,6 +506,8 @@ class TestBuildMapJson(TestCase):
         assert "stay" in kinds
         assert "experience" in kinds
         assert "meal" in kinds
+        # Main-stage days (blank destination) are tagged with the trip destination
+        assert all(item["stage"] == trip.destination for item in map_items)
 
     def test_map_json_includes_unassigned_events_with_coords(self):
         """Covers _build_map_json branch for unassigned events with lat/lng (line 2972)."""
@@ -531,6 +533,7 @@ class TestBuildMapJson(TestCase):
         unassigned = [i for i in map_items if i["day_index"] == 0]
         assert len(unassigned) == 1
         assert unassigned[0]["name"] == "Piazza Castello"
+        assert unassigned[0]["stage"] is None
 
     def test_map_json_skips_events_without_coords(self):
         """Covers false branch of 'if event.latitude and event.longitude' (lines 2959, 2972)."""

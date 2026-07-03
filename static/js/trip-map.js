@@ -151,8 +151,21 @@
       }
       return;
     }
-    const coords = stageCoords[destination];
-    if (coords) map.setView(coords, 13, { animate: true });
+    // Fit tightly to the stage's own markers so events spread out and use the
+    // available space, rather than centring at a fixed (wide) zoom.
+    const points = [];
+    eventsLayer.eachLayer((m) => {
+      if (m.stageName === destination) points.push(m.getLatLng());
+    });
+    if (points.length > 1) {
+      map.fitBounds(L.latLngBounds(points), { padding: [60, 60], maxZoom: 16 });
+    } else if (points.length === 1) {
+      map.setView(points[0], 15, { animate: true });
+    } else {
+      // No markers for this stage: fall back to its derived centre point.
+      const coords = stageCoords[destination];
+      if (coords) map.setView(coords, 14, { animate: true });
+    }
   }
 
   function wireStageSelects() {
@@ -177,6 +190,7 @@
       const color = PIN_COLORS[kind] || PIN_COLORS.experience;
       const marker = L.marker([lat, lng], { icon: makeEventIcon(color, kind, item.day_index) })
         .bindPopup(popup(name, address), { autoPan: false });
+      marker.stageName = item.stage || null;
 
       // Clicking a marker highlights matching sidebar item
       marker.on("click", () => {
