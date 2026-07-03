@@ -18,6 +18,11 @@ _GROUNDING_RADIUS = 50000
 # Generated suggestions are cached for a day to spare the free-tier quota.
 _CACHE_TTL = 24 * 3600
 
+# The "last results" pointer lives longer than the prefs cache so reopening the
+# panel/modal the next day still re-shows the last generation without spending
+# quota. It is pure UX convenience, so a longer TTL has no quota downside.
+_LAST_TTL = 48 * 3600
+
 # Ask the model for more candidates than requested so that grounding rejections
 # (place not found, outside the bias radius) still leave enough to reach the
 # user's target count. Grounding stops as soon as the target is met, so the
@@ -262,7 +267,7 @@ def generate_suggestions(
     if not force_refresh:
         cached = cache.get(key)
         if cached is not None:
-            cache.set(_last_key(user, trip), cached, _CACHE_TTL)
+            cache.set(_last_key(user, trip), cached, _LAST_TTL)
             return cached
 
     provider = get_provider(credentials.provider, credentials.api_key_encrypted)
@@ -289,7 +294,7 @@ def generate_suggestions(
             grounded.append(result)
 
     cache.set(key, grounded, _CACHE_TTL)
-    cache.set(_last_key(user, trip), grounded, _CACHE_TTL)
+    cache.set(_last_key(user, trip), grounded, _LAST_TTL)
     return grounded
 
 

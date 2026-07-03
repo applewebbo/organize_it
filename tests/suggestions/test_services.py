@@ -1,11 +1,15 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+from django.core.cache import cache
 
 from suggestions.ai.base import AISuggestionError
 from suggestions.schemas import Suggestion, SuggestionPrefs, TripContext
 from suggestions.services import (
+    _CACHE_TTL,
+    _LAST_TTL,
     GroundedSuggestion,
+    _last_key,
     build_trip_context,
     generate_suggestions,
     get_cached_suggestions,
@@ -453,3 +457,27 @@ class TestGetCachedSuggestions:
         cached = get_cached_suggestions(creds.user, trip)
         assert cached is not None
         assert len(cached) == 1
+
+
+class TestCacheTTLs:
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_last_pointer_outlives_prefs_cache(self, mock_get_provider, mock_client):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        provider = MagicMock()
+        provider.generate.return_value = [
+            Suggestion(kind="experience", name="X", type=1)
+        ]
+        mock_get_provider.return_value = provider
+        mock_client.return_value.search_text.return_value = [PLACE]
+
+        last_key = _last_key(creds.user, trip)
+        with patch("suggestions.services.cache.set", wraps=cache.set) as spy:
+            generate_suggestions(creds.user, trip)
+
+        ttls_by_key = {c.args[0]: c.args[2] for c in spy.call_args_list}
+        # the last-results pointer lives longer (48h) than the prefs cache (24h)
+        assert ttls_by_key[last_key] == _LAST_TTL == 48 * 3600
+        prefs_ttls = [t for k, t in ttls_by_key.items() if k != last_key]
+        assert prefs_ttls and all(t == _CACHE_TTL == 24 * 3600 for t in prefs_ttls)
