@@ -106,6 +106,67 @@ def _build_map_json(days_with_events, unassigned_events):
     return items
 
 
+def _stage_points(stage):
+    """Collect candidate [lat, lng] points that locate a stage.
+
+    Prefers the days' own geocoded destination coords; when those are missing
+    (older/imported stages never store them) it falls back to the real places
+    planned in the stage — its stays and events — so every stage stays
+    locatable on the map.
+    """
+    points = [
+        (day.destination_latitude, day.destination_longitude)
+        for day in stage["days"]
+        if day.destination_latitude is not None
+        and day.destination_longitude is not None
+    ]
+    if points:
+        return points
+
+    day_pks = [day.pk for day in stage["days"]]
+    points += list(
+        Stay.objects.filter(days__pk__in=day_pks)
+        .exclude(latitude=None)
+        .exclude(longitude=None)
+        .values_list("latitude", "longitude")
+        .distinct()
+    )
+    points += list(
+        Event.objects.filter(
+            day__pk__in=day_pks, latitude__isnull=False, longitude__isnull=False
+        ).values_list("latitude", "longitude")
+    )
+    return points
+
+
+def _build_stage_coords(trip, stages):
+    """Map each stage's destination name to representative [lat, lng] coords.
+
+    The main stage uses the trip's own destination coords when available;
+    otherwise (and for custom stages) coords are averaged from the stage's
+    days/places. Stages with no locatable point are omitted.
+    """
+    coords = {}
+    for stage in stages:
+        if (
+            stage["is_main"]
+            and trip.destination_latitude is not None
+            and trip.destination_longitude is not None
+        ):
+            coords[stage["destination"]] = [
+                trip.destination_latitude,
+                trip.destination_longitude,
+            ]
+            continue
+        points = _stage_points(stage)
+        if points:
+            coords[stage["destination"]] = [
+                sum(p[0] for p in points) / len(points),
+                sum(p[1] for p in points) / len(points),
+            ]
+    return coords
+
+
 def trip_map(request, pk):
     """Unified interactive map for a trip: all events across all days + unassigned."""
     trip = get_object_or_404(
@@ -127,6 +188,7 @@ def trip_map(request, pk):
             "days_with_events": days_with_events,
             "unassigned_events": unassigned_events,
             "map_items_json": json.dumps(map_items),
+            "stage_coords_json": json.dumps(_build_stage_coords(trip, stages)),
             "stages": stages,
             "has_custom_stages": any(not s["is_main"] for s in stages),
             "has_cache": has_cache,

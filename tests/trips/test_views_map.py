@@ -1,3 +1,4 @@
+import json
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -87,6 +88,78 @@ class TestTripMapView(TestCase):
             response = self.get("trips:trip-map", pk=trip.pk)
         self.response_200(response)
         assert response.context["unassigned_events"].count() == 1
+
+
+class TestMapStageCoords(TestCase):
+    def test_main_stage_coords_from_trip(self):
+        user = self.make_user("owner@example.com")
+        geo = MagicMock()
+        geo.latlng = [45.07, 7.68]
+        with patch("trips.models.geocoder.mapbox", return_value=geo):
+            trip = TripFactory(author=user)
+        with self.login(user):
+            response = self.get("trips:trip-map", pk=trip.pk)
+        coords = json.loads(response.context["stage_coords_json"])
+        assert coords[trip.destination] == [45.07, 7.68]
+
+    def test_custom_stage_coords_are_day_average(self):
+        user = self.make_user("owner@example.com")
+        geo = MagicMock()
+        geo.latlng = None
+        with patch("trips.models.geocoder.mapbox", return_value=geo):
+            trip = TripFactory(author=user)
+        days = list(trip.days.order_by("number"))
+        for day, (lat, lng) in zip(
+            days[-2:], [(41.9, 12.5), (41.8, 12.4)], strict=False
+        ):
+            day.destination = "Roma"
+            day.destination_latitude = lat
+            day.destination_longitude = lng
+            day.save()
+        with self.login(user):
+            response = self.get("trips:trip-map", pk=trip.pk)
+        coords = json.loads(response.context["stage_coords_json"])
+        assert coords["Roma"] == [pytest.approx(41.85), pytest.approx(12.45)]
+
+    def test_custom_stage_falls_back_to_event_coords(self):
+        user = self.make_user("owner@example.com")
+        geo = MagicMock()
+        geo.latlng = None
+        with patch("trips.models.geocoder.mapbox", return_value=geo):
+            trip = TripFactory(author=user)
+        day = trip.days.order_by("number").last()
+        day.destination = "Roma"
+        day.save()
+        # Stage day has no destination coords: the event's coords locate it.
+        with patch("trips.models.geocoder.mapbox", return_value=geo):
+            Event.objects.create(
+                trip=trip,
+                day=day,
+                name="Colosseo",
+                latitude=41.89,
+                longitude=12.49,
+                category=Event.Category.EXPERIENCE,
+            )
+        with self.login(user):
+            response = self.get("trips:trip-map", pk=trip.pk)
+        coords = json.loads(response.context["stage_coords_json"])
+        assert coords["Roma"] == [pytest.approx(41.89), pytest.approx(12.49)]
+
+    def test_stage_without_coords_is_omitted(self):
+        user = self.make_user("owner@example.com")
+        geo = MagicMock()
+        geo.latlng = None
+        with patch("trips.models.geocoder.mapbox", return_value=geo):
+            trip = TripFactory(author=user)
+        days = list(trip.days.order_by("number"))
+        last = days[-1]
+        last.destination = "Napoli"
+        last.save()
+        with self.login(user):
+            response = self.get("trips:trip-map", pk=trip.pk)
+        coords = json.loads(response.context["stage_coords_json"])
+        assert "Napoli" not in coords
+        assert trip.destination not in coords
 
 
 class TestMapSearchView(TestCase):

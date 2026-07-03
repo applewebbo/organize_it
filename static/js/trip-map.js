@@ -16,6 +16,9 @@
   let searchLayer = null;
   let eventsLayer = null;
 
+  // Destination name → [lat, lng] for stage dropdown → refocus (issue #370)
+  let stageCoords = {};
+
   // Index: "name|lat|lng" → Leaflet marker, for sidebar-click → popup
   const eventMarkerIndex = new Map();
 
@@ -121,8 +124,44 @@
       }
     }
 
+    // Load stage coordinates for the dropdown → refocus interaction
+    const stageEl = document.getElementById("stage-coords-data");
+    if (stageEl) {
+      try {
+        stageCoords = JSON.parse(stageEl.textContent) || {};
+      } catch (e) {
+        console.error("trip-map: failed to parse stage-coords-data", e);
+      }
+    }
+
     // Wire sidebar item clicks (data-* attributes for fly-to)
     wireSidebarClicks();
+    // Wire stage dropdowns (search + AI tabs) → refocus the map
+    wireStageSelects();
+  }
+
+  /* ── Stage dropdown → refocus map ───────────────────────────────── */
+  function focusStage(destination) {
+    if (!map) return;
+    if (!destination) {
+      // "— all stages —": fit back to every event marker
+      const bounds = eventsLayer.getBounds();
+      if (bounds.isValid()) {
+        map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
+      }
+      return;
+    }
+    const coords = stageCoords[destination];
+    if (coords) map.setView(coords, 13, { animate: true });
+  }
+
+  function wireStageSelects() {
+    document
+      .querySelectorAll("select[name='stage_destination']:not([data-wired])")
+      .forEach((sel) => {
+        sel.dataset.wired = "1";
+        sel.addEventListener("change", () => focusStage(sel.value));
+      });
   }
 
   /* ── Build events layer from data array ─────────────────────────── */
