@@ -15,7 +15,7 @@ from tests.suggestions.factories import (
     AICredentialsFactory,
     SuggestionPreferencesFactory,
 )
-from tests.trips.factories import TripFactory
+from tests.trips.factories import ExperienceFactory, StayFactory, TripFactory
 from trips.services import GooglePlacesError, PlaceResult
 
 pytestmark = pytest.mark.django_db
@@ -37,6 +37,79 @@ class TestBuildTripContext:
         assert context.destination == "Roma"
         assert context.start_date == trip.start_date
         assert context.language == "it"
+
+    def test_collects_existing_events_and_stays(self):
+        trip = TripFactory(destination="Roma")
+        day = trip.days.first()
+        ExperienceFactory(trip=trip, day=day, name="Colosseo", city="Roma")
+        StayFactory(name="Hotel Rex", city="Roma", day=day)
+
+        context = build_trip_context(trip)
+
+        assert "Colosseo (Roma)" in context.existing_places
+        assert "Hotel Rex (Roma)" in context.existing_places
+
+    def test_existing_place_without_city_uses_bare_name(self):
+        trip = TripFactory(destination="Roma")
+        day = trip.days.first()
+        ExperienceFactory(trip=trip, day=day, name="Passeggiata", city="")
+
+        context = build_trip_context(trip)
+
+        assert "Passeggiata" in context.existing_places
+
+    def test_collects_weather_for_days_with_data(self):
+        trip = TripFactory(destination="Roma")
+        day = trip.days.first()
+        day.weather_data = {
+            "weather_label": "Clear sky",
+            "temperature_min": 15.4,
+            "temperature_max": 28.1,
+            "precipitation_sum": 0.0,
+        }
+        day.save(update_fields=["weather_data"])
+
+        context = build_trip_context(trip)
+
+        assert len(context.weather) == 1
+        assert "Clear sky" in context.weather[0]
+        assert "15" in context.weather[0]
+        assert "28" in context.weather[0]
+
+    def test_no_weather_when_data_missing(self):
+        trip = TripFactory(destination="Roma")
+        context = build_trip_context(trip)
+        assert context.weather == []
+
+    def test_stage_scopes_existing_places_and_weather(self):
+        trip = TripFactory(destination="Roma")
+        days = list(trip.days.all())
+        florence_day, rome_day = days[0], days[1]
+        florence_day.destination = "Firenze"
+        florence_day.weather_data = {
+            "weather_label": "Rain",
+            "temperature_min": 10.0,
+            "temperature_max": 16.0,
+            "precipitation_sum": 12.0,
+        }
+        florence_day.save(update_fields=["destination", "weather_data"])
+        rome_day.destination = "Roma"
+        rome_day.weather_data = {
+            "weather_label": "Clear sky",
+            "temperature_min": 18.0,
+            "temperature_max": 30.0,
+            "precipitation_sum": 0.0,
+        }
+        rome_day.save(update_fields=["destination", "weather_data"])
+        ExperienceFactory(trip=trip, day=florence_day, name="Uffizi", city="Firenze")
+        ExperienceFactory(trip=trip, day=rome_day, name="Colosseo", city="Roma")
+
+        context = build_trip_context(trip, stage="Firenze")
+
+        assert "Uffizi (Firenze)" in context.existing_places
+        assert "Colosseo (Roma)" not in context.existing_places
+        assert len(context.weather) == 1
+        assert "Rain" in context.weather[0]
 
 
 class TestMergePreferences:

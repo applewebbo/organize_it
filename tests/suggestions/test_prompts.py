@@ -55,3 +55,28 @@ class TestBuildPrompt:
         )
         assert "Only propose suggestions of these kinds: meals, stays." in prompt
         assert "spanning meals, stays." in prompt
+
+    def test_lists_existing_places_to_avoid(self):
+        context = TripContext(
+            destination="Rome",
+            existing_places=["Colosseo (Roma)", "Hotel Rex (Roma)"],
+        )
+        prompt = build_prompt(context, SuggestionPrefs())
+        assert "Already planned" in prompt
+        assert "- Colosseo (Roma)" in prompt
+        assert "- Hotel Rex (Roma)" in prompt
+
+    def test_includes_weather_forecast(self):
+        context = TripContext(
+            destination="Rome",
+            weather=["2026-07-01: Clear sky, 15–28°C, 0.0mm rain"],
+        )
+        prompt = build_prompt(context, SuggestionPrefs())
+        assert "Weather forecast" in prompt
+        assert "2026-07-01: Clear sky" in prompt
+        assert "indoor options" in prompt
+
+    def test_omits_context_sections_when_empty(self):
+        prompt = build_prompt(TripContext(destination="Rome"), SuggestionPrefs())
+        assert "Already planned" not in prompt
+        assert "Weather forecast" not in prompt

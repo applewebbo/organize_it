@@ -9,7 +9,7 @@ from suggestions.ai.base import AISuggestionError
 from suggestions.ai.factory import get_provider
 from suggestions.models import AICredentials, SuggestionPreferences
 from suggestions.schemas import Suggestion, SuggestionPrefs, TripContext
-from trips.models import Trip
+from trips.models import Event, Stay, Trip
 from trips.services import GooglePlacesClient, GooglePlacesError
 
 # Radius (meters) used to bias Google Places search around the destination.
@@ -96,8 +96,48 @@ class GroundedSuggestion:
     place_id: str
 
 
-def build_trip_context(trip: Trip, language: str = "en") -> TripContext:
-    """Build the TripContext fed to the provider from a Trip."""
+def _place_label(name: str, city: str) -> str:
+    return f"{name} ({city})" if city else name
+
+
+def _existing_places(trip: Trip, stage: str | None) -> list[str]:
+    """Names of already-planned events + stays, scoped to a stage when given."""
+    if stage:
+        events = Event.objects.filter(trip=trip, day__destination=stage)
+        stays = Stay.objects.filter(days__trip=trip, days__destination=stage)
+    else:
+        events = trip.all_events.all()
+        stays = Stay.objects.filter(days__trip=trip)
+    labels = [_place_label(e.name, e.city) for e in events]
+    labels += [_place_label(s.name, s.city) for s in stays.distinct()]
+    return labels
+
+
+def _weather_lines(trip: Trip, stage: str | None) -> list[str]:
+    """Compact per-day weather summaries, scoped to a stage when given."""
+    days = trip.days.filter(weather_data__isnull=False)
+    if stage:
+        days = days.filter(destination=stage)
+    lines = []
+    for day in days.order_by("number"):
+        w = day.weather_data
+        lines.append(
+            f"{day.date}: {w['weather_label']}, "
+            f"{round(w['temperature_min'])}–{round(w['temperature_max'])}°C, "
+            f"{w['precipitation_sum']}mm rain"
+        )
+    return lines
+
+
+def build_trip_context(
+    trip: Trip, language: str = "en", stage: str | None = None
+) -> TripContext:
+    """Build the TripContext fed to the provider from a Trip.
+
+    ``existing_places`` and ``weather`` are scoped to ``stage`` when one is
+    selected, so per-stage generations only see that stage's planned places and
+    forecast.
+    """
     return TripContext(
         destination=trip.destination,
         latitude=trip.destination_latitude,
@@ -105,6 +145,8 @@ def build_trip_context(trip: Trip, language: str = "en") -> TripContext:
         start_date=trip.start_date,
         end_date=trip.end_date,
         language=language,
+        existing_places=_existing_places(trip, stage),
+        weather=_weather_lines(trip, stage),
     )
 
 
@@ -209,7 +251,7 @@ def generate_suggestions(
             "No AI credentials configured", kind=AISuggestionError.CONFIG
         )
 
-    context = build_trip_context(trip, language=language)
+    context = build_trip_context(trip, language=language, stage=stage)
     if stage:
         _apply_stage(context, trip, stage)
     preferences = merge_preferences(

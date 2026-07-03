@@ -54,6 +54,13 @@ class TripContext(BaseModel):
     start_date: date | None = None
     end_date: date | None = None
     language: str = "en"
+    # Names of places already planned (events + stays), scoped to the selected
+    # stage when one is chosen. Fed to the prompt so the model avoids duplicates
+    # and favours nearby proposals.
+    existing_places: list[str] = Field(default_factory=list)
+    # Compact per-day weather lines for days that already have a forecast,
+    # scoped to the selected stage when one is chosen.
+    weather: list[str] = Field(default_factory=list)
 
 
 class SuggestionPrefs(BaseModel):

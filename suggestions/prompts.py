@@ -41,6 +41,21 @@ def build_prompt(context: TripContext, prefs: SuggestionPrefs) -> str:
     lines.append(f"Budget: {prefs.budget}")
     if prefs.notes:
         lines.append(f"Extra notes: {prefs.notes}")
+    if context.existing_places:
+        lines.append("")
+        lines.append(
+            "Already planned for this trip (do NOT propose these or close "
+            "duplicates, and favour suggestions geographically close to them):"
+        )
+        lines.extend(f"- {place}" for place in context.existing_places)
+    if context.weather:
+        lines.append("")
+        lines.append("Weather forecast for the trip days:")
+        lines.extend(f"- {line}" for line in context.weather)
+        lines.append(
+            "Favour indoor options on cold or rainy days and outdoor ones on "
+            "clear days."
+        )
     lines.append("")
     kind_labels = {"experience": "experiences", "meal": "meals", "stay": "stays"}
     if prefs.kinds:
