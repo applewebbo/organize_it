@@ -1,0 +1,28 @@
+{% load i18n %}
+<form hx-post="{% url 'trips:map-search' trip.pk %}"
+      hx-target="#search-results-panel"
+      hx-swap="innerHTML"
+      hx-indicator="#search-spinner"
+      hx-disabled-elt="button[type='submit']">
+    {% csrf_token %}
+    {% if has_custom_stages %}
+        <select name="stage_destination"
+                class="mb-2 w-full select select-sm select-bordered">
+            <option value="">{% trans '— all stages —' %}</option>
+            {% for stage in stages %}<option value="{{ stage.destination }}">{{ stage.destination }}</option>{% endfor %}
+        </select>
+    {% endif %}
+    <div class="flex gap-2">
+        <input type="search"
+               name="query"
+               placeholder="{% trans 'Search a place…' %}"
+               autocomplete="off"
+               required
+               class="w-full input input-sm input-bordered" />
+        <button type="submit" class="btn btn-sm btn-primary">
+            <i class="ph-bold ph-magnifying-glass i-sm htmx-hide-on-request"></i>
+            <span id="search-spinner"
+                  class="loading loading-spinner loading-xs htmx-indicator"></span>
+        </button>
+    </div>
+</form>

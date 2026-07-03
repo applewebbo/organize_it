@@ -186,7 +186,8 @@ def trip_map(request, pk):
     days_with_events, unassigned_events = _build_map_events_context(trip)
     map_items = _build_map_json(days_with_events, unassigned_events, trip)
     stages = get_trip_stages(trip)
-    has_cache = get_cached_suggestions(request.user, trip) is not None
+    ai_enabled = get_profile(request.user).ai_suggestions_enabled
+    has_cache = ai_enabled and get_cached_suggestions(request.user, trip) is not None
     return TemplateResponse(
         request,
         "trips/trip-map.html",
@@ -199,6 +200,7 @@ def trip_map(request, pk):
             "stages": stages,
             "has_custom_stages": any(not s["is_main"] for s in stages),
             "has_cache": has_cache,
+            "ai_suggestions_enabled": ai_enabled,
         },
     )
 

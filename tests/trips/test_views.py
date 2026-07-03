@@ -13,6 +13,7 @@ from django.urls import reverse
 from django.utils import timezone
 from pytest_django.asserts import assertTemplateUsed
 
+from accounts.models import Profile
 from tests.test import TestCase
 from tests.trips.factories import (
     EventFactory,
@@ -580,6 +581,23 @@ class TestTripDetailView(TestCase):
         self.response_200(response)
         assertTemplateUsed(response, "trips/trip-detail.html")
         assert response.context["trip"] == trip
+
+    def test_ai_suggestions_menu_hidden_when_disabled(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        with self.login(user):
+            response = self.get("trips:trip-detail", pk=trip.pk)
+        assert response.context["ai_suggestions_enabled"] is False
+        assert "AI suggestions" not in response.content.decode()
+
+    def test_ai_suggestions_menu_shown_when_enabled(self):
+        user = self.make_user("user")
+        Profile.objects.filter(user=user).update(ai_suggestions_enabled=True)
+        trip = TripFactory(author=user)
+        with self.login(user):
+            response = self.get("trips:trip-detail", pk=trip.pk)
+        assert response.context["ai_suggestions_enabled"] is True
+        assert "AI suggestions" in response.content.decode()
 
     def test_trip_detail_query_count_is_stable_with_more_events(self):
         """N+1 guard: trip-detail query count must not grow with events/stays."""

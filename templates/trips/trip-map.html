@@ -28,81 +28,57 @@
         <div class="flex flex-col lg:flex-row h-[calc(100vh-10rem)]">
             {# Left sidebar: search only #}
             <aside class="flex flex-col w-full border-b lg:w-80 lg:border-b-0 lg:border-r border-base-300 shrink-0">
-                {# Search / AI suggestions tabs #}
+                {# Search only, or Search / AI suggestions tabs when AI is enabled #}
                 <div class="p-3 border-b border-base-300">
-                    <div role="tablist" class="tabs tabs-border tabs-sm">
-                        {# Tab 1: manual search #}
-                        <input type="radio"
-                               name="map_panel_tab"
-                               role="tab"
-                               class="tab"
-                               aria-label="{% trans 'Search' %}"
-                               hx-get="{% url 'trips:map-search' trip.pk %}"
-                               hx-target="#search-results-panel"
-                               hx-swap="innerHTML"
-                               checked />
-                        <div role="tabpanel" class="pt-3 tab-content">
-                            <form hx-post="{% url 'trips:map-search' trip.pk %}"
-                                  hx-target="#search-results-panel"
-                                  hx-swap="innerHTML"
-                                  hx-indicator="#search-spinner"
-                                  hx-disabled-elt="button[type='submit']">
-                                {% csrf_token %}
-                                {% if has_custom_stages %}
-                                    <select name="stage_destination"
-                                            class="mb-2 w-full select select-sm select-bordered">
-                                        <option value="">{% trans '— all stages —' %}</option>
-                                        {% for stage in stages %}<option value="{{ stage.destination }}">{{ stage.destination }}</option>{% endfor %}
-                                    </select>
-                                {% endif %}
-                                <div class="flex gap-2">
-                                    <input type="search"
-                                           name="query"
-                                           placeholder="{% trans 'Search a place…' %}"
+                    {% if ai_suggestions_enabled %}
+                        <div role="tablist" class="tabs tabs-border tabs-sm">
+                            {# Tab 1: manual search #}
+                            <input type="radio"
+                                   name="map_panel_tab"
+                                   role="tab"
+                                   class="tab"
+                                   aria-label="{% trans 'Search' %}"
+                                   hx-get="{% url 'trips:map-search' trip.pk %}"
+                                   hx-target="#search-results-panel"
+                                   hx-swap="innerHTML"
+                                   checked />
+                            <div role="tabpanel" class="pt-3 tab-content">{% include "trips/partials/map-search-form.html" %}</div>
+                            {# Tab 2: AI suggestions #}
+                            <input type="radio"
+                                   name="map_panel_tab"
+                                   role="tab"
+                                   class="tab"
+                                   aria-label="{% trans 'AI suggestions' %}"
+                                   hx-get="{% url 'suggestions:cached' trip.pk %}"
+                                   hx-target="#search-results-panel"
+                                   hx-swap="innerHTML" />
+                            <div role="tabpanel" class="pt-3 tab-content">
+                                <form hx-post="{% url 'suggestions:generate' trip.pk %}"
+                                      hx-target="#search-results-panel"
+                                      hx-swap="innerHTML"
+                                      hx-indicator="#ai-spinner"
+                                      hx-disabled-elt="button[type='submit']">
+                                    {% csrf_token %}
+                                    {% if has_custom_stages %}
+                                        <select name="stage_destination"
+                                                class="mb-2 w-full select select-sm select-bordered">
+                                            <option value="">{% trans '— all stages —' %}</option>
+                                            {% for stage in stages %}<option value="{{ stage.destination }}">{{ stage.destination }}</option>{% endfor %}
+                                        </select>
+                                    {% endif %}
+                                    <input type="text"
+                                           name="notes"
+                                           placeholder="{% trans 'Notes for this trip (optional)…' %}"
                                            autocomplete="off"
-                                           required
-                                           class="w-full input input-sm input-bordered" />
-                                    <button type="submit" class="btn btn-sm btn-primary">
-                                        <i class="ph-bold ph-magnifying-glass i-sm htmx-hide-on-request"></i>
-                                        <span id="search-spinner"
-                                              class="loading loading-spinner loading-xs htmx-indicator"></span>
-                                    </button>
-                                </div>
-                            </form>
+                                           class="mb-2 w-full input input-sm input-bordered" />
+                                    {% include "suggestions/ai-kind-filter.html" %}
+                                    <div id="ai-generate-actions">{% include "suggestions/ai-map-actions.html" %}</div>
+                                </form>
+                            </div>
                         </div>
-                        {# Tab 2: AI suggestions #}
-                        <input type="radio"
-                               name="map_panel_tab"
-                               role="tab"
-                               class="tab"
-                               aria-label="{% trans 'AI suggestions' %}"
-                               hx-get="{% url 'suggestions:cached' trip.pk %}"
-                               hx-target="#search-results-panel"
-                               hx-swap="innerHTML" />
-                        <div role="tabpanel" class="pt-3 tab-content">
-                            <form hx-post="{% url 'suggestions:generate' trip.pk %}"
-                                  hx-target="#search-results-panel"
-                                  hx-swap="innerHTML"
-                                  hx-indicator="#ai-spinner"
-                                  hx-disabled-elt="button[type='submit']">
-                                {% csrf_token %}
-                                {% if has_custom_stages %}
-                                    <select name="stage_destination"
-                                            class="mb-2 w-full select select-sm select-bordered">
-                                        <option value="">{% trans '— all stages —' %}</option>
-                                        {% for stage in stages %}<option value="{{ stage.destination }}">{{ stage.destination }}</option>{% endfor %}
-                                    </select>
-                                {% endif %}
-                                <input type="text"
-                                       name="notes"
-                                       placeholder="{% trans 'Notes for this trip (optional)…' %}"
-                                       autocomplete="off"
-                                       class="mb-2 w-full input input-sm input-bordered" />
-                                {% include "suggestions/ai-kind-filter.html" %}
-                                <div id="ai-generate-actions">{% include "suggestions/ai-map-actions.html" %}</div>
-                            </form>
-                        </div>
-                    </div>
+                    {% else %}
+                        {% include "trips/partials/map-search-form.html" %}
+                    {% endif %}
                 </div>
                 {# Search results #}
                 <div id="search-results-panel" class="overflow-y-auto flex-1 p-3">

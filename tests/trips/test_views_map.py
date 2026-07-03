@@ -90,6 +90,24 @@ class TestTripMapView(TestCase):
         assert response.context["unassigned_events"].count() == 1
 
 
+class TestMapAITabGating(TestCase):
+    def test_ai_tab_hidden_when_disabled(self):
+        user = self.make_user("owner@example.com")
+        trip = TripFactory(author=user)
+        with self.login(user):
+            response = self.get("trips:trip-map", pk=trip.pk)
+        assert "AI suggestions" not in response.content.decode()
+
+    def test_ai_tab_shown_when_enabled(self):
+        user = self.make_user("owner@example.com")
+        user.profile.ai_suggestions_enabled = True
+        user.profile.save()
+        trip = TripFactory(author=user)
+        with self.login(user):
+            response = self.get("trips:trip-map", pk=trip.pk)
+        assert "AI suggestions" in response.content.decode()
+
+
 class TestMapStageCoords(TestCase):
     def test_main_stage_coords_from_trip(self):
         user = self.make_user("owner@example.com")

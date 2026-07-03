@@ -157,6 +157,14 @@ class Profile(models.Model):
         default=True,
         help_text=_("Receive a daily summary email of your trip plan during the trip."),
     )
+    ai_suggestions_enabled = models.BooleanField(
+        _("Enable AI suggestions"),
+        default=False,
+        help_text=_(
+            "When enabled, the AI suggestions settings and the in-app AI "
+            "suggestions features become available."
+        ),
+    )
 
     def save(self, *args, **kwargs):
         old = Profile.objects.filter(pk=self.pk).first()

@@ -6,7 +6,11 @@ from django.views.decorators.http import require_GET, require_POST
 
 from accounts.models import get_profile
 from suggestions.ai.base import AISuggestionError
-from suggestions.forms import AICredentialsForm, SuggestionPreferencesForm
+from suggestions.forms import (
+    AICredentialsForm,
+    AISuggestionsToggleForm,
+    SuggestionPreferencesForm,
+)
 from suggestions.models import AICredentials, SuggestionPreferences
 from suggestions.services import generate_suggestions, get_cached_suggestions
 from trips.models import Event, Stay, Trip
@@ -96,15 +100,22 @@ def settings_view(request):
     """
     credentials = AICredentials.objects.filter(user=request.user).first()
     preferences, _ = SuggestionPreferences.objects.get_or_create(user=request.user)
+    profile = get_profile(request.user)
 
     credentials_form = AICredentialsForm(request.POST or None, instance=credentials)
     preferences_form = SuggestionPreferencesForm(
         request.POST or None, instance=preferences
     )
+    toggle_form = AISuggestionsToggleForm(request.POST or None, instance=profile)
 
     saved = False
     if request.method == "POST":
-        if credentials_form.is_valid() and preferences_form.is_valid():
+        if (
+            toggle_form.is_valid()
+            and credentials_form.is_valid()
+            and preferences_form.is_valid()
+        ):
+            toggle_form.save()
             preferences_form.save()
             api_key = credentials_form.cleaned_data["api_key_encrypted"]
             if api_key:
@@ -119,7 +130,9 @@ def settings_view(request):
         {
             "credentials_form": credentials_form,
             "preferences_form": preferences_form,
+            "toggle_form": toggle_form,
             "has_credentials": credentials is not None,
+            "ai_enabled": profile.ai_suggestions_enabled,
             "saved": saved,
         },
     )

@@ -1,5 +1,6 @@
 import pytest
 
+from accounts.models import Profile
 from suggestions.models import AICredentials, SuggestionPreferences
 from tests.suggestions.factories import AICredentialsFactory
 from tests.test import TestCase
@@ -91,3 +92,26 @@ class TestSuggestionSettingsView(TestCase):
             response = self.post("suggestions:settings", data=data)
         self.response_200(response)
         assert response.context["saved"] is False
+
+    def test_ai_disabled_by_default(self):
+        user = self.make_user("user")
+        with self.login(user):
+            response = self.get("suggestions:settings")
+        assert response.context["ai_enabled"] is False
+
+    def test_post_enables_ai_suggestions(self):
+        user = self.make_user("user")
+        data = {**BASE_DATA, "ai_suggestions_enabled": "on"}
+        with self.login(user):
+            response = self.post("suggestions:settings", data=data)
+        self.response_200(response)
+        assert response.context["ai_enabled"] is True
+        assert Profile.objects.get(user=user).ai_suggestions_enabled is True
+
+    def test_post_disables_ai_suggestions(self):
+        user = self.make_user("user")
+        Profile.objects.filter(user=user).update(ai_suggestions_enabled=True)
+        # Unchecked checkbox is absent from the POST payload → disabled
+        with self.login(user):
+            self.post("suggestions:settings", data=BASE_DATA)
+        assert Profile.objects.get(user=user).ai_suggestions_enabled is False

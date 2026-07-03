@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-02 09:12+0200\n"
+"POT-Creation-Date: 2026-07-03 15:50+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -126,6 +126,16 @@ msgid "Receive a daily summary email of your trip plan during the trip."
 msgstr ""
 "Ricevi ogni giorno un'email con il riepilogo del programma durante il "
 "viaggio."
+
+msgid "Enable AI suggestions"
+msgstr "Attiva i suggerimenti AI"
+
+msgid ""
+"When enabled, the AI suggestions settings and the in-app AI suggestions "
+"features become available."
+msgstr ""
+"Quando attivo, le impostazioni dei suggerimenti AI e le funzionalità di "
+"suggerimenti AI nell'app diventano disponibili."
 
 msgid "Settings modified succesfully"
 msgstr "Impostazioni salvate"
@@ -1590,6 +1600,9 @@ msgstr "Non assegnato"
 msgid "No events yet"
 msgstr "Nessun evento"
 
+msgid "Search a place…"
+msgstr "Cerca un luogo…"
+
 msgid "Add as Experience"
 msgstr "Aggiungi come esperienza"
 
@@ -1729,9 +1742,6 @@ msgstr "Vedi"
 
 msgid "Back to events"
 msgstr "Torna agli eventi"
-
-msgid "Search a place…"
-msgstr "Cerca un luogo…"
 
 msgid "Trip events"
 msgstr "Eventi del viaggio"

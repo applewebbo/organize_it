@@ -3,6 +3,7 @@
      class="mx-auto mt-8 max-w-2xl shadow card card-border bg-base-100">
     <form method="post"
           class="card-body"
+          x-data="{ enabled: {{ ai_enabled|yesno:'true,false' }} }"
           hx-post="{% url 'suggestions:settings' %}"
           hx-target="#ai-settings"
           hx-swap="outerHTML">
@@ -13,69 +14,82 @@
                 <span>{% trans "AI settings saved successfully" %}</span>
             </div>
         {% endif %}
-        <div class="mb-4">
-            <label for="{{ credentials_form.provider.id_for_label }}"
-                   class="block mb-2 font-medium">{{ credentials_form.provider.label }}</label>
-            {{ credentials_form.provider }}
-            {% if credentials_form.provider.errors %}
-                <div class="mt-1 text-sm text-error">{{ credentials_form.provider.errors }}</div>
-            {% endif %}
-        </div>
         <div class="mb-6">
-            <label for="{{ credentials_form.api_key_encrypted.id_for_label }}"
-                   class="block mb-2 font-medium">{{ credentials_form.api_key_encrypted.label }}</label>
-            {{ credentials_form.api_key_encrypted }}
-            <p class="mt-1 text-xs italic text-base-content/50">
-                {% if has_credentials %}
-                    {% trans "A key is already configured." %}
+            <label class="flex gap-3 items-center cursor-pointer">
+                <input type="checkbox"
+                       name="ai_suggestions_enabled"
+                       class="toggle toggle-primary"
+                       x-model="enabled"
+                       {% if ai_enabled %}checked{% endif %} />
+                <span class="font-medium">{% trans "Enable AI suggestions" %}</span>
+            </label>
+            <p class="mt-1 text-xs italic text-base-content/50">{{ toggle_form.ai_suggestions_enabled.help_text }}</p>
+        </div>
+        <div x-show="enabled" x-cloak>
+            <div class="mb-4">
+                <label for="{{ credentials_form.provider.id_for_label }}"
+                       class="block mb-2 font-medium">{{ credentials_form.provider.label }}</label>
+                {{ credentials_form.provider }}
+                {% if credentials_form.provider.errors %}
+                    <div class="mt-1 text-sm text-error">{{ credentials_form.provider.errors }}</div>
                 {% endif %}
-                {{ credentials_form.api_key_encrypted.help_text }}
-            </p>
-            {% if credentials_form.api_key_encrypted.errors %}
-                <div class="mt-1 text-sm text-error">{{ credentials_form.api_key_encrypted.errors }}</div>
-            {% endif %}
-        </div>
-        <div class="mb-4">
-            <label class="block mb-2 font-medium">{{ preferences_form.favored_experience_types.label }}</label>
-            <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {% for checkbox in preferences_form.favored_experience_types %}
-                    <label class="flex gap-2 items-center cursor-pointer">
-                        {{ checkbox.tag }}
-                        <span>{{ checkbox.choice_label }}</span>
-                    </label>
-                {% endfor %}
             </div>
-        </div>
-        <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-3">
-            <div>
-                <label for="{{ preferences_form.dietary.id_for_label }}"
-                       class="block mb-2 font-medium">{{ preferences_form.dietary.label }}</label>
-                {{ preferences_form.dietary }}
+            <div class="mb-6">
+                <label for="{{ credentials_form.api_key_encrypted.id_for_label }}"
+                       class="block mb-2 font-medium">{{ credentials_form.api_key_encrypted.label }}</label>
+                {{ credentials_form.api_key_encrypted }}
+                <p class="mt-1 text-xs italic text-base-content/50">
+                    {% if has_credentials %}
+                        {% trans "A key is already configured." %}
+                    {% endif %}
+                    {{ credentials_form.api_key_encrypted.help_text }}
+                </p>
+                {% if credentials_form.api_key_encrypted.errors %}
+                    <div class="mt-1 text-sm text-error">{{ credentials_form.api_key_encrypted.errors }}</div>
+                {% endif %}
             </div>
-            <div>
-                <label for="{{ preferences_form.pace.id_for_label }}"
-                       class="block mb-2 font-medium">{{ preferences_form.pace.label }}</label>
-                {{ preferences_form.pace }}
+            <div class="mb-4">
+                <label class="block mb-2 font-medium">{{ preferences_form.favored_experience_types.label }}</label>
+                <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    {% for checkbox in preferences_form.favored_experience_types %}
+                        <label class="flex gap-2 items-center cursor-pointer">
+                            {{ checkbox.tag }}
+                            <span>{{ checkbox.choice_label }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
             </div>
-            <div>
-                <label for="{{ preferences_form.budget.id_for_label }}"
-                       class="block mb-2 font-medium">{{ preferences_form.budget.label }}</label>
-                {{ preferences_form.budget }}
+            <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-3">
+                <div>
+                    <label for="{{ preferences_form.dietary.id_for_label }}"
+                           class="block mb-2 font-medium">{{ preferences_form.dietary.label }}</label>
+                    {{ preferences_form.dietary }}
+                </div>
+                <div>
+                    <label for="{{ preferences_form.pace.id_for_label }}"
+                           class="block mb-2 font-medium">{{ preferences_form.pace.label }}</label>
+                    {{ preferences_form.pace }}
+                </div>
+                <div>
+                    <label for="{{ preferences_form.budget.id_for_label }}"
+                           class="block mb-2 font-medium">{{ preferences_form.budget.label }}</label>
+                    {{ preferences_form.budget }}
+                </div>
             </div>
-        </div>
-        <div class="mb-4">
-            <label for="{{ preferences_form.result_count.id_for_label }}"
-                   class="block mb-2 font-medium">{{ preferences_form.result_count.label }}</label>
-            {{ preferences_form.result_count }}
-            <p class="mt-1 text-xs italic text-base-content/50">{{ preferences_form.result_count.help_text }}</p>
-            {% if preferences_form.result_count.errors %}
-                <div class="mt-1 text-sm text-error">{{ preferences_form.result_count.errors }}</div>
-            {% endif %}
-        </div>
-        <div class="mb-4">
-            <label for="{{ preferences_form.notes.id_for_label }}"
-                   class="block mb-2 font-medium">{{ preferences_form.notes.label }}</label>
-            {{ preferences_form.notes }}
+            <div class="mb-4">
+                <label for="{{ preferences_form.result_count.id_for_label }}"
+                       class="block mb-2 font-medium">{{ preferences_form.result_count.label }}</label>
+                {{ preferences_form.result_count }}
+                <p class="mt-1 text-xs italic text-base-content/50">{{ preferences_form.result_count.help_text }}</p>
+                {% if preferences_form.result_count.errors %}
+                    <div class="mt-1 text-sm text-error">{{ preferences_form.result_count.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="mb-4">
+                <label for="{{ preferences_form.notes.id_for_label }}"
+                       class="block mb-2 font-medium">{{ preferences_form.notes.label }}</label>
+                {{ preferences_form.notes }}
+            </div>
         </div>
         <div class="flex justify-end mt-2">
             <button type="submit" class="btn btn-sm btn-soft btn-primary">{% trans "Save" %}</button>

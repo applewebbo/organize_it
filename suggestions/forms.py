@@ -1,6 +1,7 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
+from accounts.models import Profile
 from suggestions.models import (
     MAX_RESULT_COUNT,
     MIN_RESULT_COUNT,
@@ -8,6 +9,19 @@ from suggestions.models import (
     SuggestionPreferences,
 )
 from trips.models import Experience
+
+
+class AISuggestionsToggleForm(forms.ModelForm):
+    """Single-field form for the AI suggestions activation flag on the profile."""
+
+    class Meta:
+        model = Profile
+        fields = ("ai_suggestions_enabled",)
+        widgets = {
+            "ai_suggestions_enabled": forms.CheckboxInput(
+                attrs={"class": "toggle toggle-primary"}
+            ),
+        }
 
 
 class AICredentialsForm(forms.ModelForm):

@@ -81,15 +81,17 @@
                                 {% trans 'Meal' %}
                             </a>
                         </li>
-                        <li>
-                            <a hx-get="{% url 'suggestions:modal' trip.pk %}"
-                               hx-target="#dialog"
-                               hx-swap="innerHTML"
-                               @click="$dispatch('open-modal'); document.activeElement.blur()">
-                                <i class="text-purple-500 ph-bold ph-sparkle i-sm" aria-hidden="true"></i>
-                                {% trans 'AI suggestions' %}
-                            </a>
-                        </li>
+                        {% if ai_suggestions_enabled %}
+                            <li>
+                                <a hx-get="{% url 'suggestions:modal' trip.pk %}"
+                                   hx-target="#dialog"
+                                   hx-swap="innerHTML"
+                                   @click="$dispatch('open-modal'); document.activeElement.blur()">
+                                    <i class="text-purple-500 ph-bold ph-sparkle i-sm" aria-hidden="true"></i>
+                                    {% trans 'AI suggestions' %}
+                                </a>
+                            </li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>

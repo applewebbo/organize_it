@@ -272,6 +272,7 @@ def get_trips(user):
         "day_groups": day_groups,
         "show_transfer_info": profile.show_transfer_info,
         "show_weather": profile.show_weather,
+        "ai_suggestions_enabled": profile.ai_suggestions_enabled,
         "from_home_duration": first_day.transfer_duration_from_prev
         if first_day and not arrival_transfer
         else None,
