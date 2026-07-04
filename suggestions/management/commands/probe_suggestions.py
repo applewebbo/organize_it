@@ -18,7 +18,9 @@ from suggestions.models import AICredentials, SuggestionPreferences
 from suggestions.prompts import build_prompt
 from suggestions.services import (
     _GROUNDING_RADIUS,
+    _MAX_BIAS_RADIUS,
     _OVERFETCH_FACTOR,
+    _RADIUS_METERS,
     _apply_stage,
     _haversine_m,
     build_trip_context,
@@ -42,6 +44,11 @@ class Command(BaseCommand):
         parser.add_argument("--count", type=int, help="Override result_count")
         parser.add_argument(
             "--kinds", help="Comma-separated kinds (experience,meal,stay)"
+        )
+        parser.add_argument(
+            "--radius",
+            choices=("city", "nearby", "day_trips"),
+            help="Override the stored search_radius preference",
         )
         parser.add_argument(
             "--no-ground",
@@ -90,7 +97,8 @@ class Command(BaseCommand):
         if opts["no_ground"]:
             return
 
-        self._ground_all(raw, context, prefs.result_count)
+        radius = _RADIUS_METERS.get(prefs.search_radius, _GROUNDING_RADIUS)
+        self._ground_all(raw, context, prefs.result_count, radius)
 
     def _resolve_user(self, trip, email):
         if not email:
@@ -109,16 +117,25 @@ class Command(BaseCommand):
         prefs = merge_preferences(
             SuggestionPreferences.objects.filter(user=user).first(), overrides
         )
+        updates = {}
         if opts["count"]:
-            prefs = prefs.model_copy(update={"result_count": opts["count"]})
+            updates["result_count"] = opts["count"]
+        if opts["radius"]:
+            updates["search_radius"] = opts["radius"]
+        if updates:
+            prefs = prefs.model_copy(update=updates)
         return prefs
 
-    def _ground_all(self, raw, context, target):
-        self._section("GROUNDING (Google Places)")
+    def _ground_all(self, raw, context, target, radius=_GROUNDING_RADIUS):
+        self._section(f"GROUNDING (Google Places, radius {radius / 1000:.0f}km)")
         client = GooglePlacesClient()
         bias = None
         if context.latitude is not None and context.longitude is not None:
-            bias = (context.latitude, context.longitude, _GROUNDING_RADIUS)
+            bias = (
+                context.latitude,
+                context.longitude,
+                min(radius, _MAX_BIAS_RADIUS),
+            )
 
         grounded = 0
         for i, s in enumerate(raw, 1):
@@ -142,10 +159,10 @@ class Command(BaseCommand):
             place = results[0]
             if bias is not None:
                 dist = _haversine_m(bias[0], bias[1], place.lat, place.lng)
-                if dist > bias[2]:
+                if dist > radius:
                     self.stdout.write(
                         f"{i}. {s.name}: REJECTED "
-                        f"({dist / 1000:.1f}km > {bias[2] / 1000:.0f}km radius)"
+                        f"({dist / 1000:.1f}km > {radius / 1000:.0f}km radius)"
                     )
                     continue
             grounded += 1

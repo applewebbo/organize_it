@@ -54,9 +54,18 @@ class TestSuggestionPreferences:
         prefs = SuggestionPreferencesFactory()
         assert prefs.favored_experience_types == []
         assert prefs.dietary == SuggestionPreferences.Dietary.NONE
-        assert prefs.pace == SuggestionPreferences.Pace.MODERATE
         assert prefs.budget == SuggestionPreferences.Budget.MEDIUM
+        assert prefs.travel_party == SuggestionPreferences.TravelParty.UNSPECIFIED
+        assert prefs.travel_style == SuggestionPreferences.TravelStyle.BALANCED
+        assert prefs.cuisine == SuggestionPreferences.Cuisine.ANY
+        assert prefs.interests == []
+        assert prefs.search_radius == SuggestionPreferences.SearchRadius.NEARBY
         assert prefs.notes == ""
+
+    def test_interests_persists(self):
+        prefs = SuggestionPreferencesFactory(interests=["history", "art"])
+        prefs.refresh_from_db()
+        assert prefs.interests == ["history", "art"]
 
     def test_one_to_one_with_user(self):
         prefs = SuggestionPreferencesFactory()

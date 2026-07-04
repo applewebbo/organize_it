@@ -15,6 +15,20 @@ from trips.services import GooglePlacesClient, GooglePlacesError
 # Radius (meters) used to bias Google Places search around the destination.
 _GROUNDING_RADIUS = 50000
 
+# Google Places rejects a locationBias circle radius above 50km. Wider search
+# areas (e.g. day trips) are still enforced via the post-grounding distance
+# check, so only the soft bias hint sent to Google is clamped to this cap.
+_MAX_BIAS_RADIUS = 50000
+
+# Per-preference search radius in meters. Maps the user-facing SearchRadius
+# choice to the Google Places location-bias radius; "nearby" keeps the historic
+# default so existing cached results stay valid.
+_RADIUS_METERS = {
+    "city": 8000,
+    "nearby": _GROUNDING_RADIUS,
+    "day_trips": 150000,
+}
+
 # Generated suggestions are cached for a day to spare the free-tier quota.
 _CACHE_TTL = 24 * 3600
 
@@ -169,13 +183,17 @@ def merge_preferences(
         merged = SuggestionPrefs(
             favored_experience_types=defaults.favored_experience_types,
             dietary=defaults.dietary,
-            pace=defaults.pace,
             budget=defaults.budget,
+            travel_party=defaults.travel_party,
+            travel_style=defaults.travel_style,
+            interests=defaults.interests,
+            cuisine=defaults.cuisine,
+            search_radius=defaults.search_radius,
             notes=defaults.notes,
             result_count=defaults.result_count,
         )
 
-    for field in ("favored_experience_types", "dietary", "pace", "budget", "kinds"):
+    for field in ("favored_experience_types", "dietary", "budget", "kinds"):
         if overrides.get(field) is not None:
             setattr(merged, field, overrides[field])
 
@@ -190,6 +208,7 @@ def _ground(
     suggestion: Suggestion,
     context: TripContext,
     client: GooglePlacesClient,
+    radius: int = _GROUNDING_RADIUS,
 ) -> GroundedSuggestion | None:
     """Resolve a suggestion to a real place; return None if not found."""
     query = " ".join(
@@ -199,7 +218,11 @@ def _ground(
     )
     location_bias = None
     if context.latitude is not None and context.longitude is not None:
-        location_bias = (context.latitude, context.longitude, _GROUNDING_RADIUS)
+        location_bias = (
+            context.latitude,
+            context.longitude,
+            min(radius, _MAX_BIAS_RADIUS),
+        )
 
     try:
         results = client.search_text(
@@ -217,10 +240,11 @@ def _ground(
     place = results[0]
     # locationBias is a soft hint: Google may still return a stronger text match
     # in another city (e.g. a same-named restaurant hundreds of km away). Reject
-    # grounded places that fall outside the bias radius so results stay scoped to
-    # the destination / selected stage.
+    # grounded places that fall outside the requested radius so results stay
+    # scoped to the destination / selected stage. The acceptance radius is the
+    # full requested value, which may exceed the clamped bias hint (day trips).
     if location_bias is not None:
-        lat0, lng0, radius = location_bias
+        lat0, lng0, _bias = location_bias
         if _haversine_m(lat0, lng0, place.lat, place.lng) > radius:
             return None
 
@@ -283,13 +307,14 @@ def generate_suggestions(
         suggestions = [s for s in suggestions if s.kind.value in preferences.kinds]
 
     client = GooglePlacesClient()
+    radius = _RADIUS_METERS.get(preferences.search_radius, _GROUNDING_RADIUS)
     grounded = []
     # Ground candidates until we reach the requested count; stopping early keeps
     # Google Places calls bounded when grounding succeeds cleanly.
     for suggestion in suggestions:
         if len(grounded) >= preferences.result_count:
             break
-        result = _ground(suggestion, context, client)
+        result = _ground(suggestion, context, client, radius)
         if result is not None:
             grounded.append(result)
 

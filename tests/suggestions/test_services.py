@@ -125,13 +125,22 @@ class TestMergePreferences:
         defaults = SuggestionPreferencesFactory.build(
             favored_experience_types=[1, 2],
             dietary="vegan",
-            pace="relaxed",
             budget="high",
+            travel_party="family",
+            travel_style="offbeat",
+            interests=["history"],
+            cuisine="local",
+            search_radius="city",
             notes="no crowds",
         )
         prefs = merge_preferences(defaults, None)
         assert prefs.dietary == "vegan"
         assert prefs.favored_experience_types == [1, 2]
+        assert prefs.travel_party == "family"
+        assert prefs.travel_style == "offbeat"
+        assert prefs.interests == ["history"]
+        assert prefs.cuisine == "local"
+        assert prefs.search_radius == "city"
         assert prefs.notes == "no crowds"
 
     def test_overrides_win_field_by_field(self):
@@ -203,6 +212,77 @@ class TestGenerateSuggestions:
         # location bias passed because the trip has coordinates
         _, kwargs = mock_client.return_value.search_text.call_args
         assert kwargs["location_bias"] == (41.9, 12.5, 50000)
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_search_radius_preference_sets_bias_radius(
+        self, mock_get_provider, mock_client
+    ):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        SuggestionPreferencesFactory(user=creds.user, search_radius="city")
+        trip = TripFactory(author=creds.user)
+        TripFactory._meta.model.objects.filter(pk=trip.pk).update(
+            destination_latitude=41.9, destination_longitude=12.5
+        )
+        trip.refresh_from_db()
+        suggestion = Suggestion(kind="meal", name="Trattoria", type=3, city="Roma")
+        mock_get_provider.return_value = self._provider_returning([suggestion])
+        mock_client.return_value.search_text.return_value = [PLACE]
+
+        generate_suggestions(creds.user, trip)
+
+        _, kwargs = mock_client.return_value.search_text.call_args
+        assert kwargs["location_bias"] == (41.9, 12.5, 8000)
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_day_trips_radius_is_clamped_for_google_bias(
+        self, mock_get_provider, mock_client
+    ):
+        # Google Places rejects a locationBias circle radius above 50km, so the
+        # bias must be clamped even though the acceptance radius is wider.
+        creds = AICredentialsFactory(user=TripFactory().author)
+        SuggestionPreferencesFactory(user=creds.user, search_radius="day_trips")
+        trip = TripFactory(author=creds.user)
+        TripFactory._meta.model.objects.filter(pk=trip.pk).update(
+            destination_latitude=43.77, destination_longitude=11.25
+        )
+        trip.refresh_from_db()
+        suggestion = Suggestion(kind="experience", name="Cinque Terre", type=1)
+        mock_get_provider.return_value = self._provider_returning([suggestion])
+        mock_client.return_value.search_text.return_value = [PLACE]
+
+        generate_suggestions(creds.user, trip)
+
+        _, kwargs = mock_client.return_value.search_text.call_args
+        assert kwargs["location_bias"] == (43.77, 11.25, 50000)
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_day_trips_radius_accepts_places_beyond_50km(
+        self, mock_get_provider, mock_client
+    ):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        SuggestionPreferencesFactory(user=creds.user, search_radius="day_trips")
+        trip = TripFactory(author=creds.user)
+        TripFactory._meta.model.objects.filter(pk=trip.pk).update(
+            destination_latitude=43.77, destination_longitude=11.25
+        )
+        trip.refresh_from_db()
+        suggestion = Suggestion(kind="experience", name="Bologna", type=1)
+        mock_get_provider.return_value = self._provider_returning([suggestion])
+        # ~100km north of Florence: rejected under "nearby" (50km) but within
+        # the "day_trips" acceptance radius (150km).
+        near_day_trip = PlaceResult(
+            place_id="ChIJ_bologna",
+            name="Bologna",
+            address="Piazza Maggiore, Bologna BO",
+            lat=44.67,
+            lng=11.25,
+        )
+        mock_client.return_value.search_text.return_value = [near_day_trip]
+
+        assert len(generate_suggestions(creds.user, trip)) == 1
 
     @patch("suggestions.services.GooglePlacesClient")
     @patch("suggestions.services.get_provider")

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-03 15:50+0200\n"
+"POT-Creation-Date: 2026-07-04 08:26+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -143,23 +143,35 @@ msgstr "Impostazioni salvate"
 msgid "API key"
 msgstr "Chiave API"
 
-msgid "Stored encrypted. Leave blank to keep the current key."
-msgstr "Memorizzata cifrata. Lascia vuoto per mantenere la chiave attuale."
+msgid "Leave blank to keep the current key."
+msgstr "Lascia vuoto per mantenere la chiave attuale."
 
 msgid "Provider"
 msgstr "Provider"
 
-msgid "Favoured experience types"
-msgstr "Tipi di esperienza preferiti"
+msgid "Favoured activity types"
+msgstr "Tipi di attività preferiti"
+
+msgid "Interests / themes"
+msgstr "Interessi / temi"
+
+msgid "Travelling as"
+msgstr "In viaggio come"
+
+msgid "Travel style"
+msgstr "Stile di viaggio"
 
 msgid "Dietary preference"
 msgstr "Preferenza alimentare"
 
-msgid "Pace"
-msgstr "Ritmo"
+msgid "Cuisine type"
+msgstr "Tipo di cucina"
 
 msgid "Budget"
 msgstr "Budget"
+
+msgid "Search area"
+msgstr "Area di ricerca"
 
 msgid "Number of suggestions"
 msgstr "Numero di suggerimenti"
@@ -170,8 +182,9 @@ msgstr "Note"
 msgid "How many suggestions to request per generation."
 msgstr "Quanti suggerimenti richiedere a ogni generazione."
 
-msgid "e.g. avoid tourist traps, travelling with kids"
-msgstr "es. evitare le trappole per turisti, in viaggio con bambini"
+msgid "e.g. we have a car, avoid long queues, prefer venues open late"
+msgstr ""
+"es. abbiamo l'auto, evitare lunghe code, preferire locali aperti fino a tardi"
 
 msgid "Google Gemini"
 msgstr "Google Gemini"
@@ -191,15 +204,6 @@ msgstr "Vegano"
 msgid "Gluten-free"
 msgstr "Senza glutine"
 
-msgid "Relaxed"
-msgstr "Rilassato"
-
-msgid "Moderate"
-msgstr "Moderato"
-
-msgid "Packed"
-msgstr "Intenso"
-
 msgid "Low"
 msgstr "Basso"
 
@@ -208,6 +212,69 @@ msgstr "Medio"
 
 msgid "High"
 msgstr "Alto"
+
+msgid "Not specified"
+msgstr "Non specificata"
+
+msgid "Solo"
+msgstr "Da solo"
+
+msgid "Couple"
+msgstr "In coppia"
+
+msgid "Family with children"
+msgstr "Famiglia con bambini"
+
+msgid "Group of friends"
+msgstr "Gruppo di amici"
+
+msgid "Iconic must-sees"
+msgstr "Icone imperdibili"
+
+msgid "Balanced"
+msgstr "Bilanciato"
+
+msgid "Off the beaten path"
+msgstr "Fuori dai circuiti turistici"
+
+msgid "History"
+msgstr "Storia"
+
+msgid "Art"
+msgstr "Arte"
+
+msgid "Nature"
+msgstr "Natura"
+
+msgid "Nightlife"
+msgstr "Vita notturna"
+
+msgid "Shopping"
+msgstr "Shopping"
+
+msgid "Local food"
+msgstr "Cucina locale"
+
+msgid "Relax"
+msgstr "Relax"
+
+msgid "Local traditional"
+msgstr "Tradizionale locale"
+
+msgid "Street food"
+msgstr "Street food"
+
+msgid "International"
+msgstr "Internazionale"
+
+msgid "Within the city"
+msgstr "In città"
+
+msgid "City and surroundings"
+msgstr "Città e dintorni"
+
+msgid "Include day trips"
+msgstr "Includi gite fuori porta"
 
 msgid "Suggestion preferences"
 msgstr "Preferenze suggerimenti"
@@ -669,6 +736,12 @@ msgstr "Impostazioni AI salvate correttamente"
 
 msgid "A key is already configured."
 msgstr "Una chiave è già configurata."
+
+msgid "Who's travelling"
+msgstr "Chi viaggia"
+
+msgid "Preferences"
+msgstr "Preferenze"
 
 msgid "Added to your trip"
 msgstr "Aggiunto al viaggio"
@@ -1819,9 +1892,6 @@ msgstr "Destinazione non trovata"
 msgid "Start time"
 msgstr "Orario di inizio"
 
-msgid "Not specified"
-msgstr "Non specificata"
-
 msgid "Duration"
 msgstr "Durata"
 
@@ -2259,11 +2329,20 @@ msgstr "Errore API di Unsplash. Per favore riprova più tardi."
 msgid "No images found for '{query}'"
 msgstr "Nessuna immagine trovata per '{query}'"
 
+#~ msgid "e.g. avoid tourist traps, travelling with kids"
+#~ msgstr "es. evitare le trappole per turisti, in viaggio con bambini"
+
+#~ msgid "Pace"
+#~ msgstr "Ritmo"
+
+#~ msgid "Moderate"
+#~ msgstr "Moderato"
+
+#~ msgid "Packed"
+#~ msgstr "Intenso"
+
 #~ msgid "Added"
 #~ msgstr "Aggiunto"
-
-#~ msgid "Search Places"
-#~ msgstr "Cerca Luoghi"
 
 #~ msgid "Remove participant"
 #~ msgstr "Rimuovi partecipante"

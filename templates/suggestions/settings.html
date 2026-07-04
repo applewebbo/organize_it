@@ -48,10 +48,35 @@
                     <div class="mt-1 text-sm text-error">{{ credentials_form.api_key_encrypted.errors }}</div>
                 {% endif %}
             </div>
+            <h3 class="mt-2 mb-3 text-sm font-semibold uppercase text-base-content/60">{% trans "Who's travelling" %}</h3>
+            <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2">
+                <div>
+                    <label for="{{ preferences_form.travel_party.id_for_label }}"
+                           class="block mb-2 font-medium">{{ preferences_form.travel_party.label }}</label>
+                    {{ preferences_form.travel_party }}
+                </div>
+                <div>
+                    <label for="{{ preferences_form.travel_style.id_for_label }}"
+                           class="block mb-2 font-medium">{{ preferences_form.travel_style.label }}</label>
+                    {{ preferences_form.travel_style }}
+                </div>
+            </div>
+            <h3 class="mt-4 mb-3 text-sm font-semibold uppercase text-base-content/60">{% trans "Preferences" %}</h3>
             <div class="mb-4">
                 <label class="block mb-2 font-medium">{{ preferences_form.favored_experience_types.label }}</label>
                 <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
                     {% for checkbox in preferences_form.favored_experience_types %}
+                        <label class="flex gap-2 items-center cursor-pointer">
+                            {{ checkbox.tag }}
+                            <span>{{ checkbox.choice_label }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block mb-2 font-medium">{{ preferences_form.interests.label }}</label>
+                <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    {% for checkbox in preferences_form.interests %}
                         <label class="flex gap-2 items-center cursor-pointer">
                             {{ checkbox.tag }}
                             <span>{{ checkbox.choice_label }}</span>
@@ -66,9 +91,9 @@
                     {{ preferences_form.dietary }}
                 </div>
                 <div>
-                    <label for="{{ preferences_form.pace.id_for_label }}"
-                           class="block mb-2 font-medium">{{ preferences_form.pace.label }}</label>
-                    {{ preferences_form.pace }}
+                    <label for="{{ preferences_form.cuisine.id_for_label }}"
+                           class="block mb-2 font-medium">{{ preferences_form.cuisine.label }}</label>
+                    {{ preferences_form.cuisine }}
                 </div>
                 <div>
                     <label for="{{ preferences_form.budget.id_for_label }}"
@@ -76,14 +101,21 @@
                     {{ preferences_form.budget }}
                 </div>
             </div>
-            <div class="mb-4">
-                <label for="{{ preferences_form.result_count.id_for_label }}"
-                       class="block mb-2 font-medium">{{ preferences_form.result_count.label }}</label>
-                {{ preferences_form.result_count }}
-                <p class="mt-1 text-xs italic text-base-content/50">{{ preferences_form.result_count.help_text }}</p>
-                {% if preferences_form.result_count.errors %}
-                    <div class="mt-1 text-sm text-error">{{ preferences_form.result_count.errors }}</div>
-                {% endif %}
+            <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2">
+                <div>
+                    <label for="{{ preferences_form.search_radius.id_for_label }}"
+                           class="block mb-2 font-medium">{{ preferences_form.search_radius.label }}</label>
+                    {{ preferences_form.search_radius }}
+                </div>
+                <div>
+                    <label for="{{ preferences_form.result_count.id_for_label }}"
+                           class="block mb-2 font-medium">{{ preferences_form.result_count.label }}</label>
+                    <div class="max-w-32">{{ preferences_form.result_count }}</div>
+                    <p class="mt-1 text-xs italic text-base-content/50">{{ preferences_form.result_count.help_text }}</p>
+                    {% if preferences_form.result_count.errors %}
+                        <div class="mt-1 text-sm text-error">{{ preferences_form.result_count.errors }}</div>
+                    {% endif %}
+                </div>
             </div>
             <div class="mb-4">
                 <label for="{{ preferences_form.notes.id_for_label }}"

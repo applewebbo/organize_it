@@ -68,8 +68,12 @@ class SuggestionPrefs(BaseModel):
 
     favored_experience_types: list[int] = Field(default_factory=list)
     dietary: str = "none"
-    pace: str = "moderate"
     budget: str = "medium"
+    travel_party: str = "unspecified"
+    travel_style: str = "balanced"
+    interests: list[str] = Field(default_factory=list)
+    cuisine: str = "any"
+    search_radius: str = "nearby"
     notes: str = ""
     result_count: int = 8
     # Empty means "all kinds"; otherwise restrict to these SuggestionKind values.

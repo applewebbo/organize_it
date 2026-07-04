@@ -35,7 +35,7 @@ class AICredentialsForm(forms.ModelForm):
             render_value=False,
             attrs={"class": "input input-bordered w-full", "autocomplete": "off"},
         ),
-        help_text=_("Stored encrypted. Leave blank to keep the current key."),
+        help_text=_("Leave blank to keep the current key."),
     )
 
     class Meta:
@@ -56,26 +56,39 @@ class AICredentialsForm(forms.ModelForm):
 
 class SuggestionPreferencesForm(forms.ModelForm):
     favored_experience_types = forms.MultipleChoiceField(
-        label=_("Favoured experience types"),
+        label=_("Favoured activity types"),
         required=False,
         choices=Experience.Type.choices,
+        widget=forms.CheckboxSelectMultiple,
+    )
+    interests = forms.MultipleChoiceField(
+        label=_("Interests / themes"),
+        required=False,
+        choices=SuggestionPreferences.Interest.choices,
         widget=forms.CheckboxSelectMultiple,
     )
 
     class Meta:
         model = SuggestionPreferences
         fields = (
+            "travel_party",
+            "travel_style",
             "favored_experience_types",
+            "interests",
             "dietary",
-            "pace",
+            "cuisine",
             "budget",
+            "search_radius",
             "result_count",
             "notes",
         )
         labels = {
+            "travel_party": _("Travelling as"),
+            "travel_style": _("Travel style"),
             "dietary": _("Dietary preference"),
-            "pace": _("Pace"),
+            "cuisine": _("Cuisine type"),
             "budget": _("Budget"),
+            "search_radius": _("Search area"),
             "result_count": _("Number of suggestions"),
             "notes": _("Notes"),
         }
@@ -83,9 +96,18 @@ class SuggestionPreferencesForm(forms.ModelForm):
             "result_count": _("How many suggestions to request per generation."),
         }
         widgets = {
+            "travel_party": forms.Select(
+                attrs={"class": "select select-bordered w-full"}
+            ),
+            "travel_style": forms.Select(
+                attrs={"class": "select select-bordered w-full"}
+            ),
             "dietary": forms.Select(attrs={"class": "select select-bordered w-full"}),
-            "pace": forms.Select(attrs={"class": "select select-bordered w-full"}),
+            "cuisine": forms.Select(attrs={"class": "select select-bordered w-full"}),
             "budget": forms.Select(attrs={"class": "select select-bordered w-full"}),
+            "search_radius": forms.Select(
+                attrs={"class": "select select-bordered w-full"}
+            ),
             "result_count": forms.NumberInput(
                 attrs={
                     "class": "input input-bordered w-full",
@@ -97,7 +119,9 @@ class SuggestionPreferencesForm(forms.ModelForm):
                 attrs={
                     "class": "w-full textarea textarea-bordered",
                     "rows": 3,
-                    "placeholder": _("e.g. avoid tourist traps, travelling with kids"),
+                    "placeholder": _(
+                        "e.g. we have a car, avoid long queues, prefer venues open late"
+                    ),
                 }
             ),
         }

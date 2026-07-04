@@ -80,3 +80,75 @@ class TestBuildPrompt:
         prompt = build_prompt(TripContext(destination="Rome"), SuggestionPrefs())
         assert "Already planned" not in prompt
         assert "Weather forecast" not in prompt
+
+    def test_low_budget_becomes_operational_constraint(self):
+        prompt = build_prompt(
+            TripContext(destination="Rome"), SuggestionPrefs(budget="low")
+        )
+        assert "low-cost" in prompt
+        assert "avoid fine dining" in prompt
+
+    def test_high_budget_allows_premium(self):
+        prompt = build_prompt(
+            TripContext(destination="Rome"), SuggestionPrefs(budget="high")
+        )
+        assert "premium" in prompt
+
+    def test_vegetarian_is_a_soft_constraint(self):
+        prompt = build_prompt(
+            TripContext(destination="Rome"), SuggestionPrefs(dietary="vegetarian")
+        )
+        assert "vegetarian options" in prompt
+
+    def test_vegan_is_a_strict_constraint(self):
+        prompt = build_prompt(
+            TripContext(destination="Rome"), SuggestionPrefs(dietary="vegan")
+        )
+        assert "fully vegan" in prompt
+
+    def test_gluten_free_requires_explicit_menu(self):
+        prompt = build_prompt(
+            TripContext(destination="Rome"), SuggestionPrefs(dietary="gluten_free")
+        )
+        assert "explicitly" in prompt
+        assert "gluten-free" in prompt
+
+    def test_no_dietary_line_when_none(self):
+        prompt = build_prompt(
+            TripContext(destination="Rome"), SuggestionPrefs(dietary="none")
+        )
+        assert "vegetarian" not in prompt
+        assert "vegan" not in prompt
+
+    def test_includes_travel_party_and_style_and_interests_and_cuisine(self):
+        prefs = SuggestionPrefs(
+            travel_party="family",
+            travel_style="offbeat",
+            interests=["history", "nightlife"],
+            cuisine="street_food",
+        )
+        prompt = build_prompt(TripContext(destination="Rome"), prefs)
+        assert "family" in prompt
+        assert "off the beaten path" in prompt
+        assert "history, nightlife" in prompt
+        assert "street food" in prompt
+
+    def test_omits_neutral_new_prefs(self):
+        prompt = build_prompt(TripContext(destination="Rome"), SuggestionPrefs())
+        assert "Travelling as:" not in prompt
+        assert "Interests:" not in prompt
+        assert "Cuisine:" not in prompt
+        assert "day-trip" not in prompt
+        assert "within Rome" not in prompt
+
+    def test_city_radius_keeps_suggestions_in_the_destination(self):
+        prompt = build_prompt(
+            TripContext(destination="Rome"), SuggestionPrefs(search_radius="city")
+        )
+        assert "within Rome" in prompt
+
+    def test_day_trips_radius_allows_nearby_destinations(self):
+        prompt = build_prompt(
+            TripContext(destination="Rome"), SuggestionPrefs(search_radius="day_trips")
+        )
+        assert "day-trip" in prompt

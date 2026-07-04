@@ -49,15 +49,42 @@ class SuggestionPreferences(models.Model):
         VEGAN = "vegan", _("Vegan")
         GLUTEN_FREE = "gluten_free", _("Gluten-free")
 
-    class Pace(models.TextChoices):
-        RELAXED = "relaxed", _("Relaxed")
-        MODERATE = "moderate", _("Moderate")
-        PACKED = "packed", _("Packed")
-
     class Budget(models.TextChoices):
         LOW = "low", _("Low")
         MEDIUM = "medium", _("Medium")
         HIGH = "high", _("High")
+
+    class TravelParty(models.TextChoices):
+        UNSPECIFIED = "unspecified", _("Not specified")
+        SOLO = "solo", _("Solo")
+        COUPLE = "couple", _("Couple")
+        FAMILY = "family", _("Family with children")
+        FRIENDS = "friends", _("Group of friends")
+
+    class TravelStyle(models.TextChoices):
+        ICONIC = "iconic", _("Iconic must-sees")
+        BALANCED = "balanced", _("Balanced")
+        OFFBEAT = "offbeat", _("Off the beaten path")
+
+    class Interest(models.TextChoices):
+        HISTORY = "history", _("History")
+        ART = "art", _("Art")
+        NATURE = "nature", _("Nature")
+        NIGHTLIFE = "nightlife", _("Nightlife")
+        SHOPPING = "shopping", _("Shopping")
+        LOCAL_FOOD = "local_food", _("Local food")
+        RELAX = "relax", _("Relax")
+
+    class Cuisine(models.TextChoices):
+        ANY = "any", _("No preference")
+        LOCAL = "local", _("Local traditional")
+        STREET_FOOD = "street_food", _("Street food")
+        INTERNATIONAL = "international", _("International")
+
+    class SearchRadius(models.TextChoices):
+        CITY = "city", _("Within the city")
+        NEARBY = "nearby", _("City and surroundings")
+        DAY_TRIPS = "day_trips", _("Include day trips")
 
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -70,15 +97,31 @@ class SuggestionPreferences(models.Model):
         choices=Dietary.choices,
         default=Dietary.NONE,
     )
-    pace = models.CharField(
-        max_length=20,
-        choices=Pace.choices,
-        default=Pace.MODERATE,
-    )
     budget = models.CharField(
         max_length=20,
         choices=Budget.choices,
         default=Budget.MEDIUM,
+    )
+    travel_party = models.CharField(
+        max_length=20,
+        choices=TravelParty.choices,
+        default=TravelParty.UNSPECIFIED,
+    )
+    travel_style = models.CharField(
+        max_length=20,
+        choices=TravelStyle.choices,
+        default=TravelStyle.BALANCED,
+    )
+    interests = models.JSONField(default=list, blank=True)
+    cuisine = models.CharField(
+        max_length=20,
+        choices=Cuisine.choices,
+        default=Cuisine.ANY,
+    )
+    search_radius = models.CharField(
+        max_length=20,
+        choices=SearchRadius.choices,
+        default=SearchRadius.NEARBY,
     )
     notes = models.TextField(blank=True)
     result_count = models.PositiveSmallIntegerField(

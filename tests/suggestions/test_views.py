@@ -10,8 +10,11 @@ pytestmark = pytest.mark.django_db
 BASE_DATA = {
     "provider": "gemini",
     "dietary": "none",
-    "pace": "moderate",
     "budget": "medium",
+    "travel_party": "unspecified",
+    "travel_style": "balanced",
+    "cuisine": "any",
+    "search_radius": "nearby",
     "result_count": 8,
 }
 

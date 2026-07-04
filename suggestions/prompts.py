@@ -28,6 +28,45 @@ def _intro(language: str) -> str:
     return _INTRO.get(language, _INTRO["en"])
 
 
+# Operational constraints, not bare labels: each maps a stored value to an
+# explicit instruction the model can act on.
+_BUDGET_LINES = {
+    "low": "Budget: favour free or low-cost options; avoid fine dining.",
+    "medium": "Budget: mid-range options with good value for money.",
+    "high": "Budget: premium options are welcome.",
+}
+_DIETARY_LINES = {
+    "vegetarian": (
+        "Dietary: ensure each meal offers good vegetarian options "
+        "(a non-vegetarian venue with solid vegetarian dishes is fine)."
+    ),
+    "vegan": (
+        "Dietary: only propose meals that are fully vegan or have a "
+        "dedicated vegan menu."
+    ),
+    "gluten_free": (
+        "Dietary: only propose restaurants that explicitly advertise "
+        "gluten-free options on their menu."
+    ),
+}
+_PARTY_PHRASES = {
+    "solo": "a solo traveller",
+    "couple": "a couple",
+    "family": "a family with children",
+    "friends": "a group of friends",
+}
+_STYLE_LINES = {
+    "iconic": "Focus on iconic, must-see landmarks.",
+    "balanced": "Mix iconic sights with some lesser-known spots.",
+    "offbeat": "Favour off the beaten path, less touristy spots.",
+}
+_CUISINE_PHRASES = {
+    "local": "local traditional cuisine",
+    "street_food": "street food",
+    "international": "international cuisine",
+}
+
+
 def build_prompt(context: TripContext, prefs: SuggestionPrefs) -> str:
     """Build the text prompt fed to the provider from trip context + prefs."""
     lines = [_intro(context.language), "", f"Destination: {context.destination}"]
@@ -36,9 +75,23 @@ def build_prompt(context: TripContext, prefs: SuggestionPrefs) -> str:
     if prefs.favored_experience_types:
         favored = ", ".join(str(t) for t in prefs.favored_experience_types)
         lines.append(f"Favoured experience type ids: {favored}")
-    lines.append(f"Dietary preference: {prefs.dietary}")
-    lines.append(f"Pace: {prefs.pace}")
-    lines.append(f"Budget: {prefs.budget}")
+    if prefs.travel_party in _PARTY_PHRASES:
+        lines.append(f"Travelling as: {_PARTY_PHRASES[prefs.travel_party]}.")
+    lines.append(_STYLE_LINES.get(prefs.travel_style, _STYLE_LINES["balanced"]))
+    if prefs.interests:
+        lines.append(f"Interests: {', '.join(prefs.interests)}.")
+    if prefs.cuisine in _CUISINE_PHRASES:
+        lines.append(f"Cuisine: prefer {_CUISINE_PHRASES[prefs.cuisine]}.")
+    if prefs.search_radius == "city":
+        lines.append(f"Keep all suggestions within {context.destination} itself.")
+    elif prefs.search_radius == "day_trips":
+        lines.append(
+            "You may include day-trip destinations reachable within about two "
+            "hours of the destination."
+        )
+    if prefs.dietary in _DIETARY_LINES:
+        lines.append(_DIETARY_LINES[prefs.dietary])
+    lines.append(_BUDGET_LINES.get(prefs.budget, _BUDGET_LINES["medium"]))
     if prefs.notes:
         lines.append(f"Extra notes: {prefs.notes}")
     if context.existing_places:
