@@ -65,7 +65,7 @@ RUN uv sync --frozen --no-dev --no-install-project
 # pre-download Tailwind CSS CLI to avoid runtime download (~120MB) on startup
 # IMPORTANT: keep TAILWIND_VERSION aligned with django-tailwind-cli expected version
 # (the release skill verifies this on every release)
-ARG TAILWIND_VERSION=2.8.3
+ARG TAILWIND_VERSION=2.9.1
 RUN mkdir -p /app/.django_tailwind_cli \
   && ARCH="$(dpkg --print-architecture)" \
   && case "$ARCH" in \
