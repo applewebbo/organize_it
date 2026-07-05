@@ -100,6 +100,21 @@ class TestTripForm:
         assert not form.is_valid()
         assert "Destination not found" in form.errors["destination"]
 
+    def test_clean_destination_constrained_to_place(self, mocker):
+        """Destination validation geocodes at place level so an ambiguous
+        name cannot validate against a country result."""
+        mock_geocoder = mocker.patch("geocoder.mapbox")
+        mock_geocoder.return_value.ok = True
+
+        data = {
+            "title": "Test Trip",
+            "destination": "Roma",
+            "start_date": date.today() + timedelta(days=1),
+            "end_date": date.today() + timedelta(days=3),
+        }
+        assert TripForm(data=data).is_valid()
+        assert mock_geocoder.call_args.kwargs["types"] == "place"
+
 
 class TestLinkForm:
     def test_form(self):

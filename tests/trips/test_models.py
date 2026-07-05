@@ -105,6 +105,21 @@ class TestTripModel:
         assert "John Doe" in attribution
         assert "Unsplash" in attribution
 
+    @patch("geocoder.mapbox")
+    def test_destination_geocoding_constrained_to_place(
+        self, mock_geocoder, user_factory, trip_factory
+    ):
+        """The destination is geocoded at place level so an ambiguous name
+        (e.g. "Roma") cannot match a country instead of the city."""
+        mock_geocoder.return_value.latlng = [41.9028, 12.4964]
+        trip_factory(
+            author=user_factory(),
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+            destination="Roma",
+        )
+        assert mock_geocoder.call_args.kwargs["types"] == "place"
+
 
 class TestDayModel:
     def test_factory(self, user_factory, trip_factory):

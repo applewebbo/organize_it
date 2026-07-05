@@ -508,7 +508,9 @@ def _trip_location_bias(trip) -> tuple[float, float, float] | None:
         return clat, clng, radius
     # Fallback: geocode the trip destination
     if trip.destination:
-        g = geocoder.mapbox(trip.destination, key=settings.MAPBOX_ACCESS_TOKEN)
+        g = geocoder.mapbox(
+            trip.destination, key=settings.MAPBOX_ACCESS_TOKEN, types="place"
+        )
         if g.latlng:
             return g.latlng[0], g.latlng[1], 50_000
     return None
@@ -538,7 +540,9 @@ def _stage_location_bias(
         max_dist = max(_haversine_m(clat, clng, c[0], c[1]) for c in all_coords)
         return clat, clng, min(max(max_dist * 1.5, 10_000), 50_000)
     # Fallback: geocode the stage destination name
-    g = geocoder.mapbox(stage_destination, key=settings.MAPBOX_ACCESS_TOKEN)
+    g = geocoder.mapbox(
+        stage_destination, key=settings.MAPBOX_ACCESS_TOKEN, types="place"
+    )
     if g.latlng:
         return g.latlng[0], g.latlng[1], 50_000
     return _trip_location_bias(trip)

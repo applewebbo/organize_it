@@ -143,8 +143,12 @@ def capture_trip_old_destination(sender, instance, **kwargs):
 
     destination_changed = instance._old_destination != instance.destination
     if destination_changed and instance.destination:
+        # Constrain to place-level results so an ambiguous name (e.g. "Roma")
+        # resolves to the city and cannot match a country (e.g. România).
         g = geocoder.mapbox(
-            instance.destination, access_token=settings.MAPBOX_ACCESS_TOKEN
+            instance.destination,
+            access_token=settings.MAPBOX_ACCESS_TOKEN,
+            types="place",
         )
         if g.latlng:
             instance.destination_latitude, instance.destination_longitude = g.latlng

@@ -264,7 +264,8 @@ class TripForm(forms.ModelForm):
 
     def clean_destination(self):
         destination = self.cleaned_data.get("destination")
-        g = geocoder.mapbox(destination)
+        # place-level lookup so an ambiguous name cannot validate as a country
+        g = geocoder.mapbox(destination, types="place")
         if not g.ok:
             raise ValidationError(_("Destination not found"))
         return destination

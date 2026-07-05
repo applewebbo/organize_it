@@ -658,13 +658,17 @@ class TestTripLocationBias(TestCase):
 
         with self.login(user):
             with patch("trips.views.maps.GooglePlacesClient") as MockClient:
-                with patch("trips.views.maps.geocoder.mapbox", return_value=mock_geo):
+                with patch(
+                    "trips.views.maps.geocoder.mapbox", return_value=mock_geo
+                ) as mock_mapbox:
                     MockClient.return_value.search_text.return_value = []
                     self.post("trips:map-search", pk=trip.pk, data={"query": "museo"})
 
         call_kwargs = MockClient.return_value.search_text.call_args.kwargs
         assert call_kwargs["location_bias"] is not None
         assert call_kwargs["location_bias"][2] == 50_000
+        # place-level lookup so an ambiguous destination cannot match a country
+        assert mock_mapbox.call_args.kwargs["types"] == "place"
 
     def test_search_geocoder_no_latlng_returns_none_bias(self):
         """Covers _trip_location_bias false branch of 'if g.latlng' (line 3050)."""
@@ -1895,7 +1899,9 @@ class TestStageBiasInternal(TestCase):
         mock_geo.latlng = [43.77, 11.25]
         with self.login(user):
             with patch("trips.views.maps.GooglePlacesClient") as MockClient:
-                with patch("trips.views.maps.geocoder.mapbox", return_value=mock_geo):
+                with patch(
+                    "trips.views.maps.geocoder.mapbox", return_value=mock_geo
+                ) as mock_mapbox:
                     MockClient.return_value.search_text.return_value = []
                     self.post(
                         "trips:map-search",
@@ -1905,6 +1911,8 @@ class TestStageBiasInternal(TestCase):
         call_kwargs = MockClient.return_value.search_text.call_args.kwargs
         assert call_kwargs["location_bias"] is not None
         assert call_kwargs["location_bias"][2] == 50_000
+        # place-level lookup so an ambiguous stage name cannot match a country
+        assert mock_mapbox.call_args.kwargs["types"] == "place"
 
     def test_stage_bias_falls_back_to_trip_bias_when_geocoder_fails(self):
         """Stage geocoder fails → falls back to _trip_location_bias."""
