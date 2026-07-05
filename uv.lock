@@ -751,6 +751,15 @@ wheels = [
 ]
 
 [[package]]
+name = "eval-type-backport"
+sdist = {url = "https://files.pythonhosted.org/packages/1c/15/273a4baf8248d6d76220723c3caf039d283774b31a7c46ba686120145b76/eval_type_backport-0.4.0.tar.gz", hash = "sha256:8397d25e6524c2e67b9576bb0636be27dea2192017711220c534ec2de921e9b0", size = 10260, upload-time = "2026-06-02T13:22:06.059Z"}
+source = {registry = "https://pypi.org/simple"}
+version = "0.4.0"
+wheels = [
+  {url = "https://files.pythonhosted.org/packages/50/a7/bb99bf5e6f78736ddb53480f2c3ff3702ffe2196a7c5e1661c03081d398e/eval_type_backport-0.4.0-py3-none-any.whl", hash = "sha256:ad5e2a8db71b6696a56eafb938b0f5a337d3217f256b8e158b469422b4772b20", size = 6432, upload-time = "2026-06-02T13:22:04.827Z"}
+]
+
+[[package]]
 name = "execnet"
 sdist = {url = "https://files.pythonhosted.org/packages/bf/89/780e11f9588d9e7128a3f87788354c7946a9cbb1401ad38a48c4db9a4f07/execnet-2.1.2.tar.gz", hash = "sha256:63d83bfdd9a23e35b9c6a3261412324f964c2ec8dcd8d3c6916ee9373e0befcd", size = 166622, upload-time = "2025-11-12T09:56:37.75Z"}
 source = {registry = "https://pypi.org/simple"}
@@ -1021,6 +1030,18 @@ wheels = [
 ]
 
 [[package]]
+dependencies = [
+  {name = "zipp"}
+]
+name = "importlib-metadata"
+sdist = {url = "https://files.pythonhosted.org/packages/f3/49/3b30cad09e7771a4982d9975a8cbf64f00d4a1ececb53297f1d9a7be1b10/importlib_metadata-8.7.1.tar.gz", hash = "sha256:49fef1ae6440c182052f407c8d34a68f72efc36db9ca90dc0113398f2fdde8bb", size = 57107, upload-time = "2025-12-21T10:00:19.278Z"}
+source = {registry = "https://pypi.org/simple"}
+version = "8.7.1"
+wheels = [
+  {url = "https://files.pythonhosted.org/packages/fa/5e/f8e9a1d23b9c20a551a8a02ea3637b4642e22c2626e3a13a9a29cdea99eb/importlib_metadata-8.7.1-py3-none-any.whl", hash = "sha256:5a1f80bf1daa489495071efbb095d75a634cf28a8bc299581244063b53176151", size = 27865, upload-time = "2025-12-21T10:00:18.329Z"}
+]
+
+[[package]]
 name = "inflection"
 sdist = {url = "https://files.pythonhosted.org/packages/e1/7e/691d061b7329bc8d54edbf0ec22fbfb2afe61facb681f9aaa9bff7a27d04/inflection-0.5.1.tar.gz", hash = "sha256:1a29730d366e996aaacffb2f1f1cb9593dc38e2ddd30c91250c6dde09ea9b417", size = 15091, upload-time = "2020-08-22T08:16:29.139Z"}
 source = {registry = "https://pypi.org/simple"}
@@ -1069,6 +1090,15 @@ source = {registry = "https://pypi.org/simple"}
 version = "0.15.0"
 wheels = [
   {url = "https://files.pythonhosted.org/packages/eb/be/59527c99478aade6bb33a68d72e6e18dd4e6ff6eacfc7d01bdb15bc76912/json5-0.15.0-py3-none-any.whl", hash = "sha256:56636a30c0e8a4665fe2179c0212f32eae3796dea89ea6f649b9436ecdb39618", size = 36570, upload-time = "2026-06-19T20:08:26.748Z"}
+]
+
+[[package]]
+name = "jsonpath-python"
+sdist = {url = "https://files.pythonhosted.org/packages/98/18/4ca8742534a5993ff383f7602e325ce2d5d7cc93d72ac5e1cdedbea8a458/jsonpath_python-1.1.6.tar.gz", hash = "sha256:dded9932b4ec41fb8726e09c83afa4e6be618f938c2db287cc2a81723c639671", size = 88178, upload-time = "2026-05-07T01:26:34.482Z"}
+source = {registry = "https://pypi.org/simple"}
+version = "1.1.6"
+wheels = [
+  {url = "https://files.pythonhosted.org/packages/55/8a/1270a6803bd821cbfcdda387eaa13cb41a7b1f7b9bd145979b3bfb9d6cb7/jsonpath_python-1.1.6-py3-none-any.whl", hash = "sha256:a1c50afd8d3fbbaf47a4873bc890dcb3c15da96f5c020327977d844d8731a2d4", size = 14453, upload-time = "2026-05-07T01:26:33.306Z"}
 ]
 
 [[package]]
@@ -1138,6 +1168,25 @@ source = {registry = "https://pypi.org/simple"}
 version = "1.3.4"
 wheels = [
   {url = "https://files.pythonhosted.org/packages/2c/19/04f9b178c2d8a15b076c8b5140708fa6ffc5601fb6f1e975537072df5b2a/mergedeep-1.3.4-py3-none-any.whl", hash = "sha256:70775750742b25c0d8f36c55aed03d24c3384d17c951b3175d898bd778ef0307", size = 6354, upload-time = "2021-02-05T18:55:29.583Z"}
+]
+
+[[package]]
+dependencies = [
+  {name = "eval-type-backport"},
+  {name = "httpx"},
+  {name = "jsonpath-python"},
+  {name = "opentelemetry-api"},
+  {name = "opentelemetry-semantic-conventions"},
+  {name = "pydantic"},
+  {name = "python-dateutil"},
+  {name = "typing-inspection"}
+]
+name = "mistralai"
+sdist = {url = "https://files.pythonhosted.org/packages/81/85/86762a5d0a6933fec178d65f042973514b803e9db69bda86378eb7abe6e2/mistralai-2.5.2.tar.gz", hash = "sha256:7a217090124312fbd501141f189d985e2edeff179ee15a6af73aa15e0b5965ed", size = 504653, upload-time = "2026-07-03T13:32:32.215Z"}
+source = {registry = "https://pypi.org/simple"}
+version = "2.5.2"
+wheels = [
+  {url = "https://files.pythonhosted.org/packages/06/8f/db35d88a39e843cc967adae346507884c143242af9a5d870dab653383036/mistralai-2.5.2-py3-none-any.whl", hash = "sha256:fc37d47406d1b59f234e456e37a2a0983f1c0aa8ca3d9a230f1b8d16432adb8f", size = 1222108, upload-time = "2026-07-03T13:32:30.519Z"}
 ]
 
 [[package]]
@@ -1261,6 +1310,32 @@ wheels = [
 
 [[package]]
 dependencies = [
+  {name = "importlib-metadata"},
+  {name = "typing-extensions"}
+]
+name = "opentelemetry-api"
+sdist = {url = "https://files.pythonhosted.org/packages/97/b9/3161be15bb8e3ad01be8be5a968a9237c3027c5be504362ff800fca3e442/opentelemetry_api-1.39.1.tar.gz", hash = "sha256:fbde8c80e1b937a2c61f20347e91c0c18a1940cecf012d62e65a7caf08967c9c", size = 65767, upload-time = "2025-12-11T13:32:39.182Z"}
+source = {registry = "https://pypi.org/simple"}
+version = "1.39.1"
+wheels = [
+  {url = "https://files.pythonhosted.org/packages/cf/df/d3f1ddf4bb4cb50ed9b1139cc7b1c54c34a1e7ce8fd1b9a37c0d1551a6bd/opentelemetry_api-1.39.1-py3-none-any.whl", hash = "sha256:2edd8463432a7f8443edce90972169b195e7d6a05500cd29e6d13898187c9950", size = 66356, upload-time = "2025-12-11T13:32:17.304Z"}
+]
+
+[[package]]
+dependencies = [
+  {name = "opentelemetry-api"},
+  {name = "typing-extensions"}
+]
+name = "opentelemetry-semantic-conventions"
+sdist = {url = "https://files.pythonhosted.org/packages/91/df/553f93ed38bf22f4b999d9be9c185adb558982214f33eae539d3b5cd0858/opentelemetry_semantic_conventions-0.60b1.tar.gz", hash = "sha256:87c228b5a0669b748c76d76df6c364c369c28f1c465e50f661e39737e84bc953", size = 137935, upload-time = "2025-12-11T13:32:50.487Z"}
+source = {registry = "https://pypi.org/simple"}
+version = "0.60b1"
+wheels = [
+  {url = "https://files.pythonhosted.org/packages/7a/5e/5958555e09635d09b75de3c4f8b9cae7335ca545d77392ffe7331534c402/opentelemetry_semantic_conventions-0.60b1-py3-none-any.whl", hash = "sha256:9fa8c8b0c110da289809292b0591220d3a7b53c1526a23021e977d68597893fb", size = 219982, upload-time = "2025-12-11T13:32:36.955Z"}
+]
+
+[[package]]
+dependencies = [
   {name = "cloudinary"},
   {name = "crispy-tailwind"},
   {name = "croniter"},
@@ -1288,6 +1363,7 @@ dependencies = [
   {name = "granian", extra = ["pname"]},
   {name = "httpx"},
   {name = "icalendar"},
+  {name = "mistralai"},
   {name = "pillow"},
   {name = "psycopg", extra = ["binary"]},
   {name = "pypdf"},
@@ -1355,6 +1431,7 @@ requires-dist = [
   {name = "granian", extras = ["pname"], specifier = ">=2.2.0"},
   {name = "httpx", specifier = ">=0.28.1"},
   {name = "icalendar", specifier = ">=7.1.2"},
+  {name = "mistralai", specifier = ">=2.5.2"},
   {name = "pillow", specifier = ">=12.0.0"},
   {name = "psycopg", extras = ["binary"], specifier = ">=3.2.1"},
   {name = "pypdf", specifier = ">=6.13.1"},
@@ -2310,6 +2387,15 @@ source = {registry = "https://pypi.org/simple"}
 version = "2026.3.0"
 wheels = [
   {url = "https://files.pythonhosted.org/packages/a8/a9/d23012099dc88ec69a29c6407b41d89681cb674c2043cd5b467c7e299c08/xyzservices-2026.3.0-py3-none-any.whl", hash = "sha256:503183d4b322bfebc3c50cdd21192aa3e81e36c5efbf9133d54ae82143e0576b", size = 94101, upload-time = "2026-03-30T14:42:24.608Z"}
+]
+
+[[package]]
+name = "zipp"
+sdist = {url = "https://files.pythonhosted.org/packages/b9/d8/eab98a517c14134c0b2eb4e2387bc5f457334293ec5d2dd3857ec2966802/zipp-4.1.0.tar.gz", hash = "sha256:4cb57381f544315db7688e976e922a2b18cdb513d21cc194eb42232ba2a3e602", size = 26214, upload-time = "2026-05-18T20:08:57.967Z"}
+source = {registry = "https://pypi.org/simple"}
+version = "4.1.0"
+wheels = [
+  {url = "https://files.pythonhosted.org/packages/3a/13/547360d81e6d88d58492968ffda9f9542854f11310ee556fef14260cc886/zipp-4.1.0-py3-none-any.whl", hash = "sha256:25ad4e16390cd314347dd8f1de67a2ac538ae658ed4ab9db16029c07c188e97f", size = 10238, upload-time = "2026-05-18T20:08:57.045Z"}
 ]
 
 [[package]]

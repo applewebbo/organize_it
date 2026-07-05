@@ -71,6 +71,35 @@ class TestSuggestionSettingsView(TestCase):
         self.response_200(response)
         assert AICredentials.objects.get(user=user).api_key_encrypted == "kept-key"
 
+    def test_post_switch_provider_blank_key_rejected(self):
+        # Switching provider without a new key would pair the old provider's key
+        # with the new provider -> reject and keep the record untouched.
+        user = self.make_user("user")
+        AICredentialsFactory(
+            user=user, provider="gemini", api_key_encrypted="gemini-key"
+        )
+        data = {**BASE_DATA, "provider": "mistral", "api_key_encrypted": ""}
+        with self.login(user):
+            response = self.post("suggestions:settings", data=data)
+        self.response_200(response)
+        assert response.context["saved"] is False
+        creds = AICredentials.objects.get(user=user)
+        assert creds.provider == "gemini"
+        assert creds.api_key_encrypted == "gemini-key"
+
+    def test_post_switch_provider_with_key(self):
+        user = self.make_user("user")
+        AICredentialsFactory(
+            user=user, provider="gemini", api_key_encrypted="gemini-key"
+        )
+        data = {**BASE_DATA, "provider": "mistral", "api_key_encrypted": "mistral-key"}
+        with self.login(user):
+            response = self.post("suggestions:settings", data=data)
+        self.response_200(response)
+        creds = AICredentials.objects.get(user=user)
+        assert creds.provider == "mistral"
+        assert creds.api_key_encrypted == "mistral-key"
+
     def test_post_updates_existing_key(self):
         user = self.make_user("user")
         AICredentialsFactory(user=user, api_key_encrypted="old-key")

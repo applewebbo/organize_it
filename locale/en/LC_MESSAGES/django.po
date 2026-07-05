@@ -175,6 +175,12 @@ msgstr ""
 msgid "Google Gemini"
 msgstr ""
 
+msgid "Mistral AI"
+msgstr ""
+
+msgid "Enter the API key for the new provider."
+msgstr ""
+
 msgid "AI credentials"
 msgstr ""
 

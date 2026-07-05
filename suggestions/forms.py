@@ -48,10 +48,25 @@ class AICredentialsForm(forms.ModelForm):
 
     def clean_api_key_encrypted(self):
         value = self.cleaned_data.get("api_key_encrypted", "").strip()
-        if not value and self.instance.pk:
+        self._key_left_blank = not value and bool(self.instance.pk)
+        if self._key_left_blank:
             # Keep the already-stored key when the field is left blank
             return self.instance.api_key_encrypted
         return value
+
+    def clean(self):
+        cleaned = super().clean()
+        provider = cleaned.get("provider")
+        # The stored key belongs to the previous provider; switching provider
+        # without a new key would silently pair it with the wrong provider and
+        # fail at generation time, so require the new provider's key up front.
+        provider_changed = self.instance.pk and provider != self.instance.provider
+        if provider_changed and getattr(self, "_key_left_blank", False):
+            self.add_error(
+                "api_key_encrypted",
+                _("Enter the API key for the new provider."),
+            )
+        return cleaned
 
 
 class SuggestionPreferencesForm(forms.ModelForm):

@@ -17,6 +17,7 @@ class AICredentials(models.Model):
 
     class Provider(models.TextChoices):
         GEMINI = "gemini", _("Google Gemini")
+        MISTRAL = "mistral", _("Mistral AI")
 
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,

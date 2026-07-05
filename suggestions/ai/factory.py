@@ -1,9 +1,11 @@
 from suggestions.ai.base import AISuggestionError, TripSuggestionProvider
 from suggestions.ai.gemini import GeminiProvider
+from suggestions.ai.mistral import MistralProvider
 
 # Adding a provider is one entry here plus its module.
 _PROVIDERS = {
     "gemini": GeminiProvider,
+    "mistral": MistralProvider,
 }
 
 
