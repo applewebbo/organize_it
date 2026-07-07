@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.views.decorators.http import require_GET, require_POST
@@ -11,7 +11,11 @@ from suggestions.forms import (
     AISuggestionsToggleForm,
     SuggestionPreferencesForm,
 )
-from suggestions.models import AICredentials, SuggestionPreferences
+from suggestions.models import (
+    AICredentials,
+    SharedKeyNoticeDismissal,
+    SuggestionPreferences,
+)
 from suggestions.services import generate_suggestions, get_cached_suggestions
 from trips.models import Event, Stay, Trip
 from trips.services import GooglePlacesClient, GooglePlacesError
@@ -313,6 +317,15 @@ def accept_meal(request, pk):
 @require_POST
 def accept_stay(request, pk):
     return _accept(request, pk, "stay")
+
+
+@login_required
+@require_POST
+def dismiss_shared_key_notice(request, pk):
+    """HTMX: permanently dismiss the shared-key notice for this trip and user."""
+    trip = _get_accessible_trip(request, pk)
+    SharedKeyNoticeDismissal.objects.get_or_create(user=request.user, trip=trip)
+    return HttpResponse(status=204)
 
 
 @login_required

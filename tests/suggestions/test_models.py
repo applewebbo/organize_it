@@ -6,6 +6,7 @@ from django.db import connection
 from suggestions.models import AICredentials, SuggestionPreferences
 from tests.suggestions.factories import (
     AICredentialsFactory,
+    SharedKeyNoticeDismissalFactory,
     SuggestionPreferencesFactory,
 )
 
@@ -43,6 +44,25 @@ class TestAICredentials:
     def test_one_to_one_with_user(self):
         creds = AICredentialsFactory()
         assert creds.user.ai_credentials == creds
+
+    def test_share_with_collaborators_defaults_off(self):
+        creds = AICredentialsFactory()
+        assert creds.share_with_collaborators is False
+
+
+class TestSharedKeyNoticeDismissal:
+    def test_str(self):
+        dismissal = SharedKeyNoticeDismissalFactory()
+        result = str(dismissal)
+        assert dismissal.user.email in result
+        assert str(dismissal.trip_id) in result
+
+    def test_unique_per_user_and_trip(self):
+        from django.db import IntegrityError
+
+        dismissal = SharedKeyNoticeDismissalFactory()
+        with pytest.raises(IntegrityError):
+            SharedKeyNoticeDismissalFactory(user=dismissal.user, trip=dismissal.trip)
 
 
 class TestSuggestionPreferences:

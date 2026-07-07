@@ -17,4 +17,9 @@ urlpatterns = [
     ),
     path("trip/<int:pk>/accept/meal/", views.accept_meal, name="accept-meal"),
     path("trip/<int:pk>/accept/stay/", views.accept_stay, name="accept-stay"),
+    path(
+        "trip/<int:pk>/dismiss-shared-key-notice/",
+        views.dismiss_shared_key_notice,
+        name="dismiss-shared-key-notice",
+    ),
 ]

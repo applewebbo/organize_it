@@ -1,9 +1,15 @@
 import pytest
 
 from accounts.models import Profile
-from suggestions.models import AICredentials, SuggestionPreferences
+from suggestions.models import (
+    AICredentials,
+    SharedKeyNoticeDismissal,
+    SuggestionPreferences,
+)
 from tests.suggestions.factories import AICredentialsFactory
 from tests.test import TestCase
+from tests.trips.factories import TripFactory
+from trips.models import TripCollaboration
 
 pytestmark = pytest.mark.django_db
 
@@ -147,3 +153,62 @@ class TestSuggestionSettingsView(TestCase):
         with self.login(user):
             self.post("suggestions:settings", data=BASE_DATA)
         assert Profile.objects.get(user=user).ai_suggestions_enabled is False
+
+    def test_post_toggles_share_with_collaborators(self):
+        user = self.make_user("user")
+        AICredentialsFactory(user=user, api_key_encrypted="kept-key")
+        data = {**BASE_DATA, "api_key_encrypted": "", "share_with_collaborators": "on"}
+        with self.login(user):
+            self.post("suggestions:settings", data=data)
+        creds = AICredentials.objects.get(user=user)
+        assert creds.share_with_collaborators is True
+        assert creds.api_key_encrypted == "kept-key"
+
+
+class TestDismissSharedKeyNotice(TestCase):
+    def _shared_trip(self, collaborator):
+        author = self.make_user("owner@example.com")
+        AICredentialsFactory(user=author, share_with_collaborators=True)
+        trip = TripFactory(author=author)
+        TripCollaboration.objects.create(
+            trip=trip, user=collaborator, color="blue", added_by=author
+        )
+        return trip
+
+    def test_requires_login(self):
+        trip = TripFactory()
+        response = self.post("suggestions:dismiss-shared-key-notice", pk=trip.pk)
+        self.response_302(response)
+
+    def test_get_not_allowed(self):
+        user = self.make_user("user@example.com")
+        trip = self._shared_trip(user)
+        with self.login(user):
+            response = self.get("suggestions:dismiss-shared-key-notice", pk=trip.pk)
+        self.response_405(response)
+
+    def test_forbidden_for_non_participant(self):
+        outsider = self.make_user("outsider@example.com")
+        trip = self._shared_trip(self.make_user("collab@example.com"))
+        with self.login(outsider):
+            response = self.post("suggestions:dismiss-shared-key-notice", pk=trip.pk)
+        self.response_404(response)
+
+    def test_records_dismissal(self):
+        user = self.make_user("user@example.com")
+        trip = self._shared_trip(user)
+        with self.login(user):
+            response = self.post("suggestions:dismiss-shared-key-notice", pk=trip.pk)
+        assert response.status_code == 204
+        assert SharedKeyNoticeDismissal.objects.filter(user=user, trip=trip).exists()
+
+    def test_dismissal_is_idempotent(self):
+        user = self.make_user("user@example.com")
+        trip = self._shared_trip(user)
+        with self.login(user):
+            self.post("suggestions:dismiss-shared-key-notice", pk=trip.pk)
+            response = self.post("suggestions:dismiss-shared-key-notice", pk=trip.pk)
+        assert response.status_code == 204
+        assert (
+            SharedKeyNoticeDismissal.objects.filter(user=user, trip=trip).count() == 1
+        )

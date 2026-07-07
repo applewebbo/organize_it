@@ -30,6 +30,14 @@ class AICredentials(models.Model):
         default=Provider.GEMINI,
     )
     api_key_encrypted = EncryptedTextField()
+    share_with_collaborators = models.BooleanField(
+        _("Share API key with collaborators"),
+        default=False,
+        help_text=_(
+            "When enabled, collaborators of trips you created can use your key "
+            "to generate AI suggestions if they have not configured their own."
+        ),
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -39,6 +47,35 @@ class AICredentials(models.Model):
 
     def __str__(self) -> str:
         return f"AI credentials for {self.user.email} ({self.get_provider_display()})"
+
+
+class SharedKeyNoticeDismissal(models.Model):
+    """Records that a collaborator dismissed the shared-key notice for a trip,
+    so it is never shown again to that user on that trip."""
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="shared_key_notice_dismissals",
+    )
+    trip = models.ForeignKey(
+        "trips.Trip",
+        on_delete=models.CASCADE,
+        related_name="shared_key_notice_dismissals",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "trip"], name="unique_shared_key_dismissal"
+            )
+        ]
+
+    def __str__(self) -> str:
+        return (
+            f"Shared-key notice dismissed by {self.user.email} for trip {self.trip_id}"
+        )
 
 
 class SuggestionPreferences(models.Model):

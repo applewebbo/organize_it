@@ -48,6 +48,13 @@
                     <div class="mt-1 text-sm text-error">{{ credentials_form.api_key_encrypted.errors }}</div>
                 {% endif %}
             </div>
+            <div class="mb-6">
+                <label class="flex gap-3 items-center cursor-pointer">
+                    {{ credentials_form.share_with_collaborators }}
+                    <span class="font-medium">{{ credentials_form.share_with_collaborators.label }}</span>
+                </label>
+                <p class="mt-1 text-xs italic text-base-content/50">{{ credentials_form.share_with_collaborators.help_text }}</p>
+            </div>
             <h3 class="mt-2 mb-3 text-sm font-semibold uppercase text-base-content/60">{% trans "Who's travelling" %}</h3>
             <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2">
                 <div>

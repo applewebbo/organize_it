@@ -599,6 +599,32 @@ class TestTripDetailView(TestCase):
         assert response.context["ai_suggestions_enabled"] is True
         assert "AI suggestions" in response.content.decode()
 
+    def test_shared_key_notice_shown_to_collaborator(self):
+        from tests.suggestions.factories import AICredentialsFactory
+
+        owner = self.make_user("owner@example.com")
+        AICredentialsFactory(user=owner, share_with_collaborators=True)
+        collaborator = self.make_user("collab@example.com")
+        trip = TripFactory(author=owner)
+        TripCollaboration.objects.create(
+            trip=trip, user=collaborator, color="blue", added_by=owner
+        )
+        with self.login(collaborator):
+            response = self.get("trips:trip-detail", pk=trip.pk)
+        assert response.context["show_shared_key_notice"] is True
+        assert "shared-key-notice" in response.content.decode()
+
+    def test_shared_key_notice_hidden_for_author(self):
+        from tests.suggestions.factories import AICredentialsFactory
+
+        owner = self.make_user("owner@example.com")
+        AICredentialsFactory(user=owner, share_with_collaborators=True)
+        trip = TripFactory(author=owner)
+        with self.login(owner):
+            response = self.get("trips:trip-detail", pk=trip.pk)
+        assert response.context["show_shared_key_notice"] is False
+        assert "shared-key-notice" not in response.content.decode()
+
     def test_trip_detail_query_count_is_stable_with_more_events(self):
         """N+1 guard: trip-detail query count must not grow with events/stays."""
 

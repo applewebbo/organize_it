@@ -7,7 +7,11 @@ from django.core.cache import cache
 
 from suggestions.ai.base import AISuggestionError
 from suggestions.ai.factory import get_provider
-from suggestions.models import AICredentials, SuggestionPreferences
+from suggestions.models import (
+    AICredentials,
+    SharedKeyNoticeDismissal,
+    SuggestionPreferences,
+)
 from suggestions.schemas import Suggestion, SuggestionPrefs, TripContext
 from trips.models import Event, Stay, Trip
 from trips.services import GooglePlacesClient, GooglePlacesError
@@ -258,6 +262,43 @@ def _ground(
     )
 
 
+def resolve_credentials(user, trip: Trip) -> AICredentials | None:
+    """Return the credentials to use for ``user`` generating on ``trip``.
+
+    The user's own key always takes precedence. When they have none, fall back
+    to the trip author's key, but only if the author opted in to sharing it with
+    collaborators. Returns None when no usable key is available.
+    """
+    own = AICredentials.objects.filter(user=user).first()
+    if own is not None and own.api_key_encrypted:
+        return own
+
+    if trip.author_id != user.pk:
+        shared = AICredentials.objects.filter(
+            user=trip.author, share_with_collaborators=True
+        ).first()
+        if shared is not None and shared.api_key_encrypted:
+            return shared
+
+    return None
+
+
+def should_show_shared_key_notice(user, trip: Trip) -> bool:
+    """Whether to show the shared-key notice to ``user`` on ``trip``.
+
+    Shown only to collaborators (not the author) when the trip author shares a
+    key and the user has not dismissed the notice for this trip yet.
+    """
+    if trip.author_id == user.pk:
+        return False
+    shared = AICredentials.objects.filter(
+        user=trip.author, share_with_collaborators=True
+    ).first()
+    if shared is None or not shared.api_key_encrypted:
+        return False
+    return not SharedKeyNoticeDismissal.objects.filter(user=user, trip=trip).exists()
+
+
 def generate_suggestions(
     user,
     trip: Trip,
@@ -274,8 +315,8 @@ def generate_suggestions(
     here, immediately before the provider call. Ungrounded suggestions are
     skipped.
     """
-    credentials = AICredentials.objects.filter(user=user).first()
-    if credentials is None or not credentials.api_key_encrypted:
+    credentials = resolve_credentials(user, trip)
+    if credentials is None:
         raise AISuggestionError(
             "No AI credentials configured", kind=AISuggestionError.CONFIG
         )

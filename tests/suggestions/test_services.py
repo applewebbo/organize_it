@@ -14,13 +14,25 @@ from suggestions.services import (
     generate_suggestions,
     get_cached_suggestions,
     merge_preferences,
+    resolve_credentials,
+    should_show_shared_key_notice,
 )
+from tests.accounts.factories import UserFactory
 from tests.suggestions.factories import (
     AICredentialsFactory,
+    SharedKeyNoticeDismissalFactory,
     SuggestionPreferencesFactory,
 )
 from tests.trips.factories import ExperienceFactory, StayFactory, TripFactory
+from trips.models import TripCollaboration
 from trips.services import GooglePlacesError, PlaceResult
+
+
+def _add_collaborator(trip, user):
+    TripCollaboration.objects.create(
+        trip=trip, user=user, color="blue", added_by=trip.author
+    )
+
 
 pytestmark = pytest.mark.django_db
 
@@ -166,6 +178,90 @@ class TestMergePreferences:
     def test_kinds_override(self):
         prefs = merge_preferences(None, {"kinds": ["meal", "stay"]})
         assert prefs.kinds == ["meal", "stay"]
+
+
+class TestResolveCredentials:
+    def test_returns_own_key(self):
+        creds = AICredentialsFactory()
+        trip = TripFactory(author=creds.user)
+        assert resolve_credentials(creds.user, trip) == creds
+
+    def test_own_key_takes_precedence_over_shared(self):
+        author = AICredentialsFactory(share_with_collaborators=True)
+        trip = TripFactory(author=author.user)
+        collab_creds = AICredentialsFactory()
+        _add_collaborator(trip, collab_creds.user)
+        assert resolve_credentials(collab_creds.user, trip) == collab_creds
+
+    def test_falls_back_to_author_shared_key(self):
+        author = AICredentialsFactory(share_with_collaborators=True)
+        trip = TripFactory(author=author.user)
+        collaborator = UserFactory()
+        _add_collaborator(trip, collaborator)
+        assert resolve_credentials(collaborator, trip) == author
+
+    def test_no_fallback_when_author_not_sharing(self):
+        author = AICredentialsFactory(share_with_collaborators=False)
+        trip = TripFactory(author=author.user)
+        collaborator = UserFactory()
+        _add_collaborator(trip, collaborator)
+        assert resolve_credentials(collaborator, trip) is None
+
+    def test_no_fallback_when_shared_key_empty(self):
+        author = AICredentialsFactory(
+            share_with_collaborators=True, api_key_encrypted=""
+        )
+        trip = TripFactory(author=author.user)
+        collaborator = UserFactory()
+        _add_collaborator(trip, collaborator)
+        assert resolve_credentials(collaborator, trip) is None
+
+    def test_returns_none_without_any_key(self):
+        trip = TripFactory()
+        assert resolve_credentials(trip.author, trip) is None
+
+    def test_own_empty_key_does_not_borrow_when_author(self):
+        creds = AICredentialsFactory(api_key_encrypted="")
+        trip = TripFactory(author=creds.user)
+        assert resolve_credentials(creds.user, trip) is None
+
+
+class TestShouldShowSharedKeyNotice:
+    def test_hidden_for_author(self):
+        author = AICredentialsFactory(share_with_collaborators=True)
+        trip = TripFactory(author=author.user)
+        assert should_show_shared_key_notice(author.user, trip) is False
+
+    def test_shown_for_collaborator_when_author_shares(self):
+        author = AICredentialsFactory(share_with_collaborators=True)
+        trip = TripFactory(author=author.user)
+        collaborator = UserFactory()
+        _add_collaborator(trip, collaborator)
+        assert should_show_shared_key_notice(collaborator, trip) is True
+
+    def test_hidden_when_author_not_sharing(self):
+        author = AICredentialsFactory(share_with_collaborators=False)
+        trip = TripFactory(author=author.user)
+        collaborator = UserFactory()
+        _add_collaborator(trip, collaborator)
+        assert should_show_shared_key_notice(collaborator, trip) is False
+
+    def test_hidden_when_shared_key_empty(self):
+        author = AICredentialsFactory(
+            share_with_collaborators=True, api_key_encrypted=""
+        )
+        trip = TripFactory(author=author.user)
+        collaborator = UserFactory()
+        _add_collaborator(trip, collaborator)
+        assert should_show_shared_key_notice(collaborator, trip) is False
+
+    def test_hidden_after_dismissal(self):
+        author = AICredentialsFactory(share_with_collaborators=True)
+        trip = TripFactory(author=author.user)
+        collaborator = UserFactory()
+        _add_collaborator(trip, collaborator)
+        SharedKeyNoticeDismissalFactory(user=collaborator, trip=trip)
+        assert should_show_shared_key_notice(collaborator, trip) is False
 
 
 class TestGenerateSuggestions:

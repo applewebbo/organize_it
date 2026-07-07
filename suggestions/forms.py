@@ -40,10 +40,16 @@ class AICredentialsForm(forms.ModelForm):
 
     class Meta:
         model = AICredentials
-        fields = ("provider", "api_key_encrypted")
-        labels = {"provider": _("Provider")}
+        fields = ("provider", "api_key_encrypted", "share_with_collaborators")
+        labels = {
+            "provider": _("Provider"),
+            "share_with_collaborators": _("Share API key with collaborators"),
+        }
         widgets = {
             "provider": forms.Select(attrs={"class": "select select-bordered w-full"}),
+            "share_with_collaborators": forms.CheckboxInput(
+                attrs={"class": "toggle toggle-primary"}
+            ),
         }
 
     def clean_api_key_encrypted(self):

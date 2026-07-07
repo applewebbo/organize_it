@@ -18,6 +18,7 @@ from django_q.tasks import async_task
 from weasyprint import HTML
 
 from accounts.models import Profile, get_profile
+from suggestions.services import should_show_shared_key_notice
 from trips.forms import TripForm
 from trips.models import (
     Day,
@@ -193,6 +194,7 @@ def trip_detail(request, pk):
         "show_transfer_info": profile.show_transfer_info,
         "show_weather": profile.show_weather,
         "ai_suggestions_enabled": profile.ai_suggestions_enabled,
+        "show_shared_key_notice": should_show_shared_key_notice(request.user, trip),
         "from_home_duration": first_day.transfer_duration_from_prev
         if first_day and not arrival_transfer
         else None,
