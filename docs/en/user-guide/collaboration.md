@@ -88,6 +88,10 @@ Collaborators receive email notifications when:
 !!! tip "Language Preference"
     Notification emails are sent in the language set in your account preferences. See [Account Settings](../getting-started/quick-start.md) for how to change your language.
 
+## Sharing AI Suggestions
+
+If you use [AI suggestions](suggestions.md), you can let collaborators generate suggestions on trips you created using **your** API key — handy when they haven't configured their own. Enable **Share API key with collaborators** in your Account Settings. Collaborators with their own key always use theirs; the rest fall back to yours, and their usage counts against your quota. See [AI Suggestions](suggestions.md#sharing-your-key-with-collaborators) for details.
+
 ## Frequently Asked Questions
 
 ### Can a collaborator invite other users?

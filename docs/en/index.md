@@ -33,6 +33,9 @@ Addresses are automatically geocoded with support for Google Places enrichment a
 ### 🖼️ Beautiful Images
 Upload your own cover images or search Unsplash directly from the app.
 
+### ✨ AI Suggestions
+Get AI-generated ideas for places to visit, eat, and stay, tailored to your preferences and grounded on real places. Bring your own provider key (Google Gemini or Mistral AI).
+
 ### 👥 Collaboration
 Invite other users to collaborate on a trip. Each collaborator gets a unique color badge on their contributions, and the trip appears in their "Shared with me" section.
 

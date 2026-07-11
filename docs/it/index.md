@@ -33,6 +33,9 @@ Gli indirizzi vengono geocodificati automaticamente con supporto per l'arricchim
 ### 🖼️ Immagini Bellissime
 Carica le tue immagini di copertina o cerca su Unsplash direttamente dall'app.
 
+### ✨ Suggerimenti AI
+Ottieni idee generate dall'AI su luoghi da visitare, dove mangiare e dove alloggiare, personalizzate in base alle tue preferenze e ancorate a luoghi reali. Porta la tua chiave del provider (Google Gemini o Mistral AI).
+
 ### 👥 Collaborazione
 Invita altri utenti a collaborare su un viaggio. Ogni collaboratore ottiene un badge colorato univoco sui propri contributi e il viaggio appare nella loro sezione "Condivisi con me".
 

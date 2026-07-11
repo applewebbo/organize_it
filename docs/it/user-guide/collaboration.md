@@ -88,6 +88,10 @@ I collaboratori ricevono notifiche email quando:
 !!! tip "Preferenza Lingua"
     Le email di notifica vengono inviate nella lingua impostata nelle preferenze del tuo account. Consulta le Impostazioni Account per modificare la lingua.
 
+## Condividere i Suggerimenti AI
+
+Se usi i [suggerimenti AI](suggestions.md), puoi permettere ai collaboratori di generare suggerimenti sui viaggi che hai creato usando la **tua** chiave API — comodo quando non ne hanno configurata una propria. Attiva **Condividi la chiave API con i collaboratori** nelle Impostazioni Account. I collaboratori con una chiave propria usano sempre la loro; gli altri ricadono sulla tua, e il loro utilizzo incide sulla tua quota. Vedi [Suggerimenti AI](suggestions.md#condividere-la-chiave-con-i-collaboratori) per i dettagli.
+
 ## Domande Frequenti
 
 ### Un collaboratore può invitare altri utenti?
