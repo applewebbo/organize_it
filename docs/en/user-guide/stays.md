@@ -89,13 +89,10 @@ A **Stay** is an accommodation that spans one or more consecutive days in your t
 - Useful reminder for booking flexibility
 - Example: March 1, 2025
 
-**Confirmation Number**
-- Booking reference or confirmation code
-- Example: "HTL123456", "ABC-2025-0314"
-
 **Notes**
 - Additional information
-- Example: "Free breakfast included. Pool on 5th floor. Late check-out arranged."
+- Example: "Booking ref HTL123456. Free breakfast included. Pool on 5th floor. Late check-out arranged."
+- Record the booking reference or confirmation code here
 - Max 500 characters
 
 ## Multi-Day Stays

@@ -179,7 +179,7 @@ Sì. Puoi generare un link di sola lettura dall'intestazione del viaggio. Vedi l
 
 ### Posso duplicare un viaggio?
 
-La duplicazione viaggi non è attualmente supportata ma è pianificata per una versione futura.
+La duplicazione viaggi non è attualmente supportata. Crea un nuovo viaggio e aggiungi manualmente i suoi eventi.
 
 ### Posso esportare il mio viaggio?
 
@@ -269,19 +269,15 @@ Sì. Puoi allegare PDF e immagini al viaggio, ai trasferimenti, agli alloggi e a
 
 ### Posso contrassegnare eventi come completati?
 
-Il tracciamento completamento eventi è pianificato per una versione futura.
+Non esiste uno stato di completamento per singolo evento. I viaggi passano automaticamente a Completato (e successivamente Archiviato) una volta trascorse le loro date.
 
 ### Come riordino gli eventi all'interno di un giorno?
 
-Gli eventi sono automaticamente ordinati per ora inizio. Per riordinare:
-
-1. Modifica orari evento
-2. Aggiusta ora inizio alla posizione desiderata
-3. Salva
+Gli eventi sono ordinati per ora inizio, con quelli senza orario in coda. Puoi forzare manualmente l'ordine nella pagina dettaglio giorno tramite **trascinamento** (desktop) o il pulsante **scambia ordine** (mobile).
 
 ### Posso scambiare orari evento?
 
-Attualmente, devi modificare manualmente entrambi gli eventi per scambiare orari. Una funzione di scambio è pianificata per una versione futura.
+Riordina gli eventi direttamente con il **trascinamento** (desktop) o il pulsante **scambia ordine** (mobile) — non devi modificare a mano l'orario di ogni evento.
 
 ## Domande Alloggi
 

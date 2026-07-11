@@ -86,8 +86,7 @@ Click on **Day 1 (Friday, March 14)** to open the day view.
    - **End Day**: Day 3 (Sunday)
    - **Check-in Time**: 15:00
    - **Check-out Time**: 11:00
-   - **Confirmation Number**: "HTLFORUM123" (optional)
-   - **Notes**: "Near the Colosseum. Free breakfast included."
+   - **Notes**: "Booking ref HTLFORUM123. Near the Colosseum. Free breakfast included."
 
 3. Click **Save**
 
@@ -95,6 +94,8 @@ Click on **Day 1 (Friday, March 14)** to open the day view.
     Since this stay spans all 3 days, it will appear on Day 1, Day 2, and Day 3.
 
 ### 2.3 Enrich with Google Places (Optional)
+
+You don't need to fill in every field by hand. Enter the basics — a name and address — save, and then let Google Places complete the rest.
 
 If you have a Google Places API key configured:
 
@@ -104,6 +105,9 @@ If you have a Google Places API key configured:
    - Phone number
    - Opening hours
    - Additional details
+
+!!! tip "Enrich works for experiences and meals too"
+    The same **Enrich** button is available on experience and meal cards. Add the name and address, save, then enrich to auto-fill website, phone and opening hours — no need to look them up yourself.
 
 ## Step 3: Add Arrival Transfer
 
@@ -117,8 +121,7 @@ If you have a Google Places API key configured:
    - **Destination**: "Rome Fiumicino (FCO)"
    - **Departure Time**: 08:00
    - **Arrival Time**: 11:30
-   - **Confirmation Number**: "BA123456"
-   - **Notes**: "British Airways BA500. Seat 12A."
+   - **Notes**: "British Airways BA500. Confirmation BA123456. Seat 12A."
 
 4. Click **Save**
 
@@ -146,13 +149,11 @@ If you have a Google Places API key configured:
 1. Click **Add Experience**
 2. Fill in details:
    - **Name**: "Colosseum Tour"
-   - **Category**: Museum/Attraction
+   - **Experience type**: Museum
    - **Start Time**: 16:00
    - **Duration**: 2 hours
    - **Address**: "Piazza del Colosseo, 1, 00184 Rome"
-   - **Price**: 25€ (optional)
-   - **Confirmation**: "COL202503141600" (optional)
-   - **Notes**: "Guided tour. Skip-the-line ticket. Meeting point: main entrance"
+   - **Notes**: "Guided tour, 25€. Confirmation COL202503141600. Skip-the-line ticket. Meeting point: main entrance"
 
 3. Click **Save**
 
@@ -162,7 +163,7 @@ If you have a Google Places API key configured:
 2. Click **Add Experience**
 3. Fill in details:
    - **Name**: "Roman Forum and Palatine Hill"
-   - **Category**: Museum/Attraction
+   - **Experience type**: Museum
    - **Start Time**: 09:30
    - **Duration**: 3 hours
    - **Address**: "Via della Salara Vecchia, 5/6, 00186 Rome"
@@ -175,7 +176,7 @@ If you have a Google Places API key configured:
 1. Click **Add Experience**
 2. Fill in details:
    - **Name**: "Trevi Fountain and Spanish Steps Walk"
-   - **Category**: Walk/Exploration
+   - **Experience type**: Walk
    - **Start Time**: 15:00
    - **Duration**: 2 hours
    - **Notes**: "Bring coins for the fountain!"
@@ -188,12 +189,11 @@ If you have a Google Places API key configured:
 2. Click **Add Experience**
 3. Fill in details:
    - **Name**: "Vatican Museums and Sistine Chapel"
-   - **Category**: Museum/Attraction
+   - **Experience type**: Museum
    - **Start Time**: 09:00
    - **Duration**: 3.5 hours
    - **Address**: "Viale Vaticano, 00165 Rome"
-   - **Price**: 17€
-   - **Notes**: "Book in advance. Last Sunday of month is free but crowded."
+   - **Notes**: "17€. Book in advance. Last Sunday of month is free but crowded."
 
 4. Click **Save**
 
@@ -208,12 +208,10 @@ If you have a Google Places API key configured:
 2. Click **Add Meal**
 3. Fill in details:
    - **Name**: "Trattoria da Enzo"
-   - **Cuisine Type**: Italian
    - **Meal Type**: Dinner
    - **Start Time**: 19:30
    - **Address**: "Via dei Vascellari, 29, 00153 Rome"
-   - **Reservation**: Yes
-   - **Notes**: "Traditional Roman cuisine. Try the cacio e pepe!"
+   - **Notes**: "Reservation made. Traditional Roman cuisine. Try the cacio e pepe!"
 
 4. Click **Save**
 
@@ -223,7 +221,6 @@ If you have a Google Places API key configured:
 2. Click **Add Meal**
 3. Fill in details:
    - **Name**: "Roscioli"
-   - **Cuisine Type**: Italian/Deli
    - **Meal Type**: Lunch
    - **Start Time**: 13:00
    - **Address**: "Via dei Giubbonari, 21, 00186 Rome"
@@ -236,13 +233,10 @@ If you have a Google Places API key configured:
 1. Click **Add Meal**
 2. Fill in details:
    - **Name**: "La Pergola"
-   - **Cuisine Type**: Fine Dining
    - **Meal Type**: Dinner
    - **Start Time**: 20:00
    - **Address**: "Via Alberto Cadlolo, 101, 00136 Rome"
-   - **Reservation**: Yes
-   - **Confirmation**: "LP20250315" (optional)
-   - **Notes**: "3 Michelin stars. Dress code: elegant. Reserve well in advance."
+   - **Notes**: "Reservation LP20250315. 3 Michelin stars. Dress code: elegant. Reserve well in advance."
 
 4. Click **Save**
 
@@ -252,7 +246,6 @@ If you have a Google Places API key configured:
 2. Click **Add Meal**
 3. Fill in details:
    - **Name**: "Pizzarium"
-   - **Cuisine Type**: Pizza
    - **Meal Type**: Lunch
    - **Start Time**: 13:30
    - **Address**: "Via della Meloria, 43, 00136 Rome"
@@ -287,8 +280,7 @@ If you have a Google Places API key configured:
    - **Destination**: "London Heathrow (LHR)"
    - **Departure Time**: 18:00
    - **Arrival Time**: 19:45
-   - **Confirmation**: "BA234567"
-   - **Notes**: "British Airways BA501. Seat 15C."
+   - **Notes**: "British Airways BA501. Confirmation BA234567. Seat 15C."
 
 4. Click **Save**
 

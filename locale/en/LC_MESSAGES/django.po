@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-07 06:45+0200\n"
+"POT-Creation-Date: 2026-07-11 20:57+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -270,119 +270,119 @@ msgstr ""
 msgid "AI credentials"
 msgstr ""
 
-#: suggestions/models.py:83 suggestions/models.py:115
+#: suggestions/models.py:85 suggestions/models.py:117
 msgid "No preference"
 msgstr ""
 
-#: suggestions/models.py:84
+#: suggestions/models.py:86
 msgid "Vegetarian"
 msgstr ""
 
-#: suggestions/models.py:85
+#: suggestions/models.py:87
 msgid "Vegan"
 msgstr ""
 
-#: suggestions/models.py:86
+#: suggestions/models.py:88
 msgid "Gluten-free"
 msgstr ""
 
-#: suggestions/models.py:89
+#: suggestions/models.py:91
 msgid "Low"
 msgstr ""
 
-#: suggestions/models.py:90
+#: suggestions/models.py:92
 msgid "Medium"
 msgstr ""
 
-#: suggestions/models.py:91
+#: suggestions/models.py:93
 msgid "High"
 msgstr ""
 
-#: suggestions/models.py:94 trips/forms.py:326
+#: suggestions/models.py:96 trips/forms.py:326
 msgid "Not specified"
 msgstr ""
 
-#: suggestions/models.py:95
+#: suggestions/models.py:97
 msgid "Solo"
 msgstr ""
 
-#: suggestions/models.py:96
+#: suggestions/models.py:98
 msgid "Couple"
 msgstr ""
 
-#: suggestions/models.py:97
+#: suggestions/models.py:99
 msgid "Family with children"
 msgstr ""
 
-#: suggestions/models.py:98
+#: suggestions/models.py:100
 msgid "Group of friends"
 msgstr ""
 
-#: suggestions/models.py:101
+#: suggestions/models.py:103
 msgid "Iconic must-sees"
 msgstr ""
 
-#: suggestions/models.py:102
+#: suggestions/models.py:104
 msgid "Balanced"
 msgstr ""
 
-#: suggestions/models.py:103
+#: suggestions/models.py:105
 msgid "Off the beaten path"
 msgstr ""
 
-#: suggestions/models.py:106
+#: suggestions/models.py:108
 msgid "History"
 msgstr ""
 
-#: suggestions/models.py:107
+#: suggestions/models.py:109
 msgid "Art"
 msgstr ""
 
-#: suggestions/models.py:108
+#: suggestions/models.py:110
 msgid "Nature"
 msgstr ""
 
-#: suggestions/models.py:109
+#: suggestions/models.py:111
 msgid "Nightlife"
 msgstr ""
 
-#: suggestions/models.py:110
+#: suggestions/models.py:112
 msgid "Shopping"
 msgstr ""
 
-#: suggestions/models.py:111
+#: suggestions/models.py:113
 msgid "Local food"
 msgstr ""
 
-#: suggestions/models.py:112
+#: suggestions/models.py:114
 msgid "Relax"
 msgstr ""
 
-#: suggestions/models.py:116
+#: suggestions/models.py:118
 msgid "Local traditional"
 msgstr ""
 
-#: suggestions/models.py:117
+#: suggestions/models.py:119
 msgid "Street food"
 msgstr ""
 
-#: suggestions/models.py:118
+#: suggestions/models.py:120
 msgid "International"
 msgstr ""
 
-#: suggestions/models.py:121
+#: suggestions/models.py:123
 msgid "Within the city"
 msgstr ""
 
-#: suggestions/models.py:122
+#: suggestions/models.py:124
 msgid "City and surroundings"
 msgstr ""
 
-#: suggestions/models.py:123
+#: suggestions/models.py:125
 msgid "Include day trips"
 msgstr ""
 
-#: suggestions/models.py:172 suggestions/models.py:173
+#: suggestions/models.py:174 suggestions/models.py:175
 msgid "Suggestion preferences"
 msgstr ""
 
@@ -697,85 +697,99 @@ msgid ""
 msgstr ""
 
 #: templates/cotton/quick_guide.html:103
+msgid "AI Suggestions"
+msgstr "AI Suggestions"
+
+#: templates/cotton/quick_guide.html:106
+msgid ""
+"Get AI-generated ideas for places to visit, eat, and stay — tailored to your "
+"preferences and grounded on real places. Bring your own provider key (Google "
+"Gemini or Mistral AI)."
+msgstr ""
+"Get AI-generated ideas for places to visit, eat, and stay — tailored to your "
+"preferences and grounded on real places. Bring your own provider key (Google "
+"Gemini or Mistral AI)."
+
+#: templates/cotton/quick_guide.html:117
 #, fuzzy
 #| msgid "Collaborators"
 msgid "Collaboration"
 msgstr "Collaborators"
 
-#: templates/cotton/quick_guide.html:106
+#: templates/cotton/quick_guide.html:120
 msgid ""
 "Invite friends or family to co-edit your trip. Each collaborator gets a "
 "unique color badge on their contributions so you can see who added what."
 msgstr ""
 
-#: templates/cotton/quick_guide.html:118
+#: templates/cotton/quick_guide.html:132
 msgid "Sharing"
 msgstr ""
 
-#: templates/cotton/quick_guide.html:121
+#: templates/cotton/quick_guide.html:135
 msgid ""
 "Share a read-only view of your trip with anyone via a secure magic link — no "
 "account required to view."
 msgstr ""
 
-#: templates/cotton/quick_guide.html:132 templates/trips/checklist.html:4
+#: templates/cotton/quick_guide.html:146 templates/trips/checklist.html:4
 #: templates/trips/includes/checklist-card.html:6
 msgid "Checklist"
 msgstr ""
 
-#: templates/cotton/quick_guide.html:135
+#: templates/cotton/quick_guide.html:149
 msgid ""
 "Keep a pre-departure to-do list for each trip and get an optional email "
 "reminder days before leaving."
 msgstr ""
 
-#: templates/cotton/quick_guide.html:146
+#: templates/cotton/quick_guide.html:160
 #: templates/trips/includes/attachments-card.html:6
 msgid "Documents"
 msgstr ""
 
-#: templates/cotton/quick_guide.html:149
+#: templates/cotton/quick_guide.html:163
 msgid ""
 "Attach PDFs and images — tickets, vouchers, reservations — to your trip, "
 "stays, transfers and events."
 msgstr ""
 
-#: templates/cotton/quick_guide.html:160
+#: templates/cotton/quick_guide.html:174
 msgid "PDF Export"
 msgstr ""
 
-#: templates/cotton/quick_guide.html:163
+#: templates/cotton/quick_guide.html:177
 msgid ""
 "Download a complete offline PDF of your itinerary, with optional attachments "
 "embedded for travelling without connectivity."
 msgstr ""
 
-#: templates/cotton/quick_guide.html:175
+#: templates/cotton/quick_guide.html:189
 msgid "Calendar Sync"
 msgstr ""
 
-#: templates/cotton/quick_guide.html:178
+#: templates/cotton/quick_guide.html:192
 msgid ""
 "Subscribe to your trip from any calendar app via a private iCal feed — "
 "updates flow through automatically."
 msgstr ""
 
-#: templates/cotton/quick_guide.html:189
+#: templates/cotton/quick_guide.html:203
 #: templates/trips/email/daily_digest_body.html:49
 msgid "Weather"
 msgstr "Weather"
 
-#: templates/cotton/quick_guide.html:192
+#: templates/cotton/quick_guide.html:206
 msgid ""
 "See a day-by-day forecast on your trip and receive a summary email a few "
 "days before departure to help you pack."
 msgstr ""
 
-#: templates/cotton/quick_guide.html:199
+#: templates/cotton/quick_guide.html:213
 msgid "Want to learn more? Check out our comprehensive documentation."
 msgstr ""
 
-#: templates/cotton/quick_guide.html:206
+#: templates/cotton/quick_guide.html:220
 msgid "Read Documentation"
 msgstr ""
 

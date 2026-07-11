@@ -88,6 +88,9 @@ I giorni verranno creati automaticamente per ogni data del viaggio!
    - Note
 3. Clicca su **Salva**
 
+!!! tip "Inserisci i dati di base, poi arricchisci"
+    Bastano un nome e un indirizzo per iniziare. Una volta salvato, clicca **Arricchisci** sulla scheda dell'alloggio o dell'evento per compilare automaticamente sito web, numero di telefono e orari di apertura da Google Places (richiede una chiave API Google Places). Vedi la [guida Esperienze](../user-guide/experiences.md#arricchimento-google-places) per i dettagli.
+
 Ripeti per pasti e altre attività!
 
 ### Passo 5: Aggiungi Trasporti
@@ -101,7 +104,7 @@ Ripeti per pasti e altre attività!
 3. Compila i dettagli:
    - Mezzo di trasporto (volo, treno, auto, ecc.)
    - Orari di partenza e arrivo
-   - Numero di conferma
+   - Note (numero di conferma, posto, ecc.)
 4. Clicca su **Salva**
 
 ### Passo 6: Visualizza il Tuo Itinerario

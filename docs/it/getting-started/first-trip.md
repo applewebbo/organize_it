@@ -86,8 +86,7 @@ Clicca su **Giorno 1 (Venerdì, 14 marzo)** per aprire la vista giorno.
    - **Giorno Fine**: Giorno 3 (Domenica)
    - **Orario Check-in**: 15:00
    - **Orario Check-out**: 11:00
-   - **Numero Conferma**: "HTLFORUM123" (opzionale)
-   - **Note**: "Vicino al Colosseo. Colazione inclusa."
+   - **Note**: "Rif. prenotazione HTLFORUM123. Vicino al Colosseo. Colazione inclusa."
 
 3. Clicca **Salva**
 
@@ -95,6 +94,8 @@ Clicca su **Giorno 1 (Venerdì, 14 marzo)** per aprire la vista giorno.
     Poiché questo soggiorno copre tutti e 3 i giorni, apparirà nel Giorno 1, Giorno 2 e Giorno 3.
 
 ### 2.3 Arricchisci con Google Places (Opzionale)
+
+Non devi compilare ogni campo a mano. Inserisci i dati di base — nome e indirizzo — salva, e lascia che Google Places completi il resto.
 
 Se hai una chiave API Google Places configurata:
 
@@ -104,6 +105,9 @@ Se hai una chiave API Google Places configurata:
    - Numero di telefono
    - Orari di apertura
    - Dettagli aggiuntivi
+
+!!! tip "L'arricchimento funziona anche per esperienze e pasti"
+    Lo stesso pulsante **Arricchisci** è disponibile sulle schede di esperienze e pasti. Aggiungi nome e indirizzo, salva, poi arricchisci per compilare automaticamente sito web, telefono e orari di apertura — senza doverli cercare tu.
 
 ## Passo 3: Aggiungi il Trasferimento di Arrivo
 
@@ -117,8 +121,7 @@ Se hai una chiave API Google Places configurata:
    - **Destinazione**: "Roma Fiumicino (FCO)"
    - **Orario Partenza**: 08:00
    - **Orario Arrivo**: 11:30
-   - **Numero Conferma**: "BA123456"
-   - **Note**: "British Airways BA500. Posto 12A."
+   - **Note**: "British Airways BA500. Conferma BA123456. Posto 12A."
 
 4. Clicca **Salva**
 
@@ -146,13 +149,11 @@ Se hai una chiave API Google Places configurata:
 1. Clicca **Aggiungi Esperienza**
 2. Compila i dettagli:
    - **Nome**: "Tour del Colosseo"
-   - **Categoria**: Museo/Attrazione
+   - **Tipo esperienza**: Museo
    - **Orario Inizio**: 16:00
    - **Durata**: 2 ore
    - **Indirizzo**: "Piazza del Colosseo, 1, 00184 Roma"
-   - **Prezzo**: 25€ (opzionale)
-   - **Conferma**: "COL202503141600" (opzionale)
-   - **Note**: "Tour guidato. Biglietto salta-fila. Punto d'incontro: ingresso principale"
+   - **Note**: "Tour guidato, 25€. Conferma COL202503141600. Biglietto salta-fila. Punto d'incontro: ingresso principale"
 
 3. Clicca **Salva**
 
@@ -162,7 +163,7 @@ Se hai una chiave API Google Places configurata:
 2. Clicca **Aggiungi Esperienza**
 3. Compila i dettagli:
    - **Nome**: "Foro Romano e Palatino"
-   - **Categoria**: Museo/Attrazione
+   - **Tipo esperienza**: Museo
    - **Orario Inizio**: 09:30
    - **Durata**: 3 ore
    - **Indirizzo**: "Via della Salara Vecchia, 5/6, 00186 Roma"
@@ -175,7 +176,7 @@ Se hai una chiave API Google Places configurata:
 1. Clicca **Aggiungi Esperienza**
 2. Compila i dettagli:
    - **Nome**: "Passeggiata Fontana di Trevi e Piazza di Spagna"
-   - **Categoria**: Passeggiata/Esplorazione
+   - **Tipo esperienza**: Passeggiata
    - **Orario Inizio**: 15:00
    - **Durata**: 2 ore
    - **Note**: "Porta monete per la fontana!"
@@ -188,12 +189,11 @@ Se hai una chiave API Google Places configurata:
 2. Clicca **Aggiungi Esperienza**
 3. Compila i dettagli:
    - **Nome**: "Musei Vaticani e Cappella Sistina"
-   - **Categoria**: Museo/Attrazione
+   - **Tipo esperienza**: Museo
    - **Orario Inizio**: 09:00
    - **Durata**: 3.5 ore
    - **Indirizzo**: "Viale Vaticano, 00165 Roma"
-   - **Prezzo**: 17€
-   - **Note**: "Prenota in anticipo. L'ultima domenica del mese è gratis ma affollata."
+   - **Note**: "17€. Prenota in anticipo. L'ultima domenica del mese è gratis ma affollata."
 
 4. Clicca **Salva**
 
@@ -208,12 +208,10 @@ Se hai una chiave API Google Places configurata:
 2. Clicca **Aggiungi Pasto**
 3. Compila i dettagli:
    - **Nome**: "Trattoria da Enzo"
-   - **Tipo Cucina**: Italiana
    - **Tipo Pasto**: Cena
    - **Orario Inizio**: 19:30
    - **Indirizzo**: "Via dei Vascellari, 29, 00153 Roma"
-   - **Prenotazione**: Sì
-   - **Note**: "Cucina romana tradizionale. Prova la cacio e pepe!"
+   - **Note**: "Prenotazione effettuata. Cucina romana tradizionale. Prova la cacio e pepe!"
 
 4. Clicca **Salva**
 
@@ -223,7 +221,6 @@ Se hai una chiave API Google Places configurata:
 2. Clicca **Aggiungi Pasto**
 3. Compila i dettagli:
    - **Nome**: "Roscioli"
-   - **Tipo Cucina**: Italiana/Salumeria
    - **Tipo Pasto**: Pranzo
    - **Orario Inizio**: 13:00
    - **Indirizzo**: "Via dei Giubbonari, 21, 00186 Roma"
@@ -236,13 +233,10 @@ Se hai una chiave API Google Places configurata:
 1. Clicca **Aggiungi Pasto**
 2. Compila i dettagli:
    - **Nome**: "La Pergola"
-   - **Tipo Cucina**: Alta Cucina
    - **Tipo Pasto**: Cena
    - **Orario Inizio**: 20:00
    - **Indirizzo**: "Via Alberto Cadlolo, 101, 00136 Roma"
-   - **Prenotazione**: Sì
-   - **Conferma**: "LP20250315" (opzionale)
-   - **Note**: "3 stelle Michelin. Dress code: elegante. Prenota con largo anticipo."
+   - **Note**: "Prenotazione LP20250315. 3 stelle Michelin. Dress code: elegante. Prenota con largo anticipo."
 
 4. Clicca **Salva**
 
@@ -252,7 +246,6 @@ Se hai una chiave API Google Places configurata:
 2. Clicca **Aggiungi Pasto**
 3. Compila i dettagli:
    - **Nome**: "Pizzarium"
-   - **Tipo Cucina**: Pizza
    - **Tipo Pasto**: Pranzo
    - **Orario Inizio**: 13:30
    - **Indirizzo**: "Via della Meloria, 43, 00136 Roma"
@@ -287,8 +280,7 @@ Se hai una chiave API Google Places configurata:
    - **Destinazione**: "London Heathrow (LHR)"
    - **Orario Partenza**: 18:00
    - **Orario Arrivo**: 19:45
-   - **Conferma**: "BA234567"
-   - **Note**: "British Airways BA501. Posto 15C."
+   - **Note**: "British Airways BA501. Conferma BA234567. Posto 15C."
 
 4. Clicca **Salva**
 

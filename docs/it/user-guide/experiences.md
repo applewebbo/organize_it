@@ -75,15 +75,8 @@ Un'**Esperienza** è qualsiasi attività pianificata durante il viaggio, come:
 **Note**
 - Informazioni aggiuntive
 - Esempio: "Biglietto salta-fila. Punto di incontro: ingresso principale. Porta documento per sconto studenti."
-- Massimo 500 caratteri
-
-**Numero Conferma**
-- Riferimento prenotazione
-- Esempio: "TOUR123456", "COL202503141600"
-
-**Prezzo**
-- Costo dell'esperienza (se applicabile)
-- Esempio: "25€", "$50", "Gratuito con pass città"
+- Modificato dalla scheda evento tramite il modale **note**, separatamente dal form principale
+- Annota qui riferimenti di prenotazione, prezzi o qualsiasi altro dettaglio
 
 **Giorno**
 - In quale giorno avviene questa esperienza
@@ -285,18 +278,19 @@ L'esperienza appare nella sezione "Eventi Non Associati". Assegnala a un giorno 
 ```
 Nome: Tour Colosseo e Foro Romano
 Tipo: Museum
-Orario: 09:00 - 12:30
+Orario Inizio: 09:00
+Durata: 3h 30min
 Indirizzo: Piazza del Colosseo, 1, 00184 Roma, Italia
 Note: Biglietto combinato salta-fila. Punto incontro: ingresso principale.
        Include audioguida. Indossa scarpe comode. Porta acqua.
-Conferma: COL-TOUR-2025-0314
+       Conferma: COL-TOUR-2025-0314
 ```
 
 **Esempio incompleto** (più difficile da usare):
 ```
 Nome: Colosseo
 Tipo: Museum
-Orario: 09:00 - 10:00
+Orario Inizio: 09:00
 ```
 
 ### Usare le Note in Modo Efficace
@@ -346,7 +340,7 @@ Non sovra-pianificare:
 
 Per attività giornata intera:
 - Imposta orario inizio: 09:00
-- Imposta orario fine: 18:00
+- Imposta la durata al valore massimo disponibile (7h 30min)
 - Nota: "Tour giornata intera con pranzo incluso"
 
 ### Esperienze Multi-Parte
@@ -356,14 +350,15 @@ Se un'esperienza ha più sessioni:
 **Opzione 1**: Crea un'esperienza lunga
 ```
 Nome: Tour Città Guidato (Mattina e Pomeriggio)
-Orario: 09:00 - 17:00
+Orario Inizio: 09:00
+Durata: 7h 30min
 Note: Pausa pranzo 12:00-13:00 (non incluso)
 ```
 
 **Opzione 2**: Crea esperienze separate
 ```
-Esperienza 1: Tour Città - Sessione Mattina (09:00-12:00)
-Esperienza 2: Tour Città - Sessione Pomeriggio (13:00-17:00)
+Esperienza 1: Tour Città - Sessione Mattina (Inizio 09:00, Durata 3h)
+Esperienza 2: Tour Città - Sessione Pomeriggio (Inizio 13:00, Durata 4h)
 ```
 
 ### Attività Dipendenti dal Meteo
@@ -379,7 +374,8 @@ Note: Attività all'aperto. Controlla previsioni meteo.
 Per esperienze senza orari rigidi:
 ```
 Nome: Esplora Quartiere Montmartre
-Orario: 14:00 - 17:00 (approssimativo)
+Orario Inizio: 14:00
+Durata: 3h (approssimativa)
 Note: Esplorazione auto-guidata. Nessun programma fisso.
        Visita Sacré-Cœur prima delle 18:00.
 ```
@@ -392,7 +388,7 @@ Sì, ma il sistema ti avviserà delle sovrapposizioni orarie. Potrebbe essere in
 
 ### Come marco un'esperienza come completata?
 
-Attualmente non c'è uno stato "completato". Questa funzionalità è pianificata per versioni future.
+Non esiste uno stato "completato" per le esperienze. Quando le date di un viaggio sono passate, è il viaggio stesso a passare allo stato Completato (e successivamente Archiviato).
 
 ### Posso aggiungere foto a un'esperienza?
 
@@ -409,8 +405,7 @@ No, ogni esperienza deve essere creata individualmente. Se hai attività giornal
 ### Come gestisco le prenotazioni?
 
 Aggiungi dettagli prenotazione in:
-- Campo Numero Conferma
-- Campo Note (ora, email conferma, ecc.)
+- Campo Note (numero di conferma, ora, email conferma, ecc.)
 - Sezione Link (aggiungi URL prenotazione)
 
 ### E se non conosco ancora l'orario esatto?

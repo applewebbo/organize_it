@@ -89,13 +89,10 @@ Un **Alloggio** è una sistemazione che copre uno o più giorni consecutivi nel 
 - Promemoria utile per flessibilità prenotazione
 - Esempio: 1 marzo 2025
 
-**Numero Conferma**
-- Riferimento prenotazione o codice conferma
-- Esempio: "HTL123456", "ABC-2025-0314"
-
 **Note**
 - Informazioni aggiuntive
-- Esempio: "Colazione gratuita inclusa. Piscina al 5° piano. Check-out posticipato concordato."
+- Esempio: "Rif. prenotazione HTL123456. Colazione gratuita inclusa. Piscina al 5° piano. Check-out posticipato concordato."
+- Annota qui il riferimento della prenotazione o il codice di conferma
 - Massimo 500 caratteri
 
 ## Alloggi Multi-Giorno

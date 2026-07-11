@@ -343,7 +343,7 @@ No, le date di inizio e fine sono obbligatorie. I giorni sono generati automatic
 
 ### Posso duplicare un viaggio?
 
-Attualmente non c'è una funzione di duplicazione. Devi creare un nuovo viaggio e aggiungere manualmente gli eventi. (Richiesta funzionalità: #XX)
+Attualmente non c'è una funzione di duplicazione. Devi creare un nuovo viaggio e aggiungere manualmente gli eventi.
 
 ### Posso condividere viaggi con altri?
 

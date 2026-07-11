@@ -179,7 +179,7 @@ Yes. You can generate a read-only share link from the trip header. See the [Coll
 
 ### Can I duplicate a trip?
 
-Trip duplication is not currently supported but is planned for a future release.
+Trip duplication is not currently supported. Create a new trip and add its events manually.
 
 ### Can I export my trip?
 
@@ -269,19 +269,15 @@ Yes. You can attach PDFs and images to the trip, transfers, stays and events fro
 
 ### Can I mark events as completed?
 
-Event completion tracking is planned for a future release.
+There is no per-event completion status. Trips move to Completed (and later Archived) automatically once their dates have passed.
 
 ### How do I reorder events within a day?
 
-Events are automatically ordered by start time. To reorder:
-
-1. Edit event times
-2. Adjust start time to desired position
-3. Save
+Events are ordered by start time, with untimed events after them. You can override the order manually on the day detail page via **drag and drop** (desktop) or the **swap order** button (mobile).
 
 ### Can I swap event times?
 
-Currently, you need to manually edit both events to swap times. A swap feature is planned for a future release.
+Reorder events directly with **drag and drop** (desktop) or the **swap order** button (mobile) — you don't need to edit each event's time by hand.
 
 ## Stay Questions
 

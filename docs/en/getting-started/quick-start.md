@@ -88,6 +88,9 @@ Days will be automatically created for each date in your trip!
    - Notes
 3. Click **Save**
 
+!!! tip "Enter the basics, then enrich"
+    You only need a name and address to get started. Once saved, click **Enrich** on the stay or event card to auto-fill the website, phone number and opening hours from Google Places (requires a Google Places API key). See the [Experiences guide](../user-guide/experiences.md#google-places-enrichment) for details.
+
 Repeat for meals and other activities!
 
 ### Step 5: Add Transportation
@@ -99,7 +102,7 @@ Repeat for meals and other activities!
 3. Fill in details:
    - Transport mode (flight, train, car, etc.)
    - Departure and arrival times
-   - Confirmation number
+   - Notes (confirmation number, seat, etc.)
 4. Click **Save**
 
 ### Step 6: View Your Itinerary

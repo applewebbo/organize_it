@@ -75,15 +75,8 @@ An **Experience** is any planned activity during your trip, such as:
 **Notes**
 - Additional information
 - Example: "Skip-the-line ticket. Meeting point: main entrance. Bring ID for student discount."
-- Max 500 characters
-
-**Confirmation Number**
-- Booking reference
-- Example: "TOUR123456", "COL202503141600"
-
-**Price**
-- Cost of the experience (if applicable)
-- Example: "25€", "$50", "Free with city pass"
+- Edited from the event card via the **notes** modal, separately from the main form
+- Record booking references, prices, or any other detail here
 
 **Day**
 - Which day this experience occurs
@@ -290,7 +283,7 @@ Duration: 3h 30min
 Address: Piazza del Colosseo, 1, 00184 Rome, Italy
 Notes: Skip-the-line combo ticket. Meeting point: main entrance.
        Includes audio guide. Wear comfortable shoes. Bring water.
-Confirmation: COL-TOUR-2025-0314
+       Confirmation: COL-TOUR-2025-0314
 ```
 
 **Incomplete example** (harder to use):
@@ -346,7 +339,7 @@ Don't over-schedule:
 
 For full-day activities:
 - Set start time: 09:00
-- Set end time: 18:00
+- Set duration to the longest available value (7h 30min)
 - Note: "Full day tour with lunch included"
 
 ### Multi-Part Experiences
@@ -356,14 +349,15 @@ If an experience has multiple sessions:
 **Option 1**: Create one long experience
 ```
 Name: Guided City Tour (Morning & Afternoon)
-Time: 09:00 - 17:00
+Start Time: 09:00
+Duration: 7h 30min
 Notes: Lunch break 12:00-13:00 (not included)
 ```
 
 **Option 2**: Create separate experiences
 ```
-Experience 1: City Tour - Morning Session (09:00-12:00)
-Experience 2: City Tour - Afternoon Session (13:00-17:00)
+Experience 1: City Tour - Morning Session (Start 09:00, Duration 3h)
+Experience 2: City Tour - Afternoon Session (Start 13:00, Duration 4h)
 ```
 
 ### Weather-Dependent Activities
@@ -379,7 +373,8 @@ Notes: Outdoor activity. Check weather forecast.
 For experiences without strict times:
 ```
 Name: Explore Montmartre Neighborhood
-Time: 14:00 - 17:00 (approximate)
+Start Time: 14:00
+Duration: 3h (approximate)
 Notes: Self-guided exploration. No fixed schedule.
        Visit Sacré-Cœur anytime before 18:00.
 ```
@@ -392,7 +387,7 @@ Yes, but the system will warn you about time overlaps. This might be intentional
 
 ### How do I mark an experience as completed?
 
-Currently, there's no "completed" status. This feature is planned for future releases.
+There is no "completed" status for experiences. Once a trip's dates have passed, the trip itself moves to the Completed (and later Archived) state.
 
 ### Can I add photos to an experience?
 
@@ -409,8 +404,7 @@ No, each experience must be created individually. If you have daily activities (
 ### How do I handle reservations?
 
 Add reservation details in:
-- Confirmation Number field
-- Notes field (time, confirmation email, etc.)
+- Notes field (confirmation number, time, confirmation email, etc.)
 - Links section (add reservation URL)
 
 ### What if I don't know the exact time yet?

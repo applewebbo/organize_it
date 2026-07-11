@@ -74,26 +74,11 @@ Un **Pasto** è qualsiasi evento culinario durante il tuo viaggio, inclusi:
 - Auto-popolato durante la geocodifica
 - Massimo 100 caratteri
 
-**Tipo di Cucina**
-- Tipo di cibo
-- Esempio: "Italiana", "Francese", "Sushi Giapponese", "Street Food"
-
-**Prenotazione**
-- Se è richiesta/effettuata una prenotazione
-- Campo Sì/No
-
 **Note**
 - Informazioni aggiuntive
 - Esempio: "Prova la cacio e pepe. Solo contanti. Non serve prenotazione. Chiedi tavolo all'aperto."
-- Massimo 500 caratteri
-
-**Numero di Conferma**
-- Conferma della prenotazione
-- Esempio: "RESY-20250314-001", "OpenTable #123456"
-
-**Prezzo**
-- Costo approssimativo per persona
-- Esempio: "€30-40", "$$", "Economico"
+- Modificato dalla scheda evento tramite il modale **note**, separatamente dal form principale
+- Annota qui conferme di prenotazione, prezzo approssimativo o qualsiasi altro dettaglio
 
 **Sito Web**
 - Sito web del ristorante o link di prenotazione
@@ -450,7 +435,7 @@ Note: Inclusa nella tariffa camera. Servizio 7:00-10:00.
 
 ### Posso aggiungere pasti senza prenotazioni?
 
-Sì! Aggiungi qualsiasi piano culinario, con o senza prenotazioni. Usa il campo "Prenotazione" per tracciare quali pasti sono confermati.
+Sì! Aggiungi qualsiasi piano culinario, con o senza prenotazioni. Usa le note per tracciare quali pasti sono confermati.
 
 ### Come gestisco i ristoranti walk-in?
 

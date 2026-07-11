@@ -346,7 +346,7 @@ No, start and end dates are required. Days are auto-generated from dates, and th
 
 ### Can I duplicate a trip?
 
-Currently, there's no duplicate feature. You need to create a new trip and manually add events. (Feature request: #XX)
+Currently, there's no duplicate feature. You need to create a new trip and manually add events.
 
 ### Can I share trips with others?
 

@@ -74,26 +74,11 @@ A **Meal** is any dining event during your trip, including:
 - Auto-populated during geocoding
 - Max 100 characters
 
-**Cuisine Type**
-- Type of food
-- Example: "Italian", "French", "Japanese Sushi", "Street Food"
-
-**Reservation**
-- Whether a reservation is required/made
-- Yes/No field
-
 **Notes**
 - Additional information
 - Example: "Try the cacio e pepe. Cash only. No reservation needed. Ask for outdoor seating."
-- Max 500 characters
-
-**Confirmation Number**
-- Reservation confirmation
-- Example: "RESY-20250314-001", "OpenTable #123456"
-
-**Price**
-- Approximate cost per person
-- Example: "€30-40", "$$", "Budget-friendly"
+- Edited from the event card via the **notes** modal, separately from the main form
+- Record reservation confirmations, approximate price, or any other detail here
 
 **Website**
 - Restaurant website or booking link
@@ -450,7 +435,7 @@ Notes: Included in room rate. 7:00-10:00 service.
 
 ### Can I add meals without reservations?
 
-Yes! Add any dining plan, with or without reservations. Use the "Reservation" field to track which meals are confirmed.
+Yes! Add any dining plan, with or without reservations. Use the notes to track which meals are confirmed.
 
 ### How do I handle walk-in restaurants?
 
