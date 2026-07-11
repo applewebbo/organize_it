@@ -4,7 +4,7 @@
     <div id="ai-generate-actions" hx-swap-oob="true">{% include "suggestions/ai-map-actions.html" %}</div>
 {% endif %}
 {% if error_kind %}
-    <div class="m-3 alert alert-warning alert-soft">
+    <div class="alert alert-warning alert-soft m-3">
         <div>
             {% if error_kind == 'config' %}
                 <p>{% trans "AI suggestions are not configured yet. Add a valid API key to get started." %}</p>
@@ -18,7 +18,7 @@
     </div>
 {% elif cards %}
     {% if from_cache %}
-        <p class="flex gap-1 items-center mb-2 text-xs text-base-content/50">
+        <p class="text-base-content/50 mb-2 flex items-center gap-1 text-xs">
             <i class="ph-bold ph-clock-counter-clockwise i-xs"></i>
             {% trans 'Your last suggestions' %}
         </p>
@@ -31,12 +31,12 @@
                 data-address="{{ card.address }}"
                 data-lat="{{ card.lat|unlocalize }}"
                 data-lng="{{ card.lng|unlocalize }}"
-                class="p-3 rounded-lg border transition-colors border-base-300 bg-base-100 hover:bg-base-200">
-                <div class="flex gap-2 items-center">
+                class="border-base-300 bg-base-100 hover:bg-base-200 rounded-lg border p-3 transition-colors">
+                <div class="flex items-center gap-2">
                     <i class="ph-bold {{ card.icon }} {{ card.icon_color }} i-sm shrink-0"
                        title="{{ card.kind|capfirst }}"
                        aria-hidden="true"></i>
-                    <p class="font-semibold truncate grow">{{ card.name }}</p>
+                    <p class="grow truncate font-semibold">{{ card.name }}</p>
                     <form hx-post="{% url card.add_url trip.pk %}"
                           class="shrink-0"
                           hx-target="closest li"
@@ -59,10 +59,10 @@
                     </form>
                 </div>
                 {% if card.description %}
-                    <p class="mt-1 text-xs line-clamp-3 text-base-content/70">{{ card.description }}</p>
+                    <p class="line-clamp-3 text-base-content/70 mt-1 text-xs">{{ card.description }}</p>
                 {% endif %}
                 <button type="button"
-                        class="mt-1 btn btn-xs btn-ghost"
+                        class="btn btn-xs btn-ghost mt-1"
                         hx-get="{% url 'suggestions:details' trip.pk %}?place_id={{ card.place_id }}"
                         hx-target="closest li find [data-role='place-details']"
                         hx-swap="innerHTML">
@@ -74,13 +74,13 @@
         {% endfor %}
     </ul>
 {% elif awaiting_generation %}
-    <div class="py-8 text-center text-base-content/50">
-        <i class="mb-2 ph-bold ph-sparkle i-lg"></i>
+    <div class="text-base-content/50 py-8 text-center">
+        <i class="ph-bold ph-sparkle i-lg mb-2"></i>
         <p>{% trans 'Generate suggestions for your trip' %}</p>
     </div>
 {% else %}
-    <div class="py-8 text-center text-base-content/50">
-        <i class="mb-2 ph-bold ph-sparkle i-lg"></i>
+    <div class="text-base-content/50 py-8 text-center">
+        <i class="ph-bold ph-sparkle i-lg mb-2"></i>
         <p>{% trans 'No suggestions found' %}</p>
     </div>
 {% endif %}

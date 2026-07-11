@@ -8,15 +8,15 @@
     <div class="grid grid-cols-2 gap-2 md:grid-cols-3"
          x-data="{ selectedId: '' }">
         {% for photo in photos %}
-            <div class="overflow-hidden relative rounded-lg shadow-lg cursor-pointer group"
+            <div class="group relative cursor-pointer overflow-hidden rounded-lg shadow-lg"
                  @click="selectedId = '{{ photo.id }}'; document.getElementById('id_selected_photo_id').value = '{{ photo.id }}'"
                  :class="selectedId === '{{ photo.id }}' ? 'ring-4 ring-primary' : ''">
                 <!-- Image -->
                 <img src="{{ photo.urls.small }}"
                      alt="{{ photo.alt_description }}"
-                     class="object-cover w-full h-32 transition-transform duration-200 group-hover:scale-110">
+                     class="h-32 w-full object-cover transition-transform duration-200 group-hover:scale-110">
                 <!-- Overlay with photographer credit -->
-                <div class="flex absolute inset-0 flex-col justify-end p-3 bg-gradient-to-t to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100 from-black/70">
+                <div class="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/70 to-transparent p-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                     <p class="text-sm text-white">
                         Photo by <a href="{{ photo.user.profile }}"
     target="_blank"
@@ -27,15 +27,15 @@
                 <!-- Selection indicator -->
                 <div class="absolute top-2 right-2"
                      :class="selectedId === '{{ photo.id }}' ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'">
-                    <div class="p-2 rounded-full"
+                    <div class="rounded-full p-2"
                          :class="selectedId === '{{ photo.id }}' ? 'bg-success' : 'bg-primary/80'">
-                        <i class="text-white i-md ph-bold ph-check"></i>
+                        <i class="i-md ph-bold ph-check text-white"></i>
                     </div>
                 </div>
             </div>
         {% endfor %}
     </div>
-    <p class="mt-4 text-xs text-center text-base-content/60">
+    <p class="text-base-content/60 mt-4 text-center text-xs">
         Click an image to select it for your trip, then save the form
     </p>
 {% endif %}

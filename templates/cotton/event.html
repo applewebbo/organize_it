@@ -1,19 +1,19 @@
 {% load i18n %}
 <div class="relative flex flex-col h-full rounded-lg border {{ border_color }} {{ bg_color }} overflow-hidden">
-    <div class="flex absolute right-0 top-1/2 justify-end pr-4 w-1/2 -translate-y-1/2 pointer-events-none select-none sm:hidden"
+    <div class="pointer-events-none absolute top-1/2 right-0 flex w-1/2 -translate-y-1/2 justify-end pr-4 select-none sm:hidden"
          aria-hidden="true">
         <i class="ph-bold ph-{{ icon }} text-[4rem] {{ icon_color }} opacity-[0.07]"></i>
     </div>
-    <i class="hidden absolute top-1 right-1 pointer-events-none sm:block ph-bold ph-dots-six-vertical text-base-content/20"
+    <i class="ph-bold ph-dots-six-vertical text-base-content/20 pointer-events-none absolute top-1 right-1 hidden sm:block"
        aria-hidden="true"></i>
-    <div class="py-3 px-2 sm:px-4 grow">
+    <div class="grow px-2 py-3 sm:px-4">
         <div class="flex items-start">
-            <div class="flex flex-col gap-1 items-center">
+            <div class="flex flex-col items-center gap-1">
                 <div class="{{ icon_color }} hidden bg-slate-50 dark:bg-slate-700 mt-0.5 p-1 sm:p-1.5 rounded-md border-2 sm:block {{ border_color }} ">
                     <i class="ph-bold ph-{{ icon }} i-sm sm:i-lg"></i>
                 </div>
                 {% if meal_badge %}
-                    <span class="hidden sm:inline-flex badge badge-xs badge-warning text-warning-content truncate max-w-[100px]"
+                    <span class="badge badge-xs badge-warning text-warning-content hidden max-w-[100px] truncate sm:inline-flex"
                           title="{{ meal_badge }}">{{ meal_badge }}</span>
                 {% endif %}
                 {% if event.tag %}
@@ -22,7 +22,7 @@
                 {% endif %}
             </div>
             <div class="sm:ms-2" x-data>
-                <div class="flex gap-2 items-center">
+                <div class="flex items-center gap-2">
                     <h2 class="{{ icon_color }} font-semibold text-base sm:text-lg"
                         title="{{ event.name }}">
                         {% if event.day.trip.status != 5 %}
@@ -47,13 +47,13 @@
             </div>
         </div>
         {% if meal_badge or event.category == 2 and event.tag or event.day.trip.status != 5 and event.google_maps_directions_url or swap_url or move_day_url %}
-            <div class="flex flex-row gap-2 justify-end items-center mt-2 sm:hidden me-2"
+            <div class="me-2 mt-2 flex flex-row items-center justify-end gap-2 sm:hidden"
                  x-data>
                 {% if meal_badge %}
-                    <span class="badge badge-xs badge-warning text-warning-content truncate max-w-[100px] me-auto"
+                    <span class="badge badge-xs badge-warning text-warning-content me-auto max-w-[100px] truncate"
                           title="{{ meal_badge }}">{{ meal_badge }}</span>
                 {% elif event.category == 2 and event.tag %}
-                    <span class="text-white bg-emerald-800 border-emerald-800 badge badge-xs truncate max-w-[140px] me-auto"
+                    <span class="badge badge-xs me-auto max-w-[140px] truncate border-emerald-800 bg-emerald-800 text-white"
                           title="{{ event.tag }}">{{ event.tag|capfirst }}</span>
                 {% endif %}
                 {% if event.google_maps_directions_url %}

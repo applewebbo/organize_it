@@ -7,7 +7,7 @@
     <!-- Shared AI key notice (collaborators) -->
     {% if show_shared_key_notice %}
         <div id="shared-key-notice"
-             class="mb-6 alert alert-info alert-soft alert-vertical sm:alert-horizontal"
+             class="alert alert-info alert-soft alert-vertical sm:alert-horizontal mb-6"
              role="alert">
             <i class="ph-bold ph-sparkle i-md"></i>
             <span>
@@ -24,7 +24,7 @@
     <!-- END Shared AI key notice -->
     <!-- Archived Trip Alert -->
     {% if trip.status == 5 %}
-        <div class="mb-6 alert alert-warning alert-soft alert-vertical sm:alert-horizontal"
+        <div class="alert alert-warning alert-soft alert-vertical sm:alert-horizontal mb-6"
              role="alert">
             <i class="ph-bold ph-warning i-md"></i>
             <span>{% trans "This trip is archived and cannot be modified." %}</span>

@@ -1,8 +1,8 @@
 {% load i18n %}
 <div class="modal-content">
-    <div class="flex gap-2 justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
-        <h3 class="text-lg font-semibold truncate">{{ title }}</h3>
-        <div class="flex gap-2 items-center shrink-0">
+    <div class="border-base-300 flex items-center justify-between gap-2 rounded-t border-b p-4 md:px-5 md:py-2.5">
+        <h3 class="truncate text-lg font-semibold">{{ title }}</h3>
+        <div class="flex shrink-0 items-center gap-2">
             <a class="btn btn-sm btn-primary"
                href="{% url 'trips:attachment-stream' attachment.pk %}"
                download="{{ attachment.original_name }}">
@@ -23,7 +23,7 @@
         {% elif attachment.is_pdf %}
             <embed src="{% url 'trips:attachment-stream' attachment.pk %}"
                    type="application/pdf"
-                   class="w-full h-[70vh]">
+                   class="h-[70vh] w-full">
         {% endif %}
     </div>
 </div>

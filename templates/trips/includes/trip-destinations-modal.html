@@ -1,6 +1,6 @@
 {% load i18n %}
 <div class="p-4 sm:p-6">
-    <div class="flex justify-between items-center mb-4">
+    <div class="mb-4 flex items-center justify-between">
         <h3 class="text-lg font-semibold">{% trans "Trip Stages" %}</h3>
         <button class="btn btn-sm btn-ghost btn-circle"
                 @click="$dispatch('hide-modal')"
@@ -8,17 +8,17 @@
             <i class="ph-bold ph-x i-md"></i>
         </button>
     </div>
-    <div class="flex flex-col gap-3 mb-4" x-data="{ confirmingDest: '' }">
+    <div class="mb-4 flex flex-col gap-3" x-data="{ confirmingDest: '' }">
         {% for stage in stages %}
             <div class="flex items-center gap-3 p-3 rounded-lg {% if stage.is_main %}bg-secondary/20 border border-secondary/30{% else %}bg-base-200 border border-base-300{% endif %}">
                 <div class="flex items-center justify-center w-8 h-8 rounded-full shrink-0 {% if stage.is_main %}bg-secondary/30{% else %}bg-base-300{% endif %}">
                     <i class="ph-bold {% if stage.is_main %}ph-house{% else %}ph-line-segments{% endif %} {% if stage.is_main %}text-secondary{% else %}text-base-content/50{% endif %} i-sm"
                        aria-hidden="true"></i>
                 </div>
-                <div class="flex flex-1 gap-2 justify-between items-center min-w-0">
+                <div class="flex min-w-0 flex-1 items-center justify-between gap-2">
                     <div>
                         <p class="text-sm font-semibold">{{ stage.destination }}</p>
-                        <p class="text-xs text-base-content/60">
+                        <p class="text-base-content/60 text-xs">
                             {% with first=stage.days.0 last=stage.days|last %}
                                 {% if first %}
                                     {{ first.date|date:"d M" }}
@@ -52,11 +52,11 @@
             </button>
         </div>
         <div x-show="confirmingDest !== ''" x-cloak>
-            <p class="mb-3 text-xs text-center text-error">
+            <p class="text-error mb-3 text-center text-xs">
                 <i class="ph-bold ph-warning i-sm"></i>
                 {% trans "All events on these days will be unassigned." %}
             </p>
-            <div class="flex gap-2 justify-end">
+            <div class="flex justify-end gap-2">
                 <button class="btn btn-sm btn-ghost" @click="confirmingDest = ''">{% trans "Cancel" %}</button>
                 <form hx-post="{% url 'trips:delete-stage' trip.pk %}"
                       hx-target="#dialog"

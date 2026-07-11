@@ -1,44 +1,44 @@
 {% load i18n trip_tags %}
 <ul class="leading-10">
-    <li class="flex gap-2 items-center">
+    <li class="flex items-center gap-2">
         <i class="ph-bold ph-map-pin i-md text-base-content/60"></i>{{ event.address }}
     </li>
     {% if event.estimated_duration %}
-        <li class="flex gap-2 items-center">
+        <li class="flex items-center gap-2">
             <i class="ph-bold ph-clock i-md text-base-content/60"></i>{{ event.estimated_duration|duration_display }}
         </li>
     {% endif %}
     {% if enriched_data.website %}
-        <li class="flex gap-2 items-center py-1 px-2 min-w-0 rounded bg-success/10">
+        <li class="bg-success/10 flex min-w-0 items-center gap-2 rounded px-2 py-1">
             <i class="ph-bold ph-globe i-md text-success shrink-0"></i>
             <a href="{{ enriched_data.website }}"
-               class="min-w-0 font-semibold truncate link text-success">{{ enriched_data.website }}</a>
-            <span class="gap-1 ml-auto badge badge-success badge-xs shrink-0"><i class="ph-bold ph-sparkle"></i><span class="hidden sm:inline">{% trans 'New' %}</span></span>
+               class="link text-success min-w-0 truncate font-semibold">{{ enriched_data.website }}</a>
+            <span class="badge badge-success badge-xs ml-auto shrink-0 gap-1"><i class="ph-bold ph-sparkle"></i><span class="hidden sm:inline">{% trans 'New' %}</span></span>
         </li>
     {% elif event.website %}
-        <li class="flex gap-2 items-center min-w-0">
-            <i class="ph-bold ph-globe i-md text-base-content/60 shrink-0"></i><a href="{{ event.website }}" class="min-w-0 truncate link">{{ event.website }}</a>
+        <li class="flex min-w-0 items-center gap-2">
+            <i class="ph-bold ph-globe i-md text-base-content/60 shrink-0"></i><a href="{{ event.website }}" class="link min-w-0 truncate">{{ event.website }}</a>
         </li>
     {% endif %}
     {% if enriched_data.phone_number %}
-        <li class="flex gap-2 items-center py-1 px-2 rounded bg-success/10">
+        <li class="bg-success/10 flex items-center gap-2 rounded px-2 py-1">
             <i class="ph-bold ph-phone i-md text-success"></i>
-            <span class="font-semibold text-success">{{ enriched_data.phone_number }}</span>
-            <span class="gap-1 ml-auto badge badge-success badge-xs shrink-0"><i class="ph-bold ph-sparkle"></i><span class="hidden sm:inline">{% trans 'New' %}</span></span>
+            <span class="text-success font-semibold">{{ enriched_data.phone_number }}</span>
+            <span class="badge badge-success badge-xs ml-auto shrink-0 gap-1"><i class="ph-bold ph-sparkle"></i><span class="hidden sm:inline">{% trans 'New' %}</span></span>
         </li>
     {% elif event.phone_number %}
-        <li class="flex gap-2 items-center">
+        <li class="flex items-center gap-2">
             <i class="ph-bold ph-phone i-md text-base-content/60"></i>{{ event.phone_number }}
         </li>
     {% endif %}
     {% if enriched_data.opening_hours %}
-        <li class="flex gap-2 items-center py-1 px-2 rounded bg-success/10">
+        <li class="bg-success/10 flex items-center gap-2 rounded px-2 py-1">
             <i class="ph-bold ph-door-open i-md text-success"></i>
-            <span class="font-semibold text-success">{{ enriched_data.opening_hours|format_opening_hours }}</span>
-            <span class="gap-1 ml-auto badge badge-success badge-xs shrink-0"><i class="ph-bold ph-sparkle"></i><span class="hidden sm:inline">{% trans 'New' %}</span></span>
+            <span class="text-success font-semibold">{{ enriched_data.opening_hours|format_opening_hours }}</span>
+            <span class="badge badge-success badge-xs ml-auto shrink-0 gap-1"><i class="ph-bold ph-sparkle"></i><span class="hidden sm:inline">{% trans 'New' %}</span></span>
         </li>
     {% elif event.opening_hours %}
-        <li class="flex gap-2 items-center">
+        <li class="flex items-center gap-2">
             <i class="ph-bold ph-door-open i-md text-base-content/60"></i>{{ event.opening_hours|format_opening_hours }}
         </li>
     {% endif %}

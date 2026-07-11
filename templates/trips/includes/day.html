@@ -1,22 +1,22 @@
 {% load trip_tags i18n %}
 <div id="day-{{ day.pk }}"
-     class="sm:p-3 sm:rounded-lg sm:bg-base-200 sm:dark:bg-base-300/20"
+     class="sm:bg-base-200 sm:dark:bg-base-300/20 sm:rounded-lg sm:p-3"
      hx-get="{% url 'trips:day-detail' day.pk %}"
      hx-trigger="dayModified{{ day.pk }} from:body"
      hx-target="#day-{{ day.pk }}"
      hx-swap="outerHTML">
-    <div class="flex justify-between items-start">
+    <div class="flex items-start justify-between">
         <div class="flex flex-col gap-1.5">
-            <div class="flex flex-wrap gap-2 items-center">
+            <div class="flex flex-wrap items-center gap-2">
                 <h3 class="text-base font-semibold">
                     {% if day.date %}
-                        {{ day.date|date:"j F" }} <span class="font-normal text-base-content/50 ms-0.5">{% trans 'Day' %} {{ day.number }}</span>
+                        {{ day.date|date:"j F" }} <span class="text-base-content/50 ms-0.5 font-normal">{% trans 'Day' %} {{ day.number }}</span>
                     {% else %}
                         {% trans 'Day' %} {{ day.number }}
                     {% endif %}
                 </h3>
                 {% if day.trip.is_multi_destination %}
-                    <span class="text-sm font-medium uppercase text-base-content/50">
+                    <span class="text-base-content/50 text-sm font-medium uppercase">
                         —
                         {% with dest=day.destination|default:day.trip.destination %}{{ dest }}{% endwith %}
                     </span>
@@ -30,12 +30,12 @@
                             hx-target="#dialog"
                             hx-swap="innerHTML"
                             @click="$dispatch('open-modal'); document.activeElement.blur()"
-                            class="inline-flex gap-1.5 items-center py-1 px-2.5 max-w-full text-xs font-medium text-left rounded-md cursor-pointer bg-base-300 text-base-content/70 w-fit dark:bg-base-200/50 hover:bg-base-300/70">
-                        <i class="ph-bold ph-bed i-sm shrink-0"></i><span class="break-words line-clamp-2">{{ day.stay.name }}</span>
+                            class="bg-base-300 text-base-content/70 dark:bg-base-200/50 hover:bg-base-300/70 inline-flex w-fit max-w-full cursor-pointer items-center gap-1.5 rounded-md px-2.5 py-1 text-left text-xs font-medium">
+                        <i class="ph-bold ph-bed i-sm shrink-0"></i><span class="line-clamp-2 break-words">{{ day.stay.name }}</span>
                     </button>
                 {% else %}
-                    <span class="inline-flex gap-1.5 items-center py-1 px-2.5 max-w-full text-xs font-medium rounded-md bg-base-300 text-base-content/70 w-fit dark:bg-base-200/50">
-                        <i class="ph-bold ph-bed i-sm shrink-0"></i><span class="break-words line-clamp-2">{{ day.stay.name }}</span>
+                    <span class="bg-base-300 text-base-content/70 dark:bg-base-200/50 inline-flex w-fit max-w-full items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium">
+                        <i class="ph-bold ph-bed i-sm shrink-0"></i><span class="line-clamp-2 break-words">{{ day.stay.name }}</span>
                     </span>
                 {% endif %}
             {% endif %}

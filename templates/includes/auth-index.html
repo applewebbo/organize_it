@@ -40,18 +40,18 @@
         {% endwith %}
         <!-- Other Trips Section -->
         {% if other_trips %}
-            <section id="other-trips" class="pt-8 mt-4 mb-8 border-t border-base-300">
-                <h2 class="mb-4 text-2xl font-semibold ms-2">{% trans 'Other Trips' %}</h2>
+            <section id="other-trips" class="border-base-300 mt-4 mb-8 border-t pt-8">
+                <h2 class="ms-2 mb-4 text-2xl font-semibold">{% trans 'Other Trips' %}</h2>
                 <div class="grid grid-cols-1 gap-x-4 gap-y-4 md:grid-cols-2 xl:grid-cols-3">
                     {% for trip in other_trips %}
-                        <div class="shadow-sm card card-border bg-base-100">
-                            <div class="gap-1 p-3 card-body">
-                                <span class="w-fit badge badge-outline badge-secondary badge-xs">{{ trip.get_status_display }}</span>
-                                <h3 class="text-sm sm:text-base card-title">
-                                    <a href="{% url 'trips:trip-detail' trip.id %}" class="sm:hidden link">{{ trip.title }}</a>
+                        <div class="card card-border bg-base-100 shadow-sm">
+                            <div class="card-body gap-1 p-3">
+                                <span class="badge badge-outline badge-secondary badge-xs w-fit">{{ trip.get_status_display }}</span>
+                                <h3 class="card-title text-sm sm:text-base">
+                                    <a href="{% url 'trips:trip-detail' trip.id %}" class="link sm:hidden">{{ trip.title }}</a>
                                     <span class="hidden sm:inline">{{ trip.title }}</span>
                                 </h3>
-                                <div class="flex items-center text-xs text-base-content/70">
+                                <div class="text-base-content/70 flex items-center text-xs">
                                     <span>
                                         {% if trip.start_date and trip.end_date %}
                                             {{ trip.start_date|date:"SHORT_DATE_FORMAT" }}&nbsp;-&nbsp;{{ trip.end_date|date:"SHORT_DATE_FORMAT" }}
@@ -71,8 +71,8 @@
             </section>
         {% endif %}
         <!-- Toggle Guide Button for users with trips -->
-        <div class="flex justify-center mb-2">
-            <button class="gap-2 btn btn-sm btn-ghost"
+        <div class="mb-2 flex justify-center">
+            <button class="btn btn-sm btn-ghost gap-2"
                     hx-post="{% url 'trips:toggle-guide' %}"
                     hx-swap="none"
                     hx-on::after-request="location.reload()"

@@ -1,25 +1,25 @@
 {% load i18n trip_tags %}
 <div id="events-section"
-     class="flex flex-col gap-4 mb-4"
+     class="mb-4 flex flex-col gap-4"
      hx-get="{% url 'trips:trip-detail' trip.pk %}"
      hx-target="#events-section"
      hx-swap="outerHTML"
      hx-trigger="unpairedModified from:body, destinationModified from:body">
-    <section class="shadow card card-border bg-base-100">
+    <section class="card card-border bg-base-100 shadow">
         <div class="card-body"
-             :class="view === 'map' ? 'p-4 pb-0 sm:p-6 sm:pb-0' : 'p-4 sm:p-6'"
+             :class="view === 'map' ? 'p-4 sm:pb-0' : sm:p-6' pb-0 sm:p-6"
              x-data="{ view: window.innerWidth < 640 ? 'list' : ' {% if show_map %} map {% else %} list {% endif %} ' }">
-            <div class="flex justify-between items-center">
+            <div class="flex items-center justify-between">
                 <h2 class="text-xl font-medium sm:text-2xl">{% trans 'Things to Do' %}</h2>
                 {# Map tab only on desktop (sm+) #}
-                <div role="tablist" class="hidden sm:flex tabs tabs-border tabs-sm">
+                <div role="tablist" class="tabs tabs-border tabs-sm hidden sm:flex">
                     <button role="tab"
                             :class="view === 'list' ? 'tab-active' : ''"
                             @click="view = 'list'"
                             hx-get="{% url 'trips:trip-events-list' trip.pk %}"
                             hx-target="#events-section-inner"
                             hx-swap="innerHTML"
-                            class="gap-1 tab">
+                            class="tab gap-1">
                         <i class="ph-bold ph-list i-sm" aria-hidden="true"></i>
                         {% trans 'List' %}
                     </button>
@@ -29,7 +29,7 @@
                             hx-get="{% url 'trips:trip-events-map' trip.pk %}"
                             hx-target="#events-section-inner"
                             hx-swap="innerHTML"
-                            class="gap-1 tab">
+                            class="tab gap-1">
                         <i class="ph-bold ph-map-trifold i-sm" aria-hidden="true"></i>
                         {% trans 'Map' %}
                     </button>
@@ -43,15 +43,15 @@
                 {% endif %}
             </div>
             {# Mobile disclaimer #}
-            <p class="mt-3 text-sm sm:hidden text-base-content/50">
+            <p class="text-base-content/50 mt-3 text-sm sm:hidden">
                 <i class="ph-bold ph-info i-sm" aria-hidden="true"></i>
                 {% trans 'Map view is not available on mobile devices.' %}
             </p>
         </div>
     </section>
-    <section class="shadow card card-border bg-base-100">
-        <div class="p-4 sm:p-6 card-body">
-            <div class="flex justify-between items-center">
+    <section class="card card-border bg-base-100 shadow">
+        <div class="card-body p-4 sm:p-6">
+            <div class="flex items-center justify-between">
                 <h2 class="text-xl font-medium sm:text-2xl">{% trans 'Other Things to Do' %}</h2>
                 <div class="dropdown dropdown-end" x-data>
                     <div tabindex="0"
@@ -62,13 +62,13 @@
                         <span class="hidden sm:inline">{% trans 'Add event' %}</span>
                     </div>
                     <ul tabindex="0"
-                        class="z-20 p-2 w-52 border shadow dropdown-content menu bg-base-100 rounded-box border-base-300">
+                        class="dropdown-content menu bg-base-100 rounded-box border-base-300 z-20 w-52 border p-2 shadow">
                         <li>
                             <a hx-get="{% url 'trips:add-experience-to-trip' trip.pk %}"
                                hx-target="#dialog"
                                hx-swap="innerHTML"
                                @click="$dispatch('open-modal'); document.activeElement.blur()">
-                                <i class="text-green-500 ph-bold ph-map-pin i-sm" aria-hidden="true"></i>
+                                <i class="ph-bold ph-map-pin i-sm text-green-500" aria-hidden="true"></i>
                                 {% trans 'Experience' %}
                             </a>
                         </li>
@@ -77,7 +77,7 @@
                                hx-target="#dialog"
                                hx-swap="innerHTML"
                                @click="$dispatch('open-modal'); document.activeElement.blur()">
-                                <i class="text-yellow-500 ph-bold ph-fork-knife i-sm" aria-hidden="true"></i>
+                                <i class="ph-bold ph-fork-knife i-sm text-yellow-500" aria-hidden="true"></i>
                                 {% trans 'Meal' %}
                             </a>
                         </li>
@@ -87,7 +87,7 @@
                                    hx-target="#dialog"
                                    hx-swap="innerHTML"
                                    @click="$dispatch('open-modal'); document.activeElement.blur()">
-                                    <i class="text-purple-500 ph-bold ph-sparkle i-sm" aria-hidden="true"></i>
+                                    <i class="ph-bold ph-sparkle i-sm text-purple-500" aria-hidden="true"></i>
                                     {% trans 'AI suggestions' %}
                                 </a>
                             </li>
@@ -95,7 +95,7 @@
                     </ul>
                 </div>
             </div>
-            <p class="mt-1 text-xs text-base-content/50">
+            <p class="text-base-content/50 mt-1 text-xs">
                 <i class="ph-bold ph-info i-sm" aria-hidden="true"></i>
                 {% trans 'Here you find events not yet assigned to a specific day' %}
             </p>
@@ -103,14 +103,14 @@
                 {% if has_custom_stages %}
                     {% for group in grouped_unpaired_events %}
                         <div class="mt-4">
-                            <p class="mb-2 text-xs font-semibold tracking-wide uppercase text-base-content/50">
+                            <p class="text-base-content/50 mb-2 text-xs font-semibold tracking-wide uppercase">
                                 {% if group.destination %}
                                     {{ group.destination }}
                                 {% else %}
                                     {% trans 'No stage' %}
                                 {% endif %}
                             </p>
-                            <ul class="flex flex-wrap gap-3 justify-center" x-data>
+                            <ul class="flex flex-wrap justify-center gap-3" x-data>
                                 {% for event in group.events %}
                                     <c-unpaired-event :event="event" :days="trip.days.all" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}" />
                                 {% endfor %}
@@ -118,14 +118,14 @@
                         </div>
                     {% endfor %}
                 {% else %}
-                    <ul class="flex flex-wrap gap-3 justify-center mt-4" x-data>
+                    <ul class="mt-4 flex flex-wrap justify-center gap-3" x-data>
                         {% for event in unpaired_events %}
                             <c-unpaired-event :event="event" :days="trip.days.all" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}" />
                         {% endfor %}
                     </ul>
                 {% endif %}
             {% else %}
-                <div class="py-6 text-center text-base-content/50">
+                <div class="text-base-content/50 py-6 text-center">
                     <i class="ph-bold ph-calendar-blank i-lg" aria-hidden="true"></i>
                     <p class="mt-2 text-sm">{% trans 'Nothing to do here.' %}</p>
                 </div>

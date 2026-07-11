@@ -19,7 +19,7 @@
                  hx-trigger="change from:#id_type"
                  hx-include="#id_type"></div>
         </div>
-        <div class="flex gap-2 justify-end mt-6">
+        <div class="mt-6 flex justify-end gap-2">
             <button type="button" class="btn" @click="$dispatch('hide-modal')">{% trans "Cancel" %}</button>
             <button type="submit" class="btn btn-primary">
                 {% if is_edit %}

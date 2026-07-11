@@ -1,7 +1,7 @@
 {% load i18n trip_tags %}
-<li class="flex flex-col mb-1 list-row">
-    <div class="flex gap-2 items-center">
-        <div class="flex gap-2 items-center grow">
+<li class="mb-1 flex list-row flex-col">
+    <div class="flex items-center gap-2">
+        <div class="flex grow items-center gap-2">
             {% if icon == 'fork-knife' %}
                 <i class="ph-bold ph-{{ icon }} i-sm text-yellow-500 shrink-0"
                    aria-hidden="true"></i>
@@ -9,7 +9,7 @@
                 <i class="ph-bold ph-{{ icon }} i-sm text-green-500 shrink-0"
                    aria-hidden="true"></i>
             {% endif %}
-            <a class="leading-tight link"
+            <a class="link leading-tight"
                href="{% url 'trips:event-detail' event.pk %}"
                hx-get="{% url 'trips:event-detail' event.pk %}"
                @click="$dispatch('open-modal'); document.activeElement.blur()"
@@ -17,7 +17,7 @@
                hx-swap="innerHTML">{{ event.name }}</a>
         </div>
         {% if event.start_time or event.estimated_duration %}
-            <div class="flex gap-2 items-center text-xs text-base-content/60 shrink-0">
+            <div class="text-base-content/60 flex shrink-0 items-center gap-2 text-xs">
                 {% if event.start_time %}
                     <i class="ph-bold ph-clock i-sm" aria-hidden="true"></i>{{ event.start_time|time:"H:i" }}
                 {% endif %}
@@ -27,7 +27,7 @@
             </div>
         {% endif %}
         {% if event.google_maps_directions_url %}
-            <a class="sm:hidden btn btn-xs btn-outline"
+            <a class="btn btn-xs btn-outline sm:hidden"
                href="{{ event.google_maps_directions_url }}"
                target="_blank"
                rel="noopener noreferrer"

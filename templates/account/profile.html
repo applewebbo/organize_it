@@ -4,39 +4,39 @@
     {% trans "Personal Settings" %}
 {% endblock page_title %}
 {% block content %}
-    <div class="my-5 mx-auto max-w-7xl">
+    <div class="mx-auto my-5 max-w-7xl">
         <div class="mb-12 text-center">
             <h1 class="mb-2 text-3xl font-semibold">{% trans "Personal Settings" %}</h1>
         </div>
-        <div class="mx-auto max-w-2xl shadow card card-border bg-base-100">
+        <div class="card card-border bg-base-100 mx-auto max-w-2xl shadow">
             <form method="post" class="card-body">
                 {% csrf_token %}
-                <h2 class="mb-4 text-xl font-semibold text-center sm:text-left">{% trans "Personal Information" %}</h2>
-                <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2">
+                <h2 class="mb-4 text-center text-xl font-semibold sm:text-left">{% trans "Personal Information" %}</h2>
+                <div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                         <label for="{{ profile_form.first_name.id_for_label }}"
-                               class="block mb-2 font-medium">{{ profile_form.first_name.label }}</label>
+                               class="mb-2 block font-medium">{{ profile_form.first_name.label }}</label>
                         {{ profile_form.first_name }}
                         {% if profile_form.first_name.errors %}
-                            <div class="mt-1 text-sm text-error">{{ profile_form.first_name.errors }}</div>
+                            <div class="text-error mt-1 text-sm">{{ profile_form.first_name.errors }}</div>
                         {% endif %}
                     </div>
                     <div>
                         <label for="{{ profile_form.last_name.id_for_label }}"
-                               class="block mb-2 font-medium">{{ profile_form.last_name.label }}</label>
+                               class="mb-2 block font-medium">{{ profile_form.last_name.label }}</label>
                         {{ profile_form.last_name }}
                         {% if profile_form.last_name.errors %}
-                            <div class="mt-1 text-sm text-error">{{ profile_form.last_name.errors }}</div>
+                            <div class="text-error mt-1 text-sm">{{ profile_form.last_name.errors }}</div>
                         {% endif %}
                     </div>
                 </div>
                 <div class="mb-4" x-data="homeAddressForm()">
-                    <label for="id_home_address" class="block mb-2 font-medium">{{ profile_form.home_address.label }}</label>
+                    <label for="id_home_address" class="mb-2 block font-medium">{{ profile_form.home_address.label }}</label>
                     <input type="text"
                            id="id_home_address"
                            name="home_address"
                            value="{{ profile_form.home_address.value|default:'' }}"
-                           class="w-full input input-bordered"
+                           class="input input-bordered w-full"
                            placeholder="{% trans 'Full address (street, city, country)' %}"
                            hx-post="{% url 'accounts:autocomplete-home-address' %}"
                            hx-trigger="input changed delay:500ms"
@@ -47,107 +47,107 @@
                     {{ profile_form.home_address_longitude }}
                     <div id="home-address-results"></div>
                     {% if profile_form.home_address.help_text %}
-                        <p class="mt-1 text-xs italic text-base-content/50">{{ profile_form.home_address.help_text }}</p>
+                        <p class="text-base-content/50 mt-1 text-xs italic">{{ profile_form.home_address.help_text }}</p>
                     {% endif %}
                     {% if profile_form.home_address.errors %}
-                        <div class="mt-1 text-sm text-error">{{ profile_form.home_address.errors }}</div>
+                        <div class="text-error mt-1 text-sm">{{ profile_form.home_address.errors }}</div>
                     {% endif %}
                 </div>
                 <div class="mb-6">
-                    <label class="block mb-3 font-medium">{{ profile_form.avatar.label }}</label>
+                    <label class="mb-3 block font-medium">{{ profile_form.avatar.label }}</label>
                     {{ profile_form.avatar }}
                     {% if profile_form.avatar.errors %}
-                        <div class="mt-1 text-sm text-error">{{ profile_form.avatar.errors }}</div>
+                        <div class="text-error mt-1 text-sm">{{ profile_form.avatar.errors }}</div>
                     {% endif %}
                 </div>
-                <h2 class="mt-5 mb-3 text-xl font-semibold text-center sm:text-left">{% trans "Travel Preferences" %}</h2>
-                <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2">
+                <h2 class="mt-5 mb-3 text-center text-xl font-semibold sm:text-left">{% trans "Travel Preferences" %}</h2>
+                <div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                         <label for="{{ profile_form.fav_trip.id_for_label }}"
-                               class="block mb-2 font-medium">{{ profile_form.fav_trip.label }}</label>
+                               class="mb-2 block font-medium">{{ profile_form.fav_trip.label }}</label>
                         {{ profile_form.fav_trip }}
                         {% if profile_form.fav_trip.errors %}
-                            <div class="mt-1 text-sm text-error">{{ profile_form.fav_trip.errors }}</div>
+                            <div class="text-error mt-1 text-sm">{{ profile_form.fav_trip.errors }}</div>
                         {% endif %}
                     </div>
                     <div>
                         <label for="{{ profile_form.currency.id_for_label }}"
-                               class="block mb-2 font-medium">{{ profile_form.currency.label }}</label>
+                               class="mb-2 block font-medium">{{ profile_form.currency.label }}</label>
                         {{ profile_form.currency }}
                         {% if profile_form.currency.errors %}
-                            <div class="mt-1 text-sm text-error">{{ profile_form.currency.errors }}</div>
+                            <div class="text-error mt-1 text-sm">{{ profile_form.currency.errors }}</div>
                         {% endif %}
                     </div>
                 </div>
-                <h2 class="mt-5 mb-3 text-xl font-semibold text-center sm:text-left">{% trans "Display Preferences" %}</h2>
-                <div class="grid grid-cols-1 gap-3 mb-3 sm:grid-cols-2">
+                <h2 class="mt-5 mb-3 text-center text-xl font-semibold sm:text-left">{% trans "Display Preferences" %}</h2>
+                <div class="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div>
                         <label for="{{ profile_form.default_map_view.id_for_label }}"
-                               class="block mb-2 font-medium">{{ profile_form.default_map_view.label }}</label>
+                               class="mb-2 block font-medium">{{ profile_form.default_map_view.label }}</label>
                         {{ profile_form.default_map_view }}
                         {% if profile_form.default_map_view.errors %}
-                            <div class="mt-1 text-sm text-error">{{ profile_form.default_map_view.errors }}</div>
+                            <div class="text-error mt-1 text-sm">{{ profile_form.default_map_view.errors }}</div>
                         {% endif %}
                     </div>
                     <div>
                         <label for="{{ profile_form.trip_sort_preference.id_for_label }}"
-                               class="block mb-2 font-medium">{{ profile_form.trip_sort_preference.label }}</label>
+                               class="mb-2 block font-medium">{{ profile_form.trip_sort_preference.label }}</label>
                         {{ profile_form.trip_sort_preference }}
                         {% if profile_form.trip_sort_preference.errors %}
-                            <div class="mt-1 text-sm text-error">{{ profile_form.trip_sort_preference.errors }}</div>
+                            <div class="text-error mt-1 text-sm">{{ profile_form.trip_sort_preference.errors }}</div>
                         {% endif %}
                     </div>
                     <div>
                         <label for="{{ profile_form.language.id_for_label }}"
-                               class="block mb-2 font-medium">{{ profile_form.language.label }}</label>
+                               class="mb-2 block font-medium">{{ profile_form.language.label }}</label>
                         {{ profile_form.language }}
                         {% if profile_form.language.errors %}
-                            <div class="mt-1 text-sm text-error">{{ profile_form.language.errors }}</div>
+                            <div class="text-error mt-1 text-sm">{{ profile_form.language.errors }}</div>
                         {% endif %}
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="flex gap-3 items-center cursor-pointer">
+                    <label class="flex cursor-pointer items-center gap-3">
                         {{ profile_form.use_system_theme }}
                         <span>{{ profile_form.use_system_theme.label }}</span>
                     </label>
                     {% if profile_form.use_system_theme.errors %}
-                        <div class="mt-1 text-sm text-error">{{ profile_form.use_system_theme.errors }}</div>
+                        <div class="text-error mt-1 text-sm">{{ profile_form.use_system_theme.errors }}</div>
                     {% endif %}
                 </div>
-                <div class="grid grid-cols-1 gap-2 mb-3 sm:grid-cols-2">
+                <div class="mb-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <div>
-                        <label class="flex gap-3 items-center cursor-pointer">
+                        <label class="flex cursor-pointer items-center gap-3">
                             {{ profile_form.show_transfer_info }}
                             <span>{{ profile_form.show_transfer_info.label }}</span>
                         </label>
                         {% if profile_form.show_transfer_info.errors %}
-                            <div class="mt-1 text-sm text-error">{{ profile_form.show_transfer_info.errors }}</div>
+                            <div class="text-error mt-1 text-sm">{{ profile_form.show_transfer_info.errors }}</div>
                         {% endif %}
-                        <p class="mt-1 text-xs italic text-base-content/50">{{ profile_form.show_transfer_info.help_text }}</p>
+                        <p class="text-base-content/50 mt-1 text-xs italic">{{ profile_form.show_transfer_info.help_text }}</p>
                     </div>
                     <div>
-                        <label class="flex gap-3 items-center cursor-pointer">
+                        <label class="flex cursor-pointer items-center gap-3">
                             {{ profile_form.show_weather }}
                             <span>{{ profile_form.show_weather.label }}</span>
                         </label>
                         {% if profile_form.show_weather.errors %}
-                            <div class="mt-1 text-sm text-error">{{ profile_form.show_weather.errors }}</div>
+                            <div class="text-error mt-1 text-sm">{{ profile_form.show_weather.errors }}</div>
                         {% endif %}
-                        <p class="mt-1 text-xs italic text-base-content/50">{{ profile_form.show_weather.help_text }}</p>
+                        <p class="text-base-content/50 mt-1 text-xs italic">{{ profile_form.show_weather.help_text }}</p>
                     </div>
                     <div>
-                        <label class="flex gap-3 items-center cursor-pointer">
+                        <label class="flex cursor-pointer items-center gap-3">
                             {{ profile_form.notify_daily_digest }}
                             <span>{{ profile_form.notify_daily_digest.label }}</span>
                         </label>
                         {% if profile_form.notify_daily_digest.errors %}
-                            <div class="mt-1 text-sm text-error">{{ profile_form.notify_daily_digest.errors }}</div>
+                            <div class="text-error mt-1 text-sm">{{ profile_form.notify_daily_digest.errors }}</div>
                         {% endif %}
-                        <p class="mt-1 text-xs italic text-base-content/50">{{ profile_form.notify_daily_digest.help_text }}</p>
+                        <p class="text-base-content/50 mt-1 text-xs italic">{{ profile_form.notify_daily_digest.help_text }}</p>
                     </div>
                 </div>
-                <div class="flex justify-end mt-6">
+                <div class="mt-6 flex justify-end">
                     <button type="submit" class="btn btn-sm btn-soft btn-primary">{% trans "Save" %}</button>
                 </div>
             </form>

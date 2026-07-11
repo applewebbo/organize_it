@@ -3,9 +3,9 @@
     <div class="mt-2 mb-2">
         <ul>
             {% for city in cities %}
-                <li class="flex gap-2 justify-between items-center py-2 px-3 mx-2 mb-2 text-sm rounded-lg border text-slate-600 bg-slate-50 border-slate-200">
+                <li class="mx-2 mb-2 flex items-center justify-between gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600">
                     <div>
-                        <span class="font-bold">{{ city.name }}</span>&nbsp;<span class="text-xs text-base-content/50">{{ city.country }}</span>
+                        <span class="font-bold">{{ city.name }}</span>&nbsp;<span class="text-base-content/50 text-xs">{{ city.country }}</span>
                     </div>
                     <button type="button"
                             class="btn btn-xs btn-ghost"
@@ -15,14 +15,14 @@
                 </li>
             {% endfor %}
         </ul>
-        <p class="flex gap-1 justify-end items-center px-3 my-1 mx-2 text-xs italic text-slate-400">
+        <p class="mx-2 my-1 flex items-center justify-end gap-1 px-3 text-xs text-slate-400 italic">
             <i class="ph-bold ph-info i-xs"></i>{% trans 'Search conducted via' %}&nbsp;<a href="https://nominatim.openstreetmap.org/ui/search.html"
    class="link link-primary">Nominatim API</a>
         </p>
     </div>
 {% elif found is False %}
     <div class="mt-2 mb-2">
-        <p class="py-2 px-3 mx-2 mb-2 text-sm text-red-500 rounded-lg border bg-slate-50 border-slate-200">
+        <p class="mx-2 mb-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-red-500">
             {% trans 'No city found.' %}
         </p>
     </div>

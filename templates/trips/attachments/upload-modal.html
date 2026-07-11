@@ -7,34 +7,34 @@
       method="post"
       enctype="multipart/form-data">
     {% csrf_token %}
-    <div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
+    <div class="border-base-300 flex items-center justify-between rounded-t border-b p-4 md:px-5 md:py-2.5">
         <h3 class="text-xl font-semibold">{% trans "Add document" %}</h3>
         <button type="button"
                 class="btn btn-sm btn-circle btn-ghost"
                 x-on:click="openModal = false"
                 aria-label="{% trans 'Close' %}">✕</button>
     </div>
-    <div class="p-4 space-y-4 md:p-5">
-        <p class="text-sm text-base-content/70">{% blocktrans %}Allowed: PDF, JPEG, PNG, WEBP. Max 2 MB.{% endblocktrans %}</p>
+    <div class="space-y-4 p-4 md:p-5">
+        <p class="text-base-content/70 text-sm">{% blocktrans %}Allowed: PDF, JPEG, PNG, WEBP. Max 2 MB.{% endblocktrans %}</p>
         {% if targets|length == 1 %}
             <input type="hidden" name="object_id" value="{{ targets.0.0 }}">
         {% else %}
-            <label class="w-full form-control">
+            <label class="form-control w-full">
                 <span class="label-text">{% trans "Attach to" %}</span>
-                <select name="object_id" required class="w-full select select-bordered">
+                <select name="object_id" required class="select select-bordered w-full">
                     {% for pk, label in targets %}<option value="{{ pk }}">{{ label }}</option>{% endfor %}
                 </select>
             </label>
         {% endif %}
-        <label class="w-full form-control">
+        <label class="form-control w-full">
             <span class="label-text">{% trans "File" %}</span>
             <input type="file"
                    name="file"
                    accept="application/pdf,image/jpeg,image/png,image/webp"
                    required
-                   class="w-full file-input file-input-bordered">
+                   class="file-input file-input-bordered w-full">
         </label>
-        <div class="flex gap-2 justify-end mt-4">
+        <div class="mt-4 flex justify-end gap-2">
             <button type="button" class="btn btn-ghost" x-on:click="openModal = false">{% trans "Cancel" %}</button>
             <button type="submit" class="btn btn-primary">{% trans "Upload" %}</button>
         </div>

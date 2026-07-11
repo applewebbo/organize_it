@@ -5,9 +5,9 @@
          hx-target="#stays-section"
          hx-swap="outerHTML"
          hx-trigger="tripModified from:body">
-    <div class="shadow card card-border bg-base-100">
-        <div class="p-4 sm:p-6 card-body">
-            <div class="flex justify-between items-center">
+    <div class="card card-border bg-base-100 shadow">
+        <div class="card-body p-4 sm:p-6">
+            <div class="flex items-center justify-between">
                 <h2 class="text-xl font-medium sm:text-2xl">{% trans 'Where to Sleep' %}</h2>
                 {% if trip.status != 5 and request.user == trip.author %}
                     <button class="btn btn-xs btn-soft btn-primary sm:btn-sm"
@@ -23,20 +23,20 @@
                 {% endif %}
             </div>
             {% if stays %}
-                <ul class="grid grid-cols-1 gap-3 mt-2 sm:mt-3 md:grid-cols-2">
+                <ul class="mt-2 grid grid-cols-1 gap-3 sm:mt-3 md:grid-cols-2">
                     {% for stay in stays %}
-                        <li class="flex overflow-hidden relative flex-col rounded-lg border border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-100/30"
+                        <li class="relative flex flex-col overflow-hidden rounded-lg border border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-100/30"
                             x-data>
-                            <div class="flex absolute right-0 top-1/2 justify-end pr-4 w-1/2 -translate-y-1/2 pointer-events-none select-none sm:hidden"
+                            <div class="pointer-events-none absolute top-1/2 right-0 flex w-1/2 -translate-y-1/2 justify-end pr-4 select-none sm:hidden"
                                  aria-hidden="true">
                                 <i class="ph-bold ph-bed text-[4rem] text-slate-900 opacity-[0.07]"></i>
                             </div>
-                            <div class="flex relative items-center py-3 px-4">
-                                <div class="hidden p-1.5 bg-white rounded-md border-2 sm:block text-slate-500 border-slate-300 shrink-0 dark:text-slate-300 dark:bg-slate-700 dark:border-slate-700">
-                                    <i class="text-xl ph-bold ph-bed align-sub" aria-hidden="true"></i>
+                            <div class="relative flex items-center px-4 py-3">
+                                <div class="hidden shrink-0 rounded-md border-2 border-slate-300 bg-white p-1.5 text-slate-500 sm:block dark:border-slate-700 dark:bg-slate-700 dark:text-slate-300">
+                                    <i class="ph-bold ph-bed align-sub text-xl" aria-hidden="true"></i>
                                 </div>
-                                <div class="flex flex-col grow sm:ms-3">
-                                    <div class="flex gap-2 items-center">
+                                <div class="flex grow flex-col sm:ms-3">
+                                    <div class="flex items-center gap-2">
                                         <h3 class="text-base font-semibold text-slate-600 dark:text-slate-200">
                                             {% if trip.status != 5 %}
                                                 <a hx-get="{% url 'trips:stay-detail' stay.pk %}"
@@ -49,7 +49,7 @@
                                             {% endif %}
                                         </h3>
                                     </div>
-                                    <div class="flex flex-col gap-y-1 mt-1 text-sm text-slate-500 dark:text-slate-400">
+                                    <div class="mt-1 flex flex-col gap-y-1 text-sm text-slate-500 dark:text-slate-400">
                                         {% if stay.city %}
                                             <span>
                                                 <i class="ph-bold ph-map-pin me-1" aria-hidden="true"></i>{{ stay.city }}
@@ -65,27 +65,27 @@
                                         <div class="flex flex-wrap gap-x-4">
                                             {% if stay.check_in %}
                                                 <span>
-                                                    <i class="ph-bold ph-sign-in me-1 text-success" aria-hidden="true"></i>
+                                                    <i class="ph-bold ph-sign-in text-success me-1" aria-hidden="true"></i>
                                                     <span class="hidden sm:inline">Check-in:</span> {{ stay.check_in|time:"H:i" }}
                                                 </span>
                                             {% endif %}
                                             {% if stay.check_out %}
                                                 <span>
-                                                    <i class="ph-bold ph-sign-out me-1 text-error" aria-hidden="true"></i>
+                                                    <i class="ph-bold ph-sign-out text-error me-1" aria-hidden="true"></i>
                                                     <span class="hidden sm:inline">Check-out:</span> {{ stay.check_out|time:"H:i" }}
                                                 </span>
                                             {% endif %}
                                         </div>
                                     </div>
                                     {% if stay.notes %}
-                                        <p class="flex gap-1.5 items-center mt-1 text-sm text-slate-500 line-clamp-2 dark:text-slate-400">
+                                        <p class="line-clamp-2 mt-1 flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
                                             <i class="ph-bold ph-note shrink-0" aria-hidden="true"></i>{{ stay.notes }}
                                         </p>
                                     {% endif %}
                                 </div>
                             </div>
                             {% if trip.status != 5 %}
-                                <div class="flex gap-2 justify-end py-2 px-4 mt-auto">
+                                <div class="mt-auto flex justify-end gap-2 px-4 py-2">
                                     {% if stay.google_maps_directions_url %}
                                         <a class="btn btn-xs btn-stay-card sm:btn-sm"
                                            href="{{ stay.google_maps_directions_url }}"

@@ -1,22 +1,22 @@
 {% load i18n %}
-<div class="flex gap-3 items-center p-3 rounded-lg border border-base-300 bg-base-50"
+<div class="border-base-300 bg-base-50 flex items-center gap-3 rounded-lg border p-3"
      id="day-destination-{{ day.pk }}">
-    <div class="flex flex-col justify-center items-center w-10 h-10 rounded-full bg-primary/10 shrink-0">
-        <span class="text-xs font-bold text-primary">{{ day.number }}</span>
-        <span class="text-xs leading-none text-primary/70">{% trans "Day" %}</span>
+    <div class="bg-primary/10 flex h-10 w-10 shrink-0 flex-col items-center justify-center rounded-full">
+        <span class="text-primary text-xs font-bold">{{ day.number }}</span>
+        <span class="text-primary/70 text-xs leading-none">{% trans "Day" %}</span>
     </div>
-    <div class="flex flex-col flex-1 min-w-0">
-        <span class="text-xs text-base-content/50">{{ day.date|date:"D, d M" }}</span>
+    <div class="flex min-w-0 flex-1 flex-col">
+        <span class="text-base-content/50 text-xs">{{ day.date|date:"D, d M" }}</span>
         <form hx-post="{% url 'trips:update-day-destination' trip.pk day.pk %}"
               hx-target="#day-destination-{{ day.pk }}"
               hx-swap="outerHTML"
-              class="flex gap-2 items-center mt-1">
+              class="mt-1 flex items-center gap-2">
             {% csrf_token %}
             <input type="text"
                    name="destination"
                    value="{{ day.destination }}"
                    placeholder="{{ trip.destination }}"
-                   class="w-full input input-sm input-bordered"
+                   class="input input-sm input-bordered w-full"
                    aria-label="{% trans 'Destination for day' %} {{ day.number }}">
             <button type="submit"
                     class="btn btn-sm btn-primary btn-square"

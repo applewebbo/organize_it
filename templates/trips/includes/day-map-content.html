@@ -1,5 +1,5 @@
 {% load i18n trip_tags %}
-<div class="container py-4 px-0 mx-auto xl:px-6">
+<div class="container mx-auto px-0 py-4 xl:px-6">
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {% if map %}
             <div>
@@ -9,30 +9,30 @@
                 {% endif %}
             </div>
         {% else %}
-            <div class="my-4 md:my-5 alert alert-info alert-soft">
+            <div class="alert alert-info alert-soft my-4 md:my-5">
                 <i class="ph-bold ph-info i-md text-info"></i>
                 {% trans 'No events to display on a map for this day' %}
             </div>
         {% endif %}
         <div class="hidden lg:block">
-            <ul class="text-lg list">
+            <ul class="list text-lg">
                 {% if locations.arrival_transfer %}
-                    <li class="flex gap-2 items-center p-3 mb-4 bg-red-50 rounded-lg list-row dark:bg-red-950">
-                        <div class="flex gap-2 items-center grow">
+                    <li class="mb-4 flex list-row items-center gap-2 rounded-lg bg-red-50 p-3 dark:bg-red-950">
+                        <div class="flex grow items-center gap-2">
                             {% if locations.arrival_transfer.type == 1 %}
-                                <i class="text-2xl text-red-600 dark:text-red-400 ph-bold ph-airplane-takeoff"></i>
+                                <i class="ph-bold ph-airplane-takeoff text-2xl text-red-600 dark:text-red-400"></i>
                             {% elif locations.arrival_transfer.type == 2 %}
-                                <i class="text-2xl text-red-600 dark:text-red-400 ph-bold ph-train"></i>
+                                <i class="ph-bold ph-train text-2xl text-red-600 dark:text-red-400"></i>
                             {% elif locations.arrival_transfer.type == 3 %}
-                                <i class="text-2xl text-red-600 dark:text-red-400 ph-bold ph-car"></i>
+                                <i class="ph-bold ph-car text-2xl text-red-600 dark:text-red-400"></i>
                             {% else %}
-                                <i class="text-2xl text-red-600 dark:text-red-400 ph-bold ph-bus"></i>
+                                <i class="ph-bold ph-bus text-2xl text-red-600 dark:text-red-400"></i>
                             {% endif %}
                             <a hx-get="{% url 'trips:edit-main-transfer' pk=locations.arrival_transfer.pk %}"
                                hx-target="#dialog"
                                hx-swap="innerHTML"
                                @click="$dispatch('open-modal'); document.activeElement.blur()"
-                               class="font-semibold link">
+                               class="link font-semibold">
                                 {% if locations.arrival_transfer.type == 1 or locations.arrival_transfer.type == 2 %}
                                     {{ locations.arrival_transfer.destination_name }}
                                 {% else %}
@@ -51,10 +51,10 @@
                     </li>
                 {% endif %}
                 {% if locations.stay %}
-                    <li class="flex flex-col mb-1 list-row">
-                        <div class="flex gap-2 items-center">
-                            <div class="flex gap-2 items-center grow">
-                                <i class="text-xl ph-bold ph-bed i-sm text-sky-500"></i>
+                    <li class="mb-1 flex list-row flex-col">
+                        <div class="flex items-center gap-2">
+                            <div class="flex grow items-center gap-2">
+                                <i class="ph-bold ph-bed i-sm text-xl text-sky-500"></i>
                                 <a hx-get="{% url 'trips:stay-detail' locations.stay.pk %}"
                                    hx-target="#dialog"
                                    hx-swap="innerHTML"
@@ -67,7 +67,7 @@
                                     <span class="badge badge-sm badge-outline badge-error">{{ locations.stay.check_out|time:"H:i" }}</span>
                                 {% endif %}
                             </div>
-                            <button class="relative btn btn-xs btn-outline"
+                            <button class="btn btn-xs btn-outline relative"
                                     hx-get="{% url 'trips:stay-notes' locations.stay.pk %}"
                                     @click="$dispatch('open-modal'); document.activeElement.blur()"
                                     hx-target="#dialog"
@@ -82,8 +82,8 @@
                     <c-event-list-item :event="event" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}"></c-event-list-item>
                 {% endfor %}
                 {% if locations.next_day_stay %}
-                    <li class="flex gap-2 items-center py-1 mb-2 list-row">
-                        <i class="text-xl ph-bold ph-bed i-sm text-sky-500"></i>
+                    <li class="mb-2 flex list-row items-center gap-2 py-1">
+                        <i class="ph-bold ph-bed i-sm text-xl text-sky-500"></i>
                         <a hx-get="{% url 'trips:stay-detail' locations.next_day_stay.pk %}"
                            hx-target="#dialog"
                            hx-swap="innerHTML"
@@ -92,22 +92,22 @@
                     </li>
                 {% endif %}
                 {% if locations.departure_transfer %}
-                    <li class="flex gap-2 items-center p-3 mt-4 bg-red-50 rounded-lg list-row dark:bg-red-950">
-                        <div class="flex gap-2 items-center grow">
+                    <li class="mt-4 flex list-row items-center gap-2 rounded-lg bg-red-50 p-3 dark:bg-red-950">
+                        <div class="flex grow items-center gap-2">
                             {% if locations.departure_transfer.type == 1 %}
-                                <i class="text-2xl text-red-600 dark:text-red-400 ph-bold ph-airplane-takeoff"></i>
+                                <i class="ph-bold ph-airplane-takeoff text-2xl text-red-600 dark:text-red-400"></i>
                             {% elif locations.departure_transfer.type == 2 %}
-                                <i class="text-2xl text-red-600 dark:text-red-400 ph-bold ph-train"></i>
+                                <i class="ph-bold ph-train text-2xl text-red-600 dark:text-red-400"></i>
                             {% elif locations.departure_transfer.type == 3 %}
-                                <i class="text-2xl text-red-600 dark:text-red-400 ph-bold ph-car"></i>
+                                <i class="ph-bold ph-car text-2xl text-red-600 dark:text-red-400"></i>
                             {% else %}
-                                <i class="text-2xl text-red-600 dark:text-red-400 ph-bold ph-bus"></i>
+                                <i class="ph-bold ph-bus text-2xl text-red-600 dark:text-red-400"></i>
                             {% endif %}
                             <a hx-get="{% url 'trips:edit-main-transfer' pk=locations.departure_transfer.pk %}"
                                hx-target="#dialog"
                                hx-swap="innerHTML"
                                @click="$dispatch('open-modal'); document.activeElement.blur()"
-                               class="font-semibold link">
+                               class="link font-semibold">
                                 {% if locations.departure_transfer.type == 1 or locations.departure_transfer.type == 2 %}
                                     {{ locations.departure_transfer.origin_name }}
                                 {% else %}

@@ -1,10 +1,10 @@
 {% load trip_tags i18n %}
-<div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
-    <div class="flex gap-1 items-center">
+<div class="border-base-300 flex items-center justify-between rounded-t border-b p-4 md:px-5 md:py-2.5">
+    <div class="flex items-center gap-1">
         <h3 id="event-title"
             class="text-xl font-semibold text-gray-900 dark:text-white">{{ event.name }}</h3>
         {% if event.category == 3 and event.type != 0 %}
-            <span class="hidden sm:inline-flex badge badge-outline badge-sm badge-info ms-2 align-sub">
+            <span class="badge badge-outline badge-sm badge-info ms-2 hidden align-sub sm:inline-flex">
                 <i class="ph-bold {{ event|event_type_icon }}" aria-hidden="true"></i>
                 <span class="ml-1">{{ event.get_type_display }}</span>
             </span>
@@ -16,15 +16,15 @@
     <button type="button"
             class="btn btn-ghost btn-circle btn-sm"
             x-on:click="openModal = false">
-        <i class="text-xl ph-bold ph-x"></i>
+        <i class="ph-bold ph-x text-xl"></i>
         <span class="sr-only">Close modal</span>
     </button>
 </div>
 <div id="event-details">
     <div class="relative">
         <div id="enrich-overlay"
-             class="absolute inset-0 z-50 htmx-indicator bg-base-100/90">
-            <div class="flex justify-center items-center w-full h-full">
+             class="htmx-indicator bg-base-100/90 absolute inset-0 z-50">
+            <div class="flex h-full w-full items-center justify-center">
                 <span class="loading loading-bars loading-lg text-primary"></span>
             </div>
         </div>
@@ -40,14 +40,14 @@
                     {% endif %}
                     {% if error_message %}
                         <div role="alert"
-                             class="mt-4 alert alert-error alert-soft"
+                             class="alert alert-error alert-soft mt-4"
                              x-cloak
                              x-data="{ show: true }"
                              x-show="show"
                              x-init="setTimeout(() => show = false, 4000)">{{ error_message }}</div>
                     {% elif success_message %}
                         <div role="alert"
-                             class="mt-4 alert alert-success alert-soft"
+                             class="alert alert-success alert-soft mt-4"
                              x-cloak
                              x-data="{ show: true }"
                              x-show="show"
@@ -57,7 +57,7 @@
             {% endif %}
         {% endpartialdef 'event-detail' %}
     </div>
-    <div class="grid grid-cols-2 gap-2 p-4 rounded-b sm:flex sm:justify-center md:p-5">
+    <div class="grid grid-cols-2 gap-2 rounded-b p-4 sm:flex sm:justify-center md:p-5">
         {% if event.category != 1 and not event.enriched %}
             <button type="button"
                     class="btn btn-secondary btn-soft"

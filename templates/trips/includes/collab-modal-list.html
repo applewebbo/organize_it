@@ -5,11 +5,11 @@
             {% for collab in collaborations %}
                 <li class="flex gap-3 items-center py-1.5 px-3 rounded-lg border {% if collab.is_named_only %} bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 {% elif collab.can_edit %} bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 {% else %} bg-base-200 border-base-300 {% endif %}">
                     <span class="inline-block w-3 h-3 rounded-full {{ collab.badge_bg_class }}"></span>
-                    <span class="text-sm grow">
+                    <span class="grow text-sm">
                         {% if collab.user %}
                             {% if collab.user.profile.first_name %}
                                 {{ collab.user.profile.first_name }} {{ collab.user.profile.last_name }}
-                                <span class="text-xs text-base-content/50">({{ collab.user.email }})</span>
+                                <span class="text-base-content/50 text-xs">({{ collab.user.email }})</span>
                             {% else %}
                                 {{ collab.user.email }}
                             {% endif %}
@@ -54,6 +54,6 @@
             {% endfor %}
         </ul>
     {% else %}
-        <p class="mb-4 text-sm text-base-content/60">{% trans "No participants yet." %}</p>
+        <p class="text-base-content/60 mb-4 text-sm">{% trans "No participants yet." %}</p>
     {% endif %}
 </div>

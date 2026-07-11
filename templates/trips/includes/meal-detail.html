@@ -1,24 +1,24 @@
 {% load i18n trip_tags %}
 <ul class="min-w-0 leading-10">
     {% if event.website %}
-        <li class="flex gap-2 items-center">
-            <i class="ph-bold ph-globe i-md text-base-content/60 shrink-0"></i><a href="{{ event.website }}" class="min-w-0 truncate link">{{ event.website }}</a>
+        <li class="flex items-center gap-2">
+            <i class="ph-bold ph-globe i-md text-base-content/60 shrink-0"></i><a href="{{ event.website }}" class="link min-w-0 truncate">{{ event.website }}</a>
         </li>
     {% endif %}
     {% if event.phone_number %}
-        <li class="flex gap-2 items-center">
+        <li class="flex items-center gap-2">
             <i class="ph-bold ph-phone i-md text-base-content/60"></i>{{ event.phone_number }}
         </li>
     {% endif %}
     {% if event.opening_hours %}
-        <li class="flex gap-2 items-center">
+        <li class="flex items-center gap-2">
             <i class="ph-bold ph-door-open i-md text-base-content/60"></i>{{ event.opening_hours|format_opening_hours }}
         </li>
     {% endif %}
     {% if event.notes %}
-        <li class="flex gap-2 items-start mt-1 leading-normal">
+        <li class="mt-1 flex items-start gap-2 leading-normal">
             <i class="ph-bold ph-note i-md text-base-content/60 shrink-0"></i>
-            <span class="min-w-0 text-sm whitespace-pre-line break-words">{{ event.notes }}</span>
+            <span class="min-w-0 text-sm break-words whitespace-pre-line">{{ event.notes }}</span>
         </li>
     {% endif %}
 </ul>

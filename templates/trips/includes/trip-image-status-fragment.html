@@ -1,7 +1,7 @@
 {% load static %}
 {% if trip.image_metadata.pending %}
     <div id="trip-image-{{ trip.pk }}"
-         class="flex justify-center items-center w-full h-full bg-base-200"
+         class="bg-base-200 flex h-full w-full items-center justify-center"
          hx-get="{% url 'trips:trip-image-status' trip.pk %}"
          hx-trigger="every 3s"
          hx-target="this"
@@ -12,6 +12,6 @@
     <img id="trip-image-{{ trip.pk }}"
          src="{{ trip.get_image_url|default:'' }}"
          alt="{{ trip.title }}"
-         class="object-cover w-full h-full"
+         class="h-full w-full object-cover"
          loading="lazy">
 {% endif %}

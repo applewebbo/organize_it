@@ -2,31 +2,31 @@
 <ul class="leading-10">
     {# Vehicle type (for OTHER transport) #}
     {% if event.type_specific_data.vehicle_type %}
-        <li class="flex gap-2 items-center">
+        <li class="flex items-center gap-2">
             <i class="ph-bold ph-boat i-md text-base-content/60" aria-hidden="true"></i>
             <span class="font-medium">{{ event.type_specific_data.vehicle_type }}</span>
         </li>
     {% endif %}
     {# Route: Origin → Destination #}
-    <li class="flex gap-2 items-center">
+    <li class="flex items-center gap-2">
         <i class="ph-bold ph-map-pin i-md text-base-content/60"
            aria-hidden="true"></i>
         <span>
             {{ event.origin_city }}
             {% if event.origin_address %}, {{ event.origin_address }}{% endif %}
-            <i class="mx-1 ph-bold ph-arrow-right" aria-hidden="true"></i>
+            <i class="ph-bold ph-arrow-right mx-1" aria-hidden="true"></i>
             {{ event.destination_city }}
             {% if event.destination_address %}, {{ event.destination_address }}{% endif %}
         </span>
     </li>
     {# Time and Duration #}
-    <li class="flex gap-2 items-center">
+    <li class="flex items-center gap-2">
         <i class="ph-bold ph-clock i-md text-base-content/60" aria-hidden="true"></i>
         <span>
             {{ event.start_time|time:"H:i" }}&nbsp;-&nbsp;{{ event.end_time|time:"H:i" }}
             {% if event.duration %}
                 <span class="text-base-content/60">
-                    (<i class="text-xs ph-bold ph-timer" aria-hidden="true"></i> {{ event.duration|format_duration }})
+                    (<i class="ph-bold ph-timer text-xs" aria-hidden="true"></i> {{ event.duration|format_duration }})
                 </span>
             {% endif %}
         </span>
@@ -34,18 +34,18 @@
     {# Booking Details Section #}
     {% if event.company or event.price %}
         <li class="mt-2">
-            <div class="my-1 divider"></div>
-            <span class="text-sm font-semibold text-base-content/80">{% trans "Booking Details" %}</span>
+            <div class="divider my-1"></div>
+            <span class="text-base-content/80 text-sm font-semibold">{% trans "Booking Details" %}</span>
         </li>
         {% if event.company %}
-            <li class="flex gap-2 items-center">
+            <li class="flex items-center gap-2">
                 <i class="ph-bold ph-buildings i-md text-base-content/60"
                    aria-hidden="true"></i>
                 <span><span class="text-base-content/60">{% trans "Company" %}:</span> {{ event.company }}</span>
             </li>
         {% endif %}
         {% if event.price %}
-            <li class="flex gap-2 items-center">
+            <li class="flex items-center gap-2">
                 <i class="ph-bold ph-currency-dollar i-md text-base-content/60"
                    aria-hidden="true"></i>
                 <span><span class="text-base-content/60">{% trans "Price" %}:</span> €{{ event.price }}</span>

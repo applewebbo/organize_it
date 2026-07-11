@@ -5,43 +5,43 @@
          hx-target="#main-transfers"
          hx-swap="outerHTML"
          hx-trigger="tripModified from:body">
-    <div class="shadow card card-border bg-base-100">
-        <div class="p-4 sm:p-6 card-body">
+    <div class="card card-border bg-base-100 shadow">
+        <div class="card-body p-4 sm:p-6">
             <h2 class="text-xl font-medium sm:text-2xl">{% trans "How to Get There" %}</h2>
-            <div class="grid grid-cols-1 gap-4 mt-2 sm:mt-3 md:grid-cols-2">
+            <div class="mt-2 grid grid-cols-1 gap-4 sm:mt-3 md:grid-cols-2">
                 <!-- Arrival Transfer -->
-                <div class="overflow-hidden relative p-4 rounded-lg bg-base-200" x-data>
+                <div class="bg-base-200 relative overflow-hidden rounded-lg p-4" x-data>
                     {% if arrival_transfer %}
-                        <div class="flex absolute right-0 top-1/2 justify-end pr-4 w-1/2 -translate-y-1/2 pointer-events-none select-none"
+                        <div class="pointer-events-none absolute top-1/2 right-0 flex w-1/2 -translate-y-1/2 justify-end pr-4 select-none"
                              aria-hidden="true">
                             {% if arrival_transfer.type == 1 %}
-                                <i class="ph-bold ph-airplane-takeoff text-[4rem] text-base-content opacity-[0.07]"></i>
+                                <i class="ph-bold ph-airplane-takeoff text-base-content text-[4rem] opacity-[0.07]"></i>
                             {% elif arrival_transfer.type == 2 %}
-                                <i class="ph-bold ph-train text-[4rem] text-base-content opacity-[0.07]"></i>
+                                <i class="ph-bold ph-train text-base-content text-[4rem] opacity-[0.07]"></i>
                             {% elif arrival_transfer.type == 3 %}
-                                <i class="ph-bold ph-car text-[4rem] text-base-content opacity-[0.07]"></i>
+                                <i class="ph-bold ph-car text-base-content text-[4rem] opacity-[0.07]"></i>
                             {% else %}
-                                <i class="ph-bold ph-bus text-[4rem] text-base-content opacity-[0.07]"></i>
+                                <i class="ph-bold ph-bus text-base-content text-[4rem] opacity-[0.07]"></i>
                             {% endif %}
                         </div>
                     {% endif %}
                     <div class="flex relative gap-2 justify-between items-start {% if arrival_transfer %}mb-3{% else %}sm:mb-3{% endif %}">
-                        <div class="flex gap-2 items-center">
+                        <div class="flex items-center gap-2">
                             {% if arrival_transfer %}
                                 {% if arrival_transfer.type == 1 %}
-                                    <i class="text-xl ph-bold ph-airplane-takeoff"></i>
+                                    <i class="ph-bold ph-airplane-takeoff text-xl"></i>
                                 {% elif arrival_transfer.type == 2 %}
-                                    <i class="text-xl ph-bold ph-train"></i>
+                                    <i class="ph-bold ph-train text-xl"></i>
                                 {% elif arrival_transfer.type == 3 %}
-                                    <i class="text-xl ph-bold ph-car"></i>
+                                    <i class="ph-bold ph-car text-xl"></i>
                                 {% else %}
-                                    <i class="text-xl ph-bold ph-bus"></i>
+                                    <i class="ph-bold ph-bus text-xl"></i>
                                 {% endif %}
                             {% endif %}
                             <h4 class="font-medium">{% trans "Arrival" %}</h4>
                         </div>
                         {% if arrival_transfer %}
-                            <div class="flex flex-wrap gap-2 justify-end">
+                            <div class="flex flex-wrap justify-end gap-2">
                                 {# Train status button inline #}
                                 {% if arrival_transfer.type == 2 %}
                                     {% with travel_day=trip.start_date %}
@@ -118,9 +118,9 @@
                         </div>
                         {# Connection to first event/stay #}
                         <div class="relative mt-2">
-                            <div class="flex flex-wrap gap-2 justify-between items-center">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
                                 {% if arrival_transfer.connection %}
-                                    <div class="flex gap-2 items-center text-sm">
+                                    <div class="flex items-center gap-2 text-sm">
                                         {% with mode=arrival_transfer.connection.transport_mode %}
                                             <i class="ph-bold i-sm {% if mode == 'driving' %}ph-car{% endif %} {% if mode == 'walking' %}ph-person-simple-walk{% endif %} {% if mode == 'bicycling' %}ph-bicycle{% endif %} {% if mode == 'transit' %}ph-train{% endif %}"
                                                aria-hidden="true"></i>
@@ -137,7 +137,7 @@
                                         {% endif %}
                                     </div>
                                 {% endif %}
-                                <div class="flex flex-wrap gap-1 justify-end items-center ms-auto">
+                                <div class="ms-auto flex flex-wrap items-center justify-end gap-1">
                                     {# Note #}
                                     <button class="btn btn-xs btn-soft"
                                             x-data
@@ -181,42 +181,42 @@
                             </div>
                         </div>
                     {% else %}
-                        <p class="hidden text-sm sm:block text-base-content/60">{% trans "No arrival transfer added yet." %}</p>
+                        <p class="text-base-content/60 hidden text-sm sm:block">{% trans "No arrival transfer added yet." %}</p>
                     {% endif %}
                 </div>
                 <!-- Departure Transfer -->
-                <div class="overflow-hidden relative p-4 rounded-lg bg-base-200" x-data>
+                <div class="bg-base-200 relative overflow-hidden rounded-lg p-4" x-data>
                     {% if departure_transfer %}
-                        <div class="flex absolute right-0 top-1/2 justify-end pr-4 w-1/2 -translate-y-1/2 pointer-events-none select-none"
+                        <div class="pointer-events-none absolute top-1/2 right-0 flex w-1/2 -translate-y-1/2 justify-end pr-4 select-none"
                              aria-hidden="true">
                             {% if departure_transfer.type == 1 %}
-                                <i class="ph-bold ph-airplane-landing text-[4rem] text-base-content opacity-[0.07]"></i>
+                                <i class="ph-bold ph-airplane-landing text-base-content text-[4rem] opacity-[0.07]"></i>
                             {% elif departure_transfer.type == 2 %}
-                                <i class="ph-bold ph-train text-[4rem] text-base-content opacity-[0.07]"></i>
+                                <i class="ph-bold ph-train text-base-content text-[4rem] opacity-[0.07]"></i>
                             {% elif departure_transfer.type == 3 %}
-                                <i class="ph-bold ph-car text-[4rem] text-base-content opacity-[0.07]"></i>
+                                <i class="ph-bold ph-car text-base-content text-[4rem] opacity-[0.07]"></i>
                             {% else %}
-                                <i class="ph-bold ph-bus text-[4rem] text-base-content opacity-[0.07]"></i>
+                                <i class="ph-bold ph-bus text-base-content text-[4rem] opacity-[0.07]"></i>
                             {% endif %}
                         </div>
                     {% endif %}
                     <div class="flex relative gap-2 justify-between items-start {% if departure_transfer %}mb-3{% else %}sm:mb-3{% endif %}">
-                        <div class="flex gap-2 items-center">
+                        <div class="flex items-center gap-2">
                             {% if departure_transfer %}
                                 {% if departure_transfer.type == 1 %}
-                                    <i class="text-xl ph-bold ph-airplane-landing"></i>
+                                    <i class="ph-bold ph-airplane-landing text-xl"></i>
                                 {% elif departure_transfer.type == 2 %}
-                                    <i class="text-xl ph-bold ph-train"></i>
+                                    <i class="ph-bold ph-train text-xl"></i>
                                 {% elif departure_transfer.type == 3 %}
-                                    <i class="text-xl ph-bold ph-car"></i>
+                                    <i class="ph-bold ph-car text-xl"></i>
                                 {% else %}
-                                    <i class="text-xl ph-bold ph-bus"></i>
+                                    <i class="ph-bold ph-bus text-xl"></i>
                                 {% endif %}
                             {% endif %}
                             <h4 class="font-medium">{% trans "Departure" %}</h4>
                         </div>
                         {% if departure_transfer %}
-                            <div class="flex flex-wrap gap-2 justify-end">
+                            <div class="flex flex-wrap justify-end gap-2">
                                 {# Train status button inline #}
                                 {% if departure_transfer.type == 2 %}
                                     {% with travel_day=trip.end_date %}
@@ -293,9 +293,9 @@
                         </div>
                         {# Connection from last event/stay #}
                         <div class="relative mt-2">
-                            <div class="flex flex-wrap gap-2 justify-between items-center">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
                                 {% if departure_transfer.connection %}
-                                    <div class="flex gap-2 items-center text-sm">
+                                    <div class="flex items-center gap-2 text-sm">
                                         {% with mode=departure_transfer.connection.transport_mode %}
                                             <i class="ph-bold i-sm {% if mode == 'driving' %}ph-car{% endif %} {% if mode == 'walking' %}ph-person-simple-walk{% endif %} {% if mode == 'bicycling' %}ph-bicycle{% endif %} {% if mode == 'transit' %}ph-train{% endif %}"
                                                aria-hidden="true"></i>
@@ -312,7 +312,7 @@
                                         {% endif %}
                                     </div>
                                 {% endif %}
-                                <div class="flex flex-wrap gap-1 justify-end items-center ms-auto">
+                                <div class="ms-auto flex flex-wrap items-center justify-end gap-1">
                                     {# Note #}
                                     <button class="btn btn-xs btn-soft"
                                             x-data
@@ -356,7 +356,7 @@
                             </div>
                         </div>
                     {% else %}
-                        <p class="hidden text-sm sm:block text-base-content/60">{% trans "No departure transfer added yet." %}</p>
+                        <p class="text-base-content/60 hidden text-sm sm:block">{% trans "No departure transfer added yet." %}</p>
                     {% endif %}
                 </div>
             </div>

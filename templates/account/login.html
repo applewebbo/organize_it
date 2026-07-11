@@ -2,15 +2,15 @@
 {% load static i18n crispy_forms_tags %}
 {% load account socialaccount %}
 {% block content %}
-    <div class="flex flex-col justify-center items-center py-8 px-6 mx-auto md:h-screen lg:py-0">
+    <div class="mx-auto flex flex-col items-center justify-center px-6 py-8 md:h-screen lg:py-0">
         <a href="#"
-           class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-            <img class="mr-2 w-8 h-8" src="{% static 'img/logo.png' %}" alt="logo">
+           class="mb-6 flex items-center text-2xl font-semibold text-gray-900 dark:text-white">
+            <img class="mr-2 h-8 w-8" src="{% static 'img/logo.png' %}" alt="logo">
             Organize it!
         </a>
-        <div class="w-full bg-white rounded-lg shadow sm:max-w-md md:mt-0 xl:p-0 dark:bg-gray-800 dark:border dark:border-gray-700">
-            <div class="p-6 space-y-4 sm:p-8 md:space-y-6">
-                <h1 class="text-xl font-bold tracking-tight leading-tight text-gray-900 md:text-2xl dark:text-white">
+        <div class="w-full rounded-lg bg-white shadow sm:max-w-md md:mt-0 xl:p-0 dark:border dark:border-gray-700 dark:bg-gray-800">
+            <div class="space-y-4 p-6 sm:p-8 md:space-y-6">
+                <h1 class="text-xl leading-tight font-bold tracking-tight text-gray-900 md:text-2xl dark:text-white">
                     {% trans "Sign In" %}
                 </h1>
                 {% get_providers as socialaccount_providers %}
@@ -39,7 +39,7 @@
                                name="{{ redirect_field_name }}"
                                value="{{ redirect_field_value }}" />
                     {% endif %}
-                    <div class="mb-3 text-sm text-right">
+                    <div class="mb-3 text-right text-sm">
                         <a class="text-blue-600 hover:underline"
                            href="{% url 'account_reset_password' %}"
                            data-reset-url="{% url 'account_reset_password' %}"
@@ -47,7 +47,7 @@
                             {% trans "Forgot Password?" %}
                         </a>
                     </div>
-                    <button type="submit" class="w-full btn btn-primary">{% trans "Sign In" %}</button>
+                    <button type="submit" class="btn btn-primary w-full">{% trans "Sign In" %}</button>
                     <p class="text-sm font-light text-gray-500 dark:text-gray-400">
                         {% blocktrans %}If you have not created an account yet, then please <a href="{{ signup_url }}" class="text-blue-600 hover:underline">Sign up</a> first.{% endblocktrans %}
                     </p>

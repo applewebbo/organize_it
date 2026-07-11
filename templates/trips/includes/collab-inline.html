@@ -5,9 +5,9 @@
          hx-trigger="collaboratorsModified from:body"
          hx-swap="outerHTML"
          x-data>
-    <div class="shadow card card-border bg-base-100">
-        <div class="p-4 sm:p-6 card-body">
-            <div class="flex justify-between items-center">
+    <div class="card card-border bg-base-100 shadow">
+        <div class="card-body p-4 sm:p-6">
+            <div class="flex items-center justify-between">
                 <h2 class="text-xl font-medium sm:text-2xl">{% trans "Participants" %}</h2>
                 {% if request.user == trip.author and trip.status != 5 %}
                     <button class="btn btn-xs btn-soft btn-primary sm:btn-sm"
@@ -21,16 +21,16 @@
                     </button>
                 {% endif %}
             </div>
-            <ul class="flex flex-wrap gap-3 mt-2 sm:mt-3">
-                <li class="flex gap-3 items-center py-1.5 px-2.5 rounded-lg border border-red-200 sm:py-3 sm:px-6 dark:border-red-800 bg-red-50/50 dark:bg-red-900/10">
+            <ul class="mt-2 flex flex-wrap gap-3 sm:mt-3">
+                <li class="flex items-center gap-3 rounded-lg border border-red-200 bg-red-50/50 px-2.5 py-1.5 sm:px-6 sm:py-3 dark:border-red-800 dark:bg-red-900/10">
                     {% if trip.author.profile.avatar %}
                         <img src="{% static 'img/avatars/' %}{{ trip.author.profile.avatar }}"
                              alt=""
-                             class="hidden mx-2 w-8 h-8 sm:block">
+                             class="mx-2 hidden h-8 w-8 sm:block">
                     {% else %}
                         <img src="{% static 'img/avatars/generic.png' %}"
                              alt=""
-                             class="hidden mx-2 w-8 h-8 sm:block">
+                             class="mx-2 hidden h-8 w-8 sm:block">
                     {% endif %}
                     <div>
                         <span class="text-xs font-medium sm:text-sm">{{ trip.author|user_display_name }}</span>
@@ -42,11 +42,11 @@
                         {% if collab.user and collab.user.profile.avatar %}
                             <img src="{% static 'img/avatars/' %}{{ collab.user.profile.avatar }}"
                                  alt=""
-                                 class="hidden mx-2 w-8 h-8 sm:block">
+                                 class="mx-2 hidden h-8 w-8 sm:block">
                         {% else %}
                             <img src="{% static 'img/avatars/generic.png' %}"
                                  alt=""
-                                 class="hidden mx-2 w-8 h-8 sm:block">
+                                 class="mx-2 hidden h-8 w-8 sm:block">
                         {% endif %}
                         <div>
                             <span class="text-xs font-medium sm:text-sm">

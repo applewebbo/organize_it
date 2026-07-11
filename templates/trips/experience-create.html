@@ -5,10 +5,10 @@
       class="modal-content"
       method="post"
       x-data="autocompleteForm()">
-    <div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
+    <div class="border-base-300 flex items-center justify-between rounded-t border-b p-4 md:px-5 md:py-2.5">
         <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% trans 'Create a new Experience' %}</h3>
         <button type="button"
-                class="inline-flex justify-center items-center w-8 h-8 text-sm text-gray-400 bg-transparent rounded-lg hover:text-gray-900 hover:bg-gray-200 ms-auto dark:hover:bg-gray-600 dark:hover:text-white"
+                class="ms-auto inline-flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white"
                 x-on:click="openModal = false">
             <i class="ph-bold ph-x i-md"></i>
             <span class="sr-only">Close modal</span>
@@ -16,13 +16,13 @@
     </div>
     <div class="grid gap-x-1 p-4 sm:grid-cols-4 sm:gap-x-2 md:p-5">
         {% csrf_token %}
-        <div class="px-4 pt-3 pb-6 mb-5 rounded-lg border sm:col-span-4 bg-base-200 border-base-300">
-            <label for="id_maps_link" class="block mb-1 text-sm font-medium">{% trans "Google Maps" %}</label>
+        <div class="bg-base-200 border-base-300 mb-5 rounded-lg border px-4 pt-3 pb-6 sm:col-span-4">
+            <label for="id_maps_link" class="mb-1 block text-sm font-medium">{% trans "Google Maps" %}</label>
             <div class="flex gap-2">
                 <input type="text"
                        id="id_maps_link"
                        name="maps_link"
-                       class="flex-1 input input-bordered input-sm"
+                       class="input input-bordered input-sm flex-1"
                        placeholder="{% trans 'Paste a Google Maps link to auto-fill' %}">
                 <button type="button"
                         class="btn btn-sm btn-primary"
@@ -38,11 +38,11 @@
     {% if unpaired_experiences %}
         <div class="px-4 md:px-5">
             <h4 class="text-lg font-semibold">{% trans 'Unpaired Experiences' %}</h4>
-            <ul class="flex flex-wrap gap-3 justify-start items-center mt-4">
+            <ul class="mt-4 flex flex-wrap items-center justify-start gap-3">
                 {% for exp in unpaired_experiences %}
                     <li>
                         <a href="{% url 'trips:event-pair' exp.pk day.pk %}"
-                           class="flex gap-2 items-center btn btn-primary btn-soft"
+                           class="btn btn-primary btn-soft flex items-center gap-2"
                            hx-get="{% url 'trips:event-pair' exp.pk day.pk %}"
                            hx-target="#dialog">
                             {{ exp.name }}
@@ -53,10 +53,10 @@
             </ul>
         </div>
     {% endif %}
-    <div class="flex justify-end items-center p-4 md:p-5">
+    <div class="flex items-center justify-end p-4 md:p-5">
         <button type="button"
                 x-on:click="openModal = false"
-                class="mr-2 btn btn-outline btn-error">{% trans 'Cancel' %}</button>
+                class="btn btn-outline btn-error mr-2">{% trans 'Cancel' %}</button>
         <button id="form-submit" class="btn btn-outline btn-primary" type="submit">{% trans 'Save' %}</button>
     </div>
 </form>

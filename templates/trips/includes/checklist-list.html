@@ -2,7 +2,7 @@
 <div id="checklist-list" class="space-y-2">
     {% for item in items %}
         <div id="checklist-item-{{ item.pk }}"
-             class="flex gap-3 items-center p-3 rounded-lg bg-base-200">
+             class="bg-base-200 flex items-center gap-3 rounded-lg p-3">
             <input type="checkbox"
                    class="checkbox checkbox-sm checkbox-primary"
                    {% if item.completed %}checked{% endif %}
@@ -19,6 +19,6 @@
             </button>
         </div>
     {% empty %}
-        <p class="py-4 text-center text-base-content/50">{% trans "No items yet. Add your first checklist item above." %}</p>
+        <p class="text-base-content/50 py-4 text-center">{% trans "No items yet. Add your first checklist item above." %}</p>
     {% endfor %}
 </div>

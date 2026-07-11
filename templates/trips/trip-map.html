@@ -8,14 +8,14 @@
 {% endblock extra_head %}
 {% block content %}
     {# ── Mini-header ── #}
-    <div class="overflow-hidden mb-4 shadow card card-border bg-base-100">
-        <div class="flex gap-2 justify-between items-center p-3 sm:p-6">
-            <div class="flex gap-2 items-center min-w-0 grow">
-                <h1 class="text-2xl font-semibold tracking-tight truncate">{{ trip.title }}</h1>
+    <div class="card card-border bg-base-100 mb-4 overflow-hidden shadow">
+        <div class="flex items-center justify-between gap-2 p-3 sm:p-6">
+            <div class="flex min-w-0 grow items-center gap-2">
+                <h1 class="truncate text-2xl font-semibold tracking-tight">{{ trip.title }}</h1>
             </div>
-            <div class="flex gap-2 shrink-0">
+            <div class="flex shrink-0 gap-2">
                 <a href="{% url 'trips:trip-detail' trip.pk %}"
-                   class="gap-1.5 btn btn-md btn-soft btn-primary"
+                   class="btn btn-md btn-soft btn-primary gap-1.5"
                    aria-label="{% trans 'Back to events' %}">
                     <i class="ph-bold ph-rows i-lg" aria-hidden="true"></i>
                     {% trans 'Events' %}
@@ -24,12 +24,12 @@
         </div>
     </div>
     {# ── Map + sidebar ── #}
-    <div class="overflow-hidden mb-4 shadow card card-border bg-base-100">
-        <div class="flex flex-col lg:flex-row h-[calc(100vh-10rem)]">
+    <div class="card card-border bg-base-100 mb-4 overflow-hidden shadow">
+        <div class="flex h-[calc(100vh-10rem)] flex-col lg:flex-row">
             {# Left sidebar: search only #}
-            <aside class="flex flex-col w-full border-b lg:w-80 lg:border-b-0 lg:border-r border-base-300 shrink-0">
+            <aside class="border-base-300 flex w-full shrink-0 flex-col border-b lg:w-80 lg:border-r lg:border-b-0">
                 {# Search only, or Search / AI suggestions tabs when AI is enabled #}
-                <div class="p-3 border-b border-base-300">
+                <div class="border-base-300 border-b p-3">
                     {% if ai_suggestions_enabled %}
                         <div role="tablist" class="tabs tabs-border tabs-sm">
                             {# Tab 1: manual search #}
@@ -42,7 +42,7 @@
                                    hx-target="#search-results-panel"
                                    hx-swap="innerHTML"
                                    checked />
-                            <div role="tabpanel" class="pt-3 tab-content">{% include "trips/partials/map-search-form.html" %}</div>
+                            <div role="tabpanel" class="tab-content pt-3">{% include "trips/partials/map-search-form.html" %}</div>
                             {# Tab 2: AI suggestions #}
                             <input type="radio"
                                    name="map_panel_tab"
@@ -52,7 +52,7 @@
                                    hx-get="{% url 'suggestions:cached' trip.pk %}"
                                    hx-target="#search-results-panel"
                                    hx-swap="innerHTML" />
-                            <div role="tabpanel" class="pt-3 tab-content">
+                            <div role="tabpanel" class="tab-content pt-3">
                                 <form hx-post="{% url 'suggestions:generate' trip.pk %}"
                                       hx-target="#search-results-panel"
                                       hx-swap="innerHTML"
@@ -61,7 +61,7 @@
                                     {% csrf_token %}
                                     {% if has_custom_stages %}
                                         <select name="stage_destination"
-                                                class="mb-2 w-full select select-sm select-bordered">
+                                                class="select select-sm select-bordered mb-2 w-full">
                                             <option value="">{% trans '— all stages —' %}</option>
                                             {% for stage in stages %}<option value="{{ stage.destination }}">{{ stage.destination }}</option>{% endfor %}
                                         </select>
@@ -70,7 +70,7 @@
                                            name="notes"
                                            placeholder="{% trans 'Notes for this trip (optional)…' %}"
                                            autocomplete="off"
-                                           class="mb-2 w-full input input-sm input-bordered" />
+                                           class="input input-sm input-bordered mb-2 w-full" />
                                     {% include "suggestions/ai-kind-filter.html" %}
                                     <div id="ai-generate-actions">{% include "suggestions/ai-map-actions.html" %}</div>
                                 </form>
@@ -81,23 +81,23 @@
                     {% endif %}
                 </div>
                 {# Search results #}
-                <div id="search-results-panel" class="overflow-y-auto flex-1 p-3">
+                <div id="search-results-panel" class="flex-1 overflow-y-auto p-3">
                     {% include "trips/partials/map-search-results.html" with results=None query=None %}
                 </div>
             </aside>
             {# ── Map ── #}
-            <div id="trip-map" class="flex-1 min-h-64"></div>
+            <div id="trip-map" class="min-h-64 flex-1"></div>
         </div>
     </div>
     {# ── Events below map ── #}
-    <div class="shadow card card-border bg-base-100">
-        <div class="p-4 sm:p-6 card-body">
-            <div class="flex gap-2 items-center">
+    <div class="card card-border bg-base-100 shadow">
+        <div class="card-body p-4 sm:p-6">
+            <div class="flex items-center gap-2">
                 <h2 class="text-xl font-medium sm:text-2xl">{% trans 'Trip events' %}</h2>
                 <span id="save-spinner"
                       class="loading loading-spinner loading-xs htmx-indicator"></span>
             </div>
-            <div id="events-panel" class="lg:gap-x-6 lg:columns-2">{% include "trips/partials/map-events-panel.html" %}</div>
+            <div id="events-panel" class="lg:columns-2 lg:gap-x-6">{% include "trips/partials/map-events-panel.html" %}</div>
         </div>
     </div>
 {% endblock content %}

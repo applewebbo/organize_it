@@ -13,9 +13,9 @@
             {# Form errors #}
             {% if form.errors %}
                 <div class="mb-4 sm:col-span-4">
-                    <div class="py-3 px-4 text-red-700 bg-red-100 rounded border border-red-400">
+                    <div class="rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
                         <strong>{% trans "Form validation errors:" %}</strong>
-                        <ul class="mt-2 list-disc list-inside">
+                        <ul class="mt-2 list-inside list-disc">
                             {% for field, errors in form.errors.items %}
                                 <li>
                                     <strong>{{ field }}:</strong> {{ errors|join:", " }}
@@ -27,7 +27,7 @@
             {% endif %}
             {# Pre-fill notification #}
             {% if prefilled_from_arrival %}
-                <div class="mb-4 sm:col-span-4 alert alert-info">
+                <div class="alert alert-info mb-4 sm:col-span-4">
                     <i class="ph ph-info"></i>
                     <span>{% trans "Fields pre-filled from arrival journey. You can modify them if needed." %}</span>
                 </div>
@@ -49,7 +49,7 @@
                 {{ form.destination_address|as_crispy_field }}
                 {# Quick-fill suggestions #}
                 {% if quick_fill_locations %}
-                    <div class="flex flex-wrap gap-2 mt-1">
+                    <div class="mt-1 flex flex-wrap gap-2">
                         {% for loc in quick_fill_locations %}
                             <button type="button"
                                     class="btn btn-sm btn-outline {% if loc.type == 'stay' %}btn-neutral{% elif loc.type == 'meal' %}btn-warning{% elif loc.type == 'experience' %}btn-success{% else %}btn-neutral{% endif %}"
@@ -62,7 +62,7 @@
                     </div>
                 {% endif %}
                 {# Duration estimate: triggered by custom event #}
-                <div class="flex gap-2 items-center mt-2 min-h-6">
+                <div class="mt-2 flex min-h-6 items-center gap-2">
                     <span id="duration-loading"
                           class="htmx-indicator loading loading-spinner loading-xs text-primary"
                           aria-hidden="true"></span>
@@ -85,7 +85,7 @@
         <!-- Footer with navigation -->
         {% if is_edit_modal %}
             <!-- Edit modal footer: simple Cancel + Save -->
-            <div class="flex gap-2 justify-end items-center p-4 rounded-b border-t border-base-200">
+            <div class="border-base-200 flex items-center justify-end gap-2 rounded-b border-t p-4">
                 <button type="button"
                         class="btn btn-outline btn-neutral"
                         x-on:click="openModal = false">{% trans "Cancel" %}</button>
@@ -96,7 +96,7 @@
             </div>
         {% else %}
             <!-- Wizard footer: Back + Next/Save -->
-            <div class="flex justify-between items-center p-4 rounded-b border-t border-base-200">
+            <div class="border-base-200 flex items-center justify-between rounded-b border-t p-4">
                 <button type="button"
                         class="btn btn-soft"
                         hx-get="{% url 'trips:main-transfer-step' trip.pk %}?step=type&transport_type=car{% if direction %}&direction={{ direction }}{% endif %}"

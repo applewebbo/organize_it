@@ -12,10 +12,10 @@
         {% csrf_token %}
         {% crispy form %}
     </div>
-    <div class="flex justify-end items-center p-4">
+    <div class="flex items-center justify-end p-4">
         <button type="button"
                 x-on:click="openModal = false"
-                class="ms-2 btn btn-error btn-soft">{% trans 'Cancel' %}</button>
-        <button id="form-submit" class="ms-2 btn btn-primary btn-soft" type="submit">{% trans 'Save' %}</button>
+                class="btn btn-error btn-soft ms-2">{% trans 'Cancel' %}</button>
+        <button id="form-submit" class="btn btn-primary btn-soft ms-2" type="submit">{% trans 'Save' %}</button>
     </div>
 </form>

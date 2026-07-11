@@ -1,19 +1,19 @@
 {% load i18n %}
-<div id="reminder-card" class="mt-6 shadow card bg-base-100">
+<div id="reminder-card" class="card bg-base-100 mt-6 shadow">
     <div class="card-body">
-        <h2 class="flex gap-2 items-center font-semibold card-title">
+        <h2 class="card-title flex items-center gap-2 font-semibold">
             <i class="ph ph-bell text-primary"></i>
             {% trans "Email Reminder" %}
         </h2>
-        <p class="text-sm text-base-content/60">
+        <p class="text-base-content/60 text-sm">
             {% trans "Get an email reminder before departure if there are pending items." %}
         </p>
         <form hx-post="{% url 'trips:checklist-reminder-set' trip.pk %}"
               hx-target="#reminder-card"
               hx-swap="outerHTML">
             {% csrf_token %}
-            <div class="flex gap-2 items-center">
-                <select name="reminder_days" class="flex-1 select select-bordered">
+            <div class="flex items-center gap-2">
+                <select name="reminder_days" class="select select-bordered flex-1">
                     {% for value, label in reminder_form.fields.reminder_days.choices %}
                         <option value="{{ value }}"
                                 {% if reminder_form.reminder_days.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>

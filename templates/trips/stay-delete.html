@@ -7,16 +7,16 @@
         You are deleting <strong>{{ stay.name }}</strong>. This is a permanent deletion, are you sure?
     </p>
     {% if other_stays %}
-        <div role="alert" class="flex py-4 mt-3 alert alert-info alert-soft">
+        <div role="alert" class="alert alert-info alert-soft mt-3 flex py-4">
             <div>
                 <i class="ph-bold ph-info i-sm"></i>
             </div>
             {% if show_dropdown %}
-                <div class="flex items-center grow">
-                    <label for="new_stay" class="block text-sm font-medium grow">Select stay to reassign days to:</label>
+                <div class="flex grow items-center">
+                    <label for="new_stay" class="block grow text-sm font-medium">Select stay to reassign days to:</label>
                     <select name="new_stay"
                             id="new_stay"
-                            class="w-full select select-bordered text-base-content"
+                            class="select select-bordered text-base-content w-full"
                             required>
                         {% for other_stay in other_stays %}<option value="{{ other_stay.pk }}">{{ other_stay.name }}</option>{% endfor %}
                     </select>
@@ -29,13 +29,13 @@
         </div>
     {% endif %}
 </div>
-<div class="flex justify-end items-center p-4">
-    <button class="ms-2 btn btn-sm btn-error"
+<div class="flex items-center justify-end p-4">
+    <button class="btn btn-sm btn-error ms-2"
             type="button"
             hx-post="{% url 'trips:stay-delete' stay.pk %}"
             hx-include="#new_stay"
             hx-target="#dialog">Confirm</button>
     <button type="button"
             x-on:click="openModal = false"
-            class="ms-2 btn btn-sm btn-outline btn-neutral">Cancel</button>
+            class="btn btn-sm btn-outline btn-neutral ms-2">Cancel</button>
 </div>

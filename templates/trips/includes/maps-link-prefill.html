@@ -3,7 +3,7 @@
     <div x-init="setMapsData({{ place_data_json }})">
         {% if type_warning %}
             <div role="alert"
-                 class="flex gap-2 items-center p-2 mt-3 text-sm rounded-lg alert alert-warning alert-soft">
+                 class="alert alert-warning alert-soft mt-3 flex items-center gap-2 rounded-lg p-2 text-sm">
                 <i class="ph-bold ph-warning i-sm"></i>
                 <span>
                     {% if type_warning == "stay_mismatch" %}
@@ -19,7 +19,7 @@
             </div>
         {% else %}
             <div role="alert"
-                 class="flex gap-2 items-center p-2 mt-3 text-sm rounded-lg alert alert-success alert-soft">
+                 class="alert alert-success alert-soft mt-3 flex items-center gap-2 rounded-lg p-2 text-sm">
                 <i class="ph-bold ph-check-circle i-sm"></i>
                 <span>{% trans "Location found! Fields have been pre-filled." %}</span>
             </div>
@@ -27,7 +27,7 @@
     </div>
 {% elif error %}
     <div role="alert"
-         class="flex gap-2 items-center p-2 mt-3 text-sm rounded-lg alert alert-error alert-soft">
+         class="alert alert-error alert-soft mt-3 flex items-center gap-2 rounded-lg p-2 text-sm">
         <i class="ph-bold ph-warning i-sm"></i>
         <span>{% trans "Oops! Location not recognised, fill in the details manually." %}</span>
     </div>

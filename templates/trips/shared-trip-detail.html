@@ -4,14 +4,14 @@
     {{ trip.title }}
 {% endblock page_title %}
 {% block content %}
-    <div class="mb-4 alert alert-info alert-soft">
+    <div class="alert alert-info alert-soft mb-4">
         <i class="ph-bold ph-share-network i-md"></i>
         <span>{% trans "Shared view – read only" %}</span>
     </div>
-    <div class="overflow-hidden shadow card card-border bg-base-100">
+    <div class="card card-border bg-base-100 overflow-hidden shadow">
         <div class="p-6">
             <h2 class="mb-1 text-2xl font-bold">{{ trip.title }}</h2>
-            <div class="flex gap-4 mt-2 text-sm text-base-content/60">
+            <div class="text-base-content/60 mt-2 flex gap-4 text-sm">
                 <span><i class="ph-bold ph-map-pin"></i> {{ trip.destination }}</span>
                 {% if trip.start_date %}
                     <span><i class="ph-bold ph-calendar"></i> {{ trip.start_date|date:"SHORT_DATE_FORMAT" }} – {{ trip.end_date|date:"SHORT_DATE_FORMAT" }}</span>
@@ -25,8 +25,8 @@
                 {% trans "Day" %} {{ day.number }} – {{ day.date|date:"SHORT_DATE_FORMAT" }}
             </h3>
             {% if day.stay %}
-                <div class="p-3 mb-2 text-sm rounded-lg border border-base-300 bg-base-100/60">
-                    <div class="flex gap-2 items-center">
+                <div class="border-base-300 bg-base-100/60 mb-2 rounded-lg border p-3 text-sm">
+                    <div class="flex items-center gap-2">
                         <i class="ph-bold ph-bed i-sm text-base-content/60"></i>
                         <span>{{ day.stay.name }}</span>
                         {% if day.stay.address %}<span class="text-base-content/60">, {{ day.stay.address }}</span>{% endif %}
@@ -35,24 +35,24 @@
             {% endif %}
             {% weather_widget day %}
             {% for event in day.events.all %}
-                <div class="p-3 mb-2 rounded-lg border border-base-300 bg-base-100">
-                    <div class="flex gap-2 items-center">
+                <div class="border-base-300 bg-base-100 mb-2 rounded-lg border p-3">
+                    <div class="flex items-center gap-2">
                         <span class="font-medium">{{ event.name }}</span>
                         {% if event.estimated_duration %}
-                            <span class="font-mono text-xs text-base-content/50">{{ event.estimated_duration|duration_display }}</span>
+                            <span class="text-base-content/50 font-mono text-xs">{{ event.estimated_duration|duration_display }}</span>
                         {% endif %}
                     </div>
                     {% if event.address %}
-                        <div class="mt-1 text-xs text-base-content/60">
+                        <div class="text-base-content/60 mt-1 text-xs">
                             <i class="ph-bold ph-map-pin"></i> {{ event.address }}
                         </div>
                     {% endif %}
                 </div>
             {% empty %}
-                <p class="text-sm text-base-content/50">{% trans "No events for this day." %}</p>
+                <p class="text-base-content/50 text-sm">{% trans "No events for this day." %}</p>
             {% endfor %}
         </div>
     {% empty %}
-        <p class="mt-8 text-center text-base-content/50">{% trans "No days planned yet." %}</p>
+        <p class="text-base-content/50 mt-8 text-center">{% trans "No days planned yet." %}</p>
     {% endfor %}
 {% endblock content %}

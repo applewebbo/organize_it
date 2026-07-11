@@ -9,15 +9,15 @@
     </h3>
     <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
         {% for day in days %}
-            <button class="flex flex-col gap-0.5 items-start p-3 text-left rounded-lg border transition-colors border-base-300 hover:bg-base-200"
+            <button class="border-base-300 hover:bg-base-200 flex flex-col items-start gap-0.5 rounded-lg border p-3 text-left transition-colors"
                     hx-get="{% if category == 'experience' %}{% url 'trips:add-experience' day.pk %}{% else %}{% url 'trips:add-meal' day.pk %}{% endif %}"
                     hx-target="#dialog"
                     hx-swap="innerHTML">
-                <span class="text-xs font-semibold text-base-content/50">{% trans 'Day' %} {{ forloop.counter }}</span>
+                <span class="text-base-content/50 text-xs font-semibold">{% trans 'Day' %} {{ forloop.counter }}</span>
                 <span class="text-sm font-medium">{{ day.date|date:"d M Y" }}</span>
             </button>
         {% empty %}
-            <p class="col-span-2 py-4 text-center sm:col-span-3 text-base-content/60">{% trans 'No days in this trip.' %}</p>
+            <p class="text-base-content/60 col-span-2 py-4 text-center sm:col-span-3">{% trans 'No days in this trip.' %}</p>
         {% endfor %}
     </div>
 </div>

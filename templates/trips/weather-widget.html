@@ -1,23 +1,23 @@
 {% load i18n %}
 {% if weather %}
-    <div class="flex flex-wrap gap-y-1 gap-x-2 items-center py-2 px-3 mt-2 text-sm rounded-lg border border-base-300 bg-base-200/50 text-base-content/70">
-        <span class="flex gap-1 items-center font-medium">
+    <div class="border-base-300 bg-base-200/50 text-base-content/70 mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-lg border px-3 py-2 text-sm">
+        <span class="flex items-center gap-1 font-medium">
             <i class="ph-bold {{ weather.weather_icon }} text-base"></i>
             {{ weather.temperature_max|floatformat:0 }}° / {{ weather.temperature_min|floatformat:0 }}°
         </span>
         {% if weather.precipitation_sum > 0 %}
-            <span class="flex gap-1 items-center">
+            <span class="flex items-center gap-1">
                 <i class="ph-bold ph-drop text-sky-500"></i>
                 {{ weather.precipitation_sum|floatformat:1 }} mm
             </span>
         {% endif %}
-        <span class="flex gap-1 items-center">
+        <span class="flex items-center gap-1">
             <i class="ph-bold ph-wind"></i>
             {{ weather.wind_speed_max|floatformat:0 }} km/h
         </span>
     </div>
 {% else %}
-    <div class="flex gap-1 items-center py-1 px-3 mt-2 text-xs rounded border border-dashed border-base-300 text-base-content/40">
+    <div class="border-base-300 text-base-content/40 mt-2 flex items-center gap-1 rounded border border-dashed px-3 py-1 text-xs">
         <i class="ph-bold ph-cloud-slash"></i>
         {% trans "Forecast unavailable" %}
     </div>

@@ -4,12 +4,12 @@
       hx-disabled-elt="#form-submit"
       class="modal-content"
       method="post">
-    <div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
+    <div class="border-base-300 flex items-center justify-between rounded-t border-b p-4 md:px-5 md:py-2.5">
         <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Modify {{ event.name }}</h3>
         <button type="button"
-                class="inline-flex justify-center items-center w-8 h-8 text-sm text-gray-400 bg-transparent rounded-lg hover:text-gray-900 hover:bg-gray-200 ms-auto dark:hover:bg-gray-600 dark:hover:text-white"
+                class="ms-auto inline-flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white"
                 x-on:click="openModal = false">
-            <svg class="w-3 h-3"
+            <svg class="h-3 w-3"
                  aria-hidden="true"
                  xmlns="http://www.w3.org/2000/svg"
                  fill="none"
@@ -23,10 +23,10 @@
         {% csrf_token %}
         {% crispy form %}
     </div>
-    <div class="flex justify-end items-center p-4 rounded-b border-t border-gray-200 md:p-5 dark:border-gray-600">
+    <div class="flex items-center justify-end rounded-b border-t border-gray-200 p-4 md:p-5 dark:border-gray-600">
         <button type="button"
                 x-on:click="openModal = false"
-                class="mr-2 btn btn-soft btn-error">Cancel</button>
+                class="btn btn-soft btn-error mr-2">Cancel</button>
         <button id="form-submit" class="btn btn-soft btn-primary" type="submit">Save</button>
     </div>
 </form>

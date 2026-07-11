@@ -1,6 +1,6 @@
 {% load i18n %}
 <div id="ai-settings"
-     class="mx-auto mt-8 max-w-2xl shadow card card-border bg-base-100">
+     class="card card-border bg-base-100 mx-auto mt-8 max-w-2xl shadow">
     <form method="post"
           class="card-body"
           x-data="{ enabled: {{ ai_enabled|yesno:'true,false' }} }"
@@ -8,14 +8,14 @@
           hx-target="#ai-settings"
           hx-swap="outerHTML">
         {% csrf_token %}
-        <h2 class="mb-4 text-xl font-semibold text-center sm:text-left">{% trans "AI suggestions" %}</h2>
+        <h2 class="mb-4 text-center text-xl font-semibold sm:text-left">{% trans "AI suggestions" %}</h2>
         {% if saved %}
-            <div class="mb-4 alert alert-success alert-soft">
+            <div class="alert alert-success alert-soft mb-4">
                 <span>{% trans "AI settings saved successfully" %}</span>
             </div>
         {% endif %}
         <div class="mb-6">
-            <label class="flex gap-3 items-center cursor-pointer">
+            <label class="flex cursor-pointer items-center gap-3">
                 <input type="checkbox"
                        name="ai_suggestions_enabled"
                        class="toggle toggle-primary"
@@ -23,57 +23,57 @@
                        {% if ai_enabled %}checked{% endif %} />
                 <span class="font-medium">{% trans "Enable AI suggestions" %}</span>
             </label>
-            <p class="mt-1 text-xs italic text-base-content/50">{{ toggle_form.ai_suggestions_enabled.help_text }}</p>
+            <p class="text-base-content/50 mt-1 text-xs italic">{{ toggle_form.ai_suggestions_enabled.help_text }}</p>
         </div>
         <div x-show="enabled" x-cloak>
             <div class="mb-4">
                 <label for="{{ credentials_form.provider.id_for_label }}"
-                       class="block mb-2 font-medium">{{ credentials_form.provider.label }}</label>
+                       class="mb-2 block font-medium">{{ credentials_form.provider.label }}</label>
                 {{ credentials_form.provider }}
                 {% if credentials_form.provider.errors %}
-                    <div class="mt-1 text-sm text-error">{{ credentials_form.provider.errors }}</div>
+                    <div class="text-error mt-1 text-sm">{{ credentials_form.provider.errors }}</div>
                 {% endif %}
             </div>
             <div class="mb-6">
                 <label for="{{ credentials_form.api_key_encrypted.id_for_label }}"
-                       class="block mb-2 font-medium">{{ credentials_form.api_key_encrypted.label }}</label>
+                       class="mb-2 block font-medium">{{ credentials_form.api_key_encrypted.label }}</label>
                 {{ credentials_form.api_key_encrypted }}
-                <p class="mt-1 text-xs italic text-base-content/50">
+                <p class="text-base-content/50 mt-1 text-xs italic">
                     {% if has_credentials %}
                         {% trans "A key is already configured." %}
                     {% endif %}
                     {{ credentials_form.api_key_encrypted.help_text }}
                 </p>
                 {% if credentials_form.api_key_encrypted.errors %}
-                    <div class="mt-1 text-sm text-error">{{ credentials_form.api_key_encrypted.errors }}</div>
+                    <div class="text-error mt-1 text-sm">{{ credentials_form.api_key_encrypted.errors }}</div>
                 {% endif %}
             </div>
             <div class="mb-6">
-                <label class="flex gap-3 items-center cursor-pointer">
+                <label class="flex cursor-pointer items-center gap-3">
                     {{ credentials_form.share_with_collaborators }}
                     <span class="font-medium">{{ credentials_form.share_with_collaborators.label }}</span>
                 </label>
-                <p class="mt-1 text-xs italic text-base-content/50">{{ credentials_form.share_with_collaborators.help_text }}</p>
+                <p class="text-base-content/50 mt-1 text-xs italic">{{ credentials_form.share_with_collaborators.help_text }}</p>
             </div>
-            <h3 class="mt-2 mb-3 text-sm font-semibold uppercase text-base-content/60">{% trans "Who's travelling" %}</h3>
-            <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2">
+            <h3 class="text-base-content/60 mt-2 mb-3 text-sm font-semibold uppercase">{% trans "Who's travelling" %}</h3>
+            <div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                     <label for="{{ preferences_form.travel_party.id_for_label }}"
-                           class="block mb-2 font-medium">{{ preferences_form.travel_party.label }}</label>
+                           class="mb-2 block font-medium">{{ preferences_form.travel_party.label }}</label>
                     {{ preferences_form.travel_party }}
                 </div>
                 <div>
                     <label for="{{ preferences_form.travel_style.id_for_label }}"
-                           class="block mb-2 font-medium">{{ preferences_form.travel_style.label }}</label>
+                           class="mb-2 block font-medium">{{ preferences_form.travel_style.label }}</label>
                     {{ preferences_form.travel_style }}
                 </div>
             </div>
-            <h3 class="mt-4 mb-3 text-sm font-semibold uppercase text-base-content/60">{% trans "Preferences" %}</h3>
+            <h3 class="text-base-content/60 mt-4 mb-3 text-sm font-semibold uppercase">{% trans "Preferences" %}</h3>
             <div class="mb-4">
-                <label class="block mb-2 font-medium">{{ preferences_form.favored_experience_types.label }}</label>
+                <label class="mb-2 block font-medium">{{ preferences_form.favored_experience_types.label }}</label>
                 <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
                     {% for checkbox in preferences_form.favored_experience_types %}
-                        <label class="flex gap-2 items-center cursor-pointer">
+                        <label class="flex cursor-pointer items-center gap-2">
                             {{ checkbox.tag }}
                             <span>{{ checkbox.choice_label }}</span>
                         </label>
@@ -81,56 +81,56 @@
                 </div>
             </div>
             <div class="mb-4">
-                <label class="block mb-2 font-medium">{{ preferences_form.interests.label }}</label>
+                <label class="mb-2 block font-medium">{{ preferences_form.interests.label }}</label>
                 <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
                     {% for checkbox in preferences_form.interests %}
-                        <label class="flex gap-2 items-center cursor-pointer">
+                        <label class="flex cursor-pointer items-center gap-2">
                             {{ checkbox.tag }}
                             <span>{{ checkbox.choice_label }}</span>
                         </label>
                     {% endfor %}
                 </div>
             </div>
-            <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-3">
+            <div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <div>
                     <label for="{{ preferences_form.dietary.id_for_label }}"
-                           class="block mb-2 font-medium">{{ preferences_form.dietary.label }}</label>
+                           class="mb-2 block font-medium">{{ preferences_form.dietary.label }}</label>
                     {{ preferences_form.dietary }}
                 </div>
                 <div>
                     <label for="{{ preferences_form.cuisine.id_for_label }}"
-                           class="block mb-2 font-medium">{{ preferences_form.cuisine.label }}</label>
+                           class="mb-2 block font-medium">{{ preferences_form.cuisine.label }}</label>
                     {{ preferences_form.cuisine }}
                 </div>
                 <div>
                     <label for="{{ preferences_form.budget.id_for_label }}"
-                           class="block mb-2 font-medium">{{ preferences_form.budget.label }}</label>
+                           class="mb-2 block font-medium">{{ preferences_form.budget.label }}</label>
                     {{ preferences_form.budget }}
                 </div>
             </div>
-            <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2">
+            <div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                     <label for="{{ preferences_form.search_radius.id_for_label }}"
-                           class="block mb-2 font-medium">{{ preferences_form.search_radius.label }}</label>
+                           class="mb-2 block font-medium">{{ preferences_form.search_radius.label }}</label>
                     {{ preferences_form.search_radius }}
                 </div>
                 <div>
                     <label for="{{ preferences_form.result_count.id_for_label }}"
-                           class="block mb-2 font-medium">{{ preferences_form.result_count.label }}</label>
+                           class="mb-2 block font-medium">{{ preferences_form.result_count.label }}</label>
                     <div class="max-w-32">{{ preferences_form.result_count }}</div>
-                    <p class="mt-1 text-xs italic text-base-content/50">{{ preferences_form.result_count.help_text }}</p>
+                    <p class="text-base-content/50 mt-1 text-xs italic">{{ preferences_form.result_count.help_text }}</p>
                     {% if preferences_form.result_count.errors %}
-                        <div class="mt-1 text-sm text-error">{{ preferences_form.result_count.errors }}</div>
+                        <div class="text-error mt-1 text-sm">{{ preferences_form.result_count.errors }}</div>
                     {% endif %}
                 </div>
             </div>
             <div class="mb-4">
                 <label for="{{ preferences_form.notes.id_for_label }}"
-                       class="block mb-2 font-medium">{{ preferences_form.notes.label }}</label>
+                       class="mb-2 block font-medium">{{ preferences_form.notes.label }}</label>
                 {{ preferences_form.notes }}
             </div>
         </div>
-        <div class="flex justify-end mt-2">
+        <div class="mt-2 flex justify-end">
             <button type="submit" class="btn btn-sm btn-soft btn-primary">{% trans "Save" %}</button>
         </div>
     </form>

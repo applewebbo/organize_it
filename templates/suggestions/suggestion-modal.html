@@ -1,6 +1,6 @@
 {% load i18n %}
 <div class="p-4 sm:p-6">
-    <div class="flex justify-between items-center mb-4">
+    <div class="mb-4 flex items-center justify-between">
         <h3 class="text-lg font-semibold">{% trans 'AI suggestions' %}</h3>
         <button type="button"
                 @click="$dispatch('hide-modal')"
@@ -16,7 +16,7 @@
         <input type="hidden" name="context" value="modal">
         {% if has_custom_stages %}
             <select name="stage_destination"
-                    class="mb-2 w-full select select-sm select-bordered">
+                    class="select select-sm select-bordered mb-2 w-full">
                 <option value="">{% trans '— all stages —' %}</option>
                 {% for stage in stages %}<option value="{{ stage.destination }}">{{ stage.destination }}</option>{% endfor %}
             </select>
@@ -25,21 +25,21 @@
                name="notes"
                placeholder="{% trans 'Notes for this trip (optional)…' %}"
                autocomplete="off"
-               class="mb-2 w-full input input-sm input-bordered" />
+               class="input input-sm input-bordered mb-2 w-full" />
         {% include "suggestions/ai-kind-filter.html" %}
         <div class="flex gap-2">
             {% if has_cache %}
                 <button type="submit"
                         name="refresh"
                         value="1"
-                        class="flex-1 btn btn-sm btn-secondary">
+                        class="btn btn-sm btn-secondary flex-1">
                     <i class="ph-bold ph-arrows-clockwise i-sm htmx-hide-on-request"></i>
                     <span id="ai-modal-spinner"
                           class="loading loading-spinner loading-xs htmx-indicator"></span>
                     {% trans 'Regenerate' %}
                 </button>
             {% else %}
-                <button type="submit" class="flex-1 btn btn-sm btn-secondary">
+                <button type="submit" class="btn btn-sm btn-secondary flex-1">
                     <i class="ph-bold ph-sparkle i-sm htmx-hide-on-request"></i>
                     <span id="ai-modal-spinner"
                           class="loading loading-spinner loading-xs htmx-indicator"></span>
@@ -47,9 +47,9 @@
                 </button>
             {% endif %}
         </div>
-        <p class="mt-1 text-xs text-base-content/50">{% trans 'Generating uses your AI provider quota.' %}</p>
+        <p class="text-base-content/50 mt-1 text-xs">{% trans 'Generating uses your AI provider quota.' %}</p>
     </form>
-    <div id="ai-modal-results" class="overflow-y-auto mt-4 max-h-96">
+    <div id="ai-modal-results" class="mt-4 max-h-96 overflow-y-auto">
         {% include "suggestions/map-suggestions-results.html" with cards=cards is_modal=True from_cache=has_cache awaiting_generation=has_cache|yesno:",True" %}
     </div>
 </div>

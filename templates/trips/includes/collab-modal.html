@@ -1,6 +1,6 @@
 {% load i18n %}
 <div class="p-4 sm:p-6" x-data="{ mode: 'editor' }">
-    <div class="flex justify-between items-center mb-4">
+    <div class="mb-4 flex items-center justify-between">
         <h3 class="text-lg font-semibold">{% trans "Participants" %}</h3>
         <button class="btn btn-sm btn-ghost btn-circle"
                 @click="$dispatch('hide-modal')"
@@ -9,36 +9,36 @@
         </button>
     </div>
     {% include "trips/includes/collab-modal-list.html" %}
-    <div class="pt-3 border-t border-base-300">
+    <div class="border-base-300 border-t pt-3">
         <!-- Mode selector -->
-        <div class="flex gap-1 p-1 mb-3 rounded-lg bg-base-200">
+        <div class="bg-base-200 mb-3 flex gap-1 rounded-lg p-1">
             <button type="button"
-                    class="flex-1 py-1 text-xs font-medium rounded-md transition-colors"
-                    :class="mode === 'editor' ? 'bg-base-100 shadow text-base-content' : 'text-base-content/60 hover:text-base-content'"
+                    class="flex-1 rounded-md py-1 text-xs font-medium transition-colors"
+                    :class="mode === 'editor' ? 'bg-base-100 text-base-content' : 'text-base-content/60 hover:text-base-content' shadow"
                     @click="mode = 'editor'">
-                <i class="mr-1 ph-bold ph-pencil"></i>{% trans "Editor" %}
+                <i class="ph-bold ph-pencil mr-1"></i>{% trans "Editor" %}
             </button>
             <button type="button"
-                    class="flex-1 py-1 text-xs font-medium rounded-md transition-colors"
-                    :class="mode === 'viewer' ? 'bg-base-100 shadow text-base-content' : 'text-base-content/60 hover:text-base-content'"
+                    class="flex-1 rounded-md py-1 text-xs font-medium transition-colors"
+                    :class="mode === 'viewer' ? 'bg-base-100 text-base-content' : 'text-base-content/60 hover:text-base-content' shadow"
                     @click="mode = 'viewer'">
-                <i class="mr-1 ph-bold ph-eye"></i>{% trans "Viewer" %}
+                <i class="ph-bold ph-eye mr-1"></i>{% trans "Viewer" %}
             </button>
             <button type="button"
-                    class="flex-1 py-1 text-xs font-medium rounded-md transition-colors"
-                    :class="mode === 'named' ? 'bg-base-100 shadow text-base-content' : 'text-base-content/60 hover:text-base-content'"
+                    class="flex-1 rounded-md py-1 text-xs font-medium transition-colors"
+                    :class="mode === 'named' ? 'bg-base-100 text-base-content' : 'text-base-content/60 hover:text-base-content' shadow"
                     @click="mode = 'named'">
-                <i class="mr-1 ph-bold ph-user-plus"></i>{% trans "Name only" %}
+                <i class="ph-bold ph-user-plus mr-1"></i>{% trans "Name only" %}
             </button>
         </div>
         <!-- Editor mode: search by email -->
         <div x-show="mode === 'editor'" x-cloak>
-            <label class="block mb-1 text-sm font-medium text-base-content/70">{% trans "Search editor by email" %}</label>
+            <label class="text-base-content/70 mb-1 block text-sm font-medium">{% trans "Search editor by email" %}</label>
             <input type="email"
                    id="collab-search-input"
                    name="collab_email"
                    placeholder="{% trans 'Search by email…' %}"
-                   class="w-full input input-bordered input-sm"
+                   class="input input-bordered input-sm w-full"
                    hx-get="{% url 'trips:search-user-by-email' trip.pk %}"
                    hx-trigger="input changed delay:400ms"
                    hx-target="#collab-search-result"
@@ -48,7 +48,7 @@
         </div>
         <!-- Viewer mode: email input → share link -->
         <div x-show="mode === 'viewer'" x-cloak>
-            <label class="block mb-1 text-sm font-medium text-base-content/70">
+            <label class="text-base-content/70 mb-1 block text-sm font-medium">
                 {% trans "Add viewer by email (receives a share link)" %}
             </label>
             <form hx-post="{% url 'trips:add-viewer-by-email' trip.pk %}"
@@ -60,7 +60,7 @@
                     <input type="email"
                            name="email"
                            placeholder="{% trans 'Email address…' %}"
-                           class="flex-1 input input-bordered input-sm"
+                           class="input input-bordered input-sm flex-1"
                            autocomplete="off"
                            required>
                     <button type="submit" class="btn btn-sm btn-soft btn-primary">{% trans "Add" %}</button>
@@ -69,7 +69,7 @@
         </div>
         <!-- Named participant mode: name only -->
         <div x-show="mode === 'named'" x-cloak>
-            <label class="block mb-1 text-sm font-medium text-base-content/70">
+            <label class="text-base-content/70 mb-1 block text-sm font-medium">
                 {% trans "Add participant by name (no account needed)" %}
             </label>
             <form hx-post="{% url 'trips:add-named-participant' trip.pk %}"
@@ -81,7 +81,7 @@
                     <input type="text"
                            name="name"
                            placeholder="{% trans 'Name…' %}"
-                           class="flex-1 input input-bordered input-sm"
+                           class="input input-bordered input-sm flex-1"
                            autocomplete="off"
                            required>
                     <button type="submit" class="btn btn-sm btn-soft btn-primary">{% trans "Add" %}</button>

@@ -2,9 +2,9 @@
 {% if results %}
     {% for result in results %}
         <div class="flex gap-2 items-center p-2 rounded-lg bg-base-200 {% if not forloop.first %}mt-2{% endif %}">
-            <span class="text-sm grow">{{ result.user.email }}</span>
+            <span class="grow text-sm">{{ result.user.email }}</span>
             {% if result.already_collab %}
-                <span class="text-xs text-base-content/60">{% trans "Already a participant." %}</span>
+                <span class="text-base-content/60 text-xs">{% trans "Already a participant." %}</span>
             {% else %}
                 <form method="post"
                       action="{% url 'trips:add-collaborator' trip.pk %}"
@@ -20,7 +20,7 @@
         </div>
     {% endfor %}
 {% elif email %}
-    <div class="flex gap-2 items-center p-2 text-sm rounded-lg bg-base-200">
+    <div class="bg-base-200 flex items-center gap-2 rounded-lg p-2 text-sm">
         <i class="ph-bold ph-user-circle-dashed text-base-content/60 i-md"></i>
         <span class="text-base-content/60 grow">{% trans "No account found." %}</span>
         <form method="post"

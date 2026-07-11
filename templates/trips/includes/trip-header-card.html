@@ -1,7 +1,7 @@
 {% load i18n trip_tags static %}
-<div class="overflow-hidden shadow card card-border bg-base-100">
+<div class="card card-border bg-base-100 overflow-hidden shadow">
     <!-- Top Bar: Title, Actions -->
-    <div class="flex gap-2 justify-between items-center p-3 border-b sm:gap-y-3 sm:p-6 border-base-300">
+    <div class="border-base-300 flex items-center justify-between gap-2 border-b p-3 sm:gap-y-3 sm:p-6">
         <!-- Mobile: Title and Buttons -->
         <h2 class="text-xl font-semibold tracking-tight sm:hidden">{{ trip.title }}</h2>
         <div x-data class="flex gap-1.5 sm:hidden">
@@ -30,7 +30,7 @@
                     <i class="ph-bold ph-share-network i-sm" aria-hidden="true"></i>
                 </button>
                 <ul tabindex="0"
-                    class="z-10 p-2 w-48 shadow dropdown-content menu bg-base-100 rounded-box">
+                    class="dropdown-content menu bg-base-100 rounded-box z-10 w-48 p-2 shadow">
                     {% if trip.status != 5 and request.user == trip.author %}
                         <li>
                             <button hx-get="{% url 'trips:share-link-create' trip.pk %}"
@@ -59,7 +59,7 @@
             </div>
         </div>
         <!-- Desktop: Full Layout -->
-        <div class="hidden sm:flex sm:gap-2 sm:items-center sm:grow">
+        <div class="hidden sm:flex sm:grow sm:items-center sm:gap-2">
             <h2 class="text-3xl font-semibold tracking-tight">{{ trip.title }}</h2>
         </div>
         <div x-data class="hidden gap-2 sm:flex">
@@ -103,7 +103,7 @@
                     <span class="hidden sm:inline">{% trans 'Share' %}</span>
                 </button>
                 <ul tabindex="0"
-                    class="z-10 p-2 w-48 shadow dropdown-content menu bg-base-100 rounded-box">
+                    class="dropdown-content menu bg-base-100 rounded-box z-10 w-48 p-2 shadow">
                     {% if trip.status != 5 and request.user == trip.author %}
                         <li>
                             <button hx-get="{% url 'trips:share-link-create' trip.pk %}"
@@ -133,10 +133,10 @@
         </div>
     </div>
     <!-- Center: Trip Image -->
-    <figure class="relative w-full h-48 md:h-80">
+    <figure class="relative h-48 w-full md:h-80">
         {% include "trips/includes/trip-image.html" with trip=trip image_loading="eager" image_placeholder="img/trip_generic_detail.jpg" %}
         {% if trip.needs_attribution and not trip.image_metadata.pending %}
-            <div class="absolute bottom-3 left-3 py-1 px-2 text-xs text-white rounded bg-black/50">
+            <div class="absolute bottom-3 left-3 rounded bg-black/50 px-2 py-1 text-xs text-white">
                 {{ trip.get_attribution_text }}
             </div>
         {% endif %}
@@ -148,10 +148,10 @@
     <!-- Bottom Bar: Trip Details -->
     <div class="p-3 sm:p-6">
         <div id="trip-details" class="mb-3 text-sm md:text-base">
-            <div class="flex flex-col gap-y-2 md:flex-row md:gap-y-0 md:gap-x-4 lg:gap-x-6">
+            <div class="flex flex-col gap-y-2 md:flex-row md:gap-x-4 md:gap-y-0 lg:gap-x-6">
                 <!-- Dates Row -->
-                <div class="flex gap-1.5 items-center">
-                    <i class="sm:hidden ph-bold ph-calendar-blank text-base-content/60"
+                <div class="flex items-center gap-1.5">
+                    <i class="ph-bold ph-calendar-blank text-base-content/60 sm:hidden"
                        aria-hidden="true"></i>
                     <span class="hidden md:inline">{% trans "Start Date:" %}&nbsp;</span><strong>{{ trip.start_date|date:"d F" }}</strong>
                     <span class="sm:hidden">&nbsp;-&nbsp;</span>
@@ -159,8 +159,8 @@
                     <span class="hidden md:inline">{% trans "End Date:" %}&nbsp;</span><strong>{{ trip.end_date|date:"d F" }}</strong>
                 </div>
                 <!-- Destination Row -->
-                <div class="flex gap-1.5 items-center">
-                    <i class="sm:hidden ph-bold ph-path text-base-content/60"
+                <div class="flex items-center gap-1.5">
+                    <i class="ph-bold ph-path text-base-content/60 sm:hidden"
                        aria-hidden="true"></i>
                     <span class="hidden md:inline">{% trans "Destination:" %}&nbsp;</span><strong>{{ trip.destination }}</strong>
                 </div>

@@ -5,7 +5,7 @@
     {% get_current_language as current_language %}
     <select id="language-select"
             name="language"
-            class="block p-1 w-full text-sm rounded-md md:p-1.5 bg-base-200 text-base-content"
+            class="bg-base-200 text-base-content block w-full rounded-md p-1 text-sm md:p-1.5"
             hx-post="{% url 'set_language' %}"
             hx-trigger="change"
             hx-swap="none"

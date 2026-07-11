@@ -1,24 +1,24 @@
 {% load trip_tags i18n %}
-<div class="flex justify-between items-center p-4 rounded-t border-b md:py-2.5 md:px-5 border-base-300">
+<div class="border-base-300 flex items-center justify-between rounded-t border-b p-4 md:px-5 md:py-2.5">
     <h3 id="stay-title"
         class="text-xl font-semibold text-gray-900 dark:text-white">{{ stay.name }}</h3>
     <button type="button"
             class="btn btn-ghost btn-circle btn-sm"
             x-on:click="openModal = false">
-        <i class="text-xl ph-bold ph-x"></i>
+        <i class="ph-bold ph-x text-xl"></i>
         <span class="sr-only">Close modal</span>
     </button>
 </div>
 <div id="stay-details">
     {% if show_preview %}
         <div class="p-4 md:p-5">
-            <div class="mb-4 alert alert-info alert-soft">
-                <i class="text-xl ph-bold ph-info"></i>
+            <div class="alert alert-info alert-soft mb-4">
+                <i class="ph-bold ph-info text-xl"></i>
                 <span>{% trans 'Review the enriched data below. New information is highlighted in green.' %}</span>
             </div>
             <div class="grid grid-cols-1 gap-1 sm:gap-2">{% include 'trips/includes/stay-preview.html' %}</div>
         </div>
-        <div class="flex gap-2 justify-end items-center p-4 px-8 rounded-b border-t md:p-5 border-base-300">
+        <div class="border-base-300 flex items-center justify-end gap-2 rounded-b border-t p-4 px-8 md:p-5">
             <form hx-post="{% url 'trips:confirm-enrich-stay' stay.id %}"
                   hx-target="#dialog"
                   hx-swap="innerHTML">
@@ -35,7 +35,7 @@
                 {% endif %}
                 <div class="flex gap-2">
                     <button type="submit" class="btn btn-success btn-soft">
-                        <i class="text-xl ph-bold ph-check"></i>
+                        <i class="ph-bold ph-check text-xl"></i>
                         <span>{% trans 'Accept' %}</span>
                     </button>
                     <button type="button"
@@ -43,7 +43,7 @@
                             hx-target="#dialog"
                             hx-swap="innerHTML"
                             class="btn btn-error btn-soft">
-                        <i class="text-xl ph-bold ph-x"></i>
+                        <i class="ph-bold ph-x text-xl"></i>
                         <span>{% trans 'Cancel' %}</span>
                     </button>
                 </div>
@@ -52,17 +52,17 @@
     {% elif error_message %}
         <div class="p-4 md:p-5">
             <div role="alert" class="alert alert-error alert-soft">
-                <i class="text-xl ph-bold ph-warning"></i>
+                <i class="ph-bold ph-warning text-xl"></i>
                 <span>{{ error_message }}</span>
             </div>
         </div>
-        <div class="flex gap-2 justify-end items-center p-4 px-8 rounded-b border-t md:p-5 border-base-300">
+        <div class="border-base-300 flex items-center justify-end gap-2 rounded-b border-t p-4 px-8 md:p-5">
             <button type="button"
                     hx-get="{% url 'trips:stay-detail' stay.pk %}"
                     hx-target="#dialog"
                     hx-swap="innerHTML"
                     class="btn btn-soft btn-neutral">
-                <i class="text-xl ph-bold ph-arrow-left"></i>
+                <i class="ph-bold ph-arrow-left text-xl"></i>
                 <span>{% trans 'Back' %}</span>
             </button>
         </div>

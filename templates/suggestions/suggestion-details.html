@@ -1,8 +1,8 @@
 {% load i18n %}
 {% if error %}
-    <p class="mt-1 text-xs text-error">{{ error }}</p>
+    <p class="text-error mt-1 text-xs">{{ error }}</p>
 {% elif place %}
-    <div class="mt-2 space-y-1 text-xs text-base-content/70">
+    <div class="text-base-content/70 mt-2 space-y-1 text-xs">
         {% if place.website %}
             <p>
                 <i class="ph-bold ph-globe i-xs"></i>

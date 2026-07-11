@@ -8,15 +8,15 @@
         <!-- Back link -->
         <div class="mb-4">
             <a href="{% url 'trips:trip-detail' trip.pk %}"
-               class="gap-1 btn btn-ghost btn-sm">
+               class="btn btn-ghost btn-sm gap-1">
                 <i class="ph ph-arrow-left"></i>
                 {{ trip.title }}
             </a>
         </div>
         <!-- Header -->
-        <div class="mb-6 shadow card bg-base-100">
+        <div class="card bg-base-100 mb-6 shadow">
             <div class="card-body">
-                <h1 class="flex gap-2 items-center text-2xl font-semibold card-title">
+                <h1 class="card-title flex items-center gap-2 text-2xl font-semibold">
                     <i class="ph ph-check-square text-primary"></i>
                     {% trans "Pre-departure Checklist" %}
                 </h1>
@@ -26,7 +26,7 @@
             </div>
         </div>
         <!-- Add item form -->
-        <div class="mb-4 shadow card bg-base-100">
+        <div class="card bg-base-100 mb-4 shadow">
             <div class="card-body">
                 <form hx-post="{% url 'trips:checklist-item-add' trip.pk %}"
                       hx-target="#checklist-list"
@@ -36,7 +36,7 @@
                     <div class="flex gap-2">
                         <input type="text"
                                name="text"
-                               class="flex-1 input input-bordered"
+                               class="input input-bordered flex-1"
                                placeholder="{% trans 'Add an item…' %}"
                                required
                                autocomplete="off">

@@ -1,7 +1,7 @@
 {% load i18n %}
 <div class="p-4 sm:p-6"
      x-data="{ destination: '', destinationLat: '', destinationLon: '', citySelected: false, selectCity(name, lat, lon) { this.destination = name; this.destinationLat = lat; this.destinationLon = lon; this.citySelected = true; htmx.find('#city-results').innerHTML = ''; } }">
-    <div class="flex gap-2 items-center mb-4">
+    <div class="mb-4 flex items-center gap-2">
         <button class="btn btn-sm btn-ghost btn-circle"
                 hx-get="{% url 'trips:trip-destinations' trip.pk %}"
                 hx-target="#dialog"
@@ -23,7 +23,7 @@
         <input type="hidden" name="destination_latitude" :value="destinationLat">
         <input type="hidden" name="destination_longitude" :value="destinationLon">
         <div class="mb-1">
-            <label class="block mb-1 text-sm font-medium">{% trans "Destination" %}</label>
+            <label class="mb-1 block text-sm font-medium">{% trans "Destination" %}</label>
             <div class="relative">
                 <input type="text"
                        name="destination"
@@ -31,7 +31,7 @@
                        x-model="destination"
                        @input="citySelected = false; destinationLat = ''; destinationLon = '';"
                        placeholder="{{ trip.destination }}"
-                       class="w-full input input-bordered input-sm"
+                       class="input input-bordered input-sm w-full"
                        autocomplete="off"
                        hx-post="{% url 'trips:geocode-city' %}"
                        hx-trigger="input changed delay:600ms"
@@ -39,20 +39,20 @@
                        hx-swap="innerHTML"
                        hx-indicator="#city-spinner">
                 <span id="city-spinner"
-                      class="absolute right-2 top-1/2 -translate-y-1/2 htmx-indicator">
+                      class="htmx-indicator absolute top-1/2 right-2 -translate-y-1/2">
                     <span class="loading loading-spinner loading-xs"></span>
                 </span>
             </div>
             <div id="city-results"></div>
             <p x-show="citySelected"
-               class="flex gap-1 items-center mt-1 text-xs text-success">
+               class="text-success mt-1 flex items-center gap-1 text-xs">
                 <i class="ph-bold ph-check-circle i-xs"></i>
                 {% trans "City confirmed" %}
             </p>
         </div>
         <div class="mb-4">
-            <label class="block mb-2 text-sm font-medium">{% trans "Select days" %}</label>
-            <div class="flex overflow-y-auto flex-col gap-2 max-h-64">
+            <label class="mb-2 block text-sm font-medium">{% trans "Select days" %}</label>
+            <div class="flex max-h-64 flex-col gap-2 overflow-y-auto">
                 {% for day in days %}
                     <label class="flex items-center gap-3 p-2 rounded-md cursor-pointer {% if day.pk in custom_day_pks %}opacity-40 cursor-not-allowed{% else %}hover:bg-base-200{% endif %}">
                         <input type="checkbox"
@@ -62,14 +62,14 @@
                                {% if day.pk in custom_day_pks %}disabled{% endif %}>
                         <span class="flex-1 text-sm">
                             <span class="font-medium">{% trans "Day" %} {{ day.number }}</span>
-                            <span class="ml-2 text-base-content/60">{{ day.date|date:"D, d M" }}</span>
+                            <span class="text-base-content/60 ml-2">{{ day.date|date:"D, d M" }}</span>
                         </span>
-                        {% if day.pk in custom_day_pks %}<span class="text-xs text-base-content/40">{{ day.destination }}</span>{% endif %}
+                        {% if day.pk in custom_day_pks %}<span class="text-base-content/40 text-xs">{{ day.destination }}</span>{% endif %}
                     </label>
                 {% endfor %}
             </div>
         </div>
-        <button type="submit" class="w-full btn btn-sm btn-primary">
+        <button type="submit" class="btn btn-sm btn-primary w-full">
             <i class="ph-bold ph-check i-sm"></i>
             {% trans "Create stage" %}
         </button>

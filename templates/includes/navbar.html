@@ -1,15 +1,15 @@
 {% load static i18n %}
 {% include 'includes/theme-init.html' %}
 <div x-data="{ open: false}">
-    <nav nav class="shadow bg-base-100 border-base-200">
-        <div class="flex flex-wrap items-center p-5 mx-auto max-w-7xl lg:p-6">
+    <nav nav class="bg-base-100 border-base-200 shadow">
+        <div class="mx-auto flex max-w-7xl flex-wrap items-center p-5 lg:p-6">
             <a href="{% url 'trips:home' %}"
-               class="flex items-center space-x-3 rtl:space-x-reverse grow">
+               class="flex grow items-center space-x-3 rtl:space-x-reverse">
                 <img src="{% static 'img/logo.png' %}" class="size-10" alt="Logo">
                 <span class="hidden self-center text-lg font-semibold whitespace-nowrap sm:block sm:text-xl md:text-2xl dark:text-white">Organizeit!</span>
             </a>
             <div class="flex items-center space-x-3 md:order-2 md:space-x-0 rtl:space-x-reverse">
-                <div class="flex gap-4 me-4">
+                <div class="me-4 flex gap-4">
                     {% if not user.is_authenticated or not use_system_theme %}
                         {% include 'includes/theme-switcher.html' %}
                     {% endif %}
@@ -27,7 +27,7 @@
                        class="btn btn-xs btn-primary md:btn-sm">{% trans 'Login' %}</a>
                 {% endif %}
                 <button type="button"
-                        class="inline-flex justify-center items-center p-2 w-10 h-10 text-sm text-gray-500 rounded-lg md:hidden dark:text-gray-400 hover:bg-gray-100 focus:ring-2 focus:ring-gray-200 focus:outline-none dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+                        class="inline-flex h-10 w-10 items-center justify-center rounded-lg p-2 text-sm text-gray-500 hover:bg-gray-100 focus:ring-2 focus:ring-gray-200 focus:outline-none md:hidden dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
                         aria-controls="navbar-cta"
                         aria-expanded="false"
                         x-on:click="open = ! open">
@@ -36,45 +36,45 @@
                     <i class="ph-bold ph-x i-md" x-show='open' aria-hidden='true'></i>
                 </button>
             </div>
-            <div class="hidden justify-between items-center w-full md:flex md:order-1 md:w-auto md:me-8"
+            <div class="hidden w-full items-center justify-between md:order-1 md:me-8 md:flex md:w-auto"
                  id="navbar-cta">
-                <ul class="flex flex-col p-4 mt-4 font-medium md:flex-row md:p-0 md:mt-0 md:space-x-8 md:border-0 border-slate-100 rtl:space-x-reverse">
+                <ul class="mt-4 flex flex-col border-slate-100 p-4 font-medium md:mt-0 md:flex-row md:space-x-8 md:border-0 md:p-0 rtl:space-x-reverse">
                     <li>
                         <a href="{% url 'trips:home' %}"
-                           class="block py-2 px-3 text-white rounded md:p-0 md:text-tr-blue-700 md:dark:text-tr-blue-500"
+                           class="md:text-tr-blue-700 md:dark:text-tr-blue-500 block rounded px-3 py-2 text-white md:p-0"
                            aria-current="page">Home</a>
                     </li>
                     <li>
                         <a href="{% url 'trips:trip-list' %}"
-                           class="block py-2 px-3 text-gray-900 rounded md:p-0 dark:text-white md:hover:bg-transparent md:hover:text-tr-blue-700 md:dark:hover:text-tr-blue-500 md:dark:hover:bg-transparent dark:border-slate-700 dark:hover:bg-gray-700 dark:hover:text-white hover:bg-slate-100">{% trans 'Trips' %}</a>
+                           class="md:hover:text-tr-blue-700 md:dark:hover:text-tr-blue-500 block rounded px-3 py-2 text-gray-900 hover:bg-slate-100 md:p-0 md:hover:bg-transparent dark:border-slate-700 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">{% trans 'Trips' %}</a>
                     </li>
                     {% if user.is_authenticated %}
                         <li>
                             <a href="{% url 'accounts:profile' %}"
-                               class="block py-2 px-3 text-gray-900 rounded md:p-0 dark:text-white md:hover:bg-transparent md:hover:text-tr-blue-700 md:dark:hover:text-tr-blue-500 md:dark:hover:bg-transparent dark:border-slate-700 dark:hover:bg-gray-700 dark:hover:text-white hover:bg-slate-100">{% trans 'Settings' %}</a>
+                               class="md:hover:text-tr-blue-700 md:dark:hover:text-tr-blue-500 block rounded px-3 py-2 text-gray-900 hover:bg-slate-100 md:p-0 md:hover:bg-transparent dark:border-slate-700 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">{% trans 'Settings' %}</a>
                         </li>
                     {% endif %}
                 </ul>
             </div>
         </div>
-        <div class="justify-between items-center w-full md:hidden"
+        <div class="w-full items-center justify-between md:hidden"
              x-cloak
              x-show="open"
              x-collapse.duration.500>
-            <ul class="flex flex-col gap-x-0 gap-y-4 py-4 px-5">
+            <ul class="flex flex-col gap-x-0 gap-y-4 px-5 py-4">
                 <li>
                     <a href="{% url 'trips:home' %}"
-                       class="font-medium text-tr-blue-600 dark:text-tr-blue-500"
+                       class="text-tr-blue-600 dark:text-tr-blue-500 font-medium"
                        aria-current="page">Home</a>
                 </li>
                 <li>
                     <a href="{% url 'trips:trip-list' %}"
-                       class="font-medium text-gray-500 sm:py-6 dark:text-gray-400 hover:text-gray-400 dark:hover:text-gray-500">{% trans 'Trips' %}</a>
+                       class="font-medium text-gray-500 hover:text-gray-400 sm:py-6 dark:text-gray-400 dark:hover:text-gray-500">{% trans 'Trips' %}</a>
                 </li>
                 {% if user.is_authenticated %}
                     <li>
                         <a href="{% url 'accounts:profile' %}"
-                           class="font-medium text-gray-500 sm:py-6 dark:text-gray-400 hover:text-gray-400 dark:hover:text-gray-500">{% trans 'Settings' %}</a>
+                           class="font-medium text-gray-500 hover:text-gray-400 sm:py-6 dark:text-gray-400 dark:hover:text-gray-500">{% trans 'Settings' %}</a>
                     </li>
                 {% endif %}
             </ul>
