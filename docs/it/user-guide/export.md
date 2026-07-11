@@ -53,13 +53,13 @@ Ogni viaggio ha un **token calendario** univoco e non indovinabile. L'URL del fe
 https://<dominio>/ical/<calendar-token>/
 ```
 
-Il token viene generato automaticamente alla creazione del viaggio e rimane stabile. Chiunque abbia l'URL può leggere il feed, quindi trattalo come un link privato.
+Il token viene generato automaticamente alla creazione del viaggio. Chiunque abbia l'URL può leggere il feed, quindi trattalo come un link privato — e reimpostalo se condiviso per errore (vedi [Reimpostare il link](#reimpostare-il-link)).
 
 ### Iscriversi
 
 1. Apri la pagina di dettaglio del viaggio
 2. Clicca il menu **Condividi & Esporta**
-3. Clicca **Calendario** — si apre una nuova scheda con l'URL del feed
+3. Clicca **Calendario** — si apre una nuova scheda con l'URL del feed (l'autore del viaggio può invece aprire **Link calendario** per copiare l'URL e gestire il feed)
 4. Copia l'URL
 5. Nella tua app di calendario, aggiungi un'**iscrizione** (non un'importazione) usando l'URL:
     - **Apple Calendar**: File → Nuova iscrizione a calendario
@@ -80,9 +80,16 @@ Trattandosi di un'**iscrizione**, la tua app di calendario aggiorna periodicamen
 !!! warning "Non importare — iscriviti"
     Se *importi* il file, ottieni una fotografia statica che non si aggiorna. Usa sempre l'opzione *iscriviti* / *aggiungi da URL*.
 
-### Revocare l'accesso
+### Reimpostare il link
 
-Per revocare il feed, contatta l'amministratore del viaggio. Una versione futura permetterà di rigenerare il token calendario direttamente dalle impostazioni del viaggio.
+Se l'URL del feed viene condiviso per errore, l'autore del viaggio può reimpostarlo:
+
+1. Apri la pagina di dettaglio del viaggio
+2. Clicca il menu **Condividi & Esporta**
+3. Clicca **Link calendario**
+4. Clicca **Reimposta link calendario**
+
+La reimpostazione genera un nuovo token: il vecchio URL smette immediatamente di funzionare, le iscrizioni esistenti non si aggiornano più e viene mostrato un nuovo URL da condividere.
 
 ## Domande frequenti
 

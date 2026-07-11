@@ -68,6 +68,67 @@ def test_export_trip_ical_not_found(tp):
     tp.response_404(response)
 
 
+def test_calendar_settings_modal_shows_feed_url(client, trip):
+    client.force_login(trip.author)
+    url = reverse("trips:trip-calendar-settings", kwargs={"trip_id": trip.pk})
+    response = client.get(url)
+    assert response.status_code == 200
+    feed_path = reverse(
+        "trips:trip-ical", kwargs={"calendar_token": trip.calendar_token}
+    )
+    assert feed_path in response.content.decode()
+
+
+def test_calendar_settings_requires_owner(client, trip, user_factory):
+    client.force_login(user_factory())
+    url = reverse("trips:trip-calendar-settings", kwargs={"trip_id": trip.pk})
+    response = client.get(url)
+    assert response.status_code == 404
+
+
+def test_rotate_calendar_token_changes_token(client, trip):
+    client.force_login(trip.author)
+    old_token = trip.calendar_token
+    url = reverse("trips:trip-calendar-settings", kwargs={"trip_id": trip.pk})
+    response = client.post(url)
+    assert response.status_code == 200
+    trip.refresh_from_db()
+    assert trip.calendar_token != old_token
+
+
+def test_rotate_calendar_token_invalidates_old_url(tp, client, trip):
+    old_token = trip.calendar_token
+    old_feed = reverse("trips:trip-ical", kwargs={"calendar_token": old_token})
+    tp.response_200(tp.get(old_feed))
+
+    client.force_login(trip.author)
+    url = reverse("trips:trip-calendar-settings", kwargs={"trip_id": trip.pk})
+    client.post(url)
+
+    tp.response_404(tp.get(old_feed))
+    trip.refresh_from_db()
+    new_feed = reverse(
+        "trips:trip-ical", kwargs={"calendar_token": trip.calendar_token}
+    )
+    tp.response_200(tp.get(new_feed))
+
+
+def test_rotate_calendar_token_non_owner_forbidden(client, trip, user_factory):
+    client.force_login(user_factory())
+    old_token = trip.calendar_token
+    url = reverse("trips:trip-calendar-settings", kwargs={"trip_id": trip.pk})
+    response = client.post(url)
+    assert response.status_code == 404
+    trip.refresh_from_db()
+    assert trip.calendar_token == old_token
+
+
+def test_rotate_calendar_token_requires_login(client, trip):
+    url = reverse("trips:trip-calendar-settings", kwargs={"trip_id": trip.pk})
+    response = client.post(url)
+    assert response.status_code == 302
+
+
 def test_export_trip_ical_departure_transfer_with_notes(
     tp, trip, main_transfer_factory
 ):

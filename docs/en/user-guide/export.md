@@ -52,13 +52,13 @@ Each trip has a unique, unguessable **calendar token**. The feed URL contains th
 https://<your-org-domain>/ical/<calendar-token>/
 ```
 
-The token is generated automatically when the trip is created and stays stable. Anyone with the URL can read the feed, so treat it like a private link.
+The token is generated automatically when the trip is created. Anyone with the URL can read the feed, so treat it like a private link — and reset it if it was shared by mistake (see [Resetting the link](#resetting-the-link)).
 
 ### Subscribing
 
 1. Open the trip detail page
 2. Click the **Share & Export** menu
-3. Click **Calendar** — a new tab opens with the feed URL
+3. Click **Calendar** — a new tab opens with the feed URL (the trip author can instead open **Calendar link** to copy the URL and manage the feed)
 4. Copy the URL
 5. In your calendar app, add a **subscription** (not an import) using the URL:
     - **Apple Calendar**: File → New Calendar Subscription
@@ -79,9 +79,16 @@ Because it is a **subscription**, your calendar app refreshes the feed periodica
 !!! warning "Don't import — subscribe"
     If you *import* the file, you get a one-time snapshot that won't update. Always use the *subscribe* / *add by URL* option.
 
-### Revoking access
+### Resetting the link
 
-To revoke the feed, contact your trip administrator. A future release will let you rotate the calendar token directly from the trip settings.
+If the feed URL is shared by mistake, the trip author can reset it:
+
+1. Open the trip detail page
+2. Click the **Share & Export** menu
+3. Click **Calendar link**
+4. Click **Reset calendar link**
+
+Resetting generates a new token: the old URL immediately stops working, existing subscriptions stop updating, and a new URL is shown to share again.
 
 ## FAQ
 

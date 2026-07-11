@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-11 20:57+0200\n"
+"POT-Creation-Date: 2026-07-11 21:30+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -816,7 +816,7 @@ msgstr ""
 #: templates/trips/includes/main-transfers.html:170
 #: templates/trips/includes/main-transfers.html:345
 #: templates/trips/includes/note.html:8
-#: templates/trips/includes/trip-header-card.html:95
+#: templates/trips/includes/trip-header-card.html:106
 #: templates/trips/main-transfer-connection-modal.html:37
 #: templates/trips/stay-detail.html:84 templates/trips/trip-list.html:89
 #: templates/trips/trip-list.html:165
@@ -1018,6 +1018,7 @@ msgid "Add Arrival Transfer"
 msgstr ""
 
 #: templates/trips/arrival-transfer-modal.html:16
+#: templates/trips/calendar-feed-modal.html:9
 #: templates/trips/departure-transfer-modal.html:16
 #: templates/trips/edit-main-transfer-modal.html:27
 #: templates/trips/event-modal.html:14 templates/trips/event-notes.html:14
@@ -1082,6 +1083,42 @@ msgstr ""
 
 #: templates/trips/attachments/upload-modal.html:39
 msgid "Upload"
+msgstr ""
+
+#: templates/trips/calendar-feed-modal.html:4
+msgid "Calendar feed"
+msgstr ""
+
+#: templates/trips/calendar-feed-modal.html:16 trips/views/ical.py:35
+msgid "Calendar link reset. The previous URL no longer works."
+msgstr ""
+
+#: templates/trips/calendar-feed-modal.html:20
+msgid ""
+"Subscribe to this trip from any calendar app using the private link below. "
+"Anyone with the link can read the feed, so treat it as private."
+msgstr ""
+
+#: templates/trips/calendar-feed-modal.html:30
+#: templates/trips/share-link-modal.html:27
+#: templates/trips/share-link-modal.html:51
+msgid "Copied!"
+msgstr ""
+
+#: templates/trips/calendar-feed-modal.html:30
+#: templates/trips/share-link-modal.html:27
+#: templates/trips/share-link-modal.html:51
+msgid "Copy link"
+msgstr ""
+
+#: templates/trips/calendar-feed-modal.html:37
+msgid ""
+"Reset the link if it was shared by mistake. Existing subscriptions will stop "
+"updating and a new link will be generated."
+msgstr ""
+
+#: templates/trips/calendar-feed-modal.html:45
+msgid "Reset calendar link"
 msgstr ""
 
 #: templates/trips/checklist.html:21
@@ -1272,7 +1309,7 @@ msgid "Check-out:"
 msgstr ""
 
 #: templates/trips/email/daily_digest_body.html:117
-#: templates/trips/includes/trip-header-card.html:82
+#: templates/trips/includes/trip-header-card.html:93
 #: templates/trips/trip-map.html:21 templates/trips/trip-pdf.html:218
 #: trips/views/attachments.py:136
 msgid "Events"
@@ -2084,57 +2121,62 @@ msgid "Confirm delete"
 msgstr "Confirm delete"
 
 #: templates/trips/includes/trip-header-card.html:14
-#: templates/trips/includes/trip-header-card.html:74
+#: templates/trips/includes/trip-header-card.html:85
 msgid "Manage stages"
 msgstr "Manage stages"
 
 #: templates/trips/includes/trip-header-card.html:22
-#: templates/trips/includes/trip-header-card.html:93
+#: templates/trips/includes/trip-header-card.html:104
 msgid "Edit trip"
 msgstr ""
 
 #: templates/trips/includes/trip-header-card.html:29
-#: templates/trips/includes/trip-header-card.html:101
+#: templates/trips/includes/trip-header-card.html:112
 msgid "Share & Export"
 msgstr "Share & Export"
 
 #: templates/trips/includes/trip-header-card.html:41
-#: templates/trips/includes/trip-header-card.html:114
+#: templates/trips/includes/trip-header-card.html:125
 msgid "Link"
 msgstr "Link"
 
 #: templates/trips/includes/trip-header-card.html:48
-#: templates/trips/includes/trip-header-card.html:121
+#: templates/trips/includes/trip-header-card.html:132
 msgid "PDF"
 msgstr ""
 
 #: templates/trips/includes/trip-header-card.html:55
-#: templates/trips/includes/trip-header-card.html:128
+#: templates/trips/includes/trip-header-card.html:139
 msgid "Calendar"
 msgstr ""
 
-#: templates/trips/includes/trip-header-card.html:76
+#: templates/trips/includes/trip-header-card.html:65
+#: templates/trips/includes/trip-header-card.html:149
+msgid "Calendar link"
+msgstr ""
+
+#: templates/trips/includes/trip-header-card.html:87
 msgid "Stages"
 msgstr "Stages"
 
-#: templates/trips/includes/trip-header-card.html:80
+#: templates/trips/includes/trip-header-card.html:91
 msgid "Add events"
 msgstr "Add events"
 
-#: templates/trips/includes/trip-header-card.html:103
+#: templates/trips/includes/trip-header-card.html:114
 #: templates/trips/trip-list.html:84
 msgid "Share"
 msgstr ""
 
-#: templates/trips/includes/trip-header-card.html:156
+#: templates/trips/includes/trip-header-card.html:178
 msgid "Start Date:"
 msgstr ""
 
-#: templates/trips/includes/trip-header-card.html:159
+#: templates/trips/includes/trip-header-card.html:181
 msgid "End Date:"
 msgstr ""
 
-#: templates/trips/includes/trip-header-card.html:165
+#: templates/trips/includes/trip-header-card.html:187
 msgid "Destination:"
 msgstr ""
 
@@ -2419,16 +2461,6 @@ msgstr ""
 
 #: templates/trips/share-link-list.html:41
 msgid "No active share links."
-msgstr ""
-
-#: templates/trips/share-link-modal.html:27
-#: templates/trips/share-link-modal.html:51
-msgid "Copied!"
-msgstr ""
-
-#: templates/trips/share-link-modal.html:27
-#: templates/trips/share-link-modal.html:51
-msgid "Copy link"
 msgstr ""
 
 #: templates/trips/share-link-modal.html:35

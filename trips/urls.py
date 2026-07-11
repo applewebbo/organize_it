@@ -270,6 +270,11 @@ urlpatterns += htmx_urlpatterns
 urlpatterns += [
     path("share/<uuid:token>/", views.shared_trip_detail, name="shared-trip"),
     path("ical/<uuid:calendar_token>/", views.export_trip_ical, name="trip-ical"),
+    path(
+        "trips/<int:trip_id>/calendar/",
+        views.calendar_feed_settings,
+        name="trip-calendar-settings",
+    ),
     # Unified trip map
     path("trips/<int:pk>/map/", views.trip_map, name="trip-map"),
     path("trips/<int:pk>/map/search/", views.map_search, name="map-search"),

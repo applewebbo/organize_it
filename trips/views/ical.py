@@ -1,12 +1,45 @@
 import datetime
+import uuid
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_not_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.template.response import TemplateResponse
+from django.utils.translation import gettext_lazy as _
+from django.views.decorators.http import require_http_methods
 from icalendar import Calendar
 from icalendar import Event as ICalEvent
 
 from trips.models import MainTransfer, Trip
+from trips.utils import get_trip_for_owner_or_404
+
+
+@require_http_methods(["GET", "POST"])
+def calendar_feed_settings(request, trip_id):
+    """Show the calendar feed URL and let the author rotate its token (owner only).
+
+    Rotating assigns a fresh calendar_token, which invalidates the previous
+    feed URL so a leaked or shared link can be revoked.
+    """
+    trip = get_trip_for_owner_or_404(trip_id, request.user)
+
+    rotated = False
+    if request.method == "POST":
+        trip.calendar_token = uuid.uuid4()
+        trip.save(update_fields=["calendar_token"])
+        rotated = True
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            _("Calendar link reset. The previous URL no longer works."),
+        )
+
+    return TemplateResponse(
+        request,
+        "trips/calendar-feed-modal.html",
+        {"trip": trip, "rotated": rotated},
+    )
 
 
 @login_not_required
