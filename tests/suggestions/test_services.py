@@ -2,6 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from django.core.cache import cache
+from django.test import override_settings
 
 from suggestions.ai.base import AISuggestionError
 from suggestions.schemas import Suggestion, SuggestionPrefs, TripContext
@@ -657,3 +658,120 @@ class TestCacheTTLs:
         assert ttls_by_key[last_key] == _LAST_TTL == 48 * 3600
         prefs_ttls = [t for k, t in ttls_by_key.items() if k != last_key]
         assert prefs_ttls and all(t == _CACHE_TTL == 24 * 3600 for t in prefs_ttls)
+
+
+class TestGenerationQuota:
+    """Daily caps prevent shared-key abuse: a real provider call (cache miss or
+    Regenerate) is counted per executing user and per trip; cache hits are free.
+    """
+
+    def _setup(self, mock_get_provider, mock_client):
+        provider = MagicMock()
+        provider.generate.return_value = [
+            Suggestion(kind="experience", name="X", type=1)
+        ]
+        mock_get_provider.return_value = provider
+        mock_client.return_value.search_text.return_value = [PLACE]
+        return provider
+
+    @override_settings(
+        AI_GENERATION_DAILY_CAP_PER_USER=1, AI_GENERATION_DAILY_CAP_PER_TRIP=100
+    )
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_per_user_cap_blocks_further_generations(
+        self, mock_get_provider, mock_client
+    ):
+        provider = self._setup(mock_get_provider, mock_client)
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+
+        generate_suggestions(creds.user, trip)  # consumes the single allowance
+        with pytest.raises(AISuggestionError) as exc:
+            generate_suggestions(creds.user, trip, force_refresh=True)
+
+        assert exc.value.kind == AISuggestionError.RATE_LIMIT
+        # blocked before spending the provider quota
+        assert provider.generate.call_count == 1
+
+    @override_settings(
+        AI_GENERATION_DAILY_CAP_PER_USER=100, AI_GENERATION_DAILY_CAP_PER_TRIP=1
+    )
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_per_trip_cap_is_shared_across_collaborators(
+        self, mock_get_provider, mock_client
+    ):
+        self._setup(mock_get_provider, mock_client)
+        author_creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=author_creds.user)
+        collaborator = UserFactory()
+        AICredentialsFactory(user=collaborator)
+        _add_collaborator(trip, collaborator)
+
+        generate_suggestions(author_creds.user, trip)  # trip allowance spent
+        with pytest.raises(AISuggestionError) as exc:
+            generate_suggestions(collaborator, trip, force_refresh=True)
+
+        assert exc.value.kind == AISuggestionError.RATE_LIMIT
+
+    @override_settings(
+        AI_GENERATION_DAILY_CAP_PER_USER=1, AI_GENERATION_DAILY_CAP_PER_TRIP=100
+    )
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_cache_hits_do_not_consume_quota(self, mock_get_provider, mock_client):
+        provider = self._setup(mock_get_provider, mock_client)
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+
+        # one real call followed by two cache hits, all under a cap of 1
+        generate_suggestions(creds.user, trip)
+        generate_suggestions(creds.user, trip)
+        generate_suggestions(creds.user, trip)
+
+        assert provider.generate.call_count == 1
+
+    @override_settings(
+        AI_GENERATION_DAILY_CAP_PER_USER=1, AI_GENERATION_DAILY_CAP_PER_TRIP=100
+    )
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_shared_key_counts_against_executing_collaborator(
+        self, mock_get_provider, mock_client
+    ):
+        provider = self._setup(mock_get_provider, mock_client)
+        author_creds = AICredentialsFactory(
+            share_with_collaborators=True, user=TripFactory().author
+        )
+        trip = TripFactory(author=author_creds.user)
+        collaborator = UserFactory()
+        _add_collaborator(trip, collaborator)
+
+        # collaborator generates on the author's shared key, hitting their own cap
+        generate_suggestions(collaborator, trip)
+        with pytest.raises(AISuggestionError) as exc:
+            generate_suggestions(collaborator, trip, force_refresh=True)
+        assert exc.value.kind == AISuggestionError.RATE_LIMIT
+
+        # the author's own per-user quota is untouched, so they can still generate
+        generate_suggestions(author_creds.user, TripFactory(author=author_creds.user))
+        assert provider.generate.call_count == 2
+
+    @override_settings(
+        AI_GENERATION_DAILY_CAP_PER_USER=0, AI_GENERATION_DAILY_CAP_PER_TRIP=100
+    )
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_zero_cap_blocks_before_calling_provider(
+        self, mock_get_provider, mock_client
+    ):
+        provider = self._setup(mock_get_provider, mock_client)
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+
+        with pytest.raises(AISuggestionError) as exc:
+            generate_suggestions(creds.user, trip)
+
+        assert exc.value.kind == AISuggestionError.RATE_LIMIT
+        provider.generate.assert_not_called()

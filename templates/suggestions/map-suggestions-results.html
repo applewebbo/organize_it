@@ -11,6 +11,8 @@
                 <a href="{% url 'accounts:profile' %}" class="link link-primary">{% trans "Check your AI settings" %}</a>
             {% elif error_kind == 'quota' %}
                 <p>{% trans "You have reached the AI provider usage limit. Please try again later." %}</p>
+            {% elif error_kind == 'rate_limit' %}
+                <p>{% trans "You have reached the daily AI suggestion limit. Please try again tomorrow." %}</p>
             {% else %}
                 <p>{% trans "Something went wrong while generating suggestions. Please try again." %}</p>
             {% endif %}

@@ -9,11 +9,13 @@ class AISuggestionError(Exception):
     Mirrors trips.services.GooglePlacesError: callers catch this single type
     regardless of the underlying provider. ``kind`` classifies the failure so
     the UI can show an appropriate message: a configuration problem (missing or
-    invalid key), a quota/rate limit, or a generic error.
+    invalid key), a provider quota/rate limit, the app's own daily generation
+    cap, or a generic error.
     """
 
     CONFIG = "config"
     QUOTA = "quota"
+    RATE_LIMIT = "rate_limit"
     GENERIC = "generic"
 
     def __init__(self, message: str, kind: str = GENERIC):

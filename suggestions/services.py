@@ -3,7 +3,9 @@ import json
 from dataclasses import dataclass
 from math import asin, cos, radians, sin, sqrt
 
+from django.conf import settings
 from django.core.cache import cache
+from django.utils import timezone
 
 from suggestions.ai.base import AISuggestionError
 from suggestions.ai.factory import get_provider
@@ -41,6 +43,10 @@ _CACHE_TTL = 24 * 3600
 # quota. It is pure UX convenience, so a longer TTL has no quota downside.
 _LAST_TTL = 48 * 3600
 
+# Daily generation counters are keyed by calendar day (local time), so they
+# reset naturally at midnight; the TTL only cleans up yesterday's stale keys.
+_QUOTA_TTL = 48 * 3600
+
 # Ask the model for more candidates than requested so that grounding rejections
 # (place not found, outside the bias radius) still leave enough to reach the
 # user's target count. Grounding stops as soon as the target is met, so the
@@ -77,6 +83,34 @@ def _last_key(user, trip: Trip) -> str:
     peek.
     """
     return f"ai_sugg_last:{trip.pk}:{user.pk}"
+
+
+def _quota_key(scope: str, ident) -> str:
+    """Per-day counter key for a generation scope (``user`` or ``trip``)."""
+    return f"ai_gen_quota:{scope}:{ident}:{timezone.localdate().isoformat()}"
+
+
+def _enforce_generation_quota(user, trip: Trip) -> None:
+    """Reject and count a real provider generation against the daily caps.
+
+    Only called on an actual provider hit (cache miss or Regenerate), so cache
+    hits never spend quota. Counters are checked first, then incremented, so a
+    rejected call does not bump either counter. Raises ``AISuggestionError``
+    with ``RATE_LIMIT`` when the executing user or the trip is over its cap.
+    """
+    caps = (
+        (_quota_key("user", user.pk), settings.AI_GENERATION_DAILY_CAP_PER_USER),
+        (_quota_key("trip", trip.pk), settings.AI_GENERATION_DAILY_CAP_PER_TRIP),
+    )
+    for key, cap in caps:
+        if cache.get(key, 0) >= cap:
+            raise AISuggestionError(
+                "Daily AI generation limit reached",
+                kind=AISuggestionError.RATE_LIMIT,
+            )
+    for key, _cap in caps:
+        cache.add(key, 0, _QUOTA_TTL)
+        cache.incr(key)
 
 
 def _haversine_m(lat1: float, lng1: float, lat2: float, lng2: float) -> float:
@@ -334,6 +368,10 @@ def generate_suggestions(
         if cached is not None:
             cache.set(_last_key(user, trip), cached, _LAST_TTL)
             return cached
+
+    # About to hit the provider for real: enforce the daily caps before spending
+    # the (possibly shared) provider quota.
+    _enforce_generation_quota(user, trip)
 
     provider = get_provider(credentials.provider, credentials.api_key_encrypted)
     # Over-request so grounding rejections still leave enough to hit the target.

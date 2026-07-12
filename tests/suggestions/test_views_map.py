@@ -137,6 +137,20 @@ class TestGenerateView(TestCase):
         assert "/accounts/profile/" not in content
 
     @patch("suggestions.views.generate_suggestions")
+    def test_rate_limit_error_message(self, mock_generate):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        mock_generate.side_effect = AISuggestionError(
+            "cap", kind=AISuggestionError.RATE_LIMIT
+        )
+        with self.login(user):
+            response = self.post("suggestions:generate", pk=trip.pk)
+        self.response_200(response)
+        content = response.content.decode()
+        assert "daily AI suggestion limit" in content
+        assert "/accounts/profile/" not in content
+
+    @patch("suggestions.views.generate_suggestions")
     def test_generic_error_message(self, mock_generate):
         user = self.make_user("user@example.com")
         trip = TripFactory(author=user)

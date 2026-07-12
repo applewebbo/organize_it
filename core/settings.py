@@ -299,6 +299,16 @@ UNSPLASH_ACCESS_KEY = env("UNSPLASH_ACCESS_KEY", default="")
 # Fernet key used to encrypt BYOK AI credentials at rest (suggestions app)
 FIELD_ENCRYPTION_KEY = env("FIELD_ENCRYPTION_KEY", default="")
 
+# Daily caps on AI suggestion generations that reach the provider (cache misses
+# and Regenerate). Guards a shared key against a collaborator draining the trip
+# author's provider quota (issue #378). Counted per executing user and per trip.
+AI_GENERATION_DAILY_CAP_PER_USER = env.int(
+    "AI_GENERATION_DAILY_CAP_PER_USER", default=20
+)
+AI_GENERATION_DAILY_CAP_PER_TRIP = env.int(
+    "AI_GENERATION_DAILY_CAP_PER_TRIP", default=30
+)
+
 # DJANGO-DBBACKUP with Django Storages
 STORAGES = {
     "default": {
