@@ -47,7 +47,7 @@ class TestGenerateCacheKey(TestCase):
 
 
 class TestGeocodeLocation(TestCase):
-    @patch("trips.utils.requests.get")
+    @patch("trips.utils.geocoding.requests.get")
     def test_geocode_location_returns_sorted_addresses(self, mock_get):
         from trips.utils import geocode_location
 
@@ -76,27 +76,27 @@ class TestGeocodeLocation(TestCase):
         assert addresses[0]["address"].endswith("Milan")
         assert addresses[1]["address"].endswith("Rome")
 
-    @patch("trips.utils.requests.get")
+    @patch("trips.utils.geocoding.requests.get")
     def test_geocode_location_returns_empty_on_no_results(self, mock_get):
         mock_get.return_value.status_code = 200
         mock_get.return_value.json.return_value = {}
         addresses = geocode_location("Nonexistent", "Nowhere")
         assert addresses == []
 
-    @patch("trips.utils.requests.get")
+    @patch("trips.utils.geocoding.requests.get")
     def test_geocode_location_returns_empty_on_error(self, mock_get):
         mock_get.side_effect = Exception("API error")
         addresses = geocode_location("Hotel", "Italy")
         assert addresses == []
 
-    @patch("trips.utils.requests.get")
+    @patch("trips.utils.geocoding.requests.get")
     def test_geocode_location_empty_list_response(self, mock_get):
         mock_get.return_value.status_code = 200
         mock_get.return_value.json.return_value = []  # Simulate API returns empty list
         addresses = geocode_location("Hotel", "Italy")
         assert addresses == []
 
-    @patch("trips.utils.requests.get")
+    @patch("trips.utils.geocoding.requests.get")
     def test_geocode_location_non_200_status_code(self, mock_get):
         """Should return [] if API response status code is not 200."""
         mock_get.return_value.status_code = 404
@@ -117,7 +117,7 @@ class TestGeocodeLocation(TestCase):
         assert geocode_location("", "Rome") is None
         assert geocode_location("Hotel", "") is None
 
-    @patch("trips.utils.requests.get")
+    @patch("trips.utils.geocoding.requests.get")
     def test_geocode_location_returns_cached_result(self, mock_get):
         # Prepare a fake cached result
         cached_result = [
@@ -139,7 +139,7 @@ class TestGeocodeLocation(TestCase):
 
 class TestGeocodeLocationAddressFormat(TestCase):
     def test_address_format_with_only_street_and_city(self):
-        with patch("trips.utils.requests.get") as mock_get:
+        with patch("trips.utils.geocoding.requests.get") as mock_get:
             mock_get.return_value.status_code = 200
             mock_get.return_value.json.return_value = [
                 {
@@ -155,7 +155,7 @@ class TestGeocodeLocationAddressFormat(TestCase):
             assert addresses[0]["address"] == "Via Milano, Milan"
 
     def test_address_format_with_street_housenumber_and_city(self):
-        with patch("trips.utils.requests.get") as mock_get:
+        with patch("trips.utils.geocoding.requests.get") as mock_get:
             mock_get.return_value.status_code = 200
             mock_get.return_value.json.return_value = [
                 {
@@ -175,7 +175,7 @@ class TestGeocodeLocationAddressFormat(TestCase):
             assert addresses[0]["address"] == "Via Roma 1, Rome"
 
     def test_address_format_with_only_city(self):
-        with patch("trips.utils.requests.get") as mock_get:
+        with patch("trips.utils.geocoding.requests.get") as mock_get:
             mock_get.return_value.status_code = 200
             mock_get.return_value.json.return_value = [
                 {
@@ -191,7 +191,7 @@ class TestGeocodeLocationAddressFormat(TestCase):
             assert addresses[0]["address"] == "Naples"
 
     def test_address_format_with_street_housenumber_no_city(self):
-        with patch("trips.utils.requests.get") as mock_get:
+        with patch("trips.utils.geocoding.requests.get") as mock_get:
             mock_get.return_value.status_code = 200
             mock_get.return_value.json.return_value = [
                 {

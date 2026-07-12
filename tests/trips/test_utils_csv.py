@@ -12,7 +12,7 @@ def test_load_train_stations_skips_missing_coordinates(tmp_path):
     import trips.utils
 
     # Reset cache
-    trips.utils._STATIONS_CACHE = None
+    trips.utils.transport._STATIONS_CACHE = None
 
     # Create temporary CSV with missing coordinates
     csv_dir = tmp_path / "trips" / "data"
@@ -66,7 +66,7 @@ def test_load_train_stations_skips_missing_coordinates(tmp_path):
         assert stations[0]["name"] == "Valid Station"
     finally:
         settings.BASE_DIR = original_base_dir
-        trips.utils._STATIONS_CACHE = None
+        trips.utils.transport._STATIONS_CACHE = None
 
 
 def test_load_train_stations_handles_invalid_data(tmp_path):
@@ -74,7 +74,7 @@ def test_load_train_stations_handles_invalid_data(tmp_path):
     import trips.utils
 
     # Reset cache
-    trips.utils._STATIONS_CACHE = None
+    trips.utils.transport._STATIONS_CACHE = None
 
     # Create temporary CSV with invalid data
     csv_dir = tmp_path / "trips" / "data"
@@ -130,4 +130,4 @@ def test_load_train_stations_handles_invalid_data(tmp_path):
         assert isinstance(stations[0]["longitude"], float)
     finally:
         settings.BASE_DIR = original_base_dir
-        trips.utils._STATIONS_CACHE = None
+        trips.utils.transport._STATIONS_CACHE = None

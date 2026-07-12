@@ -35,9 +35,9 @@ from trips.utils import (
 
 
 class TestRateLimitCheck(TestCase):
-    @patch("trips.utils.time.sleep")
-    @patch("trips.utils.cache.get")
-    @patch("trips.utils.cache.set")
+    @patch("trips.utils.geocoding.time.sleep")
+    @patch("trips.utils.geocoding.cache.get")
+    @patch("trips.utils.geocoding.cache.set")
     def test_rate_limit_check_no_wait(self, mock_cache_set, mock_cache_get, mock_sleep):
         mock_cache_get.return_value = (
             time_module.time() - 2
@@ -46,9 +46,9 @@ class TestRateLimitCheck(TestCase):
         mock_sleep.assert_not_called()
         mock_cache_set.assert_called_once()
 
-    @patch("trips.utils.time.sleep")
-    @patch("trips.utils.cache.get")
-    @patch("trips.utils.cache.set")
+    @patch("trips.utils.geocoding.time.sleep")
+    @patch("trips.utils.geocoding.cache.get")
+    @patch("trips.utils.geocoding.cache.set")
     def test_rate_limit_check_with_wait(
         self, mock_cache_set, mock_cache_get, mock_sleep
     ):
@@ -59,9 +59,9 @@ class TestRateLimitCheck(TestCase):
         mock_sleep.assert_called_once_with(pytest.approx(0.5, abs=0.01))
         mock_cache_set.assert_called_once()
 
-    @patch("trips.utils.time.sleep")
-    @patch("trips.utils.cache.get")
-    @patch("trips.utils.cache.set")
+    @patch("trips.utils.geocoding.time.sleep")
+    @patch("trips.utils.geocoding.cache.get")
+    @patch("trips.utils.geocoding.cache.set")
     def test_rate_limit_check_first_request(
         self, mock_cache_set, mock_cache_get, mock_sleep
     ):
@@ -79,7 +79,7 @@ class TestGeocoding(TestCase):
     def setUp(self):
         cache.clear()
 
-    @patch("trips.utils.requests.get")
+    @patch("trips.utils.geocoding.requests.get")
     def test_geocode_location_success(self, mock_get):
         """Test geocode_location with a successful API response."""
         mock_response = MagicMock()
@@ -102,7 +102,7 @@ class TestGeocoding(TestCase):
         self.assertEqual(results[0]["address"], "Piazza del Colosseo, Rome")
         mock_get.assert_called_once()
 
-    @patch("trips.utils.requests.get")
+    @patch("trips.utils.geocoding.requests.get")
     def test_geocode_location_no_results(self, mock_get):
         """Test geocode_location when API returns no results."""
         mock_response = MagicMock()
@@ -113,7 +113,7 @@ class TestGeocoding(TestCase):
         results = geocode_location("Unknown Place", "Nowhere")
         self.assertEqual(results, [])
 
-    @patch("trips.utils.requests.get")
+    @patch("trips.utils.geocoding.requests.get")
     def test_geocode_location_api_error(self, mock_get):
         """Test geocode_location with an API error."""
         mock_response = MagicMock()
@@ -123,7 +123,7 @@ class TestGeocoding(TestCase):
         results = geocode_location("Test", "City")
         self.assertEqual(results, [])
 
-    @patch("trips.utils.requests.get")
+    @patch("trips.utils.geocoding.requests.get")
     def test_geocode_location_request_exception(self, mock_get):
         """Test geocode_location with a request exception."""
         mock_get.side_effect = Exception("Connection error")
@@ -137,7 +137,7 @@ class TestGeocoding(TestCase):
         self.assertIsNone(geocode_location("Name", ""))
         self.assertIsNone(geocode_location("", ""))
 
-    @patch("trips.utils.requests.get")
+    @patch("trips.utils.geocoding.requests.get")
     def test_geocode_location_caching(self, mock_get):
         """Test that geocode_location results are cached."""
         mock_response = MagicMock()
@@ -153,7 +153,7 @@ class TestGeocoding(TestCase):
         geocode_location("Test Place", "Test City")
         mock_get.assert_called_once()  # Should not be called again
 
-    @patch("trips.utils.requests.get")
+    @patch("trips.utils.geocoding.requests.get")
     def test_geocode_city_success(self, mock_get):
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -173,13 +173,13 @@ class TestGeocoding(TestCase):
         assert results[0]["country"] == "Italia"
         assert results[0]["lat"] == 41.89
 
-    @patch("trips.utils.requests.get")
+    @patch("trips.utils.geocoding.requests.get")
     def test_geocode_city_empty_query(self, mock_get):
         results = geocode_city("")
         assert results == []
         mock_get.assert_not_called()
 
-    @patch("trips.utils.requests.get")
+    @patch("trips.utils.geocoding.requests.get")
     def test_geocode_city_non_200_response(self, mock_get):
         mock_response = MagicMock()
         mock_response.status_code = 500
@@ -187,13 +187,13 @@ class TestGeocoding(TestCase):
         results = geocode_city("errorcity_unique_xyz")
         assert results == []
 
-    @patch("trips.utils.requests.get")
+    @patch("trips.utils.geocoding.requests.get")
     def test_geocode_city_api_error(self, mock_get):
         mock_get.side_effect = Exception("network error")
         results = geocode_city("Roma")
         assert results == []
 
-    @patch("trips.utils.requests.get")
+    @patch("trips.utils.geocoding.requests.get")
     def test_geocode_city_caching(self, mock_get):
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -211,7 +211,7 @@ class TestGeocoding(TestCase):
         geocode_city("caching_test_city_xyz")
         mock_get.assert_called_once()
 
-    @patch("trips.utils.geocode_city")
+    @patch("trips.utils.geocoding.geocode_city")
     def test_geocode_trip_destination_updates_days(self, mock_geocode_city):
         from tests.trips.factories import TripFactory
 
@@ -234,7 +234,7 @@ class TestGeocoding(TestCase):
         for d in days:
             assert d.destination_latitude == 41.89
 
-    @patch("trips.utils.geocode_city")
+    @patch("trips.utils.geocoding.geocode_city")
     def test_geocode_trip_destination_no_results(self, mock_geocode_city):
         from tests.trips.factories import TripFactory
 
@@ -772,7 +772,7 @@ class TestUnsplashAPI(TestCase):
         cache.clear()
 
     @patch("django.conf.settings.UNSPLASH_ACCESS_KEY", "test_key")
-    @patch("trips.utils.requests.get")
+    @patch("trips.utils.images.requests.get")
     def test_search_unsplash_photos_success(self, mock_get):
         """Test successful Unsplash search"""
         mock_response = MagicMock()
@@ -809,7 +809,7 @@ class TestUnsplashAPI(TestCase):
         mock_get.assert_called_once()
 
     @patch("django.conf.settings.UNSPLASH_ACCESS_KEY", "test_key")
-    @patch("trips.utils.requests.get")
+    @patch("trips.utils.images.requests.get")
     def test_search_unsplash_photos_cached(self, mock_get):
         """Test that search results are cached"""
         mock_response = MagicMock()
@@ -847,7 +847,7 @@ class TestUnsplashAPI(TestCase):
         self.assertEqual(mock_get.call_count, 1)  # Still 1, not called again
 
     @patch("django.conf.settings.UNSPLASH_ACCESS_KEY", "test_key")
-    @patch("trips.utils.requests.get")
+    @patch("trips.utils.images.requests.get")
     def test_search_unsplash_photos_timeout(self, mock_get):
         """Test Unsplash API timeout handling"""
         import requests
@@ -859,7 +859,7 @@ class TestUnsplashAPI(TestCase):
         self.assertIsNone(photos)
 
     @patch("django.conf.settings.UNSPLASH_ACCESS_KEY", "test_key")
-    @patch("trips.utils.requests.get")
+    @patch("trips.utils.images.requests.get")
     def test_search_unsplash_photos_api_error(self, mock_get):
         """Test Unsplash API error handling"""
         import requests
@@ -878,7 +878,7 @@ class TestUnsplashAPI(TestCase):
         self.assertIsNone(photos)
 
     @patch("django.conf.settings.UNSPLASH_ACCESS_KEY", "test_key")
-    @patch("trips.utils.requests.get")
+    @patch("trips.utils.images.requests.get")
     def test_download_unsplash_photo_success(self, mock_get):
         """Test successful photo download from Unsplash"""
         # Mock download tracking response
@@ -914,7 +914,7 @@ class TestUnsplashAPI(TestCase):
         self.assertEqual(mock_get.call_count, 2)  # Download tracking + image download
 
     @patch("django.conf.settings.UNSPLASH_ACCESS_KEY", "test_key")
-    @patch("trips.utils.requests.get")
+    @patch("trips.utils.images.requests.get")
     def test_download_unsplash_photo_error(self, mock_get):
         """Test download error handling"""
         import requests
@@ -1062,7 +1062,7 @@ class TestImageProcessing(TestCase):
         )
 
         # Mock logger to verify warning is called
-        with patch("trips.utils.logger.warning") as mock_warning:
+        with patch("trips.utils.images.logger.warning") as mock_warning:
             # Should still process and resize
             processed = process_trip_image(uploaded_file)
 
