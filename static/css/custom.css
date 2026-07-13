@@ -1,5 +1,9 @@
 [x-cloak] { display: none !important; }
 
+/* Map view drops the card's bottom padding (kept as a class so rustywind does
+   not corrupt the Alpine :class ternary by reordering Tailwind utilities). */
+.events-card-map { padding-bottom: 0 !important; }
+
 textarea.fl-textarea {
     height: 7rem !important;
 }
