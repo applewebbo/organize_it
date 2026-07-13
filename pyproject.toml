@@ -60,7 +60,8 @@ dependencies = [
   "icalendar>=7.1.2",
   "pypdf>=6.13.1",
   "google-genai>=2.10.0",
-  "mistralai>=2.5.2"
+  "mistralai>=2.5.2",
+  "django-pwa>=2.0.1"
 ]
 description = "Help you organize your trips and travel plans."
 name = "organize_it"
@@ -77,7 +78,7 @@ exclude_also = [
 
 [tool.coverage.run]
 branch = true
-omit = ['*/node_modules/*', '*/venv/*', '*/migrations/*', '*/tests/*', '*/test_*.py', '*/settings/*', '*/wsgi.py', '*/asgi.py', '*/manage.py', '*/core/*', '*/accounts/managers.py', '*/trips/tasks.py', "accounts/templatetags/custom_tailwind.py", '*/populate_trips.py', '*/enrich_airports_icao.py', '*/probe_suggestions.py', '*/regeocode_trip_destinations.py']
+omit = ['*/node_modules/*', '*/venv/*', '*/migrations/*', '*/tests/*', '*/test_*.py', '*/settings/*', '*/wsgi.py', '*/asgi.py', '*/manage.py', '*/core/*', '*/scripts/*', '*/accounts/managers.py', '*/trips/tasks.py', "accounts/templatetags/custom_tailwind.py", '*/populate_trips.py', '*/enrich_airports_icao.py', '*/probe_suggestions.py', '*/regeocode_trip_destinations.py']
 
 [tool.djlint]
 ignore = "T002,H006"

@@ -617,6 +617,18 @@ wheels = [
 
 [[package]]
 dependencies = [
+  {name = "django"}
+]
+name = "django-pwa"
+sdist = {url = "https://files.pythonhosted.org/packages/39/5f/4a77504bb5edd693711ec2a396d47836f0a0b4d3f2fb9dc773f8b450c067/django_pwa-2.0.1.tar.gz", hash = "sha256:5539fabb41fe189cc2a82cb1f0f889b45671a8144d7b5bb5206a9ddd0fddb3c2", size = 448237, upload-time = "2024-09-27T13:15:52.481Z"}
+source = {registry = "https://pypi.org/simple"}
+version = "2.0.1"
+wheels = [
+  {url = "https://files.pythonhosted.org/packages/c3/64/5ffd65b8e8e9d5563e863d868c259f69a1af79c878f6be469540c573347c/django_pwa-2.0.1-py3-none-any.whl", hash = "sha256:41dc931c645c6125c556bd753205ca051aa48e5d46edbf281003594f3d76d4a3", size = 453981, upload-time = "2024-09-27T13:15:50.858Z"}
+]
+
+[[package]]
+dependencies = [
   {name = "django"},
   {name = "django-picklefield"}
 ]
@@ -1371,6 +1383,7 @@ dependencies = [
   {name = "django-environ"},
   {name = "django-extensions"},
   {name = "django-htmx"},
+  {name = "django-pwa"},
   {name = "django-q2"},
   {name = "django-redis"},
   {name = "django-storages", extra = ["dropbox"]},
@@ -1439,6 +1452,7 @@ requires-dist = [
   {name = "django-environ", specifier = ">=0.11.2"},
   {name = "django-extensions"},
   {name = "django-htmx", specifier = ">=1.19.0"},
+  {name = "django-pwa", specifier = ">=2.0.1"},
   {name = "django-q2", specifier = ">=1.8.0"},
   {name = "django-redis", specifier = ">=5.4.0"},
   {name = "django-storages", extras = ["dropbox"], specifier = ">=1.14.6"},

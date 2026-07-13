@@ -1,4 +1,4 @@
-{% load i18n static django_htmx tailwind_cli %}
+{% load i18n static django_htmx tailwind_cli pwa %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -13,6 +13,10 @@
         </title>
         {% block extra_head %}
         {% endblock extra_head %}
+        <!-- PWA -->
+        {% if PWA_ENABLED %}
+            {% progressive_web_app_meta %}
+        {% endif %}
         <link rel="shortcut icon"
               type="image/png"
               href="{% static 'img/favicon.png' %}" />

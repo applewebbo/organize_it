@@ -37,7 +37,9 @@
     {% endif %}
     {# Folium map — self-contained iframe, no Leaflet init issues #}
     {% if map %}
-        <div class="map-container overflow-hidden rounded-lg">{{ map|safe }}</div>
+        <div x-show="$store.connection.online"
+             class="map-container overflow-hidden rounded-lg">{{ map|safe }}</div>
+        {% include 'trips/includes/map-offline-placeholder.html' %}
     {% else %}
         <div class="alert alert-soft alert-info py-6 text-center">
             <i class="ph-bold ph-map-trifold i-md" aria-hidden="true"></i>

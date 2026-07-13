@@ -1,0 +1,9 @@
+{% load i18n %}
+{# Shown in place of a map when the PWA is offline (map tiles are cross-origin
+   and cannot be cached). Relies on the Alpine "connection" store. #}
+<div x-show="!$store.connection.online"
+     x-cloak
+     class="map-container bg-base-200 text-base-content/60 flex min-h-48 flex-col items-center justify-center gap-2 p-6 text-center">
+    <i class="ph-bold ph-wifi-slash i-lg"></i>
+    <span class="text-sm font-medium">{% trans "Map not available offline" %}</span>
+</div>

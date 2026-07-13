@@ -15,7 +15,10 @@ pytestmark = pytest.mark.django_db
 def test_app_version_context_processor():
     request = RequestFactory().get("/")
     context = app_version(request)
-    assert context == {"APP_VERSION": settings.APP_VERSION}
+    assert context == {
+        "APP_VERSION": settings.APP_VERSION,
+        "PWA_ENABLED": settings.PWA_ENABLED,
+    }
 
 
 def test_footer_version_links_to_releases():

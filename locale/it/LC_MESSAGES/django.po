@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-12 16:51+0200\n"
+"POT-Creation-Date: 2026-07-13 13:03+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -92,11 +92,11 @@ msgstr "Superuser deve avere is_superuser=True."
 msgid "email address"
 msgstr "indirizzo email"
 
-#: accounts/models.py:52 core/settings.py:241
+#: accounts/models.py:52 core/settings.py:281
 msgid "Italian"
 msgstr "Italiano"
 
-#: accounts/models.py:53 core/settings.py:242
+#: accounts/models.py:53 core/settings.py:282
 msgid "English"
 msgstr "Inglese"
 
@@ -969,6 +969,22 @@ msgstr "Chiudi"
 #: templates/includes/navbar.html:34
 msgid "Open main menu"
 msgstr "Apri il menu principale"
+
+#: templates/offline.html:8
+msgid "Offline"
+msgstr "Offline"
+
+#: templates/offline.html:46
+msgid "You are offline"
+msgstr "Sei offline"
+
+#: templates/offline.html:48
+msgid ""
+"Trips you have already opened stay available. Check your connection and "
+"reload to see the latest changes."
+msgstr ""
+"I viaggi che hai già aperto restano disponibili. Controlla la connessione e "
+"ricarica per vedere le ultime modifiche."
 
 #: templates/suggestions/ai-map-actions.html:11
 #: templates/suggestions/suggestion-modal.html:39
@@ -1935,7 +1951,7 @@ msgstr "Destinazione non trovata"
 msgid "Nothing to do here."
 msgstr "Niente da fare qui."
 
-#: templates/trips/includes/day-map-content.html:14
+#: templates/trips/includes/day-map-content.html:15
 msgid "No events to display on a map for this day"
 msgstr "Nessun evento da mostrare sulla mappa per il giorno selezionato"
 
@@ -2106,6 +2122,10 @@ msgstr "Ritorno"
 #: templates/trips/includes/main-transfers.html:359
 msgid "No departure transfer added yet."
 msgstr "Nessun trasferimento di ritorno aggiunto."
+
+#: templates/trips/includes/map-offline-placeholder.html:8
+msgid "Map not available offline"
+msgstr "Mappa non disponibile offline"
 
 #: templates/trips/includes/maps-link-prefill.html:10
 msgid "Location found, but this doesn't look like an accommodation."

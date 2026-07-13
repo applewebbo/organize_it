@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     "django_htmx",
     "django_tailwind_cli",
     "django_q",
+    "pwa",
     "storages",
     "cloudinary_storage",
     "dbbackup",
@@ -175,6 +176,46 @@ STATIC_URL = "/static/"
 
 MEDIA_ROOT = BASE_DIR / "media"
 MEDIA_URL = "/media/"
+
+# Progressive Web App (django-pwa)
+PWA_APP_NAME = "Organize It"
+PWA_APP_DESCRIPTION = "Organize your next trip"
+PWA_APP_THEME_COLOR = "#FFFFFF"
+PWA_APP_BACKGROUND_COLOR = "#FFFFFF"
+PWA_APP_DISPLAY = "standalone"
+PWA_APP_SCOPE = "/"
+PWA_APP_ORIENTATION = "any"
+PWA_APP_START_URL = "/"
+PWA_APP_STATUS_BAR_COLOR = "default"
+PWA_APP_DIR = "ltr"
+PWA_APP_LANG = "en-US"
+PWA_APP_ICONS = [
+    {
+        "src": "/static/img/android-chrome-192x192.png",
+        "sizes": "192x192",
+        "type": "image/png",
+        "purpose": "any",
+    },
+    {
+        "src": "/static/img/android-chrome-512x512.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "any",
+    },
+    {
+        "src": "/static/img/maskable-icon-512x512.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "maskable",
+    },
+]
+PWA_APP_ICONS_APPLE = [{"src": "/static/img/apple-touch-icon.png", "sizes": "180x180"}]
+PWA_APP_OFFLINE_URL = "/offline/"
+PWA_APP_DEBUG_MODE = DEBUG
+PWA_SERVICE_WORKER_PATH = BASE_DIR / "static" / "js" / "serviceworker.js"
+# Register the service worker only outside DEBUG: a caching worker plus the
+# browser-reload SSE stream make local development noisy and serve stale assets.
+PWA_ENABLED = not DEBUG
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -471,6 +512,9 @@ elif ENVIRONMENT == "test":
             "NAME": ":memory:",
         }
     }
+
+    # Keep the PWA meta/registration rendered so it stays covered by tests.
+    PWA_ENABLED = True
 
     PASSWORD_HASHERS = ("django.contrib.auth.hashers.MD5PasswordHasher",)
 

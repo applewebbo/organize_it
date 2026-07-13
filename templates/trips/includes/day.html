@@ -44,10 +44,12 @@
     </div>
     <div id="day-info-{{ day.pk }}"
          class="mt-3"
-         {% if show_map and not map %}hx-get="{% url 'trips:day-detail' day.pk %}" hx-trigger="load" hx-target="#day-{{ day.pk }}" hx-swap="outerHTML"{% endif %}>
+         {% if show_map and not map %}hx-get="{% url 'trips:day-detail' day.pk %}" hx-trigger="load[navigator.onLine], online from:window" hx-target="#day-{{ day.pk }}" hx-swap="outerHTML"{% endif %}>
         {% if show_map %}
             {% if map %}
                 {% include 'trips/includes/day-map-content.html' %}
+            {% else %}
+                {% include 'trips/includes/map-offline-placeholder.html' %}
             {% endif %}
         {% else %}
             {% include 'trips/includes/day-list-content.html' %}

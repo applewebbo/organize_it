@@ -3,7 +3,8 @@
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {% if map %}
             <div>
-                <div class="map-container">{{ map|safe }}</div>
+                <div x-show="$store.connection.online" class="map-container">{{ map|safe }}</div>
+                {% include 'trips/includes/map-offline-placeholder.html' %}
                 {% if show_weather %}
                     {% weather_widget locations.day %}
                 {% endif %}

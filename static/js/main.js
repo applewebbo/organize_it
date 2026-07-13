@@ -288,6 +288,15 @@ function swapButton(eventId, swapUrl, label) {
 }
 
 document.addEventListener("alpine:init", () => {
+    // Reactive online/offline state, used to swap unavailable maps for an
+    // "offline" placeholder while the PWA is running without a connection.
+    Alpine.store("connection", {
+        online: navigator.onLine,
+        init() {
+            window.addEventListener("online", () => (this.online = true));
+            window.addEventListener("offline", () => (this.online = false));
+        },
+    });
     Alpine.data("swapButton", swapButton);
     Alpine.data("autocompleteForm", () => ({
         geocodeTimer: null,

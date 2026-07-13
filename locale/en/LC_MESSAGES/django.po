@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-12 16:51+0200\n"
+"POT-Creation-Date: 2026-07-13 13:03+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -93,11 +93,11 @@ msgstr ""
 msgid "email address"
 msgstr ""
 
-#: accounts/models.py:52 core/settings.py:241
+#: accounts/models.py:52 core/settings.py:281
 msgid "Italian"
 msgstr ""
 
-#: accounts/models.py:53 core/settings.py:242
+#: accounts/models.py:53 core/settings.py:282
 msgid "English"
 msgstr ""
 
@@ -903,6 +903,20 @@ msgstr ""
 
 #: templates/includes/navbar.html:34
 msgid "Open main menu"
+msgstr ""
+
+#: templates/offline.html:8
+msgid "Offline"
+msgstr ""
+
+#: templates/offline.html:46
+msgid "You are offline"
+msgstr ""
+
+#: templates/offline.html:48
+msgid ""
+"Trips you have already opened stay available. Check your connection and "
+"reload to see the latest changes."
 msgstr ""
 
 #: templates/suggestions/ai-map-actions.html:11
@@ -1854,7 +1868,7 @@ msgstr ""
 msgid "Nothing to do here."
 msgstr "Nothing to do here."
 
-#: templates/trips/includes/day-map-content.html:14
+#: templates/trips/includes/day-map-content.html:15
 msgid "No events to display on a map for this day"
 msgstr ""
 
@@ -2024,6 +2038,10 @@ msgstr ""
 
 #: templates/trips/includes/main-transfers.html:359
 msgid "No departure transfer added yet."
+msgstr ""
+
+#: templates/trips/includes/map-offline-placeholder.html:8
+msgid "Map not available offline"
 msgstr ""
 
 #: templates/trips/includes/maps-link-prefill.html:10

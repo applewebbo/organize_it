@@ -1,0 +1,52 @@
+{% load i18n static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="description" content="Organize your next trip" />
+        <meta name="keywords" content="django, organize, trip" />
+        <title>Organize It — {% trans "Offline" %}</title>
+        <style>
+            html,
+            body {
+                height: 100%;
+                margin: 0;
+                font-family: system-ui, -apple-system, sans-serif;
+                background-color: #f8f9fa;
+                color: #475569;
+            }
+            body {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                padding: 1.5rem;
+                box-sizing: border-box;
+            }
+            img {
+                width: 96px;
+                height: 96px;
+                margin-bottom: 1.5rem;
+            }
+            h1 {
+                font-size: 1.5rem;
+                margin: 0 0 0.75rem;
+                color: #1e293b;
+            }
+            p {
+                font-size: 1rem;
+                max-width: 28rem;
+                margin: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <img src="{% static 'img/logo.png' %}" alt="Organize It" />
+        <h1>{% trans "You are offline" %}</h1>
+        <p>
+            {% trans "Trips you have already opened stay available. Check your connection and reload to see the latest changes." %}
+        </p>
+    </body>
+</html>
