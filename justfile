@@ -142,15 +142,15 @@ makemessages:
 test *args:
     ENVIRONMENT=test uv run python -m pytest --reuse-db -s -x {{ args }}
 
-# Run fast tests
+# Run fast tests (TEST_WORKERS controls parallelism, default 4; niced to keep the machine responsive)
 [group('utility')]
 ftest *args:
-    ENVIRONMENT=test uv run pytest -n 4 --reuse-db --dist loadscope --exitfirst {{ args }}
+    nice -n 10 env ENVIRONMENT=test uv run pytest -n ${TEST_WORKERS:-4} --reuse-db --dist loadscope --exitfirst {{ args }}
 
 # Run fast tests with coverage report (must reach 100%)
 [group('utility')]
 cov *args:
-    ENVIRONMENT=test uv run pytest -n 4 --reuse-db --dist loadscope --exitfirst --cov=. --cov-report html:htmlcov --cov-report term:skip-covered --cov-fail-under 100 {{ args }}
+    nice -n 10 env ENVIRONMENT=test uv run pytest -n ${TEST_WORKERS:-4} --reuse-db --dist loadscope --exitfirst --cov=. --cov-report html:htmlcov --cov-report term:skip-covered --cov-fail-under 100 {{ args }}
 
 # Show coverage for a specific test file against a source module (no threshold)
 # Usage: just fcov tests/trips/test_views_map.py trips/views/maps.py
