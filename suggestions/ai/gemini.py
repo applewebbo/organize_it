@@ -1,11 +1,17 @@
 import logging
+from datetime import date
 
 from google import genai
 from google.genai import types
 
 from suggestions.ai.base import AISuggestionError
-from suggestions.prompts import build_prompt
-from suggestions.schemas import Suggestion, SuggestionPrefs, TripContext
+from suggestions.prompts import build_day_prompt, build_prompt
+from suggestions.schemas import (
+    DayItinerary,
+    Suggestion,
+    SuggestionPrefs,
+    TripContext,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -71,3 +77,31 @@ class GeminiProvider:
         if not suggestions:
             raise AISuggestionError("The AI provider returned no suggestions")
         return suggestions
+
+    def generate_day(
+        self,
+        context: TripContext,
+        prefs: SuggestionPrefs,
+        day_date: date,
+        day_stops: list[str] | None = None,
+    ) -> DayItinerary:
+        prompt = build_day_prompt(context, prefs, day_date, day_stops)
+        try:
+            response = self._client.models.generate_content(
+                model=self._model,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    response_schema=DayItinerary,
+                    thinking_config=types.ThinkingConfig(thinking_budget=0),
+                ),
+            )
+        except Exception as exc:  # SDK/network errors -> single error type
+            kind = _error_kind(exc)
+            logger.warning("Gemini day itinerary failed (kind=%s): %s", kind, exc)
+            raise AISuggestionError(str(exc), kind=kind) from exc
+
+        itinerary = response.parsed
+        if not itinerary or not itinerary.stops:
+            raise AISuggestionError("The AI provider returned no itinerary")
+        return itinerary

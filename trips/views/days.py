@@ -68,6 +68,7 @@ def day_detail(request, pk):
         "show_map": show_map,
         "next_day": next_day,
         "show_weather": profile.show_weather,
+        "ai_suggestions_enabled": profile.ai_suggestions_enabled,
     }
 
     # If map view is preferred, prepare map context

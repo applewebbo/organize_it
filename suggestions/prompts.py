@@ -1,3 +1,5 @@
+from datetime import date
+
 from suggestions.schemas import SuggestionPrefs, TripContext
 from trips.models import Experience, Meal
 
@@ -67,11 +69,10 @@ _CUISINE_PHRASES = {
 }
 
 
-def build_prompt(context: TripContext, prefs: SuggestionPrefs) -> str:
-    """Build the text prompt fed to the provider from trip context + prefs."""
-    lines = [_intro(context.language), "", f"Destination: {context.destination}"]
-    if context.start_date and context.end_date:
-        lines.append(f"Dates: {context.start_date} to {context.end_date}")
+def _preference_lines(context: TripContext, prefs: SuggestionPrefs) -> list[str]:
+    """Shared preference constraints fed to both the multi-card and the
+    day-itinerary prompts."""
+    lines = []
     if prefs.favored_experience_types:
         favored = ", ".join(str(t) for t in prefs.favored_experience_types)
         lines.append(f"Favoured experience type ids: {favored}")
@@ -94,6 +95,12 @@ def build_prompt(context: TripContext, prefs: SuggestionPrefs) -> str:
     lines.append(_BUDGET_LINES.get(prefs.budget, _BUDGET_LINES["medium"]))
     if prefs.notes:
         lines.append(f"Extra notes: {prefs.notes}")
+    return lines
+
+
+def _context_lines(context: TripContext) -> list[str]:
+    """Shared existing-places + weather context fed to both prompts."""
+    lines = []
     if context.existing_places:
         lines.append("")
         lines.append(
@@ -109,6 +116,16 @@ def build_prompt(context: TripContext, prefs: SuggestionPrefs) -> str:
             "Favour indoor options on cold or rainy days and outdoor ones on "
             "clear days."
         )
+    return lines
+
+
+def build_prompt(context: TripContext, prefs: SuggestionPrefs) -> str:
+    """Build the text prompt fed to the provider from trip context + prefs."""
+    lines = [_intro(context.language), "", f"Destination: {context.destination}"]
+    if context.start_date and context.end_date:
+        lines.append(f"Dates: {context.start_date} to {context.end_date}")
+    lines.extend(_preference_lines(context, prefs))
+    lines.extend(_context_lines(context))
     lines.append("")
     kind_labels = {"experience": "experiences", "meal": "meals", "stay": "stays"}
     if prefs.kinds:
@@ -128,4 +145,51 @@ def build_prompt(context: TripContext, prefs: SuggestionPrefs) -> str:
         "Set the integer 'type' field from this legend (omit it for stays): "
         + _TYPE_LEGEND
     )
+    return "\n".join(lines)
+
+
+def build_day_prompt(
+    context: TripContext,
+    prefs: SuggestionPrefs,
+    day_date: date,
+    day_stops: list[str] | None = None,
+) -> str:
+    """Build the prompt for a single-day itinerary.
+
+    Reuses the shared preference and context sections but asks for an ordered
+    sequence of experiences and meals for ``day_date``. When ``day_stops`` is
+    given (the "add to existing" strategy) the model must weave those already
+    scheduled places into the returned order, using their exact names.
+    """
+    lines = [
+        _intro(context.language),
+        "",
+        f"Destination: {context.destination}",
+        f"Plan a single-day itinerary for {day_date}.",
+    ]
+    lines.extend(_preference_lines(context, prefs))
+    lines.extend(_context_lines(context))
+    lines.append("")
+    lines.append(
+        "Return the stops in order, forming a realistic, geographically coherent "
+        "day: start in the morning and end in the evening."
+    )
+    lines.append(
+        "Cover the day's meals (breakfast, lunch and dinner as appropriate) with "
+        "restaurants, interleaved with experiences and activities."
+    )
+    if day_stops:
+        lines.append("")
+        lines.append(
+            "These places are already scheduled on this day and MUST appear in "
+            "the returned order at a sensible position, using their exact name:"
+        )
+        lines.extend(f"- {name}" for name in day_stops)
+    lines.append("")
+    lines.append(
+        "For each stop provide a real name and a precise postal address so it can "
+        "be located on a map, plus an 'estimated_duration_minutes' integer with a "
+        "realistic visit or meal duration."
+    )
+    lines.append("Set the integer 'type' field from this legend: " + _TYPE_LEGEND)
     return "\n".join(lines)

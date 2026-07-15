@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-13 13:03+0200\n"
+"POT-Creation-Date: 2026-07-15 08:19+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -93,11 +93,11 @@ msgstr ""
 msgid "email address"
 msgstr ""
 
-#: accounts/models.py:52 core/settings.py:281
+#: accounts/models.py:52 core/settings.py:282
 msgid "Italian"
 msgstr ""
 
-#: accounts/models.py:53 core/settings.py:282
+#: accounts/models.py:53 core/settings.py:283
 msgid "English"
 msgstr ""
 
@@ -885,7 +885,8 @@ msgstr "Add document"
 msgid "Source code"
 msgstr ""
 
-#: templates/includes/messages.html:20
+#: templates/includes/messages.html:20 templates/suggestions/day-applied.html:7
+#: templates/suggestions/plan-day-modal.html:11
 #: templates/suggestions/suggestion-modal.html:8
 #: templates/trips/attachments/preview-modal.html:15
 #: templates/trips/attachments/upload-modal.html:15
@@ -905,15 +906,15 @@ msgstr ""
 msgid "Open main menu"
 msgstr ""
 
-#: templates/offline.html:8
+#: templates/offline.html:9
 msgid "Offline"
 msgstr ""
 
-#: templates/offline.html:46
+#: templates/offline.html:47
 msgid "You are offline"
 msgstr ""
 
-#: templates/offline.html:48
+#: templates/offline.html:49
 msgid ""
 "Trips you have already opened stay available. Check your connection and "
 "reload to see the latest changes."
@@ -930,24 +931,33 @@ msgid "Generate"
 msgstr ""
 
 #: templates/suggestions/ai-map-actions.html:22
+#: templates/suggestions/plan-day-modal.html:70
 #: templates/suggestions/suggestion-modal.html:50
 msgid "Generating uses your AI provider quota."
 msgstr ""
 
+#: templates/suggestions/day-applied.html:4
+msgid "Day itinerary applied"
+msgstr ""
+
 #: templates/suggestions/map-suggestions-results.html:10
+#: templates/suggestions/plan-day-results.html:6
 msgid ""
 "AI suggestions are not configured yet. Add a valid API key to get started."
 msgstr ""
 
 #: templates/suggestions/map-suggestions-results.html:11
+#: templates/suggestions/plan-day-results.html:7
 msgid "Check your AI settings"
 msgstr ""
 
 #: templates/suggestions/map-suggestions-results.html:13
+#: templates/suggestions/plan-day-results.html:9
 msgid "You have reached the AI provider usage limit. Please try again later."
 msgstr ""
 
 #: templates/suggestions/map-suggestions-results.html:15
+#: templates/suggestions/plan-day-results.html:11
 msgid ""
 "You have reached the daily AI suggestion limit. Please try again tomorrow."
 msgstr ""
@@ -983,6 +993,69 @@ msgstr ""
 #| msgid "No results found"
 msgid "No suggestions found"
 msgstr "No results found"
+
+#: templates/suggestions/plan-day-modal.html:5
+msgid "Plan the day"
+msgstr ""
+
+#: templates/suggestions/plan-day-modal.html:21
+msgid "This day already has events"
+msgstr ""
+
+#: templates/suggestions/plan-day-modal.html:29
+msgid "Add to existing events"
+msgstr ""
+
+#: templates/suggestions/plan-day-modal.html:37
+msgid "Unpair existing events"
+msgstr ""
+
+#: templates/suggestions/plan-day-modal.html:45
+msgid "Delete existing events"
+msgstr ""
+
+#: templates/suggestions/plan-day-modal.html:50
+msgid ""
+"Existing events will be moved to the unassigned list only when you apply the "
+"plan."
+msgstr ""
+
+#: templates/suggestions/plan-day-modal.html:55
+msgid "Existing events will be deleted only when you apply the plan."
+msgstr ""
+
+#: templates/suggestions/plan-day-modal.html:61
+msgid "Notes for this day (optional)…"
+msgstr ""
+
+#: templates/suggestions/plan-day-modal.html:68
+#: templates/trips/includes/day.html:55
+msgid "Plan day"
+msgstr ""
+
+#: templates/suggestions/plan-day-results.html:13
+msgid "Something went wrong while generating the itinerary. Please try again."
+msgstr ""
+
+#: templates/suggestions/plan-day-results.html:44
+msgid "existing"
+msgstr ""
+
+#: templates/suggestions/plan-day-results.html:57
+msgid "The day's current events will be deleted."
+msgstr ""
+
+#: templates/suggestions/plan-day-results.html:62
+msgid "The day's current events will be moved to the unassigned list."
+msgstr ""
+
+#: templates/suggestions/plan-day-results.html:67
+msgid "Apply day"
+msgstr ""
+
+#: templates/suggestions/plan-day-results.html:73
+msgid "No itinerary generated"
+msgstr ""
 
 #: templates/suggestions/settings.html:11
 #: templates/suggestions/suggestion-modal.html:4
@@ -1884,6 +1957,10 @@ msgstr "Select a day for the meal"
 msgid "No days in this trip."
 msgstr "No days in this trip."
 
+#: templates/trips/includes/day.html:52 templates/trips/includes/day.html:53
+msgid "Plan the day with AI"
+msgstr ""
+
 #: templates/trips/includes/events-list-fragment.html:12
 #: templates/trips/includes/events-list-fragment.html:54
 #: templates/trips/includes/transfer-info.html:13
@@ -1896,7 +1973,7 @@ msgstr ""
 msgid "Estimated driving distance"
 msgstr ""
 
-#: templates/trips/includes/events-map-fragment.html:44
+#: templates/trips/includes/events-map-fragment.html:46
 msgid "No events with location to display on the map."
 msgstr "No events with location to display on the map."
 
@@ -3123,7 +3200,7 @@ msgstr ""
 msgid "You've joined the trip as a participant."
 msgstr "You've joined the trip as a participant."
 
-#: trips/views/days.py:206
+#: trips/views/days.py:207
 msgid "Event moved successfully"
 msgstr ""
 

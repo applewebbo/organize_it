@@ -11,6 +11,21 @@ urlpatterns = [
     path("trip/<int:pk>/details/", views.details, name="details"),
     path("trip/<int:pk>/modal/", views.suggestion_modal, name="modal"),
     path(
+        "trip/<int:pk>/day/<int:day_id>/plan/",
+        views.plan_day_modal,
+        name="plan-day-modal",
+    ),
+    path(
+        "trip/<int:pk>/day/<int:day_id>/generate/",
+        views.generate_day,
+        name="generate-day",
+    ),
+    path(
+        "trip/<int:pk>/day/<int:day_id>/accept/",
+        views.accept_day,
+        name="accept-day",
+    ),
+    path(
         "trip/<int:pk>/accept/experience/",
         views.accept_experience,
         name="accept-experience",

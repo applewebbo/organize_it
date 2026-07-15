@@ -1,6 +1,6 @@
 from datetime import date
 
-from suggestions.prompts import build_prompt
+from suggestions.prompts import build_day_prompt, build_prompt
 from suggestions.schemas import SuggestionPrefs, TripContext
 
 
@@ -152,3 +152,62 @@ class TestBuildPrompt:
             TripContext(destination="Rome"), SuggestionPrefs(search_radius="day_trips")
         )
         assert "day-trip" in prompt
+
+
+class TestBuildDayPrompt:
+    def test_asks_for_single_ordered_day(self):
+        prompt = build_day_prompt(
+            TripContext(destination="Rome"), SuggestionPrefs(), date(2026, 7, 1)
+        )
+        assert "single-day itinerary" in prompt
+        assert "2026-07-01" in prompt
+        assert "in order" in prompt
+
+    def test_requests_estimated_duration(self):
+        prompt = build_day_prompt(
+            TripContext(destination="Rome"), SuggestionPrefs(), date(2026, 7, 1)
+        )
+        assert "estimated_duration_minutes" in prompt
+
+    def test_covers_meals(self):
+        prompt = build_day_prompt(
+            TripContext(destination="Rome"), SuggestionPrefs(), date(2026, 7, 1)
+        )
+        assert "meal" in prompt.lower()
+
+    def test_reuses_shared_preferences(self):
+        prompt = build_day_prompt(
+            TripContext(destination="Rome"),
+            SuggestionPrefs(budget="high", interests=["history"]),
+            date(2026, 7, 1),
+        )
+        assert "premium" in prompt
+        assert "history" in prompt
+
+    def test_reuses_context_sections(self):
+        context = TripContext(
+            destination="Rome",
+            existing_places=["Colosseo (Roma)"],
+            weather=["2026-07-01: Clear sky, 15–28°C, 0.0mm rain"],
+        )
+        prompt = build_day_prompt(context, SuggestionPrefs(), date(2026, 7, 1))
+        assert "- Colosseo (Roma)" in prompt
+        assert "Weather forecast" in prompt
+
+    def test_interleaves_existing_day_stops_when_given(self):
+        prompt = build_day_prompt(
+            TripContext(destination="Rome"),
+            SuggestionPrefs(),
+            date(2026, 7, 1),
+            day_stops=["Colosseo", "Trattoria Luzzi"],
+        )
+        assert "already scheduled" in prompt.lower()
+        assert "- Colosseo" in prompt
+        assert "- Trattoria Luzzi" in prompt
+        assert "exact" in prompt.lower()
+
+    def test_no_interleave_section_without_day_stops(self):
+        prompt = build_day_prompt(
+            TripContext(destination="Rome"), SuggestionPrefs(), date(2026, 7, 1)
+        )
+        assert "already scheduled" not in prompt.lower()

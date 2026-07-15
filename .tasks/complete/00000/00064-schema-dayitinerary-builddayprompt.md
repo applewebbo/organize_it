@@ -1,0 +1,1 @@
+../../all/00000/00064-schema-dayitinerary-builddayprompt.md

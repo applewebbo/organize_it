@@ -1,3 +1,6 @@
+import json
+from datetime import timedelta
+
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
@@ -16,8 +19,16 @@ from suggestions.models import (
     SharedKeyNoticeDismissal,
     SuggestionPreferences,
 )
-from suggestions.services import generate_suggestions, get_cached_suggestions
-from trips.models import Event, Stay, Trip
+from suggestions.services import (
+    DAY_STRATEGIES,
+    DAY_STRATEGY_ADD,
+    DAY_STRATEGY_DELETE,
+    DAY_STRATEGY_UNPAIR,
+    generate_day_itinerary,
+    generate_suggestions,
+    get_cached_suggestions,
+)
+from trips.models import Day, Event, Stay, Trip
 from trips.services import GooglePlacesClient, GooglePlacesError
 from trips.utils import accessible_trips_qs, build_categorized_event, get_trip_stages
 from trips.views.maps import _build_map_events_context
@@ -326,6 +337,174 @@ def dismiss_shared_key_notice(request, pk):
     trip = _get_accessible_trip(request, pk)
     SharedKeyNoticeDismissal.objects.get_or_create(user=request.user, trip=trip)
     return HttpResponse(status=204)
+
+
+def _get_accessible_day(request, pk, day_id):
+    trip = _get_accessible_trip(request, pk)
+    day = get_object_or_404(Day, pk=day_id, trip=trip)
+    return trip, day
+
+
+def _to_stop_card(grounded) -> dict:
+    """Turn a GroundedStop into the dict the day-itinerary preview renders."""
+    stop = grounded.stop
+    kind = stop.kind.value
+    icon, icon_color = _KIND_ICON[kind]
+    return {
+        "kind": kind,
+        "name": stop.name,
+        "description": stop.description,
+        "icon": icon,
+        "icon_color": icon_color,
+        "address": grounded.address,
+        "city": grounded.city,
+        "lat": grounded.latitude,
+        "lng": grounded.longitude,
+        "place_id": grounded.place_id,
+        "duration_minutes": stop.estimated_duration_minutes,
+        "existing_event_id": grounded.existing_event_id,
+    }
+
+
+@login_required
+@require_GET
+def plan_day_modal(request, pk, day_id):
+    """HTMX: render the "plan this day" modal shell for a single day.
+
+    When the day already holds events the modal offers the three strategies
+    (add / unpair / delete); nothing is generated until the user submits.
+    """
+    trip, day = _get_accessible_day(request, pk, day_id)
+    return TemplateResponse(
+        request,
+        "suggestions/plan-day-modal.html",
+        {"trip": trip, "day": day, "has_events": day.events.exists()},
+    )
+
+
+@login_required
+@require_POST
+def generate_day(request, pk, day_id):
+    """HTMX: generate a draft day itinerary and render it for review."""
+    trip, day = _get_accessible_day(request, pk, day_id)
+    strategy = request.POST.get("strategy", DAY_STRATEGY_ADD)
+    if strategy not in DAY_STRATEGIES:
+        strategy = DAY_STRATEGY_ADD
+    force_refresh = bool(request.POST.get("refresh"))
+    overrides = {}
+    notes = request.POST.get("notes", "").strip()
+    if notes:
+        overrides["notes"] = notes
+    language = get_profile(request.user).language
+
+    stops = []
+    error_kind = None
+    try:
+        grounded = generate_day_itinerary(
+            request.user, trip, day, strategy, overrides, language, force_refresh
+        )
+        stops = [_to_stop_card(g) for g in grounded]
+    except AISuggestionError as exc:
+        error_kind = exc.kind
+
+    return TemplateResponse(
+        request,
+        "suggestions/plan-day-results.html",
+        {
+            "trip": trip,
+            "day": day,
+            "stops": stops,
+            "strategy": strategy,
+            "error_kind": error_kind,
+            "has_cache": error_kind is None,
+        },
+    )
+
+
+def _create_day_event(user, trip, day, item, order) -> None:
+    """Create an Experience/Meal on ``day`` from a submitted itinerary stop."""
+    name = (item.get("name") or "").strip()
+    category = _ACCEPT_CATEGORY.get(item.get("kind"))
+    if not name or category is None:
+        return
+    obj = build_categorized_event(
+        category,
+        trip=trip,
+        day=day,
+        name=name,
+        address=item.get("address") or "",
+        city=item.get("city") or "",
+        place_id=item.get("place_id") or "",
+        order=order,
+        last_modified_by=user,
+    )
+    lat, lng = item.get("lat"), item.get("lng")
+    if lat is not None and lng is not None:
+        try:
+            obj.latitude = float(lat)
+            obj.longitude = float(lng)
+        except TypeError, ValueError:
+            pass
+    minutes = item.get("duration_minutes")
+    if minutes:
+        obj.estimated_duration = timedelta(minutes=int(minutes))
+    obj.save()
+
+
+def _apply_day_itinerary(user, trip, day, strategy, stops) -> None:
+    """Apply an accepted day itinerary.
+
+    ``unpair``/``delete`` detach or remove the day's current events first, then
+    every accepted stop is created fresh. ``add`` reorders matched existing
+    events in place, creates the new ones, and appends any existing event the
+    user deselected after the accepted sequence.
+    """
+    existing = list(day.events.all())
+    if strategy == DAY_STRATEGY_UNPAIR:
+        Event.objects.filter(day=day).update(day=None)
+    elif strategy == DAY_STRATEGY_DELETE:
+        Event.objects.filter(day=day).delete()
+
+    consumed = set()
+    order = 0
+    for item in stops:
+        existing_id = item.get("existing_event_id")
+        if existing_id and strategy == DAY_STRATEGY_ADD:
+            Event.objects.filter(pk=existing_id, day=day).update(order=order)
+            consumed.add(existing_id)
+        else:
+            _create_day_event(user, trip, day, item, order)
+        order += 1
+
+    if strategy == DAY_STRATEGY_ADD:
+        for event in existing:
+            if event.pk not in consumed:
+                event.order = order
+                event.save(update_fields=["order"])
+                order += 1
+
+
+@login_required
+@require_POST
+def accept_day(request, pk, day_id):
+    """HTMX: apply an accepted day itinerary and refresh the day view."""
+    trip, day = _get_accessible_day(request, pk, day_id)
+    strategy = request.POST.get("strategy", DAY_STRATEGY_ADD)
+    if strategy not in DAY_STRATEGIES:
+        strategy = DAY_STRATEGY_ADD
+    try:
+        stops = json.loads(request.POST.get("stops", "[]"))
+    except json.JSONDecodeError:
+        stops = []
+
+    _apply_day_itinerary(request.user, trip, day, strategy, stops)
+
+    return TemplateResponse(
+        request,
+        "suggestions/day-applied.html",
+        {"trip": trip, "day": day},
+        headers={"HX-Trigger": f"dayModified{day.pk}, unpairedModified"},
+    )
 
 
 @login_required

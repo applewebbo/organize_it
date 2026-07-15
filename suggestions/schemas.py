@@ -45,6 +45,38 @@ class Suggestion(BaseModel):
         return self
 
 
+class ItineraryStop(BaseModel):
+    """A single stop in a generated day itinerary. Only experiences and meals
+    take part in a day plan (stays span multiple days), and each stop carries an
+    AI-estimated duration used to populate ``Event.estimated_duration``."""
+
+    kind: SuggestionKind
+    name: str = Field(min_length=1)
+    description: str = ""
+    address: str = ""
+    city: str = ""
+    type: int | None = None
+    estimated_duration_minutes: int | None = None
+
+    @model_validator(mode="after")
+    def normalize_type_for_kind(self):
+        # Same rationale as Suggestion.normalize_type_for_kind: coerce an
+        # out-of-range type to None instead of failing the whole response.
+        if self.kind is SuggestionKind.EXPERIENCE and self.type not in EXPERIENCE_TYPES:
+            self.type = None
+        elif self.kind is SuggestionKind.MEAL and self.type not in MEAL_TYPES:
+            self.type = None
+        elif self.kind is SuggestionKind.STAY:
+            self.type = None
+        return self
+
+
+class DayItinerary(BaseModel):
+    """An ordered sequence of stops proposed for a single day."""
+
+    stops: list[ItineraryStop] = Field(default_factory=list)
+
+
 class TripContext(BaseModel):
     """Context about the trip fed to the prompt."""
 

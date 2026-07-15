@@ -5,13 +5,25 @@ from django.core.cache import cache
 from django.test import override_settings
 
 from suggestions.ai.base import AISuggestionError
-from suggestions.schemas import Suggestion, SuggestionPrefs, TripContext
+from suggestions.schemas import (
+    DayItinerary,
+    ItineraryStop,
+    Suggestion,
+    SuggestionPrefs,
+    TripContext,
+)
 from suggestions.services import (
     _CACHE_TTL,
     _LAST_TTL,
+    DAY_STRATEGY_ADD,
+    DAY_STRATEGY_DELETE,
+    DAY_STRATEGY_UNPAIR,
+    GroundedStop,
     GroundedSuggestion,
     _last_key,
+    build_day_context,
     build_trip_context,
+    generate_day_itinerary,
     generate_suggestions,
     get_cached_suggestions,
     merge_preferences,
@@ -579,6 +591,277 @@ class TestGenerateSuggestions:
 
         # a stage-scoped request is cached under a different key
         assert provider.generate.call_count == 2
+
+
+class TestBuildDayContext:
+    def test_uses_day_destination_and_coordinates(self):
+        trip = TripFactory(destination="Roma")
+        day = trip.days.first()
+        day.destination = "Firenze"
+        day.destination_latitude = 43.77
+        day.destination_longitude = 11.25
+        day.save(
+            update_fields=[
+                "destination",
+                "destination_latitude",
+                "destination_longitude",
+            ]
+        )
+
+        context = build_day_context(trip, day, language="it")
+
+        assert context.destination == "Firenze"
+        assert context.latitude == 43.77
+        assert context.language == "it"
+
+    def test_falls_back_to_trip_destination_and_coordinates(self):
+        trip = TripFactory(destination="Roma")
+        TripFactory._meta.model.objects.filter(pk=trip.pk).update(
+            destination_latitude=41.9, destination_longitude=12.5
+        )
+        trip.refresh_from_db()
+        day = trip.days.first()
+
+        context = build_day_context(trip, day)
+
+        assert context.destination == "Roma"
+        assert context.latitude == 41.9
+
+    def test_excludes_target_day_events_from_existing_places(self):
+        trip = TripFactory(destination="Roma")
+        days = list(trip.days.all())
+        target, other = days[0], days[1]
+        ExperienceFactory(trip=trip, day=target, name="Colosseo", city="Roma")
+        ExperienceFactory(trip=trip, day=other, name="Duomo", city="Roma")
+
+        context = build_day_context(trip, target)
+
+        assert "Duomo (Roma)" in context.existing_places
+        assert "Colosseo (Roma)" not in context.existing_places
+
+    def test_exclude_names_drops_homonyms_from_avoid_list(self):
+        # A same-named event on another day must not land in the "do NOT propose"
+        # list when that name is fed as a must-include stop (the "add" strategy).
+        trip = TripFactory(destination="Roma")
+        days = list(trip.days.all())
+        target, other = days[0], days[1]
+        ExperienceFactory(trip=trip, day=target, name="Colosseo", city="Roma")
+        ExperienceFactory(trip=trip, day=other, name="Colosseo", city="Roma")
+        ExperienceFactory(trip=trip, day=other, name="Pantheon", city="Roma")
+
+        context = build_day_context(trip, target, exclude_names=["Colosseo"])
+
+        assert "Colosseo (Roma)" not in context.existing_places
+        assert "Pantheon (Roma)" in context.existing_places
+
+    def test_weather_scoped_to_the_day(self):
+        trip = TripFactory(destination="Roma")
+        day = trip.days.first()
+        day.weather_data = {
+            "weather_label": "Clear sky",
+            "temperature_min": 15.0,
+            "temperature_max": 28.0,
+            "precipitation_sum": 0.0,
+        }
+        day.save(update_fields=["weather_data"])
+
+        context = build_day_context(trip, day)
+
+        assert len(context.weather) == 1
+        assert "Clear sky" in context.weather[0]
+
+    def test_no_weather_without_data(self):
+        trip = TripFactory(destination="Roma")
+        context = build_day_context(trip, trip.days.first())
+        assert context.weather == []
+
+
+class TestGenerateDayItinerary:
+    def _provider_returning(self, stops):
+        provider = MagicMock()
+        provider.generate_day.return_value = DayItinerary(stops=stops)
+        return provider
+
+    def test_raises_without_credentials(self):
+        trip = TripFactory()
+        with pytest.raises(AISuggestionError):
+            generate_day_itinerary(trip.author, trip, trip.days.first())
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_grounds_new_stops_with_duration(self, mock_get_provider, mock_client):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        day = trip.days.first()
+        stop = ItineraryStop(
+            kind="meal", name="Trattoria", type=3, estimated_duration_minutes=90
+        )
+        mock_get_provider.return_value = self._provider_returning([stop])
+        mock_client.return_value.search_text.return_value = [PLACE]
+
+        results = generate_day_itinerary(creds.user, trip, day)
+
+        assert len(results) == 1
+        assert isinstance(results[0], GroundedStop)
+        assert results[0].place_id == "ChIJ_grounded"
+        assert results[0].stop.estimated_duration_minutes == 90
+        assert results[0].existing_event_id is None
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_add_strategy_reuses_existing_event(self, mock_get_provider, mock_client):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        day = trip.days.first()
+        existing = ExperienceFactory(
+            trip=trip, day=day, name="Colosseo", city="Roma", address="Piazza"
+        )
+        stops = [
+            ItineraryStop(kind="experience", name="Colosseo", type=1),
+            ItineraryStop(kind="meal", name="New Trattoria", type=3),
+        ]
+        provider = self._provider_returning(stops)
+        mock_get_provider.return_value = provider
+        mock_client.return_value.search_text.return_value = [PLACE]
+
+        results = generate_day_itinerary(
+            creds.user, trip, day, strategy=DAY_STRATEGY_ADD
+        )
+
+        # existing event fed to the prompt and reused without a Places call
+        assert provider.generate_day.call_args.args[3] == ["Colosseo"]
+        # the fed event is not also in the "do NOT propose" avoid-list
+        context = provider.generate_day.call_args.args[0]
+        assert "Colosseo (Roma)" not in context.existing_places
+        assert results[0].existing_event_id == existing.pk
+        assert results[0].address == "Piazza"
+        assert results[1].existing_event_id is None
+        assert mock_client.return_value.search_text.call_count == 1
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_unpair_strategy_ignores_existing_events(
+        self, mock_get_provider, mock_client
+    ):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        day = trip.days.first()
+        ExperienceFactory(trip=trip, day=day, name="Colosseo", city="Roma")
+        provider = self._provider_returning(
+            [ItineraryStop(kind="experience", name="Forum", type=1)]
+        )
+        mock_get_provider.return_value = provider
+        mock_client.return_value.search_text.return_value = [PLACE]
+
+        generate_day_itinerary(creds.user, trip, day, strategy=DAY_STRATEGY_UNPAIR)
+
+        # no must-include stops are fed to the model for a clean day
+        assert provider.generate_day.call_args.args[3] is None
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_delete_strategy_ignores_existing_events(
+        self, mock_get_provider, mock_client
+    ):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        day = trip.days.first()
+        ExperienceFactory(trip=trip, day=day, name="Colosseo", city="Roma")
+        provider = self._provider_returning(
+            [ItineraryStop(kind="experience", name="Forum", type=1)]
+        )
+        mock_get_provider.return_value = provider
+        mock_client.return_value.search_text.return_value = [PLACE]
+
+        generate_day_itinerary(creds.user, trip, day, strategy=DAY_STRATEGY_DELETE)
+
+        assert provider.generate_day.call_args.args[3] is None
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_stays_are_dropped(self, mock_get_provider, mock_client):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        stops = [
+            ItineraryStop(kind="stay", name="Hotel"),
+            ItineraryStop(kind="experience", name="Forum", type=1),
+        ]
+        mock_get_provider.return_value = self._provider_returning(stops)
+        mock_client.return_value.search_text.return_value = [PLACE]
+
+        results = generate_day_itinerary(creds.user, trip, trip.days.first())
+
+        assert [r.stop.name for r in results] == ["Forum"]
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_ungrounded_stop_is_dropped(self, mock_get_provider, mock_client):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        stops = [
+            ItineraryStop(kind="experience", name="Nowhere", type=1),
+            ItineraryStop(kind="meal", name="Trattoria", type=3),
+        ]
+        mock_get_provider.return_value = self._provider_returning(stops)
+        # first stop fails to ground, second succeeds
+        mock_client.return_value.search_text.side_effect = [[], [PLACE]]
+
+        results = generate_day_itinerary(creds.user, trip, trip.days.first())
+
+        assert [r.stop.name for r in results] == ["Trattoria"]
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_second_call_uses_cache(self, mock_get_provider, mock_client):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        day = trip.days.first()
+        provider = self._provider_returning(
+            [ItineraryStop(kind="experience", name="Forum", type=1)]
+        )
+        mock_get_provider.return_value = provider
+        mock_client.return_value.search_text.return_value = [PLACE]
+
+        generate_day_itinerary(creds.user, trip, day)
+        generate_day_itinerary(creds.user, trip, day)
+
+        assert provider.generate_day.call_count == 1
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_force_refresh_bypasses_cache(self, mock_get_provider, mock_client):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        day = trip.days.first()
+        provider = self._provider_returning(
+            [ItineraryStop(kind="experience", name="Forum", type=1)]
+        )
+        mock_get_provider.return_value = provider
+        mock_client.return_value.search_text.return_value = [PLACE]
+
+        generate_day_itinerary(creds.user, trip, day)
+        generate_day_itinerary(creds.user, trip, day, force_refresh=True)
+
+        assert provider.generate_day.call_count == 2
+
+    @override_settings(
+        AI_GENERATION_DAILY_CAP_PER_USER=0, AI_GENERATION_DAILY_CAP_PER_TRIP=100
+    )
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_quota_blocks_before_provider(self, mock_get_provider, mock_client):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        provider = self._provider_returning(
+            [ItineraryStop(kind="experience", name="Forum", type=1)]
+        )
+        mock_get_provider.return_value = provider
+
+        with pytest.raises(AISuggestionError) as exc:
+            generate_day_itinerary(creds.user, trip, trip.days.first())
+
+        assert exc.value.kind == AISuggestionError.RATE_LIMIT
+        provider.generate_day.assert_not_called()
 
 
 class TestGetCachedSuggestions:

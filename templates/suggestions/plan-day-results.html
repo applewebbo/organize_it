@@ -1,0 +1,75 @@
+{% load i18n %}
+{% if error_kind %}
+    <div class="alert alert-warning alert-soft">
+        <div>
+            {% if error_kind == 'config' %}
+                <p>{% trans "AI suggestions are not configured yet. Add a valid API key to get started." %}</p>
+                <a href="{% url 'accounts:profile' %}" class="link link-primary">{% trans "Check your AI settings" %}</a>
+            {% elif error_kind == 'quota' %}
+                <p>{% trans "You have reached the AI provider usage limit. Please try again later." %}</p>
+            {% elif error_kind == 'rate_limit' %}
+                <p>{% trans "You have reached the daily AI suggestion limit. Please try again tomorrow." %}</p>
+            {% else %}
+                <p>{% trans "Something went wrong while generating the itinerary. Please try again." %}</p>
+            {% endif %}
+        </div>
+    </div>
+{% elif stops %}
+    {{ stops|json_script:"plan-day-stops" }}
+    <form hx-post="{% url 'suggestions:accept-day' trip.pk day.pk %}"
+          hx-target="#plan-day-results"
+          hx-swap="innerHTML"
+          hx-disabled-elt="button[type='submit']"
+          x-data="{ stops: JSON.parse(document.getElementById('plan-day-stops').textContent).map(s => ({ ...s, include: true })) }">
+        {% csrf_token %}
+        <input type="hidden" name="strategy" value="{{ strategy }}" />
+        <input type="hidden"
+               name="stops"
+               :value="JSON.stringify(stops.filter(s => s.include))" />
+        <ul class="space-y-2">
+            {% for stop in stops %}
+                <li class="border-base-300 bg-base-100 rounded-lg border p-3">
+                    <label class="flex cursor-pointer items-center gap-2">
+                        <input type="checkbox"
+                               class="checkbox checkbox-sm shrink-0"
+                               x-model="stops[{{ forloop.counter0 }}].include" />
+                        <i class="ph-bold {{ stop.icon }} {{ stop.icon_color }} i-sm shrink-0"
+                           title="{{ stop.kind|capfirst }}"
+                           aria-hidden="true"></i>
+                        <span class="grow truncate font-semibold">{{ stop.name }}</span>
+                        {% if stop.duration_minutes %}
+                            <span class="text-base-content/50 shrink-0 text-xs">{{ stop.duration_minutes }}′</span>
+                        {% endif %}
+                        {% if stop.existing_event_id %}
+                            <span class="badge badge-xs badge-ghost shrink-0">{% trans 'existing' %}</span>
+                        {% endif %}
+                    </label>
+                    {% if stop.description %}
+                        <p class="text-base-content/70 line-clamp-2 mt-1 ps-6 text-xs">{{ stop.description }}</p>
+                    {% endif %}
+                    {% if stop.address %}<p class="text-base-content/50 mt-0.5 ps-6 text-xs">{{ stop.address }}</p>{% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+        {% if strategy == 'delete' %}
+            <p class="text-warning mt-2 flex items-center gap-1 text-xs">
+                <i class="ph-bold ph-warning i-xs"></i>
+                {% trans "The day's current events will be deleted." %}
+            </p>
+        {% elif strategy == 'unpair' %}
+            <p class="text-base-content/60 mt-2 flex items-center gap-1 text-xs">
+                <i class="ph-bold ph-info i-xs"></i>
+                {% trans "The day's current events will be moved to the unassigned list." %}
+            </p>
+        {% endif %}
+        <button type="submit" class="btn btn-sm btn-success mt-3 w-full">
+            <i class="ph-bold ph-check i-sm htmx-hide-on-request"></i>
+            {% trans 'Apply day' %}
+        </button>
+    </form>
+{% else %}
+    <div class="text-base-content/50 py-8 text-center">
+        <i class="ph-bold ph-sparkle i-lg mb-2"></i>
+        <p>{% trans 'No itinerary generated' %}</p>
+    </div>
+{% endif %}

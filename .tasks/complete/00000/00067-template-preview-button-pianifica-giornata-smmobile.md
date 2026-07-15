@@ -1,0 +1,1 @@
+../../all/00000/00067-template-preview-button-pianifica-giornata-smmobile.md

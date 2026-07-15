@@ -14,7 +14,14 @@ from suggestions.models import (
     SharedKeyNoticeDismissal,
     SuggestionPreferences,
 )
-from suggestions.schemas import Suggestion, SuggestionPrefs, TripContext
+from suggestions.schemas import (
+    DayItinerary,
+    ItineraryStop,
+    Suggestion,
+    SuggestionKind,
+    SuggestionPrefs,
+    TripContext,
+)
 from trips.models import Event, Stay, Trip
 from trips.services import GooglePlacesClient, GooglePlacesError
 
@@ -52,6 +59,15 @@ _QUOTA_TTL = 48 * 3600
 # user's target count. Grounding stops as soon as the target is met, so the
 # extra candidates cost nothing when grounding succeeds cleanly.
 _OVERFETCH_FACTOR = 3
+
+# Strategies for a day-itinerary generation when the target day already holds
+# events. Only "add" feeds the existing events to the model (to interleave and
+# reorder them); "unpair"/"delete" generate a clean day and act on the existing
+# events only when the draft is accepted.
+DAY_STRATEGY_ADD = "add"
+DAY_STRATEGY_UNPAIR = "unpair"
+DAY_STRATEGY_DELETE = "delete"
+DAY_STRATEGIES = frozenset({DAY_STRATEGY_ADD, DAY_STRATEGY_UNPAIR, DAY_STRATEGY_DELETE})
 
 
 def _cache_key(
@@ -399,6 +415,199 @@ def generate_suggestions(
 
     cache.set(key, grounded, _CACHE_TTL)
     cache.set(_last_key(user, trip), grounded, _LAST_TTL)
+    return grounded
+
+
+@dataclass
+class GroundedStop:
+    """An itinerary stop enriched with real location data. ``existing_event_id``
+    is set when the stop maps to an event already on the day (the "add"
+    strategy), so acceptance reorders that event instead of creating a new one."""
+
+    stop: ItineraryStop
+    address: str
+    city: str
+    latitude: float | None
+    longitude: float | None
+    place_id: str
+    existing_event_id: int | None = None
+
+
+def _day_existing_places(
+    trip: Trip, day, exclude_names: list[str] | None = None
+) -> list[str]:
+    """Trip-wide planned places minus the target day's own events.
+
+    The day's events never appear as "avoid" hints: for "add" they are fed
+    separately as must-include stops, and for "unpair"/"delete" they are being
+    removed. ``exclude_names`` additionally drops any same-named place elsewhere
+    in the trip, so a must-include stop is never also listed as "do NOT propose".
+    The rest of the trip is still passed so the model avoids duplicates.
+    """
+    exclude = {n.strip().casefold() for n in (exclude_names or [])}
+    events = trip.all_events.exclude(day=day)
+    stays = Stay.objects.filter(days__trip=trip).distinct()
+    labels = [
+        _place_label(e.name, e.city)
+        for e in events
+        if e.name.strip().casefold() not in exclude
+    ]
+    labels += [
+        _place_label(s.name, s.city)
+        for s in stays
+        if s.name.strip().casefold() not in exclude
+    ]
+    return labels
+
+
+def _day_weather_lines(day) -> list[str]:
+    """Single compact weather line for the target day, when a forecast exists."""
+    w = day.weather_data
+    if not w:
+        return []
+    return [
+        f"{day.date}: {w['weather_label']}, "
+        f"{round(w['temperature_min'])}–{round(w['temperature_max'])}°C, "
+        f"{w['precipitation_sum']}mm rain"
+    ]
+
+
+def build_day_context(
+    trip: Trip, day, language: str = "en", exclude_names: list[str] | None = None
+) -> TripContext:
+    """Build the TripContext for a single-day itinerary, scoped to the day's
+    destination and forecast. ``exclude_names`` drops same-named places from the
+    avoid-list (used for the "add" strategy's must-include stops)."""
+    return TripContext(
+        destination=day.destination or trip.destination,
+        latitude=(
+            day.destination_latitude
+            if day.destination_latitude is not None
+            else trip.destination_latitude
+        ),
+        longitude=(
+            day.destination_longitude
+            if day.destination_longitude is not None
+            else trip.destination_longitude
+        ),
+        start_date=trip.start_date,
+        end_date=trip.end_date,
+        language=language,
+        existing_places=_day_existing_places(trip, day, exclude_names),
+        weather=_day_weather_lines(day),
+    )
+
+
+def _day_cache_key(
+    trip: Trip, day, strategy: str, preferences: SuggestionPrefs, language: str
+) -> str:
+    payload = json.dumps(
+        {
+            "trip": trip.pk,
+            "day": day.pk,
+            "strategy": strategy,
+            "lang": language,
+            "prefs": preferences.model_dump(),
+        },
+        sort_keys=True,
+        default=str,
+    )
+    digest = hashlib.sha256(payload.encode()).hexdigest()[:16]
+    return f"ai_day:{trip.pk}:{day.pk}:{digest}"
+
+
+def _ground_itinerary(
+    itinerary: DayItinerary,
+    context: TripContext,
+    existing_events: list,
+    radius: int,
+) -> list[GroundedStop]:
+    """Ground each stop to a real place, preserving order.
+
+    Stops whose name matches an existing day event (the "add" strategy) reuse
+    that event's location instead of hitting Google Places, and carry its id so
+    acceptance can reorder it. Stays and ungrounded stops are dropped.
+    """
+    by_name = {e.name.strip().casefold(): e for e in existing_events}
+    client = GooglePlacesClient()
+    grounded: list[GroundedStop] = []
+    for stop in itinerary.stops:
+        if stop.kind is SuggestionKind.STAY:
+            continue
+        existing = by_name.get(stop.name.strip().casefold())
+        if existing is not None:
+            grounded.append(
+                GroundedStop(
+                    stop=stop,
+                    address=existing.address,
+                    city=existing.city,
+                    latitude=existing.latitude,
+                    longitude=existing.longitude,
+                    place_id=existing.place_id,
+                    existing_event_id=existing.pk,
+                )
+            )
+            continue
+        result = _ground(stop, context, client, radius)
+        if result is not None:
+            grounded.append(
+                GroundedStop(
+                    stop=stop,
+                    address=result.address,
+                    city=result.city,
+                    latitude=result.latitude,
+                    longitude=result.longitude,
+                    place_id=result.place_id,
+                )
+            )
+    return grounded
+
+
+def generate_day_itinerary(
+    user,
+    trip: Trip,
+    day,
+    strategy: str = DAY_STRATEGY_ADD,
+    overrides: dict | None = None,
+    language: str = "en",
+    force_refresh: bool = False,
+) -> list[GroundedStop]:
+    """Generate and ground a single-day itinerary for ``day``.
+
+    ``strategy`` decides how existing events are treated (see DAY_STRATEGIES);
+    only "add" feeds them to the model for interleaving. Results are cached per
+    day + strategy + preferences and the daily generation caps are enforced on a
+    real provider hit, mirroring ``generate_suggestions``. Nothing on the day is
+    mutated here — the draft is applied only on acceptance.
+    """
+    credentials = resolve_credentials(user, trip)
+    if credentials is None:
+        raise AISuggestionError(
+            "No AI credentials configured", kind=AISuggestionError.CONFIG
+        )
+
+    preferences = merge_preferences(
+        SuggestionPreferences.objects.filter(user=user).first(), overrides
+    )
+
+    existing_events = list(day.events.all()) if strategy == DAY_STRATEGY_ADD else []
+    day_stops = [e.name for e in existing_events] or None
+    context = build_day_context(trip, day, language=language, exclude_names=day_stops)
+
+    key = _day_cache_key(trip, day, strategy, preferences, language)
+    if not force_refresh:
+        cached = cache.get(key)
+        if cached is not None:
+            return cached
+
+    _enforce_generation_quota(user, trip)
+
+    provider = get_provider(credentials.provider, credentials.api_key_encrypted)
+    itinerary = provider.generate_day(context, preferences, day.date, day_stops)
+
+    radius = _RADIUS_METERS.get(preferences.search_radius, _GROUNDING_RADIUS)
+    grounded = _ground_itinerary(itinerary, context, existing_events, radius)
+    cache.set(key, grounded, _CACHE_TTL)
     return grounded
 
 

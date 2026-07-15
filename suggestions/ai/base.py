@@ -1,6 +1,12 @@
+from datetime import date
 from typing import Protocol, runtime_checkable
 
-from suggestions.schemas import Suggestion, SuggestionPrefs, TripContext
+from suggestions.schemas import (
+    DayItinerary,
+    Suggestion,
+    SuggestionPrefs,
+    TripContext,
+)
 
 
 class AISuggestionError(Exception):
@@ -31,3 +37,11 @@ class TripSuggestionProvider(Protocol):
     def generate(
         self, context: TripContext, prefs: SuggestionPrefs
     ) -> list[Suggestion]: ...
+
+    def generate_day(
+        self,
+        context: TripContext,
+        prefs: SuggestionPrefs,
+        day_date: date,
+        day_stops: list[str] | None = None,
+    ) -> DayItinerary: ...

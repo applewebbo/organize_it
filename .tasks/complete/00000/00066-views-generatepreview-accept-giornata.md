@@ -1,0 +1,1 @@
+../../all/00000/00066-views-generatepreview-accept-giornata.md
