@@ -971,7 +971,13 @@ class TestResolveMapsLinkView(TestCase):
         mock_resp = MagicMock()
         mock_resp.url = "https://www.google.com/maps/place/No+Place+ID+Here"
         with self.login(user):
-            with patch("trips.views.maps.requests.get", return_value=mock_resp):
+            with (
+                patch("trips.views.maps.requests.get", return_value=mock_resp),
+                patch(
+                    "trips.views.maps.GooglePlacesClient.search_text",
+                    return_value=[],
+                ),
+            ):
                 response = self.post(
                     "trips:resolve-maps-link",
                     data={"maps_link": "https://maps.app.goo.gl/abc123"},
