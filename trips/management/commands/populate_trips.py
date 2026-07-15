@@ -35,109 +35,94 @@ MULTI_TRIP_DATE_CONFIG = (-3, 4)
 User = get_user_model()
 
 
-def _create_stay_and_events(trip, all_days, author, creator):
+class _PlacePool:
+    """Draws distinct places per (city, category) so a trip never repeats a name.
+
+    Places are handed out without replacement from a per-trip shuffled copy of the
+    city pool; once a category is exhausted it falls back to random reuse so
+    generation never crashes on short pools.
+    """
+
+    def __init__(self):
+        self._remaining = {}
+
+    def take(self, city, category):
+        """Return an unused place for the city+category, or reuse when exhausted."""
+        key = (city, category)
+        remaining = self._remaining.get(key)
+        if remaining is None:
+            remaining = PLACES[city][category].copy()
+            random.shuffle(remaining)
+            self._remaining[key] = remaining
+        if remaining:
+            return remaining.pop()
+        pool = PLACES[city][category]
+        return random.choice(pool) if pool else None
+
+
+def _place_kwargs(place):
+    """Return factory kwargs for a chosen place, empty when the pool is exhausted."""
+    return {"chosen_place": place} if place else {}
+
+
+def _create_stay_and_events(trip, all_days, author, creator, pool):
     """Create stay, meals and experiences for a trip."""
     destination = trip.destination
     hotels_for_city = PLACES[destination]["hotels"]
-    restaurants_for_city = PLACES[destination]["restaurants"]
 
     if len(all_days) > 2 and len(hotels_for_city) >= 2:
-        chosen_hotels = random.sample(hotels_for_city, 2)
         stay1 = StayFactory(
-            city=destination, chosen_place=chosen_hotels[0], author=author
+            city=destination,
+            author=author,
+            **_place_kwargs(pool.take(destination, "hotels")),
         )
         stay1.days.set(all_days[:2])
         stay2 = StayFactory(
-            city=destination, chosen_place=chosen_hotels[1], author=author
+            city=destination,
+            author=author,
+            **_place_kwargs(pool.take(destination, "hotels")),
         )
         stay2.days.set(all_days[2:])
     else:
-        stay = StayFactory(city=destination, author=author)
+        stay = StayFactory(
+            city=destination,
+            author=author,
+            **_place_kwargs(pool.take(destination, "hotels")),
+        )
         stay.days.set(all_days)
 
     for day in trip.days.all():
-        if len(restaurants_for_city) >= 2:
-            chosen_restaurants = random.sample(restaurants_for_city, 2)
-            MealFactory.create(
-                day=day,
-                trip=trip,
-                type=2,
-                estimated_duration=timedelta(minutes=90),
-                city=destination,
-                chosen_place=chosen_restaurants[0],
-                last_modified_by=creator,
-            )
-            MealFactory.create(
-                day=day,
-                trip=trip,
-                type=3,
-                estimated_duration=timedelta(minutes=90),
-                city=destination,
-                chosen_place=chosen_restaurants[1],
-                last_modified_by=creator,
-            )
-        else:
-            MealFactory.create(
-                day=day,
-                trip=trip,
-                type=2,
-                estimated_duration=timedelta(minutes=90),
-                city=destination,
-                last_modified_by=creator,
-            )
-
-        ExperienceFactory.create(
-            day=day,
-            trip=trip,
-            estimated_duration=timedelta(minutes=random.randrange(60, 120, 15)),
-            city=destination,
-            last_modified_by=creator,
-        )
+        _create_events_for_day(day, trip, destination, creator, pool)
 
 
-def _create_events_for_day(day, trip, city, creator):
+def _create_events_for_day(day, trip, city, creator, pool):
     """Create meal and experience events for a day using the given city's places."""
-    restaurants = PLACES[city]["restaurants"]
-    attractions = PLACES[city]["attractions"]
-    if len(restaurants) >= 2:
-        chosen = random.sample(restaurants, 2)
-        MealFactory.create(
-            day=day,
-            trip=trip,
-            type=2,
-            estimated_duration=timedelta(minutes=90),
-            city=city,
-            chosen_place=chosen[0],
-            last_modified_by=creator,
-        )
-        MealFactory.create(
-            day=day,
-            trip=trip,
-            type=3,
-            estimated_duration=timedelta(minutes=90),
-            city=city,
-            chosen_place=chosen[1],
-            last_modified_by=creator,
-        )
-    else:
-        MealFactory.create(
-            day=day,
-            trip=trip,
-            type=2,
-            estimated_duration=timedelta(minutes=90),
-            city=city,
-            chosen_place=random.choice(restaurants) if restaurants else None,
-            last_modified_by=creator,
-        )
-    if attractions:
-        ExperienceFactory.create(
-            day=day,
-            trip=trip,
-            estimated_duration=timedelta(minutes=random.randrange(60, 120, 15)),
-            city=city,
-            chosen_place=random.choice(attractions),
-            last_modified_by=creator,
-        )
+    MealFactory.create(
+        day=day,
+        trip=trip,
+        type=2,
+        estimated_duration=timedelta(minutes=90),
+        city=city,
+        last_modified_by=creator,
+        **_place_kwargs(pool.take(city, "restaurants")),
+    )
+    MealFactory.create(
+        day=day,
+        trip=trip,
+        type=3,
+        estimated_duration=timedelta(minutes=90),
+        city=city,
+        last_modified_by=creator,
+        **_place_kwargs(pool.take(city, "restaurants")),
+    )
+    ExperienceFactory.create(
+        day=day,
+        trip=trip,
+        estimated_duration=timedelta(minutes=random.randrange(60, 120, 15)),
+        city=city,
+        last_modified_by=creator,
+        **_place_kwargs(pool.take(city, "attractions")),
+    )
 
 
 def _create_multi_destination_trip(user, cities):
@@ -152,6 +137,7 @@ def _create_multi_destination_trip(user, cities):
     )
     all_days = list(trip.days.order_by("number"))
     mid = len(all_days) // 2
+    pool = _PlacePool()
 
     # First half: main destination (city1, leave day.destination blank = inherits trip.destination)
     first_half = all_days[:mid]
@@ -164,21 +150,21 @@ def _create_multi_destination_trip(user, cities):
     # Stay for city1
     if PLACES[city1]["hotels"]:
         stay1 = StayFactory(
-            city=city1, chosen_place=PLACES[city1]["hotels"][0], author=user
+            city=city1, author=user, **_place_kwargs(pool.take(city1, "hotels"))
         )
         stay1.days.set(first_half)
 
     # Stay for city2
     if PLACES[city2]["hotels"]:
         stay2 = StayFactory(
-            city=city2, chosen_place=PLACES[city2]["hotels"][0], author=user
+            city=city2, author=user, **_place_kwargs(pool.take(city2, "hotels"))
         )
         stay2.days.set(second_half)
 
     for day in first_half:
-        _create_events_for_day(day, trip, city1, user)
+        _create_events_for_day(day, trip, city1, user, pool)
     for day in second_half:
-        _create_events_for_day(day, trip, city2, user)
+        _create_events_for_day(day, trip, city2, user, pool)
 
     # Calculate transfers after stays/events are created (needs geocoded coordinates)
     for day in all_days[:-1]:
@@ -225,7 +211,9 @@ class Command(BaseCommand):
                     direction=2,
                 )
                 all_days = list(trip.days.all())
-                _create_stay_and_events(trip, all_days, author=user, creator=user)
+                _create_stay_and_events(
+                    trip, all_days, author=user, creator=user, pool=_PlacePool()
+                )
 
         # Multi-destination road trip for each user
         for user in users:
@@ -263,12 +251,15 @@ class Command(BaseCommand):
                     direction=1,
                 )
                 all_days = list(shared_trip.days.all())
-                stay = StayFactory(city=destination, author=owner)
+                pool = _PlacePool()
+                stay = StayFactory(
+                    city=destination,
+                    author=owner,
+                    **_place_kwargs(pool.take(destination, "hotels")),
+                )
                 stay.days.set(all_days)
 
                 for day in shared_trip.days.all():
-                    restaurants = PLACES[destination]["restaurants"]
-                    chosen = random.sample(restaurants, min(2, len(restaurants)))
                     # Meal by owner
                     MealFactory.create(
                         day=day,
@@ -276,8 +267,8 @@ class Command(BaseCommand):
                         type=2,
                         estimated_duration=timedelta(minutes=90),
                         city=destination,
-                        chosen_place=chosen[0] if chosen else None,
                         last_modified_by=owner,
+                        **_place_kwargs(pool.take(destination, "restaurants")),
                     )
                     MealFactory.create(
                         day=day,
@@ -285,8 +276,8 @@ class Command(BaseCommand):
                         type=3,
                         estimated_duration=timedelta(minutes=90),
                         city=destination,
-                        chosen_place=chosen[1] if len(chosen) > 1 else None,
                         last_modified_by=collab,
+                        **_place_kwargs(pool.take(destination, "restaurants")),
                     )
                     ExperienceFactory.create(
                         day=day,
@@ -294,6 +285,7 @@ class Command(BaseCommand):
                         estimated_duration=timedelta(minutes=120),
                         city=destination,
                         last_modified_by=owner,
+                        **_place_kwargs(pool.take(destination, "attractions")),
                     )
                     ExperienceFactory.create(
                         day=day,
@@ -301,6 +293,7 @@ class Command(BaseCommand):
                         estimated_duration=timedelta(minutes=120),
                         city=destination,
                         last_modified_by=collab,
+                        **_place_kwargs(pool.take(destination, "attractions")),
                     )
 
         logger.info("Trips populated correctly!")
