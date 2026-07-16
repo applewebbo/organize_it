@@ -4,7 +4,7 @@ slug: expense-data-models-migration-factories-admin-for-379
 title: 'Expense data models + migration + factories + admin (for #379)'
 labels: []
 created: '2026-07-16T12:35:47.995+02:00'
-updated: '2026-07-16T12:36:09.411+02:00'
+updated: '2026-07-16T12:42:27.530+02:00'
 ---
 
 ## Task Comments
@@ -12,3 +12,4 @@ updated: '2026-07-16T12:36:09.411+02:00'
 | Commented At | Comment |
 | --- | --- |
 | 2026-07-16T12:36:09.411+02:00 | Status changed from ready to in-progress |
+| 2026-07-16T12:42:27.530+02:00 | Status changed from in-progress to complete |
