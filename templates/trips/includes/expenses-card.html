@@ -1,0 +1,82 @@
+{% load i18n expense_tags %}
+<div class="card bg-base-100 shadow">
+    <div class="card-body">
+        <div class="flex items-center justify-between">
+            <h2 class="card-title flex items-center gap-2 text-xl font-semibold">
+                <i class="ph ph-receipt text-primary"></i>
+                {% trans "Expenses" %}
+            </h2>
+            {% if trip.expenses_enabled %}
+                <button class="btn btn-ghost btn-sm btn-circle"
+                        hx-get="{% url 'trips:expense-settings' trip.pk %}"
+                        hx-target="#dialog"
+                        @click="$dispatch('open-modal'); document.activeElement.blur()"
+                        aria-label="{% trans 'Expense settings' %}">
+                    <i class="ph ph-gear"></i>
+                </button>
+            {% endif %}
+        </div>
+        {% if not trip.expenses_enabled %}
+            <p class="text-base-content/60 mt-2 text-sm">
+                {% trans "Track who paid for what and split shared costs among participants." %}
+            </p>
+            <div class="mt-3">
+                <button class="btn btn-primary btn-sm gap-1"
+                        hx-get="{% url 'trips:expense-settings' trip.pk %}"
+                        hx-target="#dialog"
+                        @click="$dispatch('open-modal'); document.activeElement.blur()">
+                    <i class="ph ph-sliders"></i>
+                    {% trans "Enable expense sharing" %}
+                </button>
+            </div>
+        {% else %}
+            <div class="mt-2 flex flex-wrap items-center gap-4">
+                <div>
+                    <p class="text-base-content/50 text-xs tracking-wide uppercase">{% trans "Total" %}</p>
+                    <p class="text-lg font-semibold">{{ summary.total|money:summary.currency }}</p>
+                </div>
+                {% if user_net is not None %}
+                    <div>
+                        <p class="text-base-content/50 text-xs tracking-wide uppercase">{% trans "Your balance" %}</p>
+                        {% if user_net > 0 %}
+                            <p class="text-success text-lg font-semibold">{% trans "you are owed" %} {{ user_net|money:summary.currency }}</p>
+                        {% elif user_net < 0 %}
+                            <p class="text-error text-lg font-semibold">{% trans "you owe" %} {{ user_net|money:summary.currency }}</p>
+                        {% else %}
+                            <p class="text-lg font-semibold">{% trans "settled up" %}</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+            {% if summary.settlements %}
+                <ul class="mt-3 space-y-1 text-sm">
+                    {% for s in summary.settlements|slice:":3" %}
+                        <li class="flex items-center gap-2">
+                            <i class="ph ph-arrow-right text-base-content/40"></i>
+                            <span><strong>{{ s.from_label }}</strong> → <strong>{{ s.to_label }}</strong></span>
+                            <span class="text-base-content/70 ml-auto">{{ s.amount|money:summary.currency }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-base-content/50 mt-3 text-sm">{% trans "Everyone is settled up." %}</p>
+            {% endif %}
+            <div class="card-actions mt-4 justify-end">
+                <button class="btn btn-outline btn-sm gap-1"
+                        hx-get="{% url 'trips:expenses-modal' trip.pk %}"
+                        hx-target="#dialog"
+                        @click="$dispatch('open-modal'); document.activeElement.blur()">
+                    <i class="ph ph-list-magnifying-glass"></i>
+                    {% trans "Details" %}
+                </button>
+                <button class="btn btn-primary btn-sm gap-1"
+                        hx-get="{% url 'trips:expense-create' trip.pk %}"
+                        hx-target="#dialog"
+                        @click="$dispatch('open-modal'); document.activeElement.blur()">
+                    <i class="ph ph-plus"></i>
+                    {% trans "Add expense" %}
+                </button>
+            </div>
+        {% endif %}
+    </div>
+</div>

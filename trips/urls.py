@@ -374,6 +374,16 @@ urlpatterns += [
     ),
     # EXPENSES
     path(
+        "trips/<int:trip_pk>/expenses/card/",
+        views.expenses_card,
+        name="expenses-card",
+    ),
+    path(
+        "trips/<int:trip_pk>/expenses/modal/",
+        views.expenses_modal,
+        name="expenses-modal",
+    ),
+    path(
         "trips/<int:trip_pk>/expenses/settings/",
         views.expense_settings,
         name="expense-settings",

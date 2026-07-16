@@ -63,6 +63,8 @@ from trips.views.expenses import (
     expense_delete,
     expense_modify,
     expense_settings,
+    expenses_card,
+    expenses_modal,
     family_unit_assign,
     family_unit_create,
     family_unit_delete,
@@ -269,4 +271,6 @@ __all__ = [
     "expense_create",
     "expense_modify",
     "expense_delete",
+    "expenses_card",
+    "expenses_modal",
 ]

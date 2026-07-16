@@ -30,6 +30,13 @@
                  hx-trigger="load, attachmentsModified from:body"
                  hx-swap="innerHTML"></div>
             <!-- END Documents Section -->
+            <!-- Expenses Section -->
+            <div id="expenses-card-container"
+                 class="mb-8"
+                 hx-get="{% url 'trips:expenses-card' trip.pk %}"
+                 hx-trigger="load, expensesModified from:body"
+                 hx-swap="innerHTML"></div>
+            <!-- END Expenses Section -->
             <!-- Collaborators Section -->
             {% with collaborations=trip.collaborations.all %}
                 {% if request.user == trip.author or collaborations %}

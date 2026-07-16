@@ -1,6 +1,7 @@
 import json
 
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
@@ -8,7 +9,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 
 from accounts.models import get_profile
-from trips.expenses import ensure_expense_participants
+from trips.expenses import build_expense_summary, ensure_expense_participants
 from trips.forms import ExpenseForm, ExpenseSettingsForm, FamilyUnitForm
 from trips.models import (
     Event,
@@ -19,9 +20,20 @@ from trips.models import (
     MainTransfer,
     Stay,
 )
-from trips.utils import editable_trips_qs
+from trips.utils import accessible_trips_qs, editable_trips_qs
 
 EXPENSES_MODIFIED = {"HX-Trigger": "expensesModified"}
+
+
+def _user_net(trip, user, summary):
+    """The current user's individual net balance, or None if not a participant."""
+    participant = trip.expense_participants.filter(
+        Q(user=user) | Q(collaboration__user=user)
+    ).first()
+    if participant is None:
+        return None
+    data = summary["nets_by_participant"].get(participant.pk)
+    return data["net"] if data else None
 
 
 def _config_context(trip):
@@ -136,6 +148,33 @@ def participant_toggle_child(request, pk):
     participant.is_child = not participant.is_child
     participant.save(update_fields=["is_child"])
     return _render_config(request, trip)
+
+
+@login_required
+def expenses_card(request, trip_pk):
+    """Lazy summary card shown inside the trip detail (any participant)."""
+    trip = get_object_or_404(accessible_trips_qs(request.user), pk=trip_pk)
+    context = {"trip": trip}
+    if trip.expenses_enabled:
+        ensure_expense_participants(trip)
+        summary = build_expense_summary(trip)
+        context["summary"] = summary
+        context["user_net"] = _user_net(trip, request.user, summary)
+    return TemplateResponse(request, "trips/includes/expenses-card.html", context)
+
+
+@login_required
+def expenses_modal(request, trip_pk):
+    """Detailed expense view (balances, list, totals) in a modal."""
+    trip = get_object_or_404(accessible_trips_qs(request.user), pk=trip_pk)
+    ensure_expense_participants(trip)
+    summary = build_expense_summary(trip)
+    expenses = trip.expenses.select_related("payer").all()
+    return TemplateResponse(
+        request,
+        "trips/expenses-modal.html",
+        {"trip": trip, "summary": summary, "expenses": expenses},
+    )
 
 
 def _resolve_linked(trip, ct, obj_id):

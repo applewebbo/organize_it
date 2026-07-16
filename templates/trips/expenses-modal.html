@@ -1,0 +1,137 @@
+{% load i18n expense_tags %}
+<div class="modal-content" x-data="{ tab: 'balances' }">
+    <div class="border-base-300 flex items-center justify-between rounded-t border-b p-4 md:px-5 md:py-2.5">
+        <h3 class="text-xl font-semibold">{% trans "Expenses" %}</h3>
+        <button type="button"
+                class="btn btn-sm btn-circle btn-ghost"
+                x-on:click="openModal = false"
+                aria-label="{% trans 'Close' %}">✕</button>
+    </div>
+    <div class="p-4 md:p-5">
+        <div role="tablist" class="tabs tabs-bordered mb-4">
+            <button role="tab"
+                    class="tab"
+                    :class="tab === 'balances' && 'tab-active'"
+                    @click="tab = 'balances'">{% trans "Balances" %}</button>
+            <button role="tab"
+                    class="tab"
+                    :class="tab === 'expenses' && 'tab-active'"
+                    @click="tab = 'expenses'">{% trans "Expenses" %}</button>
+            <button role="tab"
+                    class="tab"
+                    :class="tab === 'totals' && 'tab-active'"
+                    @click="tab = 'totals'">{% trans "Totals" %}</button>
+        </div>
+        <div x-show="tab === 'balances'">
+            {% if summary.warnings %}
+                <div class="alert alert-warning alert-soft mb-3" role="alert">
+                    <i class="ph-bold ph-warning i-md"></i>
+                    <span>
+                        {% blocktrans %}Some children are not assigned to a family unit with an adult, so their share is not charged to a parent. Assign them in the expense settings.{% endblocktrans %}
+                    </span>
+                </div>
+            {% endif %}
+            {% if summary.settlements %}
+                <ul class="mb-4 space-y-2">
+                    {% for s in summary.settlements %}
+                        <li class="bg-base-200 flex items-center gap-2 rounded-lg px-3 py-2 text-sm">
+                            <strong>{{ s.from_label }}</strong>
+                            <i class="ph ph-arrow-right text-base-content/50"></i>
+                            <strong>{{ s.to_label }}</strong>
+                            <span class="ml-auto font-semibold">{{ s.amount|money:summary.currency }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-base-content/60 mb-4 text-sm">{% trans "Everyone is settled up." %}</p>
+            {% endif %}
+            <div class="overflow-x-auto">
+                <table class="table-sm table">
+                    <thead>
+                        <tr>
+                            <th>{% trans "Participant" %}</th>
+                            <th class="text-right">{% trans "Paid" %}</th>
+                            <th class="text-right">{% trans "Share" %}</th>
+                            <th class="text-right">{% trans "Balance" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in summary.balances %}
+                            <tr>
+                                <td>{{ row.participant.display_name }}</td>
+                                <td class="text-right">{{ row.paid|money:summary.currency }}</td>
+                                <td class="text-right">{{ row.owed|money:summary.currency }}</td>
+                                <td class="text-right {% if row.net > 0 %}text-success{% elif row.net < 0 %}text-error{% endif %}">
+                                    {{ row.net|money:summary.currency }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div x-show="tab === 'expenses'" x-cloak>
+            {% if expenses %}
+                <ul class="divide-base-300 divide-y">
+                    {% for expense in expenses %}
+                        <li class="flex items-center gap-3 py-2">
+                            <div class="min-w-0 flex-1">
+                                <p class="truncate font-medium">{{ expense.title }}</p>
+                                <p class="text-base-content/50 text-xs">
+                                    {{ expense.date }} · {{ expense.get_category_display }} · {{ expense.payer.display_name }}
+                                </p>
+                            </div>
+                            <span class="font-semibold">{{ expense.amount|money:summary.currency }}</span>
+                            <button class="btn btn-ghost btn-xs btn-circle"
+                                    hx-get="{% url 'trips:expense-modify' expense.pk %}"
+                                    hx-target="#dialog"
+                                    aria-label="{% trans 'Edit expense' %}">
+                                <i class="ph ph-pencil-simple"></i>
+                            </button>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-base-content/60 text-sm">{% trans "No expenses yet." %}</p>
+            {% endif %}
+        </div>
+        <div x-show="tab === 'totals'" x-cloak>
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                    <h4 class="mb-2 font-semibold">{% trans "By day" %}</h4>
+                    <table class="table-sm table">
+                        <tbody>
+                            {% for row in summary.by_day %}
+                                <tr>
+                                    <td>{% if row.day_number %}{% trans "Day" %} {{ row.day_number }} · {% endif %}{{ row.date }}</td>
+                                    <td class="text-right">{{ row.total|money:summary.currency }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td class="text-base-content/50">{% trans "No expenses yet." %}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <h4 class="mb-2 font-semibold">{% trans "By category" %}</h4>
+                    <table class="table-sm table">
+                        <tbody>
+                            {% for row in summary.by_category %}
+                                <tr>
+                                    <td>{{ row.label }}</td>
+                                    <td class="text-right">{{ row.total|money:summary.currency }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td class="text-base-content/50">{% trans "No expenses yet." %}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
