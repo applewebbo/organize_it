@@ -80,6 +80,8 @@ class TestEnsureExpenseParticipants:
         expense_factory(trip=trip, payer=participant, amount=Decimal("10.00"))
         collab.delete()
         ensure_expense_participants(trip)
+        # a second sync keeps the already-deactivated orphan untouched
+        ensure_expense_participants(trip)
         participant.refresh_from_db()
         assert participant.is_active is False
         assert ExpenseParticipant.objects.filter(trip=trip).count() == 2
