@@ -59,6 +59,9 @@ from trips.views.events import (
     tag_suggestions,
 )
 from trips.views.expenses import (
+    expense_create,
+    expense_delete,
+    expense_modify,
     expense_settings,
     family_unit_assign,
     family_unit_create,
@@ -263,4 +266,7 @@ __all__ = [
     "family_unit_delete",
     "family_unit_assign",
     "participant_toggle_child",
+    "expense_create",
+    "expense_modify",
+    "expense_delete",
 ]

@@ -398,4 +398,19 @@ urlpatterns += [
         views.participant_toggle_child,
         name="participant-toggle-child",
     ),
+    path(
+        "trips/<int:trip_pk>/expenses/create/",
+        views.expense_create,
+        name="expense-create",
+    ),
+    path(
+        "expenses/<int:pk>/modify/",
+        views.expense_modify,
+        name="expense-modify",
+    ),
+    path(
+        "expenses/<int:pk>/delete/",
+        views.expense_delete,
+        name="expense-delete",
+    ),
 ]

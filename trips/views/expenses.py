@@ -1,15 +1,24 @@
 import json
 
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
+from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 
 from accounts.models import get_profile
 from trips.expenses import ensure_expense_participants
-from trips.forms import ExpenseSettingsForm, FamilyUnitForm
-from trips.models import ExpenseParticipant, FamilyUnit
+from trips.forms import ExpenseForm, ExpenseSettingsForm, FamilyUnitForm
+from trips.models import (
+    Event,
+    Expense,
+    ExpenseParticipant,
+    ExpenseShare,
+    FamilyUnit,
+    MainTransfer,
+    Stay,
+)
 from trips.utils import editable_trips_qs
 
 EXPENSES_MODIFIED = {"HX-Trigger": "expensesModified"}
@@ -127,3 +136,113 @@ def participant_toggle_child(request, pk):
     participant.is_child = not participant.is_child
     participant.save(update_fields=["is_child"])
     return _render_config(request, trip)
+
+
+def _resolve_linked(trip, ct, obj_id):
+    """Resolve the trip item an expense is attached to from ``ct``/``obj`` params."""
+    if not ct or not obj_id:
+        return None
+    if ct == "event":
+        return get_object_or_404(Event, pk=obj_id, trip=trip)
+    if ct == "stay":
+        return get_object_or_404(
+            Stay.objects.filter(days__trip=trip).distinct(), pk=obj_id
+        )
+    if ct == "transfer":
+        return get_object_or_404(MainTransfer, pk=obj_id, trip=trip)
+    raise Http404
+
+
+def _default_date(trip, linked_obj):
+    if isinstance(linked_obj, Event):
+        return linked_obj.day.date if linked_obj.day else trip.start_date
+    if isinstance(linked_obj, Stay):
+        first_day = linked_obj.days.first()
+        return first_day.date if first_day else trip.start_date
+    if isinstance(linked_obj, MainTransfer):
+        if linked_obj.direction == MainTransfer.Direction.DEPARTURE:
+            return trip.end_date
+        return trip.start_date
+    return timezone.localdate()
+
+
+def _save_shares(expense, participants):
+    expense.shares.all().delete()
+    ExpenseShare.objects.bulk_create(
+        ExpenseShare(expense=expense, participant=participant)
+        for participant in participants
+    )
+
+
+@login_required
+def expense_create(request, trip_pk):
+    """Create an expense, optionally linked to an item via ?ct=&obj=."""
+    trip = get_object_or_404(editable_trips_qs(request.user), pk=trip_pk)
+    ensure_expense_participants(trip)
+    ct = request.GET.get("ct", "")
+    obj_id = request.GET.get("obj", "")
+    linked_obj = _resolve_linked(trip, ct, obj_id)
+    linked = linked_obj is not None
+
+    if request.method == "POST":
+        form = ExpenseForm(request.POST, trip=trip, linked=linked)
+        if form.is_valid():
+            expense = form.save(commit=False)
+            expense.trip = trip
+            expense.created_by = request.user
+            if linked:
+                expense.content_object = linked_obj
+            expense.save()
+            _save_shares(expense, form.cleaned_data["shared_with"])
+            return HttpResponse(status=204, headers=EXPENSES_MODIFIED)
+    else:
+        form = ExpenseForm(
+            trip=trip, linked=linked, initial={"date": _default_date(trip, linked_obj)}
+        )
+
+    return TemplateResponse(
+        request,
+        "trips/expense-create.html",
+        {"form": form, "trip": trip, "linked_object": linked_obj},
+    )
+
+
+@login_required
+def expense_modify(request, pk):
+    expense = get_object_or_404(Expense, pk=pk)
+    trip = get_object_or_404(editable_trips_qs(request.user), pk=expense.trip_id)
+    ensure_expense_participants(trip)
+    linked = expense.is_linked
+
+    if request.method == "POST":
+        form = ExpenseForm(request.POST, instance=expense, trip=trip, linked=linked)
+        if form.is_valid():
+            form.save()
+            _save_shares(expense, form.cleaned_data["shared_with"])
+            return HttpResponse(status=204, headers=EXPENSES_MODIFIED)
+    else:
+        form = ExpenseForm(
+            instance=expense,
+            trip=trip,
+            linked=linked,
+            initial={
+                "shared_with": list(
+                    expense.shares.values_list("participant_id", flat=True)
+                )
+            },
+        )
+
+    return TemplateResponse(
+        request,
+        "trips/expense-modify.html",
+        {"form": form, "trip": trip, "expense": expense},
+    )
+
+
+@login_required
+@require_http_methods(["POST"])
+def expense_delete(request, pk):
+    expense = get_object_or_404(Expense, pk=pk)
+    get_object_or_404(editable_trips_qs(request.user), pk=expense.trip_id)
+    expense.delete()
+    return HttpResponse(status=204, headers=EXPENSES_MODIFIED)

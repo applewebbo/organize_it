@@ -1,0 +1,31 @@
+{% load crispy_forms_tags i18n %}
+<form hx-post="{% url 'trips:expense-modify' expense.pk %}"
+      hx-target="#dialog"
+      class="modal-content"
+      method="post">
+    <div class="border-base-300 flex items-center justify-between rounded-t border-b p-4 md:px-5 md:py-2.5">
+        <h3 class="text-xl font-semibold">{% trans "Edit expense" %}</h3>
+        <button type="button"
+                class="btn btn-sm btn-circle btn-ghost"
+                x-on:click="openModal = false"
+                aria-label="{% trans 'Close' %}">✕</button>
+    </div>
+    <div class="p-4 md:p-5">
+        {% csrf_token %}
+        {% if expense.is_linked %}
+            <div class="bg-base-200 mb-4 flex items-center gap-2 rounded-lg px-3 py-2 text-sm">
+                <i class="ph ph-link text-primary"></i>
+                <span>{% trans "Linked to" %} <strong>{{ expense.content_object.name|default:expense.content_object }}</strong></span>
+            </div>
+        {% endif %}
+        {% crispy form %}
+    </div>
+    <div class="flex items-center justify-between p-4 md:p-5">
+        <button type="button"
+                class="btn btn-outline btn-error"
+                hx-post="{% url 'trips:expense-delete' expense.pk %}"
+                hx-confirm="{% trans 'Delete this expense?' %}"
+                x-on:click="openModal = false">{% trans "Delete" %}</button>
+        <button class="btn btn-primary" type="submit">{% trans "Save" %}</button>
+    </div>
+</form>
