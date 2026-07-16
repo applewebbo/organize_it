@@ -1,0 +1,101 @@
+{% load crispy_forms_tags i18n %}
+<div class="modal-content" id="expense-settings-modal">
+    <div class="border-base-300 flex items-center justify-between rounded-t border-b p-4 md:px-5 md:py-2.5">
+        <h3 class="text-xl font-semibold">{% trans "Expense settings" %}</h3>
+        <button type="button"
+                class="btn btn-sm btn-circle btn-ghost"
+                x-on:click="openModal = false"
+                aria-label="{% trans 'Close' %}">✕</button>
+    </div>
+    <div class="p-4 md:p-5">
+        <form hx-post="{% url 'trips:expense-settings' trip.pk %}"
+              hx-target="#expense-settings-modal"
+              hx-swap="outerHTML"
+              method="post">
+            {% csrf_token %}
+            {% crispy settings_form %}
+            <div class="mt-3 flex justify-end">
+                <button type="submit" class="btn btn-primary btn-sm">{% trans "Save settings" %}</button>
+            </div>
+        </form>
+        {% partialdef config inline %}
+            <div id="expense-config" class="mt-4">
+                {% if trip.expenses_enabled %}
+                    <div class="alert alert-info alert-soft mb-4" role="alert">
+                        <i class="ph-bold ph-info i-md"></i>
+                        <span>{% trans "Add everyone in the 'Participants' section first — the people added there appear below. Group couples and assign children to a parent." %}</span>
+                    </div>
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div class="border-base-300 rounded-box border border-dashed p-3"
+                             data-assign-url="{% url 'trips:family-unit-assign' trip.pk %}"
+                             data-unit-id="">
+                            <p class="text-base-content/60 mb-2 text-xs font-semibold tracking-wide uppercase">{% trans "Unassigned" %}</p>
+                            <div class="family-unit-drop flex min-h-10 flex-wrap gap-2">
+                                {% for participant in unassigned %}
+                                    {% include "trips/includes/_participant-chip.html" %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% for unit in units %}
+                            <div class="border-base-300 bg-base-200 rounded-box border p-3"
+                                 data-assign-url="{% url 'trips:family-unit-assign' trip.pk %}"
+                                 data-unit-id="{{ unit.pk }}">
+                                <div class="mb-2 flex items-center justify-between gap-2">
+                                    <span class="font-semibold">{{ unit.display_name }}</span>
+                                    <div class="flex items-center gap-2">
+                                        {% if unit.shared_wallet %}
+                                            <span class="badge badge-success badge-sm gap-1"
+                                                  title="{% trans 'Debts inside this family are netted; settlements are shown per family.' %}">
+                                                <i class="ph ph-wallet"></i>{% trans "Shared" %}
+                                            </span>
+                                        {% else %}
+                                            <span class="badge badge-ghost badge-sm"
+                                                  title="{% trans 'Each adult keeps an individual balance.' %}">{% trans "Separate" %}</span>
+                                        {% endif %}
+                                        <button type="button"
+                                                class="btn btn-ghost btn-xs text-error"
+                                                hx-post="{% url 'trips:family-unit-delete' unit.pk %}"
+                                                hx-target="#expense-config"
+                                                hx-swap="outerHTML"
+                                                aria-label="{% trans 'Delete family unit' %}">
+                                            <i class="ph ph-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="family-unit-drop flex min-h-10 flex-wrap gap-2">
+                                    {% for participant in unit.members.all %}
+                                        {% include "trips/includes/_participant-chip.html" %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <form class="mt-4 flex flex-wrap items-end gap-2"
+                          hx-post="{% url 'trips:family-unit-create' trip.pk %}"
+                          hx-target="#expense-config"
+                          hx-swap="outerHTML">
+                        {% csrf_token %}
+                        <div>
+                            <label for="id_unit_name" class="mb-1 block text-xs font-medium">{% trans "Family name" %}</label>
+                            <input type="text"
+                                   id="id_unit_name"
+                                   name="name"
+                                   class="input input-bordered input-sm"
+                                   placeholder="{% trans 'e.g. Rossi' %}">
+                        </div>
+                        <label class="label cursor-pointer gap-2 text-sm">
+                            <input type="checkbox"
+                                   name="shared_wallet"
+                                   class="checkbox checkbox-sm"
+                                   checked>
+                            {% trans "Shared wallet" %}
+                        </label>
+                        <button type="submit" class="btn btn-outline btn-sm gap-1">
+                            <i class="ph ph-plus"></i>{% trans "Add family" %}
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        {% endpartialdef %}
+    </div>
+</div>

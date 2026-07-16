@@ -372,4 +372,30 @@ urlpatterns += [
         views.attachment_preview,
         name="attachment-preview",
     ),
+    # EXPENSES
+    path(
+        "trips/<int:trip_pk>/expenses/settings/",
+        views.expense_settings,
+        name="expense-settings",
+    ),
+    path(
+        "trips/<int:trip_pk>/expenses/family-units/create/",
+        views.family_unit_create,
+        name="family-unit-create",
+    ),
+    path(
+        "expenses/family-units/<int:pk>/delete/",
+        views.family_unit_delete,
+        name="family-unit-delete",
+    ),
+    path(
+        "trips/<int:trip_pk>/expenses/family-units/assign/",
+        views.family_unit_assign,
+        name="family-unit-assign",
+    ),
+    path(
+        "expenses/participants/<int:pk>/toggle-child/",
+        views.participant_toggle_child,
+        name="participant-toggle-child",
+    ),
 ]

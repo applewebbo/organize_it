@@ -58,6 +58,13 @@ from trips.views.events import (
     single_event,
     tag_suggestions,
 )
+from trips.views.expenses import (
+    expense_settings,
+    family_unit_assign,
+    family_unit_create,
+    family_unit_delete,
+    participant_toggle_child,
+)
 from trips.views.ical import calendar_feed_settings, export_trip_ical
 from trips.views.maps import (
     create_stage,
@@ -250,4 +257,10 @@ __all__ = [
     "attachment_delete",
     "attachment_stream",
     "attachment_preview",
+    # expenses
+    "expense_settings",
+    "family_unit_create",
+    "family_unit_delete",
+    "family_unit_assign",
+    "participant_toggle_child",
 ]

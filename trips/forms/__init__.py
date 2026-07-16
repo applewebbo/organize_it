@@ -6,6 +6,7 @@ working for every form thanks to the re-exports below.
 
 from trips.forms.base import urlfields_assume_https
 from trips.forms.event import EventForm, ExperienceForm, MealForm, NoteForm
+from trips.forms.expense import ExpenseForm, ExpenseSettingsForm, FamilyUnitForm
 from trips.forms.stay import AddNoteToStayForm, StayForm
 from trips.forms.transfer import (
     CarMainTransferForm,
@@ -30,7 +31,10 @@ __all__ = [
     "ChecklistItemForm",
     "ChecklistReminderForm",
     "EventForm",
+    "ExpenseForm",
+    "ExpenseSettingsForm",
     "ExperienceForm",
+    "FamilyUnitForm",
     "FlightMainTransferForm",
     "LinkForm",
     "MainTransferBaseForm",

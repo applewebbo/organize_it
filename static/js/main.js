@@ -283,6 +283,44 @@ function initSortableLists() {
 initSortableLists();
 document.addEventListener("htmx:afterSettle", () => initSortableLists());
 
+// SortableJS drag & drop for expense family units (sm+ only)
+function initFamilyUnitSortables() {
+    if (window.innerWidth < 640) return;
+    if (typeof Sortable === "undefined") return;
+    document.querySelectorAll("[data-assign-url]:not([data-sortable-init])").forEach((el) => {
+        el.setAttribute("data-sortable-init", "true");
+        const dropZone = el.querySelector(".family-unit-drop") || el;
+        const assignUrl = el.dataset.assignUrl;
+        Sortable.create(dropZone, {
+            group: "family-units",
+            animation: 150,
+            filter: "button, a, select",
+            preventOnFilter: false,
+            ghostClass: "opacity-40",
+            onEnd(evt) {
+                if (evt.to !== dropZone) return;
+                const csrfToken = document.cookie
+                    .split("; ")
+                    .find((c) => c.startsWith("csrftoken="))
+                    ?.split("=")[1] || "";
+                const participantId = evt.item.dataset.participantId;
+                const unitId = el.dataset.unitId || null;
+                fetch(assignUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrfToken,
+                    },
+                    body: JSON.stringify({ participant_id: participantId, unit_id: unitId }),
+                });
+            },
+        });
+    });
+}
+
+initFamilyUnitSortables();
+document.addEventListener("htmx:afterSettle", () => initFamilyUnitSortables());
+
 function swapButton(eventId, swapUrl, label) {
     return { open: false };
 }

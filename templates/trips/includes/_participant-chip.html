@@ -1,0 +1,27 @@
+{% load i18n %}
+<div class="expense-participant-chip bg-base-100 border-base-300 flex items-center gap-2 rounded-full border py-1 pr-2 pl-3 text-sm shadow-sm"
+     data-participant-id="{{ participant.pk }}">
+    <i class="ph ph-dots-six-vertical text-base-content/30 hidden cursor-grab sm:inline"></i>
+    <span class="{% if participant.is_child %}text-info{% endif %}">{{ participant.display_name }}</span>
+    <button type="button"
+            class="btn btn-ghost btn-xs btn-circle {% if participant.is_child %}text-info{% else %}text-base-content/40{% endif %}"
+            hx-post="{% url 'trips:participant-toggle-child' participant.pk %}"
+            hx-target="#expense-config"
+            hx-swap="outerHTML"
+            title="{% if participant.is_child %}{% trans 'Child (share charged to parents)' %}{% else %}{% trans 'Mark as child' %}{% endif %}">
+        <i class="ph ph-baby"></i>
+    </button>
+    <select class="select select-bordered select-xs sm:hidden"
+            name="unit_id"
+            hx-post="{% url 'trips:family-unit-assign' trip.pk %}"
+            hx-target="#expense-config"
+            hx-swap="outerHTML"
+            hx-vals='{"participant_id": "{{ participant.pk }}"}'
+            aria-label="{% trans 'Assign to family' %}">
+        <option value="" {% if not participant.family_unit_id %}selected{% endif %}>{% trans "Unassigned" %}</option>
+        {% for unit in units %}
+            <option value="{{ unit.pk }}"
+                    {% if participant.family_unit_id == unit.pk %}selected{% endif %}>{{ unit.display_name }}</option>
+        {% endfor %}
+    </select>
+</div>
