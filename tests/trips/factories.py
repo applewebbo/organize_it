@@ -1,5 +1,6 @@
 import random
 from datetime import time
+from decimal import Decimal
 
 import factory
 
@@ -1733,3 +1734,45 @@ class ChecklistItemFactory(factory.django.DjangoModelFactory):
     trip = factory.SubFactory(TripFactory)
     text = factory.Faker("sentence", nb_words=4)
     completed = False
+
+
+class FamilyUnitFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "trips.FamilyUnit"
+
+    trip = factory.SubFactory(TripFactory)
+    name = factory.Faker("last_name")
+    shared_wallet = True
+
+
+class ExpenseParticipantFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "trips.ExpenseParticipant"
+
+    trip = factory.SubFactory(TripFactory)
+    name_snapshot = factory.Faker("first_name")
+    is_child = False
+    is_active = True
+
+
+class ExpenseFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "trips.Expense"
+
+    trip = factory.SubFactory(TripFactory)
+    title = factory.Faker("sentence", nb_words=3)
+    amount = Decimal("30.00")
+    date = factory.LazyAttribute(lambda o: o.trip.start_date)
+    payer = factory.SubFactory(
+        ExpenseParticipantFactory, trip=factory.SelfAttribute("..trip")
+    )
+
+
+class ExpenseShareFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "trips.ExpenseShare"
+
+    expense = factory.SubFactory(ExpenseFactory)
+    participant = factory.SubFactory(
+        ExpenseParticipantFactory, trip=factory.SelfAttribute("..expense.trip")
+    )

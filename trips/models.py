@@ -1,5 +1,6 @@
 import uuid
 from datetime import date, timedelta
+from decimal import Decimal
 from urllib.parse import quote
 
 import geocoder
@@ -7,8 +8,9 @@ from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 from django.db import models
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save, pre_delete, pre_save
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
@@ -18,6 +20,14 @@ from django.utils.translation import gettext_lazy as _
 def days_between(start_date, end_date):
     delta = end_date - start_date
     return delta.days
+
+
+# Kept in sync with accounts.models.Profile.CURRENCY_CHOICES (asserted in tests)
+CURRENCY_CHOICES = [
+    ("EUR", "Euro (€)"),
+    ("USD", "US Dollar ($)"),
+    ("GBP", "Pound Sterling (£)"),
+]
 
 
 class Trip(models.Model):
@@ -59,6 +69,10 @@ class Trip(models.Model):
     daily_digest_sent_on = models.DateField(null=True, blank=True)
     calendar_token = models.UUIDField(
         default=uuid.uuid4, editable=False, unique=True, null=True
+    )
+    expenses_enabled = models.BooleanField(default=False)
+    expense_currency = models.CharField(
+        max_length=3, choices=CURRENCY_CHOICES, default="EUR"
     )
 
     class Meta:
@@ -1099,3 +1113,196 @@ class Attachment(models.Model):
         )
         if siblings.count() >= limit:
             raise ValidationError(_("Attachment limit reached for this item."))
+
+
+class FamilyUnit(models.Model):
+    """A group of participants (couple/family) sharing expenses within a trip."""
+
+    trip = models.ForeignKey(
+        Trip, on_delete=models.CASCADE, related_name="family_units"
+    )
+    name = models.CharField(max_length=100, blank=True)
+    shared_wallet = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("created_at",)
+
+    def __str__(self) -> str:
+        return f"{self.display_name} [{self.trip.title}]"
+
+    @property
+    def display_name(self) -> str:
+        if self.name:
+            return self.name
+        first_adult = self.members.filter(is_child=False).first()
+        if first_adult:
+            return _("Family of %(name)s") % {"name": first_adult.display_name}
+        return _("Family unit")
+
+
+class ExpenseParticipant(models.Model):
+    """Expense identity for a trip participant (author, collaborator or named-only).
+
+    Decoupled from TripCollaboration so the trip author (who has no collaboration
+    row) is representable and expense history survives collaborator removal.
+    """
+
+    trip = models.ForeignKey(
+        Trip, on_delete=models.CASCADE, related_name="expense_participants"
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
+    collaboration = models.OneToOneField(
+        "TripCollaboration",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="expense_participant",
+    )
+    name_snapshot = models.CharField(max_length=100)
+    family_unit = models.ForeignKey(
+        FamilyUnit,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="members",
+    )
+    is_child = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("created_at",)
+
+    def __str__(self) -> str:
+        return f"{self.display_name} [{self.trip.title}]"
+
+    @property
+    def display_name(self) -> str:
+        if self.collaboration_id and self.collaboration:
+            return self.collaboration.display_name
+        if self.user_id and self.user:
+            return self.user.profile.first_name or self.user.email
+        return self.name_snapshot
+
+
+class Expense(models.Model):
+    """A cost incurred during a trip, optionally linked to a trip item."""
+
+    class Category(models.TextChoices):
+        MEAL = "meal", _("Meal")
+        EXPERIENCE = "experience", _("Experience")
+        STAY = "stay", _("Accommodation")
+        TRANSPORT = "transport", _("Transport")
+        LOCAL_TRANSPORT = "local_transport", _("Local transport")
+        GROCERIES = "groceries", _("Groceries")
+        SHOPPING = "shopping", _("Shopping")
+        TICKETS = "tickets", _("Tickets")
+        OTHER = "other", _("Other")
+
+    trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="expenses")
+    content_type = models.ForeignKey(
+        ContentType, null=True, blank=True, on_delete=models.SET_NULL
+    )
+    object_id = models.PositiveIntegerField(null=True, blank=True)
+    content_object = GenericForeignKey("content_type", "object_id")
+    title = models.CharField(max_length=120)
+    amount = models.DecimalField(
+        max_digits=9,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal("0.01"))],
+    )
+    category = models.CharField(
+        max_length=20, choices=Category.choices, default=Category.OTHER
+    )
+    date = models.DateField()
+    payer = models.ForeignKey(
+        ExpenseParticipant, on_delete=models.PROTECT, related_name="expenses_paid"
+    )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("-date", "-created_at")
+        indexes = [
+            models.Index(fields=["content_type", "object_id"]),
+            models.Index(fields=["trip", "date"]),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.title} ({self.amount})"
+
+    @property
+    def is_linked(self) -> bool:
+        return self.content_type_id is not None and self.object_id is not None
+
+    def _normalize_event_content_type(self):
+        obj = self.content_object
+        if obj is not None and isinstance(obj, Event) and type(obj) is not Event:
+            self.content_type = ContentType.objects.get_for_model(Event)
+
+    def _derive_category(self):
+        obj = self.content_object
+        if obj is None:
+            return
+        if isinstance(obj, Event):
+            self.category = (
+                self.Category.MEAL
+                if obj.category == Event.Category.MEAL
+                else self.Category.EXPERIENCE
+            )
+        elif isinstance(obj, Stay):
+            self.category = self.Category.STAY
+        elif isinstance(obj, MainTransfer):
+            self.category = self.Category.TRANSPORT
+
+    def save(self, *args, **kwargs):
+        self._normalize_event_content_type()
+        self._derive_category()
+        super().save(*args, **kwargs)
+
+
+class ExpenseShare(models.Model):
+    """Links an Expense to a participant it is shared with (equal split in v1)."""
+
+    expense = models.ForeignKey(
+        Expense, on_delete=models.CASCADE, related_name="shares"
+    )
+    participant = models.ForeignKey(
+        ExpenseParticipant, on_delete=models.CASCADE, related_name="expense_shares"
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["expense", "participant"], name="unique_expense_share"
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.participant.display_name} → {self.expense.title}"
+
+
+@receiver(pre_delete, sender=Event)
+@receiver(pre_delete, sender=Stay)
+@receiver(pre_delete, sender=MainTransfer)
+def unlink_expenses_on_delete(sender, instance, **kwargs):
+    """Keep an expense as free-standing when its linked trip item is deleted."""
+    ct = ContentType.objects.get_for_model(
+        Event if isinstance(instance, Event) else sender
+    )
+    Expense.objects.filter(content_type=ct, object_id=instance.pk).update(
+        content_type=None, object_id=None
+    )

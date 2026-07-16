@@ -1,0 +1,13 @@
+---
+id: '0000000072'
+slug: balance-and-settlement-algorithm-tripsexpensespy-for-379
+title: 'Balance and settlement algorithm trips/expenses.py (for #379)'
+labels: []
+created: '2026-07-16T12:35:48.070+02:00'
+updated: '2026-07-16T12:35:48.070+02:00'
+---
+
+## Task Comments
+
+| Commented At | Comment |
+| --- | --- |

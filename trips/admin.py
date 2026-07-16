@@ -2,7 +2,11 @@ from django.contrib import admin
 
 from .models import (
     Day,
+    Expense,
+    ExpenseParticipant,
+    ExpenseShare,
     Experience,
+    FamilyUnit,
     Link,
     Meal,
     Stay,
@@ -47,3 +51,27 @@ class MealAdmin(admin.ModelAdmin):
 @admin.register(Stay)
 class StayAdmin(admin.ModelAdmin):
     list_display = ["__str__"]
+
+
+@admin.register(FamilyUnit)
+class FamilyUnitAdmin(admin.ModelAdmin):
+    list_display = ["__str__", "trip", "shared_wallet"]
+    list_filter = ["trip"]
+
+
+@admin.register(ExpenseParticipant)
+class ExpenseParticipantAdmin(admin.ModelAdmin):
+    list_display = ["__str__", "trip", "family_unit", "is_child", "is_active"]
+    list_filter = ["trip", "is_child", "is_active"]
+
+
+class ExpenseShareInline(admin.TabularInline):
+    model = ExpenseShare
+    extra = 0
+
+
+@admin.register(Expense)
+class ExpenseAdmin(admin.ModelAdmin):
+    list_display = ["title", "trip", "amount", "category", "date", "payer"]
+    list_filter = ["trip", "category"]
+    inlines = [ExpenseShareInline]
