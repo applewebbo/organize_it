@@ -14,12 +14,11 @@ class ExpenseSettingsForm(forms.ModelForm):
             "expenses_enabled": _("Enable expense sharing"),
             "expense_currency": _("Trip currency"),
         }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_tag = False
-        self.helper.layout = Layout("expenses_enabled", "expense_currency")
+        widgets = {
+            "expense_currency": forms.Select(
+                attrs={"class": "select select-bordered w-full"}
+            ),
+        }
 
 
 class FamilyUnitForm(forms.ModelForm):
@@ -37,6 +36,7 @@ class ExpenseForm(forms.ModelForm):
         queryset=ExpenseParticipant.objects.none(),
         widget=forms.CheckboxSelectMultiple,
         label=_("Shared with"),
+        required=False,
     )
 
     class Meta:

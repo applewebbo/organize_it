@@ -62,4 +62,5 @@
                rel="noopener">{{ event.website }}</a>
         </li>
     {% endif %}
+    {% include "trips/includes/_expense-cost-row.html" with obj=event trip=event.trip ct="transfer" %}
 </ul>

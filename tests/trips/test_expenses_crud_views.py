@@ -117,6 +117,33 @@ class TestExpenseCreate:
         response = client.get(f"{url}?ct=event&obj={meal.pk}")
         assert response.context["form"].initial["date"] == meal.day.date
 
+    def test_default_date_for_linked_stay(self, crud_trip, stay_factory):
+        trip, user, client, p1, p2 = crud_trip
+        stay = stay_factory(day=trip.days.first())
+        url = reverse("trips:expense-create", args=[trip.pk])
+        response = client.get(f"{url}?ct=stay&obj={stay.pk}")
+        assert response.context["form"].initial["date"] == trip.days.first().date
+
+    def test_default_date_for_departure_transfer(
+        self, crud_trip, main_transfer_factory
+    ):
+        trip, user, client, p1, p2 = crud_trip
+        transfer = main_transfer_factory(
+            trip=trip, direction=2
+        )  # DEPARTURE -> trip end
+        url = reverse("trips:expense-create", args=[trip.pk])
+        response = client.get(f"{url}?ct=transfer&obj={transfer.pk}")
+        assert response.context["form"].initial["date"] == trip.end_date
+
+    def test_default_date_for_arrival_transfer(self, crud_trip, main_transfer_factory):
+        trip, user, client, p1, p2 = crud_trip
+        transfer = main_transfer_factory(
+            trip=trip, direction=1
+        )  # ARRIVAL -> trip start
+        url = reverse("trips:expense-create", args=[trip.pk])
+        response = client.get(f"{url}?ct=transfer&obj={transfer.pk}")
+        assert response.context["form"].initial["date"] == trip.start_date
+
     def test_invalid_ct_returns_404(self, crud_trip):
         trip, user, client, p1, p2 = crud_trip
         url = reverse("trips:expense-create", args=[trip.pk])
@@ -180,6 +207,28 @@ class TestExpenseModify:
         expense.refresh_from_db()
         assert expense.title == "Updated"
         assert expense.shares.count() == 2
+
+    def test_post_invalid_rerenders(self, crud_trip):
+        trip, user, client, p1, p2 = crud_trip
+        expense = Expense.objects.create(
+            trip=trip, title="X", amount="20.00", date=trip.start_date, payer=p1
+        )
+        ExpenseShare.objects.create(expense=expense, participant=p1)
+        url = reverse("trips:expense-modify", args=[expense.pk])
+        response = client.post(
+            url,
+            {
+                "title": "Updated",
+                "amount": "30.00",
+                "date": trip.start_date.isoformat(),
+                "category": "other",
+                "payer": p1.pk,
+                # no shared_with -> clean_shared_with fails
+            },
+        )
+        assert response.status_code == 200
+        expense.refresh_from_db()
+        assert expense.title == "X"
 
 
 class TestExpenseDelete:

@@ -164,6 +164,26 @@ def expenses_card(request, trip_pk):
 
 
 @login_required
+@require_http_methods(["POST"])
+def expense_toggle(request, trip_pk):
+    """Enable/disable expense sharing from the inline card switch (editors only)."""
+    trip = get_object_or_404(editable_trips_qs(request.user), pk=trip_pk)
+    enabling = "expenses_enabled" in request.POST
+    if enabling and not trip.expenses_enabled:
+        trip.expense_currency = get_profile(trip.author).currency
+    trip.expenses_enabled = enabling
+    trip.save(update_fields=["expenses_enabled", "expense_currency"])
+
+    context = {"trip": trip}
+    if trip.expenses_enabled:
+        ensure_expense_participants(trip)
+        summary = build_expense_summary(trip)
+        context["summary"] = summary
+        context["user_net"] = _user_net(trip, request.user, summary)
+    return TemplateResponse(request, "trips/includes/expenses-card.html", context)
+
+
+@login_required
 def expenses_modal(request, trip_pk):
     """Detailed expense view (balances, list, totals) in a modal."""
     trip = get_object_or_404(accessible_trips_qs(request.user), pk=trip_pk)

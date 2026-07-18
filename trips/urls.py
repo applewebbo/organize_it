@@ -384,6 +384,11 @@ urlpatterns += [
         name="expenses-modal",
     ),
     path(
+        "trips/<int:trip_pk>/expenses/toggle/",
+        views.expense_toggle,
+        name="expense-toggle",
+    ),
+    path(
         "trips/<int:trip_pk>/expenses/settings/",
         views.expense_settings,
         name="expense-settings",

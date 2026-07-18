@@ -1,5 +1,7 @@
-{% load crispy_forms_tags i18n %}
-<div class="modal-content" id="expense-settings-modal">
+{% load i18n %}
+<div class="modal-content"
+     id="expense-settings-modal"
+     x-data="{ enabled: {{ trip.expenses_enabled|yesno:'true,false' }} }">
     <div class="border-base-300 flex items-center justify-between rounded-t border-b p-4 md:px-5 md:py-2.5">
         <h3 class="text-xl font-semibold">{% trans "Expense settings" %}</h3>
         <button type="button"
@@ -13,8 +15,23 @@
               hx-swap="outerHTML"
               method="post">
             {% csrf_token %}
-            {% crispy settings_form %}
-            <div class="mt-3 flex justify-end">
+            <label class="flex cursor-pointer items-center gap-3">
+                <input type="checkbox"
+                       name="expenses_enabled"
+                       class="toggle toggle-primary"
+                       x-model="enabled"
+                       {% if trip.expenses_enabled %}checked{% endif %} />
+                <span class="font-medium">{% trans "Enable expense sharing" %}</span>
+            </label>
+            <p class="text-base-content/50 mt-1 text-xs italic">
+                {% trans "Track who paid for what and split shared costs among participants." %}
+            </p>
+            <div x-show="enabled" x-cloak class="mt-4">
+                <label for="{{ settings_form.expense_currency.id_for_label }}"
+                       class="mb-1 block text-sm font-medium">{% trans "Trip currency" %}</label>
+                {{ settings_form.expense_currency }}
+            </div>
+            <div class="mt-4 flex justify-end">
                 <button type="submit" class="btn btn-primary btn-sm">{% trans "Save settings" %}</button>
             </div>
         </form>

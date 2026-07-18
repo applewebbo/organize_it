@@ -55,6 +55,16 @@ class TestExpenseSettings:
         url = reverse("trips:expense-settings", args=[other_trip.pk])
         assert client.get(url).status_code == 404
 
+    def test_post_invalid_currency_rerenders(self, editor_trip):
+        trip, user, client = editor_trip
+        url = reverse("trips:expense-settings", args=[trip.pk])
+        response = client.post(
+            url, {"expenses_enabled": "on", "expense_currency": "XXX"}
+        )
+        assert response.status_code == 200
+        trip.refresh_from_db()
+        assert trip.expense_currency != "XXX"
+
 
 class TestFamilyUnits:
     def test_create(self, editor_trip):
