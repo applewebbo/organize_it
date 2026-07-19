@@ -6,7 +6,7 @@ from decimal import ROUND_FLOOR, Decimal
 
 from django.db.models import Sum
 
-from trips.models import Expense, ExpenseParticipant
+from trips.models import ExpenseParticipant
 
 ZERO = Decimal("0.00")
 CENT = Decimal("0.01")
@@ -171,23 +171,6 @@ def trip_total(trip) -> Decimal:
     return trip.expenses.aggregate(total=Sum("amount"))["total"] or ZERO
 
 
-def totals_by_category(trip):
-    labels = dict(Expense.Category.choices)
-    rows = (
-        trip.expenses.values("category")
-        .annotate(total=Sum("amount"))
-        .order_by("-total")
-    )
-    return [
-        {
-            "category": row["category"],
-            "label": labels[row["category"]],
-            "total": row["total"],
-        }
-        for row in rows
-    ]
-
-
 def totals_by_day(trip):
     day_numbers = {day.date: day.number for day in trip.days.all()}
     rows = trip.expenses.values("date").annotate(total=Sum("amount")).order_by("date")
@@ -246,7 +229,6 @@ def build_expense_summary(trip):
         "balances": balance_rows,
         "warnings": [by_id[pid] for pid in warning_ids],
         "by_day": totals_by_day(trip),
-        "by_category": totals_by_category(trip),
         "nets_by_participant": balances,
     }
 

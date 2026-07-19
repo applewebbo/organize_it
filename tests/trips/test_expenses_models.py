@@ -79,7 +79,7 @@ class TestExpenseParticipant:
         assert "Bimbo" in str(participant)
 
 
-class TestExpenseCategoryDerivation:
+class TestExpenseLinking:
     def _make_participant(self, trip):
         return ExpenseParticipant.objects.create(trip=trip, name_snapshot="P")
 
@@ -95,44 +95,21 @@ class TestExpenseCategoryDerivation:
         expense.save()
         return expense
 
-    def test_meal_category(self, meal_factory):
-        meal = meal_factory()
-        expense = self._linked_expense(meal.trip, meal)
-        assert expense.category == Expense.Category.MEAL
-
-    def test_experience_category(self, experience_factory):
-        experience = experience_factory()
-        expense = self._linked_expense(experience.trip, experience)
-        assert expense.category == Expense.Category.EXPERIENCE
-
     def test_experience_content_type_normalized_to_event(self, experience_factory):
         experience = experience_factory()
         expense = self._linked_expense(experience.trip, experience)
         assert expense.content_type == ContentType.objects.get_for_model(Event)
         assert expense.is_linked is True
 
-    def test_stay_category(self, stay_factory, trip_factory):
-        trip = trip_factory()
-        stay = stay_factory(day=trip.days.first())
-        expense = self._linked_expense(trip, stay)
-        assert expense.category == Expense.Category.STAY
-
-    def test_transfer_category(self, main_transfer_factory):
-        transfer = main_transfer_factory()
-        expense = self._linked_expense(transfer.trip, transfer)
-        assert expense.category == Expense.Category.TRANSPORT
-
-    def test_free_expense_keeps_manual_category(self, trip_factory):
+    def test_free_expense_is_not_linked(self, trip_factory):
         trip = trip_factory()
         expense = Expense.objects.create(
             trip=trip,
             title="Taxi",
             amount=Decimal("15.00"),
-            category=Expense.Category.LOCAL_TRANSPORT,
             date=trip.start_date,
             payer=self._make_participant(trip),
         )
-        assert expense.category == Expense.Category.LOCAL_TRANSPORT
         assert expense.is_linked is False
 
     def test_str(self, trip_factory):
@@ -185,12 +162,12 @@ class TestUnlinkOnDelete:
     def test_deleting_event_keeps_expense_free_standing(self, meal_factory):
         meal = meal_factory()
         expense = self._linked_expense(meal.trip, meal)
-        assert expense.category == Expense.Category.MEAL
+        assert expense.is_linked is True
         meal.delete()
         expense.refresh_from_db()
         assert expense.content_type is None
         assert expense.object_id is None
-        assert expense.category == Expense.Category.MEAL
+        assert expense.is_linked is False
 
     def test_deleting_stay_keeps_expense(self, stay_factory, trip_factory):
         trip = trip_factory()

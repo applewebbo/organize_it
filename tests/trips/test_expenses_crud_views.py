@@ -45,7 +45,6 @@ class TestExpenseCreate:
                 "title": "Taxi",
                 "amount": "20.00",
                 "date": trip.start_date.isoformat(),
-                "category": "local_transport",
                 "payer": p1.pk,
                 "shared_with": [p1.pk, p2.pk],
             },
@@ -54,10 +53,16 @@ class TestExpenseCreate:
         assert response.headers["HX-Trigger"] == "expensesModified"
         expense = Expense.objects.get(title="Taxi")
         assert expense.created_by == user
-        assert expense.category == "local_transport"
         assert expense.shares.count() == 2
 
-    def test_post_linked_to_meal_derives_category(self, crud_trip, meal_factory):
+    def test_get_prefills_payer_with_current_user(self, crud_trip):
+        trip, user, client, p1, p2 = crud_trip
+        author_participant = trip.expense_participants.get(user=user)
+        url = reverse("trips:expense-create", args=[trip.pk])
+        response = client.get(url)
+        assert response.context["form"].initial["payer"] == author_participant.pk
+
+    def test_post_linked_to_meal(self, crud_trip, meal_factory):
         trip, user, client, p1, p2 = crud_trip
         meal = meal_factory(trip=trip)
         url = reverse("trips:expense-create", args=[trip.pk])
@@ -73,7 +78,7 @@ class TestExpenseCreate:
         )
         assert response.status_code == 204
         expense = Expense.objects.get(title="Dinner")
-        assert expense.category == "meal"
+        assert expense.is_linked is True
         assert expense.object_id == meal.pk
 
     def test_post_linked_to_stay(self, crud_trip, stay_factory):
@@ -91,7 +96,7 @@ class TestExpenseCreate:
             },
         )
         assert response.status_code == 204
-        assert Expense.objects.get(title="Hotel").category == "stay"
+        assert Expense.objects.get(title="Hotel").object_id == stay.pk
 
     def test_post_linked_to_transfer(self, crud_trip, main_transfer_factory):
         trip, user, client, p1, p2 = crud_trip
@@ -108,7 +113,7 @@ class TestExpenseCreate:
             },
         )
         assert response.status_code == 204
-        assert Expense.objects.get(title="Flight").category == "transport"
+        assert Expense.objects.get(title="Flight").object_id == transfer.pk
 
     def test_default_date_for_linked_event(self, crud_trip, meal_factory):
         trip, user, client, p1, p2 = crud_trip
@@ -158,7 +163,6 @@ class TestExpenseCreate:
                 "title": "Taxi",
                 "amount": "20.00",
                 "date": trip.start_date.isoformat(),
-                "category": "other",
                 "payer": p1.pk,
                 # no shared_with -> invalid
             },
@@ -198,7 +202,6 @@ class TestExpenseModify:
                 "title": "Updated",
                 "amount": "30.00",
                 "date": trip.start_date.isoformat(),
-                "category": "other",
                 "payer": p1.pk,
                 "shared_with": [p1.pk, p2.pk],
             },
@@ -221,7 +224,6 @@ class TestExpenseModify:
                 "title": "Updated",
                 "amount": "30.00",
                 "date": trip.start_date.isoformat(),
-                "category": "other",
                 "payer": p1.pk,
                 # no shared_with -> clean_shared_with fails
             },

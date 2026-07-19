@@ -4,7 +4,6 @@ import pytest
 
 from trips.expenses import (
     build_expense_summary,
-    totals_by_category,
     totals_by_day,
     trip_total,
 )
@@ -93,27 +92,6 @@ class TestTotals:
     def test_trip_total_empty(self, trip_factory):
         trip = trip_factory()
         assert trip_total(trip) == D("0.00")
-
-    def test_totals_by_category(self, trip_factory, meal_factory):
-        trip = trip_factory()
-        anna = _participant(trip, "Anna")
-        meal = meal_factory(trip=trip)
-        linked = Expense(
-            trip=trip,
-            title="Dinner",
-            amount=D("40.00"),
-            date=trip.start_date,
-            payer=anna,
-        )
-        linked.content_object = meal
-        linked.save()
-        ExpenseShare.objects.create(expense=linked, participant=anna)
-        _expense(trip, anna, [anna], D("10.00"), category=Expense.Category.GROCERIES)
-        totals = totals_by_category(trip)
-        by_cat = {row["category"]: row for row in totals}
-        assert by_cat["meal"]["total"] == D("40.00")
-        assert by_cat["meal"]["label"] == "Meal"
-        assert by_cat["groceries"]["total"] == D("10.00")
 
     def test_totals_by_day_maps_day_number(self, trip_factory):
         trip = trip_factory()

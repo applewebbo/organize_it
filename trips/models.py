@@ -1195,17 +1195,6 @@ class ExpenseParticipant(models.Model):
 class Expense(models.Model):
     """A cost incurred during a trip, optionally linked to a trip item."""
 
-    class Category(models.TextChoices):
-        MEAL = "meal", _("Meal")
-        EXPERIENCE = "experience", _("Experience")
-        STAY = "stay", _("Accommodation")
-        TRANSPORT = "transport", _("Transport")
-        LOCAL_TRANSPORT = "local_transport", _("Local transport")
-        GROCERIES = "groceries", _("Groceries")
-        SHOPPING = "shopping", _("Shopping")
-        TICKETS = "tickets", _("Tickets")
-        OTHER = "other", _("Other")
-
     trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="expenses")
     content_type = models.ForeignKey(
         ContentType, null=True, blank=True, on_delete=models.SET_NULL
@@ -1217,9 +1206,6 @@ class Expense(models.Model):
         max_digits=9,
         decimal_places=2,
         validators=[MinValueValidator(Decimal("0.01"))],
-    )
-    category = models.CharField(
-        max_length=20, choices=Category.choices, default=Category.OTHER
     )
     date = models.DateField()
     payer = models.ForeignKey(
@@ -1253,24 +1239,8 @@ class Expense(models.Model):
         if obj is not None and isinstance(obj, Event) and type(obj) is not Event:
             self.content_type = ContentType.objects.get_for_model(Event)
 
-    def _derive_category(self):
-        obj = self.content_object
-        if obj is None:
-            return
-        if isinstance(obj, Event):
-            self.category = (
-                self.Category.MEAL
-                if obj.category == Event.Category.MEAL
-                else self.Category.EXPERIENCE
-            )
-        elif isinstance(obj, Stay):
-            self.category = self.Category.STAY
-        elif isinstance(obj, MainTransfer):
-            self.category = self.Category.TRANSPORT
-
     def save(self, *args, **kwargs):
         self._normalize_event_content_type()
-        self._derive_category()
         super().save(*args, **kwargs)
 
 

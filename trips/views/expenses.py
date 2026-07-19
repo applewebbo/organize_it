@@ -244,7 +244,7 @@ def expense_create(request, trip_pk):
     linked = linked_obj is not None
 
     if request.method == "POST":
-        form = ExpenseForm(request.POST, trip=trip, linked=linked)
+        form = ExpenseForm(request.POST, trip=trip)
         if form.is_valid():
             expense = form.save(commit=False)
             expense.trip = trip
@@ -255,9 +255,13 @@ def expense_create(request, trip_pk):
             _save_shares(expense, form.cleaned_data["shared_with"])
             return HttpResponse(status=204, headers=EXPENSES_MODIFIED)
     else:
-        form = ExpenseForm(
-            trip=trip, linked=linked, initial={"date": _default_date(trip, linked_obj)}
-        )
+        initial = {"date": _default_date(trip, linked_obj)}
+        current = trip.expense_participants.filter(
+            user=request.user, is_active=True
+        ).first()
+        if current is not None:
+            initial["payer"] = current.pk
+        form = ExpenseForm(trip=trip, initial=initial)
 
     return TemplateResponse(
         request,
@@ -271,10 +275,9 @@ def expense_modify(request, pk):
     expense = get_object_or_404(Expense, pk=pk)
     trip = get_object_or_404(editable_trips_qs(request.user), pk=expense.trip_id)
     ensure_expense_participants(trip)
-    linked = expense.is_linked
 
     if request.method == "POST":
-        form = ExpenseForm(request.POST, instance=expense, trip=trip, linked=linked)
+        form = ExpenseForm(request.POST, instance=expense, trip=trip)
         if form.is_valid():
             form.save()
             _save_shares(expense, form.cleaned_data["shared_with"])
@@ -283,7 +286,6 @@ def expense_modify(request, pk):
         form = ExpenseForm(
             instance=expense,
             trip=trip,
-            linked=linked,
             initial={
                 "shared_with": list(
                     expense.shares.values_list("participant_id", flat=True)

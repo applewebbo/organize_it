@@ -72,6 +72,6 @@ class ExpenseShareInline(admin.TabularInline):
 
 @admin.register(Expense)
 class ExpenseAdmin(admin.ModelAdmin):
-    list_display = ["title", "trip", "amount", "category", "date", "payer"]
-    list_filter = ["trip", "category"]
+    list_display = ["title", "trip", "amount", "date", "payer"]
+    list_filter = ["trip"]
     inlines = [ExpenseShareInline]

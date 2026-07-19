@@ -41,19 +41,18 @@ class ExpenseForm(forms.ModelForm):
 
     class Meta:
         model = Expense
-        fields = ["title", "amount", "date", "category", "payer"]
+        fields = ["title", "amount", "date", "payer"]
         labels = {
             "title": _("Description"),
             "amount": _("Amount"),
             "date": _("Date"),
-            "category": _("Category"),
             "payer": _("Paid by"),
         }
         widgets = {
             "date": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
         }
 
-    def __init__(self, *args, trip=None, linked=False, **kwargs):
+    def __init__(self, *args, trip=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.trip = trip
         participants = ExpenseParticipant.objects.filter(trip=trip, is_active=True)
@@ -66,30 +65,18 @@ class ExpenseForm(forms.ModelForm):
             self.initial["shared_with"] = list(
                 participants.values_list("pk", flat=True)
             )
-        # Linked expenses derive their category from the linked object.
-        if linked:
-            del self.fields["category"]
 
         self.helper = FormHelper()
         self.helper.form_tag = False
         # On sm+ (6-column grid): row 1 is description + amount, row 2 is
-        # date/category/payer, row 3 is the "split between" checkboxes.
+        # date + payer, row 3 is the "split between" checkboxes.
         layout_fields = [
             Field("title", wrapper_class="sm:col-span-4"),
             Field("amount", wrapper_class="sm:col-span-2"),
+            Field("date", wrapper_class="sm:col-span-3"),
+            Field("payer", wrapper_class="sm:col-span-3"),
+            Field("shared_with", wrapper_class="sm:col-span-6"),
         ]
-        if not linked:
-            layout_fields += [
-                Field("date", wrapper_class="sm:col-span-2"),
-                Field("category", wrapper_class="sm:col-span-2"),
-                Field("payer", wrapper_class="sm:col-span-2"),
-            ]
-        else:
-            layout_fields += [
-                Field("date", wrapper_class="sm:col-span-3"),
-                Field("payer", wrapper_class="sm:col-span-3"),
-            ]
-        layout_fields.append(Field("shared_with", wrapper_class="sm:col-span-6"))
         self.helper.layout = Layout(*layout_fields)
 
     def clean_shared_with(self):

@@ -35,7 +35,7 @@ class TestExpensesCard:
         response = client.get(url)
         assert response.status_code == 200
         assert "summary" not in response.context
-        assert b"Enable expense sharing" in response.content
+        assert b"Track who paid for what" in response.content
 
     def test_enabled_shows_totals_and_user_net(self, authenticated_user, trip_factory):
         user, client = authenticated_user

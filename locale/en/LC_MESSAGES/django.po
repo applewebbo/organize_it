@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-19 11:37+0200\n"
+"POT-Creation-Date: 2026-07-19 20:14+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -347,7 +347,7 @@ msgstr ""
 msgid "Nightlife"
 msgstr ""
 
-#: suggestions/models.py:112 trips/models.py:1205
+#: suggestions/models.py:112
 msgid "Shopping"
 msgstr ""
 
@@ -581,14 +581,12 @@ msgstr ""
 #: templates/cotton/dropdown.html:20
 #: templates/trips/includes/events-map-fragment.html:22
 #: templates/trips/includes/events-section.html:72 trips/models.py:581
-#: trips/models.py:1200
 msgid "Experience"
 msgstr ""
 
 #: templates/cotton/dropdown.html:29
 #: templates/trips/includes/events-map-fragment.html:31
 #: templates/trips/includes/events-section.html:81 trips/models.py:582
-#: trips/models.py:1199
 msgid "Meal"
 msgstr ""
 
@@ -714,11 +712,11 @@ msgstr ""
 "preferences and grounded on real places. Bring your own provider key (Google "
 "Gemini or Mistral AI)."
 
-#: templates/cotton/quick_guide.html:117
+#: templates/cotton/quick_guide.html:118
 msgid "Day Planning"
 msgstr "Day Planning"
 
-#: templates/cotton/quick_guide.html:120
+#: templates/cotton/quick_guide.html:121
 msgid ""
 "Let the AI plan a whole day for you — an ordered set of stops you can review "
 "and apply. Add to, unpair, or replace the events already on the day."
@@ -726,11 +724,11 @@ msgstr ""
 "Let the AI plan a whole day for you — an ordered set of stops you can review "
 "and apply. Add to, unpair, or replace the events already on the day."
 
-#: templates/cotton/quick_guide.html:131
+#: templates/cotton/quick_guide.html:132
 msgid "Shared Expenses"
 msgstr "Shared Expenses"
 
-#: templates/cotton/quick_guide.html:134
+#: templates/cotton/quick_guide.html:135
 msgid ""
 "Track who paid for what and split shared costs among participants. See who "
 "owes whom with simplified settlements, with support for families and "
@@ -740,86 +738,86 @@ msgstr ""
 "owes whom with simplified settlements, with support for families and "
 "children."
 
-#: templates/cotton/quick_guide.html:145
+#: templates/cotton/quick_guide.html:146
 #, fuzzy
 #| msgid "Collaborators"
 msgid "Collaboration"
 msgstr "Collaborators"
 
-#: templates/cotton/quick_guide.html:148
+#: templates/cotton/quick_guide.html:149
 msgid ""
 "Invite friends or family to co-edit your trip. Each collaborator gets a "
 "unique color badge on their contributions so you can see who added what."
 msgstr ""
 
-#: templates/cotton/quick_guide.html:160
+#: templates/cotton/quick_guide.html:161
 msgid "Sharing"
 msgstr ""
 
-#: templates/cotton/quick_guide.html:163
+#: templates/cotton/quick_guide.html:164
 msgid ""
 "Share a read-only view of your trip with anyone via a secure magic link — no "
 "account required to view."
 msgstr ""
 
-#: templates/cotton/quick_guide.html:174 templates/trips/checklist.html:4
+#: templates/cotton/quick_guide.html:175 templates/trips/checklist.html:4
 #: templates/trips/includes/checklist-card.html:6
 msgid "Checklist"
 msgstr ""
 
-#: templates/cotton/quick_guide.html:177
+#: templates/cotton/quick_guide.html:178
 msgid ""
 "Keep a pre-departure to-do list for each trip and get an optional email "
 "reminder days before leaving."
 msgstr ""
 
-#: templates/cotton/quick_guide.html:188
+#: templates/cotton/quick_guide.html:189
 #: templates/trips/includes/attachments-card.html:6
 msgid "Documents"
 msgstr ""
 
-#: templates/cotton/quick_guide.html:191
+#: templates/cotton/quick_guide.html:192
 msgid ""
 "Attach PDFs and images — tickets, vouchers, reservations — to your trip, "
 "stays, transfers and events."
 msgstr ""
 
-#: templates/cotton/quick_guide.html:202
+#: templates/cotton/quick_guide.html:203
 msgid "PDF Export"
 msgstr ""
 
-#: templates/cotton/quick_guide.html:205
+#: templates/cotton/quick_guide.html:206
 msgid ""
 "Download a complete offline PDF of your itinerary, with optional attachments "
 "embedded for travelling without connectivity."
 msgstr ""
 
-#: templates/cotton/quick_guide.html:217
+#: templates/cotton/quick_guide.html:218
 msgid "Calendar Sync"
 msgstr ""
 
-#: templates/cotton/quick_guide.html:220
+#: templates/cotton/quick_guide.html:221
 msgid ""
 "Subscribe to your trip from any calendar app via a private iCal feed — "
 "updates flow through automatically."
 msgstr ""
 
-#: templates/cotton/quick_guide.html:231
+#: templates/cotton/quick_guide.html:232
 #: templates/trips/email/daily_digest_body.html:49
 msgid "Weather"
 msgstr "Weather"
 
-#: templates/cotton/quick_guide.html:234
+#: templates/cotton/quick_guide.html:235
 msgid ""
 "See a day-by-day forecast on your trip and receive a summary email a few "
 "days before departure to help you pack."
 msgstr ""
 
-#: templates/cotton/quick_guide.html:245
+#: templates/cotton/quick_guide.html:247
 msgid "Install & Offline"
 msgstr "Install & Offline"
 
-#: templates/cotton/quick_guide.html:248
+#: templates/cotton/quick_guide.html:250
 msgid ""
 "Install Organize It as an app on your phone or desktop, and keep trips you "
 "have already opened readable even when you lose connectivity."
@@ -827,11 +825,11 @@ msgstr ""
 "Install Organize It as an app on your phone or desktop, and keep trips you "
 "have already opened readable even when you lose connectivity."
 
-#: templates/cotton/quick_guide.html:255
+#: templates/cotton/quick_guide.html:257
 msgid "Want to learn more? Check out our comprehensive documentation."
 msgstr ""
 
-#: templates/cotton/quick_guide.html:262
+#: templates/cotton/quick_guide.html:264
 msgid "Read Documentation"
 msgstr ""
 
@@ -906,7 +904,7 @@ msgstr ""
 
 #: templates/includes/footer.html:42 templates/includes/navbar.html:54
 #: templates/includes/navbar.html:77
-#: templates/trips/includes/expenses-card.html:17
+#: templates/trips/includes/expenses-card.html:14
 msgid "Settings"
 msgstr "Settings"
 
@@ -1028,7 +1026,7 @@ msgstr "Stay added to trip."
 #: templates/suggestions/map-suggestions-results.html:72
 #: templates/trips/arrival-transfer-modal.html:23
 #: templates/trips/departure-transfer-modal.html:23
-#: templates/trips/includes/expenses-card.html:75
+#: templates/trips/includes/expenses-card.html:67
 msgid "Details"
 msgstr ""
 
@@ -1431,7 +1429,7 @@ msgstr ""
 msgid "Transfers"
 msgstr ""
 
-#: templates/trips/email/daily_digest_body.html:84 trips/models.py:1201
+#: templates/trips/email/daily_digest_body.html:84
 msgid "Accommodation"
 msgstr ""
 
@@ -1660,7 +1658,7 @@ msgstr ""
 
 #: templates/trips/email/weather_reminder_body.html:47
 #: templates/trips/email/weather_reminder_body.txt:7
-#: templates/trips/expenses-modal.html:106
+#: templates/trips/expenses-modal.html:102
 #: templates/trips/includes/create-stage-modal.html:64
 #: templates/trips/includes/day-destination-card.html:6
 #: templates/trips/includes/day-selector.html:16
@@ -1764,7 +1762,7 @@ msgid "Add Notes"
 msgstr ""
 
 #: templates/trips/expense-create.html:7
-#: templates/trips/includes/expenses-card.html:82
+#: templates/trips/includes/expenses-card.html:74
 msgid "Add expense"
 msgstr "Add expense"
 
@@ -1773,7 +1771,7 @@ msgstr "Add expense"
 msgid "Linked to"
 msgstr "Linked to"
 
-#: templates/trips/expense-modify.html:7 templates/trips/expenses-modal.html:88
+#: templates/trips/expense-modify.html:7 templates/trips/expenses-modal.html:86
 msgid "Edit expense"
 msgstr "Edit expense"
 
@@ -1782,7 +1780,7 @@ msgid "Delete this expense?"
 msgstr "Delete this expense?"
 
 #: templates/trips/expense-settings.html:6
-#: templates/trips/includes/expenses-card.html:15
+#: templates/trips/includes/expenses-card.html:12
 msgid "Expense settings"
 msgstr "Expense settings"
 
@@ -1791,7 +1789,7 @@ msgid "Enable expense sharing"
 msgstr "Enable expense sharing"
 
 #: templates/trips/expense-settings.html:27
-#: templates/trips/includes/expenses-card.html:35
+#: templates/trips/includes/expenses-card.html:32
 msgid "Track who paid for what and split shared costs among participants."
 msgstr "Track who paid for what and split shared costs among participants."
 
@@ -1854,7 +1852,7 @@ msgid "Add family"
 msgstr "Add family"
 
 #: templates/trips/expenses-modal.html:4 templates/trips/expenses-modal.html:19
-#: templates/trips/includes/expenses-card.html:7
+#: templates/trips/includes/expenses-card.html:5
 msgid "Expenses"
 msgstr "Expenses"
 
@@ -1875,7 +1873,7 @@ msgstr ""
 "share is not charged to a parent. Assign them in the expense settings."
 
 #: templates/trips/expenses-modal.html:46
-#: templates/trips/includes/expenses-card.html:67
+#: templates/trips/includes/expenses-card.html:59
 msgid "Everyone is settled up."
 msgstr "Everyone is settled up."
 
@@ -1898,19 +1896,14 @@ msgstr ""
 msgid "Balance"
 msgstr "Balance"
 
-#: templates/trips/expenses-modal.html:95
-#: templates/trips/expenses-modal.html:111
-#: templates/trips/expenses-modal.html:128
+#: templates/trips/expenses-modal.html:93
+#: templates/trips/expenses-modal.html:107
 msgid "No expenses yet."
 msgstr "No expenses yet."
 
-#: templates/trips/expenses-modal.html:101
+#: templates/trips/expenses-modal.html:97
 msgid "By day"
 msgstr "By day"
-
-#: templates/trips/expenses-modal.html:118
-msgid "By category"
-msgstr "By category"
 
 #: templates/trips/experience-create-unpaired.html:9
 #: templates/trips/experience-create.html:9
@@ -2206,29 +2199,17 @@ msgstr "Here you find events not yet assigned to a specific day"
 msgid "No stage"
 msgstr "No stage"
 
-#: templates/trips/includes/expenses-card.html:21
+#: templates/trips/includes/expenses-card.html:18
 msgid "Enable"
 msgstr "Enable"
 
-#: templates/trips/includes/expenses-card.html:40
+#: templates/trips/includes/expenses-card.html:37
 msgid "Total"
 msgstr "Total"
 
-#: templates/trips/includes/expenses-card.html:45
+#: templates/trips/includes/expenses-card.html:42
 msgid "Your balance"
 msgstr "Your balance"
-
-#: templates/trips/includes/expenses-card.html:47
-msgid "you are owed"
-msgstr "you are owed"
-
-#: templates/trips/includes/expenses-card.html:49
-msgid "you owe"
-msgstr "you owe"
-
-#: templates/trips/includes/expenses-card.html:51
-msgid "settled up"
-msgstr "settled up"
 
 #: templates/trips/includes/experience-preview.html:16
 #: templates/trips/includes/experience-preview.html:27
@@ -2708,7 +2689,7 @@ msgid "Car"
 msgstr ""
 
 #: templates/trips/partials/main-transfer-type.html:57 trips/models.py:336
-#: trips/models.py:827 trips/models.py:1207
+#: trips/models.py:827
 msgid "Other"
 msgstr ""
 
@@ -3070,14 +3051,10 @@ msgid "Date"
 msgstr "Date"
 
 #: trips/forms/expense.py:49
-msgid "Category"
-msgstr "Category"
-
-#: trips/forms/expense.py:50
 msgid "Paid by"
 msgstr "Paid by"
 
-#: trips/forms/expense.py:98
+#: trips/forms/expense.py:85
 msgid "Select at least one participant."
 msgstr "Select at least one participant."
 
@@ -3439,22 +3416,6 @@ msgstr "Family of %(name)s"
 msgid "Family unit"
 msgstr "Family unit"
 
-#: trips/models.py:1202
-msgid "Transport"
-msgstr "Transport"
-
-#: trips/models.py:1203
-msgid "Local transport"
-msgstr "Local transport"
-
-#: trips/models.py:1204
-msgid "Groceries"
-msgstr "Groceries"
-
-#: trips/models.py:1206
-msgid "Tickets"
-msgstr "Tickets"
-
 #: trips/views/attachments.py:90
 msgid "This trip"
 msgstr "This trip"
@@ -3630,59 +3591,3 @@ msgstr ""
 #, python-brace-format
 msgid "No images found for '{query}'"
 msgstr ""
-
-#~ msgid "Shared with"
-#~ msgstr "Shared with"
-
-#~ msgid "Remove participant"
-#~ msgstr "Remove participant"
-
-#~ msgid "Add participant by email"
-#~ msgstr "Add participant by email"
-
-#, fuzzy
-#~| msgid "Events"
-#~ msgid "Event"
-#~ msgstr "Events"
-
-#~ msgid "min"
-#~ msgstr "min"
-
-#~ msgid "This looks like an accommodation, not an experience."
-#~ msgstr "This looks like an accommodation, not an experience."
-
-#~ msgid "This looks like a restaurant or café, not an experience."
-#~ msgstr "This looks like a restaurant or café, not an experience."
-
-#~ msgid "Main"
-#~ msgstr "Main"
-
-#~ msgid "%(count)s days"
-#~ msgstr "%(count)s days"
-
-#~ msgid "Show map"
-#~ msgstr "Show map"
-
-#~ msgid "Show list"
-#~ msgstr "Show list"
-
-#~ msgid "Set as viewer"
-#~ msgstr "Set as viewer"
-
-#~ msgid "Set as editor"
-#~ msgstr "Set as editor"
-
-#~ msgid "Add by email"
-#~ msgstr "Add by email"
-
-#~ msgid "Collaborators"
-#~ msgstr "Collaborators"
-
-#~ msgid "Remove collaborator"
-#~ msgstr "Remove collaborator"
-
-#~ msgid "Activities and events organized by day"
-#~ msgstr "Activities and events organized by day"
-
-#~ msgid "Open map"
-#~ msgstr "Open map"
