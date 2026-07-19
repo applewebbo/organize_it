@@ -2,22 +2,20 @@
 <div class="card bg-base-100 shadow">
     <div class="card-body">
         <div class="flex flex-wrap items-center justify-between gap-2">
-            <h2 class="card-title flex items-center gap-2 text-xl font-semibold">
-                <i class="ph ph-receipt text-primary"></i>
-                {% trans "Expenses" %}
-            </h2>
+            <h2 class="card-title text-xl font-semibold">{% trans "Expenses" %}</h2>
             <div class="flex items-center gap-2">
                 {% if trip.expenses_enabled %}
-                    <button class="btn btn-ghost btn-sm btn-circle"
+                    <button class="btn btn-ghost btn-sm gap-1"
                             hx-get="{% url 'trips:expense-settings' trip.pk %}"
                             hx-target="#dialog"
                             @click="$dispatch('open-modal'); document.activeElement.blur()"
                             aria-label="{% trans 'Expense settings' %}">
-                        <i class="ph ph-gear"></i>
+                        <i class="ph-bold ph-gear i-md"></i>
+                        <span class="hidden sm:inline">{% trans "Settings" %}</span>
                     </button>
                 {% endif %}
                 <label class="flex cursor-pointer items-center gap-2">
-                    <span class="text-sm font-medium">{% trans "Enable expense sharing" %}</span>
+                    <span class="hidden text-sm font-medium sm:inline">{% trans "Enable" %}</span>
                     <input type="checkbox"
                            name="expenses_enabled"
                            class="toggle toggle-primary"
@@ -56,7 +54,7 @@
                 <ul class="mt-3 space-y-1 text-sm">
                     {% for s in summary.settlements|slice:":3" %}
                         <li class="flex items-center gap-2">
-                            <i class="ph ph-arrow-right text-base-content/40"></i>
+                            <i class="ph-bold ph-arrow-right text-base-content/40"></i>
                             <span><strong>{{ s.from_label }}</strong> → <strong>{{ s.to_label }}</strong></span>
                             <span class="text-base-content/70 ml-auto">{{ s.amount|money:summary.currency }}</span>
                         </li>
@@ -70,14 +68,14 @@
                         hx-get="{% url 'trips:expenses-modal' trip.pk %}"
                         hx-target="#dialog"
                         @click="$dispatch('open-modal'); document.activeElement.blur()">
-                    <i class="ph ph-list-magnifying-glass"></i>
+                    <i class="ph-bold ph-list-magnifying-glass"></i>
                     {% trans "Details" %}
                 </button>
                 <button class="btn btn-primary btn-sm gap-1"
                         hx-get="{% url 'trips:expense-create' trip.pk %}"
                         hx-target="#dialog"
                         @click="$dispatch('open-modal'); document.activeElement.blur()">
-                    <i class="ph ph-plus"></i>
+                    <i class="ph-bold ph-plus"></i>
                     {% trans "Add expense" %}
                 </button>
             </div>

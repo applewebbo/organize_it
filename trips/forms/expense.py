@@ -35,7 +35,7 @@ class ExpenseForm(forms.ModelForm):
     shared_with = forms.ModelMultipleChoiceField(
         queryset=ExpenseParticipant.objects.none(),
         widget=forms.CheckboxSelectMultiple,
-        label=_("Shared with"),
+        label=_("Split the expense between"),
         required=False,
     )
 
@@ -59,6 +59,9 @@ class ExpenseForm(forms.ModelForm):
         participants = ExpenseParticipant.objects.filter(trip=trip, is_active=True)
         self.fields["payer"].queryset = participants
         self.fields["shared_with"].queryset = participants
+        # Show only the participant name, not the model __str__ ("Name [Trip]").
+        self.fields["payer"].label_from_instance = lambda p: p.display_name
+        self.fields["shared_with"].label_from_instance = lambda p: p.display_name
         if not self.is_bound and self.initial.get("shared_with") is None:
             self.initial["shared_with"] = list(
                 participants.values_list("pk", flat=True)
@@ -69,10 +72,24 @@ class ExpenseForm(forms.ModelForm):
 
         self.helper = FormHelper()
         self.helper.form_tag = False
-        layout_fields = [Field("title"), Field("amount"), Field("date")]
+        # On sm+ (6-column grid): row 1 is description + amount, row 2 is
+        # date/category/payer, row 3 is the "split between" checkboxes.
+        layout_fields = [
+            Field("title", wrapper_class="sm:col-span-4"),
+            Field("amount", wrapper_class="sm:col-span-2"),
+        ]
         if not linked:
-            layout_fields.append(Field("category"))
-        layout_fields += [Field("payer"), Field("shared_with")]
+            layout_fields += [
+                Field("date", wrapper_class="sm:col-span-2"),
+                Field("category", wrapper_class="sm:col-span-2"),
+                Field("payer", wrapper_class="sm:col-span-2"),
+            ]
+        else:
+            layout_fields += [
+                Field("date", wrapper_class="sm:col-span-3"),
+                Field("payer", wrapper_class="sm:col-span-3"),
+            ]
+        layout_fields.append(Field("shared_with", wrapper_class="sm:col-span-6"))
         self.helper.layout = Layout(*layout_fields)
 
     def clean_shared_with(self):

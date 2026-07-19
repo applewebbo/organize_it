@@ -36,7 +36,7 @@
                     {% for s in summary.settlements %}
                         <li class="bg-base-200 flex items-center gap-2 rounded-lg px-3 py-2 text-sm">
                             <strong>{{ s.from_label }}</strong>
-                            <i class="ph ph-arrow-right text-base-content/50"></i>
+                            <i class="ph-bold ph-arrow-right text-base-content/50"></i>
                             <strong>{{ s.to_label }}</strong>
                             <span class="ml-auto font-semibold">{{ s.amount|money:summary.currency }}</span>
                         </li>
@@ -86,7 +86,7 @@
                                     hx-get="{% url 'trips:expense-modify' expense.pk %}"
                                     hx-target="#dialog"
                                     aria-label="{% trans 'Edit expense' %}">
-                                <i class="ph ph-pencil-simple"></i>
+                                <i class="ph-bold ph-pencil-simple"></i>
                             </button>
                         </li>
                     {% endfor %}

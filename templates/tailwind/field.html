@@ -16,12 +16,12 @@
             {% include 'tailwind/layout/help_text.html' %}
         </div>
     {% elif field|is_select %}
-        <div class="{% if field_class %}{{ field_class }}{% else %}mb-4{% endif %}"{% if flat_attrs %} {{ flat_attrs|safe }}{% endif %}>
+        <div class="{% if wrapper_class %}{{ wrapper_class }} {% endif %}{% if field_class %}{{ field_class }}{% else %}mb-4{% endif %}"{% if flat_attrs %} {{ flat_attrs|safe }}{% endif %}>
             {% include 'tailwind/layout/select.html' %}
         </div>
     {# if field has a special template then use this #}
     {% elif field|is_checkboxselectmultiple %}
-        <div class="{% if field_class %}{{ field_class }}{% else %}mb-3{% endif %}"{% if flat_attrs %} {{ flat_attrs|safe }}{% endif %}>
+        <div class="{% if wrapper_class %}{{ wrapper_class }} {% endif %}{% if field_class %}{{ field_class }}{% else %}mb-3{% endif %}"{% if flat_attrs %} {{ flat_attrs|safe }}{% endif %}>
             {% include 'tailwind/layout/checkboxselectmultiple.html' %}
         </div>
     {% elif field|is_radioselect %}

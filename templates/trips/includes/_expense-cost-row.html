@@ -14,7 +14,7 @@
                     hx-get="{% url 'trips:expense-create' trip.pk %}?ct={{ ct }}&obj={{ obj.pk }}"
                     hx-target="#dialog"
                     @click="$dispatch('open-modal'); document.activeElement.blur()">
-                <i class="ph ph-plus"></i>{% trans "Add cost" %}
+                <i class="ph-bold ph-plus"></i>{% trans "Add cost" %}
             </button>
         {% endif %}
     </li>

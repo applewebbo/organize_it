@@ -63,7 +63,7 @@
                                         {% if unit.shared_wallet %}
                                             <span class="badge badge-success badge-sm gap-1"
                                                   title="{% trans 'Debts inside this family are netted; settlements are shown per family.' %}">
-                                                <i class="ph ph-wallet"></i>{% trans "Shared" %}
+                                                <i class="ph-bold ph-wallet"></i>{% trans "Shared" %}
                                             </span>
                                         {% else %}
                                             <span class="badge badge-ghost badge-sm"
@@ -75,7 +75,7 @@
                                                 hx-target="#expense-config"
                                                 hx-swap="outerHTML"
                                                 aria-label="{% trans 'Delete family unit' %}">
-                                            <i class="ph ph-trash"></i>
+                                            <i class="ph-bold ph-trash"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -108,7 +108,7 @@
                             {% trans "Shared wallet" %}
                         </label>
                         <button type="submit" class="btn btn-outline btn-sm gap-1">
-                            <i class="ph ph-plus"></i>{% trans "Add family" %}
+                            <i class="ph-bold ph-plus"></i>{% trans "Add family" %}
                         </button>
                     </form>
                 {% endif %}
