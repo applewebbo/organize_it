@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-16 14:20+0200\n"
+"POT-Creation-Date: 2026-07-19 11:37+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -543,8 +543,8 @@ msgid "Display Preferences"
 msgstr "Preferenze di visualizzazione"
 
 #: templates/account/profile.html:151 templates/suggestions/settings.html:134
-#: templates/trips/event-notes.html:30 templates/trips/expense-create.html:27
-#: templates/trips/expense-modify.html:29
+#: templates/trips/event-notes.html:30 templates/trips/expense-create.html:35
+#: templates/trips/expense-modify.html:37
 #: templates/trips/experience-create-unpaired.html:35
 #: templates/trips/experience-create.html:60
 #: templates/trips/includes/checklist-reminder-card.html:24
@@ -764,10 +764,37 @@ msgstr ""
 "reali. Porta la tua chiave del provider (Google Gemini o Mistral AI)."
 
 #: templates/cotton/quick_guide.html:117
+msgid "Day Planning"
+msgstr "Pianificazione Giornata"
+
+#: templates/cotton/quick_guide.html:120
+msgid ""
+"Let the AI plan a whole day for you — an ordered set of stops you can review "
+"and apply. Add to, unpair, or replace the events already on the day."
+msgstr ""
+"Lascia che l'AI pianifichi un intero giorno per te — un insieme ordinato di "
+"tappe che puoi esaminare e applicare. Aggiungi, scollega o sostituisci gli "
+"eventi già presenti nel giorno."
+
+#: templates/cotton/quick_guide.html:131
+msgid "Shared Expenses"
+msgstr "Spese Condivise"
+
+#: templates/cotton/quick_guide.html:134
+msgid ""
+"Track who paid for what and split shared costs among participants. See who "
+"owes whom with simplified settlements, with support for families and "
+"children."
+msgstr ""
+"Tieni traccia di chi ha pagato e dividi le spese condivise tra i "
+"partecipanti. Scopri chi deve cosa a chi con regolamenti semplificati, con "
+"supporto per famiglie e bambini."
+
+#: templates/cotton/quick_guide.html:145
 msgid "Collaboration"
 msgstr "Collaborazione"
 
-#: templates/cotton/quick_guide.html:120
+#: templates/cotton/quick_guide.html:148
 msgid ""
 "Invite friends or family to co-edit your trip. Each collaborator gets a "
 "unique color badge on their contributions so you can see who added what."
@@ -776,11 +803,11 @@ msgstr ""
 "ottiene un badge colorato univoco sui propri contributi così puoi vedere chi "
 "ha aggiunto cosa."
 
-#: templates/cotton/quick_guide.html:132
+#: templates/cotton/quick_guide.html:160
 msgid "Sharing"
 msgstr "Condivisione"
 
-#: templates/cotton/quick_guide.html:135
+#: templates/cotton/quick_guide.html:163
 msgid ""
 "Share a read-only view of your trip with anyone via a secure magic link — no "
 "account required to view."
@@ -788,12 +815,12 @@ msgstr ""
 "Condividi una vista in sola lettura del tuo viaggio con chiunque tramite un "
 "magic link sicuro — nessun account richiesto per visualizzare."
 
-#: templates/cotton/quick_guide.html:146 templates/trips/checklist.html:4
+#: templates/cotton/quick_guide.html:174 templates/trips/checklist.html:4
 #: templates/trips/includes/checklist-card.html:6
 msgid "Checklist"
 msgstr "Checklist"
 
-#: templates/cotton/quick_guide.html:149
+#: templates/cotton/quick_guide.html:177
 msgid ""
 "Keep a pre-departure to-do list for each trip and get an optional email "
 "reminder days before leaving."
@@ -801,12 +828,12 @@ msgstr ""
 "Tieni una lista delle cose da fare prima della partenza per ogni viaggio e "
 "ricevi un promemoria email opzionale qualche giorno prima di partire."
 
-#: templates/cotton/quick_guide.html:160
+#: templates/cotton/quick_guide.html:188
 #: templates/trips/includes/attachments-card.html:6
 msgid "Documents"
 msgstr "Documenti"
 
-#: templates/cotton/quick_guide.html:163
+#: templates/cotton/quick_guide.html:191
 msgid ""
 "Attach PDFs and images — tickets, vouchers, reservations — to your trip, "
 "stays, transfers and events."
@@ -814,11 +841,11 @@ msgstr ""
 "Allega PDF e immagini — biglietti, voucher, prenotazioni — al viaggio, agli "
 "alloggi, ai trasferimenti e agli eventi."
 
-#: templates/cotton/quick_guide.html:174
+#: templates/cotton/quick_guide.html:202
 msgid "PDF Export"
 msgstr "Esportazione PDF"
 
-#: templates/cotton/quick_guide.html:177
+#: templates/cotton/quick_guide.html:205
 msgid ""
 "Download a complete offline PDF of your itinerary, with optional attachments "
 "embedded for travelling without connectivity."
@@ -826,11 +853,11 @@ msgstr ""
 "Scarica un PDF offline completo del tuo itinerario, con gli allegati "
 "incorporati opzionalmente per viaggiare anche senza connessione."
 
-#: templates/cotton/quick_guide.html:189
+#: templates/cotton/quick_guide.html:217
 msgid "Calendar Sync"
 msgstr "Sincronizzazione calendario"
 
-#: templates/cotton/quick_guide.html:192
+#: templates/cotton/quick_guide.html:220
 msgid ""
 "Subscribe to your trip from any calendar app via a private iCal feed — "
 "updates flow through automatically."
@@ -838,12 +865,12 @@ msgstr ""
 "Iscriviti al tuo viaggio da qualsiasi app di calendario tramite un feed iCal "
 "privato — gli aggiornamenti arrivano automaticamente."
 
-#: templates/cotton/quick_guide.html:203
+#: templates/cotton/quick_guide.html:231
 #: templates/trips/email/daily_digest_body.html:49
 msgid "Weather"
 msgstr "Meteo"
 
-#: templates/cotton/quick_guide.html:206
+#: templates/cotton/quick_guide.html:234
 msgid ""
 "See a day-by-day forecast on your trip and receive a summary email a few "
 "days before departure to help you pack."
@@ -852,11 +879,23 @@ msgstr ""
 "riepilogativa qualche giorno prima della partenza per aiutarti a fare i "
 "bagagli."
 
-#: templates/cotton/quick_guide.html:213
+#: templates/cotton/quick_guide.html:245
+msgid "Install & Offline"
+msgstr "Installazione e Offline"
+
+#: templates/cotton/quick_guide.html:248
+msgid ""
+"Install Organize It as an app on your phone or desktop, and keep trips you "
+"have already opened readable even when you lose connectivity."
+msgstr ""
+"Installa Organize It come app su telefono o desktop e mantieni consultabili "
+"i viaggi che hai già aperto anche quando perdi la connessione."
+
+#: templates/cotton/quick_guide.html:255
 msgid "Want to learn more? Check out our comprehensive documentation."
 msgstr "Vuoi saperne di più? Consulta la nostra documentazione completa."
 
-#: templates/cotton/quick_guide.html:220
+#: templates/cotton/quick_guide.html:262
 msgid "Read Documentation"
 msgstr "Leggi la documentazione"
 
@@ -884,7 +923,7 @@ msgid "Other Trips"
 msgstr "Altri Viaggi"
 
 #: templates/includes/auth-index.html:72 templates/trips/event-detail.html:86
-#: templates/trips/includes/_expense-cost-row.html:12
+#: templates/trips/includes/_expense-cost-row.html:11
 #: templates/trips/includes/main-transfers.html:170
 #: templates/trips/includes/main-transfers.html:345
 #: templates/trips/includes/note.html:8
@@ -935,6 +974,7 @@ msgstr "Home"
 
 #: templates/includes/footer.html:42 templates/includes/navbar.html:54
 #: templates/includes/navbar.html:77
+#: templates/trips/includes/expenses-card.html:17
 msgid "Settings"
 msgstr "Impostazioni"
 
@@ -960,8 +1000,8 @@ msgstr "Codice del progetto"
 #: templates/trips/attachments/preview-modal.html:15
 #: templates/trips/attachments/upload-modal.html:15
 #: templates/trips/event-detail.html:100 templates/trips/event-notes.html:33
-#: templates/trips/expense-create.html:11
-#: templates/trips/expense-modify.html:11
+#: templates/trips/expense-create.html:18
+#: templates/trips/expense-modify.html:18
 #: templates/trips/expense-settings.html:10
 #: templates/trips/expenses-modal.html:8
 #: templates/trips/includes/collab-modal.html:7
@@ -1057,7 +1097,7 @@ msgstr "Aggiungi al viaggio"
 #: templates/suggestions/map-suggestions-results.html:72
 #: templates/trips/arrival-transfer-modal.html:23
 #: templates/trips/departure-transfer-modal.html:23
-#: templates/trips/includes/expenses-card.html:74
+#: templates/trips/includes/expenses-card.html:75
 msgid "Details"
 msgstr "Dettagli"
 
@@ -1233,7 +1273,7 @@ msgstr "File"
 
 #: templates/trips/attachments/upload-modal.html:38
 #: templates/trips/event-enrich-preview.html:63
-#: templates/trips/event-modal.html:29 templates/trips/expense-create.html:26
+#: templates/trips/event-modal.html:29 templates/trips/expense-create.html:34
 #: templates/trips/experience-create-unpaired.html:34
 #: templates/trips/experience-create.html:59
 #: templates/trips/includes/trip-destinations-modal.html:60
@@ -1754,7 +1794,7 @@ msgid "Enrich"
 msgstr "Arricchisci"
 
 #: templates/trips/event-detail.html:94 templates/trips/event-modal.html:3
-#: templates/trips/expense-modify.html:28
+#: templates/trips/expense-modify.html:36
 #: templates/trips/includes/main-transfers.html:178
 #: templates/trips/includes/main-transfers.html:353
 #: templates/trips/includes/note.html:12
@@ -1813,12 +1853,12 @@ msgid "Add Notes"
 msgstr "Aggiungi Note"
 
 #: templates/trips/expense-create.html:7
-#: templates/trips/includes/expenses-card.html:81
+#: templates/trips/includes/expenses-card.html:82
 msgid "Add expense"
 msgstr "Aggiungi spesa"
 
-#: templates/trips/expense-create.html:18
-#: templates/trips/expense-modify.html:18
+#: templates/trips/expense-create.html:26
+#: templates/trips/expense-modify.html:26
 msgid "Linked to"
 msgstr "Collegata a"
 
@@ -1826,7 +1866,7 @@ msgstr "Collegata a"
 msgid "Edit expense"
 msgstr "Modifica spesa"
 
-#: templates/trips/expense-modify.html:27
+#: templates/trips/expense-modify.html:35
 msgid "Delete this expense?"
 msgstr "Eliminare questa spesa?"
 
@@ -1835,15 +1875,16 @@ msgstr "Eliminare questa spesa?"
 msgid "Expense settings"
 msgstr "Impostazioni spese"
 
-#: templates/trips/expense-settings.html:24
-#: templates/trips/includes/expenses-card.html:20 trips/forms/expense.py:14
+#: templates/trips/expense-settings.html:24 trips/forms/expense.py:14
 msgid "Enable expense sharing"
-msgstr "Attiva divisione spese"
+msgstr "Attiva condivisione spese"
 
 #: templates/trips/expense-settings.html:27
-#: templates/trips/includes/expenses-card.html:34
+#: templates/trips/includes/expenses-card.html:35
 msgid "Track who paid for what and split shared costs among participants."
-msgstr "Tieni traccia di chi ha pagato e dividi le spese condivise tra i partecipanti."
+msgstr ""
+"Tieni traccia di chi ha pagato e dividi le spese condivise tra i "
+"partecipanti."
 
 #: templates/trips/expense-settings.html:31 trips/forms/expense.py:15
 msgid "Trip currency"
@@ -1857,7 +1898,9 @@ msgstr "Salva impostazioni"
 msgid ""
 "Add everyone in the 'Participants' section first — the people added there "
 "appear below. Group couples and assign children to a parent."
-msgstr "Aggiungi prima tutti nella sezione «Chi partecipa»: le persone aggiunte lì compaiono qui sotto. Raggruppa le coppie e assegna i bambini a un genitore."
+msgstr ""
+"Aggiungi prima tutti nella sezione «Chi partecipa»: le persone aggiunte lì "
+"compaiono qui sotto. Raggruppa le coppie e assegna i bambini a un genitore."
 
 #: templates/trips/expense-settings.html:49
 #: templates/trips/includes/_participant-chip.html:21
@@ -1867,7 +1910,8 @@ msgstr "Non assegnato"
 
 #: templates/trips/expense-settings.html:65
 msgid "Debts inside this family are netted; settlements are shown per family."
-msgstr "I debiti interni al nucleo si compensano; i saldi sono mostrati per nucleo."
+msgstr ""
+"I debiti interni al nucleo si compensano; i saldi sono mostrati per nucleo."
 
 #: templates/trips/expense-settings.html:66
 msgid "Shared"
@@ -1918,10 +1962,12 @@ msgstr "Totali"
 msgid ""
 "Some children are not assigned to a family unit with an adult, so their "
 "share is not charged to a parent. Assign them in the expense settings."
-msgstr "Alcuni bambini non sono assegnati a un nucleo con un adulto, quindi la loro quota non viene addebitata a un genitore. Assegnali nelle impostazioni spese."
+msgstr ""
+"Alcuni bambini non sono assegnati a un nucleo con un adulto, quindi la loro "
+"quota non viene addebitata a un genitore. Assegnali nelle impostazioni spese."
 
 #: templates/trips/expenses-modal.html:46
-#: templates/trips/includes/expenses-card.html:66
+#: templates/trips/includes/expenses-card.html:67
 msgid "Everyone is settled up."
 msgstr "Sono tutti in pari."
 
@@ -1993,7 +2039,7 @@ msgstr "Cerca"
 msgid "Unpaired Experiences"
 msgstr "Esperienze non abbinate"
 
-#: templates/trips/includes/_expense-cost-row.html:19
+#: templates/trips/includes/_expense-cost-row.html:17
 msgid "Add cost"
 msgstr "Aggiungi costo"
 
@@ -2252,23 +2298,27 @@ msgstr "Qui trovi gli eventi non ancora abbinati ad un giorno specifico"
 msgid "No stage"
 msgstr "Nessuna tappa"
 
-#: templates/trips/includes/expenses-card.html:39
+#: templates/trips/includes/expenses-card.html:21
+msgid "Enable"
+msgstr "Attiva"
+
+#: templates/trips/includes/expenses-card.html:40
 msgid "Total"
 msgstr "Totale"
 
-#: templates/trips/includes/expenses-card.html:44
+#: templates/trips/includes/expenses-card.html:45
 msgid "Your balance"
 msgstr "Il tuo saldo"
 
-#: templates/trips/includes/expenses-card.html:46
+#: templates/trips/includes/expenses-card.html:47
 msgid "you are owed"
 msgstr "ti devono"
 
-#: templates/trips/includes/expenses-card.html:48
+#: templates/trips/includes/expenses-card.html:49
 msgid "you owe"
 msgstr "devi"
 
-#: templates/trips/includes/expenses-card.html:50
+#: templates/trips/includes/expenses-card.html:51
 msgid "settled up"
 msgstr "in pari"
 
@@ -3106,30 +3156,30 @@ msgid "Add notes..."
 msgstr "Aggiungi note..."
 
 #: trips/forms/expense.py:38
-msgid "Shared with"
-msgstr "Condivisa con"
+msgid "Split the expense between"
+msgstr "Dividi la spesa tra"
 
-#: trips/forms/expense.py:45
+#: trips/forms/expense.py:46
 msgid "Description"
 msgstr "Descrizione"
 
-#: trips/forms/expense.py:46
+#: trips/forms/expense.py:47
 msgid "Amount"
 msgstr "Importo"
 
-#: trips/forms/expense.py:47
+#: trips/forms/expense.py:48
 msgid "Date"
 msgstr "Data"
 
-#: trips/forms/expense.py:48
+#: trips/forms/expense.py:49
 msgid "Category"
 msgstr "Categoria"
 
-#: trips/forms/expense.py:49
+#: trips/forms/expense.py:50
 msgid "Paid by"
 msgstr "Pagato da"
 
-#: trips/forms/expense.py:80
+#: trips/forms/expense.py:98
 msgid "Select at least one participant."
 msgstr "Seleziona almeno un partecipante."
 
@@ -3693,6 +3743,9 @@ msgstr "Errore API di Unsplash. Per favore riprova più tardi."
 #, python-brace-format
 msgid "No images found for '{query}'"
 msgstr "Nessuna immagine trovata per '{query}'"
+
+#~ msgid "Shared with"
+#~ msgstr "Condivisa con"
 
 #~ msgid "e.g. avoid tourist traps, travelling with kids"
 #~ msgstr "es. evitare le trappole per turisti, in viaggio con bambini"

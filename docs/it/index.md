@@ -15,6 +15,7 @@ Organize It ti aiuta a creare itinerari di viaggio dettagliati organizzando tutt
 - **Esperienze** - Attività, musei, tour e attrazioni
 - **Pasti** - Prenotazioni ristoranti e piani per i pasti
 - **Trasferimenti** - Voli, treni e trasporti
+- **Spese Condivise** - Traccia i costi e dividili tra i partecipanti
 
 ## Caratteristiche Principali
 
@@ -34,7 +35,13 @@ Gli indirizzi vengono geocodificati automaticamente con supporto per l'arricchim
 Carica le tue immagini di copertina o cerca su Unsplash direttamente dall'app.
 
 ### ✨ Suggerimenti AI
-Ottieni idee generate dall'AI su luoghi da visitare, dove mangiare e dove alloggiare, personalizzate in base alle tue preferenze e ancorate a luoghi reali. Porta la tua chiave del provider (Google Gemini o Mistral AI).
+Ottieni idee generate dall'AI su luoghi da visitare, dove mangiare e dove alloggiare, personalizzate in base alle tue preferenze e ancorate a luoghi reali. Porta la tua chiave del provider (Google Gemini o Mistral AI). L'AI può anche pianificare un intero giorno per te.
+
+### 💶 Spese Condivise
+Traccia chi ha pagato cosa e dividi le spese condivise tra i partecipanti, con regolamenti semplificati e supporto per le famiglie, dove la quota dei bambini viene addebitata ai genitori.
+
+### 📲 Installabile e Offline
+Installa Organize It come app su qualsiasi dispositivo e mantieni consultabili i viaggi che hai già aperto anche quando perdi la connessione.
 
 ### 👥 Collaborazione
 Invita altri utenti a collaborare su un viaggio. Ogni collaboratore ottiene un badge colorato univoco sui propri contributi e il viaggio appare nella loro sezione "Condivisi con me".

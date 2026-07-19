@@ -107,6 +107,29 @@ Per aggiungere un luogo, clicca **Aggiungi** sulla sua card. Viene creato come *
 
 Ogni proposta viene confrontata con **Google Places** per associare indirizzo, coordinate e ID luogo reali. Le proposte non abbinabili — o che risolvono a un luogo fuori dall'**area di ricerca** scelta — vengono scartate, così le card puntano sempre a un locale reale e correttamente localizzato.
 
+## Pianificare un Intero Giorno
+
+Oltre a suggerire singoli luoghi, Organize It può proporre un **itinerario completo per un singolo giorno** — un insieme ordinato di tappe (esperienze, pasti) che si incastrano tra loro.
+
+1. In un viaggio, apri il giorno da pianificare e premi **Pianifica giornata** (il pulsante nell'intestazione del giorno).
+2. Nel modale, aggiungi facoltativamente delle **note per questo giorno**, poi premi **Pianifica giornata** per generare.
+3. Esamina le **tappe** proposte. Ognuna ha una casella — deseleziona ciò che non vuoi.
+4. Premi **Applica giornata** per aggiungere le tappe selezionate al giorno.
+
+### Scegliere una Strategia
+
+Se il giorno **ha già degli eventi**, scegli come il piano deve trattarli:
+
+- **Aggiungi agli eventi esistenti** — mantieni ciò che c'è e aggiungi le nuove tappe accanto.
+- **Scollega gli eventi esistenti** — gli eventi attuali vengono spostati nell'elenco non assegnati quando applichi il piano, liberando il giorno per le nuove tappe.
+- **Elimina gli eventi esistenti** — gli eventi attuali vengono eliminati quando applichi il piano.
+
+!!! info "Niente cambia finché non applichi"
+    La generazione si limita a proporre un itinerario. Gli eventi esistenti vengono scollegati o eliminati **solo quando premi Applica giornata** e solo per la strategia scelta.
+
+!!! warning "La generazione usa la tua quota"
+    Come per i suggerimenti di luoghi, pianificare un giorno chiama il tuo provider AI con la tua chiave e viene conteggiato sulla tua quota e sul limite giornaliero.
+
 ## Condividere la Chiave con i Collaboratori
 
 Se hai creato un viaggio e aggiunto [collaboratori](collaboration.md), puoi permettere loro di generare suggerimenti AI usando la **tua** chiave quando non ne hanno configurata una propria.

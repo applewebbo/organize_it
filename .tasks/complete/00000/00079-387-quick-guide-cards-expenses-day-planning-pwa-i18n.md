@@ -1,0 +1,1 @@
+../../all/00000/00079-387-quick-guide-cards-expenses-day-planning-pwa-i18n.md

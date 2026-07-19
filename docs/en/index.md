@@ -15,6 +15,7 @@ Organize It helps you create detailed travel itineraries by organizing all aspec
 - **Experiences** - Activities, museums, tours, and attractions
 - **Meals** - Restaurant reservations and dining plans
 - **Transfers** - Flights, trains, and transportation
+- **Shared Expenses** - Track costs and split them among participants
 
 ## Key Features
 
@@ -34,7 +35,13 @@ Addresses are automatically geocoded with support for Google Places enrichment a
 Upload your own cover images or search Unsplash directly from the app.
 
 ### ✨ AI Suggestions
-Get AI-generated ideas for places to visit, eat, and stay, tailored to your preferences and grounded on real places. Bring your own provider key (Google Gemini or Mistral AI).
+Get AI-generated ideas for places to visit, eat, and stay, tailored to your preferences and grounded on real places. Bring your own provider key (Google Gemini or Mistral AI). The AI can also plan a whole day for you.
+
+### 💶 Shared Expenses
+Track who paid for what and split shared costs among participants, with simplified settlements and support for families where children's shares are charged to their parents.
+
+### 📲 Installable & Offline
+Install Organize It as an app on any device and keep trips you have already opened readable when you lose connectivity.
 
 ### 👥 Collaboration
 Invite other users to collaborate on a trip. Each collaborator gets a unique color badge on their contributions, and the trip appears in their "Shared with me" section.

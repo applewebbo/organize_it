@@ -53,11 +53,13 @@ nav:
   - Meals: user-guide/meals.md
   - AI Suggestions: user-guide/suggestions.md
   - Transfers: user-guide/transfers.md
+  - Shared Expenses: user-guide/expenses.md
   - Checklist: user-guide/checklist.md
   - Documents & Attachments: user-guide/attachments.md
   - Export & Calendar Sync: user-guide/export.md
   - Weather: user-guide/weather.md
   - Collaboration: user-guide/collaboration.md
+  - Install & Offline: user-guide/pwa.md
 - FAQ: faq.md
 
 markdown_extensions:

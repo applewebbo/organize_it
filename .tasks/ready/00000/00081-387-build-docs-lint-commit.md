@@ -1,0 +1,1 @@
+../../all/00000/00081-387-build-docs-lint-commit.md

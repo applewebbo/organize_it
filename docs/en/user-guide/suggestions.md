@@ -107,6 +107,29 @@ To add a place, click **Add** on its card. It is created as an **Experience**, *
 
 Every proposal is matched against **Google Places** to attach a real address, coordinates, and place ID. Proposals that can't be matched — or that resolve to a place outside your chosen **search area** — are discarded, so cards always point to a real, correctly located venue.
 
+## Planning a Whole Day
+
+Besides suggesting individual places, Organize It can propose a **full itinerary for a single day** — an ordered set of stops (experiences, meals) that fit together.
+
+1. On a trip, open the day you want to plan and press **Plan day** (the button on the day header).
+2. In the modal, optionally add **notes for this day**, then press **Plan day** to generate.
+3. Review the proposed **stops**. Each one has a checkbox — untick anything you don't want.
+4. Press **Apply day** to add the selected stops to the day.
+
+### Choosing a Strategy
+
+If the day **already has events**, you pick how the plan should treat them:
+
+- **Add to existing events** — keep what's there and add the new stops alongside.
+- **Unpair existing events** — the current events are moved to the unassigned list when you apply the plan, leaving the day for the new stops.
+- **Delete existing events** — the current events are deleted when you apply the plan.
+
+!!! info "Nothing changes until you apply"
+    Generating only proposes an itinerary. Your existing events are unpaired or deleted **only when you press Apply day**, and only for the strategy you chose.
+
+!!! warning "Generating uses your quota"
+    Like place suggestions, planning a day calls your AI provider with your key and counts against your quota and daily limit.
+
 ## Sharing Your Key with Collaborators
 
 If you created a trip and added [collaborators](collaboration.md), you can let them generate AI suggestions using **your** key when they haven't configured their own.
