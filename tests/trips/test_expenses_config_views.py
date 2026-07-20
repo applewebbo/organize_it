@@ -32,8 +32,11 @@ class TestExpenseSettings:
         response = client.post(
             url, {"expenses_enabled": "on", "expense_currency": "GBP"}
         )
-        assert response.status_code == 200
-        assert response.headers["HX-Trigger"] == "expensesModified"
+        assert response.status_code == 204
+        triggers = json.loads(response.headers["HX-Trigger"])
+        assert "expensesModified" in triggers
+        assert "hide-modal" in triggers
+        assert triggers["showMessage"]["type"] == "success"
         trip.refresh_from_db()
         assert trip.expenses_enabled is True
         assert trip.expense_currency == "GBP"

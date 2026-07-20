@@ -6,6 +6,7 @@ from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.utils import timezone
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
 
 from accounts.models import get_profile
@@ -67,13 +68,21 @@ def expense_settings(request, trip_pk):
         form = ExpenseSettingsForm(request.POST, instance=trip)
         if form.is_valid():
             form.save()
-            context = {"settings_form": ExpenseSettingsForm(instance=trip)}
-            context.update(_config_context(trip))
-            return TemplateResponse(
-                request,
-                "trips/expense-settings.html",
-                context,
-                headers=EXPENSES_MODIFIED,
+            # Close the modal, refresh the summary card and confirm the save.
+            return HttpResponse(
+                status=204,
+                headers={
+                    "HX-Trigger": json.dumps(
+                        {
+                            "expensesModified": {},
+                            "hide-modal": {},
+                            "showMessage": {
+                                "type": "success",
+                                "message": str(_("Expense settings saved")),
+                            },
+                        }
+                    )
+                },
             )
     else:
         initial = {}

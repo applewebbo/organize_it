@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-20 09:47+0200\n"
+"POT-Creation-Date: 2026-07-20 10:05+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -3574,6 +3574,10 @@ msgstr "Non ho trovavo un luogo corrispondente."
 #: trips/views/events.py:480
 msgid "Event enriched successfully!"
 msgstr "Dati aggiunti con successo!"
+
+#: trips/views/expenses.py:81
+msgid "Expense settings saved"
+msgstr "Impostazioni spese salvate"
 
 #: trips/views/maps.py:610
 msgid "Event added to trip."

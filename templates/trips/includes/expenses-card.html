@@ -28,11 +28,11 @@
             </div>
         </div>
         {% if not trip.expenses_enabled %}
-            <p class="text-base-content/50 mt-1 text-xs italic">
+            <p class="text-base-content/50 mt-1 text-center text-xs italic sm:text-left">
                 {% trans "Track who paid for what and split shared costs among participants." %}
             </p>
         {% else %}
-            <div class="mt-2 flex flex-wrap items-center gap-4">
+            <div class="mt-2 flex flex-wrap items-center justify-center gap-4 text-center sm:justify-start sm:text-left">
                 <div>
                     <p class="text-base-content/50 text-xs tracking-wide uppercase">{% trans "Total" %}</p>
                     <p class="text-lg font-semibold">{{ summary.total|money:summary.currency }}</p>
@@ -49,14 +49,14 @@
             {% if summary.settlements %}
                 <ul class="mt-3 space-y-1 text-sm">
                     {% for s in summary.settlements|slice:":3" %}
-                        <li class="flex items-center gap-2">
+                        <li class="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
                             <span><strong>{{ s.from_label }}</strong> → <strong>{{ s.to_label }}</strong></span>
-                            <span class="text-base-content/70 ml-auto">{{ s.amount|money:summary.currency }}</span>
+                            <span class="text-base-content/70 sm:ml-auto">{{ s.amount|money:summary.currency }}</span>
                         </li>
                     {% endfor %}
                 </ul>
             {% else %}
-                <p class="text-base-content/50 mt-3 text-sm">{% trans "Everyone is settled up." %}</p>
+                <p class="text-base-content/50 mt-3 text-center text-sm sm:text-left">{% trans "Everyone is settled up." %}</p>
             {% endif %}
             <div class="card-actions mt-4 justify-end">
                 <button class="btn btn-outline btn-sm gap-1"
