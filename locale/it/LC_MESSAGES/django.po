@@ -1982,7 +1982,7 @@ msgstr "Pagato"
 #: templates/trips/includes/trip-header-card.html:114
 #: templates/trips/trip-list.html:84
 msgid "Share"
-msgstr "Condividi"
+msgstr "Quota"
 
 #: templates/trips/expenses-modal.html:55
 msgid "Balance"

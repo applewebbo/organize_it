@@ -290,7 +290,6 @@ function initFamilyUnitSortables() {
     document.querySelectorAll("[data-assign-url]:not([data-sortable-init])").forEach((el) => {
         el.setAttribute("data-sortable-init", "true");
         const dropZone = el.querySelector(".family-unit-drop") || el;
-        const assignUrl = el.dataset.assignUrl;
         Sortable.create(dropZone, {
             group: "family-units",
             animation: 150,
@@ -298,14 +297,17 @@ function initFamilyUnitSortables() {
             preventOnFilter: false,
             ghostClass: "opacity-40",
             onEnd(evt) {
-                if (evt.to !== dropZone) return;
+                // onEnd fires on the source list; read the destination from evt.to.
+                if (evt.from === evt.to) return;
+                const target = evt.to.closest("[data-assign-url]");
+                if (!target) return;
                 const csrfToken = document.cookie
                     .split("; ")
                     .find((c) => c.startsWith("csrftoken="))
                     ?.split("=")[1] || "";
                 const participantId = evt.item.dataset.participantId;
-                const unitId = el.dataset.unitId || null;
-                fetch(assignUrl, {
+                const unitId = target.dataset.unitId || null;
+                fetch(target.dataset.assignUrl, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

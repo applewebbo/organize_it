@@ -1,7 +1,5 @@
 {% load i18n %}
-<div class="modal-content"
-     id="expense-settings-modal"
-     x-data="{ enabled: {{ trip.expenses_enabled|yesno:'true,false' }} }">
+<div class="modal-content" id="expense-settings-modal">
     <div class="border-base-300 flex items-center justify-between rounded-t border-b p-4 md:px-5 md:py-2.5">
         <h3 class="text-xl font-semibold">{% trans "Expense settings" %}</h3>
         <button type="button"
@@ -10,30 +8,16 @@
                 aria-label="{% trans 'Close' %}">✕</button>
     </div>
     <div class="p-4 md:p-5">
-        <form hx-post="{% url 'trips:expense-settings' trip.pk %}"
+        <form id="expense-settings-form"
+              hx-post="{% url 'trips:expense-settings' trip.pk %}"
               hx-target="#expense-settings-modal"
               hx-swap="outerHTML"
               method="post">
             {% csrf_token %}
-            <label class="flex cursor-pointer items-center gap-3">
-                <input type="checkbox"
-                       name="expenses_enabled"
-                       class="toggle toggle-primary"
-                       x-model="enabled"
-                       {% if trip.expenses_enabled %}checked{% endif %} />
-                <span class="font-medium">{% trans "Enable expense sharing" %}</span>
-            </label>
-            <p class="text-base-content/50 mt-1 text-xs italic">
-                {% trans "Track who paid for what and split shared costs among participants." %}
-            </p>
-            <div x-show="enabled" x-cloak class="mt-4">
-                <label for="{{ settings_form.expense_currency.id_for_label }}"
-                       class="mb-1 block text-sm font-medium">{% trans "Trip currency" %}</label>
-                {{ settings_form.expense_currency }}
-            </div>
-            <div class="mt-4 flex justify-end">
-                <button type="submit" class="btn btn-primary btn-sm">{% trans "Save settings" %}</button>
-            </div>
+            <input type="hidden" name="expenses_enabled" value="on">
+            <label for="{{ settings_form.expense_currency.id_for_label }}"
+                   class="mb-1 block text-sm font-medium">{% trans "Trip currency" %}</label>
+            {{ settings_form.expense_currency }}
         </form>
         {% partialdef config inline %}
             <div id="expense-config" class="mt-4">
@@ -114,5 +98,10 @@
                 {% endif %}
             </div>
         {% endpartialdef %}
+        <div class="border-base-300 mt-6 flex justify-end border-t pt-4">
+            <button type="submit"
+                    form="expense-settings-form"
+                    class="btn btn-primary btn-sm">{% trans "Save settings" %}</button>
+        </div>
     </div>
 </div>

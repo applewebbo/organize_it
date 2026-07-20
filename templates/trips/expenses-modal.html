@@ -76,10 +76,10 @@
                     {% for expense in expenses %}
                         <li class="flex items-center gap-3 py-2">
                             <div class="min-w-0 flex-1">
-                                <p class="truncate font-medium">{{ expense.title }}</p>
+                                <p class="truncate text-sm font-medium">{{ expense.title }}</p>
                                 <p class="text-base-content/50 text-xs">{{ expense.date }} · {{ expense.payer.display_name }}</p>
                             </div>
-                            <span class="font-semibold">{{ expense.amount|money:summary.currency }}</span>
+                            <span class="text-sm font-semibold">{{ expense.amount|money:summary.currency }}</span>
                             <button class="btn btn-ghost btn-xs btn-circle"
                                     hx-get="{% url 'trips:expense-modify' expense.pk %}"
                                     hx-target="#dialog"
