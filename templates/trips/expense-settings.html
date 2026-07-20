@@ -43,25 +43,14 @@
                                  data-unit-id="{{ unit.pk }}">
                                 <div class="mb-2 flex items-center justify-between gap-2">
                                     <span class="font-semibold">{{ unit.display_name }}</span>
-                                    <div class="flex items-center gap-2">
-                                        {% if unit.shared_wallet %}
-                                            <span class="badge badge-success badge-sm gap-1"
-                                                  title="{% trans 'Debts inside this family are netted; settlements are shown per family.' %}">
-                                                <i class="ph-bold ph-wallet"></i>{% trans "Shared" %}
-                                            </span>
-                                        {% else %}
-                                            <span class="badge badge-ghost badge-sm"
-                                                  title="{% trans 'Each adult keeps an individual balance.' %}">{% trans "Separate" %}</span>
-                                        {% endif %}
-                                        <button type="button"
-                                                class="btn btn-ghost btn-xs text-error"
-                                                hx-post="{% url 'trips:family-unit-delete' unit.pk %}"
-                                                hx-target="#expense-config"
-                                                hx-swap="outerHTML"
-                                                aria-label="{% trans 'Delete family unit' %}">
-                                            <i class="ph-bold ph-trash"></i>
-                                        </button>
-                                    </div>
+                                    <button type="button"
+                                            class="btn btn-ghost btn-xs text-error"
+                                            hx-post="{% url 'trips:family-unit-delete' unit.pk %}"
+                                            hx-target="#expense-config"
+                                            hx-swap="outerHTML"
+                                            aria-label="{% trans 'Delete family unit' %}">
+                                        <i class="ph-bold ph-trash"></i>
+                                    </button>
                                 </div>
                                 <div class="family-unit-drop flex min-h-10 flex-wrap gap-2">
                                     {% for participant in unit.members.all %}
@@ -84,13 +73,6 @@
                                    class="input input-bordered input-sm"
                                    placeholder="{% trans 'e.g. Rossi' %}">
                         </div>
-                        <label class="label cursor-pointer gap-2 text-sm">
-                            <input type="checkbox"
-                                   name="shared_wallet"
-                                   class="checkbox checkbox-sm"
-                                   checked>
-                            {% trans "Shared wallet" %}
-                        </label>
                         <button type="submit" class="btn btn-outline btn-sm gap-1">
                             <i class="ph-bold ph-plus"></i>{% trans "Add family" %}
                         </button>

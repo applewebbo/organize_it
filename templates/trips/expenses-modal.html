@@ -58,7 +58,7 @@
                     <tbody>
                         {% for row in summary.balances %}
                             <tr>
-                                <td>{{ row.participant.display_name }}</td>
+                                <td>{{ row.label }}</td>
                                 <td class="text-right">{{ row.paid|money:summary.currency }}</td>
                                 <td class="text-right">{{ row.owed|money:summary.currency }}</td>
                                 <td class="text-right {% if row.net > 0 %}text-success{% elif row.net < 0 %}text-error{% endif %}">
@@ -77,7 +77,7 @@
                         <li class="flex items-center gap-3 py-2">
                             <div class="min-w-0 flex-1">
                                 <p class="truncate text-sm font-medium">{{ expense.title }}</p>
-                                <p class="text-base-content/50 text-xs">{{ expense.date }} · {{ expense.payer.display_name }}</p>
+                                <p class="text-base-content/50 text-xs">{{ expense.date }} · {{ expense.payer_label }}</p>
                             </div>
                             <span class="text-sm font-semibold">{{ expense.amount|money:summary.currency }}</span>
                             <button class="btn btn-ghost btn-xs btn-circle"

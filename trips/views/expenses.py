@@ -189,7 +189,7 @@ def expenses_modal(request, trip_pk):
     trip = get_object_or_404(accessible_trips_qs(request.user), pk=trip_pk)
     ensure_expense_participants(trip)
     summary = build_expense_summary(trip)
-    expenses = trip.expenses.select_related("payer").all()
+    expenses = trip.expenses.select_related("payer__family_unit").all()
     return TemplateResponse(
         request,
         "trips/expenses-modal.html",
@@ -225,11 +225,10 @@ def _default_date(trip, linked_obj):
     return timezone.localdate()
 
 
-def _save_shares(expense, participants):
+def _save_shares(expense, participant_ids):
     expense.shares.all().delete()
     ExpenseShare.objects.bulk_create(
-        ExpenseShare(expense=expense, participant=participant)
-        for participant in participants
+        ExpenseShare(expense=expense, participant_id=pid) for pid in participant_ids
     )
 
 
@@ -249,19 +248,18 @@ def expense_create(request, trip_pk):
             expense = form.save(commit=False)
             expense.trip = trip
             expense.created_by = request.user
+            expense.payer_id = form.payer_participant_id
             if linked:
                 expense.content_object = linked_obj
             expense.save()
-            _save_shares(expense, form.cleaned_data["shared_with"])
+            _save_shares(expense, form.sharer_participant_ids)
             return HttpResponse(status=204, headers=EXPENSES_MODIFIED)
     else:
         initial = {"date": _default_date(trip, linked_obj)}
         current = trip.expense_participants.filter(
             user=request.user, is_active=True
         ).first()
-        if current is not None:
-            initial["payer"] = current.pk
-        form = ExpenseForm(trip=trip, initial=initial)
+        form = ExpenseForm(trip=trip, initial=initial, current_participant=current)
 
     return TemplateResponse(
         request,
@@ -279,19 +277,13 @@ def expense_modify(request, pk):
     if request.method == "POST":
         form = ExpenseForm(request.POST, instance=expense, trip=trip)
         if form.is_valid():
-            form.save()
-            _save_shares(expense, form.cleaned_data["shared_with"])
+            expense = form.save(commit=False)
+            expense.payer_id = form.payer_participant_id
+            expense.save()
+            _save_shares(expense, form.sharer_participant_ids)
             return HttpResponse(status=204, headers=EXPENSES_MODIFIED)
     else:
-        form = ExpenseForm(
-            instance=expense,
-            trip=trip,
-            initial={
-                "shared_with": list(
-                    expense.shares.values_list("participant_id", flat=True)
-                )
-            },
-        )
+        form = ExpenseForm(instance=expense, trip=trip)
 
     return TemplateResponse(
         request,

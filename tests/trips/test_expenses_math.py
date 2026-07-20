@@ -3,7 +3,7 @@ from decimal import Decimal
 from trips.expenses import (
     ExpenseInput,
     Participant,
-    aggregate_wallets,
+    aggregate_wallet_balances,
     compute_balances,
     settle,
     split_amount,
@@ -37,12 +37,12 @@ class TestChildAttribution:
     def test_issue_example_single_parent_units(self):
         # 4 adults + 2 children, €60 split six ways; each child charged to one adult.
         participants = [
-            Participant(1, unit_id=10, unit_shared=True),
-            Participant(2, unit_id=20, unit_shared=True),
+            Participant(1, unit_id=10),
+            Participant(2, unit_id=20),
             Participant(3),
             Participant(4),
-            Participant(5, is_child=True, unit_id=10, unit_shared=True),
-            Participant(6, is_child=True, unit_id=20, unit_shared=True),
+            Participant(5, is_child=True, unit_id=10),
+            Participant(6, is_child=True, unit_id=20),
         ]
         expenses = [ExpenseInput(D("60.00"), payer_id=3, sharer_ids=(1, 2, 3, 4, 5, 6))]
         balances, warnings = compute_balances(participants, expenses)
@@ -57,12 +57,12 @@ class TestChildAttribution:
 
     def test_couple_unit_two_children(self):
         participants = [
-            Participant(1, unit_id=10, unit_shared=True),
-            Participant(2, unit_id=10, unit_shared=True),
+            Participant(1, unit_id=10),
+            Participant(2, unit_id=10),
             Participant(3),
             Participant(4),
-            Participant(5, is_child=True, unit_id=10, unit_shared=True),
-            Participant(6, is_child=True, unit_id=10, unit_shared=True),
+            Participant(5, is_child=True, unit_id=10),
+            Participant(6, is_child=True, unit_id=10),
         ]
         expenses = [ExpenseInput(D("60.00"), payer_id=3, sharer_ids=(1, 2, 3, 4, 5, 6))]
         balances, _ = compute_balances(participants, expenses)
@@ -124,30 +124,38 @@ class TestChildAttribution:
 
 
 class TestWalletsAndSettlement:
+    def _bal(self, net):
+        return {"paid": D("0.00"), "owed": D("0.00"), "net": net}
+
     def test_participant_without_unit_is_solo(self):
         participants = [Participant(1), Participant(2)]
-        balances = {1: {"net": D("10.00")}, 2: {"net": D("-10.00")}}
-        wallet_nets, _ = aggregate_wallets(participants, balances)
-        assert set(wallet_nets) == {("solo", 1), ("solo", 2)}
+        balances = {1: self._bal(D("10.00")), 2: self._bal(D("-10.00"))}
+        wallets = aggregate_wallet_balances(participants, balances)
+        assert set(wallets) == {("solo", 1), ("solo", 2)}
 
-    def test_shared_unit_aggregates_members(self):
+    def test_unit_aggregates_members(self):
         participants = [
-            Participant(1, unit_id=10, unit_shared=True),
-            Participant(2, unit_id=10, unit_shared=True),
+            Participant(1, unit_id=10),
+            Participant(2, unit_id=10),
         ]
-        balances = {1: {"net": D("15.00")}, 2: {"net": D("-5.00")}}
-        wallet_nets, _ = aggregate_wallets(participants, balances)
+        balances = {1: self._bal(D("15.00")), 2: self._bal(D("-5.00"))}
+        wallets = aggregate_wallet_balances(participants, balances)
         # intra-unit debts cancel: net wallet = 10
-        assert wallet_nets == {("unit", 10): D("10.00")}
+        assert set(wallets) == {("unit", 10)}
+        assert wallets[("unit", 10)]["net"] == D("10.00")
+        assert sorted(wallets[("unit", 10)]["members"]) == [1, 2]
 
-    def test_non_shared_unit_keeps_members_solo(self):
-        participants = [
-            Participant(1, unit_id=10, unit_shared=False),
-            Participant(2, unit_id=10, unit_shared=False),
-        ]
-        balances = {1: {"net": D("15.00")}, 2: {"net": D("-5.00")}}
-        wallet_nets, _ = aggregate_wallets(participants, balances)
-        assert wallet_nets == {("solo", 1): D("15.00"), ("solo", 2): D("-5.00")}
+    def test_wallet_sums_paid_and_owed(self):
+        participants = [Participant(1, unit_id=10), Participant(2, unit_id=10)]
+        balances = {
+            1: {"paid": D("30.00"), "owed": D("10.00"), "net": D("20.00")},
+            2: {"paid": D("0.00"), "owed": D("10.00"), "net": D("-10.00")},
+        }
+        wallets = aggregate_wallet_balances(participants, balances)
+        wallet = wallets[("unit", 10)]
+        assert wallet["paid"] == D("30.00")
+        assert wallet["owed"] == D("20.00")
+        assert wallet["net"] == D("10.00")
 
     def test_settle_minimizes_transactions(self):
         wallet_nets = {
@@ -188,29 +196,17 @@ class TestWalletsAndSettlement:
 
 
 class TestSingleFamilyTrip:
-    def _participants(self, shared):
+    def _participants(self):
         return [
-            Participant(1, unit_id=10, unit_shared=shared),
-            Participant(2, unit_id=10, unit_shared=shared),
-            Participant(3, is_child=True, unit_id=10, unit_shared=shared),
+            Participant(1, unit_id=10),
+            Participant(2, unit_id=10),
+            Participant(3, is_child=True, unit_id=10),
         ]
 
-    def test_shared_wallet_settles_to_zero(self):
-        participants = self._participants(shared=True)
+    def test_single_family_settles_to_zero(self):
+        participants = self._participants()
         expenses = [ExpenseInput(D("30.00"), payer_id=1, sharer_ids=(1, 2, 3))]
         balances, _ = compute_balances(participants, expenses)
-        wallet_nets, _ = aggregate_wallets(participants, balances)
+        wallets = aggregate_wallet_balances(participants, balances)
+        wallet_nets = {key: w["net"] for key, w in wallets.items()}
         assert settle(wallet_nets) == []
-
-    def test_separate_wallet_settles_between_parents(self):
-        participants = self._participants(shared=False)
-        expenses = [ExpenseInput(D("30.00"), payer_id=1, sharer_ids=(1, 2, 3))]
-        balances, _ = compute_balances(participants, expenses)
-        # parent 1 paid 30, each owes 15 (own 10 + half child's 10)
-        assert balances[1]["net"] == D("15.00")
-        assert balances[2]["net"] == D("-15.00")
-        wallet_nets, _ = aggregate_wallets(participants, balances)
-        settlements = settle(wallet_nets)
-        assert settlements == [
-            {"from": ("solo", 2), "to": ("solo", 1), "amount": D("15.00")}
-        ]

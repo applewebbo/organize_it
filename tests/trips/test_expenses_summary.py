@@ -45,10 +45,7 @@ class TestBuildExpenseSummary:
         assert summary["settlements"] == [
             {"from_label": "Bruno", "to_label": "Anna", "amount": D("15.00")}
         ]
-        assert {row["participant"].pk for row in summary["balances"]} == {
-            anna.pk,
-            bruno.pk,
-        }
+        assert {row["label"] for row in summary["balances"]} == {"Anna", "Bruno"}
         assert summary["warnings"] == []
 
     def test_settlement_uses_unit_label(self, trip_factory):
@@ -63,6 +60,22 @@ class TestBuildExpenseSummary:
         assert summary["settlements"] == [
             {"from_label": "Carla", "to_label": "Rossi", "amount": D("10.00")}
         ]
+
+    def test_balances_grouped_by_family(self, trip_factory):
+        trip = trip_factory()
+        unit = FamilyUnit.objects.create(trip=trip, name="Rossi")
+        marco = _participant(trip, "Marco", unit=unit)
+        laura = _participant(trip, "Laura", unit=unit)
+        carla = _participant(trip, "Carla")
+        _expense(trip, marco, [marco, laura, carla], D("30.00"))
+        summary = build_expense_summary(trip)
+        rows = {row["label"]: row for row in summary["balances"]}
+        assert set(rows) == {"Rossi", "Carla"}
+        # Rossi paid 30 and consumed their two shares (20): net +10.
+        assert rows["Rossi"]["paid"] == D("30.00")
+        assert rows["Rossi"]["owed"] == D("20.00")
+        assert rows["Rossi"]["net"] == D("10.00")
+        assert rows["Carla"]["net"] == D("-10.00")
 
     def test_warning_for_child_without_unit(self, trip_factory):
         trip = trip_factory()

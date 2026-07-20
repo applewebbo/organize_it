@@ -1234,6 +1234,12 @@ class Expense(models.Model):
     def is_linked(self) -> bool:
         return self.content_type_id is not None and self.object_id is not None
 
+    @property
+    def payer_label(self) -> str:
+        """Family name when the payer belongs to a unit, else their own name."""
+        unit = self.payer.family_unit
+        return unit.display_name if unit else self.payer.display_name
+
     def _normalize_event_content_type(self):
         obj = self.content_object
         if obj is not None and isinstance(obj, Event) and type(obj) is not Event:

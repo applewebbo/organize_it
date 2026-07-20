@@ -123,6 +123,35 @@ class TestExpenseLinking:
         )
         assert "Taxi" in str(expense)
 
+    def test_payer_label_uses_participant_name_when_ungrouped(self, trip_factory):
+        trip = trip_factory()
+        payer = ExpenseParticipant.objects.create(trip=trip, name_snapshot="Anna")
+        expense = Expense.objects.create(
+            trip=trip,
+            title="Taxi",
+            amount=Decimal("15.00"),
+            date=trip.start_date,
+            payer=payer,
+        )
+        assert expense.payer_label == "Anna"
+
+    def test_payer_label_uses_family_name_when_grouped(
+        self, trip_factory, family_unit_factory
+    ):
+        trip = trip_factory()
+        unit = family_unit_factory(trip=trip, name="Rossi")
+        payer = ExpenseParticipant.objects.create(
+            trip=trip, name_snapshot="Anna", family_unit=unit
+        )
+        expense = Expense.objects.create(
+            trip=trip,
+            title="Taxi",
+            amount=Decimal("15.00"),
+            date=trip.start_date,
+            payer=payer,
+        )
+        assert expense.payer_label == "Rossi"
+
 
 class TestExpenseShare:
     def test_unique_constraint(self, expense_factory, expense_participant_factory):

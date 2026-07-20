@@ -19,7 +19,6 @@ class Participant:
     id: int
     is_child: bool = False
     unit_id: int | None = None
-    unit_shared: bool = False
 
 
 @dataclass(frozen=True)
@@ -97,20 +96,29 @@ def compute_balances(participants, expenses):
     return balances, warnings
 
 
-def aggregate_wallets(participants, balances):
-    """Group participant nets into wallets (shared units vs. individuals)."""
+def aggregate_wallet_balances(participants, balances):
+    """Group per-participant paid/owed/net into wallet-level rows.
+
+    Every family unit is a single wallet (its members' debts net out); each
+    ungrouped participant is their own solo wallet. Returns a dict keyed by
+    ``("unit", unit_id)`` / ``("solo", participant_id)``.
+    """
     by_id = {p.id: p for p in participants}
-    wallet_nets = defaultdict(lambda: ZERO)
-    wallet_members = defaultdict(list)
+    wallets = {}
     for pid, balance in balances.items():
         participant = by_id[pid]
-        if participant.unit_id is not None and participant.unit_shared:
+        if participant.unit_id is not None:
             key = ("unit", participant.unit_id)
         else:
             key = ("solo", pid)
-        wallet_nets[key] += balance["net"]
-        wallet_members[key].append(pid)
-    return dict(wallet_nets), dict(wallet_members)
+        wallet = wallets.setdefault(
+            key, {"paid": ZERO, "owed": ZERO, "net": ZERO, "members": []}
+        )
+        wallet["paid"] += balance["paid"]
+        wallet["owed"] += balance["owed"]
+        wallet["net"] += balance["net"]
+        wallet["members"].append(pid)
+    return wallets
 
 
 def settle(wallet_nets):
@@ -139,13 +147,11 @@ def settle(wallet_nets):
 def _load_participants(trip):
     descriptors = []
     for participant in trip.expense_participants.select_related("family_unit").all():
-        unit = participant.family_unit
         descriptors.append(
             Participant(
                 id=participant.pk,
                 is_child=participant.is_child,
                 unit_id=participant.family_unit_id,
-                unit_shared=bool(unit and unit.shared_wallet),
             )
         )
     return descriptors
@@ -192,14 +198,15 @@ def build_expense_summary(trip):
     expenses = _load_expenses(trip)
 
     balances, warning_ids = compute_balances(descriptors, expenses)
-    wallet_nets, wallet_members = aggregate_wallets(descriptors, balances)
+    wallets = aggregate_wallet_balances(descriptors, balances)
+    wallet_nets = {key: wallet["net"] for key, wallet in wallets.items()}
     settlements = settle(wallet_nets)
 
     def wallet_label(key):
         kind, ident = key
         if kind == "unit":
             # A ("unit", ...) wallet always has at least one member carrying the unit.
-            return by_id[wallet_members[key][0]].family_unit.display_name
+            return by_id[wallets[key]["members"][0]].family_unit.display_name
         return by_id[ident].display_name
 
     settlement_rows = [
@@ -213,14 +220,14 @@ def build_expense_summary(trip):
 
     balance_rows = [
         {
-            "participant": by_id[pid],
-            "paid": data["paid"],
-            "owed": data["owed"],
-            "net": data["net"],
+            "label": wallet_label(key),
+            "paid": wallet["paid"],
+            "owed": wallet["owed"],
+            "net": wallet["net"],
         }
-        for pid, data in balances.items()
+        for key, wallet in wallets.items()
     ]
-    balance_rows.sort(key=lambda row: row["participant"].display_name.lower())
+    balance_rows.sort(key=lambda row: row["label"].lower())
 
     return {
         "currency": trip.expense_currency,

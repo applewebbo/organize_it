@@ -70,7 +70,7 @@ class TestFamilyUnits:
     def test_create(self, editor_trip):
         trip, user, client = editor_trip
         url = reverse("trips:family-unit-create", args=[trip.pk])
-        response = client.post(url, {"name": "Rossi", "shared_wallet": "on"})
+        response = client.post(url, {"name": "Rossi"})
         assert response.status_code == 200
         assert FamilyUnit.objects.filter(trip=trip, name="Rossi").exists()
 

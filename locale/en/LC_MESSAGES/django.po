@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-19 20:14+0200\n"
+"POT-Creation-Date: 2026-07-20 09:47+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -934,7 +934,7 @@ msgstr ""
 #: templates/trips/event-detail.html:100 templates/trips/event-notes.html:33
 #: templates/trips/expense-create.html:18
 #: templates/trips/expense-modify.html:18
-#: templates/trips/expense-settings.html:10
+#: templates/trips/expense-settings.html:8
 #: templates/trips/expenses-modal.html:8
 #: templates/trips/includes/collab-modal.html:7
 #: templates/trips/includes/create-stage-modal.html:15
@@ -1779,29 +1779,16 @@ msgstr "Edit expense"
 msgid "Delete this expense?"
 msgstr "Delete this expense?"
 
-#: templates/trips/expense-settings.html:6
+#: templates/trips/expense-settings.html:4
 #: templates/trips/includes/expenses-card.html:12
 msgid "Expense settings"
 msgstr "Expense settings"
 
-#: templates/trips/expense-settings.html:24 trips/forms/expense.py:14
-msgid "Enable expense sharing"
-msgstr "Enable expense sharing"
-
-#: templates/trips/expense-settings.html:27
-#: templates/trips/includes/expenses-card.html:32
-msgid "Track who paid for what and split shared costs among participants."
-msgstr "Track who paid for what and split shared costs among participants."
-
-#: templates/trips/expense-settings.html:31 trips/forms/expense.py:15
+#: templates/trips/expense-settings.html:19 trips/forms/expense.py:15
 msgid "Trip currency"
 msgstr "Trip currency"
 
-#: templates/trips/expense-settings.html:35
-msgid "Save settings"
-msgstr "Save settings"
-
-#: templates/trips/expense-settings.html:43
+#: templates/trips/expense-settings.html:27
 msgid ""
 "Add everyone in the 'Participants' section first — the people added there "
 "appear below. Group couples and assign children to a parent."
@@ -1809,47 +1796,31 @@ msgstr ""
 "Add everyone in the 'Participants' section first — the people added there "
 "appear below. Group couples and assign children to a parent."
 
-#: templates/trips/expense-settings.html:49
+#: templates/trips/expense-settings.html:33
 #: templates/trips/includes/_participant-chip.html:21
 #: templates/trips/partials/map-events-panel.html:51
 msgid "Unassigned"
 msgstr "Unassigned"
 
-#: templates/trips/expense-settings.html:65
-msgid "Debts inside this family are netted; settlements are shown per family."
-msgstr "Debts inside this family are netted; settlements are shown per family."
-
-#: templates/trips/expense-settings.html:66
-msgid "Shared"
-msgstr "Shared"
-
-#: templates/trips/expense-settings.html:70
-msgid "Each adult keeps an individual balance."
-msgstr "Each adult keeps an individual balance."
-
-#: templates/trips/expense-settings.html:70
-msgid "Separate"
-msgstr "Separate"
-
-#: templates/trips/expense-settings.html:77
+#: templates/trips/expense-settings.html:51
 msgid "Delete family unit"
 msgstr "Delete family unit"
 
-#: templates/trips/expense-settings.html:96 trips/forms/expense.py:29
+#: templates/trips/expense-settings.html:69 trips/forms/expense.py:29
 msgid "Family name"
 msgstr "Family name"
 
-#: templates/trips/expense-settings.html:101
+#: templates/trips/expense-settings.html:74
 msgid "e.g. Rossi"
 msgstr "e.g. Rossi"
 
-#: templates/trips/expense-settings.html:108 trips/forms/expense.py:30
-msgid "Shared wallet"
-msgstr "Shared wallet"
-
-#: templates/trips/expense-settings.html:111
+#: templates/trips/expense-settings.html:77
 msgid "Add family"
 msgstr "Add family"
+
+#: templates/trips/expense-settings.html:86
+msgid "Save settings"
+msgstr "Save settings"
 
 #: templates/trips/expenses-modal.html:4 templates/trips/expenses-modal.html:19
 #: templates/trips/includes/expenses-card.html:5
@@ -2202,6 +2173,10 @@ msgstr "No stage"
 #: templates/trips/includes/expenses-card.html:18
 msgid "Enable"
 msgstr "Enable"
+
+#: templates/trips/includes/expenses-card.html:32
+msgid "Track who paid for what and split shared costs among participants."
+msgstr "Track who paid for what and split shared costs among participants."
 
 #: templates/trips/includes/expenses-card.html:37
 msgid "Total"
@@ -3034,27 +3009,31 @@ msgstr "Meal type"
 msgid "Add notes..."
 msgstr ""
 
-#: trips/forms/expense.py:38
-msgid "Split the expense between"
-msgstr "Split the expense between"
+#: trips/forms/expense.py:14
+msgid "Enable expense sharing"
+msgstr "Enable expense sharing"
 
-#: trips/forms/expense.py:46
-msgid "Description"
-msgstr ""
-
-#: trips/forms/expense.py:47
-msgid "Amount"
-msgstr "Amount"
-
-#: trips/forms/expense.py:48
-msgid "Date"
-msgstr "Date"
-
-#: trips/forms/expense.py:49
+#: trips/forms/expense.py:41
 msgid "Paid by"
 msgstr "Paid by"
 
-#: trips/forms/expense.py:85
+#: trips/forms/expense.py:44
+msgid "Split the expense between"
+msgstr "Split the expense between"
+
+#: trips/forms/expense.py:52
+msgid "Description"
+msgstr ""
+
+#: trips/forms/expense.py:53
+msgid "Amount"
+msgstr "Amount"
+
+#: trips/forms/expense.py:54
+msgid "Date"
+msgstr "Date"
+
+#: trips/forms/expense.py:155
 msgid "Select at least one participant."
 msgstr "Select at least one participant."
 

@@ -55,7 +55,7 @@ class StayAdmin(admin.ModelAdmin):
 
 @admin.register(FamilyUnit)
 class FamilyUnitAdmin(admin.ModelAdmin):
-    list_display = ["__str__", "trip", "shared_wallet"]
+    list_display = ["__str__", "trip"]
     list_filter = ["trip"]
 
 

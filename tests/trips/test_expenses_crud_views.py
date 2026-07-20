@@ -6,10 +6,16 @@ from trips.models import (
     Expense,
     ExpenseParticipant,
     ExpenseShare,
+    FamilyUnit,
     TripCollaboration,
 )
 
 pytestmark = pytest.mark.django_db
+
+
+def _p(participant):
+    """Party token for an ungrouped participant."""
+    return f"p{participant.pk}"
 
 
 @pytest.fixture
@@ -45,14 +51,15 @@ class TestExpenseCreate:
                 "title": "Taxi",
                 "amount": "20.00",
                 "date": trip.start_date.isoformat(),
-                "payer": p1.pk,
-                "shared_with": [p1.pk, p2.pk],
+                "payer": _p(p1),
+                "shared_with": [_p(p1), _p(p2)],
             },
         )
         assert response.status_code == 204
         assert response.headers["HX-Trigger"] == "expensesModified"
         expense = Expense.objects.get(title="Taxi")
         assert expense.created_by == user
+        assert expense.payer == p1
         assert expense.shares.count() == 2
 
     def test_get_prefills_payer_with_current_user(self, crud_trip):
@@ -60,7 +67,7 @@ class TestExpenseCreate:
         author_participant = trip.expense_participants.get(user=user)
         url = reverse("trips:expense-create", args=[trip.pk])
         response = client.get(url)
-        assert response.context["form"].initial["payer"] == author_participant.pk
+        assert response.context["form"].initial["payer"] == _p(author_participant)
 
     def test_post_linked_to_meal(self, crud_trip, meal_factory):
         trip, user, client, p1, p2 = crud_trip
@@ -72,8 +79,8 @@ class TestExpenseCreate:
                 "title": "Dinner",
                 "amount": "40.00",
                 "date": trip.start_date.isoformat(),
-                "payer": p1.pk,
-                "shared_with": [p1.pk],
+                "payer": _p(p1),
+                "shared_with": [_p(p1)],
             },
         )
         assert response.status_code == 204
@@ -91,8 +98,8 @@ class TestExpenseCreate:
                 "title": "Hotel",
                 "amount": "100.00",
                 "date": trip.start_date.isoformat(),
-                "payer": p1.pk,
-                "shared_with": [p1.pk],
+                "payer": _p(p1),
+                "shared_with": [_p(p1)],
             },
         )
         assert response.status_code == 204
@@ -108,8 +115,8 @@ class TestExpenseCreate:
                 "title": "Flight",
                 "amount": "200.00",
                 "date": trip.start_date.isoformat(),
-                "payer": p1.pk,
-                "shared_with": [p1.pk],
+                "payer": _p(p1),
+                "shared_with": [_p(p1)],
             },
         )
         assert response.status_code == 204
@@ -163,7 +170,7 @@ class TestExpenseCreate:
                 "title": "Taxi",
                 "amount": "20.00",
                 "date": trip.start_date.isoformat(),
-                "payer": p1.pk,
+                "payer": _p(p1),
                 # no shared_with -> invalid
             },
         )
@@ -176,6 +183,54 @@ class TestExpenseCreate:
         url = reverse("trips:expense-create", args=[other.pk])
         assert client.get(url).status_code == 404
 
+    def test_share_with_group_expands_to_all_members(self, crud_trip):
+        trip, user, client, p1, p2 = crud_trip
+        unit = FamilyUnit.objects.create(trip=trip, name="Rossi")
+        p1.family_unit = unit
+        p1.save(update_fields=["family_unit"])
+        p2.family_unit = unit
+        p2.save(update_fields=["family_unit"])
+        author = trip.expense_participants.get(user=user)
+        url = reverse("trips:expense-create", args=[trip.pk])
+        response = client.post(
+            url,
+            {
+                "title": "Groceries",
+                "amount": "30.00",
+                "date": trip.start_date.isoformat(),
+                "payer": _p(author),
+                "shared_with": [f"u{unit.pk}", _p(author)],
+            },
+        )
+        assert response.status_code == 204
+        expense = Expense.objects.get(title="Groceries")
+        shared = set(expense.shares.values_list("participant_id", flat=True))
+        assert shared == {p1.pk, p2.pk, author.pk}
+
+    def test_group_payer_stored_on_member_with_group_label(self, crud_trip):
+        trip, user, client, p1, p2 = crud_trip
+        unit = FamilyUnit.objects.create(trip=trip, name="Rossi")
+        p1.family_unit = unit
+        p1.save(update_fields=["family_unit"])
+        p2.family_unit = unit
+        p2.save(update_fields=["family_unit"])
+        author = trip.expense_participants.get(user=user)
+        url = reverse("trips:expense-create", args=[trip.pk])
+        response = client.post(
+            url,
+            {
+                "title": "Dinner",
+                "amount": "40.00",
+                "date": trip.start_date.isoformat(),
+                "payer": f"u{unit.pk}",
+                "shared_with": [f"u{unit.pk}", _p(author)],
+            },
+        )
+        assert response.status_code == 204
+        expense = Expense.objects.get(title="Dinner")
+        assert expense.payer_id in {p1.pk, p2.pk}
+        assert expense.payer_label == "Rossi"
+
 
 class TestExpenseModify:
     def test_get_renders_with_initial_shares(self, crud_trip):
@@ -187,7 +242,7 @@ class TestExpenseModify:
         url = reverse("trips:expense-modify", args=[expense.pk])
         response = client.get(url)
         assert response.status_code == 200
-        assert list(response.context["form"].initial["shared_with"]) == [p1.pk]
+        assert list(response.context["form"].initial["shared_with"]) == [_p(p1)]
 
     def test_post_updates_and_resets_shares(self, crud_trip):
         trip, user, client, p1, p2 = crud_trip
@@ -202,8 +257,8 @@ class TestExpenseModify:
                 "title": "Updated",
                 "amount": "30.00",
                 "date": trip.start_date.isoformat(),
-                "payer": p1.pk,
-                "shared_with": [p1.pk, p2.pk],
+                "payer": _p(p1),
+                "shared_with": [_p(p1), _p(p2)],
             },
         )
         assert response.status_code == 204
@@ -224,7 +279,7 @@ class TestExpenseModify:
                 "title": "Updated",
                 "amount": "30.00",
                 "date": trip.start_date.isoformat(),
-                "payer": p1.pk,
+                "payer": _p(p1),
                 # no shared_with -> clean_shared_with fails
             },
         )
