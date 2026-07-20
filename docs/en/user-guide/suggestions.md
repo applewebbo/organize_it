@@ -116,6 +116,8 @@ Besides suggesting individual places, Organize It can propose a **full itinerary
 3. Review the proposed **stops**. Each one has a checkbox — untick anything you don't want.
 4. Press **Apply day** to add the selected stops to the day.
 
+![Plan the day modal](../assets/screenshots/plan-day-modal.png)
+
 ### Choosing a Strategy
 
 If the day **already has events**, you pick how the plan should treat them:

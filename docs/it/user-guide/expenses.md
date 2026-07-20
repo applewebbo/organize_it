@@ -17,6 +17,8 @@ Organize It può tenere traccia di chi ha pagato cosa durante un viaggio e divid
 1. Apri un viaggio e trova la card **Spese**.
 2. Attiva l'interruttore **Attiva divisione spese** nell'intestazione della card.
 
+![La card Spese](../assets/screenshots/expenses-card.png)
+
 La prima volta che attivi la funzione, la valuta del viaggio viene impostata automaticamente dalla valuta preferita del tuo profilo. Potrai cambiarla in seguito nelle impostazioni delle spese.
 
 !!! info "I dati vengono conservati"
@@ -25,6 +27,8 @@ La prima volta che attivi la funzione, la valuta del viaggio viene impostata aut
 ## Configurare i Partecipanti
 
 Apri le **impostazioni spese** (l'icona a ingranaggio sulla card Spese) per configurare il viaggio.
+
+![Impostazioni spese con un nucleo famigliare](../assets/screenshots/expense-settings.png)
 
 !!! warning "Aggiungi prima le persone"
     I partecipanti provengono dalla sezione **Chi partecipa** del viaggio. Aggiungi prima tutti lì — l'autore e ogni collaboratore, comprese le persone "solo nome" senza account — e compariranno automaticamente nelle impostazioni delle spese.
@@ -35,10 +39,9 @@ Scegli un'unica valuta per tutto il viaggio (EUR, USD o GBP). Tutti gli importi 
 
 ### Nuclei Famigliari
 
-Un **nucleo famigliare** raggruppa le persone che condividono un portafoglio — tipicamente una coppia o una famiglia. Trascina il chip di un partecipante su un nucleo per assegnarlo, oppure riportalo su **Non assegnati** per staccarlo.
+Un **nucleo famigliare** raggruppa le persone che condividono un unico portafoglio — tipicamente una coppia o una famiglia. Trascina il chip di un partecipante su un nucleo per assegnarlo, oppure riportalo su **Non assegnati** per staccarlo.
 
-- **Portafoglio condiviso** (default): i debiti *interni* al nucleo si annullano e i regolamenti sono mostrati per nucleo anziché per persona. Usalo per una coppia che mette in comune il denaro.
-- **Portafogli separati**: ogni adulto mantiene un saldo individuale e può regolare i conti con gli altri membri. Usalo per una singola famiglia in viaggio da sola, dove i due genitori vogliono dividere le spese 50/50.
+Un nucleo è trattato come **un'unica entità**: i debiti *interni* si annullano e i regolamenti sono mostrati per nucleo anziché per persona. Quando aggiungi una spesa, l'intero nucleo compare come **singola scelta** per chi ha pagato e con chi dividere (vedi sotto).
 
 !!! tip "Mobile"
     Su schermi piccoli il drag & drop è sostituito da un **selettore di nucleo** su ogni chip partecipante.
@@ -59,14 +62,19 @@ Ci sono due modi per registrare un costo.
 
 ### Spese Libere
 
-Dalla card **Spese**, scegli **Aggiungi spesa** e compila descrizione, importo, data, **categoria** (pasto, esperienza, alloggio, trasporto, trasporto locale, spesa alimentare, shopping, biglietti o altro), chi ha **pagato** e con chi **dividerla**. Bisogna selezionare almeno un partecipante.
+Dalla card **Spese**, scegli **Aggiungi spesa** e compila descrizione, importo, data, chi ha **pagato** e con chi **dividerla**. **Pagato da** è precompilato con te e puoi cambiarlo. Bisogna selezionare almeno un'entità.
+
+![Form Aggiungi spesa](../assets/screenshots/expense-form.png)
+
+!!! tip "I nuclei famigliari sono un'unica scelta"
+    Dove hai un nucleo famigliare, esso compare come **singola opzione** sia in **Pagato da** sia in **Dividi tra** — scegli il nucleo invece dei singoli membri. Dividere con un nucleo addebita una quota uguale a **ciascun** membro, e un pagamento del nucleo viene accreditato all'intero nucleo.
 
 ### Costi Collegati a un Alloggio, Evento o Trasferimento
 
-Su un alloggio, un'esperienza, un pasto o un trasferimento principale, usa **Aggiungi costo** per collegare una spesa direttamente a quell'elemento. La **categoria è derivata automaticamente** da ciò a cui l'hai collegata e la data è impostata di default al giorno dell'elemento (o all'inizio/fine del viaggio per i trasferimenti di andata/ritorno). L'elemento collegato mostra il suo costo nel viaggio e nella vista di dettaglio.
+Su un alloggio, un'esperienza, un pasto o un trasferimento principale, usa **Aggiungi costo** per collegare una spesa direttamente a quell'elemento. La data è impostata di default al giorno dell'elemento (o all'inizio/fine del viaggio per i trasferimenti di andata/ritorno). L'elemento collegato mostra il suo costo nel viaggio e nella vista di dettaglio.
 
 !!! info "Le spese collegate sopravvivono alla cancellazione"
-    Se in seguito elimini l'alloggio, l'evento o il trasferimento a cui una spesa era collegata, la **spesa viene conservata** come costo libero (la categoria derivata è mantenuta), così i saldi restano corretti.
+    Se in seguito elimini l'alloggio, l'evento o il trasferimento a cui una spesa era collegata, la **spesa viene conservata** come costo libero, così i saldi restano corretti.
 
 ## Regole di Divisione
 
@@ -76,9 +84,11 @@ Ogni spesa è divisa **equamente** tra i partecipanti con cui l'hai condivisa. G
 
 Apri il modale **Spese** (il pulsante **Dettagli** sulla card) per vedere tutto in tre schede:
 
-- **Saldi** — l'insieme minimo di regolamenti tra portafogli ("A paga B") più un dettaglio per persona di quanto ciascun partecipante ha pagato e deve. Qui compare un avviso se un bambino non è assegnato.
+- **Saldi** — l'insieme minimo di regolamenti tra portafogli ("A paga B") più un dettaglio per portafoglio di quanto ciascuna entità ha pagato e deve. Qui compare un avviso se un bambino non è assegnato.
 - **Spese** — l'elenco completo delle spese per data, con azioni di modifica ed eliminazione.
-- **Totali** — totali **per giorno** e **per categoria**, più il totale del viaggio.
+- **Totali** — totali **per giorno**, più il totale del viaggio.
+
+![Modale dettaglio spese con i saldi](../assets/screenshots/expenses-modal.png)
 
 La card Spese mostra il totale del viaggio e il **tuo** saldo personale (quanto devi o quanto ti devono).
 

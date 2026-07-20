@@ -116,6 +116,8 @@ Oltre a suggerire singoli luoghi, Organize It può proporre un **itinerario comp
 3. Esamina le **tappe** proposte. Ognuna ha una casella — deseleziona ciò che non vuoi.
 4. Premi **Applica giornata** per aggiungere le tappe selezionate al giorno.
 
+![Modale Pianifica la giornata](../assets/screenshots/plan-day-modal.png)
+
 ### Scegliere una Strategia
 
 Se il giorno **ha già degli eventi**, scegli come il piano deve trattarli:

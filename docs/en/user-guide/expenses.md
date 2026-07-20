@@ -17,6 +17,8 @@ Organize It can track who paid for what during a trip and split shared costs amo
 1. Open a trip and find the **Expenses** card.
 2. Flip the **Enable expense sharing** toggle in the card header.
 
+![The Expenses card](../assets/screenshots/expenses-card.png)
+
 The trip currency is set automatically from your profile's preferred currency the first time you enable the feature. You can change it later in the expense settings.
 
 !!! info "Data is preserved"
@@ -25,6 +27,8 @@ The trip currency is set automatically from your profile's preferred currency th
 ## Configuring Participants
 
 Open the **expense settings** (the gear icon on the Expenses card) to set up the trip.
+
+![Expense settings with a family unit](../assets/screenshots/expense-settings.png)
 
 !!! warning "Add people first"
     Participants come from the trip's **Participants** section (**Who's coming**). Add everyone there first — the author and every collaborator, including "name only" people without an account, appear automatically in the expense settings.
@@ -35,10 +39,9 @@ Pick a single currency for the whole trip (EUR, USD, or GBP). All amounts and ba
 
 ### Family Units
 
-A **family unit** groups people who share a wallet — typically a couple or a family. Drag a participant's chip onto a family unit to assign them, or drag it back to **Unassigned** to detach.
+A **family unit** groups people who share a single wallet — typically a couple or a family. Drag a participant's chip onto a family unit to assign them, or drag it back to **Unassigned** to detach.
 
-- **Shared wallet** (default): debts *inside* the unit cancel out, and settlements are shown per unit rather than per person. Use this for a couple who pool their money.
-- **Separate wallets**: each adult keeps an individual balance and can settle up with the other members. Use this for a single family travelling alone where the two parents want to split costs 50/50.
+A unit is treated as **one party**: debts *inside* the unit cancel out, and settlements are shown per unit rather than per person. When you add an expense, the whole unit appears as a **single choice** for who paid and who to split with (see below).
 
 !!! tip "Mobile"
     On small screens, drag & drop is replaced by a **family selector** on each participant chip.
@@ -59,14 +62,19 @@ There are two ways to record a cost.
 
 ### Standalone Expenses
 
-From the **Expenses** card, choose **Add expense** and fill in the description, amount, date, **category** (meal, experience, stay, transport, local transport, groceries, shopping, tickets, or other), who **paid**, and who to **share** it with. At least one participant must be selected.
+From the **Expenses** card, choose **Add expense** and fill in the description, amount, date, who **paid**, and who to **split** it with. **Paid by** defaults to you and can be changed. At least one party must be selected.
+
+![Add expense form](../assets/screenshots/expense-form.png)
+
+!!! tip "Family units are one choice"
+    Where you have a family unit, it appears as a **single option** in both **Paid by** and **Split between** — pick the unit instead of its individual members. Splitting with a unit charges an equal share to **each** of its members under the hood, and a payment by a unit is credited to the whole unit.
 
 ### Costs Linked to a Stay, Event or Transfer
 
-On a stay, experience, meal, or main transfer, use **Add cost** to attach an expense directly to that item. The **category is derived automatically** from what you linked it to, and the date defaults to the item's day (or the trip start/end for arrival/departure transfers). The linked item is shown on the trip and in the detail view with its cost.
+On a stay, experience, meal, or main transfer, use **Add cost** to attach an expense directly to that item. The date defaults to the item's day (or the trip start/end for arrival/departure transfers). The linked item is shown on the trip and in the detail view with its cost.
 
 !!! info "Linked expenses survive deletion"
-    If you later delete the stay, event, or transfer an expense was attached to, the **expense is kept** as a standalone cost (its derived category is preserved) so your balances stay correct.
+    If you later delete the stay, event, or transfer an expense was attached to, the **expense is kept** as a standalone cost so your balances stay correct.
 
 ## Splitting Rules
 
@@ -76,9 +84,11 @@ Each expense is split **equally** among the participants you shared it with. Amo
 
 Open the **Expenses** modal (the **Details** button on the card) to see everything in three tabs:
 
-- **Balances** — the minimal set of settlements between wallets ("A pays B") plus a per-person breakdown of what each participant paid and owes. A warning appears here if any child is unassigned.
+- **Balances** — the minimal set of settlements between wallets ("A pays B") plus a per-wallet breakdown of what each party paid and owes. A warning appears here if any child is unassigned.
 - **Expenses** — the full list of expenses by date, with edit and delete actions.
-- **Totals** — totals **by day** and **by category**, plus the trip total.
+- **Totals** — totals **by day**, plus the trip total.
+
+![Expenses detail modal showing balances](../assets/screenshots/expenses-modal.png)
 
 The Expenses card itself shows the trip total and **your** personal balance (how much you owe or are owed).
 
