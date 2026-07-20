@@ -4,7 +4,7 @@ slug: 387-refreshadd-screenshots
 title: '387: refresh/add screenshots'
 labels: []
 created: '2026-07-19T10:19:09.061+02:00'
-updated: '2026-07-19T10:32:29.441+02:00'
+updated: '2026-07-20T11:34:43.687+02:00'
 ---
 
 ## Task Comments
@@ -12,3 +12,4 @@ updated: '2026-07-19T10:32:29.441+02:00'
 | Commented At | Comment |
 | --- | --- |
 | 2026-07-19T10:32:29.441+02:00 | Status changed from ready to in-progress |
+| 2026-07-20T11:34:43.687+02:00 | Status changed from in-progress to complete |
