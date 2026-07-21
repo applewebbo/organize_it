@@ -142,15 +142,15 @@ makemessages:
 test *args:
     ENVIRONMENT=test uv run python -m pytest --reuse-db -s -x {{ args }}
 
-# Run fast tests (TEST_WORKERS controls parallelism, default 4; niced to keep the machine responsive)
+# Run fast tests (TEST_WORKERS controls parallelism, default 2 to keep the machine responsive; raise it for faster CI runs)
 [group('utility')]
 ftest *args:
-    nice -n 10 env ENVIRONMENT=test uv run pytest -n ${TEST_WORKERS:-4} --reuse-db --dist loadscope --exitfirst {{ args }}
+    nice -n 10 env ENVIRONMENT=test uv run pytest -n ${TEST_WORKERS:-2} --reuse-db --dist loadscope --exitfirst {{ args }}
 
 # Run fast tests with coverage report (must reach 100%)
 [group('utility')]
 cov *args:
-    nice -n 10 env ENVIRONMENT=test uv run pytest -n ${TEST_WORKERS:-4} --reuse-db --dist loadscope --exitfirst --cov=. --cov-report html:htmlcov --cov-report term:skip-covered --cov-fail-under 100 {{ args }}
+    nice -n 10 env ENVIRONMENT=test uv run pytest -n ${TEST_WORKERS:-2} --reuse-db --dist loadscope --exitfirst --cov=. --cov-report html:htmlcov --cov-report term:skip-covered --cov-fail-under 100 {{ args }}
 
 # Show coverage for a specific test file against a source module (no threshold)
 # Usage: just fcov tests/trips/test_views_map.py trips/views/maps.py
@@ -167,10 +167,10 @@ fcov test_path source="trips":
 mptest:
     ENVIRONMENT=test uv run python -m pytest -m "not mapbox" --cov-report html:htmlcov --cov-report term:skip-covered --cov-fail-under 100
 
-# Run pre-commit hooks (linting, formatting, security checks)
+# Run pre-commit hooks (linting, formatting, security checks); niced to keep the machine responsive
 [group('utility')]
 lint:
-    just _pre-commit run --all-files
+    nice -n 10 just _pre-commit run --all-files
 
 _pre-commit *args:
     uvx prek {{ args }}
