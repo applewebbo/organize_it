@@ -3,6 +3,18 @@ from datetime import date
 from suggestions.schemas import SuggestionPrefs, TripContext
 from trips.models import Experience, Meal
 
+# Deterministic, locale-free weekday names (avoid strftime("%A"), which depends
+# on the active locale).
+_WEEKDAYS = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+]
+
 # Legend so the model emits valid per-kind `type` ids (kind "stay" has no type).
 _TYPE_LEGEND = "; ".join(
     [
@@ -122,6 +134,12 @@ def _preference_lines(
                 "You may include day-trip destinations reachable within about two "
                 "hours of the destination."
             )
+        elif prefs.search_radius == "nearby":
+            lines.append(
+                f"Focus on {context.destination} and its immediate surroundings "
+                "(easily reachable nearby towns); do not stray to far-off "
+                "destinations."
+            )
     if prefs.dietary in _DIETARY_LINES:
         lines.append(_DIETARY_LINES[prefs.dietary])
     lines.append(_BUDGET_LINES.get(prefs.budget, _BUDGET_LINES["medium"]))
@@ -205,8 +223,17 @@ def build_day_prompt(
     area_line = _DAY_AREA_LINES.get(prefs.search_radius, _DAY_AREA_LINES["nearby"])
     lines.append(area_line.format(destination=context.destination))
     lines.append(
-        "Return the stops in order, forming a realistic, geographically coherent "
-        "day: start in the morning and end in the evening."
+        "Aim for a well-paced full day of roughly 4 to 6 stops; do not over-pack it."
+    )
+    lines.append(
+        "Return the stops in order along a sensible walking or transit route that "
+        "minimises backtracking, forming a realistic day: start in the morning "
+        "and end in the evening."
+    )
+    weekday = _WEEKDAYS[day_date.weekday()]
+    lines.append(
+        f"This day is a {weekday}; avoid venues typically closed on that weekday "
+        "(e.g. some museums on Mondays)."
     )
     lines.append(
         "Cover the day's meals (breakfast, lunch and dinner as appropriate) with "

@@ -153,6 +153,13 @@ class TestBuildPrompt:
         )
         assert "day-trip" in prompt
 
+    def test_nearby_radius_focuses_on_surroundings(self):
+        prompt = build_prompt(
+            TripContext(destination="Rome"), SuggestionPrefs(search_radius="nearby")
+        )
+        assert "immediate surroundings" in prompt
+        assert "far-off" in prompt
+
 
 class TestBuildDayPrompt:
     def test_asks_for_single_ordered_day(self):
@@ -249,3 +256,24 @@ class TestBuildDayPrompt:
             date(2026, 7, 1),
         )
         assert "You may include day-trip destinations" not in prompt
+
+    def test_day_has_pacing_guidance(self):
+        prompt = build_day_prompt(
+            TripContext(destination="Rome"), SuggestionPrefs(), date(2026, 7, 1)
+        )
+        assert "well-paced" in prompt
+        assert "4 to 6" in prompt
+
+    def test_day_orders_stops_to_minimise_backtracking(self):
+        prompt = build_day_prompt(
+            TripContext(destination="Rome"), SuggestionPrefs(), date(2026, 7, 1)
+        )
+        assert "minimise" in prompt
+        assert "backtrack" in prompt
+
+    def test_day_mentions_the_weekday(self):
+        prompt = build_day_prompt(
+            TripContext(destination="Rome"), SuggestionPrefs(), date(2026, 7, 1)
+        )
+        assert "Wednesday" in prompt
+        assert "closed" in prompt
