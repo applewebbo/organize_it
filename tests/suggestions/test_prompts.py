@@ -211,3 +211,41 @@ class TestBuildDayPrompt:
             TripContext(destination="Rome"), SuggestionPrefs(), date(2026, 7, 1)
         )
         assert "already scheduled" not in prompt.lower()
+
+    def test_nearby_radius_clusters_the_day_in_one_zone(self):
+        prompt = build_day_prompt(
+            TripContext(destination="Rome"),
+            SuggestionPrefs(search_radius="nearby"),
+            date(2026, 7, 1),
+        )
+        assert "single locality" in prompt.lower()
+        assert "close together" in prompt.lower()
+        assert "do not spread" in prompt.lower()
+
+    def test_day_trips_radius_picks_one_locality_and_clusters(self):
+        prompt = build_day_prompt(
+            TripContext(destination="Rome"),
+            SuggestionPrefs(search_radius="day_trips"),
+            date(2026, 7, 1),
+        )
+        assert "one day-trip locality" in prompt.lower()
+        assert "outside rome" in prompt.lower()
+        assert "clustered" in prompt.lower()
+        assert "not how far apart" in prompt.lower()
+
+    def test_city_radius_keeps_day_inside_destination(self):
+        prompt = build_day_prompt(
+            TripContext(destination="Rome"),
+            SuggestionPrefs(search_radius="city"),
+            date(2026, 7, 1),
+        )
+        assert "inside Rome" in prompt
+        assert "neighbourhood" in prompt.lower()
+
+    def test_day_prompt_omits_multi_card_spread_phrasing(self):
+        prompt = build_day_prompt(
+            TripContext(destination="Rome"),
+            SuggestionPrefs(search_radius="day_trips"),
+            date(2026, 7, 1),
+        )
+        assert "You may include day-trip destinations" not in prompt

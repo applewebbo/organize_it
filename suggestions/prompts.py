@@ -69,9 +69,40 @@ _CUISINE_PHRASES = {
 }
 
 
-def _preference_lines(context: TripContext, prefs: SuggestionPrefs) -> list[str]:
+# Per-radius clustering guidance for a single day: the radius widens which
+# area the day may happen in, never how far apart the day's own stops are.
+_DAY_AREA_LINES = {
+    "city": (
+        "Keep the whole day inside {destination} and cluster the stops in one "
+        "or two adjacent neighbourhoods, so every stop is a short walk or "
+        "transit ride from the previous one."
+    ),
+    "nearby": (
+        "First choose a SINGLE locality or compact zone — either {destination} "
+        "itself or one nearby town or area — then keep every stop of the day "
+        "close together inside it, within short travel times of each other. Do "
+        "not spread the day's stops across the whole surrounding area."
+    ),
+    "day_trips": (
+        "First choose ONE day-trip locality — a town or area OUTSIDE "
+        "{destination}, reachable within about two hours of it — then keep every "
+        "stop of the day clustered inside that single locality, within short "
+        "travel times of each other. Do not simply stay in {destination}. A "
+        "wider radius only widens which locality you may pick, not how far apart "
+        "the day's stops are."
+    ),
+}
+
+
+def _preference_lines(
+    context: TripContext, prefs: SuggestionPrefs, *, include_radius: bool = True
+) -> list[str]:
     """Shared preference constraints fed to both the multi-card and the
-    day-itinerary prompts."""
+    day-itinerary prompts.
+
+    ``include_radius`` is disabled by the day-itinerary prompt, which replaces
+    the multi-card radius phrasing with its own clustering guidance.
+    """
     lines = []
     if prefs.favored_experience_types:
         favored = ", ".join(str(t) for t in prefs.favored_experience_types)
@@ -83,13 +114,14 @@ def _preference_lines(context: TripContext, prefs: SuggestionPrefs) -> list[str]
         lines.append(f"Interests: {', '.join(prefs.interests)}.")
     if prefs.cuisine in _CUISINE_PHRASES:
         lines.append(f"Cuisine: prefer {_CUISINE_PHRASES[prefs.cuisine]}.")
-    if prefs.search_radius == "city":
-        lines.append(f"Keep all suggestions within {context.destination} itself.")
-    elif prefs.search_radius == "day_trips":
-        lines.append(
-            "You may include day-trip destinations reachable within about two "
-            "hours of the destination."
-        )
+    if include_radius:
+        if prefs.search_radius == "city":
+            lines.append(f"Keep all suggestions within {context.destination} itself.")
+        elif prefs.search_radius == "day_trips":
+            lines.append(
+                "You may include day-trip destinations reachable within about two "
+                "hours of the destination."
+            )
     if prefs.dietary in _DIETARY_LINES:
         lines.append(_DIETARY_LINES[prefs.dietary])
     lines.append(_BUDGET_LINES.get(prefs.budget, _BUDGET_LINES["medium"]))
@@ -167,9 +199,11 @@ def build_day_prompt(
         f"Destination: {context.destination}",
         f"Plan a single-day itinerary for {day_date}.",
     ]
-    lines.extend(_preference_lines(context, prefs))
+    lines.extend(_preference_lines(context, prefs, include_radius=False))
     lines.extend(_context_lines(context))
     lines.append("")
+    area_line = _DAY_AREA_LINES.get(prefs.search_radius, _DAY_AREA_LINES["nearby"])
+    lines.append(area_line.format(destination=context.destination))
     lines.append(
         "Return the stops in order, forming a realistic, geographically coherent "
         "day: start in the morning and end in the evening."
