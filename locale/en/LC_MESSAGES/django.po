@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -59,10 +58,8 @@ msgid "Show transfer info"
 msgstr ""
 
 #: accounts/forms.py:57 accounts/models.py:151
-#, fuzzy
-#| msgid "Weather forecast"
 msgid "Show weather forecast"
-msgstr "Weather forecast"
+msgstr "Show weather forecast"
 
 #: accounts/forms.py:58 accounts/models.py:156
 msgid "Daily digest email"
@@ -195,10 +192,8 @@ msgid "Enter the API key for the new provider."
 msgstr ""
 
 #: suggestions/forms.py:80
-#, fuzzy
-#| msgid "Add as Experience"
 msgid "Favoured activity types"
-msgstr "Experience type"
+msgstr "Favoured activity types"
 
 #: suggestions/forms.py:86
 msgid "Interests / themes"
@@ -225,16 +220,12 @@ msgid "Budget"
 msgstr ""
 
 #: suggestions/forms.py:112
-#, fuzzy
-#| msgid "Search Places"
 msgid "Search area"
-msgstr "Search Places"
+msgstr "Search area"
 
 #: suggestions/forms.py:113
-#, fuzzy
-#| msgid "No results found"
 msgid "Number of suggestions"
-msgstr "No results found"
+msgstr "Number of suggestions"
 
 #: suggestions/forms.py:114 templates/trips/event-detail.html:78
 #: templates/trips/main-transfer-connection-create.html:89
@@ -615,10 +606,8 @@ msgid "Get directions"
 msgstr ""
 
 #: templates/cotton/event.html:74
-#, fuzzy
-#| msgid "Add events"
 msgid "Reorder event"
-msgstr "Add events"
+msgstr "Reorder event"
 
 #: templates/cotton/event.html:85
 msgid "Move to another day"
@@ -739,10 +728,8 @@ msgstr ""
 "children."
 
 #: templates/cotton/quick_guide.html:146
-#, fuzzy
-#| msgid "Collaborators"
 msgid "Collaboration"
-msgstr "Collaborators"
+msgstr "Collaboration"
 
 #: templates/cotton/quick_guide.html:149
 msgid ""
@@ -917,10 +904,8 @@ msgid "Login"
 msgstr ""
 
 #: templates/includes/footer.html:73
-#, fuzzy
-#| msgid "Add document"
 msgid "Documentation"
-msgstr "Add document"
+msgstr "Documentation"
 
 #: templates/includes/footer.html:81
 msgid "Source code"
@@ -1012,16 +997,12 @@ msgid "Something went wrong while generating suggestions. Please try again."
 msgstr ""
 
 #: templates/suggestions/map-suggestions-results.html:25
-#, fuzzy
-#| msgid "No results found"
 msgid "Your last suggestions"
-msgstr "No results found"
+msgstr "Your last suggestions"
 
 #: templates/suggestions/map-suggestions-results.html:58
-#, fuzzy
-#| msgid "Stay added to trip."
 msgid "Add to trip"
-msgstr "Stay added to trip."
+msgstr "Add to trip"
 
 #: templates/suggestions/map-suggestions-results.html:72
 #: templates/trips/arrival-transfer-modal.html:23
@@ -1035,10 +1016,8 @@ msgid "Generate suggestions for your trip"
 msgstr ""
 
 #: templates/suggestions/map-suggestions-results.html:86
-#, fuzzy
-#| msgid "No results found"
 msgid "No suggestions found"
-msgstr "No results found"
+msgstr "No suggestions found"
 
 #: templates/suggestions/plan-day-modal.html:5
 msgid "Plan the day"
@@ -1127,10 +1106,8 @@ msgid "Preferences"
 msgstr ""
 
 #: templates/suggestions/suggestion-added.html:5
-#, fuzzy
-#| msgid "Stay added to trip."
 msgid "Added to your trip"
-msgstr "Stay added to trip."
+msgstr "Added to your trip"
 
 #: templates/suggestions/suggestion-details.html:12 trips/forms/event.py:92
 #: trips/forms/event.py:98 trips/forms/stay.py:76 trips/forms/stay.py:92
@@ -1302,10 +1279,8 @@ msgstr ""
 
 #: templates/trips/email/added_as_collaborator_body.html:6
 #: templates/trips/email/added_as_collaborator_body.html:16
-#, fuzzy
-#| msgid "Already a collaborator."
 msgid "You've been added as a collaborator"
-msgstr "Already a collaborator."
+msgstr "You've been added as a collaborator"
 
 #: templates/trips/email/added_as_collaborator_body.html:7
 msgid "Collaboration invitation"
@@ -1326,10 +1301,8 @@ msgstr ""
 #: templates/trips/email/added_as_collaborator_body.html:22
 #: templates/trips/email/invitation_accepted_body.html:22
 #: templates/trips/email/weather_reminder_body.html:70
-#, fuzzy
-#| msgid "Open map"
 msgid "Open trip"
-msgstr "Open map"
+msgstr "Open trip"
 
 #: templates/trips/email/added_as_collaborator_body.html:25
 #: templates/trips/email/added_as_collaborator_body.txt:8
@@ -1394,10 +1367,8 @@ msgstr ""
 
 #: templates/trips/email/daily_digest_body.html:7
 #: templates/trips/email/daily_digest_body.html:8
-#, fuzzy
-#| msgid "No days in this trip."
 msgid "Today on your trip"
-msgstr "No days in this trip."
+msgstr "Today on your trip"
 
 #: templates/trips/email/daily_digest_body.html:34
 #: templates/trips/email/daily_digest_body.txt:2
@@ -1456,16 +1427,12 @@ msgstr "Events"
 
 #: templates/trips/email/daily_digest_body.html:140
 #: templates/trips/email/daily_digest_body.txt:18
-#, fuzzy
-#| msgid "Not yet scheduled"
 msgid "No events scheduled for today."
-msgstr "Not yet scheduled"
+msgstr "No events scheduled for today."
 
 #: templates/trips/email/daily_digest_body.html:153
-#, fuzzy
-#| msgid "Open map"
 msgid "Open the trip"
-msgstr "Open map"
+msgstr "Open the trip"
 
 #: templates/trips/email/daily_digest_body.html:158
 msgid ""
@@ -1474,10 +1441,8 @@ msgid ""
 msgstr ""
 
 #: templates/trips/email/daily_digest_body.txt:5
-#, fuzzy
-#| msgid "Weather"
 msgid "Weather:"
-msgstr "Weather"
+msgstr "Weather:"
 
 #: templates/trips/email/daily_digest_body.txt:9
 msgid "Transfers:"
@@ -1488,16 +1453,12 @@ msgid "Accommodation:"
 msgstr ""
 
 #: templates/trips/email/daily_digest_body.txt:16
-#, fuzzy
-#| msgid "Events"
 msgid "Events:"
-msgstr "Events"
+msgstr "Events:"
 
 #: templates/trips/email/daily_digest_body.txt:20
-#, fuzzy
-#| msgid "Open map"
 msgid "Open the trip:"
-msgstr "Open map"
+msgstr "Open the trip:"
 
 #: templates/trips/email/daily_digest_body.txt:22
 msgid "Enjoy your day!"
@@ -1617,10 +1578,8 @@ msgid "No account required — just click the button below."
 msgstr ""
 
 #: templates/trips/email/viewer_invitation_body.html:22
-#, fuzzy
-#| msgid "Viewer"
 msgid "View the trip"
-msgstr "Viewer"
+msgstr "View the trip"
 
 #: templates/trips/email/viewer_invitation_body.txt:1
 #, python-format
@@ -1638,16 +1597,12 @@ msgstr ""
 
 #: templates/trips/email/weather_reminder_body.html:7
 #: templates/trips/email/weather_reminder_body.html:8
-#, fuzzy
-#| msgid "Weather forecast"
 msgid "Weather reminder"
-msgstr "Weather forecast"
+msgstr "Weather reminder"
 
 #: templates/trips/email/weather_reminder_body.html:33
-#, fuzzy
-#| msgid "Weather forecast"
 msgid "Weather Forecast"
-msgstr "Weather forecast"
+msgstr "Weather Forecast"
 
 #: templates/trips/email/weather_reminder_body.html:37
 #, python-format
@@ -1970,10 +1925,8 @@ msgid "No checklist items yet."
 msgstr ""
 
 #: templates/trips/includes/checklist-list.html:17
-#, fuzzy
-#| msgid "Delete stage"
 msgid "Delete this item?"
-msgstr "Delete stage"
+msgstr "Delete this item?"
 
 #: templates/trips/includes/checklist-list.html:22
 msgid "No items yet. Add your first checklist item above."
@@ -1988,10 +1941,8 @@ msgid "Get an email reminder before departure if there are pending items."
 msgstr ""
 
 #: templates/trips/includes/city-results.html:26
-#, fuzzy
-#| msgid "No account found."
 msgid "No city found."
-msgstr "No account found."
+msgstr "No city found."
 
 #: templates/trips/includes/collab-inline.html:11
 #: templates/trips/includes/collab-modal.html:4
@@ -2024,8 +1975,6 @@ msgstr ""
 
 #: templates/trips/includes/collab-modal-list.html:27
 #: templates/trips/includes/collab-modal.html:25
-#, fuzzy
-#| msgid "Viewer"
 msgid "Viewer"
 msgstr "Viewer"
 
@@ -2046,10 +1995,8 @@ msgid "Name only"
 msgstr ""
 
 #: templates/trips/includes/collab-modal.html:36
-#, fuzzy
-#| msgid "Search by email…"
 msgid "Search editor by email"
-msgstr "Search by email…"
+msgstr "Search editor by email"
 
 #: templates/trips/includes/collab-modal.html:40
 msgid "Search by email…"
@@ -2064,10 +2011,8 @@ msgid "Email address…"
 msgstr ""
 
 #: templates/trips/includes/collab-modal.html:73
-#, fuzzy
-#| msgid "Add participant by email"
 msgid "Add participant by name (no account needed)"
-msgstr "Add participant by email"
+msgstr "Add participant by name (no account needed)"
 
 #: templates/trips/includes/collab-modal.html:83
 msgid "Name…"
@@ -2357,10 +2302,8 @@ msgstr ""
 
 #: templates/trips/includes/stays-section.html:19
 #: templates/trips/includes/stays-section.html:21
-#, fuzzy
-#| msgid "Add as Stay"
 msgid "Add stay"
-msgstr "Add as Stay"
+msgstr "Add stay"
 
 #: templates/trips/includes/transport-detail.html:38
 msgid "Booking Details"
@@ -2693,10 +2636,8 @@ msgid "No results found"
 msgstr "No results found"
 
 #: templates/trips/partials/map-search-results.html:79
-#, fuzzy
-#| msgid "Search for a place to add it to your trip"
 msgid "Find places to add to your trip"
-msgstr "Search for a place to add it to your trip"
+msgstr "Find places to add to your trip"
 
 #: templates/trips/share-link-created.html:4
 #: templates/trips/share-link-modal.html:4
@@ -2879,10 +2820,8 @@ msgid "of"
 msgstr "of"
 
 #: templates/trips/trip-pdf.html:226 templates/trips/trip-pdf.html:407
-#, fuzzy
-#| msgid "Link"
 msgid "Links"
-msgstr "Link"
+msgstr "Links"
 
 #: templates/trips/trip-pdf.html:237
 msgid "Outbound"
@@ -2996,8 +2935,6 @@ msgid "Opening hours"
 msgstr ""
 
 #: trips/forms/event.py:335 trips/forms/event.py:340
-#, fuzzy
-#| msgid "Add as Experience"
 msgid "Experience type"
 msgstr "Experience type"
 
@@ -3404,10 +3341,8 @@ msgid "Trip"
 msgstr ""
 
 #: trips/views/attachments.py:251
-#, fuzzy
-#| msgid "Add document"
 msgid "Document"
-msgstr "Add document"
+msgstr "Document"
 
 #: trips/views/checklist.py:120
 msgid "Reminder saved"

@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
@@ -641,22 +640,16 @@ msgstr "Crea il tuo primo viaggio"
 #: templates/cotton/event.html:64 templates/cotton/event_list_item.html:34
 #: templates/trips/includes/stays-section.html:94
 #: templates/trips/includes/stays-section.html:96
-#, fuzzy
-#| msgid "Direction"
 msgid "Get directions"
-msgstr "Direzione"
+msgstr "Ottieni indicazioni"
 
 #: templates/cotton/event.html:74
-#, fuzzy
-#| msgid "Add event"
 msgid "Reorder event"
-msgstr "Aggiungi evento"
+msgstr "Riordina evento"
 
 #: templates/cotton/event.html:85
-#, fuzzy
-#| msgid "Create another"
 msgid "Move to another day"
-msgstr "Crea un altro"
+msgstr "Sposta in un altro giorno"
 
 #: templates/cotton/quick_guide.html:5
 msgid "How It Works"
@@ -1513,10 +1506,8 @@ msgid "Accommodation"
 msgstr "Alloggio"
 
 #: templates/trips/email/daily_digest_body.html:86
-#, fuzzy
-#| msgid "Stay"
 msgid "Stay:"
-msgstr "Soggiorno"
+msgstr "Soggiorno:"
 
 #: templates/trips/email/daily_digest_body.html:100
 #: templates/trips/email/daily_digest_body.txt:13
@@ -1681,10 +1672,8 @@ msgid "You've been invited to collaborate on \"%(title)s\""
 msgstr "Sei stato invitato a collaborare a \"%(title)s\""
 
 #: templates/trips/email/viewer_invitation_body.html:6
-#, fuzzy
-#| msgid "Trip collaboration invitation"
 msgid "Trip view invitation"
-msgstr "Invito alla collaborazione al viaggio"
+msgstr "Invito a visualizzare il viaggio"
 
 #: templates/trips/email/viewer_invitation_body.html:8
 #: templates/trips/email/viewer_invitation_body.html:16
@@ -1723,10 +1712,8 @@ msgstr "Sei stato invitato a vedere il viaggio \"%(title)s\""
 
 #: templates/trips/email/weather_reminder_body.html:7
 #: templates/trips/email/weather_reminder_body.html:8
-#, fuzzy
-#| msgid "Email reminder"
 msgid "Weather reminder"
-msgstr "Promemoria email"
+msgstr "Promemoria meteo"
 
 #: templates/trips/email/weather_reminder_body.html:33
 msgid "Weather Forecast"
@@ -2077,10 +2064,8 @@ msgstr ""
 "Ricevi un'email prima della partenza se ci sono elementi da completare."
 
 #: templates/trips/includes/city-results.html:26
-#, fuzzy
-#| msgid "No account found."
 msgid "No city found."
-msgstr "Nessun account trovato."
+msgstr "Nessuna città trovata."
 
 #: templates/trips/includes/collab-inline.html:11
 #: templates/trips/includes/collab-modal.html:4
@@ -2113,10 +2098,8 @@ msgstr ""
 
 #: templates/trips/includes/collab-modal-list.html:27
 #: templates/trips/includes/collab-modal.html:25
-#, fuzzy
-#| msgid "View"
 msgid "Viewer"
-msgstr "Vedi"
+msgstr "Osservatore"
 
 #: templates/trips/includes/collab-modal-list.html:38
 msgid "Downgrade to viewer"
@@ -2179,10 +2162,8 @@ msgid "Destination"
 msgstr "Destinazione"
 
 #: templates/trips/includes/create-stage-modal.html:50
-#, fuzzy
-#| msgid "Confirm"
 msgid "City confirmed"
-msgstr "Conferma"
+msgstr "Città confermata"
 
 #: templates/trips/includes/create-stage-modal.html:54
 msgid "Select days"
@@ -2193,10 +2174,8 @@ msgid "Create stage"
 msgstr "Crea tappa"
 
 #: templates/trips/includes/day-destination-card.html:20
-#, fuzzy
-#| msgid "Destination not found"
 msgid "Destination for day"
-msgstr "Destinazione non trovata"
+msgstr "Destinazione del giorno"
 
 #: templates/trips/includes/day-list-content.html:42
 #: templates/trips/includes/events-section.html:130
@@ -2678,10 +2657,8 @@ msgid "Move to day"
 msgstr ""
 
 #: templates/trips/move-event-day-modal.html:29
-#, fuzzy
-#| msgid "Forecast unavailable"
 msgid "No other days available."
-msgstr "Previsioni non disponibili"
+msgstr "Nessun altro giorno disponibile."
 
 #: templates/trips/note-modify.html:8 templates/trips/stay-note-modify.html:8
 msgid "Modify notes"
@@ -2891,8 +2868,6 @@ msgid "Move"
 msgstr ""
 
 #: templates/trips/trip-create.html:10
-#, fuzzy
-#| msgid "Edit trip"
 msgid "Edit Trip"
 msgstr "Modifica viaggio"
 
@@ -3524,10 +3499,8 @@ msgid "You've joined the trip as a participant."
 msgstr "Sei entrato nel viaggio come partecipante."
 
 #: trips/views/days.py:207
-#, fuzzy
-#| msgid "Event paired successfully"
 msgid "Event moved successfully"
-msgstr "Evento ricollegato correttamente"
+msgstr "Evento spostato correttamente"
 
 #: trips/views/events.py:47 trips/views/events.py:93
 msgid "Experience added successfully"
