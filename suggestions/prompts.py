@@ -134,7 +134,7 @@ def _preference_lines(
                 "You may include day-trip destinations reachable within about two "
                 "hours of the destination."
             )
-        elif prefs.search_radius == "nearby":
+        else:  # "nearby" (the default)
             lines.append(
                 f"Focus on {context.destination} and its immediate surroundings "
                 "(easily reachable nearby towns); do not stray to far-off "
