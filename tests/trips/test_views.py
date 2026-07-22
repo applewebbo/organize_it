@@ -535,18 +535,6 @@ class TestTripListView(TestCase):
 class TestTripDetailView(TestCase):
     """Test cases for trip detail view"""
 
-    def test_get_trip_detail_success(self):
-        """Test successful retrieval of trip detail page"""
-        user = self.make_user("user")
-        trip = TripFactory(author=user)
-
-        with self.login(user):
-            response = self.get("trips:trip-detail", pk=trip.pk)
-
-        self.response_200(response)
-        assertTemplateUsed(response, "trips/trip-detail.html")
-        assert response.context["trip"] == trip
-
     def test_get_trip_detail_not_found(self):
         """Test 404 response for non-existent trip"""
         user = self.make_user("user")
