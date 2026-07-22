@@ -51,7 +51,21 @@ DEBUG=True
 MAPBOX_ACCESS_TOKEN=your-mapbox-token
 GOOGLE_PLACES_API_KEY=your-google-places-key
 UNSPLASH_ACCESS_KEY=your-unsplash-key
+
+# Opzionale: login sociale con Google
+GOOGLE_OAUTH_CLIENT_ID=your-google-oauth-client-id
+GOOGLE_OAUTH_CLIENT_SECRET=your-google-oauth-client-secret
 ```
+
+!!! note "Login sociale con Google (opzionale)"
+    Per abilitare **Entra con Google**, crea un OAuth 2.0 Client ID (tipo
+    *Applicazione web*) nella [Google Cloud Console](https://console.cloud.google.com/),
+    aggiungi `http://localhost:8000/accounts/google/login/callback/` tra i redirect
+    URI autorizzati e imposta `GOOGLE_OAUTH_CLIENT_ID` / `GOOGLE_OAUTH_CLIENT_SECRET`.
+    Lasciandoli vuoti il bottone resta nascosto.
+
+    In produzione aggiungi anche il redirect URI reale — `https://tuo-dominio.tld/accounts/google/login/callback/` —
+    poiché deve corrispondere esattamente alla richiesta (schema, host e slash finale inclusi).
 
 !!! tip "Genera una Secret Key"
     Puoi generare una chiave segreta sicura usando Python:

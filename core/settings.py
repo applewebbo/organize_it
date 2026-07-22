@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
     "crispy_tailwind",
     "crispy_forms",
     "django_browser_reload",
@@ -258,6 +259,36 @@ ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_PRESERVE_USERNAME_CASING = False
 ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+
+# ALLAUTH SOCIALACCOUNT (Google)
+# allauth 65.x reads the OAuth app from settings (no django.contrib.sites or DB
+# SocialApp needed). Credentials live in the environment; see .env.example.
+GOOGLE_OAUTH_CLIENT_ID = env("GOOGLE_OAUTH_CLIENT_ID", default="")
+GOOGLE_OAUTH_CLIENT_SECRET = env("GOOGLE_OAUTH_CLIENT_SECRET", default="")
+
+# Only register the provider when credentials are set, so the Google button
+# hides itself on installs without OAuth configured instead of 500-ing.
+SOCIALACCOUNT_PROVIDERS = {}
+if GOOGLE_OAUTH_CLIENT_ID:
+    SOCIALACCOUNT_PROVIDERS["google"] = {
+        "APP": {
+            "client_id": GOOGLE_OAUTH_CLIENT_ID,
+            "secret": GOOGLE_OAUTH_CLIENT_SECRET,
+            "key": "",
+        },
+        "SCOPE": ["profile", "email"],
+        "AUTH_PARAMS": {"access_type": "online"},
+        # Trust Google's verified email so social sign-in skips the redundant
+        # confirmation step required by ACCOUNT_EMAIL_VERIFICATION="mandatory".
+        "VERIFIED_EMAIL": True,
+    }
+# Link a Google login to an existing email/password account with the same
+# verified address, instead of erroring or creating a duplicate.
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+# Skip allauth's unstyled "Continue with Google" interstitial: the daisyUI
+# button is already an explicit action, so go straight to Google's consent.
+SOCIALACCOUNT_LOGIN_ON_GET = True
 
 
 # DJANGO CRISPY FORMS

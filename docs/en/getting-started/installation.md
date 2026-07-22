@@ -51,7 +51,21 @@ DEBUG=True
 MAPBOX_ACCESS_TOKEN=your-mapbox-token
 GOOGLE_PLACES_API_KEY=your-google-places-key
 UNSPLASH_ACCESS_KEY=your-unsplash-key
+
+# Optional: Google social login
+GOOGLE_OAUTH_CLIENT_ID=your-google-oauth-client-id
+GOOGLE_OAUTH_CLIENT_SECRET=your-google-oauth-client-secret
 ```
+
+!!! note "Google social login (optional)"
+    To enable **Sign in with Google**, create an OAuth 2.0 Client ID (type *Web
+    application*) in the [Google Cloud Console](https://console.cloud.google.com/),
+    add `http://localhost:8000/accounts/google/login/callback/` as an authorized
+    redirect URI, and set `GOOGLE_OAUTH_CLIENT_ID` / `GOOGLE_OAUTH_CLIENT_SECRET`.
+    Leave them blank to keep the button hidden.
+
+    In production, add your live redirect URI too — `https://your-domain.tld/accounts/google/login/callback/` —
+    since it must match the request exactly (scheme, host and trailing slash included).
 
 !!! tip "Generate a Secret Key"
     You can generate a secure secret key using Python:

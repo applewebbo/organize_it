@@ -49,6 +49,12 @@ A **Trip** is the main container for your travel plans. Each trip has:
 4. Verify your email (in development, check the console)
 5. Log in
 
+!!! tip "Sign in with Google"
+    You can also skip the form and use **Sign in with Google** on the login and
+    signup pages. Google's verified email is trusted, so no separate email
+    verification is needed. If you already have an email/password account with
+    the same address, the Google login links to it automatically.
+
 ### Step 2: Create Your First Trip
 
 1. Click **Create New Trip**

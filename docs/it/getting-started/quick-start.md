@@ -49,6 +49,12 @@ Gli **Eventi** sono le attività nel tuo itinerario. Ci sono quattro tipi:
 4. Verifica la tua email (in sviluppo, controlla la console)
 5. Effettua il login
 
+!!! tip "Accedi con Google"
+    Puoi anche saltare il form e usare **Entra con Google** nelle pagine di login
+    e registrazione. L'email verificata da Google è considerata affidabile, quindi
+    non serve una verifica email separata. Se hai già un account email/password con
+    lo stesso indirizzo, l'accesso con Google viene collegato automaticamente.
+
 ### Passo 2: Crea il Tuo Primo Viaggio
 
 1. Clicca su **Crea Nuovo Viaggio**

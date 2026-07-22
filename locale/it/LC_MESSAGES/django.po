@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-20 10:05+0200\n"
+"POT-Creation-Date: 2026-07-22 08:06+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -91,11 +91,11 @@ msgstr "Superuser deve avere is_superuser=True."
 msgid "email address"
 msgstr "indirizzo email"
 
-#: accounts/models.py:52 core/settings.py:282
+#: accounts/models.py:52 core/settings.py:308
 msgid "Italian"
 msgstr "Italiano"
 
-#: accounts/models.py:53 core/settings.py:283
+#: accounts/models.py:53 core/settings.py:309
 msgid "English"
 msgstr "Inglese"
 
@@ -428,32 +428,23 @@ msgstr ""
 msgid "Powered by"
 msgstr ""
 
-#: templates/account/login.html:14 templates/account/login.html:50
+#: templates/account/login.html:14 templates/account/login.html:48
 msgid "Sign In"
 msgstr "Entra"
 
-#: templates/account/login.html:19
-#, python-format
-msgid ""
-"Please sign in with one\n"
-"            of your existing third party accounts. Or, <a "
-"href=\"%(signup_url)s\">sign up</a>\n"
-"            for a %(site_name)s account and sign in below:"
-msgstr ""
-"Per favore esegui il login con uno dei\n"
-"            tuoi account di terze parti. Oppure, <a "
-"href=\"%(signup_url)s\">registrati</a>\n"
-"            per un account presso %(site_name)s ed esegui il login qui sotto:"
+#: templates/account/login.html:26
+msgid "Sign in with Google"
+msgstr "Entra con Google"
 
-#: templates/account/login.html:27
+#: templates/account/login.html:28 templates/account/signup.html:31
 msgid "or"
 msgstr "oppure"
 
-#: templates/account/login.html:47
+#: templates/account/login.html:45
 msgid "Forgot Password?"
 msgstr "Password dimenticata?"
 
-#: templates/account/login.html:52
+#: templates/account/login.html:50
 #, python-format
 msgid ""
 "If you have not created an account yet, then please <a "
@@ -565,21 +556,27 @@ msgstr "Preferenze di visualizzazione"
 msgid "Save"
 msgstr "Salva"
 
-#: templates/account/signup.html:4
+#: templates/account/signup.html:5
 msgid "Signup"
 msgstr "Registrati"
 
-#: templates/account/signup.html:16 templates/account/signup.html:32
+#: templates/account/signup.html:17 templates/account/signup.html:44
 #: templates/includes/footer.html:64
 msgid "Sign Up"
 msgstr "Registrati"
 
-#: templates/account/signup.html:19
+#: templates/account/signup.html:29
+msgid "Sign up with Google"
+msgstr "Registrati con Google"
+
+#: templates/account/signup.html:46
 #, python-format
 msgid ""
-"Already have an account? Then please <a href=\"%(login_url)s\">sign in</a>"
+"Already have an account? Then please <a href=\"%(login_url)s\" class=\"text-"
+"blue-600 hover:underline\">sign in</a>"
 msgstr ""
-"Hai già un account? Allora per favore <a href=\"%(login_url)s\">entra</a>"
+"Hai già un account? Allora per favore <a href=\"%(login_url)s\" class=\"text-"
+"blue-600 hover:underline\">entra</a>"
 
 #: templates/account/verification_sent.html:4
 #: templates/account/verification_sent.html:7
@@ -3659,3 +3656,16 @@ msgstr "Errore API di Unsplash. Per favore riprova più tardi."
 #, python-brace-format
 msgid "No images found for '{query}'"
 msgstr "Nessuna immagine trovata per '{query}'"
+
+#, python-format
+#~ msgid ""
+#~ "Please sign in with one\n"
+#~ "            of your existing third party accounts. Or, <a "
+#~ "href=\"%(signup_url)s\">sign up</a>\n"
+#~ "            for a %(site_name)s account and sign in below:"
+#~ msgstr ""
+#~ "Per favore esegui il login con uno dei\n"
+#~ "            tuoi account di terze parti. Oppure, <a "
+#~ "href=\"%(signup_url)s\">registrati</a>\n"
+#~ "            per un account presso %(site_name)s ed esegui il login qui "
+#~ "sotto:"
