@@ -419,9 +419,9 @@ Yes. You can export your trip as a printable offline **PDF** and subscribe to an
 
 ### How do I report a bug?
 
-Report bugs on Codeberg:
+Report bugs on GitHub:
 
-1. Visit [https://codeberg.org/webbografico/organize_it/issues](https://codeberg.org/webbografico/organize_it/issues)
+1. Visit [https://github.com/applewebbo/organize_it/issues](https://github.com/applewebbo/organize_it/issues)
 2. Click **New Issue**
 3. Describe the bug:
    - What you did
@@ -432,9 +432,9 @@ Report bugs on Codeberg:
 
 ### How do I request a feature?
 
-Request features on Codeberg Issues:
+Request features on GitHub Issues:
 
-1. Visit [https://codeberg.org/webbografico/organize_it/issues](https://codeberg.org/webbografico/organize_it/issues)
+1. Visit [https://github.com/applewebbo/organize_it/issues](https://github.com/applewebbo/organize_it/issues)
 2. Click **New Issue**
 3. Describe the feature:
    - What you want to do
@@ -444,7 +444,7 @@ Request features on Codeberg Issues:
 
 ### Is Organize It open source?
 
-Check the Codeberg repository for license information: [https://codeberg.org/webbografico/organize_it](https://codeberg.org/webbografico/organize_it)
+Check the GitHub repository for license information: [https://github.com/applewebbo/organize_it](https://github.com/applewebbo/organize_it)
 
 ### Can I contribute to Organize It?
 
@@ -551,4 +551,4 @@ Can't find an answer to your question?
 
 - [Getting Started Guide](getting-started/installation.md)
 - [User Guide](user-guide/trips.md)
-- [Codeberg Repository](https://codeberg.org/webbografico/organize_it)
+- [GitHub Repository](https://github.com/applewebbo/organize_it)

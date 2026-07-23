@@ -421,9 +421,9 @@ Sì. Puoi esportare il tuo viaggio come **PDF** offline stampabile e iscriverti 
 
 ### Come segnalo un bug?
 
-Segnala bug su Codeberg:
+Segnala bug su GitHub:
 
-1. Visita [https://codeberg.org/webbografico/organize_it/issues](https://codeberg.org/webbografico/organize_it/issues)
+1. Visita [https://github.com/applewebbo/organize_it/issues](https://github.com/applewebbo/organize_it/issues)
 2. Clicca **New Issue**
 3. Descrivi il bug:
    - Cosa hai fatto
@@ -434,9 +434,9 @@ Segnala bug su Codeberg:
 
 ### Come richiedo una funzionalità?
 
-Richiedi funzionalità sulle Issues di Codeberg:
+Richiedi funzionalità sulle Issues di GitHub:
 
-1. Visita [https://codeberg.org/webbografico/organize_it/issues](https://codeberg.org/webbografico/organize_it/issues)
+1. Visita [https://github.com/applewebbo/organize_it/issues](https://github.com/applewebbo/organize_it/issues)
 2. Clicca **New Issue**
 3. Descrivi la funzionalità:
    - Cosa vuoi fare
@@ -446,7 +446,7 @@ Richiedi funzionalità sulle Issues di Codeberg:
 
 ### Organize It è open source?
 
-Controlla il repository Codeberg per informazioni sulla licenza: [https://codeberg.org/webbografico/organize_it](https://codeberg.org/webbografico/organize_it)
+Controlla il repository GitHub per informazioni sulla licenza: [https://github.com/applewebbo/organize_it](https://github.com/applewebbo/organize_it)
 
 ### Posso contribuire a Organize It?
 
@@ -553,4 +553,4 @@ Non trovi risposta alla tua domanda?
 
 - [Guida Primi Passi](getting-started/installation.md)
 - [Guida Utente](user-guide/trips.md)
-- [Repository Codeberg](https://codeberg.org/webbografico/organize_it)
+- [Repository GitHub](https://github.com/applewebbo/organize_it)
