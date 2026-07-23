@@ -25,7 +25,7 @@ def test_footer_version_links_to_releases():
     html = render_to_string(
         "includes/footer.html", {"APP_VERSION": settings.APP_VERSION}
     )
-    assert "https://codeberg.org/webbografico/organize_it/releases" in html
+    assert "https://github.com/applewebbo/organize_it/releases" in html
     assert f"v{settings.APP_VERSION}" in html
 
 
@@ -35,10 +35,10 @@ def test_footer_has_menu_links():
     )
     # internal app pages
     assert "/trips/list" in html
-    # documentation (Codeberg Pages)
-    assert "webbografico.codeberg.page/organize_it" in html
+    # documentation (GitHub Pages)
+    assert "applewebbo.github.io/organize_it" in html
     # repository
-    assert "https://codeberg.org/webbografico/organize_it" in html
+    assert "https://github.com/applewebbo/organize_it" in html
 
 
 def test_footer_shows_login_for_anonymous():
