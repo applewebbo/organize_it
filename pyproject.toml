@@ -19,7 +19,7 @@ dev = [
 ]
 docs = [
   "mkdocs>=1.5",
-  "mkdocs-material>=9.5",
+  "mkdocs-material>=9.5,<9.7",  # 9.7+ prints a Material 2.0 license nag on build
   "mkdocs-static-i18n>=1.2.0"
 ]
 
