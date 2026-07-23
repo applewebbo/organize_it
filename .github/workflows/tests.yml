@@ -1,0 +1,44 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: test-secret-key-for-ci
+      ENVIRONMENT: test
+      ALLOWED_HOSTS: '*'
+      MAPBOX_ACCESS_TOKEN: ${{ secrets.MAPBOX_ACCESS_TOKEN }}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install system dependencies (gettext + WeasyPrint runtime libs)
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y -qq gettext libpango-1.0-0 libpangocairo-1.0-0 \
+          libcairo2 libgdk-pixbuf-2.0-0 libfontconfig1 libffi8 libglib2.0-0
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
+        cache-dependency-glob: uv.lock
+
+    - name: Set up Python
+      run: uv python install
+
+    - name: Install dependencies
+      run: uv sync
+
+    - name: Compile translations
+      run: uv run python manage.py compilemessages -l it -l en
+
+    - name: Run tests (excluding mapbox tests that need external APIs)
+      run: uv run pytest -n 8 --reuse-db --dist loadscope --exitfirst -m "not mapbox"
