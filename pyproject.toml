@@ -2,6 +2,7 @@
 dev = [
   "coverage>=7.6.1",
   "django-coverage-plugin>=3.1.0",
+  "django-crawl>=1.1.0",
   "django-devbar>=0.7.0",
   "django-test-plus>=2.2.4",
   "django-watchfiles>=1.4.0",

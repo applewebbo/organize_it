@@ -98,6 +98,11 @@ fresh: clean install
 @populate_trips:
     uv run python manage.py populate_trips
 
+# Crawl the site for broken links / runtime errors (needs a populated dev DB)
+[group('development')]
+crawl *args:
+    ENVIRONMENT=dev uv run python manage.py crawl -v 2 {{ args }}
+
 # Create database migrations
 [group('development')]
 makemigrations:

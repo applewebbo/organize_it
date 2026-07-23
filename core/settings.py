@@ -443,6 +443,7 @@ if ENVIRONMENT == "dev":
     }
     INSTALLED_APPS += [
         "django_watchfiles",
+        "django_crawl",
     ]
 
     # django-devbar: insert middleware right after SecurityMiddleware
