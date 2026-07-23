@@ -152,6 +152,6 @@ Now that you have your first trip set up, explore:
 
 - Check the [FAQ](../faq.md) for common questions
 - Read the detailed [User Guide](../user-guide/trips.md)
-- Report issues on [Codeberg](https://codeberg.org/webbografico/organize_it/issues)
+- Report issues on [GitHub](https://github.com/applewebbo/organize_it/issues)
 
 Happy planning! ✈️
