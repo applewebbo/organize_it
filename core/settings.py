@@ -35,7 +35,7 @@ env = environ.Env(
 
 SECRET_KEY = env("SECRET_KEY")
 ENVIRONMENT = env("ENVIRONMENT", default="prod")
-APP_VERSION = "2026.10.1"
+APP_VERSION = "2026.10.2"
 
 DEBUG = env.bool("DEBUG")
 
