@@ -1460,7 +1460,7 @@ dependencies = [
 ]
 name = "organize-it"
 source = {virtual = "."}
-version = "2026.10.2"
+version = "2026.10.3"
 
 [package.dev-dependencies]
 dev = [
