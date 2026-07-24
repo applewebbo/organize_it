@@ -77,9 +77,9 @@ Before starting multi-step work, create tasks in `taskdb`.
   - `Co-Authored-By: Claude <noreply@anthropic.com>`
 - Keep commit messages concise and focused on the changes made
 
-## Issue & Release Management (Codeberg)
+## Issue & Release Management (GitHub)
 
-Issues and releases live on Codeberg and are managed through `just` recipes (backed by the `fj` CLI). **Use these commands directly — do not run `just --list` / help to rediscover them each time.** Write all issue content in English.
+Issues and releases live on GitHub (`applewebbo/organize_it`) and are managed through `just` recipes (backed by the `gh` CLI, which targets the repo explicitly via `-R applewebbo/organize_it`). **Use these commands directly — do not run `just --list` / help to rediscover them each time.** Write all issue content in English.
 
 | Command | Purpose |
 |---------|---------|
@@ -96,11 +96,11 @@ Issues and releases live on Codeberg and are managed through `just` recipes (bac
 
 **Editing/creating bodies — avoid the backtick trap:**
 - Passing a body as a shell argument (`just issue-create "t" "…`code`…"`) makes the shell execute anything in backticks. For any body containing backticks/backslashes/`$`, **write it to a temp file first and use `just issue-edit-body <n> <file>`** (which reads the file safely). Typical flow: create with a placeholder body, then set the real body from a file.
-- To fetch an existing body for editing, read `CODEBERG_API_TOKEN` from `.env` and GET `/api/v1/repos/webbografico/organize_it/issues/<n>` (`.body`).
+- To fetch an existing body for editing, run `gh issue view <n> -R applewebbo/organize_it --json body -q .body`.
 
 **Conventions:**
 - Issue bodies use only bullet/numbered lists — never task-list checkboxes (`- [ ]`).
-- Reference issues in commits with `for #<n>` (never `fix #<n>`); close issues manually at release.
+- Reference issues in commits with `for #<n>` for intermediate commits; the **last** commit that resolves an issue uses `fix #<n>` so GitHub auto-closes it on merge to main.
 
 ## Project Overview
 
@@ -151,13 +151,13 @@ All commands use `just` (justfile). Never use `pip` - always use `uv`.
 - `just docs-serve` - Serve documentation locally at http://localhost:8001
 - `just docs-build` - Build documentation to `site/` directory
 - Documentation source files are in `docs/` directory (EN and IT)
-- Documentation is hosted on Codeberg Pages: https://webbografico.codeberg.page/organize_it/en/ (EN) and https://webbografico.codeberg.page/organize_it/it/ (IT)
-- Auto-builds via Forgejo Actions on push to main branch (changes in `docs/` or mkdocs config files)
+- Documentation is hosted on GitHub Pages: https://applewebbo.github.io/organize_it/en/ (EN) and https://applewebbo.github.io/organize_it/it/ (IT)
+- Auto-builds via GitHub Actions (`.github/workflows/docs.yml`) on push to main branch (changes in `docs/` or mkdocs config files)
 
 **Updating Documentation:**
 1. Edit markdown files in `docs/en/` (English) or `docs/it/` (Italian)
 2. Test locally with `just docs-serve`
-3. Commit and push to trigger Codeberg Pages rebuild
+3. Commit and push to trigger GitHub Pages rebuild
 4. Screenshots are in `docs/assets/screenshots/`
 
 **IMPORTANT:** When making substantial UI changes, remind the user to update the documentation screenshots and content accordingly.

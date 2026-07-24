@@ -187,128 +187,87 @@ secure:
 
 
 ##########################################################################
-# Codeberg
+# GitHub
 ##########################################################################
 
-# List issues (state: open|closed|all)
-[group('codeberg')]
-issues state="open":
-    fj issue search "" --state {{state}}
+# Target GitHub repository for all gh commands (origin may still point elsewhere)
+github_repo := "applewebbo/organize_it"
 
-# Show issue details
-[group('codeberg')]
+# List issues (state: open|closed|all)
+[group('github')]
+issues state="open":
+    gh issue list -R {{github_repo}} --state {{state}}
+
+# Show issue details (with comments)
+[group('github')]
 issue number:
-    fj issue view {{number}}
+    gh issue view {{number}} -R {{github_repo}} --comments
 
 # Add comment to issue from a markdown file (usage: just issue-comment 360 /path/to/comment.md)
-[group('codeberg')]
+[group('github')]
 issue-comment number file:
-    fj issue comment {{number}} --body-file {{file}}
-
-# Mark a checkbox step as done in issue body
-[group('codeberg')]
-issue-check number step:
-    ./bin/codeberg check {{number}} "{{step}}"
+    gh issue comment {{number}} -R {{github_repo}} --body-file {{file}}
 
 # Close issue
-[group('codeberg')]
+[group('github')]
 issue-close number:
-    fj issue close {{number}}
+    gh issue close {{number}} -R {{github_repo}}
 
 # Reopen issue
-[group('codeberg')]
+[group('github')]
 issue-reopen number:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    TOKEN=$(grep "^CODEBERG_API_TOKEN=" .env | cut -d'=' -f2 | tr -d '"' | tr -d "'")
-    curl -s -X PATCH "https://codeberg.org/api/v1/repos/webbografico/organize_it/issues/{{number}}" \
-      -H "Authorization: token ${TOKEN}" \
-      -H "Content-Type: application/json" \
-      -d '{"state":"open"}' | python3 -c "import sys,json; d=json.load(sys.stdin); print(f'✓ Issue #{d[\"number\"]} reopened')"
+    gh issue reopen {{number}} -R {{github_repo}}
 
-# Create a label if it doesn't exist (color optional, default blue)
-[group('codeberg')]
-label-create name color="#0075ca":
-    #!/usr/bin/env bash
-    set -euo pipefail
-    TOKEN=$(grep "^CODEBERG_API_TOKEN=" .env | cut -d'=' -f2 | tr -d '"' | tr -d "'")
-    EXISTING=$(curl -s "https://codeberg.org/api/v1/repos/webbografico/organize_it/labels" \
-      -H "Authorization: token ${TOKEN}" | jq -r '.[] | select(.name == "{{name}}") | .id')
-    if [ -n "$EXISTING" ]; then
-        echo "✓ Label '{{name}}' already exists (id: ${EXISTING})"
-    else
-        curl -s -X POST "https://codeberg.org/api/v1/repos/webbografico/organize_it/labels" \
-          -H "Authorization: token ${TOKEN}" \
-          -H "Content-Type: application/json" \
-          -d '{"name":"{{name}}","color":"{{color}}"}' | jq -r '"✓ Label \(.name) created (id: \(.id))"'
-    fi
+# Create a label if it doesn't exist (color optional, default blue). --force updates it if present.
+[group('github')]
+label-create name color="0075ca":
+    gh label create "{{name}}" -R {{github_repo}} --color "{{color}}" --force
 
 # Add labels to issue (space-separated label names)
-[group('codeberg')]
+[group('github')]
 issue-label number *labels:
     #!/usr/bin/env bash
     set -euo pipefail
     for label in {{labels}}; do
-        fj issue edit {{number}} labels -a "$label"
+        gh issue edit {{number}} -R {{github_repo}} --add-label "$label"
         echo "✓ Label '$label' added to issue #{{number}}"
     done
 
 # Create a label (if missing, with random color) and assign it to an issue: just issue-label-create <issue> <label>
-[group('codeberg')]
+[group('github')]
 issue-label-create number name:
     #!/usr/bin/env bash
     set -euo pipefail
-    COLORS=("#e11d48" "#ea580c" "#d97706" "#65a30d" "#16a34a" "#059669" "#0891b2" "#2563eb" "#7c3aed" "#c026d3" \
-            "#be185d" "#b45309" "#4d7c0f" "#0e7490" "#1d4ed8" "#6d28d9" "#a21caf" "#be123c" "#15803d" "#0369a1")
+    COLORS=("e11d48" "ea580c" "d97706" "65a30d" "16a34a" "059669" "0891b2" "2563eb" "7c3aed" "c026d3" \
+            "be185d" "b45309" "4d7c0f" "0e7490" "1d4ed8" "6d28d9" "a21caf" "be123c" "15803d" "0369a1")
     RANDOM_COLOR=${COLORS[$((RANDOM % ${#COLORS[@]}))]}
-    TOKEN=$(grep "^CODEBERG_API_TOKEN=" .env | cut -d'=' -f2 | tr -d '"' | tr -d "'")
-    LABEL_ID=$(curl -s "https://codeberg.org/api/v1/repos/webbografico/organize_it/labels" \
-      -H "Authorization: token ${TOKEN}" | jq -r '.[] | select(.name == "{{name}}") | .id')
-    if [ -z "$LABEL_ID" ]; then
-        echo "Creating label '{{name}}' with color ${RANDOM_COLOR}..."
-        LABEL_ID=$(curl -s -X POST "https://codeberg.org/api/v1/repos/webbografico/organize_it/labels" \
-          -H "Authorization: token ${TOKEN}" \
-          -H "Content-Type: application/json" \
-          -d "{\"name\":\"{{name}}\",\"color\":\"${RANDOM_COLOR}\"}" | jq -r '.id')
-        echo "✓ Label '{{name}}' created (id: ${LABEL_ID})"
-    else
-        echo "✓ Label '{{name}}' already exists (id: ${LABEL_ID})"
-    fi
-    fj issue edit {{number}} labels -a "{{name}}"
-    echo "✓ Label assigned to issue #{{number}}"
+    gh label create "{{name}}" -R {{github_repo}} --color "${RANDOM_COLOR}" --force
+    gh issue edit {{number}} -R {{github_repo}} --add-label "{{name}}"
+    echo "✓ Label '{{name}}' assigned to issue #{{number}}"
 
 # Create new issue (body optional)
-[group('codeberg')]
+[group('github')]
 issue-create title body="":
-    #!/usr/bin/env bash
-    set -euo pipefail
-    if [ -z "{{body}}" ]; then
-        EDITOR=true fj issue create "{{title}}" --no-template
-    else
-        TMPFILE=$(mktemp /tmp/issue-body-XXXXXX.md)
-        echo "{{body}}" > "$TMPFILE"
-        EDITOR=true fj issue create "{{title}}" --body-file "$TMPFILE" --no-template
-        rm "$TMPFILE"
-    fi
+    gh issue create -R {{github_repo}} --title "{{title}}" --body "{{body}}"
 
 # Edit issue body from file (usage: just issue-edit-body 249 /path/to/body.md)
-[group('codeberg')]
+[group('github')]
 issue-edit-body number file:
-    fj issue edit {{number}} body "$(cat {{file}})"
+    gh issue edit {{number}} -R {{github_repo}} --body-file {{file}}
 
 # List all releases
-[group('codeberg')]
+[group('github')]
 release-list:
-    fj release list --include-draft --include-prerelease
+    gh release list -R {{github_repo}}
 
 # Show release details
-[group('codeberg')]
+[group('github')]
 release-show tag:
-    fj release view "{{tag}}" --by-tag
+    gh release view "{{tag}}" -R {{github_repo}}
 
-# Create a new release (creates tag, pushes main+tag, creates Codeberg release via fj)
+# Create a new release (creates tag, pushes main+tag, creates GitHub release via gh)
 # Pass notes_file to use custom rich notes; omit for auto-generated notes from commits
-[group('codeberg')]
+[group('github')]
 release-create tag previous_tag="" notes_file="" draft="false" prerelease="false":
     #!/usr/bin/env bash
     set -euo pipefail
@@ -385,13 +344,25 @@ release-create tag previous_tag="" notes_file="" draft="false" prerelease="false
                 echo ""
             fi
             echo "### 📖 Full Changelog"
-            echo "https://codeberg.org/webbografico/organize_it/compare/${PREV_TAG}...{{tag}}"
+            echo "https://github.com/{{github_repo}}/compare/${PREV_TAG}...{{tag}}"
         } > "$NOTES_FILE"
     fi
 
-    # Create release via fj
-    echo "🚀 Creating release on Codeberg..."
-    fj release create "{{tag}}" -r webbografico/organize_it --tag "{{tag}}" --body "$(cat "$NOTES_FILE")"
+    # Build gh release flags
+    RELEASE_FLAGS=(--title "{{tag}}" --notes-file "$NOTES_FILE")
+    if [ "{{previous_tag}}" != "" ]; then
+        RELEASE_FLAGS+=(--verify-tag)
+    fi
+    if [ "{{draft}}" = "true" ]; then
+        RELEASE_FLAGS+=(--draft)
+    fi
+    if [ "{{prerelease}}" = "true" ]; then
+        RELEASE_FLAGS+=(--prerelease)
+    fi
+
+    # Create release via gh
+    echo "🚀 Creating release on GitHub..."
+    gh release create "{{tag}}" -R {{github_repo}} "${RELEASE_FLAGS[@]}"
     echo ""
     echo "✓ Release {{tag}} created!"
 
