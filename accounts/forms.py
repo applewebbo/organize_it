@@ -1,3 +1,4 @@
+from allauth.account.forms import LoginForm
 from django import forms
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.db.models import Q
@@ -7,6 +8,18 @@ from trips.models import Trip
 
 from .models import CustomUser, Profile
 from .widgets import AvatarRadioSelect
+
+
+class CustomLoginForm(LoginForm):
+    """Login form that drops allauth's password reset help_text.
+
+    The login template renders its own styled Forgot Password link, so the
+    default help_text link would show up as a duplicate.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["password"].help_text = ""
 
 
 class CustomUserCreationForm(UserCreationForm):

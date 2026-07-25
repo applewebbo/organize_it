@@ -259,6 +259,7 @@ ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_PRESERVE_USERNAME_CASING = False
 ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_FORMS = {"login": "accounts.forms.CustomLoginForm"}
 
 # ALLAUTH SOCIALACCOUNT (Google)
 # allauth 65.x reads the OAuth app from settings (no django.contrib.sites or DB

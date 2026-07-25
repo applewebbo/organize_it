@@ -1,9 +1,22 @@
 import pytest
 
-from accounts.forms import ProfileUpdateForm
+from accounts.forms import CustomLoginForm, ProfileUpdateForm
 from tests.trips.factories import TripFactory
 
 pytestmark = pytest.mark.django_db
+
+
+class TestCustomLoginForm:
+    def test_password_help_text_is_cleared(self):
+        """allauth adds a reset link as password help_text; clear it to avoid
+        a duplicate of the template's own Forgot Password link."""
+        form = CustomLoginForm()
+        assert form.fields["password"].help_text == ""
+
+    def test_login_page_renders_single_reset_link(self, client):
+        """The login page must expose the password reset URL only once."""
+        html = client.get("/accounts/login/").content.decode()
+        assert html.count('href="/accounts/password/reset/"') == 1
 
 
 class TestProfileUpdateForm:
