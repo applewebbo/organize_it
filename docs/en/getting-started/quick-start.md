@@ -49,6 +49,8 @@ A **Trip** is the main container for your travel plans. Each trip has:
 4. Verify your email (in development, check the console)
 5. Log in
 
+![Login page with Sign in with Google button](../assets/screenshots/login.png)
+
 !!! tip "Sign in with Google"
     You can also skip the form and use **Sign in with Google** on the login and
     signup pages. Google's verified email is trusted, so no separate email

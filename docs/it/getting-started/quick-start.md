@@ -49,6 +49,8 @@ Gli **Eventi** sono le attività nel tuo itinerario. Ci sono quattro tipi:
 4. Verifica la tua email (in sviluppo, controlla la console)
 5. Effettua il login
 
+![Pagina di login con pulsante Entra con Google](../assets/screenshots/login.png)
+
 !!! tip "Accedi con Google"
     Puoi anche saltare il form e usare **Entra con Google** nelle pagine di login
     e registrazione. L'email verificata da Google è considerata affidabile, quindi
