@@ -19,7 +19,8 @@ dev = [
 ]
 docs = [
   "mkdocs>=1.5",
-  "mkdocs-material>=9.5,<9.7",  # 9.7+ prints a Material 2.0 license nag on build
+  "mkdocs-material>=9.7.7",  # 9.7+ needed for pymdown-extensions>=11 (fixes GHSA-9xwg-3r6f-jcx2)
+  "pymdown-extensions>=11.0.1",
   "mkdocs-static-i18n>=1.2.0"
 ]
 
@@ -68,7 +69,7 @@ description = "Help you organize your trips and travel plans."
 name = "organize_it"
 readme = "README.md"
 requires-python = ">=3.14"
-version = "2026.10.3"
+version = "2026.10.4"
 
 [tool.bandit]
 skips = ["B101", "B311"]

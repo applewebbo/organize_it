@@ -17,7 +17,8 @@ default:
 [group('setup')]
 @update_all: lock update_phosphor
     uv sync --all-extras --upgrade
-    uvx --with pre-commit-uv prek auto-update
+    # djLint pinned to v1.40.5: 1.40.6+ breaks templates (H037 + reformatter). Keep excluded.
+    uvx --with pre-commit-uv prek auto-update --exclude-repo https://github.com/djlint/djLint
 
 # Download or update self-hosted Phosphor Icons (bold variant)
 [group('setup')]
