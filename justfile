@@ -198,10 +198,16 @@ github_repo := "applewebbo/organize_it"
 issues state="open":
     gh issue list -R {{github_repo}} --state {{state}}
 
-# Show issue details (with comments)
+# Show issue details (body + comments if any)
 [group('github')]
 issue number:
-    gh issue view {{number}} -R {{github_repo}} --comments
+    #!/usr/bin/env bash
+    set -euo pipefail
+    gh issue view {{number}} -R {{github_repo}}
+    comments=$(gh issue view {{number}} -R {{github_repo}} --comments)
+    if [ -n "$comments" ]; then
+        printf '\n--- Comments ---\n%s\n' "$comments"
+    fi
 
 # Add comment to issue from a markdown file (usage: just issue-comment 360 /path/to/comment.md)
 [group('github')]
