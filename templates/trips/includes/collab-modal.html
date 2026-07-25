@@ -13,22 +13,28 @@
         <!-- Mode selector -->
         <div class="bg-base-200 mb-3 flex gap-1 rounded-lg p-1">
             <button type="button"
-                    class="flex-1 rounded-md py-1 text-xs font-medium transition-colors"
+                    class="flex-1 rounded-md py-1.5 text-base transition-colors"
                     :class="mode === 'editor' ? 'bg-base-100 text-base-content' : 'text-base-content/60 hover:text-base-content' shadow"
-                    @click="mode = 'editor'">
-                <i class="ph-bold ph-pencil mr-1"></i>{% trans "Editor" %}
+                    @click="mode = 'editor'"
+                    title="{% trans 'Editor' %}"
+                    aria-label="{% trans 'Editor' %}">
+                <i class="ph-bold ph-pencil" aria-hidden="true"></i>
             </button>
             <button type="button"
-                    class="flex-1 rounded-md py-1 text-xs font-medium transition-colors"
+                    class="flex-1 rounded-md py-1.5 text-base transition-colors"
                     :class="mode === 'viewer' ? 'bg-base-100 text-base-content' : 'text-base-content/60 hover:text-base-content' shadow"
-                    @click="mode = 'viewer'">
-                <i class="ph-bold ph-eye mr-1"></i>{% trans "Viewer" %}
+                    @click="mode = 'viewer'"
+                    title="{% trans 'Viewer' %}"
+                    aria-label="{% trans 'Viewer' %}">
+                <i class="ph-bold ph-eye" aria-hidden="true"></i>
             </button>
             <button type="button"
-                    class="flex-1 rounded-md py-1 text-xs font-medium transition-colors"
+                    class="flex-1 rounded-md py-1.5 text-base transition-colors"
                     :class="mode === 'named' ? 'bg-base-100 text-base-content' : 'text-base-content/60 hover:text-base-content' shadow"
-                    @click="mode = 'named'">
-                <i class="ph-bold ph-user-plus mr-1"></i>{% trans "Name only" %}
+                    @click="mode = 'named'"
+                    title="{% trans 'Name only' %}"
+                    aria-label="{% trans 'Name only' %}">
+                <i class="ph-bold ph-user-plus" aria-hidden="true"></i>
             </button>
         </div>
         <!-- Editor mode: search by email -->
@@ -56,7 +62,7 @@
                   hx-swap="outerHTML"
                   @htmx:after-request="if(event.detail.successful) { $el.reset() }">
                 {% csrf_token %}
-                <div class="flex gap-2">
+                <div class="mb-2 flex items-center gap-2">
                     <input type="email"
                            name="email"
                            placeholder="{% trans 'Email address…' %}"
@@ -68,23 +74,48 @@
             </form>
         </div>
         <!-- Named participant mode: name only -->
-        <div x-show="mode === 'named'" x-cloak>
+        <div x-show="mode === 'named'" x-cloak x-data="{ isChild: false }">
             <label class="text-base-content/70 mb-1 block text-sm font-medium">
                 {% trans "Add participant by name (no account needed)" %}
             </label>
             <form hx-post="{% url 'trips:add-named-participant' trip.pk %}"
                   hx-target="#collab-modal-list"
                   hx-swap="outerHTML"
-                  @htmx:after-request="if(event.detail.successful) { $el.reset() }">
+                  @htmx:after-request="if(event.detail.successful) { $el.reset(); isChild = false }">
                 {% csrf_token %}
-                <div class="flex gap-2">
+                <!-- Adult / child selector -->
+                <div class="bg-base-200 mb-2 flex gap-1 rounded-lg p-1">
+                    <button type="button"
+                            class="flex-1 rounded-md py-1 text-xs font-medium whitespace-nowrap transition-colors"
+                            :class="!isChild ? 'bg-base-100 text-base-content shadow' : 'text-base-content/60 hover:text-base-content'"
+                            @click="isChild = false">
+                        <i class="ph-bold ph-user mr-1"></i>{% trans "Adult" %}
+                    </button>
+                    <button type="button"
+                            class="flex-1 rounded-md py-1 text-xs font-medium whitespace-nowrap transition-colors"
+                            :class="isChild ? 'bg-base-100 text-base-content shadow' : 'text-base-content/60 hover:text-base-content'"
+                            @click="isChild = true">
+                        <i class="ph-bold ph-baby mr-1"></i>{% trans "Child" %}
+                    </button>
+                </div>
+                <input type="checkbox" name="is_child" class="hidden" x-model="isChild">
+                <div class="mb-2 flex items-center gap-2">
                     <input type="text"
                            name="name"
                            placeholder="{% trans 'Name…' %}"
-                           class="input input-bordered input-sm flex-1"
+                           class="input input-bordered input-sm min-w-0 flex-1"
                            autocomplete="off"
                            required>
-                    <button type="submit" class="btn btn-sm btn-soft btn-primary">{% trans "Add" %}</button>
+                    <input type="number"
+                           name="age"
+                           min="0"
+                           max="17"
+                           placeholder="{% trans 'Age' %}"
+                           class="input input-bordered input-sm w-12 shrink-0 px-1.5 text-center sm:w-20 sm:px-3 sm:text-left"
+                           x-show="isChild"
+                           x-cloak
+                           :required="isChild">
+                    <button type="submit" class="btn btn-sm btn-soft btn-primary shrink-0">{% trans "Add" %}</button>
                 </div>
             </form>
         </div>

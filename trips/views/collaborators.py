@@ -14,7 +14,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.translation import override as translation_override
 from django.views.decorators.http import require_http_methods
 
-from trips.forms import ShareLinkCreateForm
+from trips.forms import NamedParticipantForm, ShareLinkCreateForm
 from trips.models import ShareLink, TripCollaboration, TripInvitation
 from trips.utils import get_trip_for_owner_or_404, get_trip_or_404
 
@@ -242,16 +242,18 @@ def add_viewer_by_email(request, trip_id):
 def add_named_participant(request, trip_id):
     """Add a named participant with no account or email (owner only)."""
     trip = get_trip_for_owner_or_404(trip_id, request.user)
-    name = request.POST.get("name", "").strip()
+    form = NamedParticipantForm(request.POST)
 
-    if not name:
+    if not form.is_valid():
         return HttpResponse(status=400)
 
     color = TripCollaboration.next_free_color(trip)
     TripCollaboration.objects.create(
         trip=trip,
         user=None,
-        participant_name=name,
+        participant_name=form.cleaned_data["name"],
+        is_child=form.cleaned_data["is_child"],
+        age=form.cleaned_data["age"],
         color=color,
         added_by=request.user,
         can_edit=False,

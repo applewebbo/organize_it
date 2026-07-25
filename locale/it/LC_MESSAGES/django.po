@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-22 08:06+0200\n"
+"POT-Creation-Date: 2026-07-25 15:20+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -18,59 +18,59 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.8\n"
 
-#: accounts/forms.py:47 accounts/models.py:78
+#: accounts/forms.py:60 accounts/models.py:78
 msgid "First name"
 msgstr "Nome"
 
-#: accounts/forms.py:48 accounts/models.py:84
+#: accounts/forms.py:61 accounts/models.py:84
 msgid "Last name"
 msgstr "Cognome"
 
-#: accounts/forms.py:49 accounts/models.py:120
+#: accounts/forms.py:62 accounts/models.py:120
 msgid "Home address"
 msgstr "Indirizzo di casa"
 
-#: accounts/forms.py:50 accounts/models.py:90
+#: accounts/forms.py:63 accounts/models.py:90
 msgid "Avatar"
 msgstr "Immagine profilo"
 
-#: accounts/forms.py:51 accounts/models.py:99
+#: accounts/forms.py:64 accounts/models.py:99
 msgid "Preferred currency"
 msgstr "Valuta preferita"
 
-#: accounts/forms.py:52
+#: accounts/forms.py:65
 msgid "Email language"
 msgstr "Lingua email"
 
-#: accounts/forms.py:53
+#: accounts/forms.py:66
 msgid "Default event view"
 msgstr "Vista eventi di default"
 
-#: accounts/forms.py:54
+#: accounts/forms.py:67
 msgid "Sort trips by"
 msgstr "Ordine viaggi"
 
-#: accounts/forms.py:55 accounts/models.py:143
+#: accounts/forms.py:68 accounts/models.py:143
 msgid "Use your device's light/dark system setting."
 msgstr "Usa le impostazioni di sistema per il tema chiaro/scuro."
 
-#: accounts/forms.py:56 accounts/models.py:146
+#: accounts/forms.py:69 accounts/models.py:146
 msgid "Show transfer info"
 msgstr "Mostra info trasferimenti"
 
-#: accounts/forms.py:57 accounts/models.py:151
+#: accounts/forms.py:70 accounts/models.py:151
 msgid "Show weather forecast"
 msgstr "Mostra meteo"
 
-#: accounts/forms.py:58 accounts/models.py:156
+#: accounts/forms.py:71 accounts/models.py:156
 msgid "Daily digest email"
 msgstr "Email riepilogo giornaliero"
 
-#: accounts/forms.py:59
+#: accounts/forms.py:72
 msgid "Favourite trip"
 msgstr "Viaggio preferito"
 
-#: accounts/forms.py:71 templates/account/profile.html:40
+#: accounts/forms.py:84 templates/account/profile.html:40
 #: trips/forms/transfer.py:473 trips/forms/transfer.py:485
 msgid "Full address (street, city, country)"
 msgstr "Indirizzo completo (via, città, paese)"
@@ -91,11 +91,11 @@ msgstr "Superuser deve avere is_superuser=True."
 msgid "email address"
 msgstr "indirizzo email"
 
-#: accounts/models.py:52 core/settings.py:308
+#: accounts/models.py:52 core/settings.py:314
 msgid "Italian"
 msgstr "Italiano"
 
-#: accounts/models.py:53 core/settings.py:309
+#: accounts/models.py:53 core/settings.py:315
 msgid "English"
 msgstr "Inglese"
 
@@ -1330,14 +1330,14 @@ msgid "Pre-departure Checklist"
 msgstr "Checklist pre-partenza"
 
 #: templates/trips/checklist.html:40
-#: templates/trips/includes/checklist-card.html:18 trips/forms/trip.py:332
+#: templates/trips/includes/checklist-card.html:18 trips/forms/trip.py:349
 msgid "Add an item…"
 msgstr "Aggiungi un elemento…"
 
 #: templates/trips/checklist.html:45
 #: templates/trips/includes/checklist-card.html:23
 #: templates/trips/includes/collab-modal.html:66
-#: templates/trips/includes/collab-modal.html:87
+#: templates/trips/includes/collab-modal.html:103
 #: templates/trips/includes/collab-search-result.html:17
 #: templates/trips/includes/main-transfers.html:91
 #: templates/trips/includes/main-transfers.html:266
@@ -2098,15 +2098,20 @@ msgstr ""
 msgid "Viewer"
 msgstr "Osservatore"
 
-#: templates/trips/includes/collab-modal-list.html:38
+#: templates/trips/includes/collab-modal-list.html:32
+#: templates/trips/includes/collab-modal.html:92 trips/forms/trip.py:331
+msgid "Child"
+msgstr "Bambino"
+
+#: templates/trips/includes/collab-modal-list.html:44
 msgid "Downgrade to viewer"
 msgstr "Passa a osservatore"
 
-#: templates/trips/includes/collab-modal-list.html:49
+#: templates/trips/includes/collab-modal-list.html:55
 msgid "Remove"
 msgstr "Rimuovi"
 
-#: templates/trips/includes/collab-modal-list.html:57
+#: templates/trips/includes/collab-modal-list.html:63
 msgid "No participants yet."
 msgstr "Nessun partecipante."
 
@@ -2134,9 +2139,17 @@ msgstr "Indirizzo email…"
 msgid "Add participant by name (no account needed)"
 msgstr "Aggiungi partecipante per nome (senza account)"
 
-#: templates/trips/includes/collab-modal.html:83
+#: templates/trips/includes/collab-modal.html:86
+msgid "Adult"
+msgstr "Adulto"
+
+#: templates/trips/includes/collab-modal.html:99
 msgid "Name…"
 msgstr "Nome…"
+
+#: templates/trips/includes/collab-modal.html:106 trips/forms/trip.py:332
+msgid "Age"
+msgstr "Età"
 
 #: templates/trips/includes/collab-search-result.html:7
 msgid "Already a participant."
@@ -2995,7 +3008,7 @@ msgstr "Durata"
 
 #: trips/forms/event.py:46 trips/forms/event.py:47 trips/forms/event.py:96
 #: trips/forms/stay.py:27 trips/forms/stay.py:28 trips/forms/stay.py:75
-#: trips/forms/stay.py:87
+#: trips/forms/stay.py:87 trips/forms/trip.py:330
 msgid "Name"
 msgstr "Nome"
 
@@ -3278,31 +3291,35 @@ msgstr "Etichetta opzionale per identificare il link"
 msgid "Expires after"
 msgstr "Scade dopo"
 
-#: trips/forms/trip.py:345
+#: trips/forms/trip.py:338
+msgid "Age is required for a child."
+msgstr "L'età è obbligatoria per un bambino."
+
+#: trips/forms/trip.py:362
 msgid "Off"
 msgstr "Disattivato"
 
-#: trips/forms/trip.py:346
+#: trips/forms/trip.py:363
 msgid "1 day before"
 msgstr "1 giorno prima"
 
-#: trips/forms/trip.py:347
+#: trips/forms/trip.py:364
 msgid "3 days before"
 msgstr "3 giorni prima"
 
-#: trips/forms/trip.py:348
+#: trips/forms/trip.py:365
 msgid "7 days before"
 msgstr "7 giorni prima"
 
-#: trips/forms/trip.py:349
+#: trips/forms/trip.py:366
 msgid "14 days before"
 msgstr "14 giorni prima"
 
-#: trips/forms/trip.py:350
+#: trips/forms/trip.py:367
 msgid "30 days before"
 msgstr "30 giorni prima"
 
-#: trips/forms/trip.py:356
+#: trips/forms/trip.py:373
 msgid "Email reminder"
 msgstr "Promemoria email"
 
@@ -3446,32 +3463,32 @@ msgstr ""
 msgid "Indigo"
 msgstr ""
 
-#: trips/models.py:983
+#: trips/models.py:987
 msgid "View only"
 msgstr "Solo visualizzazione"
 
-#: trips/models.py:984
+#: trips/models.py:988
 msgid "Can edit"
 msgstr "Può modificare"
 
-#: trips/models.py:1104
+#: trips/models.py:1108
 msgid "File type not allowed."
 msgstr "Tipo di file non consentito."
 
-#: trips/models.py:1106
+#: trips/models.py:1110
 msgid "File exceeds the 2 MB size limit."
 msgstr "Il file supera il limite di 2 MB."
 
-#: trips/models.py:1115
+#: trips/models.py:1119
 msgid "Attachment limit reached for this item."
 msgstr "Limite di allegati raggiunto per questo elemento."
 
-#: trips/models.py:1140
+#: trips/models.py:1144
 #, python-format
 msgid "Family of %(name)s"
 msgstr "Famiglia di %(name)s"
 
-#: trips/models.py:1141
+#: trips/models.py:1145
 msgid "Family unit"
 msgstr "Nucleo famigliare"
 
@@ -3491,7 +3508,7 @@ msgstr "Allegato"
 msgid "Reminder saved"
 msgstr "Promemoria salvato"
 
-#: trips/views/collaborators.py:393
+#: trips/views/collaborators.py:395
 msgid "You've joined the trip as a participant."
 msgstr "Sei entrato nel viaggio come partecipante."
 

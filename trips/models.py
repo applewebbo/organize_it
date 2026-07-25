@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
-from django.core.validators import MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models.signals import post_save, pre_delete, pre_save
 from django.dispatch import receiver
@@ -901,6 +901,10 @@ class TripCollaboration(models.Model):
         related_name="collaboration",
     )
     color = models.CharField(max_length=20, choices=PALETTE)
+    is_child = models.BooleanField(default=False)
+    age = models.PositiveSmallIntegerField(
+        null=True, blank=True, validators=[MaxValueValidator(17)]
+    )
     added_at = models.DateTimeField(auto_now_add=True)
     added_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,

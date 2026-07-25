@@ -27,6 +27,12 @@
                                 {% trans "Viewer" %}
                             {% endif %}
                         </span>
+                        {% if collab.is_child %}
+                            <span class="badge badge-warning badge-xs ml-1 gap-0.5"
+                                  title="{% trans 'Child' %}">
+                                <i class="ph-bold ph-baby"></i>{{ collab.age }}
+                            </span>
+                        {% endif %}
                     </span>
                     {% if collab.can_edit %}
                         <form hx-post="{% url 'trips:toggle-participant-role' trip.pk collab.pk %}"

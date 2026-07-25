@@ -324,6 +324,23 @@ class ShareLinkCreateForm(forms.Form):
         )
 
 
+class NamedParticipantForm(forms.Form):
+    """Add a named participant (no account). A child requires an age (0–17)."""
+
+    name = forms.CharField(max_length=100, label=_("Name"))
+    is_child = forms.BooleanField(required=False, label=_("Child"))
+    age = forms.IntegerField(required=False, min_value=0, max_value=17, label=_("Age"))
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get("is_child"):
+            if cleaned.get("age") is None:
+                self.add_error("age", _("Age is required for a child."))
+        else:
+            cleaned["age"] = None
+        return cleaned
+
+
 class ChecklistItemForm(forms.ModelForm):
     class Meta:
         model = ChecklistItem

@@ -21,6 +21,7 @@ from trips.forms.trip import (
     ChecklistItemForm,
     ChecklistReminderForm,
     LinkForm,
+    NamedParticipantForm,
     ShareLinkCreateForm,
     TripForm,
 )
@@ -41,6 +42,7 @@ __all__ = [
     "MainTransferConnectionEditForm",
     "MainTransferConnectionForm",
     "MealForm",
+    "NamedParticipantForm",
     "NoteForm",
     "OtherMainTransferForm",
     "ShareLinkCreateForm",

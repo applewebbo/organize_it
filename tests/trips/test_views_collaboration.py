@@ -429,6 +429,35 @@ class TestAddNamedParticipant:
         response = client.post(url, {"name": "Luca"})
         assert "collaboratorsModified" in response.headers.get("HX-Trigger", "")
 
+    def test_adult_defaults(self, client, user_factory, trip_factory):
+        owner = user_factory()
+        trip = trip_factory(author=owner)
+        client.force_login(owner)
+        url = reverse("trips:add-named-participant", args=[trip.pk])
+        client.post(url, {"name": "Marco"})
+        collab = trip.collaborations.get(participant_name="Marco")
+        assert collab.is_child is False
+        assert collab.age is None
+
+    def test_adds_child_with_age(self, client, user_factory, trip_factory):
+        owner = user_factory()
+        trip = trip_factory(author=owner)
+        client.force_login(owner)
+        url = reverse("trips:add-named-participant", args=[trip.pk])
+        response = client.post(url, {"name": "Sofia", "is_child": "on", "age": "8"})
+        assert response.status_code == 200
+        collab = trip.collaborations.get(participant_name="Sofia")
+        assert collab.is_child is True
+        assert collab.age == 8
+
+    def test_child_without_age_returns_400(self, client, user_factory, trip_factory):
+        owner = user_factory()
+        trip = trip_factory(author=owner)
+        client.force_login(owner)
+        url = reverse("trips:add-named-participant", args=[trip.pk])
+        response = client.post(url, {"name": "Sofia", "is_child": "on"})
+        assert response.status_code == 400
+
 
 class TestCollaboratorsModal:
     def test_owner_sees_modal(self, client, user_factory, trip_factory):

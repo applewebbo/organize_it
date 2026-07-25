@@ -1573,6 +1573,36 @@ class TestTripCollaboration:
         assert collab.display_name == "viewer@example.com"
         assert collab.is_named_only is False
 
+    def test_defaults_adult_no_age(self, trip_factory):
+        from trips.models import TripCollaboration
+
+        trip = trip_factory()
+        collab = TripCollaboration.objects.create(
+            trip=trip,
+            user=None,
+            participant_name="Marco",
+            color="blue",
+            added_by=trip.author,
+        )
+        assert collab.is_child is False
+        assert collab.age is None
+
+    def test_child_with_age(self, trip_factory):
+        from trips.models import TripCollaboration
+
+        trip = trip_factory()
+        collab = TripCollaboration.objects.create(
+            trip=trip,
+            user=None,
+            participant_name="Sofia",
+            color="blue",
+            added_by=trip.author,
+            is_child=True,
+            age=8,
+        )
+        assert collab.is_child is True
+        assert collab.age == 8
+
 
 class TestTripInvitation:
     def test_str(self, user_factory, trip_factory):
