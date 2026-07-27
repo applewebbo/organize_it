@@ -1,4 +1,5 @@
 {% load i18n trip_tags %}
+{% stay22_enabled as stay22_on %}
 <section id="stays-section"
          class="mb-4"
          hx-get="{% url 'trips:trip-detail' trip.pk %}"
@@ -9,17 +10,59 @@
         <div class="card-body p-4 sm:p-6">
             <div class="flex items-center justify-between">
                 <h2 class="text-xl font-medium sm:text-2xl">{% trans 'Where to Sleep' %}</h2>
-                {% if trip.status != 5 and request.user == trip.author %}
-                    <button class="btn btn-xs btn-soft btn-primary sm:btn-sm"
-                            x-data
-                            hx-get="{% url 'trips:add-stay-for-trip' trip.pk %}"
-                            hx-target="#dialog"
-                            hx-swap="innerHTML"
-                            @click="$dispatch('open-modal'); document.activeElement.blur()"
-                            aria-label="{% trans 'Add stay' %}">
-                        <i class="ph-bold ph-plus i-sm" aria-hidden="true"></i>
-                        <span class="hidden sm:inline">{% trans 'Add stay' %}</span>
-                    </button>
+                {% if trip.status != 5 %}
+                    {% if request.user == trip.author and stay22_on %}
+                        <div class="dropdown dropdown-end" x-data>
+                            <div tabindex="0"
+                                 role="button"
+                                 class="btn btn-xs btn-soft btn-primary sm:btn-sm">
+                                <i class="ph-bold ph-plus i-sm" aria-hidden="true"></i>
+                                <span class="hidden sm:inline">{% trans 'Stay' %}</span>
+                                <i class="ph-bold ph-caret-down" aria-hidden="true"></i>
+                            </div>
+                            <ul tabindex="0"
+                                class="dropdown-content menu bg-base-100 rounded-box z-10 w-56 p-2 shadow">
+                                <li>
+                                    <a hx-get="{% url 'trips:add-stay-for-trip' trip.pk %}"
+                                       hx-target="#dialog"
+                                       hx-swap="innerHTML"
+                                       @click="$dispatch('open-modal'); document.activeElement.blur()">
+                                        <i class="ph-bold ph-plus" aria-hidden="true"></i>{% trans 'Add stay' %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a hx-get="{% url 'trips:stay-booking-modal' trip.pk %}"
+                                       hx-target="#dialog"
+                                       hx-swap="innerHTML"
+                                       @click="$dispatch('open-modal'); document.activeElement.blur()">
+                                        <i class="ph-bold ph-magnifying-glass" aria-hidden="true"></i>{% trans 'Find a stay' %}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    {% elif request.user == trip.author %}
+                        <button class="btn btn-xs btn-soft btn-primary sm:btn-sm"
+                                x-data
+                                hx-get="{% url 'trips:add-stay-for-trip' trip.pk %}"
+                                hx-target="#dialog"
+                                hx-swap="innerHTML"
+                                @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                aria-label="{% trans 'Add stay' %}">
+                            <i class="ph-bold ph-plus i-sm" aria-hidden="true"></i>
+                            <span class="hidden sm:inline">{% trans 'Add stay' %}</span>
+                        </button>
+                    {% elif stay22_on %}
+                        <button class="btn btn-xs btn-soft btn-primary sm:btn-sm"
+                                x-data
+                                hx-get="{% url 'trips:stay-booking-modal' trip.pk %}"
+                                hx-target="#dialog"
+                                hx-swap="innerHTML"
+                                @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                aria-label="{% trans 'Find a stay' %}">
+                            <i class="ph-bold ph-magnifying-glass i-sm" aria-hidden="true"></i>
+                            <span class="hidden sm:inline">{% trans 'Find a stay' %}</span>
+                        </button>
+                    {% endif %}
                 {% endif %}
             </div>
             {% if stays %}

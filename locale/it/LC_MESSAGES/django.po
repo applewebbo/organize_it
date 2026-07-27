@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-25 15:20+0200\n"
+"POT-Creation-Date: 2026-07-26 14:21+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -635,8 +635,8 @@ msgid "Create Your First Trip"
 msgstr "Crea il tuo primo viaggio"
 
 #: templates/cotton/event.html:64 templates/cotton/event_list_item.html:34
-#: templates/trips/includes/stays-section.html:94
-#: templates/trips/includes/stays-section.html:96
+#: templates/trips/includes/stays-section.html:137
+#: templates/trips/includes/stays-section.html:139
 msgid "Get directions"
 msgstr "Ottieni indicazioni"
 
@@ -995,6 +995,8 @@ msgstr "Codice del progetto"
 #: templates/trips/includes/collab-modal.html:7
 #: templates/trips/includes/create-stage-modal.html:15
 #: templates/trips/includes/note.html:13
+#: templates/trips/includes/stay-booking-modal.html:7
+#: templates/trips/includes/stay-booking-stage-chooser.html:7
 #: templates/trips/includes/trip-destinations-modal.html:7
 #: templates/trips/move-event-day-modal.html:14
 #: templates/trips/note-modify.html:31 templates/trips/stay-detail.html:98
@@ -1242,8 +1244,8 @@ msgstr ""
 #: templates/trips/includes/main-transfers.html:150
 #: templates/trips/includes/main-transfers.html:323
 #: templates/trips/includes/main-transfers.html:325
-#: templates/trips/includes/stays-section.html:104
-#: templates/trips/includes/stays-section.html:106
+#: templates/trips/includes/stays-section.html:147
+#: templates/trips/includes/stays-section.html:149
 msgid "Add document"
 msgstr "Aggiungi allegato"
 
@@ -1336,8 +1338,8 @@ msgstr "Aggiungi un elemento…"
 
 #: templates/trips/checklist.html:45
 #: templates/trips/includes/checklist-card.html:23
-#: templates/trips/includes/collab-modal.html:66
-#: templates/trips/includes/collab-modal.html:103
+#: templates/trips/includes/collab-modal.html:72
+#: templates/trips/includes/collab-modal.html:118
 #: templates/trips/includes/collab-search-result.html:17
 #: templates/trips/includes/main-transfers.html:91
 #: templates/trips/includes/main-transfers.html:266
@@ -2081,6 +2083,7 @@ msgstr "Organizzatore"
 #: templates/trips/includes/collab-inline.html:67
 #: templates/trips/includes/collab-modal-list.html:23
 #: templates/trips/includes/collab-modal.html:19
+#: templates/trips/includes/collab-modal.html:20
 msgid "Editor"
 msgstr "Editor"
 
@@ -2094,12 +2097,13 @@ msgid "Invitation sent to %(email)s."
 msgstr ""
 
 #: templates/trips/includes/collab-modal-list.html:27
-#: templates/trips/includes/collab-modal.html:25
+#: templates/trips/includes/collab-modal.html:27
+#: templates/trips/includes/collab-modal.html:28
 msgid "Viewer"
 msgstr "Osservatore"
 
 #: templates/trips/includes/collab-modal-list.html:32
-#: templates/trips/includes/collab-modal.html:92 trips/forms/trip.py:331
+#: templates/trips/includes/collab-modal.html:98 trips/forms/trip.py:331
 msgid "Child"
 msgstr "Bambino"
 
@@ -2115,39 +2119,40 @@ msgstr "Rimuovi"
 msgid "No participants yet."
 msgstr "Nessun partecipante."
 
-#: templates/trips/includes/collab-modal.html:31
+#: templates/trips/includes/collab-modal.html:35
+#: templates/trips/includes/collab-modal.html:36
 msgid "Name only"
 msgstr "Solo nome"
 
-#: templates/trips/includes/collab-modal.html:36
+#: templates/trips/includes/collab-modal.html:42
 msgid "Search editor by email"
 msgstr "Cerca editor per email"
 
-#: templates/trips/includes/collab-modal.html:40
+#: templates/trips/includes/collab-modal.html:46
 msgid "Search by email…"
 msgstr "Cerca per email…"
 
-#: templates/trips/includes/collab-modal.html:52
+#: templates/trips/includes/collab-modal.html:58
 msgid "Add viewer by email (receives a share link)"
 msgstr "Aggiungi osservatore via email (riceve un link di accesso)"
 
-#: templates/trips/includes/collab-modal.html:62
+#: templates/trips/includes/collab-modal.html:68
 msgid "Email address…"
 msgstr "Indirizzo email…"
 
-#: templates/trips/includes/collab-modal.html:73
+#: templates/trips/includes/collab-modal.html:79
 msgid "Add participant by name (no account needed)"
 msgstr "Aggiungi partecipante per nome (senza account)"
 
-#: templates/trips/includes/collab-modal.html:86
+#: templates/trips/includes/collab-modal.html:92
 msgid "Adult"
 msgstr "Adulto"
 
-#: templates/trips/includes/collab-modal.html:99
+#: templates/trips/includes/collab-modal.html:105
 msgid "Name…"
 msgstr "Nome…"
 
-#: templates/trips/includes/collab-modal.html:106 trips/forms/trip.py:332
+#: templates/trips/includes/collab-modal.html:113 trips/forms/trip.py:332
 msgid "Age"
 msgstr "Età"
 
@@ -2422,6 +2427,47 @@ msgstr "Dati stazioni da database CSV"
 msgid "No station found. Try searching by name or country."
 msgstr "Nessuna stazione trovata. Prova a cercare per nome o paese."
 
+#: templates/trips/includes/stay-booking-content.html:9
+msgid "Who is travelling?"
+msgstr "Chi viaggia?"
+
+#: templates/trips/includes/stay-booking-content.html:17
+msgid "Me"
+msgstr "Io"
+
+#: templates/trips/includes/stay-booking-content.html:19
+#: templates/trips/includes/stay-booking-content.html:36
+msgid "adult"
+msgstr "adulto"
+
+#: templates/trips/includes/stay-booking-content.html:33
+msgid "yrs"
+msgstr "anni"
+
+#: templates/trips/includes/stay-booking-content.html:44
+msgid "adults"
+msgstr "adulti"
+
+#: templates/trips/includes/stay-booking-content.html:45
+msgid "children"
+msgstr "bambini"
+
+#: templates/trips/includes/stay-booking-content.html:51
+msgid "Search on Stay22"
+msgstr "Cerca su Stay22"
+
+#: templates/trips/includes/stay-booking-modal.html:4
+#: templates/trips/includes/stay-booking-stage-chooser.html:4
+#: templates/trips/includes/stays-section.html:38
+#: templates/trips/includes/stays-section.html:61
+#: templates/trips/includes/stays-section.html:63
+msgid "Find a stay"
+msgstr "Trova soggiorno"
+
+#: templates/trips/includes/stay-booking-stage-chooser.html:11
+msgid "Which leg do you want to search for?"
+msgstr "Per quale tappa vuoi cercare?"
+
 #: templates/trips/includes/stay-preview.html:7
 msgid "from"
 msgstr "dalle"
@@ -2430,13 +2476,22 @@ msgstr "dalle"
 msgid "before"
 msgstr "entro le"
 
-#: templates/trips/includes/stays-section.html:11
+#: templates/trips/includes/stays-section.html:12
 #: trips/views/attachments.py:129
 msgid "Where to Sleep"
 msgstr "Dove Dormire"
 
-#: templates/trips/includes/stays-section.html:19
-#: templates/trips/includes/stays-section.html:21
+#: templates/trips/includes/stays-section.html:20
+#: templates/trips/main-transfer-connection-create.html:46
+#: templates/trips/main-transfer-connection-create.html:58
+#: templates/trips/main-transfer-connection-edit.html:30
+#: templates/trips/main-transfer-connection-edit.html:43
+msgid "Stay"
+msgstr "Soggiorno"
+
+#: templates/trips/includes/stays-section.html:30
+#: templates/trips/includes/stays-section.html:50
+#: templates/trips/includes/stays-section.html:52
 msgid "Add stay"
 msgstr "Aggiungi soggiorno"
 
@@ -2580,13 +2635,6 @@ msgstr "Crea un trasferimento dal punto di partenza"
 #: templates/trips/main-transfer-connection-edit.html:25
 msgid "Arrival Point"
 msgstr "Punto di arrivo"
-
-#: templates/trips/main-transfer-connection-create.html:46
-#: templates/trips/main-transfer-connection-create.html:58
-#: templates/trips/main-transfer-connection-edit.html:30
-#: templates/trips/main-transfer-connection-edit.html:43
-msgid "Stay"
-msgstr "Soggiorno"
 
 #: templates/trips/main-transfer-connection-create.html:71
 #: templates/trips/main-transfer-connection-edit.html:46
@@ -3492,6 +3540,18 @@ msgstr "Famiglia di %(name)s"
 msgid "Family unit"
 msgstr "Nucleo famigliare"
 
+#: trips/models.py:1282
+msgid "Smart"
+msgstr "Smart"
+
+#: trips/models.py:1283
+msgid "Booking.com"
+msgstr "Booking.com"
+
+#: trips/models.py:1284
+msgid "Expedia"
+msgstr "Expedia"
+
 #: trips/views/attachments.py:90
 msgid "This trip"
 msgstr "Questo viaggio"
@@ -3536,15 +3596,15 @@ msgstr "Evento scollegato correttamente"
 msgid "Event paired successfully"
 msgstr "Evento ricollegato correttamente"
 
-#: trips/views/events.py:338 trips/views/stays.py:174
+#: trips/views/events.py:338 trips/views/stays.py:181
 msgid "Note added successfully"
 msgstr "Nota aggiunta con successo"
 
-#: trips/views/events.py:360 trips/views/stays.py:199
+#: trips/views/events.py:360 trips/views/stays.py:206
 msgid "Note updated successfully"
 msgstr "Nota modificata correttamente"
 
-#: trips/views/events.py:380 trips/views/stays.py:219
+#: trips/views/events.py:380 trips/views/stays.py:226
 msgid "Note deleted successfully"
 msgstr "Nota eliminata correttamente"
 
@@ -3554,7 +3614,7 @@ msgstr ""
 "L’evento deve avere un nome e un indirizzo per poter procedere con aggiunta "
 "dei dati aggiuntivi."
 
-#: trips/views/events.py:414 trips/views/stays.py:255
+#: trips/views/events.py:414 trips/views/stays.py:262
 msgid "Could not find a matching place."
 msgstr "Non ho trovavo un luogo corrispondente."
 
@@ -3574,21 +3634,21 @@ msgstr "Evento aggiunto al viaggio."
 msgid "Stay added to trip."
 msgstr "Soggiorno aggiunto al viaggio."
 
-#: trips/views/stays.py:32 trips/views/stays.py:53
+#: trips/views/stays.py:39 trips/views/stays.py:60
 msgid "Stay added successfully"
 msgstr "Soggiorno aggiunto correttamente"
 
-#: trips/views/stays.py:135
+#: trips/views/stays.py:142
 msgid "Stay deleted successfully"
 msgstr "Soggiorno eliminato correttamente"
 
-#: trips/views/stays.py:243
+#: trips/views/stays.py:250
 msgid "Stay must have a name and an address to be enriched."
 msgstr ""
 "L’evento deve avere un nome e un indirizzo per poter procedere con aggiunta "
 "dei dati."
 
-#: trips/views/stays.py:350
+#: trips/views/stays.py:357
 msgid "Stay enriched successfully!"
 msgstr "Dati aggiunti con successo!"
 
@@ -3673,6 +3733,15 @@ msgstr "Errore API di Unsplash. Per favore riprova più tardi."
 #, python-brace-format
 msgid "No images found for '{query}'"
 msgstr "Nessuna immagine trovata per '{query}'"
+
+#~ msgid "Update guests"
+#~ msgstr "Aggiorna ospiti"
+
+#~ msgid "Find Accommodation"
+#~ msgstr "Trova alloggio"
+
+#~ msgid "Find accommodation"
+#~ msgstr "Trova alloggio"
 
 #, python-format
 #~ msgid ""

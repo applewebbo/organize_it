@@ -1,0 +1,1 @@
+../../all/00000/00094-staybooking-model-migration.md

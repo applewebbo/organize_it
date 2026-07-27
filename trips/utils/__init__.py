@@ -34,6 +34,7 @@ from trips.utils.stages import (
     group_days_by_destination,
     group_unpaired_events_by_stage,
 )
+from trips.utils.stay22 import build_stay22_url
 from trips.utils.transport import (
     get_airport_by_iata,
     get_flight_origin_icao,
@@ -47,6 +48,7 @@ from trips.utils.transport import (
 __all__ = [
     "accessible_trips_qs",
     "build_categorized_event",
+    "build_stay22_url",
     "convert_google_opening_hours",
     "create_day_map",
     "create_trip_map",

@@ -368,6 +368,7 @@ DATE_INPUT_FORMATS = [
 
 GOOGLE_PLACES_API_KEY = env("GOOGLE_PLACES_API_KEY", default="")
 UNSPLASH_ACCESS_KEY = env("UNSPLASH_ACCESS_KEY", default="")
+STAY22_AID = env("STAY22_AID", default="")
 
 # Fernet key used to encrypt BYOK AI credentials at rest (suggestions app)
 FIELD_ENCRYPTION_KEY = env("FIELD_ENCRYPTION_KEY", default="")

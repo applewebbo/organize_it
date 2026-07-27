@@ -1,0 +1,54 @@
+{% load i18n %}
+<div id="stay-booking-content">
+    <form hx-post="{% url 'trips:stay-booking-save' trip.pk %}"
+          hx-target="#stay-booking-content"
+          hx-swap="outerHTML"
+          hx-trigger="change">
+        {% csrf_token %}
+        <input type="hidden" name="destination" value="{{ destination }}">
+        <p class="text-base-content/70 mb-2 text-sm font-medium">{% trans "Who is travelling?" %}</p>
+        <div class="mb-3 space-y-1.5">
+            <label class="flex cursor-pointer items-center justify-between gap-2 text-sm">
+                <span class="flex items-center gap-2">
+                    <input type="checkbox"
+                           name="includes_author"
+                           class="checkbox checkbox-sm"
+                           {% if includes_author %}checked{% endif %}>
+                    {% trans "Me" %}
+                </span>
+                <span class="text-base-content/50 text-xs">{% trans "adult" %}</span>
+            </label>
+            {% for collab in collaborations %}
+                <label class="flex cursor-pointer items-center justify-between gap-2 text-sm">
+                    <span class="flex items-center gap-2">
+                        <input type="checkbox"
+                               name="participants"
+                               value="{{ collab.pk }}"
+                               class="checkbox checkbox-sm"
+                               {% if collab.pk in selected_ids %}checked{% endif %}>
+                        {{ collab.display_name }}
+                    </span>
+                    {% if collab.is_child %}
+                        <span class="text-base-content/50 flex items-center gap-1 text-xs">
+                            <i class="ph-bold ph-baby"></i>{{ collab.age }} {% trans "yrs" %}
+                        </span>
+                    {% else %}
+                        <span class="text-base-content/50 text-xs">{% trans "adult" %}</span>
+                    {% endif %}
+                </label>
+            {% endfor %}
+        </div>
+    </form>
+    <div class="border-base-300 mt-3 border-t pt-3">
+        <p class="text-base-content/70 mb-2 text-sm">
+            <i class="ph-bold ph-user me-1"></i>{{ booking.adults }} {% trans "adults" %}
+            {% if booking.children %}· <i class="ph-bold ph-baby mx-1"></i>{{ booking.children }} {% trans "children" %}{% endif %}
+        </p>
+        <a href="{% url 'trips:stay-booking-redirect' trip.pk %}?destination={{ destination|urlencode }}"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="btn btn-primary w-full">
+            {% trans "Search on Stay22" %}<i class="ph-bold ph-arrow-square-out"></i>
+        </a>
+    </div>
+</div>

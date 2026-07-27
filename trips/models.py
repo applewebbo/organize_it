@@ -1275,6 +1275,50 @@ class ExpenseShare(models.Model):
         return f"{self.participant.display_name} → {self.expense.title}"
 
 
+class StayBooking(models.Model):
+    """A per-user Stay22 accommodation search saved for a trip stage (destination)."""
+
+    class Provider(models.TextChoices):
+        SMART = "smart", _("Smart")
+        BOOKING = "booking", _("Booking.com")
+        EXPEDIA = "expedia", _("Expedia")
+
+    trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="bookings")
+    destination = models.CharField(max_length=100)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="stay_bookings",
+    )
+    participants = models.ManyToManyField(
+        TripCollaboration, blank=True, related_name="stay_bookings"
+    )
+    includes_author = models.BooleanField(default=True)
+    provider = models.CharField(
+        max_length=20, choices=Provider.choices, default=Provider.SMART
+    )
+    hotel_name = models.CharField(max_length=200, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("trip", "destination", "created_by")
+
+    def __str__(self) -> str:
+        return f"{self.destination} booking for {self.trip.title}"
+
+    @property
+    def adults(self) -> int:
+        count = self.participants.filter(is_child=False).count()
+        if self.includes_author:
+            count += 1
+        return count
+
+    @property
+    def children(self) -> int:
+        return self.participants.filter(is_child=True).count()
+
+
 @receiver(pre_delete, sender=Event)
 @receiver(pre_delete, sender=Stay)
 @receiver(pre_delete, sender=MainTransfer)

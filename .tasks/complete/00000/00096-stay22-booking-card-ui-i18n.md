@@ -1,0 +1,1 @@
+../../all/00000/00096-stay22-booking-card-ui-i18n.md

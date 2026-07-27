@@ -1,0 +1,30 @@
+{% load i18n %}
+<div class="p-4 sm:p-6" x-data>
+    <div class="mb-4 flex items-center justify-between">
+        <h3 class="text-lg font-semibold">{% trans "Find a stay" %}</h3>
+        <button class="btn btn-sm btn-ghost btn-circle"
+                @click="$dispatch('hide-modal')"
+                aria-label="{% trans 'Close' %}">
+            <i class="ph-bold ph-x i-md"></i>
+        </button>
+    </div>
+    <p class="text-base-content/70 mb-3 text-sm">{% trans "Which leg do you want to search for?" %}</p>
+    <ul class="space-y-2">
+        {% for stage in stages %}
+            {% with first_day=stage.days|first last_day=stage.days|last %}
+                <li>
+                    <button type="button"
+                            class="border-base-300 hover:border-primary hover:bg-base-200 flex w-full items-center justify-between rounded-lg border p-3 text-left transition-colors"
+                            hx-get="{% url 'trips:stay-booking-modal' trip.pk %}?destination={{ stage.destination|urlencode }}"
+                            hx-target="#dialog"
+                            hx-swap="innerHTML">
+                        <span class="flex items-center gap-2 font-medium">
+                            <i class="ph-bold ph-map-pin"></i>{{ stage.destination }}
+                        </span>
+                        <span class="text-base-content/60 text-sm">{{ first_day.date|date:"j M" }} – {{ last_day.date|date:"j M" }}</span>
+                    </button>
+                </li>
+            {% endwith %}
+        {% endfor %}
+    </ul>
+</div>

@@ -2,17 +2,24 @@ import json
 import logging
 from datetime import timedelta
 
+from django.conf import settings
 from django.contrib import messages
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
 from trips.forms import AddNoteToStayForm, StayForm
-from trips.models import Day, Stay
+from trips.models import Day, Stay, StayBooking
 from trips.services import GooglePlacesClient, GooglePlacesError
-from trips.utils import editable_trips_qs, get_trip_for_editor_or_404
+from trips.utils import (
+    build_stay22_url,
+    editable_trips_qs,
+    get_trip_for_editor_or_404,
+    get_trip_or_404,
+    get_trip_stages,
+)
 from trips.views.days import _day_city
 
 logger = logging.getLogger(__name__)
@@ -354,3 +361,93 @@ def confirm_enrich_stay(request, stay_id):
     day_triggers = {f"dayModified{day.pk}": {} for day in stay.days.all()}
     response["HX-Trigger"] = json.dumps(day_triggers)
     return response
+
+
+def _get_stage(trip, destination):
+    """Return the trip stage matching ``destination``, else raise Http404."""
+    for stage in get_trip_stages(trip):
+        if stage["destination"] == destination:
+            return stage
+    raise Http404
+
+
+def _booking_content_context(trip, destination, user):
+    """Build context for the booking content fragment, ensuring a booking exists."""
+    stage = _get_stage(trip, destination)
+    collaborations = trip.collaborations.all()
+    booking, created = StayBooking.objects.get_or_create(
+        trip=trip, destination=destination, created_by=user
+    )
+    if created:
+        booking.participants.set(collaborations)
+    selected_ids = set(booking.participants.values_list("pk", flat=True))
+    days = stage["days"]
+    return {
+        "trip": trip,
+        "destination": destination,
+        "booking": booking,
+        "collaborations": collaborations,
+        "selected_ids": selected_ids,
+        "includes_author": booking.includes_author,
+        "checkin": days[0].date,
+        "checkout": days[-1].date,
+    }
+
+
+def stay_booking_modal(request, trip_pk):
+    if not settings.STAY22_AID:
+        raise Http404
+    trip = get_trip_or_404(trip_pk, request.user)
+    stages = get_trip_stages(trip)
+    destination = request.GET.get("destination")
+    if destination is None and len(stages) > 1:
+        context = {"trip": trip, "stages": stages}
+        return TemplateResponse(
+            request, "trips/includes/stay-booking-stage-chooser.html", context
+        )
+    if destination is None:
+        destination = stages[0]["destination"]
+    context = _booking_content_context(trip, destination, request.user)
+    return TemplateResponse(request, "trips/includes/stay-booking-modal.html", context)
+
+
+@require_http_methods(["POST"])
+def stay_booking_save(request, trip_pk):
+    if not settings.STAY22_AID:
+        raise Http404
+    trip = get_trip_or_404(trip_pk, request.user)
+    destination = request.POST.get("destination")
+    _get_stage(trip, destination)
+    booking, _ = StayBooking.objects.get_or_create(
+        trip=trip, destination=destination, created_by=request.user
+    )
+    booking.includes_author = "includes_author" in request.POST
+    booking.save()
+    ids = request.POST.getlist("participants")
+    booking.participants.set(trip.collaborations.filter(pk__in=ids))
+    context = _booking_content_context(trip, destination, request.user)
+    return TemplateResponse(
+        request, "trips/includes/stay-booking-content.html", context
+    )
+
+
+def stay_booking_redirect(request, trip_pk):
+    if not settings.STAY22_AID:
+        raise Http404
+    trip = get_trip_or_404(trip_pk, request.user)
+    destination = request.GET.get("destination") or trip.destination
+    stage = _get_stage(trip, destination)
+    booking = get_object_or_404(
+        StayBooking, trip=trip, destination=destination, created_by=request.user
+    )
+    days = stage["days"]
+    url = build_stay22_url(
+        aid=settings.STAY22_AID,
+        address=destination,
+        checkin=days[0].date,
+        checkout=days[-1].date,
+        adults=booking.adults,
+        children=booking.children,
+        provider=booking.provider,
+    )
+    return HttpResponseRedirect(url)

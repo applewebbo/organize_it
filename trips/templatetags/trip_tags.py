@@ -1,12 +1,19 @@
 import re
 
 from django import template
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.html import format_html, format_html_join
 
 from trips.data.phone_prefixes import ITALIAN_PREFIXES
 
 register = template.Library()
+
+
+@register.simple_tag
+def stay22_enabled():
+    """True when a Stay22 partner ID is configured."""
+    return bool(settings.STAY22_AID)
 
 
 @register.filter

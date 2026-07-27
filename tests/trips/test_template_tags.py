@@ -1,4 +1,5 @@
 import pytest
+from django.test import override_settings
 
 from tests.trips.factories import (
     EventFactory,
@@ -27,10 +28,21 @@ from trips.templatetags.trip_tags import (
     next_day,
     phone_format,
     prev_day,
+    stay22_enabled,
     user_display_name,
 )
 
 pytestmark = pytest.mark.django_db
+
+
+class TestStay22Enabled:
+    @override_settings(STAY22_AID="aid123")
+    def test_enabled_when_aid_set(self):
+        assert stay22_enabled() is True
+
+    @override_settings(STAY22_AID="")
+    def test_disabled_when_aid_empty(self):
+        assert stay22_enabled() is False
 
 
 @pytest.fixture

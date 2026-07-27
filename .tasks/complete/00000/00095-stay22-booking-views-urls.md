@@ -1,0 +1,1 @@
+../../all/00000/00095-stay22-booking-views-urls.md
