@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-26 14:21+0200\n"
+"POT-Creation-Date: 2026-07-27 12:09+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2322,15 +2322,25 @@ msgstr "adult"
 msgid "yrs"
 msgstr "yrs"
 
-#: templates/trips/includes/stay-booking-content.html:44
+#: templates/trips/includes/stay-booking-content.html:42
+msgid "Booking provider"
+msgstr ""
+
+#: templates/trips/includes/stay-booking-content.html:51
+msgid ""
+"If the selected provider has no options for this destination, Stay22 routes "
+"you to an available one."
+msgstr ""
+
+#: templates/trips/includes/stay-booking-content.html:57
 msgid "adults"
 msgstr "adults"
 
-#: templates/trips/includes/stay-booking-content.html:45
+#: templates/trips/includes/stay-booking-content.html:58
 msgid "children"
 msgstr "children"
 
-#: templates/trips/includes/stay-booking-content.html:51
+#: templates/trips/includes/stay-booking-content.html:64
 msgid "Search on Stay22"
 msgstr ""
 
@@ -3398,7 +3408,7 @@ msgid "Family unit"
 msgstr "Family unit"
 
 #: trips/models.py:1282
-msgid "Smart"
+msgid "Best Deal (Smart)"
 msgstr ""
 
 #: trips/models.py:1283
@@ -3407,6 +3417,14 @@ msgstr ""
 
 #: trips/models.py:1284
 msgid "Expedia"
+msgstr ""
+
+#: trips/models.py:1285
+msgid "Hotels.com"
+msgstr ""
+
+#: trips/models.py:1286
+msgid "Airbnb"
 msgstr ""
 
 #: trips/views/attachments.py:90

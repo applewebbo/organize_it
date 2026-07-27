@@ -389,6 +389,7 @@ def _booking_content_context(trip, destination, user):
         "collaborations": collaborations,
         "selected_ids": selected_ids,
         "includes_author": booking.includes_author,
+        "provider_choices": StayBooking.Provider.choices,
         "checkin": days[0].date,
         "checkout": days[-1].date,
     }
@@ -422,6 +423,9 @@ def stay_booking_save(request, trip_pk):
         trip=trip, destination=destination, created_by=request.user
     )
     booking.includes_author = "includes_author" in request.POST
+    provider = request.POST.get("provider")
+    if provider in StayBooking.Provider.values:
+        booking.provider = provider
     booking.save()
     ids = request.POST.getlist("participants")
     booking.participants.set(trip.collaborations.filter(pk__in=ids))

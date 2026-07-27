@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-26 14:21+0200\n"
+"POT-Creation-Date: 2026-07-27 12:09+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2444,15 +2444,27 @@ msgstr "adulto"
 msgid "yrs"
 msgstr "anni"
 
-#: templates/trips/includes/stay-booking-content.html:44
+#: templates/trips/includes/stay-booking-content.html:42
+msgid "Booking provider"
+msgstr "Dove prenotare"
+
+#: templates/trips/includes/stay-booking-content.html:51
+msgid ""
+"If the selected provider has no options for this destination, Stay22 routes "
+"you to an available one."
+msgstr ""
+"Se il servizio scelto non ha opzioni per questa meta, Stay22 ti indirizza a "
+"uno disponibile."
+
+#: templates/trips/includes/stay-booking-content.html:57
 msgid "adults"
 msgstr "adulti"
 
-#: templates/trips/includes/stay-booking-content.html:45
+#: templates/trips/includes/stay-booking-content.html:58
 msgid "children"
 msgstr "bambini"
 
-#: templates/trips/includes/stay-booking-content.html:51
+#: templates/trips/includes/stay-booking-content.html:64
 msgid "Search on Stay22"
 msgstr "Cerca su Stay22"
 
@@ -3541,8 +3553,8 @@ msgid "Family unit"
 msgstr "Nucleo famigliare"
 
 #: trips/models.py:1282
-msgid "Smart"
-msgstr "Smart"
+msgid "Best Deal (Smart)"
+msgstr "Miglior offerta (Smart)"
 
 #: trips/models.py:1283
 msgid "Booking.com"
@@ -3551,6 +3563,14 @@ msgstr "Booking.com"
 #: trips/models.py:1284
 msgid "Expedia"
 msgstr "Expedia"
+
+#: trips/models.py:1285
+msgid "Hotels.com"
+msgstr ""
+
+#: trips/models.py:1286
+msgid "Airbnb"
+msgstr ""
 
 #: trips/views/attachments.py:90
 msgid "This trip"
@@ -3733,6 +3753,9 @@ msgstr "Errore API di Unsplash. Per favore riprova più tardi."
 #, python-brace-format
 msgid "No images found for '{query}'"
 msgstr "Nessuna immagine trovata per '{query}'"
+
+#~ msgid "Smart"
+#~ msgstr "Smart"
 
 #~ msgid "Update guests"
 #~ msgstr "Aggiorna ospiti"

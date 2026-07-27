@@ -1,16 +1,22 @@
 from urllib.parse import urlencode
 
-STAY22_BASE_URL = "https://www.stay22.com/allez/roam"
+STAY22_ROAM_URL = "https://www.stay22.com/allez/roam"
+# Backwards-compatible alias.
+STAY22_BASE_URL = STAY22_ROAM_URL
 
 
 def build_stay22_url(
     *, aid, address, checkin, checkout, adults, children=0, provider="smart"
 ):
-    """Build a Stay22 Allez smart-link URL with pre-filled search parameters.
+    """Build a monetized Stay22 Allez roam URL with pre-filled search params.
 
     ``checkin``/``checkout`` are ``date`` objects, formatted as ``YYYY-MM-DD``.
-    ``children`` is appended only when greater than zero. A non-``smart``
-    ``provider`` forces the destination platform via the native override.
+    ``children`` is appended only when greater than zero.
+
+    ``provider="smart"`` lets roam pick the best OTA. A specific provider
+    (``booking``/``expedia``) is forced via the documented ``provider`` query
+    param, which overrides roam's AI selection while keeping the traffic
+    monetized through the same Allez endpoint.
     """
     params = {
         "aid": aid,
@@ -23,4 +29,4 @@ def build_stay22_url(
         params["children"] = children
     if provider and provider != "smart":
         params["provider"] = provider
-    return f"{STAY22_BASE_URL}?{urlencode(params)}"
+    return f"{STAY22_ROAM_URL}?{urlencode(params)}"

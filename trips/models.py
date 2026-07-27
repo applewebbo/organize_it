@@ -1279,9 +1279,11 @@ class StayBooking(models.Model):
     """A per-user Stay22 accommodation search saved for a trip stage (destination)."""
 
     class Provider(models.TextChoices):
-        SMART = "smart", _("Smart")
+        SMART = "smart", _("Best Deal (Smart)")
         BOOKING = "booking", _("Booking.com")
         EXPEDIA = "expedia", _("Expedia")
+        HOTELSCOM = "hotelscom", _("Hotels.com")
+        AIRBNB = "airbnb", _("Airbnb")
 
     trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="bookings")
     destination = models.CharField(max_length=100)

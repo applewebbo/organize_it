@@ -125,6 +125,36 @@ class TestStayBookingViews(TestCase):
         booking = StayBooking.objects.get(trip=trip, created_by=user)
         assert booking.participants.count() == 0
 
+    def test_save_sets_provider(self):
+        user, trip = self._setup()
+        with self.login(user):
+            response = self.post(
+                "trips:stay-booking-save",
+                trip_pk=trip.pk,
+                data={"destination": trip.destination, "provider": "booking"},
+            )
+        self.response_200(response)
+        booking = StayBooking.objects.get(trip=trip, created_by=user)
+        assert booking.provider == "booking"
+
+    def test_save_ignores_invalid_provider(self):
+        user, trip = self._setup()
+        StayBooking.objects.create(
+            trip=trip,
+            destination=trip.destination,
+            created_by=user,
+            provider="expedia",
+        )
+        with self.login(user):
+            response = self.post(
+                "trips:stay-booking-save",
+                trip_pk=trip.pk,
+                data={"destination": trip.destination, "provider": "bogus"},
+            )
+        self.response_200(response)
+        booking = StayBooking.objects.get(trip=trip, created_by=user)
+        assert booking.provider == "expedia"
+
     def test_save_invalid_destination_404(self):
         user, trip = self._setup()
         with self.login(user):
@@ -162,6 +192,25 @@ class TestStayBookingViews(TestCase):
         location = response["Location"]
         assert location.startswith("https://www.stay22.com/allez/roam")
         assert "aid=aid123" in location
+
+    def test_redirect_forces_provider_for_booking(self):
+        user, trip = self._setup()
+        StayBooking.objects.create(
+            trip=trip,
+            destination=trip.destination,
+            created_by=user,
+            provider="booking",
+        )
+        with self.login(user):
+            response = self.get(
+                "trips:stay-booking-redirect",
+                trip_pk=trip.pk,
+                data={"destination": trip.destination},
+            )
+        assert response.status_code == 302
+        location = response["Location"]
+        assert location.startswith("https://www.stay22.com/allez/roam")
+        assert "provider=booking" in location
 
     def test_redirect_defaults_to_trip_destination(self):
         user, trip = self._setup()

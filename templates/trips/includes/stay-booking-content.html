@@ -38,6 +38,19 @@
                 </label>
             {% endfor %}
         </div>
+        <label class="block">
+            <span class="text-base-content/70 mb-1 block text-sm font-medium">{% trans "Booking provider" %}</span>
+            <select name="provider" class="select select-bordered select-sm w-full">
+                {% for value, label in provider_choices %}
+                    <option value="{{ value }}"
+                            {% if value == booking.provider %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <span class="text-base-content/50 mt-1 flex items-start gap-1 text-xs">
+                <i class="ph-bold ph-info mt-0.5"></i>
+                {% trans "If the selected provider has no options for this destination, Stay22 routes you to an available one." %}
+            </span>
+        </label>
     </form>
     <div class="border-base-300 mt-3 border-t pt-3">
         <p class="text-base-content/70 mb-2 text-sm">
