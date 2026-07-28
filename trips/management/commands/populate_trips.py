@@ -1,6 +1,7 @@
 import logging
 import random
 from datetime import date, timedelta
+from decimal import Decimal
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
@@ -10,13 +11,20 @@ from tests.accounts.factories import UserFactory
 from tests.trips.factories import (
     ITALIAN_CITIES,
     PLACES,
+    ChecklistItemFactory,
+    ExpenseFactory,
+    ExpenseParticipantFactory,
+    ExpenseShareFactory,
     ExperienceFactory,
+    FamilyUnitFactory,
     MainTransferFactory,
     MealFactory,
+    StayBookingFactory,
     StayFactory,
     TripFactory,
 )
-from trips.models import Day, Trip, TripCollaboration
+from trips.expenses import ensure_expense_participants
+from trips.models import Day, StayBooking, Trip, TripCollaboration
 from trips.tasks import calculate_day_transfer
 
 logger = logging.getLogger("task")
@@ -173,13 +181,91 @@ def _create_multi_destination_trip(user, cities):
     return trip
 
 
+# (title, amount) templates for seeded expenses, split equally across participants
+EXPENSE_TEMPLATES = [
+    ("Hotel", Decimal("240.00")),
+    ("Dinner out", Decimal("86.50")),
+    ("Museum tickets", Decimal("42.00")),
+    ("Groceries", Decimal("31.20")),
+    ("Taxi", Decimal("18.00")),
+]
+
+CHECKLIST_ITEMS = [
+    "Passport / ID",
+    "Book museum tickets",
+    "Pack chargers",
+    "Travel insurance",
+]
+
+
+def _create_expenses_for_trip(trip, creator):
+    """Enable expenses and seed shared costs split across all participants."""
+    if not trip.expenses_enabled:
+        trip.expenses_enabled = True
+        trip.save(update_fields=["expenses_enabled"])
+    ensure_expense_participants(trip)
+    participants = list(trip.expense_participants.filter(is_active=True))
+    if not participants:
+        return
+    for i, (title, amount) in enumerate(EXPENSE_TEMPLATES):
+        payer = participants[i % len(participants)]
+        expense = ExpenseFactory(
+            trip=trip,
+            title=title,
+            amount=amount,
+            date=trip.start_date,
+            payer=payer,
+            created_by=creator,
+        )
+        for participant in participants:
+            ExpenseShareFactory(expense=expense, participant=participant)
+
+
+def _add_family_with_child(trip):
+    """Group the author with a named-only child into a shared family unit.
+
+    Must run after expenses exist: the child shares them to gain expense
+    history, otherwise a later ensure_expense_participants() would prune it as
+    a historyless orphan.
+    """
+    unit = FamilyUnitFactory(trip=trip, name="")
+    child = ExpenseParticipantFactory(
+        trip=trip, name_snapshot="Leo", is_child=True, family_unit=unit
+    )
+    author_participant = trip.expense_participants.filter(
+        user=trip.author, collaboration__isnull=True
+    ).first()
+    if author_participant:
+        author_participant.family_unit = unit
+        author_participant.save(update_fields=["family_unit"])
+    for expense in trip.expenses.all():
+        ExpenseShareFactory(expense=expense, participant=child)
+
+
+def _create_booking(trip, destination, creator, provider=StayBooking.Provider.SMART):
+    """Seed a Stay22 accommodation search for a trip stage (destination)."""
+    StayBookingFactory(
+        trip=trip, destination=destination, created_by=creator, provider=provider
+    )
+
+
+def _create_checklist(trip):
+    """Seed a short packing/todo checklist for a trip."""
+    for i, text in enumerate(CHECKLIST_ITEMS):
+        ChecklistItemFactory(trip=trip, text=text, completed=(i == 0))
+
+
 class Command(BaseCommand):
     help = "Generates dummy trips with stays and events (keeps existing users)"
 
     @transaction.atomic
     def handle(self, *args, **kwargs):
         self.stdout.write("Deleting existing trips...")
-        Trip.objects.all().delete()
+        # Delete per-instance so Trip.delete() runs and clears each trip's
+        # expenses first (they PROTECT their payer participant); a bulk
+        # QuerySet delete would bypass that override and raise ProtectedError.
+        for trip in Trip.objects.all():
+            trip.delete()
 
         # Keep existing non-superuser accounts; create if fewer than NUMBER_OF_USERS
         users = list(User.objects.filter(is_superuser=False))
@@ -187,6 +273,11 @@ class Command(BaseCommand):
             needed = NUMBER_OF_USERS - len(users)
             UserFactory.create_batch(needed)
             users = list(User.objects.filter(is_superuser=False))
+
+        # Include existing superusers so `just crawl` (which logs in as the first
+        # superuser) sees crawlable content. Never create superusers; when none
+        # exist this simply adds nothing.
+        users += list(User.objects.filter(is_superuser=True))
 
         self.stdout.write("Creating trips...")
         cities = ITALIAN_CITIES.copy()
@@ -214,11 +305,19 @@ class Command(BaseCommand):
                 _create_stay_and_events(
                     trip, all_days, author=user, creator=user, pool=_PlacePool()
                 )
+                _create_checklist(trip)
+                _create_booking(trip, destination, user)
+                _create_expenses_for_trip(trip, user)
 
         # Multi-destination road trip for each user
         for user in users:
             multi_cities = random.sample(cities, 2)
-            _create_multi_destination_trip(user, multi_cities)
+            multi_trip = _create_multi_destination_trip(user, multi_cities)
+            _create_checklist(multi_trip)
+            _create_booking(multi_trip, multi_cities[0], user)
+            _create_booking(multi_trip, multi_cities[1], user)
+            _create_expenses_for_trip(multi_trip, user)
+            _add_family_with_child(multi_trip)
 
         # Shared trips: user1 owns → user2 collabs, and vice versa
         if len(users) >= 2:
@@ -295,6 +394,10 @@ class Command(BaseCommand):
                         last_modified_by=collab,
                         **_place_kwargs(pool.take(destination, "attractions")),
                     )
+
+                _create_checklist(shared_trip)
+                _create_booking(shared_trip, destination, owner)
+                _create_expenses_for_trip(shared_trip, owner)
 
         logger.info("Trips populated correctly!")
         self.stdout.write(self.style.SUCCESS("Successfully populated database"))

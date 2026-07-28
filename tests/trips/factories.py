@@ -1776,3 +1776,14 @@ class ExpenseShareFactory(factory.django.DjangoModelFactory):
     participant = factory.SubFactory(
         ExpenseParticipantFactory, trip=factory.SelfAttribute("..expense.trip")
     )
+
+
+class StayBookingFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "trips.StayBooking"
+
+    trip = factory.SubFactory(TripFactory)
+    destination = factory.LazyAttribute(lambda o: o.trip.destination)
+    created_by = factory.LazyAttribute(lambda o: o.trip.author)
+    provider = "smart"
+    includes_author = True
