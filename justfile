@@ -245,10 +245,16 @@ issue-label number *labels:
 issue-label-create number name:
     #!/usr/bin/env bash
     set -euo pipefail
-    COLORS=("e11d48" "ea580c" "d97706" "65a30d" "16a34a" "059669" "0891b2" "2563eb" "7c3aed" "c026d3" \
-            "be185d" "b45309" "4d7c0f" "0e7490" "1d4ed8" "6d28d9" "a21caf" "be123c" "15803d" "0369a1")
-    RANDOM_COLOR=${COLORS[$((RANDOM % ${#COLORS[@]}))]}
-    gh label create "{{name}}" -R {{github_repo}} --color "${RANDOM_COLOR}" --force
+    # Create the label with a random color only when it doesn't already exist,
+    # so re-assigning an existing label keeps its current color.
+    if gh label list -R {{github_repo}} --limit 999 --json name -q '.[].name' | grep -qxF "{{name}}"; then
+        echo "• Label '{{name}}' already exists, keeping its color"
+    else
+        COLORS=("e11d48" "ea580c" "d97706" "65a30d" "16a34a" "059669" "0891b2" "2563eb" "7c3aed" "c026d3" \
+                "be185d" "b45309" "4d7c0f" "0e7490" "1d4ed8" "6d28d9" "a21caf" "be123c" "15803d" "0369a1")
+        RANDOM_COLOR=${COLORS[$((RANDOM % ${#COLORS[@]}))]}
+        gh label create "{{name}}" -R {{github_repo}} --color "${RANDOM_COLOR}"
+    fi
     gh issue edit {{number}} -R {{github_repo}} --add-label "{{name}}"
     echo "✓ Label '{{name}}' assigned to issue #{{number}}"
 
