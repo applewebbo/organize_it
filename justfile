@@ -15,7 +15,7 @@ default:
     uv sync
 # Update dependencies and pre-commit hooks
 [group('setup')]
-@update_all: lock update_phosphor
+@update_all: lock
     uv sync --all-extras --upgrade
     uvx --with pre-commit-uv prek auto-update
 
@@ -55,6 +55,26 @@ update_phosphor:
     mkdir -p "$(dirname "$VERSION_FILE")"
     echo "$LATEST" > "$VERSION_FILE"
     echo "✓ Phosphor Icons $LATEST installed in $STATIC_DIR"
+
+# Verify every Phosphor icon referenced in templates exists in the self-hosted set
+[group('setup')]
+check_phosphor:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    CSS="static/icons/phosphor/bold/style.css"
+    AVAILABLE=$(grep -oE '\.ph-bold\.ph-[a-z0-9-]+:before' "$CSS" | sed -E 's/.*\.(ph-[a-z0-9-]+):before/\1/' | sort -u)
+    USED=$(grep -rhoE 'ph-[a-z0-9-]+' templates/ | grep -vE '^ph-(bold|thin|light|regular|fill|duotone)$' | sort -u)
+    MISSING=$(comm -23 <(echo "$USED") <(echo "$AVAILABLE"))
+    if [ -n "$MISSING" ]; then
+        echo "❌ Phosphor icons used in templates but missing from the set:"
+        echo "$MISSING"
+        exit 1
+    fi
+    echo "✓ All Phosphor icons used in templates are present"
+
+# Update self-hosted Phosphor Icons then verify every used icon exists
+[group('setup')]
+phosphor: update_phosphor check_phosphor
 
 # Update a specific package
 [group('setup')]
