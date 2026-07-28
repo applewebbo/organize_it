@@ -27,10 +27,27 @@ logger = logging.getLogger(__name__)
 
 def add_stay_for_trip(request, trip_pk):
     trip = get_trip_for_editor_or_404(trip_pk, request.user)
+    # Mirror the Stay22 'Find a stay' flow (#405): a multi-stage trip first
+    # picks a leg, then the form is pre-filled with that stage's city and days
+    # so the user only enters the accommodation name/address.
+    stages = get_trip_stages(trip)
+    destination = request.GET.get("destination")
+    if request.method == "GET" and destination is None and len(stages) > 1:
+        context = {"trip": trip, "stages": stages}
+        return TemplateResponse(
+            request, "trips/includes/add-stay-stage-chooser.html", context
+        )
+    if destination is None:
+        destination = stages[0]["destination"]
+    stage = _get_stage(trip, destination)
+    initial = {
+        "city": destination,
+        "apply_to_days": [day.pk for day in stage["days"]],
+    }
     form = StayForm(
         trip,
         data=request.POST or None,
-        initial={"city": trip.destination},
+        initial=initial,
         geocode=True,
     )
     if form.is_valid():

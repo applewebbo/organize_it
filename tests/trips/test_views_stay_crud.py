@@ -422,3 +422,53 @@ class TestAddStayForTripView(TestCase):
         trip = TripFactory()
         response = self.get("trips:add-stay-for-trip", trip_pk=trip.pk)
         self.response_302(response)
+
+    def test_get_prefills_stage_from_destination(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        days = list(trip.days.all())
+        with self.login(user):
+            response = self.get(
+                "trips:add-stay-for-trip",
+                trip_pk=trip.pk,
+                data={"destination": trip.destination},
+            )
+        self.response_200(response)
+        form = response.context["form"]
+        assert form.initial["city"] == trip.destination
+        assert set(form.initial["apply_to_days"]) == {day.pk for day in days}
+
+    def test_get_single_stage_prefills_default(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        days = list(trip.days.all())
+        with self.login(user):
+            response = self.get("trips:add-stay-for-trip", trip_pk=trip.pk)
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/stay-create.html")
+        form = response.context["form"]
+        assert form.initial["city"] == trip.destination
+        assert set(form.initial["apply_to_days"]) == {day.pk for day in days}
+
+    def test_get_multi_stage_shows_chooser(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        day = trip.days.order_by("number").first()
+        day.destination = "Testville"
+        day.save()
+        with self.login(user):
+            response = self.get("trips:add-stay-for-trip", trip_pk=trip.pk)
+        self.response_200(response)
+        assertTemplateUsed(response, "trips/includes/add-stay-stage-chooser.html")
+        self.assertResponseContains("Testville", response, html=False)
+
+    def test_get_invalid_destination_returns_404(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        with self.login(user):
+            response = self.get(
+                "trips:add-stay-for-trip",
+                trip_pk=trip.pk,
+                data={"destination": "Nowhere City"},
+            )
+        self.response_404(response)
