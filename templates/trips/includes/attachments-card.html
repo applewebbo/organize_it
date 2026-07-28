@@ -3,7 +3,7 @@
     <div class="card-body">
         <h2 class="card-title flex items-center gap-2 text-xl font-semibold">
             <i class="ph ph-paperclip text-primary"></i>
-            {% trans "Documents" %}
+            {% translate "Documents" %}
             {% if total_count > 0 %}
                 <span class="badge badge-outline badge-sm">{{ total_count }}</span>
             {% endif %}
@@ -24,7 +24,7 @@
                                     hx-target="#dialog"
                                     hx-swap="innerHTML"
                                     @click="$dispatch('open-modal'); document.activeElement.blur()"
-                                    aria-label="{% trans 'Add document' %}">
+                                    aria-label="{% translate 'Add document' %}">
                                 <i class="ph-bold ph-plus i-sm"></i>
                             </button>
                         {% endif %}
@@ -45,16 +45,16 @@
                                     </button>
                                     <button class="btn btn-xs btn-error btn-soft"
                                             hx-delete="{% url 'trips:attachment-delete' att.pk %}"
-                                            hx-confirm="{% trans 'Delete this document?' %}"
+                                            hx-confirm="{% translate 'Delete this document?' %}"
                                             hx-swap="none"
-                                            aria-label="{% trans 'Delete document' %}">
+                                            aria-label="{% translate 'Delete document' %}">
                                         <i class="ph-bold ph-trash" aria-hidden="true"></i>
                                     </button>
                                 </li>
                             {% endfor %}
                         </ul>
                     {% else %}
-                        <p class="text-base-content/50 text-xs">{% trans "No documents yet." %}</p>
+                        <p class="text-base-content/50 text-xs">{% translate "No documents yet." %}</p>
                     {% endif %}
                 </div>
             {% endfor %}

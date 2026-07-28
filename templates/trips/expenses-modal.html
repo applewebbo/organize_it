@@ -1,33 +1,33 @@
-{% load i18n expense_tags %}
+{% load expense_tags i18n %}
 <div class="modal-content" x-data="{ tab: 'balances' }">
     <div class="border-base-300 flex items-center justify-between rounded-t border-b p-4 md:px-5 md:py-2.5">
-        <h3 class="text-xl font-semibold">{% trans "Expenses" %}</h3>
+        <h3 class="text-xl font-semibold">{% translate "Expenses" %}</h3>
         <button type="button"
                 class="btn btn-sm btn-circle btn-ghost"
                 x-on:click="openModal = false"
-                aria-label="{% trans 'Close' %}">✕</button>
+                aria-label="{% translate 'Close' %}">✕</button>
     </div>
     <div class="p-4 md:p-5">
         <div role="tablist" class="tabs tabs-bordered mb-4">
             <button role="tab"
                     class="tab"
                     :class="tab === 'balances' && 'tab-active'"
-                    @click="tab = 'balances'">{% trans "Balances" %}</button>
+                    @click="tab = 'balances'">{% translate "Balances" %}</button>
             <button role="tab"
                     class="tab"
                     :class="tab === 'expenses' && 'tab-active'"
-                    @click="tab = 'expenses'">{% trans "Expenses" %}</button>
+                    @click="tab = 'expenses'">{% translate "Expenses" %}</button>
             <button role="tab"
                     class="tab"
                     :class="tab === 'totals' && 'tab-active'"
-                    @click="tab = 'totals'">{% trans "Totals" %}</button>
+                    @click="tab = 'totals'">{% translate "Totals" %}</button>
         </div>
         <div x-show="tab === 'balances'">
             {% if summary.warnings %}
                 <div class="alert alert-warning alert-soft mb-3" role="alert">
                     <i class="ph-bold ph-warning i-md"></i>
                     <span>
-                        {% blocktrans %}Some children are not assigned to a family unit with an adult, so their share is not charged to a parent. Assign them in the expense settings.{% endblocktrans %}
+                        {% blocktranslate %}Some children are not assigned to a family unit with an adult, so their share is not charged to a parent. Assign them in the expense settings.{% endblocktranslate %}
                     </span>
                 </div>
             {% endif %}
@@ -43,16 +43,16 @@
                     {% endfor %}
                 </ul>
             {% else %}
-                <p class="text-base-content/60 mb-4 text-sm">{% trans "Everyone is settled up." %}</p>
+                <p class="text-base-content/60 mb-4 text-sm">{% translate "Everyone is settled up." %}</p>
             {% endif %}
             <div class="overflow-x-auto">
                 <table class="table-sm table">
                     <thead>
                         <tr>
-                            <th>{% trans "Participant" %}</th>
-                            <th class="text-right">{% trans "Paid" %}</th>
-                            <th class="text-right">{% trans "Share" %}</th>
-                            <th class="text-right">{% trans "Balance" %}</th>
+                            <th>{% translate "Participant" %}</th>
+                            <th class="text-right">{% translate "Paid" %}</th>
+                            <th class="text-right">{% translate "Share" %}</th>
+                            <th class="text-right">{% translate "Balance" %}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -83,28 +83,28 @@
                             <button class="btn btn-ghost btn-xs btn-circle"
                                     hx-get="{% url 'trips:expense-modify' expense.pk %}"
                                     hx-target="#dialog"
-                                    aria-label="{% trans 'Edit expense' %}">
+                                    aria-label="{% translate 'Edit expense' %}">
                                 <i class="ph-bold ph-pencil-simple"></i>
                             </button>
                         </li>
                     {% endfor %}
                 </ul>
             {% else %}
-                <p class="text-base-content/60 text-sm">{% trans "No expenses yet." %}</p>
+                <p class="text-base-content/60 text-sm">{% translate "No expenses yet." %}</p>
             {% endif %}
         </div>
         <div x-show="tab === 'totals'" x-cloak>
-            <h4 class="mb-2 font-semibold">{% trans "By day" %}</h4>
+            <h4 class="mb-2 font-semibold">{% translate "By day" %}</h4>
             <table class="table-sm table">
                 <tbody>
                     {% for row in summary.by_day %}
                         <tr>
-                            <td>{% if row.day_number %}{% trans "Day" %} {{ row.day_number }} · {% endif %}{{ row.date }}</td>
+                            <td>{% if row.day_number %}{% translate "Day" %} {{ row.day_number }} · {% endif %}{{ row.date }}</td>
                             <td class="text-right">{{ row.total|money:summary.currency }}</td>
                         </tr>
                     {% empty %}
                         <tr>
-                            <td class="text-base-content/50">{% trans "No expenses yet." %}</td>
+                            <td class="text-base-content/50">{% translate "No expenses yet." %}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

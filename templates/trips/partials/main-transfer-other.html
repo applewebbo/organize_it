@@ -14,7 +14,7 @@
             {% if form.errors %}
                 <div class="mb-4 sm:col-span-4">
                     <div class="rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
-                        <strong>{% trans "Form validation errors:" %}</strong>
+                        <strong>{% translate "Form validation errors:" %}</strong>
                         <ul class="mt-2 list-inside list-disc">
                             {% for field, errors in form.errors.items %}
                                 <li>
@@ -29,15 +29,15 @@
             {% if prefilled_from_arrival %}
                 <div class="alert alert-info mb-4 sm:col-span-4">
                     <i class="ph ph-info"></i>
-                    <span>{% trans "Fields pre-filled from arrival journey. You can modify them if needed." %}</span>
+                    <span>{% translate "Fields pre-filled from arrival journey. You can modify them if needed." %}</span>
                 </div>
             {% endif %}
             <div class="mb-4 sm:col-span-4">
                 <h4 class="text-lg font-semibold text-gray-900 dark:text-white">
                     {% if direction == 'arrival' %}
-                        {% trans "Arrival Transport" %}
+                        {% translate "Arrival Transport" %}
                     {% else %}
-                        {% trans "Departure Transport" %}
+                        {% translate "Departure Transport" %}
                     {% endif %}
                 </h4>
             </div>
@@ -60,9 +60,9 @@
             <div class="border-base-200 flex items-center justify-end gap-2 rounded-b border-t p-4">
                 <button type="button"
                         class="btn btn-outline btn-neutral"
-                        x-on:click="openModal = false">{% trans "Cancel" %}</button>
+                        x-on:click="openModal = false">{% translate "Cancel" %}</button>
                 <button id="form-submit" class="btn btn-primary" type="submit">
-                    {% trans "Save" %}
+                    {% translate "Save" %}
                     <i class="ph-bold ph-check"></i>
                 </button>
             </div>
@@ -76,10 +76,10 @@
                         hx-swap="innerHTML"
                         @htmx:after-settle="currentStep = 'type'">
                     <i class="ph-bold ph-arrow-left"></i>
-                    {% trans "Back" %}
+                    {% translate "Back" %}
                 </button>
                 <button id="form-submit" class="btn btn-primary" type="submit">
-                    {% trans "Save" %}
+                    {% translate "Save" %}
                     <i class="ph-bold ph-check"></i>
                 </button>
             </div>

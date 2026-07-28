@@ -1,8 +1,9 @@
 {% extends "base.html" %}
-{% load static trip_tags i18n %}
+{% load i18n static trip_tags %}
 {% block page_title %}
     {{ trip.title }}
 {% endblock page_title %}
+
 {% block content %}
     <!-- Shared AI key notice (collaborators) -->
     {% if show_shared_key_notice %}
@@ -11,13 +12,13 @@
              role="alert">
             <i class="ph-bold ph-sparkle i-md"></i>
             <span>
-                {% blocktrans %}The trip creator shared their AI key with you: enable AI suggestions in your settings to generate suggestions for this trip using it.{% endblocktrans %}
+                {% blocktranslate %}The trip creator shared their AI key with you: enable AI suggestions in your settings to generate suggestions for this trip using it.{% endblocktranslate %}
             </span>
             <div>
                 <button class="btn btn-sm btn-ghost"
                         hx-post="{% url 'suggestions:dismiss-shared-key-notice' trip.id %}"
                         hx-target="#shared-key-notice"
-                        hx-swap="delete">{% trans 'Dismiss' %}</button>
+                        hx-swap="delete">{% translate 'Dismiss' %}</button>
             </div>
         </div>
     {% endif %}
@@ -27,11 +28,11 @@
         <div class="alert alert-warning alert-soft alert-vertical sm:alert-horizontal mb-6"
              role="alert">
             <i class="ph-bold ph-warning i-md"></i>
-            <span>{% trans "This trip is archived and cannot be modified." %}</span>
+            <span>{% translate "This trip is archived and cannot be modified." %}</span>
             <div>
                 <button class="btn btn-sm btn-warning"
                         hx-get="{% url 'trips:trip-unarchive' trip.id %}"
-                        hx-target="">{% trans 'Unarchive' %}</button>
+                        hx-target="">{% translate 'Unarchive' %}</button>
             </div>
         </div>
     {% endif %}
@@ -51,7 +52,7 @@
     <!-- END Stays Section -->
     {% partialdef days inline %}
         {% include 'trips/includes/events-section.html' %}
-    {% endpartialdef %}
+    {% endpartialdef days %}
     <!-- Checklist Section -->
     <div id="checklist-card-container"
          class="mb-8"
@@ -81,5 +82,6 @@
     {% endwith %}
     <!-- END Collaborators Section -->
 {% endblock content %}
+
 {% block script %}
 {% endblock script %}

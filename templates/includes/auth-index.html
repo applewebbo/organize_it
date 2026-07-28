@@ -1,4 +1,4 @@
-{% load i18n trip_tags static %}
+{% load i18n static trip_tags %}
 <div class="mx-auto mt-8 max-w-7xl">
     {% if fav_trip or latest_trip %}
         {% with trip=fav_trip|default:latest_trip %}
@@ -48,7 +48,7 @@
         <!-- Other Trips Section -->
         {% if other_trips %}
             <section id="other-trips" class="border-base-300 mt-4 mb-8 border-t pt-8">
-                <h2 class="ms-2 mb-4 text-2xl font-semibold">{% trans 'Other Trips' %}</h2>
+                <h2 class="ms-2 mb-4 text-2xl font-semibold">{% translate 'Other Trips' %}</h2>
                 <div class="grid grid-cols-1 gap-x-4 gap-y-4 md:grid-cols-2 xl:grid-cols-3">
                     {% for trip in other_trips %}
                         <div class="card card-border bg-base-100 shadow-sm">
@@ -69,7 +69,7 @@
                                 </div>
                                 <div class="hidden justify-end text-right sm:block">
                                     <a href="{% url 'trips:trip-detail' trip.id %}"
-                                       class="btn btn-xs btn-primary btn-soft">{% trans 'Edit' %}</a>
+                                       class="btn btn-xs btn-primary btn-soft">{% translate 'Edit' %}</a>
                                 </div>
                             </div>
                         </div>
@@ -83,13 +83,13 @@
                     hx-post="{% url 'trips:toggle-guide' %}"
                     hx-swap="none"
                     hx-on::after-request="location.reload()"
-                    aria-label="{% trans 'Toggle guide visibility' %}">
+                    aria-label="{% translate 'Toggle guide visibility' %}">
                 <i class="ph-bold ph-question i-md" aria-hidden="true"></i>
                 <span>
                     {% if show_guide %}
-                        {% trans 'Hide Guide' %}
+                        {% translate 'Hide Guide' %}
                     {% else %}
-                        {% trans 'Show Guide' %}
+                        {% translate 'Show Guide' %}
                     {% endif %}
                 </span>
             </button>

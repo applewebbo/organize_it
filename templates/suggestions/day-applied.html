@@ -1,8 +1,8 @@
 {% load i18n %}
 <div class="border-success/40 bg-success/10 flex flex-col items-center gap-2 rounded-lg border p-4 text-center">
     <i class="ph-bold ph-check-circle i-lg text-success" aria-hidden="true"></i>
-    <p class="text-success text-sm font-medium">{% trans 'Day itinerary applied' %}</p>
+    <p class="text-success text-sm font-medium">{% translate 'Day itinerary applied' %}</p>
     <button type="button"
             @click="$dispatch('hide-modal')"
-            class="btn btn-sm btn-ghost">{% trans 'Close' %}</button>
+            class="btn btn-sm btn-ghost">{% translate 'Close' %}</button>
 </div>

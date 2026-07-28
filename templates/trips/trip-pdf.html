@@ -6,12 +6,12 @@
         <meta charset="UTF-8">
         <meta name="description" content="Trip itinerary">
         <meta name="keywords" content="trip, itinerary">
-        <title>{{ trip.title }} – {% trans "Itinerary" %}</title>
+        <title>{{ trip.title }} – {% translate "Itinerary" %}</title>
         <style>
         @page {
             margin: 1.2cm 1.8cm;
             @bottom-right {
-                content: "{% trans 'Page' %} " counter(page) " {% trans 'of' %} " counter(pages);
+                content: "{% translate 'Page' %} " counter(page) " {% translate 'of' %} " counter(pages);
                 font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
                 font-size: 8pt;
                 color: #888;
@@ -211,32 +211,32 @@
         <div class="summary-box">
             <div class="summary-item">
                 <span class="summary-value">{{ summary.days }}</span>
-                <span class="summary-label">{% trans "Days" %}</span>
+                <span class="summary-label">{% translate "Days" %}</span>
             </div>
             <div class="summary-item">
                 <span class="summary-value">{{ summary.events }}</span>
-                <span class="summary-label">{% trans "Events" %}</span>
+                <span class="summary-label">{% translate "Events" %}</span>
             </div>
             <div class="summary-item">
                 <span class="summary-value">{{ summary.stays }}</span>
-                <span class="summary-label">{% trans "Stays" %}</span>
+                <span class="summary-label">{% translate "Stays" %}</span>
             </div>
             <div class="summary-item">
                 <span class="summary-value">{{ summary.links }}</span>
-                <span class="summary-label">{% trans "Links" %}</span>
+                <span class="summary-label">{% translate "Links" %}</span>
             </div>
         </div>
         {% if arrival_transfer or departure_transfer %}
             <div class="section">
-                <h2>{% trans "Main Transfers" %}</h2>
+                <h2>{% translate "Main Transfers" %}</h2>
                 {% for mt in main_transfers %}
                     <div class="transfer-box">
                         <div class="transfer-line">
                             <strong>
                                 {% if mt.direction == 1 %}
-                                    {% trans "Outbound" %}
+                                    {% translate "Outbound" %}
                                 {% else %}
-                                    {% trans "Return" %}
+                                    {% translate "Return" %}
                                 {% endif %}
                             </strong>
                             – {{ mt.get_type_display }}
@@ -257,13 +257,13 @@
                             <div class="transfer-line transfer-extra">
                                 {% if mt.company %}{{ mt.company }}{% endif %}
                                 {% if mt.flight_number %}
-                                    {% trans "Flight" %} {{ mt.flight_number }}
+                                    {% translate "Flight" %} {{ mt.flight_number }}
                                 {% endif %}
                                 {% if mt.train_number %}
-                                    {% trans "Train" %} {{ mt.train_number }}
+                                    {% translate "Train" %} {{ mt.train_number }}
                                 {% endif %}
                                 {% if mt.terminal %}
-                                    {% trans "Terminal" %} {{ mt.terminal }}
+                                    {% translate "Terminal" %} {{ mt.terminal }}
                                 {% endif %}
                             </div>
                         {% endif %}
@@ -278,7 +278,7 @@
             {% for day in days %}
                 <div class="day-block">
                     <div class="day-header">
-                        {% trans "Day" %} {{ day.number }} – {{ day.date|date:"l, d F Y" }}
+                        {% translate "Day" %} {{ day.number }} – {{ day.date|date:"l, d F Y" }}
                         {% if day.destination %}· {{ day.destination }}{% endif %}
                     </div>
                     {% if day.show_stay %}
@@ -300,13 +300,13 @@
                                     <svg class="ico" viewBox="0 0 256 256">
                                         <path d="M144.49,136.49l-40,40a12,12,0,0,1-17-17L107,140H24a12,12,0,0,1,0-24h83L87.51,96.49a12,12,0,0,1,17-17l40,40A12,12,0,0,1,144.49,136.49ZM200,28H136a12,12,0,0,0,0,24h52V204H136a12,12,0,0,0,0,24h64a12,12,0,0,0,12-12V40A12,12,0,0,0,200,28Z" />
                                     </svg>
-                                    {% trans "Check-in" %}: {{ day.stay.check_in|time:"H:i" }}
+                                    {% translate "Check-in" %}: {{ day.stay.check_in|time:"H:i" }}
                                 {% endif %}
                                 {% if day.stay.check_out %}
                                     <svg class="ico" viewBox="0 0 256 256">
                                         <path d="M124,216a12,12,0,0,1-12,12H48a12,12,0,0,1-12-12V40A12,12,0,0,1,48,28h64a12,12,0,0,1,0,24H60V204h52A12,12,0,0,1,124,216Zm108.49-96.49-40-40a12,12,0,0,0-17,17L195,116H112a12,12,0,0,0,0,24h83l-19.52,19.51a12,12,0,0,0,17,17l40-40A12,12,0,0,0,232.49,119.51Z" />
                                     </svg>
-                                    {% trans "Check-out" %}: {{ day.stay.check_out|time:"H:i" }}
+                                    {% translate "Check-out" %}: {{ day.stay.check_out|time:"H:i" }}
                                 {% endif %}
                                 {% if day.stay.phone_number %}
                                     <svg class="ico" viewBox="0 0 256 256">
@@ -396,7 +396,7 @@
                             {% endif %}
                         </div>
                     {% empty %}
-                        <p class="empty-day">{% trans "No events for this day." %}</p>
+                        <p class="empty-day">{% translate "No events for this day." %}</p>
                     {% endfor %}
                 </div>
                 <!-- day-block -->
@@ -404,7 +404,7 @@
         </div>
         {% if links %}
             <div class="section">
-                <h2>{% trans "Links" %}</h2>
+                <h2>{% translate "Links" %}</h2>
                 <ul class="links-list">
                     {% for link in links %}
                         <li>

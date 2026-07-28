@@ -14,11 +14,11 @@
                     hx-delete="{% url 'trips:checklist-item-delete' item.pk %}"
                     hx-target="#checklist-list"
                     hx-swap="outerHTML"
-                    hx-confirm="{% trans 'Delete this item?' %}">
+                    hx-confirm="{% translate 'Delete this item?' %}">
                 <i class="ph ph-trash"></i>
             </button>
         </div>
     {% empty %}
-        <p class="text-base-content/50 py-4 text-center">{% trans "No items yet. Add your first checklist item above." %}</p>
+        <p class="text-base-content/50 py-4 text-center">{% translate "No items yet. Add your first checklist item above." %}</p>
     {% endfor %}
 </div>

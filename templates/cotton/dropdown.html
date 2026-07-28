@@ -4,10 +4,10 @@
         <div tabindex="0"
              role="button"
              class="btn btn-xs btn-soft btn-primary sm:btn-sm"
-             aria-label="{% trans 'Add event' %}"
+             aria-label="{% translate 'Add event' %}"
              aria-haspopup="menu">
             <i class="ph-bold ph-plus i-sm" aria-hidden="true"></i>
-            <span class="hidden sm:inline">{% trans 'Add event' %}</span>
+            <span class="hidden sm:inline">{% translate 'Add event' %}</span>
         </div>
         <ul tabindex="0"
             class="dropdown-content menu bg-base-100 rounded-box border-base-300 z-20 w-52 border p-2 shadow">
@@ -17,7 +17,7 @@
                    hx-swap="innerHTML"
                    @click="$dispatch('open-modal'); document.activeElement.blur()">
                     <i class="ph-bold ph-map-pin i-sm text-green-500" aria-hidden="true"></i>
-                    {% trans 'Experience' %}
+                    {% translate 'Experience' %}
                 </a>
             </li>
             <li>
@@ -26,7 +26,7 @@
                    hx-swap="innerHTML"
                    @click="$dispatch('open-modal'); document.activeElement.blur()">
                     <i class="ph-bold ph-fork-knife i-sm text-yellow-500" aria-hidden="true"></i>
-                    {% trans 'Meal' %}
+                    {% translate 'Meal' %}
                 </a>
             </li>
         </ul>

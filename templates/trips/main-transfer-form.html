@@ -1,10 +1,10 @@
-{% load i18n crispy_forms_tags %}
+{% load crispy_forms_tags i18n %}
 <div class="p-6" x-data>
     <h3 class="mb-4 text-lg font-bold">
         {% if is_edit %}
-            {% trans "Edit Main Trip" %}
+            {% translate "Edit Main Trip" %}
         {% else %}
-            {% trans "Add Main Trip" %}
+            {% translate "Add Main Trip" %}
         {% endif %}
     </h3>
     <form method="post"
@@ -20,12 +20,12 @@
                  hx-include="#id_type"></div>
         </div>
         <div class="mt-6 flex justify-end gap-2">
-            <button type="button" class="btn" @click="$dispatch('hide-modal')">{% trans "Cancel" %}</button>
+            <button type="button" class="btn" @click="$dispatch('hide-modal')">{% translate "Cancel" %}</button>
             <button type="submit" class="btn btn-primary">
                 {% if is_edit %}
-                    {% trans "Update" %}
+                    {% translate "Update" %}
                 {% else %}
-                    {% trans "Add" %}
+                    {% translate "Add" %}
                 {% endif %}
             </button>
         </div>

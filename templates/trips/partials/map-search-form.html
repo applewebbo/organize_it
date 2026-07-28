@@ -8,14 +8,14 @@
     {% if has_custom_stages %}
         <select name="stage_destination"
                 class="select select-sm select-bordered mb-2 w-full">
-            <option value="">{% trans '— all stages —' %}</option>
+            <option value="">{% translate '— all stages —' %}</option>
             {% for stage in stages %}<option value="{{ stage.destination }}">{{ stage.destination }}</option>{% endfor %}
         </select>
     {% endif %}
     <div class="flex gap-2">
         <input type="search"
                name="query"
-               placeholder="{% trans 'Search a place…' %}"
+               placeholder="{% translate 'Search a place…' %}"
                autocomplete="off"
                required
                class="input input-sm input-bordered w-full" />

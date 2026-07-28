@@ -1,23 +1,23 @@
 {% load i18n %}
 <div id="calendar-modal-content">
     <div class="border-base-300 flex items-center justify-between rounded-t border-b p-4 md:px-5 md:py-2.5">
-        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% trans "Calendar feed" %}</h3>
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% translate "Calendar feed" %}</h3>
         <button type="button"
                 class="btn btn-ghost btn-circle btn-sm"
                 x-on:click="openModal = false">
             <i class="ph-bold ph-x text-xl"></i>
-            <span class="sr-only">{% trans "Close modal" %}</span>
+            <span class="sr-only">{% translate "Close modal" %}</span>
         </button>
     </div>
     <div class="p-4 md:p-6">
         {% if rotated %}
             <div class="border-success bg-success/10 mb-4 flex items-center gap-2 rounded-lg border p-3 text-sm">
                 <i class="ph-bold ph-check-circle text-success shrink-0 text-lg"></i>
-                <span>{% trans "Calendar link reset. The previous URL no longer works." %}</span>
+                <span>{% translate "Calendar link reset. The previous URL no longer works." %}</span>
             </div>
         {% endif %}
         <p class="text-base-content/70 mb-3 text-sm">
-            {% trans "Subscribe to this trip from any calendar app using the private link below. Anyone with the link can read the feed, so treat it as private." %}
+            {% translate "Subscribe to this trip from any calendar app using the private link below. Anyone with the link can read the feed, so treat it as private." %}
         </p>
         <div class="border-base-300 mb-4 flex items-center gap-2 rounded-lg border p-3">
             <input type="text"
@@ -27,14 +27,14 @@
             <button x-data="{ copied: false }"
                     class="btn btn-xs btn-soft shrink-0"
                     :class="copied ? 'btn-success' :"
-                    :title="copied ? '{% trans "Copied!" %}' : '{% trans "Copy link" %}'"
+                    :title="copied ? '{% translate "Copied!" %}' : '{% translate "Copy link" %}'"
                     @click="navigator.clipboard.writeText($el.previousElementSibling.value); copied = true; setTimeout(() => copied = false, 2000)">
                 <i class="ph-bold" :class="copied ? 'ph-check' : 'ph-copy'"></i>
             </button>
         </div>
         <div class="border-base-300 border-t pt-4">
             <p class="text-base-content/70 mb-2 text-sm">
-                {% trans "Reset the link if it was shared by mistake. Existing subscriptions will stop updating and a new link will be generated." %}
+                {% translate "Reset the link if it was shared by mistake. Existing subscriptions will stop updating and a new link will be generated." %}
             </p>
             <button type="button"
                     class="btn btn-sm btn-error btn-soft w-full"
@@ -42,7 +42,7 @@
                     hx-target="#calendar-modal-content"
                     hx-swap="outerHTML">
                 <i class="ph-bold ph-arrows-clockwise"></i>
-                {% trans "Reset calendar link" %}
+                {% translate "Reset calendar link" %}
             </button>
         </div>
     </div>

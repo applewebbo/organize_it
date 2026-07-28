@@ -2,7 +2,7 @@
 <li class="border-success/40 bg-success/10 flex items-center gap-2 rounded-lg border p-3">
     <i class="ph-bold ph-check-circle i-sm text-success shrink-0"
        aria-hidden="true"></i>
-    <span class="text-success text-sm font-medium">{% trans 'Added to your trip' %}</span>
+    <span class="text-success text-sm font-medium">{% translate 'Added to your trip' %}</span>
 </li>
 {% if refresh_events_panel %}
     <div id="events-panel" hx-swap-oob="innerHTML">{% include "trips/partials/map-events-panel.html" %}</div>

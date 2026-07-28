@@ -27,7 +27,7 @@
                             <input type="hidden" name="lng" value="{{ place.lng }}">
                             <button type="submit"
                                     class="btn btn-xs btn-outline btn-success"
-                                    title="{% trans 'Add as Experience' %}">
+                                    title="{% translate 'Add as Experience' %}">
                                 <i class="ph-bold ph-ticket i-xs"></i>
                             </button>
                         </form>
@@ -43,7 +43,7 @@
                             <input type="hidden" name="lng" value="{{ place.lng }}">
                             <button type="submit"
                                     class="btn btn-xs btn-outline btn-warning"
-                                    title="{% trans 'Add as Meal' %}">
+                                    title="{% translate 'Add as Meal' %}">
                                 <i class="ph-bold ph-fork-knife i-xs"></i>
                             </button>
                         </form>
@@ -59,7 +59,7 @@
                             <input type="hidden" name="lng" value="{{ place.lng }}">
                             <button type="submit"
                                     class="btn btn-xs btn-outline btn-info"
-                                    title="{% trans 'Add as Stay' %}">
+                                    title="{% translate 'Add as Stay' %}">
                                 <i class="ph-bold ph-bed i-xs"></i>
                             </button>
                         </form>
@@ -71,11 +71,11 @@
 {% elif query %}
     <div class="text-base-content/50 py-8 text-center">
         <i class="ph-bold ph-magnifying-glass i-lg mb-2"></i>
-        <p>{% trans 'No results found' %}</p>
+        <p>{% translate 'No results found' %}</p>
     </div>
 {% else %}
     <div class="text-base-content/50 py-8 text-center">
         <i class="ph-bold ph-map-trifold i-lg mb-2"></i>
-        <p>{% trans 'Find places to add to your trip' %}</p>
+        <p>{% translate 'Find places to add to your trip' %}</p>
     </div>
 {% endif %}

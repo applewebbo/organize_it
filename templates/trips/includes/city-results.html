@@ -16,14 +16,14 @@
             {% endfor %}
         </ul>
         <p class="mx-2 my-1 flex items-center justify-end gap-1 px-3 text-xs text-slate-400 italic">
-            <i class="ph-bold ph-info i-xs"></i>{% trans 'Search conducted via' %}&nbsp;<a href="https://nominatim.openstreetmap.org/ui/search.html"
+            <i class="ph-bold ph-info i-xs"></i>{% translate 'Search conducted via' %}&nbsp;<a href="https://nominatim.openstreetmap.org/ui/search.html"
    class="link link-primary">Nominatim API</a>
         </p>
     </div>
 {% elif found is False %}
     <div class="mt-2 mb-2">
         <p class="mx-2 mb-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-red-500">
-            {% trans 'No city found.' %}
+            {% translate 'No city found.' %}
         </p>
     </div>
 {% endif %}

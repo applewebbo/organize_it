@@ -1,4 +1,4 @@
-{% load static i18n %}
+{% load i18n static %}
 {% include 'includes/theme-init.html' %}
 <div x-data="{ open: false}">
     <nav nav class="bg-base-100 border-base-200 shadow">
@@ -20,18 +20,18 @@
                         {% csrf_token %}
                         <button type="submit"
                                 href="{% url 'account_logout' %}"
-                                class="btn btn-xs btn-primary md:btn-sm">{% trans 'Logout' %}</button>
+                                class="btn btn-xs btn-primary md:btn-sm">{% translate 'Logout' %}</button>
                     </form>
                 {% else %}
                     <a href="{% url 'account_login' %}"
-                       class="btn btn-xs btn-primary md:btn-sm">{% trans 'Login' %}</a>
+                       class="btn btn-xs btn-primary md:btn-sm">{% translate 'Login' %}</a>
                 {% endif %}
                 <button type="button"
                         class="inline-flex h-10 w-10 items-center justify-center rounded-lg p-2 text-sm text-gray-500 hover:bg-gray-100 focus:ring-2 focus:ring-gray-200 focus:outline-none md:hidden dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
                         aria-controls="navbar-cta"
                         aria-expanded="false"
                         x-on:click="open = ! open">
-                    <span class="sr-only">{% trans 'Open main menu' %}</span>
+                    <span class="sr-only">{% translate 'Open main menu' %}</span>
                     <i class="ph-bold ph-list i-md" x-show='!open' aria-hidden='true'></i>
                     <i class="ph-bold ph-x i-md" x-show='open' aria-hidden='true'></i>
                 </button>
@@ -46,12 +46,12 @@
                     </li>
                     <li>
                         <a href="{% url 'trips:trip-list' %}"
-                           class="md:hover:text-tr-blue-700 md:dark:hover:text-tr-blue-500 block rounded px-3 py-2 text-gray-900 hover:bg-slate-100 md:p-0 md:hover:bg-transparent dark:border-slate-700 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">{% trans 'Trips' %}</a>
+                           class="md:hover:text-tr-blue-700 md:dark:hover:text-tr-blue-500 block rounded px-3 py-2 text-gray-900 hover:bg-slate-100 md:p-0 md:hover:bg-transparent dark:border-slate-700 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">{% translate 'Trips' %}</a>
                     </li>
                     {% if user.is_authenticated %}
                         <li>
                             <a href="{% url 'accounts:profile' %}"
-                               class="md:hover:text-tr-blue-700 md:dark:hover:text-tr-blue-500 block rounded px-3 py-2 text-gray-900 hover:bg-slate-100 md:p-0 md:hover:bg-transparent dark:border-slate-700 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">{% trans 'Settings' %}</a>
+                               class="md:hover:text-tr-blue-700 md:dark:hover:text-tr-blue-500 block rounded px-3 py-2 text-gray-900 hover:bg-slate-100 md:p-0 md:hover:bg-transparent dark:border-slate-700 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">{% translate 'Settings' %}</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -69,12 +69,12 @@
                 </li>
                 <li>
                     <a href="{% url 'trips:trip-list' %}"
-                       class="font-medium text-gray-500 hover:text-gray-400 sm:py-6 dark:text-gray-400 dark:hover:text-gray-500">{% trans 'Trips' %}</a>
+                       class="font-medium text-gray-500 hover:text-gray-400 sm:py-6 dark:text-gray-400 dark:hover:text-gray-500">{% translate 'Trips' %}</a>
                 </li>
                 {% if user.is_authenticated %}
                     <li>
                         <a href="{% url 'accounts:profile' %}"
-                           class="font-medium text-gray-500 hover:text-gray-400 sm:py-6 dark:text-gray-400 dark:hover:text-gray-500">{% trans 'Settings' %}</a>
+                           class="font-medium text-gray-500 hover:text-gray-400 sm:py-6 dark:text-gray-400 dark:hover:text-gray-500">{% translate 'Settings' %}</a>
                     </li>
                 {% endif %}
             </ul>

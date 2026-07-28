@@ -3,18 +3,18 @@
     {% if show_transfer_info and from_home_duration %}
         <div class="text-base-content/80 bg-info/10 border-info/20 mx-auto mb-4 flex w-full max-w-sm flex-col items-center gap-1.5 rounded-xl border px-4 py-3 text-sm">
             <div class="flex items-center gap-2 font-medium">
-                <span class="truncate text-center">{% trans "Home" %}</span>
+                <span class="truncate text-center">{% translate "Home" %}</span>
                 <i class="ph-bold ph-arrow-right text-info shrink-0" aria-hidden="true"></i>
                 <span class="truncate text-center">{{ from_home_destination }}</span>
             </div>
             <div class="flex items-center gap-4 text-xs opacity-80">
                 <div class="flex items-center gap-1.5"
-                     title="{% trans 'Estimated driving time' %}">
+                     title="{% translate 'Estimated driving time' %}">
                     <i class="ph-bold ph-car shrink-0" aria-hidden="true"></i>
                     <span>~{{ from_home_duration|format_minutes }}</span>
                 </div>
                 <div class="flex items-center gap-1.5"
-                     title="{% trans 'Estimated driving distance' %}">
+                     title="{% translate 'Estimated driving distance' %}">
                     <i class="ph-bold ph-map-pin-line shrink-0" aria-hidden="true"></i>
                     <span>~{{ from_home_distance }} km</span>
                 </div>
@@ -47,16 +47,16 @@
             <div class="flex items-center gap-2 font-medium">
                 <span class="truncate text-center">{{ to_home_destination }}</span>
                 <i class="ph-bold ph-arrow-right text-info shrink-0" aria-hidden="true"></i>
-                <span class="truncate text-center">{% trans "Home" %}</span>
+                <span class="truncate text-center">{% translate "Home" %}</span>
             </div>
             <div class="flex items-center gap-4 text-xs opacity-80">
                 <div class="flex items-center gap-1.5"
-                     title="{% trans 'Estimated driving time' %}">
+                     title="{% translate 'Estimated driving time' %}">
                     <i class="ph-bold ph-car shrink-0" aria-hidden="true"></i>
                     <span>~{{ to_home_duration|format_minutes }}</span>
                 </div>
                 <div class="flex items-center gap-1.5"
-                     title="{% trans 'Estimated driving distance' %}">
+                     title="{% translate 'Estimated driving distance' %}">
                     <i class="ph-bold ph-map-pin-line shrink-0" aria-hidden="true"></i>
                     <span>~{{ to_home_distance }} km</span>
                 </div>

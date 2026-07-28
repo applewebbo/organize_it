@@ -1,12 +1,12 @@
 {% load i18n %}
 <div class="p-4 md:p-6">
-    <h3 class="mb-4 text-lg font-semibold">{% trans "Active share links" %}</h3>
+    <h3 class="mb-4 text-lg font-semibold">{% translate "Active share links" %}</h3>
     {% if links %}
         <table class="table w-full">
             <thead>
                 <tr>
-                    <th>{% trans "Label" %}</th>
-                    <th>{% trans "Expires" %}</th>
+                    <th>{% translate "Label" %}</th>
+                    <th>{% translate "Expires" %}</th>
                     <th></th>
                 </tr>
             </thead>
@@ -18,7 +18,7 @@
                             {% if link.expires_at %}
                                 {{ link.expires_at|date:"SHORT_DATE_FORMAT" }}
                             {% else %}
-                                {% trans "Never" %}
+                                {% translate "Never" %}
                             {% endif %}
                         </td>
                         <td class="flex gap-2">
@@ -38,6 +38,6 @@
             </tbody>
         </table>
     {% else %}
-        <p class="text-base-content/50">{% trans "No active share links." %}</p>
+        <p class="text-base-content/50">{% translate "No active share links." %}</p>
     {% endif %}
 </div>

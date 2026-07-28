@@ -2,9 +2,9 @@
 <div class="p-4 sm:p-6">
     <h3 class="mb-4 text-lg font-semibold">
         {% if category == 'experience' %}
-            {% trans 'Select a day for the experience' %}
+            {% translate 'Select a day for the experience' %}
         {% else %}
-            {% trans 'Select a day for the meal' %}
+            {% translate 'Select a day for the meal' %}
         {% endif %}
     </h3>
     <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -13,11 +13,11 @@
                     hx-get="{% if category == 'experience' %}{% url 'trips:add-experience' day.pk %}{% else %}{% url 'trips:add-meal' day.pk %}{% endif %}"
                     hx-target="#dialog"
                     hx-swap="innerHTML">
-                <span class="text-base-content/50 text-xs font-semibold">{% trans 'Day' %} {{ forloop.counter }}</span>
+                <span class="text-base-content/50 text-xs font-semibold">{% translate 'Day' %} {{ forloop.counter }}</span>
                 <span class="text-sm font-medium">{{ day.date|date:"d M Y" }}</span>
             </button>
         {% empty %}
-            <p class="text-base-content/60 col-span-2 py-4 text-center sm:col-span-3">{% trans 'No days in this trip.' %}</p>
+            <p class="text-base-content/60 col-span-2 py-4 text-center sm:col-span-3">{% translate 'No days in this trip.' %}</p>
         {% endfor %}
     </div>
 </div>

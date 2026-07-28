@@ -3,10 +3,10 @@
     <div class="card-body">
         <h2 class="card-title flex items-center gap-2 font-semibold">
             <i class="ph ph-bell text-primary"></i>
-            {% trans "Email Reminder" %}
+            {% translate "Email Reminder" %}
         </h2>
         <p class="text-base-content/60 text-sm">
-            {% trans "Get an email reminder before departure if there are pending items." %}
+            {% translate "Get an email reminder before departure if there are pending items." %}
         </p>
         <form hx-post="{% url 'trips:checklist-reminder-set' trip.pk %}"
               hx-target="#reminder-card"
@@ -21,7 +21,7 @@
                         </option>
                     {% endfor %}
                 </select>
-                <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+                <button type="submit" class="btn btn-primary">{% translate "Save" %}</button>
             </div>
         </form>
     </div>

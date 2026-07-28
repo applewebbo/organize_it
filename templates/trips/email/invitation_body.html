@@ -3,9 +3,9 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>{% trans "You've been invited to collaborate on a trip" %}</title>
+        <title>{% translate "You've been invited to collaborate on a trip" %}</title>
         <meta name="description"
-              content="{% trans "Trip collaboration invitation" %}">
+              content="{% translate "Trip collaboration invitation" %}">
         <meta name="keywords" content="collaboration, invitation, trip">
         <style>
     body { font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 24px; }
@@ -14,19 +14,19 @@
         </style>
     </head>
     <body>
-        <h2>{% trans "You've been invited to collaborate on a trip" %}</h2>
+        <h2>{% translate "You've been invited to collaborate on a trip" %}</h2>
         <p>
-            {% blocktrans with email=invited_by.email title=trip.title %}{{ email }} has invited you to collaborate on the trip <strong>{{ title }}</strong>.{% endblocktrans %}
+            {% blocktranslate with email=invited_by.email title=trip.title %}{{ email }} has invited you to collaborate on the trip <strong>{{ title }}</strong>.{% endblocktranslate %}
         </p>
         <p>
-            {% trans "To accept the invitation and join the trip, click the button below. You will need to create an account if you don't have one yet." %}
+            {% translate "To accept the invitation and join the trip, click the button below. You will need to create an account if you don't have one yet." %}
         </p>
         <p>
-            <a href="{{ accept_url }}" class="btn">{% trans "Accept invitation" %}</a>
+            <a href="{{ accept_url }}" class="btn">{% translate "Accept invitation" %}</a>
         </p>
         <div class="footer">
-            <p>{% trans "This invitation expires in 7 days." %}</p>
-            <p>{% trans "If you did not expect this invitation, you can ignore this email." %}</p>
+            <p>{% translate "This invitation expires in 7 days." %}</p>
+            <p>{% translate "If you did not expect this invitation, you can ignore this email." %}</p>
         </div>
     </body>
 </html>

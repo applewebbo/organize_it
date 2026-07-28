@@ -16,17 +16,17 @@
             {% endfor %}
         </ul>
         <p class="mx-2 my-1 flex items-center justify-end gap-1 px-3 text-xs text-slate-400 italic">
-            <i class="ph-bold ph-info i-xs"></i>{% trans 'Search conducted via' %}&nbsp;<a href="https://nominatim.openstreetmap.org/ui/search.html"
+            <i class="ph-bold ph-info i-xs"></i>{% translate 'Search conducted via' %}&nbsp;<a href="https://nominatim.openstreetmap.org/ui/search.html"
    class="link link-primary">Nominatim API</a>
         </p>
     </div>
 {% else %}
     <div class="-mt-1 mb-4">
         <p class="mx-2 mb-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-red-500">
-            {% trans 'No address found.' %}
+            {% translate 'No address found.' %}
         </p>
         <p class="mx-2 my-1 flex items-center justify-end gap-1 px-3 text-xs text-slate-400 italic">
-            <i class="ph-bold ph-info i-xs"></i>{% trans 'Search conducted via' %}&nbsp;<a href="https://nominatim.openstreetmap.org/ui/search.html"
+            <i class="ph-bold ph-info i-xs"></i>{% translate 'Search conducted via' %}&nbsp;<a href="https://nominatim.openstreetmap.org/ui/search.html"
    class="link link-primary">Nominatim API</a>
         </p>
     </div>

@@ -7,14 +7,14 @@
     <div class="alert alert-warning alert-soft m-3">
         <div>
             {% if error_kind == 'config' %}
-                <p>{% trans "AI suggestions are not configured yet. Add a valid API key to get started." %}</p>
-                <a href="{% url 'accounts:profile' %}" class="link link-primary">{% trans "Check your AI settings" %}</a>
+                <p>{% translate "AI suggestions are not configured yet. Add a valid API key to get started." %}</p>
+                <a href="{% url 'accounts:profile' %}" class="link link-primary">{% translate "Check your AI settings" %}</a>
             {% elif error_kind == 'quota' %}
-                <p>{% trans "You have reached the AI provider usage limit. Please try again later." %}</p>
+                <p>{% translate "You have reached the AI provider usage limit. Please try again later." %}</p>
             {% elif error_kind == 'rate_limit' %}
-                <p>{% trans "You have reached the daily AI suggestion limit. Please try again tomorrow." %}</p>
+                <p>{% translate "You have reached the daily AI suggestion limit. Please try again tomorrow." %}</p>
             {% else %}
-                <p>{% trans "Something went wrong while generating suggestions. Please try again." %}</p>
+                <p>{% translate "Something went wrong while generating suggestions. Please try again." %}</p>
             {% endif %}
         </div>
     </div>
@@ -22,7 +22,7 @@
     {% if from_cache %}
         <p class="text-base-content/50 mb-2 flex items-center gap-1 text-xs">
             <i class="ph-bold ph-clock-counter-clockwise i-xs"></i>
-            {% trans 'Your last suggestions' %}
+            {% translate 'Your last suggestions' %}
         </p>
     {% endif %}
     <ul class="space-y-2">
@@ -55,7 +55,7 @@
                         <input type="hidden" name="lng" value="{{ card.lng|unlocalize }}">
                         <button type="submit"
                                 class="btn btn-xs btn-outline btn-success"
-                                title="{% trans 'Add to trip' %}">
+                                title="{% translate 'Add to trip' %}">
                             <i class="ph-bold ph-plus i-xs"></i>
                         </button>
                     </form>
@@ -69,7 +69,7 @@
                         hx-target="closest li find [data-role='place-details']"
                         hx-swap="innerHTML">
                     <i class="ph-bold ph-info i-xs"></i>
-                    {% trans "Details" %}
+                    {% translate "Details" %}
                 </button>
                 <div data-role="place-details"></div>
             </li>
@@ -78,11 +78,11 @@
 {% elif awaiting_generation %}
     <div class="text-base-content/50 py-8 text-center">
         <i class="ph-bold ph-sparkle i-lg mb-2"></i>
-        <p>{% trans 'Generate suggestions for your trip' %}</p>
+        <p>{% translate 'Generate suggestions for your trip' %}</p>
     </div>
 {% else %}
     <div class="text-base-content/50 py-8 text-center">
         <i class="ph-bold ph-sparkle i-lg mb-2"></i>
-        <p>{% trans 'No suggestions found' %}</p>
+        <p>{% translate 'No suggestions found' %}</p>
     </div>
 {% endif %}

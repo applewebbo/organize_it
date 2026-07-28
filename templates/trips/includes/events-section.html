@@ -10,7 +10,7 @@
              :class="view === 'map' ? 'events-card-map' : ''"
              x-data="{ view: window.innerWidth < 640 ? 'list' : ' {% if show_map %} map {% else %} list {% endif %} ' }">
             <div class="flex items-center justify-between">
-                <h2 class="text-xl font-medium sm:text-2xl">{% trans 'Things to Do' %}</h2>
+                <h2 class="text-xl font-medium sm:text-2xl">{% translate 'Things to Do' %}</h2>
                 {# Map tab only on desktop (sm+) #}
                 <div role="tablist" class="tabs tabs-border tabs-sm hidden sm:flex">
                     <button role="tab"
@@ -21,7 +21,7 @@
                             hx-swap="innerHTML"
                             class="tab gap-1">
                         <i class="ph-bold ph-list i-sm" aria-hidden="true"></i>
-                        {% trans 'List' %}
+                        {% translate 'List' %}
                     </button>
                     <button role="tab"
                             :class="view === 'map' ? 'tab-active' : ''"
@@ -31,7 +31,7 @@
                             hx-swap="innerHTML"
                             class="tab gap-1">
                         <i class="ph-bold ph-map-trifold i-sm" aria-hidden="true"></i>
-                        {% trans 'Map' %}
+                        {% translate 'Map' %}
                     </button>
                 </div>
             </div>
@@ -45,21 +45,21 @@
             {# Mobile disclaimer #}
             <p class="text-base-content/50 mt-3 text-sm sm:hidden">
                 <i class="ph-bold ph-info i-sm" aria-hidden="true"></i>
-                {% trans 'Map view is not available on mobile devices.' %}
+                {% translate 'Map view is not available on mobile devices.' %}
             </p>
         </div>
     </section>
     <section class="card card-border bg-base-100 shadow">
         <div class="card-body p-4 sm:p-6">
             <div class="flex items-center justify-between">
-                <h2 class="text-xl font-medium sm:text-2xl">{% trans 'Other Things to Do' %}</h2>
+                <h2 class="text-xl font-medium sm:text-2xl">{% translate 'Other Things to Do' %}</h2>
                 <div class="dropdown dropdown-end" x-data>
                     <div tabindex="0"
                          role="button"
                          class="btn btn-xs btn-soft btn-primary sm:btn-sm"
                          aria-haspopup="menu">
                         <i class="ph-bold ph-plus i-sm" aria-hidden="true"></i>
-                        <span class="hidden sm:inline">{% trans 'Add event' %}</span>
+                        <span class="hidden sm:inline">{% translate 'Add event' %}</span>
                     </div>
                     <ul tabindex="0"
                         class="dropdown-content menu bg-base-100 rounded-box border-base-300 z-20 w-52 border p-2 shadow">
@@ -69,7 +69,7 @@
                                hx-swap="innerHTML"
                                @click="$dispatch('open-modal'); document.activeElement.blur()">
                                 <i class="ph-bold ph-map-pin i-sm text-green-500" aria-hidden="true"></i>
-                                {% trans 'Experience' %}
+                                {% translate 'Experience' %}
                             </a>
                         </li>
                         <li>
@@ -78,7 +78,7 @@
                                hx-swap="innerHTML"
                                @click="$dispatch('open-modal'); document.activeElement.blur()">
                                 <i class="ph-bold ph-fork-knife i-sm text-yellow-500" aria-hidden="true"></i>
-                                {% trans 'Meal' %}
+                                {% translate 'Meal' %}
                             </a>
                         </li>
                         {% if ai_suggestions_enabled %}
@@ -88,7 +88,7 @@
                                    hx-swap="innerHTML"
                                    @click="$dispatch('open-modal'); document.activeElement.blur()">
                                     <i class="ph-bold ph-sparkle i-sm text-purple-500" aria-hidden="true"></i>
-                                    {% trans 'AI suggestions' %}
+                                    {% translate 'AI suggestions' %}
                                 </a>
                             </li>
                         {% endif %}
@@ -97,7 +97,7 @@
             </div>
             <p class="text-base-content/50 mt-1 text-xs">
                 <i class="ph-bold ph-info i-sm" aria-hidden="true"></i>
-                {% trans 'Here you find events not yet assigned to a specific day' %}
+                {% translate 'Here you find events not yet assigned to a specific day' %}
             </p>
             {% if unpaired_events %}
                 {% if has_custom_stages %}
@@ -107,7 +107,7 @@
                                 {% if group.destination %}
                                     {{ group.destination }}
                                 {% else %}
-                                    {% trans 'No stage' %}
+                                    {% translate 'No stage' %}
                                 {% endif %}
                             </p>
                             <ul class="flex flex-wrap justify-center gap-3" x-data>
@@ -127,7 +127,7 @@
             {% else %}
                 <div class="text-base-content/50 py-6 text-center">
                     <i class="ph-bold ph-calendar-blank i-lg" aria-hidden="true"></i>
-                    <p class="mt-2 text-sm">{% trans 'Nothing to do here.' %}</p>
+                    <p class="mt-2 text-sm">{% translate 'Nothing to do here.' %}</p>
                 </div>
             {% endif %}
         </div>

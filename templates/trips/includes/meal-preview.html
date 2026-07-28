@@ -13,7 +13,7 @@
             <i class="ph-bold ph-globe i-md text-success shrink-0"></i>
             <a href="{{ enriched_data.website }}"
                class="link text-success min-w-0 truncate font-semibold">{{ enriched_data.website }}</a>
-            <span class="badge badge-success badge-xs ml-auto shrink-0 gap-1"><i class="ph-bold ph-sparkle"></i><span class="hidden sm:inline">{% trans 'New' %}</span></span>
+            <span class="badge badge-success badge-xs ml-auto shrink-0 gap-1"><i class="ph-bold ph-sparkle"></i><span class="hidden sm:inline">{% translate 'New' %}</span></span>
         </li>
     {% elif event.website %}
         <li class="flex min-w-0 items-center gap-2">
@@ -24,7 +24,7 @@
         <li class="bg-success/10 flex items-center gap-2 rounded px-2 py-1">
             <i class="ph-bold ph-phone i-md text-success"></i>
             <span class="text-success font-semibold">{{ enriched_data.phone_number }}</span>
-            <span class="badge badge-success badge-xs ml-auto shrink-0 gap-1"><i class="ph-bold ph-sparkle"></i><span class="hidden sm:inline">{% trans 'New' %}</span></span>
+            <span class="badge badge-success badge-xs ml-auto shrink-0 gap-1"><i class="ph-bold ph-sparkle"></i><span class="hidden sm:inline">{% translate 'New' %}</span></span>
         </li>
     {% elif event.phone_number %}
         <li class="flex items-center gap-2">
@@ -35,7 +35,7 @@
         <li class="bg-success/10 flex items-center gap-2 rounded px-2 py-1">
             <i class="ph-bold ph-door-open i-md text-success"></i>
             <span class="text-success font-semibold">{{ enriched_data.opening_hours|format_opening_hours }}</span>
-            <span class="badge badge-success badge-xs ml-auto shrink-0 gap-1"><i class="ph-bold ph-sparkle"></i><span class="hidden sm:inline">{% trans 'New' %}</span></span>
+            <span class="badge badge-success badge-xs ml-auto shrink-0 gap-1"><i class="ph-bold ph-sparkle"></i><span class="hidden sm:inline">{% translate 'New' %}</span></span>
         </li>
     {% elif event.opening_hours %}
         <li class="flex items-center gap-2">

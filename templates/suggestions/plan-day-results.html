@@ -3,14 +3,14 @@
     <div class="alert alert-warning alert-soft">
         <div>
             {% if error_kind == 'config' %}
-                <p>{% trans "AI suggestions are not configured yet. Add a valid API key to get started." %}</p>
-                <a href="{% url 'accounts:profile' %}" class="link link-primary">{% trans "Check your AI settings" %}</a>
+                <p>{% translate "AI suggestions are not configured yet. Add a valid API key to get started." %}</p>
+                <a href="{% url 'accounts:profile' %}" class="link link-primary">{% translate "Check your AI settings" %}</a>
             {% elif error_kind == 'quota' %}
-                <p>{% trans "You have reached the AI provider usage limit. Please try again later." %}</p>
+                <p>{% translate "You have reached the AI provider usage limit. Please try again later." %}</p>
             {% elif error_kind == 'rate_limit' %}
-                <p>{% trans "You have reached the daily AI suggestion limit. Please try again tomorrow." %}</p>
+                <p>{% translate "You have reached the daily AI suggestion limit. Please try again tomorrow." %}</p>
             {% else %}
-                <p>{% trans "Something went wrong while generating the itinerary. Please try again." %}</p>
+                <p>{% translate "Something went wrong while generating the itinerary. Please try again." %}</p>
             {% endif %}
         </div>
     </div>
@@ -41,7 +41,7 @@
                             <span class="text-base-content/50 shrink-0 text-xs">{{ stop.duration_minutes }}′</span>
                         {% endif %}
                         {% if stop.existing_event_id %}
-                            <span class="badge badge-xs badge-ghost shrink-0">{% trans 'existing' %}</span>
+                            <span class="badge badge-xs badge-ghost shrink-0">{% translate 'existing' %}</span>
                         {% endif %}
                     </label>
                     {% if stop.description %}
@@ -54,22 +54,22 @@
         {% if strategy == 'delete' %}
             <p class="text-warning mt-2 flex items-center gap-1 text-xs">
                 <i class="ph-bold ph-warning i-xs"></i>
-                {% trans "The day's current events will be deleted." %}
+                {% translate "The day's current events will be deleted." %}
             </p>
         {% elif strategy == 'unpair' %}
             <p class="text-base-content/60 mt-2 flex items-center gap-1 text-xs">
                 <i class="ph-bold ph-info i-xs"></i>
-                {% trans "The day's current events will be moved to the unassigned list." %}
+                {% translate "The day's current events will be moved to the unassigned list." %}
             </p>
         {% endif %}
         <button type="submit" class="btn btn-sm btn-success mt-3 w-full">
             <i class="ph-bold ph-check i-sm htmx-hide-on-request"></i>
-            {% trans 'Apply day' %}
+            {% translate 'Apply day' %}
         </button>
     </form>
 {% else %}
     <div class="text-base-content/50 py-8 text-center">
         <i class="ph-bold ph-sparkle i-lg mb-2"></i>
-        <p>{% trans 'No itinerary generated' %}</p>
+        <p>{% translate 'No itinerary generated' %}</p>
     </div>
 {% endif %}

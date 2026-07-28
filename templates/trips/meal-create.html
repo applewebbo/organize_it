@@ -6,7 +6,7 @@
       method="post"
       x-data="autocompleteForm()">
     <div class="border-base-300 flex items-center justify-between rounded-t border-b p-4 md:px-5 md:py-2.5">
-        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% trans 'Create a new Meal' %}</h3>
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% translate 'Create a new Meal' %}</h3>
         <button type="button"
                 class="ms-auto inline-flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white"
                 x-on:click="openModal = false">
@@ -23,19 +23,19 @@
     <div class="grid gap-x-1 p-4 sm:grid-cols-4 sm:gap-x-2 md:p-5">
         {% csrf_token %}
         <div class="bg-base-200 border-base-300 mb-5 rounded-lg border px-4 pt-3 pb-6 sm:col-span-4">
-            <label for="id_maps_link" class="mb-1 block text-sm font-medium">{% trans "Google Maps" %}</label>
+            <label for="id_maps_link" class="mb-1 block text-sm font-medium">{% translate "Google Maps" %}</label>
             <div class="flex gap-2">
                 <input type="text"
                        id="id_maps_link"
                        name="maps_link"
                        class="input input-bordered input-sm flex-1"
-                       placeholder="{% trans 'Paste a Google Maps link to auto-fill' %}">
+                       placeholder="{% translate 'Paste a Google Maps link to auto-fill' %}">
                 <button type="button"
                         class="btn btn-sm btn-primary"
                         hx-post="{% url 'trips:resolve-maps-link' %}"
                         hx-target="#maps-link-results"
                         hx-include="[name='maps_link']"
-                        hx-vals='{"form_type": "meal"}'>{% trans "Search" %}</button>
+                        hx-vals='{"form_type": "meal"}'>{% translate "Search" %}</button>
             </div>
             <div id="maps-link-results"></div>
         </div>
@@ -43,7 +43,7 @@
     </div>
     {% if unpaired_experiences %}
         <div class="px-4 md:px-5">
-            <h4 class="text-lg font-semibold">{% trans 'Unpaired Meals' %}</h4>
+            <h4 class="text-lg font-semibold">{% translate 'Unpaired Meals' %}</h4>
             <ul class="mt-4 flex flex-wrap items-center justify-start gap-3">
                 {% for exp in unpaired_experiences %}
                     <li>

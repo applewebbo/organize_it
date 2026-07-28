@@ -7,9 +7,9 @@
     <div class="border-base-300 flex items-center justify-between rounded-t border-b p-4 md:px-5 md:py-2.5">
         <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
             {% if is_update %}
-                {% trans 'Edit Trip' %}
+                {% translate 'Edit Trip' %}
             {% else %}
-                {% trans 'Create a New Trip' %}
+                {% translate 'Create a New Trip' %}
             {% endif %}
         </h3>
         <button type="button"
@@ -31,7 +31,7 @@
         {% if is_update %}
             <div class="alert alert-warning alert-soft alert-sm mt-4 sm:col-span-2">
                 <i class="ph-bold ph-warning i-sm"></i>
-                <span>{% trans "Changing the dates may remove some days. Events on removed days will become unpaired and can be reassigned later." %}</span>
+                <span>{% translate "Changing the dates may remove some days. Events on removed days will become unpaired and can be reassigned later." %}</span>
             </div>
         {% endif %}
     </div>

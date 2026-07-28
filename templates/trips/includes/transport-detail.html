@@ -35,20 +35,20 @@
     {% if event.company or event.price %}
         <li class="mt-2">
             <div class="divider my-1"></div>
-            <span class="text-base-content/80 text-sm font-semibold">{% trans "Booking Details" %}</span>
+            <span class="text-base-content/80 text-sm font-semibold">{% translate "Booking Details" %}</span>
         </li>
         {% if event.company %}
             <li class="flex items-center gap-2">
                 <i class="ph-bold ph-buildings i-md text-base-content/60"
                    aria-hidden="true"></i>
-                <span><span class="text-base-content/60">{% trans "Company" %}:</span> {{ event.company }}</span>
+                <span><span class="text-base-content/60">{% translate "Company" %}:</span> {{ event.company }}</span>
             </li>
         {% endif %}
         {% if event.price %}
             <li class="flex items-center gap-2">
                 <i class="ph-bold ph-currency-dollar i-md text-base-content/60"
                    aria-hidden="true"></i>
-                <span><span class="text-base-content/60">{% trans "Price" %}:</span> €{{ event.price }}</span>
+                <span><span class="text-base-content/60">{% translate "Price" %}:</span> €{{ event.price }}</span>
             </li>
         {% endif %}
     {% endif %}

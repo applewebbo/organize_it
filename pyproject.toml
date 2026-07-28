@@ -6,7 +6,8 @@ dev = [
   "django-devbar>=0.7.0",
   "django-test-plus>=2.2.4",
   "django-watchfiles>=1.4.0",
-  "djlint==1.40.5",
+  "djade>=1.9.0",
+  "djlint>=1.43.0",
   "pre-commit>=3.8.0",
   "pytest>=9.0.3",
   "pytest-cov>=5.0.0",
@@ -83,7 +84,10 @@ branch = true
 omit = ['*/node_modules/*', '*/venv/*', '*/migrations/*', '*/tests/*', '*/test_*.py', '*/settings/*', '*/wsgi.py', '*/asgi.py', '*/manage.py', '*/core/*', '*/scripts/*', '*/accounts/managers.py', '*/trips/tasks.py', "accounts/templatetags/custom_tailwind.py", '*/populate_trips.py', '*/enrich_airports_icao.py', '*/probe_suggestions.py', '*/probe_day_itinerary.py', '*/regeocode_trip_destinations.py']
 
 [tool.djlint]
-ignore = "T002,H006"
+# H025: djLint misparses closing </style>/</script> of embedded blocks whose
+# inner content is indented less than the tag as orphans (9 email/PDF/script
+# templates). djade does not reindent HTML, so ignore it globally.
+ignore = "T002,H006,H025"
 profile = "django"
 
 [tool.pytest.ini_options]

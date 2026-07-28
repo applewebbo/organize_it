@@ -2,13 +2,13 @@
 <div class="p-4 sm:p-6" x-data="{ strategy: 'add' }">
     <div class="mb-4 flex items-center justify-between">
         <h3 class="text-lg font-semibold">
-            {% trans 'Plan the day' %}
+            {% translate 'Plan the day' %}
             <span class="text-base-content/50 font-normal">— {{ day.date|date:"j F" }}</span>
         </h3>
         <button type="button"
                 @click="$dispatch('hide-modal')"
                 class="btn btn-sm btn-circle btn-ghost"
-                aria-label="{% trans 'Close' %}">✕</button>
+                aria-label="{% translate 'Close' %}">✕</button>
     </div>
     <form hx-post="{% url 'suggestions:generate-day' trip.pk day.pk %}"
           hx-target="#plan-day-results"
@@ -18,7 +18,7 @@
         {% csrf_token %}
         {% if has_events %}
             <fieldset class="border-base-300 mb-3 rounded-lg border p-3">
-                <legend class="px-1 text-sm font-medium">{% trans 'This day already has events' %}</legend>
+                <legend class="px-1 text-sm font-medium">{% translate 'This day already has events' %}</legend>
                 <label class="label cursor-pointer justify-start gap-2 py-1">
                     <input type="radio"
                            name="strategy"
@@ -26,7 +26,7 @@
                            class="radio radio-sm"
                            x-model="strategy"
                            checked />
-                    <span class="text-sm">{% trans 'Add to existing events' %}</span>
+                    <span class="text-sm">{% translate 'Add to existing events' %}</span>
                 </label>
                 <label class="label cursor-pointer justify-start gap-2 py-1">
                     <input type="radio"
@@ -34,7 +34,7 @@
                            value="unpair"
                            class="radio radio-sm"
                            x-model="strategy" />
-                    <span class="text-sm">{% trans 'Unpair existing events' %}</span>
+                    <span class="text-sm">{% translate 'Unpair existing events' %}</span>
                 </label>
                 <label class="label cursor-pointer justify-start gap-2 py-1">
                     <input type="radio"
@@ -42,32 +42,32 @@
                            value="delete"
                            class="radio radio-sm"
                            x-model="strategy" />
-                    <span class="text-sm">{% trans 'Delete existing events' %}</span>
+                    <span class="text-sm">{% translate 'Delete existing events' %}</span>
                 </label>
                 <p x-show="strategy === 'unpair'"
                    x-cloak
                    class="text-base-content/60 mt-1 text-xs">
-                    {% trans 'Existing events will be moved to the unassigned list only when you apply the plan.' %}
+                    {% translate 'Existing events will be moved to the unassigned list only when you apply the plan.' %}
                 </p>
                 <p x-show="strategy === 'delete'"
                    x-cloak
                    class="text-warning mt-1 text-xs">
-                    {% trans 'Existing events will be deleted only when you apply the plan.' %}
+                    {% translate 'Existing events will be deleted only when you apply the plan.' %}
                 </p>
             </fieldset>
         {% endif %}
         <input type="text"
                name="notes"
-               placeholder="{% trans 'Notes for this day (optional)…' %}"
+               placeholder="{% translate 'Notes for this day (optional)…' %}"
                autocomplete="off"
                class="input input-sm input-bordered mb-2 w-full" />
         <button type="submit" class="btn btn-sm btn-secondary w-full">
             <i class="ph-bold ph-sparkle i-sm htmx-hide-on-request"></i>
             <span id="plan-day-spinner"
                   class="loading loading-spinner loading-xs htmx-indicator"></span>
-            {% trans 'Plan day' %}
+            {% translate 'Plan day' %}
         </button>
-        <p class="text-base-content/50 mt-1 text-xs">{% trans 'Generating uses your AI provider quota.' %}</p>
+        <p class="text-base-content/50 mt-1 text-xs">{% translate 'Generating uses your AI provider quota.' %}</p>
     </form>
     <div id="plan-day-results" class="mt-4 max-h-96 overflow-y-auto"></div>
 </div>

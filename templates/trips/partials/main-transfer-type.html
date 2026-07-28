@@ -1,7 +1,7 @@
 {% load i18n %}
 <div class="p-4 md:p-5">
     <p class="mb-4 text-sm text-slate-600 dark:text-slate-300">
-        {% trans "Select the type of transport for this transfer." %}
+        {% translate "Select the type of transport for this transfer." %}
     </p>
     <div class="grid grid-cols-2 gap-4">
         <!-- Plane -->
@@ -14,7 +14,7 @@
                 hx-swap="innerHTML"
                 @htmx:after-settle="currentStep = 'form'">
             <i class="ph-bold ph-airplane-takeoff text-primary text-4xl"></i>
-            <span class="font-semibold">{% trans "Plane" %}</span>
+            <span class="font-semibold">{% translate "Plane" %}</span>
         </button>
         <!-- Train -->
         <button type="button"
@@ -26,7 +26,7 @@
                 hx-swap="innerHTML"
                 @htmx:after-settle="currentStep = 'form'">
             <i class="ph-bold ph-train text-primary text-4xl"></i>
-            <span class="font-semibold">{% trans "Train" %}</span>
+            <span class="font-semibold">{% translate "Train" %}</span>
         </button>
         <!-- Car -->
         <button type="button"
@@ -38,7 +38,7 @@
                 hx-swap="innerHTML"
                 @htmx:after-settle="currentStep = 'form'">
             <i class="ph-bold ph-car text-primary text-4xl"></i>
-            <span class="font-semibold">{% trans "Car" %}</span>
+            <span class="font-semibold">{% translate "Car" %}</span>
         </button>
         <!-- Other -->
         <button type="button"
@@ -54,11 +54,11 @@
                 <span class="text-xl font-bold">/</span>
                 <i class="ph-bold ph-bus text-3xl"></i>
             </span>
-            <span class="font-semibold">{% trans "Other" %}</span>
+            <span class="font-semibold">{% translate "Other" %}</span>
         </button>
     </div>
 </div>
 <!-- Footer -->
 <div class="border-base-200 flex items-center justify-between rounded-b border-t p-4">
-    <button type="button" x-on:click="openModal = false" class="btn btn-soft">{% trans "Cancel" %}</button>
+    <button type="button" x-on:click="openModal = false" class="btn btn-soft">{% translate "Cancel" %}</button>
 </div>

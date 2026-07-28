@@ -61,7 +61,7 @@
                        href="{{ event.google_maps_directions_url }}"
                        target="_blank"
                        rel="noopener noreferrer"
-                       aria-label="{% trans 'Get directions' %}">
+                       aria-label="{% translate 'Get directions' %}">
                         <i class="ph-bold ph-path i-sm {{ icon_color }}" aria-hidden="true"></i>
                     </a>
                 {% endif %}
@@ -71,7 +71,7 @@
                             hx-target="#dialog"
                             hx-swap="innerHTML"
                             @click="$dispatch('open-modal'); document.activeElement.blur()"
-                            aria-label="{% trans 'Reorder event' %}">
+                            aria-label="{% translate 'Reorder event' %}">
                         <i class="ph-bold ph-arrows-down-up i-sm {{ icon_color }}"
                            aria-hidden="true"></i>
                     </button>
@@ -82,7 +82,7 @@
                             hx-target="#dialog"
                             hx-swap="innerHTML"
                             @click="$dispatch('open-modal'); document.activeElement.blur()"
-                            aria-label="{% trans 'Move to another day' %}">
+                            aria-label="{% translate 'Move to another day' %}">
                         <i class="ph-bold ph-arrow-square-right i-sm {{ icon_color }}"
                            aria-hidden="true"></i>
                     </button>

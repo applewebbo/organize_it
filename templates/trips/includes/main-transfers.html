@@ -7,7 +7,7 @@
          hx-trigger="tripModified from:body">
     <div class="card card-border bg-base-100 shadow">
         <div class="card-body p-4 sm:p-6">
-            <h2 class="text-xl font-medium sm:text-2xl">{% trans "How to Get There" %}</h2>
+            <h2 class="text-xl font-medium sm:text-2xl">{% translate "How to Get There" %}</h2>
             <div class="mt-2 grid grid-cols-1 gap-4 sm:mt-3 md:grid-cols-2">
                 <!-- Arrival Transfer -->
                 <div class="bg-base-200 relative overflow-hidden rounded-lg p-4" x-data>
@@ -38,7 +38,7 @@
                                     <i class="ph-bold ph-bus text-xl"></i>
                                 {% endif %}
                             {% endif %}
-                            <h4 class="font-medium">{% trans "Arrival" %}</h4>
+                            <h4 class="font-medium">{% translate "Arrival" %}</h4>
                         </div>
                         {% if arrival_transfer %}
                             <div class="flex flex-wrap justify-end gap-2">
@@ -49,13 +49,13 @@
                                            target="_blank"
                                            rel="noopener noreferrer"
                                            class="btn btn-xs sm:btn-sm btn-soft {% if today != travel_day %}btn-disabled{% endif %}"
-                                           title="{% if arrival_transfer.train_number %}{% trans 'Train status' %}{% else %}{% trans 'Station departures' %}{% endif %}">
+                                           title="{% if arrival_transfer.train_number %}{% translate 'Train status' %}{% else %}{% translate 'Station departures' %}{% endif %}">
                                             <i class="ph-bold ph-train-simple i-sm"></i>
                                             <span class="hidden sm:inline">
                                                 {% if arrival_transfer.train_number %}
-                                                    {% trans "Train status" %}
+                                                    {% translate "Train status" %}
                                                 {% else %}
-                                                    {% trans "Station departures" %}
+                                                    {% translate "Station departures" %}
                                                 {% endif %}
                                             </span>
                                         </a>
@@ -68,13 +68,13 @@
                                            target="_blank"
                                            rel="noopener noreferrer"
                                            class="btn btn-xs sm:btn-sm btn-soft {% if not today == travel_day or not flight_active %}btn-disabled{% endif %}"
-                                           title="{% if arrival_transfer.flight_number %}{% trans 'Flight status' %}{% else %}{% trans 'Airport departures' %}{% endif %}">
+                                           title="{% if arrival_transfer.flight_number %}{% translate 'Flight status' %}{% else %}{% translate 'Airport departures' %}{% endif %}">
                                             <i class="ph-bold ph-airplane i-sm"></i>
                                             <span class="hidden sm:inline">
                                                 {% if arrival_transfer.flight_number %}
-                                                    {% trans "Flight status" %}
+                                                    {% translate "Flight status" %}
                                                 {% else %}
-                                                    {% trans "Airport departures" %}
+                                                    {% translate "Airport departures" %}
                                                 {% endif %}
                                             </span>
                                         </a>
@@ -88,7 +88,7 @@
                                     hx-swap="innerHTML"
                                     @click="$dispatch('open-modal'); document.activeElement.blur()">
                                 <i class="ph-bold ph-plus i-sm"></i>
-                                {% trans "Add" %}
+                                {% translate "Add" %}
                             </button>
                         {% endif %}
                     </div>
@@ -96,24 +96,24 @@
                         <div class="relative space-y-1 text-sm">
                             {% if arrival_transfer.type == 1 or arrival_transfer.type == 2 %}
                                 <p>
-                                    <strong>{% trans "From:" %}</strong> {{ arrival_transfer.origin_name }}
+                                    <strong>{% translate "From:" %}</strong> {{ arrival_transfer.origin_name }}
                                 </p>
                                 <p>
-                                    <strong>{% trans "To:" %}</strong> {{ arrival_transfer.destination_name }}
+                                    <strong>{% translate "To:" %}</strong> {{ arrival_transfer.destination_name }}
                                 </p>
                             {% else %}
                                 <p>
-                                    <strong>{% trans "From:" %}</strong> {{ arrival_transfer.origin_address }}
+                                    <strong>{% translate "From:" %}</strong> {{ arrival_transfer.origin_address }}
                                 </p>
                                 <p>
-                                    <strong>{% trans "To:" %}</strong> {{ arrival_transfer.destination_address }}
+                                    <strong>{% translate "To:" %}</strong> {{ arrival_transfer.destination_address }}
                                 </p>
                             {% endif %}
                             <p>
-                                <strong>{% trans "Departure:" %}</strong> {{ arrival_transfer.start_time }}
+                                <strong>{% translate "Departure:" %}</strong> {{ arrival_transfer.start_time }}
                             </p>
                             <p>
-                                <strong>{% trans "Arrival:" %}</strong> {{ arrival_transfer.end_time }}
+                                <strong>{% translate "Arrival:" %}</strong> {{ arrival_transfer.end_time }}
                             </p>
                         </div>
                         {# Connection to first event/stay #}
@@ -131,7 +131,7 @@
                                                target="_blank"
                                                rel="noopener noreferrer"
                                                class="btn btn-xs btn-circle btn-ghost"
-                                               aria-label="{% trans 'Open in Google Maps' %}">
+                                               aria-label="{% translate 'Open in Google Maps' %}">
                                                 <i class="ph-bold ph-map-trifold i-sm" aria-hidden="true"></i>
                                             </a>
                                         {% endif %}
@@ -145,9 +145,9 @@
                                             hx-target="#dialog"
                                             hx-swap="innerHTML"
                                             @click="$dispatch('open-modal'); document.activeElement.blur()"
-                                            title="{% trans 'Add document' %}">
+                                            title="{% translate 'Add document' %}">
                                         <i class="ph-bold ph-paperclip i-sm"></i>
-                                        <span class="hidden sm:inline">{% trans "Add document" %}</span>
+                                        <span class="hidden sm:inline">{% translate "Add document" %}</span>
                                     </button>
                                     {# Transfer connection #}
                                     <button class="btn btn-xs btn-soft"
@@ -155,9 +155,9 @@
                                             hx-target="#dialog"
                                             hx-swap="innerHTML"
                                             @click="$dispatch('open-modal'); document.activeElement.blur()"
-                                            title="{% if arrival_transfer.connection %}{% trans 'Edit connection' %}{% else %}{% trans 'Add connection' %}{% endif %}">
+                                            title="{% if arrival_transfer.connection %}{% translate 'Edit connection' %}{% else %}{% translate 'Add connection' %}{% endif %}">
                                         <i class="ph-bold ph-line-segment i-sm"></i>
-                                        <span class="hidden sm:inline">{% trans "Transfer" %}</span>
+                                        <span class="hidden sm:inline">{% translate "Transfer" %}</span>
                                     </button>
                                     {# Edit transfer #}
                                     <button class="btn btn-xs btn-soft"
@@ -165,23 +165,23 @@
                                             hx-target="#dialog"
                                             hx-swap="innerHTML"
                                             @click="$dispatch('open-modal'); document.activeElement.blur()"
-                                            title="{% trans 'Edit transfer' %}">
+                                            title="{% translate 'Edit transfer' %}">
                                         <i class="ph-bold ph-pencil-simple i-sm"></i>
-                                        <span class="hidden sm:inline">{% trans "Edit" %}</span>
+                                        <span class="hidden sm:inline">{% translate "Edit" %}</span>
                                     </button>
                                     {# Delete transfer #}
                                     <button class="btn btn-xs btn-error btn-soft"
                                             hx-delete="{% url 'trips:delete-main-transfer' pk=arrival_transfer.pk %}"
-                                            hx-confirm="{% trans 'Are you sure you want to delete this main transfer?' %}"
-                                            title="{% trans 'Delete transfer' %}">
+                                            hx-confirm="{% translate 'Are you sure you want to delete this main transfer?' %}"
+                                            title="{% translate 'Delete transfer' %}">
                                         <i class="ph-bold ph-trash i-sm"></i>
-                                        <span class="hidden sm:inline">{% trans "Delete" %}</span>
+                                        <span class="hidden sm:inline">{% translate "Delete" %}</span>
                                     </button>
                                 </div>
                             </div>
                         </div>
                     {% else %}
-                        <p class="text-base-content/60 hidden text-sm sm:block">{% trans "No arrival transfer added yet." %}</p>
+                        <p class="text-base-content/60 hidden text-sm sm:block">{% translate "No arrival transfer added yet." %}</p>
                     {% endif %}
                 </div>
                 <!-- Departure Transfer -->
@@ -213,7 +213,7 @@
                                     <i class="ph-bold ph-bus text-xl"></i>
                                 {% endif %}
                             {% endif %}
-                            <h4 class="font-medium">{% trans "Departure" %}</h4>
+                            <h4 class="font-medium">{% translate "Departure" %}</h4>
                         </div>
                         {% if departure_transfer %}
                             <div class="flex flex-wrap justify-end gap-2">
@@ -224,13 +224,13 @@
                                            target="_blank"
                                            rel="noopener noreferrer"
                                            class="btn btn-xs sm:btn-sm btn-soft {% if today != travel_day %}btn-disabled{% endif %}"
-                                           title="{% if departure_transfer.train_number %}{% trans 'Train status' %}{% else %}{% trans 'Station departures' %}{% endif %}">
+                                           title="{% if departure_transfer.train_number %}{% translate 'Train status' %}{% else %}{% translate 'Station departures' %}{% endif %}">
                                             <i class="ph-bold ph-train-simple i-sm"></i>
                                             <span class="hidden sm:inline">
                                                 {% if departure_transfer.train_number %}
-                                                    {% trans "Train status" %}
+                                                    {% translate "Train status" %}
                                                 {% else %}
-                                                    {% trans "Station departures" %}
+                                                    {% translate "Station departures" %}
                                                 {% endif %}
                                             </span>
                                         </a>
@@ -243,13 +243,13 @@
                                            target="_blank"
                                            rel="noopener noreferrer"
                                            class="btn btn-xs sm:btn-sm btn-soft {% if not today == travel_day or not flight_active %}btn-disabled{% endif %}"
-                                           title="{% if departure_transfer.flight_number %}{% trans 'Flight status' %}{% else %}{% trans 'Airport departures' %}{% endif %}">
+                                           title="{% if departure_transfer.flight_number %}{% translate 'Flight status' %}{% else %}{% translate 'Airport departures' %}{% endif %}">
                                             <i class="ph-bold ph-airplane i-sm"></i>
                                             <span class="hidden sm:inline">
                                                 {% if departure_transfer.flight_number %}
-                                                    {% trans "Flight status" %}
+                                                    {% translate "Flight status" %}
                                                 {% else %}
-                                                    {% trans "Airport departures" %}
+                                                    {% translate "Airport departures" %}
                                                 {% endif %}
                                             </span>
                                         </a>
@@ -263,7 +263,7 @@
                                     hx-swap="innerHTML"
                                     @click="$dispatch('open-modal'); document.activeElement.blur()">
                                 <i class="ph-bold ph-plus i-sm"></i>
-                                {% trans "Add" %}
+                                {% translate "Add" %}
                             </button>
                         {% endif %}
                     </div>
@@ -271,24 +271,24 @@
                         <div class="relative space-y-1 text-sm">
                             {% if departure_transfer.type == 1 or departure_transfer.type == 2 %}
                                 <p>
-                                    <strong>{% trans "From:" %}</strong> {{ departure_transfer.origin_name }}
+                                    <strong>{% translate "From:" %}</strong> {{ departure_transfer.origin_name }}
                                 </p>
                                 <p>
-                                    <strong>{% trans "To:" %}</strong> {{ departure_transfer.destination_name }}
+                                    <strong>{% translate "To:" %}</strong> {{ departure_transfer.destination_name }}
                                 </p>
                             {% else %}
                                 <p>
-                                    <strong>{% trans "From:" %}</strong> {{ departure_transfer.origin_address }}
+                                    <strong>{% translate "From:" %}</strong> {{ departure_transfer.origin_address }}
                                 </p>
                                 <p>
-                                    <strong>{% trans "To:" %}</strong> {{ departure_transfer.destination_address }}
+                                    <strong>{% translate "To:" %}</strong> {{ departure_transfer.destination_address }}
                                 </p>
                             {% endif %}
                             <p>
-                                <strong>{% trans "Departure:" %}</strong> {{ departure_transfer.start_time }}
+                                <strong>{% translate "Departure:" %}</strong> {{ departure_transfer.start_time }}
                             </p>
                             <p>
-                                <strong>{% trans "Arrival:" %}</strong> {{ departure_transfer.end_time }}
+                                <strong>{% translate "Arrival:" %}</strong> {{ departure_transfer.end_time }}
                             </p>
                         </div>
                         {# Connection from last event/stay #}
@@ -306,7 +306,7 @@
                                                target="_blank"
                                                rel="noopener noreferrer"
                                                class="btn btn-xs btn-circle btn-ghost"
-                                               aria-label="{% trans 'Open in Google Maps' %}">
+                                               aria-label="{% translate 'Open in Google Maps' %}">
                                                 <i class="ph-bold ph-map-trifold i-sm" aria-hidden="true"></i>
                                             </a>
                                         {% endif %}
@@ -320,9 +320,9 @@
                                             hx-target="#dialog"
                                             hx-swap="innerHTML"
                                             @click="$dispatch('open-modal'); document.activeElement.blur()"
-                                            title="{% trans 'Add document' %}">
+                                            title="{% translate 'Add document' %}">
                                         <i class="ph-bold ph-paperclip i-sm"></i>
-                                        <span class="hidden sm:inline">{% trans "Add document" %}</span>
+                                        <span class="hidden sm:inline">{% translate "Add document" %}</span>
                                     </button>
                                     {# Transfer connection #}
                                     <button class="btn btn-xs btn-soft"
@@ -330,9 +330,9 @@
                                             hx-target="#dialog"
                                             hx-swap="innerHTML"
                                             @click="$dispatch('open-modal'); document.activeElement.blur()"
-                                            title="{% if departure_transfer.connection %}{% trans 'Edit connection' %}{% else %}{% trans 'Add connection' %}{% endif %}">
+                                            title="{% if departure_transfer.connection %}{% translate 'Edit connection' %}{% else %}{% translate 'Add connection' %}{% endif %}">
                                         <i class="ph-bold ph-line-segment i-sm"></i>
-                                        <span class="hidden sm:inline">{% trans "Transfer" %}</span>
+                                        <span class="hidden sm:inline">{% translate "Transfer" %}</span>
                                     </button>
                                     {# Edit transfer #}
                                     <button class="btn btn-xs btn-soft"
@@ -340,23 +340,23 @@
                                             hx-target="#dialog"
                                             hx-swap="innerHTML"
                                             @click="$dispatch('open-modal'); document.activeElement.blur()"
-                                            title="{% trans 'Edit transfer' %}">
+                                            title="{% translate 'Edit transfer' %}">
                                         <i class="ph-bold ph-pencil-simple i-sm"></i>
-                                        <span class="hidden sm:inline">{% trans "Edit" %}</span>
+                                        <span class="hidden sm:inline">{% translate "Edit" %}</span>
                                     </button>
                                     {# Delete transfer #}
                                     <button class="btn btn-xs btn-error btn-soft"
                                             hx-delete="{% url 'trips:delete-main-transfer' pk=departure_transfer.pk %}"
-                                            hx-confirm="{% trans 'Are you sure you want to delete this main transfer?' %}"
-                                            title="{% trans 'Delete transfer' %}">
+                                            hx-confirm="{% translate 'Are you sure you want to delete this main transfer?' %}"
+                                            title="{% translate 'Delete transfer' %}">
                                         <i class="ph-bold ph-trash i-sm"></i>
-                                        <span class="hidden sm:inline">{% trans "Delete" %}</span>
+                                        <span class="hidden sm:inline">{% translate "Delete" %}</span>
                                     </button>
                                 </div>
                             </div>
                         </div>
                     {% else %}
-                        <p class="text-base-content/60 hidden text-sm sm:block">{% trans "No departure transfer added yet." %}</p>
+                        <p class="text-base-content/60 hidden text-sm sm:block">{% translate "No departure transfer added yet." %}</p>
                     {% endif %}
                 </div>
             </div>

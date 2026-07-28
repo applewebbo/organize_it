@@ -1,5 +1,4 @@
-{% load crispy_forms_filters %}
-{% load l10n %}
+{% load crispy_forms_filters l10n %}
 {% if field.label and form_show_labels %}
     <span class="mb-1 block text-sm font-medium text-gray-700">{{ field.label|safe }}{% if field.field.required %}<span class="asteriskField">*</span>{% endif %}</span>
 {% endif %}

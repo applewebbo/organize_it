@@ -1,6 +1,6 @@
 {% load i18n %}
 <div class="border-base-300 flex items-center justify-between rounded-t border-b p-4 md:px-5 md:py-2.5">
-    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% trans "Delete" %} {{ event.name }}</h3>
+    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% translate "Delete" %} {{ event.name }}</h3>
     <button type="button"
             class="ms-auto inline-flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white"
             x-on:click="openModal = false">
@@ -11,26 +11,26 @@
              viewBox="0 0 14 14">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
         </svg>
-        <span class="sr-only">{% trans "Close modal" %}</span>
+        <span class="sr-only">{% translate "Close modal" %}</span>
     </button>
 </div>
 <div class="p-4 md:p-5">
     <div role="alert" class="alert alert-error alert-soft my-4 md:my-5">
         <i class="ph-bold ph-warning i-sm"></i>
-        <span>{% blocktrans with name=event.name %}You are deleting {{ name }} permanently.{% endblocktrans %}</span>
+        <span>{% blocktranslate with name=event.name %}You are deleting {{ name }} permanently.{% endblocktranslate %}</span>
     </div>
     <p class="text-sm text-slate-500 italic dark:text-slate-300">
-        {% trans "This action cannot be undone. You can alternatively unpair from this day and reuse later by reassigning to a day of your trip. If you are sure to proceed just click confirm." %}
+        {% translate "This action cannot be undone. You can alternatively unpair from this day and reuse later by reassigning to a day of your trip. If you are sure to proceed just click confirm." %}
     </p>
 </div>
 <div class="flex items-center justify-end rounded-b p-4">
     <button type="button"
             x-on:click="openModal = false"
-            class="btn btn-soft mr-2">{% trans "Cancel" %}</button>
+            class="btn btn-soft mr-2">{% translate "Cancel" %}</button>
     <button class="btn btn-soft btn-primary mr-2"
             hx-put="{% url 'trips:event-unpair' event.pk %}"
-            type="button">{% trans "Unpair" %}</button>
+            type="button">{% translate "Unpair" %}</button>
     <button class="btn btn-soft btn-error"
             hx-delete="{% url 'trips:event-delete' event.pk %}"
-            type="button">{% trans "Confirm" %}</button>
+            type="button">{% translate "Confirm" %}</button>
 </div>

@@ -3,8 +3,8 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>{% trans "Checklist reminder" %}</title>
-        <meta name="description" content="{% trans 'Checklist reminder' %}">
+        <title>{% translate "Checklist reminder" %}</title>
+        <meta name="description" content="{% translate 'Checklist reminder' %}">
         <meta name="keywords" content="checklist, reminder, trip">
         <style>
     body { font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 24px; }
@@ -15,19 +15,19 @@
         </style>
     </head>
     <body>
-        <h2>{% trans "Checklist reminder" %}</h2>
+        <h2>{% translate "Checklist reminder" %}</h2>
         <p>
-            {% blocktrans with title=trip.title days=days_to_departure %}Your trip <strong>{{ title }}</strong> departs in <strong>{{ days }}</strong> day(s) and you still have pending checklist items.{% endblocktrans %}
+            {% blocktranslate with title=trip.title days=days_to_departure %}Your trip <strong>{{ title }}</strong> departs in <strong>{{ days }}</strong> day(s) and you still have pending checklist items.{% endblocktranslate %}
         </p>
-        <h3>{% trans "Pending items:" %}</h3>
+        <h3>{% translate "Pending items:" %}</h3>
         <ul>
             {% for item in pending_items %}<li>{{ item.text }}</li>{% endfor %}
         </ul>
         <p>
-            <a href="{{ trip_url }}" class="btn">{% trans "Open checklist" %}</a>
+            <a href="{{ trip_url }}" class="btn">{% translate "Open checklist" %}</a>
         </p>
         <div class="footer">
-            <p>{% trans "You received this email because you set a checklist reminder in Organize It." %}</p>
+            <p>{% translate "You received this email because you set a checklist reminder in Organize It." %}</p>
         </div>
     </body>
 </html>

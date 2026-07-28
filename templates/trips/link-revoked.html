@@ -1,12 +1,13 @@
 {% extends "base-simplified.html" %}
 {% load i18n %}
 {% block page_title %}
-    {% trans "Link revoked" %}
+    {% translate "Link revoked" %}
 {% endblock page_title %}
+
 {% block content %}
     <div class="flex min-h-[40vh] flex-col items-center justify-center text-center">
         <i class="ph-bold ph-link-break text-error mb-4 text-6xl"></i>
-        <h2 class="mb-2 text-2xl font-bold">{% trans "This link has been revoked" %}</h2>
-        <p class="text-base-content/60">{% trans "The sharing link you followed has been deactivated by the owner." %}</p>
+        <h2 class="mb-2 text-2xl font-bold">{% translate "This link has been revoked" %}</h2>
+        <p class="text-base-content/60">{% translate "The sharing link you followed has been deactivated by the owner." %}</p>
     </div>
 {% endblock content %}

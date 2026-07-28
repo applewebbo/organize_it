@@ -9,7 +9,7 @@
                      class="btn btn-xs btn-soft btn-primary sm:btn-sm gap-1"
                      aria-haspopup="menu">
                     <i class="ph-bold ph-plus i-sm" aria-hidden="true"></i>
-                    <span class="hidden sm:inline">{% trans 'Add event' %}</span>
+                    <span class="hidden sm:inline">{% translate 'Add event' %}</span>
                 </div>
                 <ul tabindex="0"
                     class="dropdown-content menu bg-base-100 rounded-box border-base-300 z-20 w-52 border p-2 shadow">
@@ -19,7 +19,7 @@
                            hx-swap="innerHTML"
                            @click="$dispatch('open-modal'); document.activeElement.blur()">
                             <i class="ph-bold ph-map-pin i-sm text-green-500" aria-hidden="true"></i>
-                            {% trans 'Experience' %}
+                            {% translate 'Experience' %}
                         </a>
                     </li>
                     <li>
@@ -28,7 +28,7 @@
                            hx-swap="innerHTML"
                            @click="$dispatch('open-modal'); document.activeElement.blur()">
                             <i class="ph-bold ph-fork-knife i-sm text-yellow-500" aria-hidden="true"></i>
-                            {% trans 'Meal' %}
+                            {% translate 'Meal' %}
                         </a>
                     </li>
                 </ul>
@@ -43,7 +43,7 @@
     {% else %}
         <div class="alert alert-soft alert-info py-6 text-center">
             <i class="ph-bold ph-map-trifold i-md" aria-hidden="true"></i>
-            <span>{% trans 'No events with location to display on the map.' %}</span>
+            <span>{% translate 'No events with location to display on the map.' %}</span>
         </div>
     {% endif %}
 </div>

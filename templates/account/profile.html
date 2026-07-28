@@ -1,17 +1,18 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% block page_title %}
-    {% trans "Personal Settings" %}
+    {% translate "Personal Settings" %}
 {% endblock page_title %}
+
 {% block content %}
     <div class="mx-auto my-5 max-w-7xl">
         <div class="mb-12 text-center">
-            <h1 class="mb-2 text-3xl font-semibold">{% trans "Personal Settings" %}</h1>
+            <h1 class="mb-2 text-3xl font-semibold">{% translate "Personal Settings" %}</h1>
         </div>
         <div class="card card-border bg-base-100 mx-auto max-w-2xl shadow">
             <form method="post" class="card-body">
                 {% csrf_token %}
-                <h2 class="mb-4 text-center text-xl font-semibold sm:text-left">{% trans "Personal Information" %}</h2>
+                <h2 class="mb-4 text-center text-xl font-semibold sm:text-left">{% translate "Personal Information" %}</h2>
                 <div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                         <label for="{{ profile_form.first_name.id_for_label }}"
@@ -37,7 +38,7 @@
                            name="home_address"
                            value="{{ profile_form.home_address.value|default:'' }}"
                            class="input input-bordered w-full"
-                           placeholder="{% trans 'Full address (street, city, country)' %}"
+                           placeholder="{% translate 'Full address (street, city, country)' %}"
                            hx-post="{% url 'accounts:autocomplete-home-address' %}"
                            hx-trigger="input changed delay:500ms"
                            hx-target="#home-address-results"
@@ -60,7 +61,7 @@
                         <div class="text-error mt-1 text-sm">{{ profile_form.avatar.errors }}</div>
                     {% endif %}
                 </div>
-                <h2 class="mt-5 mb-3 text-center text-xl font-semibold sm:text-left">{% trans "Travel Preferences" %}</h2>
+                <h2 class="mt-5 mb-3 text-center text-xl font-semibold sm:text-left">{% translate "Travel Preferences" %}</h2>
                 <div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                         <label for="{{ profile_form.fav_trip.id_for_label }}"
@@ -79,7 +80,7 @@
                         {% endif %}
                     </div>
                 </div>
-                <h2 class="mt-5 mb-3 text-center text-xl font-semibold sm:text-left">{% trans "Display Preferences" %}</h2>
+                <h2 class="mt-5 mb-3 text-center text-xl font-semibold sm:text-left">{% translate "Display Preferences" %}</h2>
                 <div class="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div>
                         <label for="{{ profile_form.default_map_view.id_for_label }}"
@@ -148,7 +149,7 @@
                     </div>
                 </div>
                 <div class="mt-6 flex justify-end">
-                    <button type="submit" class="btn btn-sm btn-soft btn-primary">{% trans "Save" %}</button>
+                    <button type="submit" class="btn btn-sm btn-soft btn-primary">{% translate "Save" %}</button>
                 </div>
             </form>
         </div>

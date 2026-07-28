@@ -3,9 +3,9 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>{% trans "Your invitation was accepted" %}</title>
+        <title>{% translate "Your invitation was accepted" %}</title>
         <meta name="description"
-              content="{% trans "Collaboration invitation accepted" %}">
+              content="{% translate "Collaboration invitation accepted" %}">
         <meta name="keywords" content="collaboration, invitation, trip">
         <style>
     body { font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 24px; }
@@ -14,15 +14,15 @@
         </style>
     </head>
     <body>
-        <h2>{% trans "Your invitation was accepted" %}</h2>
+        <h2>{% translate "Your invitation was accepted" %}</h2>
         <p>
-            {% blocktrans with email=new_collaborator_email title=trip.title %}{{ email }} has accepted your invitation and is now a collaborator on <strong>{{ title }}</strong>.{% endblocktrans %}
+            {% blocktranslate with email=new_collaborator_email title=trip.title %}{{ email }} has accepted your invitation and is now a collaborator on <strong>{{ title }}</strong>.{% endblocktranslate %}
         </p>
         <p>
-            <a href="{{ trip_url }}" class="btn">{% trans "Open trip" %}</a>
+            <a href="{{ trip_url }}" class="btn">{% translate "Open trip" %}</a>
         </p>
         <div class="footer">
-            <p>{% trans "You received this email because someone accepted your collaboration invitation in Organize It." %}</p>
+            <p>{% translate "You received this email because someone accepted your collaboration invitation in Organize It." %}</p>
         </div>
     </body>
 </html>

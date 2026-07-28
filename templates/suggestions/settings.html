@@ -8,10 +8,10 @@
           hx-target="#ai-settings"
           hx-swap="outerHTML">
         {% csrf_token %}
-        <h2 class="mb-4 text-center text-xl font-semibold sm:text-left">{% trans "AI suggestions" %}</h2>
+        <h2 class="mb-4 text-center text-xl font-semibold sm:text-left">{% translate "AI suggestions" %}</h2>
         {% if saved %}
             <div class="alert alert-success alert-soft mb-4">
-                <span>{% trans "AI settings saved successfully" %}</span>
+                <span>{% translate "AI settings saved successfully" %}</span>
             </div>
         {% endif %}
         <div class="mb-6">
@@ -21,7 +21,7 @@
                        class="toggle toggle-primary"
                        x-model="enabled"
                        {% if ai_enabled %}checked{% endif %} />
-                <span class="font-medium">{% trans "Enable AI suggestions" %}</span>
+                <span class="font-medium">{% translate "Enable AI suggestions" %}</span>
             </label>
             <p class="text-base-content/50 mt-1 text-xs italic">{{ toggle_form.ai_suggestions_enabled.help_text }}</p>
         </div>
@@ -40,7 +40,7 @@
                 {{ credentials_form.api_key_encrypted }}
                 <p class="text-base-content/50 mt-1 text-xs italic">
                     {% if has_credentials %}
-                        {% trans "A key is already configured." %}
+                        {% translate "A key is already configured." %}
                     {% endif %}
                     {{ credentials_form.api_key_encrypted.help_text }}
                 </p>
@@ -55,7 +55,7 @@
                 </label>
                 <p class="text-base-content/50 mt-1 text-xs italic">{{ credentials_form.share_with_collaborators.help_text }}</p>
             </div>
-            <h3 class="text-base-content/60 mt-2 mb-3 text-sm font-semibold uppercase">{% trans "Who's travelling" %}</h3>
+            <h3 class="text-base-content/60 mt-2 mb-3 text-sm font-semibold uppercase">{% translate "Who's travelling" %}</h3>
             <div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                     <label for="{{ preferences_form.travel_party.id_for_label }}"
@@ -68,7 +68,7 @@
                     {{ preferences_form.travel_style }}
                 </div>
             </div>
-            <h3 class="text-base-content/60 mt-4 mb-3 text-sm font-semibold uppercase">{% trans "Preferences" %}</h3>
+            <h3 class="text-base-content/60 mt-4 mb-3 text-sm font-semibold uppercase">{% translate "Preferences" %}</h3>
             <div class="mb-4">
                 <label class="mb-2 block font-medium">{{ preferences_form.favored_experience_types.label }}</label>
                 <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -131,7 +131,7 @@
             </div>
         </div>
         <div class="mt-2 flex justify-end">
-            <button type="submit" class="btn btn-sm btn-soft btn-primary">{% trans "Save" %}</button>
+            <button type="submit" class="btn btn-sm btn-soft btn-primary">{% translate "Save" %}</button>
         </div>
     </form>
 </div>

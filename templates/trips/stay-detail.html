@@ -1,4 +1,4 @@
-{% load trip_tags i18n %}
+{% load i18n trip_tags %}
 <div class="border-base-300 flex items-center justify-between rounded-t border-b p-4 md:px-5 md:py-2.5">
     <h3 id="stay-title"
         class="text-xl font-semibold text-gray-900 dark:text-white">{{ stay.name }}</h3>
@@ -6,7 +6,7 @@
             class="btn btn-ghost btn-circle btn-sm"
             x-on:click="openModal = false{% if modified %}; location.reload(){% endif %}">
         <i class="ph-bold ph-x i-md"></i>
-        <span class="sr-only">{% trans 'Close modal' %}</span>
+        <span class="sr-only">{% translate 'Close modal' %}</span>
     </button>
 </div>
 <div id="stay-details">
@@ -72,7 +72,7 @@
                         hx-swap="innerHTML"
                         hx-target="#dialog">
                     <i class="ph-bold ph-list-plus"></i>
-                    <span>{% trans 'Enrich' %}</span>
+                    <span>{% translate 'Enrich' %}</span>
                 </button>
             {% endif %}
             <button type="button"
@@ -81,7 +81,7 @@
                     hx-target="#stay-details"
                     hx-swap="innerHTML">
                 <i class="ph-bold ph-pencil-line"></i>
-                <span>{% trans 'Edit' %}</span>
+                <span>{% translate 'Edit' %}</span>
             </button>
             <button type="button"
                     class="btn btn-error btn-soft"
@@ -89,13 +89,13 @@
                     hx-target="#stay-details"
                     hx-swap="innerHTML">
                 <i class="ph-bold ph-trash"></i>
-                <span>{% trans 'Delete' %}</span>
+                <span>{% translate 'Delete' %}</span>
             </button>
             <button type="button"
                     x-on:click="openModal = false{% if modified %}; location.reload(){% endif %}"
                     class="btn btn-soft btn-neutral">
                 <i class="ph-bold ph-x-circle"></i>
-                <span>{% trans 'Close' %}</span>
+                <span>{% translate 'Close' %}</span>
             </button>
         </div>
     </div>

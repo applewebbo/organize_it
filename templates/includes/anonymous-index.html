@@ -1,16 +1,16 @@
-{% load static i18n %}
+{% load i18n static %}
 <section class="card card-border bg-base-100 mx-auto max-w-7xl text-center shadow">
     <img src="{% static 'img/hero.jpg' %}" class="rounded-t-lg" alt="Planner">
     <div class="m-auto px-6 py-5 lg:px-10 lg:py-12">
         <h1 class="mb-4 max-w-3xl text-3xl leading-none font-extrabold tracking-tight md:text-4xl xl:text-5xl dark:text-white">
-            {% trans 'Organize your next trip!' %}
+            {% translate 'Organize your next trip!' %}
         </h1>
         <p class="mb-6 max-w-3xl text-base/6 font-light text-gray-500 md:text-lg/6 lg:mb-8 lg:text-xl/7 dark:text-gray-400">
-            {% trans 'Register experiences, stays and transports. Keep links and notes about them. Organize them by day and look at a map to set up your next journey. Share the journey plan with your friends and family.' %}
+            {% translate 'Register experiences, stays and transports. Keep links and notes about them. Organize them by day and look at a map to set up your next journey. Share the journey plan with your friends and family.' %}
         </p>
         <a href="{% url 'account_signup' %}"
            class="btn btn-primary md:btn-lg inline-flex items-center justify-center">
-            {% trans 'Get started' %}
+            {% translate 'Get started' %}
             <svg class="-mr-1 ml-2 h-5 w-5"
                  fill="currentColor"
                  viewBox="0 0 20 20"

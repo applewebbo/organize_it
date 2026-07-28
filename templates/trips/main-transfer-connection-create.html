@@ -7,9 +7,9 @@
     <div class="border-base-300 flex items-center justify-between rounded-t border-b p-4 md:px-5 md:py-2.5">
         <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
             {% if main_transfer.direction == 1 %}
-                {% trans 'Create Connection from Arrival' %}
+                {% translate 'Create Connection from Arrival' %}
             {% else %}
-                {% trans 'Create Connection to Departure' %}
+                {% translate 'Create Connection to Departure' %}
             {% endif %}
         </h3>
         <button type="button"
@@ -34,7 +34,7 @@
                                 {{ main_transfer.destination_address }}
                             {% endif %}
                         </span>
-                        <span class="text-base-content/70 text-sm">{% trans 'Arrival Point' %}</span>
+                        <span class="text-base-content/70 text-sm">{% translate 'Arrival Point' %}</span>
                     </div>
                     <i class="ph-bold ph-arrow-right px-4"></i>
                     <div class="flex flex-col justify-center text-center">
@@ -43,7 +43,7 @@
                             {% if destination_type == 'event' %}
                                 {{ destination.start_time|time:"H:i" }}
                             {% else %}
-                                {% trans 'Stay' %}
+                                {% translate 'Stay' %}
                             {% endif %}
                         </span>
                     </div>
@@ -55,7 +55,7 @@
                             {% if destination_type == 'event' %}
                                 {{ destination.start_time|time:"H:i" }}
                             {% else %}
-                                {% trans 'Stay' %}
+                                {% translate 'Stay' %}
                             {% endif %}
                         </span>
                     </div>
@@ -68,7 +68,7 @@
                                 {{ main_transfer.origin_address }}
                             {% endif %}
                         </span>
-                        <span class="text-base-content/70 text-sm">{% trans 'Departure Point' %}</span>
+                        <span class="text-base-content/70 text-sm">{% translate 'Departure Point' %}</span>
                     </div>
                 {% endif %}
             </div>
@@ -86,14 +86,14 @@
                       id="{{ form.notes.id_for_label }}"
                       rows="3"
                       class="textarea textarea-bordered w-full"
-                      placeholder="{% trans 'Notes' %}">{{ form.notes.value|default:'' }}</textarea>
+                      placeholder="{% translate 'Notes' %}">{{ form.notes.value|default:'' }}</textarea>
             {% if form.notes.errors %}<div class="text-error mt-1 text-sm">{{ form.notes.errors }}</div>{% endif %}
         </div>
     </div>
     <div class="flex items-center justify-end p-4 md:p-5">
         <button type="button"
                 x-on:click="openModal = false"
-                class="btn btn-outline btn-error mr-2">{% trans 'Cancel' %}</button>
-        <button id="form-submit" class="btn btn-outline btn-primary" type="submit">{% trans 'Save' %}</button>
+                class="btn btn-outline btn-error mr-2">{% translate 'Cancel' %}</button>
+        <button id="form-submit" class="btn btn-outline btn-primary" type="submit">{% translate 'Save' %}</button>
     </div>
 </form>

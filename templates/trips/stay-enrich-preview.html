@@ -1,4 +1,4 @@
-{% load trip_tags i18n %}
+{% load i18n trip_tags %}
 <div class="border-base-300 flex items-center justify-between rounded-t border-b p-4 md:px-5 md:py-2.5">
     <h3 id="stay-title"
         class="text-xl font-semibold text-gray-900 dark:text-white">{{ stay.name }}</h3>
@@ -14,7 +14,7 @@
         <div class="p-4 md:p-5">
             <div class="alert alert-info alert-soft mb-4">
                 <i class="ph-bold ph-info text-xl"></i>
-                <span>{% trans 'Review the enriched data below. New information is highlighted in green.' %}</span>
+                <span>{% translate 'Review the enriched data below. New information is highlighted in green.' %}</span>
             </div>
             <div class="grid grid-cols-1 gap-1 sm:gap-2">{% include 'trips/includes/stay-preview.html' %}</div>
         </div>
@@ -36,7 +36,7 @@
                 <div class="flex gap-2">
                     <button type="submit" class="btn btn-success btn-soft">
                         <i class="ph-bold ph-check text-xl"></i>
-                        <span>{% trans 'Accept' %}</span>
+                        <span>{% translate 'Accept' %}</span>
                     </button>
                     <button type="button"
                             hx-get="{% url 'trips:stay-detail' stay.pk %}"
@@ -44,7 +44,7 @@
                             hx-swap="innerHTML"
                             class="btn btn-error btn-soft">
                         <i class="ph-bold ph-x text-xl"></i>
-                        <span>{% trans 'Cancel' %}</span>
+                        <span>{% translate 'Cancel' %}</span>
                     </button>
                 </div>
             </form>
@@ -63,7 +63,7 @@
                     hx-swap="innerHTML"
                     class="btn btn-soft btn-neutral">
                 <i class="ph-bold ph-arrow-left text-xl"></i>
-                <span>{% trans 'Back' %}</span>
+                <span>{% translate 'Back' %}</span>
             </button>
         </div>
     {% endif %}

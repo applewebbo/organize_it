@@ -1,6 +1,6 @@
 {% load i18n trip_tags %}
 <div class="border-base-300 flex items-center justify-between rounded-t border-b p-4 md:px-5 md:py-2.5">
-    <h3 class="text-lg font-semibold">{% trans "Move to day" %} — {{ event.name|truncatechars:28 }}</h3>
+    <h3 class="text-lg font-semibold">{% translate "Move to day" %} — {{ event.name|truncatechars:28 }}</h3>
     <button type="button"
             class="ms-auto inline-flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white"
             x-on:click="openModal = false">
@@ -11,7 +11,7 @@
              viewBox="0 0 14 14">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
         </svg>
-        <span class="sr-only">{% trans "Close" %}</span>
+        <span class="sr-only">{% translate "Close" %}</span>
     </button>
 </div>
 <div class="p-4 md:p-5">
@@ -22,11 +22,11 @@
                     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                     @click="openModal = false">
                 {% if day.date %}{{ day.date|date:"j M" }} —{% endif %}
-                {% trans "Day" %} {{ day.number }}
+                {% translate "Day" %} {{ day.number }}
                 {% if day.destination %}<span class="ms-1 text-xs opacity-60">{{ day.destination }}</span>{% endif %}
             </button>
         {% empty %}
-            <p class="text-base-content/50 text-sm">{% trans "No other days available." %}</p>
+            <p class="text-base-content/50 text-sm">{% translate "No other days available." %}</p>
         {% endfor %}
     </div>
 </div>

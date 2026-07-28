@@ -3,7 +3,7 @@
     {% for day_data in days_with_events %}
         <div class="mb-4 break-inside-avoid">
             <div class="mb-2 flex items-baseline gap-2">
-                <span class="text-primary text-sm font-bold">{% trans 'Day' %} {{ forloop.counter }}</span>
+                <span class="text-primary text-sm font-bold">{% translate 'Day' %} {{ forloop.counter }}</span>
                 <span class="text-base-content/60 text-xs">{{ day_data.day.date }}</span>
             </div>
             <ul class="space-y-1">
@@ -48,7 +48,7 @@
     {% if unassigned_events %}
         <div class="mb-4 break-inside-avoid">
             <div class="mb-2 flex items-center gap-2">
-                <span class="bg-base-300 text-base-content/70 rounded-full px-2 py-0.5 text-xs font-bold">{% trans 'Unassigned' %}</span>
+                <span class="bg-base-300 text-base-content/70 rounded-full px-2 py-0.5 text-xs font-bold">{% translate 'Unassigned' %}</span>
             </div>
             <ul class="space-y-1">
                 {% for event in unassigned_events %}
@@ -72,6 +72,6 @@
 {% else %}
     <div class="text-base-content/40 py-6 text-center">
         <i class="ph-bold ph-calendar-blank i-lg mb-2"></i>
-        <p class="text-sm">{% trans 'No events yet' %}</p>
+        <p class="text-sm">{% translate 'No events yet' %}</p>
     </div>
 {% endif %}

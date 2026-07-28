@@ -5,7 +5,7 @@
       class="modal-content"
       method="post">
     <div class="border-base-300 flex items-center justify-between rounded-t border-b p-4 md:px-5 md:py-2.5">
-        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% trans 'Edit Connection' %}</h3>
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% translate 'Edit Connection' %}</h3>
         <button type="button"
                 class="ms-auto inline-flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white"
                 x-on:click="openModal = false">
@@ -22,12 +22,12 @@
                     <span class="font-medium">{{ connection.from_location }}</span>
                     <span class="text-base-content/70 text-sm">
                         {% if connection.main_transfer.direction == 1 %}
-                            {% trans 'Arrival Point' %}
+                            {% translate 'Arrival Point' %}
                         {% else %}
                             {% if connection.event %}
                                 {{ connection.event.start_time|time:"H:i" }}
                             {% else %}
-                                {% trans 'Stay' %}
+                                {% translate 'Stay' %}
                             {% endif %}
                         {% endif %}
                     </span>
@@ -40,10 +40,10 @@
                             {% if connection.event %}
                                 {{ connection.event.start_time|time:"H:i" }}
                             {% else %}
-                                {% trans 'Stay' %}
+                                {% translate 'Stay' %}
                             {% endif %}
                         {% else %}
-                            {% trans 'Departure Point' %}
+                            {% translate 'Departure Point' %}
                         {% endif %}
                     </span>
                 </div>
@@ -62,14 +62,14 @@
                       id="{{ form.notes.id_for_label }}"
                       rows="3"
                       class="textarea textarea-bordered w-full"
-                      placeholder="{% trans 'Notes' %}">{{ form.notes.value|default:'' }}</textarea>
+                      placeholder="{% translate 'Notes' %}">{{ form.notes.value|default:'' }}</textarea>
             {% if form.notes.errors %}<div class="text-error mt-1 text-sm">{{ form.notes.errors }}</div>{% endif %}
         </div>
     </div>
     <div class="flex items-center justify-end p-4 md:p-5">
         <button type="button"
                 x-on:click="openModal = false"
-                class="btn btn-outline btn-error mr-2">{% trans 'Cancel' %}</button>
-        <button id="form-submit" class="btn btn-outline btn-primary" type="submit">{% trans 'Save' %}</button>
+                class="btn btn-outline btn-error mr-2">{% translate 'Cancel' %}</button>
+        <button id="form-submit" class="btn btn-outline btn-primary" type="submit">{% translate 'Save' %}</button>
     </div>
 </form>

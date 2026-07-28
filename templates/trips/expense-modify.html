@@ -4,7 +4,7 @@
       class="modal-content"
       method="post">
     <div class="border-base-300 flex items-center justify-between rounded-t border-b p-4 md:px-5 md:py-2.5">
-        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% trans "Edit expense" %}</h3>
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% translate "Edit expense" %}</h3>
         <button type="button"
                 class="ms-auto inline-flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white"
                 x-on:click="openModal = false">
@@ -15,7 +15,7 @@
                  viewBox="0 0 14 14">
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
             </svg>
-            <span class="sr-only">{% trans "Close" %}</span>
+            <span class="sr-only">{% translate "Close" %}</span>
         </button>
     </div>
     <div class="p-4 md:p-5">
@@ -23,7 +23,7 @@
         {% if expense.is_linked %}
             <div class="bg-base-200 mb-4 flex items-center gap-2 rounded-lg px-3 py-2 text-sm">
                 <i class="ph-bold ph-link text-primary"></i>
-                <span>{% trans "Linked to" %} <strong>{{ expense.content_object.name|default:expense.content_object }}</strong></span>
+                <span>{% translate "Linked to" %} <strong>{{ expense.content_object.name|default:expense.content_object }}</strong></span>
             </div>
         {% endif %}
         <div class="grid gap-x-1 sm:grid-cols-6 sm:gap-x-2">{% crispy form %}</div>
@@ -32,8 +32,8 @@
         <button type="button"
                 class="btn btn-outline btn-error"
                 hx-post="{% url 'trips:expense-delete' expense.pk %}"
-                hx-confirm="{% trans 'Delete this expense?' %}"
-                x-on:click="openModal = false">{% trans "Delete" %}</button>
-        <button class="btn btn-primary" type="submit">{% trans "Save" %}</button>
+                hx-confirm="{% translate 'Delete this expense?' %}"
+                x-on:click="openModal = false">{% translate "Delete" %}</button>
+        <button class="btn btn-primary" type="submit">{% translate "Save" %}</button>
     </div>
 </form>

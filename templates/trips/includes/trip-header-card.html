@@ -1,4 +1,4 @@
-{% load i18n trip_tags static %}
+{% load i18n static trip_tags %}
 <div class="card card-border bg-base-100 overflow-hidden shadow">
     <!-- Top Bar: Title, Actions -->
     <div class="border-base-300 flex items-center justify-between gap-2 border-b p-3 sm:gap-y-3 sm:p-6">
@@ -11,7 +11,7 @@
                         hx-target="#dialog"
                         hx-swap="innerHTML"
                         @click="$dispatch('open-modal'); document.activeElement.blur()"
-                        aria-label="{% trans 'Manage stages' %}">
+                        aria-label="{% translate 'Manage stages' %}">
                     <i class="ph-bold ph-line-segments i-sm" aria-hidden="true"></i>
                 </button>
                 <button class="btn btn-xs btn-soft"
@@ -19,14 +19,14 @@
                         hx-target="#dialog"
                         hx-swap="innerHTML"
                         @click="$dispatch('open-modal'); document.activeElement.blur()"
-                        aria-label="{% trans 'Edit trip' %}">
+                        aria-label="{% translate 'Edit trip' %}">
                     <i class="ph-bold ph-pencil-simple i-sm" aria-hidden="true"></i>
                 </button>
             {% endif %}
             <div class="dropdown dropdown-end">
                 <button tabindex="0"
                         class="btn btn-xs btn-soft"
-                        aria-label="{% trans 'Share & Export' %}">
+                        aria-label="{% translate 'Share & Export' %}">
                     <i class="ph-bold ph-share-network i-sm" aria-hidden="true"></i>
                 </button>
                 <ul tabindex="0"
@@ -38,21 +38,21 @@
                                     hx-swap="innerHTML"
                                     @click="$dispatch('open-modal'); document.activeElement.blur()">
                                 <i class="ph-bold ph-link" aria-hidden="true"></i>
-                                {% trans 'Link' %}
+                                {% translate 'Link' %}
                             </button>
                         </li>
                     {% endif %}
                     <li>
                         <a href="{% url 'trips:trip-export-pdf' trip.pk %}">
                             <i class="ph-bold ph-file-pdf" aria-hidden="true"></i>
-                            {% trans 'PDF' %}
+                            {% translate 'PDF' %}
                         </a>
                     </li>
                     <li>
                         <a href="{% url 'trips:trip-ical' trip.calendar_token %}"
                            target="_blank">
                             <i class="ph-bold ph-calendar-plus" aria-hidden="true"></i>
-                            {% trans 'Calendar' %}
+                            {% translate 'Calendar' %}
                         </a>
                     </li>
                     {% if request.user == trip.author %}
@@ -62,7 +62,7 @@
                                     hx-swap="innerHTML"
                                     @click="$dispatch('open-modal'); document.activeElement.blur()">
                                 <i class="ph-bold ph-arrows-clockwise" aria-hidden="true"></i>
-                                {% trans 'Calendar link' %}
+                                {% translate 'Calendar link' %}
                             </button>
                         </li>
                     {% endif %}
@@ -82,15 +82,15 @@
                                 hx-target="#dialog"
                                 hx-swap="innerHTML"
                                 @click="$dispatch('open-modal'); document.activeElement.blur()"
-                                aria-label="{% trans 'Manage stages' %}">
+                                aria-label="{% translate 'Manage stages' %}">
                             <i class="ph-bold ph-line-segments i-lg" aria-hidden="true"></i>
-                            <span class="hidden sm:inline">{% trans 'Stages' %}</span>
+                            <span class="hidden sm:inline">{% translate 'Stages' %}</span>
                         </button>
                         <a href="{% url 'trips:trip-map' trip.pk %}"
                            class="btn btn-md btn-soft btn-primary"
-                           aria-label="{% trans 'Add events' %}">
+                           aria-label="{% translate 'Add events' %}">
                             <i class="ph-bold ph-map-trifold i-lg" aria-hidden="true"></i>
-                            <span class="hidden sm:inline">{% trans 'Events' %}</span>
+                            <span class="hidden sm:inline">{% translate 'Events' %}</span>
                         </a>
                     {% endif %}
                 {% endif %}
@@ -101,15 +101,15 @@
                         hx-target="#dialog"
                         hx-swap="innerHTML"
                         @click="$dispatch('open-modal'); document.activeElement.blur()"
-                        aria-label="{% trans 'Edit trip' %}">
+                        aria-label="{% translate 'Edit trip' %}">
                     <i class="ph-bold ph-pencil-simple i-lg" aria-hidden="true"></i>
-                    <span class="hidden sm:inline">{% trans 'Edit' %}</span>
+                    <span class="hidden sm:inline">{% translate 'Edit' %}</span>
                 </button>
             {% endif %}
             <div class="dropdown dropdown-end">
                 <button tabindex="0"
                         class="btn btn-md btn-soft"
-                        aria-label="{% trans 'Share & Export' %}">
+                        aria-label="{% translate 'Share & Export' %}">
                     <i class="ph-bold ph-share-network i-lg" aria-hidden="true"></i>
                     <span class="hidden sm:inline">{% translate 'Share' context 'trip action' %}</span>
                 </button>
@@ -122,21 +122,21 @@
                                     hx-swap="innerHTML"
                                     @click="$dispatch('open-modal'); document.activeElement.blur()">
                                 <i class="ph-bold ph-link" aria-hidden="true"></i>
-                                {% trans 'Link' %}
+                                {% translate 'Link' %}
                             </button>
                         </li>
                     {% endif %}
                     <li>
                         <a href="{% url 'trips:trip-export-pdf' trip.pk %}">
                             <i class="ph-bold ph-file-pdf" aria-hidden="true"></i>
-                            {% trans 'PDF' %}
+                            {% translate 'PDF' %}
                         </a>
                     </li>
                     <li>
                         <a href="{% url 'trips:trip-ical' trip.calendar_token %}"
                            target="_blank">
                             <i class="ph-bold ph-calendar-plus" aria-hidden="true"></i>
-                            {% trans 'Calendar' %}
+                            {% translate 'Calendar' %}
                         </a>
                     </li>
                     {% if request.user == trip.author %}
@@ -146,7 +146,7 @@
                                     hx-swap="innerHTML"
                                     @click="$dispatch('open-modal'); document.activeElement.blur()">
                                 <i class="ph-bold ph-arrows-clockwise" aria-hidden="true"></i>
-                                {% trans 'Calendar link' %}
+                                {% translate 'Calendar link' %}
                             </button>
                         </li>
                     {% endif %}
@@ -175,16 +175,16 @@
                 <div class="flex items-center gap-1.5">
                     <i class="ph-bold ph-calendar-blank text-base-content/60 sm:hidden"
                        aria-hidden="true"></i>
-                    <span class="hidden md:inline">{% trans "Start Date:" %}&nbsp;</span><strong>{{ trip.start_date|date:"d F" }}</strong>
+                    <span class="hidden md:inline">{% translate "Start Date:" %}&nbsp;</span><strong>{{ trip.start_date|date:"d F" }}</strong>
                     <span class="sm:hidden">&nbsp;-&nbsp;</span>
                     <span class="hidden md:inline">&nbsp;&nbsp;</span>
-                    <span class="hidden md:inline">{% trans "End Date:" %}&nbsp;</span><strong>{{ trip.end_date|date:"d F" }}</strong>
+                    <span class="hidden md:inline">{% translate "End Date:" %}&nbsp;</span><strong>{{ trip.end_date|date:"d F" }}</strong>
                 </div>
                 <!-- Destination Row -->
                 <div class="flex items-center gap-1.5">
                     <i class="ph-bold ph-path text-base-content/60 sm:hidden"
                        aria-hidden="true"></i>
-                    <span class="hidden md:inline">{% trans "Destination:" %}&nbsp;</span><strong>{{ trip.destination }}</strong>
+                    <span class="hidden md:inline">{% translate "Destination:" %}&nbsp;</span><strong>{{ trip.destination }}</strong>
                 </div>
             </div>
         </div>

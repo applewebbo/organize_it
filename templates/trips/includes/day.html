@@ -1,4 +1,4 @@
-{% load trip_tags i18n %}
+{% load i18n trip_tags %}
 <div id="day-{{ day.pk }}"
      class="sm:bg-base-200 sm:dark:bg-base-300/20 sm:rounded-lg sm:p-3"
      hx-get="{% url 'trips:day-detail' day.pk %}"
@@ -10,9 +10,9 @@
             <div class="flex flex-wrap items-center gap-2">
                 <h3 class="text-base font-semibold">
                     {% if day.date %}
-                        {{ day.date|date:"j F" }} <span class="text-base-content/50 ms-0.5 font-normal">{% trans 'Day' %} {{ day.number }}</span>
+                        {{ day.date|date:"j F" }} <span class="text-base-content/50 ms-0.5 font-normal">{% translate 'Day' %} {{ day.number }}</span>
                     {% else %}
-                        {% trans 'Day' %} {{ day.number }}
+                        {% translate 'Day' %} {{ day.number }}
                     {% endif %}
                 </h3>
                 {% if day.trip.is_multi_destination %}
@@ -49,10 +49,10 @@
                         hx-swap="innerHTML"
                         @click="$dispatch('open-modal'); document.activeElement.blur()"
                         class="btn btn-xs btn-soft btn-secondary sm:btn-sm tooltip tooltip-left"
-                        data-tip="{% trans 'Plan the day with AI' %}"
-                        aria-label="{% trans 'Plan the day with AI' %}">
+                        data-tip="{% translate 'Plan the day with AI' %}"
+                        aria-label="{% translate 'Plan the day with AI' %}">
                     <i class="ph-bold ph-sparkle i-sm" aria-hidden="true"></i>
-                    <span class="hidden sm:inline">{% trans 'Plan day' %}</span>
+                    <span class="hidden sm:inline">{% translate 'Plan day' %}</span>
                 </button>
             {% endif %}
             <c-dropdown :day="day" />

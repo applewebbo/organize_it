@@ -20,16 +20,16 @@
                         {% endif %}
                         <span class="ml-1 text-xs {% if collab.can_edit %}text-blue-600 dark:text-blue-400 {% elif collab.is_named_only %}text-green-600 dark:text-green-400 {% else %}text-base-content/50{% endif %}">
                             {% if collab.can_edit %}
-                                {% trans "Editor" %}
+                                {% translate "Editor" %}
                             {% elif collab.is_named_only %}
-                                {% trans "Participant" %}
+                                {% translate "Participant" %}
                             {% else %}
-                                {% trans "Viewer" %}
+                                {% translate "Viewer" %}
                             {% endif %}
                         </span>
                         {% if collab.is_child %}
                             <span class="badge badge-warning badge-xs ml-1 gap-0.5"
-                                  title="{% trans 'Child' %}">
+                                  title="{% translate 'Child' %}">
                                 <i class="ph-bold ph-baby"></i>{{ collab.age }}
                             </span>
                         {% endif %}
@@ -41,7 +41,7 @@
                             {% csrf_token %}
                             <button type="submit"
                                     class="btn btn-xs btn-ghost text-base-content/50"
-                                    title="{% trans 'Downgrade to viewer' %}">
+                                    title="{% translate 'Downgrade to viewer' %}">
                                 <i class="ph-bold ph-arrow-square-down"></i>
                             </button>
                         </form>
@@ -52,7 +52,7 @@
                         {% csrf_token %}
                         <button type="submit"
                                 class="btn btn-xs btn-ghost text-error"
-                                aria-label="{% trans 'Remove' %}">
+                                aria-label="{% translate 'Remove' %}">
                             <i class="ph-bold ph-x"></i>
                         </button>
                     </form>
@@ -60,6 +60,6 @@
             {% endfor %}
         </ul>
     {% else %}
-        <p class="text-base-content/60 mb-4 text-sm">{% trans "No participants yet." %}</p>
+        <p class="text-base-content/60 mb-4 text-sm">{% translate "No participants yet." %}</p>
     {% endif %}
 </div>

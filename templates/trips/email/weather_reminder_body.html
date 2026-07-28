@@ -4,8 +4,8 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>{% trans "Weather reminder" %}</title>
-        <meta name="description" content="{% trans 'Weather reminder' %}">
+        <title>{% translate "Weather reminder" %}</title>
+        <meta name="description" content="{% translate 'Weather reminder' %}">
         <meta name="keywords" content="weather, reminder, trip">
     </head>
     <body style="margin:0;padding:0;background-color:#ffffff;">
@@ -30,11 +30,11 @@
                             <td style="padding:0 0 12px 0;
                                        font-size:20px;
                                        font-weight:bold;
-                                       color:#333333">{% trans "Weather Forecast" %}</td>
+                                       color:#333333">{% translate "Weather Forecast" %}</td>
                         </tr>
                         <tr>
                             <td style="padding:0 0 16px 0;font-size:14px;color:#555555;">
-                                {% blocktrans with title=trip.title %}Your trip <strong>{{ title }}</strong> is approaching! Here is the weather forecast for the first days of your journey:{% endblocktrans %}
+                                {% blocktranslate with title=trip.title %}Your trip <strong>{{ title }}</strong> is approaching! Here is the weather forecast for the first days of your journey:{% endblocktranslate %}
                             </td>
                         </tr>
                         {% for day in days %}
@@ -44,13 +44,13 @@
                                            background-color:#fafafa;
                                            font-size:14px">
                                     <p style="margin:0 0 6px 0;font-weight:bold;font-size:15px;">
-                                        {% trans "Day" %} {{ day.number }} ({{ day.date|date:"SHORT_DATE_FORMAT" }})
+                                        {% translate "Day" %} {{ day.number }} ({{ day.date|date:"SHORT_DATE_FORMAT" }})
                                     </p>
                                     {% if day.weather_data %}
-                                        ☀️ {% trans "Max:" %} {{ day.weather_data.temperature_max|floatformat:"0" }}°C •
-                                        ❄️ {% trans "Min:" %} {{ day.weather_data.temperature_min|floatformat:"0" }}°C
+                                        ☀️ {% translate "Max:" %} {{ day.weather_data.temperature_max|floatformat:"0" }}°C •
+                                        ❄️ {% translate "Min:" %} {{ day.weather_data.temperature_min|floatformat:"0" }}°C
                                     {% else %}
-                                        {% trans "No data available." %}
+                                        {% translate "No data available." %}
                                     {% endif %}
                                 </td>
                             </tr>
@@ -67,12 +67,12 @@
                                           color:#ffffff;
                                           font-weight:bold;
                                           font-family:Arial,Helvetica,sans-serif;
-                                          font-size:14px">{% trans "Open trip" %}</a>
+                                          font-size:14px">{% translate "Open trip" %}</a>
                             </td>
                         </tr>
                         <tr>
                             <td style="padding:32px 0 0 0;font-size:12px;color:#888888;">
-                                {% trans "You received this email because you have a trip departing in 3 days." %}
+                                {% translate "You received this email because you have a trip departing in 3 days." %}
                             </td>
                         </tr>
                     </table>

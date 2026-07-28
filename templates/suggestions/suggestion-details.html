@@ -9,7 +9,7 @@
                 <a href="{{ place.website }}"
                    target="_blank"
                    rel="noopener"
-                   class="link link-primary">{% trans "Website" %}</a>
+                   class="link link-primary">{% translate "Website" %}</a>
             </p>
         {% endif %}
         {% if place.phone_number %}
@@ -18,7 +18,7 @@
             </p>
         {% endif %}
         {% if not place.website and not place.phone_number %}
-            <p>{% trans "No extra details available." %}</p>
+            <p>{% translate "No extra details available." %}</p>
         {% endif %}
     </div>
 {% endif %}

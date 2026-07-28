@@ -1,17 +1,17 @@
-{% load i18n crispy_forms_tags %}
+{% load crispy_forms_tags i18n %}
 <div class="border-base-300 flex items-center justify-between rounded-t border-b px-4 py-2 md:px-5 md:py-2.5">
     <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
         {% if stay.notes %}
-            {% trans 'Stay Notes' %}
+            {% translate 'Stay Notes' %}
         {% else %}
-            {% trans 'Add Notes' %}
+            {% translate 'Add Notes' %}
         {% endif %}
     </h3>
     <button type="button"
             class="ms-auto inline-flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white"
             x-on:click="openModal = false">
         <i class="ph-bold ph-x i-md"></i>
-        <span class="sr-only">{% trans 'Close modal' %}</span>
+        <span class="sr-only">{% translate 'Close modal' %}</span>
     </button>
 </div>
 <div class="grid gap-x-1 p-4 sm:grid-cols-2 sm:gap-x-2 md:p-5">
@@ -27,10 +27,10 @@
                 <div class="flex items-center justify-end gap-2 pb-4">
                     <button id="form-submit"
                             class="btn btn-sm btn-soft btn-primary"
-                            type="submit">{% trans 'Save' %}</button>
+                            type="submit">{% translate 'Save' %}</button>
                     <button type="button"
                             x-on:click="openModal = false"
-                            class="btn btn-sm btn-soft">{% trans 'Close' %}</button>
+                            class="btn btn-sm btn-soft">{% translate 'Close' %}</button>
                 </div>
             </form>
         </div>

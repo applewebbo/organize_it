@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags i18n %}
 {% block page_title %}
-    {% trans "Checklist" %} — {{ trip.title }}
+    {% translate "Checklist" %} — {{ trip.title }}
 {% endblock page_title %}
+
 {% block content %}
     <div class="mx-auto max-w-2xl">
         <!-- Back link -->
@@ -18,7 +19,7 @@
             <div class="card-body">
                 <h1 class="card-title flex items-center gap-2 text-2xl font-semibold">
                     <i class="ph ph-check-square text-primary"></i>
-                    {% trans "Pre-departure Checklist" %}
+                    {% translate "Pre-departure Checklist" %}
                 </h1>
                 {% with total=items.count done=items|dictsortreversed:"completed"|length %}
                     {% with completed_count=items.filter.count %}{% endwith %}
@@ -37,12 +38,12 @@
                         <input type="text"
                                name="text"
                                class="input input-bordered flex-1"
-                               placeholder="{% trans 'Add an item…' %}"
+                               placeholder="{% translate 'Add an item…' %}"
                                required
                                autocomplete="off">
                         <button type="submit" class="btn btn-primary">
                             <i class="ph ph-plus"></i>
-                            {% trans "Add" %}
+                            {% translate "Add" %}
                         </button>
                     </div>
                 </form>

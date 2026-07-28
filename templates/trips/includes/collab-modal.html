@@ -1,10 +1,10 @@
 {% load i18n %}
 <div class="p-4 sm:p-6" x-data="{ mode: 'editor' }">
     <div class="mb-4 flex items-center justify-between">
-        <h3 class="text-lg font-semibold">{% trans "Participants" %}</h3>
+        <h3 class="text-lg font-semibold">{% translate "Participants" %}</h3>
         <button class="btn btn-sm btn-ghost btn-circle"
                 @click="$dispatch('hide-modal')"
-                aria-label="{% trans 'Close' %}">
+                aria-label="{% translate 'Close' %}">
             <i class="ph-bold ph-x i-md"></i>
         </button>
     </div>
@@ -16,34 +16,34 @@
                     class="flex-1 rounded-md py-1.5 text-base transition-colors"
                     :class="mode === 'editor' ? 'bg-base-100 text-base-content' : 'text-base-content/60 hover:text-base-content' shadow"
                     @click="mode = 'editor'"
-                    title="{% trans 'Editor' %}"
-                    aria-label="{% trans 'Editor' %}">
+                    title="{% translate 'Editor' %}"
+                    aria-label="{% translate 'Editor' %}">
                 <i class="ph-bold ph-pencil" aria-hidden="true"></i>
             </button>
             <button type="button"
                     class="flex-1 rounded-md py-1.5 text-base transition-colors"
                     :class="mode === 'viewer' ? 'bg-base-100 text-base-content' : 'text-base-content/60 hover:text-base-content' shadow"
                     @click="mode = 'viewer'"
-                    title="{% trans 'Viewer' %}"
-                    aria-label="{% trans 'Viewer' %}">
+                    title="{% translate 'Viewer' %}"
+                    aria-label="{% translate 'Viewer' %}">
                 <i class="ph-bold ph-eye" aria-hidden="true"></i>
             </button>
             <button type="button"
                     class="flex-1 rounded-md py-1.5 text-base transition-colors"
                     :class="mode === 'named' ? 'bg-base-100 text-base-content' : 'text-base-content/60 hover:text-base-content' shadow"
                     @click="mode = 'named'"
-                    title="{% trans 'Name only' %}"
-                    aria-label="{% trans 'Name only' %}">
+                    title="{% translate 'Name only' %}"
+                    aria-label="{% translate 'Name only' %}">
                 <i class="ph-bold ph-user-plus" aria-hidden="true"></i>
             </button>
         </div>
         <!-- Editor mode: search by email -->
         <div x-show="mode === 'editor'" x-cloak>
-            <label class="text-base-content/70 mb-1 block text-sm font-medium">{% trans "Search editor by email" %}</label>
+            <label class="text-base-content/70 mb-1 block text-sm font-medium">{% translate "Search editor by email" %}</label>
             <input type="email"
                    id="collab-search-input"
                    name="collab_email"
-                   placeholder="{% trans 'Search by email…' %}"
+                   placeholder="{% translate 'Search by email…' %}"
                    class="input input-bordered input-sm w-full"
                    hx-get="{% url 'trips:search-user-by-email' trip.pk %}"
                    hx-trigger="input changed delay:400ms"
@@ -55,7 +55,7 @@
         <!-- Viewer mode: email input → share link -->
         <div x-show="mode === 'viewer'" x-cloak>
             <label class="text-base-content/70 mb-1 block text-sm font-medium">
-                {% trans "Add viewer by email (receives a share link)" %}
+                {% translate "Add viewer by email (receives a share link)" %}
             </label>
             <form hx-post="{% url 'trips:add-viewer-by-email' trip.pk %}"
                   hx-target="#collab-modal-list"
@@ -65,18 +65,18 @@
                 <div class="mb-2 flex items-center gap-2">
                     <input type="email"
                            name="email"
-                           placeholder="{% trans 'Email address…' %}"
+                           placeholder="{% translate 'Email address…' %}"
                            class="input input-bordered input-sm flex-1"
                            autocomplete="off"
                            required>
-                    <button type="submit" class="btn btn-sm btn-soft btn-primary">{% trans "Add" %}</button>
+                    <button type="submit" class="btn btn-sm btn-soft btn-primary">{% translate "Add" %}</button>
                 </div>
             </form>
         </div>
         <!-- Named participant mode: name only -->
         <div x-show="mode === 'named'" x-cloak x-data="{ isChild: false }">
             <label class="text-base-content/70 mb-1 block text-sm font-medium">
-                {% trans "Add participant by name (no account needed)" %}
+                {% translate "Add participant by name (no account needed)" %}
             </label>
             <form hx-post="{% url 'trips:add-named-participant' trip.pk %}"
                   hx-target="#collab-modal-list"
@@ -89,20 +89,20 @@
                             class="flex-1 rounded-md py-1 text-xs font-medium whitespace-nowrap transition-colors"
                             :class="!isChild ? 'bg-base-100 text-base-content shadow' : 'text-base-content/60 hover:text-base-content'"
                             @click="isChild = false">
-                        <i class="ph-bold ph-user mr-1"></i>{% trans "Adult" %}
+                        <i class="ph-bold ph-user mr-1"></i>{% translate "Adult" %}
                     </button>
                     <button type="button"
                             class="flex-1 rounded-md py-1 text-xs font-medium whitespace-nowrap transition-colors"
                             :class="isChild ? 'bg-base-100 text-base-content shadow' : 'text-base-content/60 hover:text-base-content'"
                             @click="isChild = true">
-                        <i class="ph-bold ph-baby mr-1"></i>{% trans "Child" %}
+                        <i class="ph-bold ph-baby mr-1"></i>{% translate "Child" %}
                     </button>
                 </div>
                 <input type="checkbox" name="is_child" class="hidden" x-model="isChild">
                 <div class="mb-2 flex items-center gap-2">
                     <input type="text"
                            name="name"
-                           placeholder="{% trans 'Name…' %}"
+                           placeholder="{% translate 'Name…' %}"
                            class="input input-bordered input-sm min-w-0 flex-1"
                            autocomplete="off"
                            required>
@@ -110,12 +110,12 @@
                            name="age"
                            min="0"
                            max="17"
-                           placeholder="{% trans 'Age' %}"
+                           placeholder="{% translate 'Age' %}"
                            class="input input-bordered input-sm w-12 shrink-0 px-1.5 text-center sm:w-20 sm:px-3 sm:text-left"
                            x-show="isChild"
                            x-cloak
                            :required="isChild">
-                    <button type="submit" class="btn btn-sm btn-soft btn-primary shrink-0">{% trans "Add" %}</button>
+                    <button type="submit" class="btn btn-sm btn-soft btn-primary shrink-0">{% translate "Add" %}</button>
                 </div>
             </form>
         </div>

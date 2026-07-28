@@ -9,7 +9,7 @@
     <div class="card card-border bg-base-100 shadow">
         <div class="card-body p-4 sm:p-6">
             <div class="flex items-center justify-between">
-                <h2 class="text-xl font-medium sm:text-2xl">{% trans 'Where to Sleep' %}</h2>
+                <h2 class="text-xl font-medium sm:text-2xl">{% translate 'Where to Sleep' %}</h2>
                 {% if trip.status != 5 %}
                     {% if request.user == trip.author and stay22_on %}
                         <div class="dropdown dropdown-end" x-data>
@@ -17,7 +17,7 @@
                                  role="button"
                                  class="btn btn-xs btn-soft btn-primary sm:btn-sm">
                                 <i class="ph-bold ph-plus i-sm" aria-hidden="true"></i>
-                                <span class="hidden sm:inline">{% trans 'Stay' %}</span>
+                                <span class="hidden sm:inline">{% translate 'Stay' %}</span>
                                 <i class="ph-bold ph-caret-down" aria-hidden="true"></i>
                             </div>
                             <ul tabindex="0"
@@ -27,7 +27,7 @@
                                        hx-target="#dialog"
                                        hx-swap="innerHTML"
                                        @click="$dispatch('open-modal'); document.activeElement.blur()">
-                                        <i class="ph-bold ph-plus" aria-hidden="true"></i>{% trans 'Add stay' %}
+                                        <i class="ph-bold ph-plus" aria-hidden="true"></i>{% translate 'Add stay' %}
                                     </a>
                                 </li>
                                 <li>
@@ -35,7 +35,7 @@
                                        hx-target="#dialog"
                                        hx-swap="innerHTML"
                                        @click="$dispatch('open-modal'); document.activeElement.blur()">
-                                        <i class="ph-bold ph-magnifying-glass" aria-hidden="true"></i>{% trans 'Find a stay' %}
+                                        <i class="ph-bold ph-magnifying-glass" aria-hidden="true"></i>{% translate 'Find a stay' %}
                                     </a>
                                 </li>
                             </ul>
@@ -47,9 +47,9 @@
                                 hx-target="#dialog"
                                 hx-swap="innerHTML"
                                 @click="$dispatch('open-modal'); document.activeElement.blur()"
-                                aria-label="{% trans 'Add stay' %}">
+                                aria-label="{% translate 'Add stay' %}">
                             <i class="ph-bold ph-plus i-sm" aria-hidden="true"></i>
-                            <span class="hidden sm:inline">{% trans 'Add stay' %}</span>
+                            <span class="hidden sm:inline">{% translate 'Add stay' %}</span>
                         </button>
                     {% elif stay22_on %}
                         <button class="btn btn-xs btn-soft btn-primary sm:btn-sm"
@@ -58,9 +58,9 @@
                                 hx-target="#dialog"
                                 hx-swap="innerHTML"
                                 @click="$dispatch('open-modal'); document.activeElement.blur()"
-                                aria-label="{% trans 'Find a stay' %}">
+                                aria-label="{% translate 'Find a stay' %}">
                             <i class="ph-bold ph-magnifying-glass i-sm" aria-hidden="true"></i>
-                            <span class="hidden sm:inline">{% trans 'Find a stay' %}</span>
+                            <span class="hidden sm:inline">{% translate 'Find a stay' %}</span>
                         </button>
                     {% endif %}
                 {% endif %}
@@ -134,9 +134,9 @@
                                            href="{{ stay.google_maps_directions_url }}"
                                            target="_blank"
                                            rel="noopener noreferrer"
-                                           title="{% trans 'Get directions' %}">
+                                           title="{% translate 'Get directions' %}">
                                             <i class="ph-bold ph-path i-sm"></i>
-                                            <span class="hidden sm:inline">{% trans "Get directions" %}</span>
+                                            <span class="hidden sm:inline">{% translate "Get directions" %}</span>
                                         </a>
                                     {% endif %}
                                     <button class="btn btn-xs btn-stay-card sm:btn-sm"
@@ -144,9 +144,9 @@
                                             hx-target="#dialog"
                                             hx-swap="innerHTML"
                                             @click="$dispatch('open-modal'); document.activeElement.blur()"
-                                            title="{% trans 'Add document' %}">
+                                            title="{% translate 'Add document' %}">
                                         <i class="ph-bold ph-paperclip i-sm"></i>
-                                        <span class="hidden sm:inline">{% trans "Add document" %}</span>
+                                        <span class="hidden sm:inline">{% translate "Add document" %}</span>
                                     </button>
                                 </div>
                             {% endif %}

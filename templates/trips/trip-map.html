@@ -1,11 +1,13 @@
 {% extends "base.html" %}
-{% load static i18n %}
+{% load i18n static %}
 {% block page_title %}
-    {{ trip.title }} — {% trans 'Map' %}
+    {{ trip.title }} — {% translate 'Map' %}
 {% endblock page_title %}
+
 {% block extra_head %}
     <link rel="stylesheet" href="{% static 'css/leaflet.css' %}" />
 {% endblock extra_head %}
+
 {% block content %}
     {# ── Mini-header ── #}
     <div class="card card-border bg-base-100 mb-4 overflow-hidden shadow">
@@ -16,9 +18,9 @@
             <div class="flex shrink-0 gap-2">
                 <a href="{% url 'trips:trip-detail' trip.pk %}"
                    class="btn btn-md btn-soft btn-primary gap-1.5"
-                   aria-label="{% trans 'Back to events' %}">
+                   aria-label="{% translate 'Back to events' %}">
                     <i class="ph-bold ph-rows i-lg" aria-hidden="true"></i>
-                    {% trans 'Events' %}
+                    {% translate 'Events' %}
                 </a>
             </div>
         </div>
@@ -37,7 +39,7 @@
                                    name="map_panel_tab"
                                    role="tab"
                                    class="tab"
-                                   aria-label="{% trans 'Search' %}"
+                                   aria-label="{% translate 'Search' %}"
                                    hx-get="{% url 'trips:map-search' trip.pk %}"
                                    hx-target="#search-results-panel"
                                    hx-swap="innerHTML"
@@ -48,7 +50,7 @@
                                    name="map_panel_tab"
                                    role="tab"
                                    class="tab"
-                                   aria-label="{% trans 'AI suggestions' %}"
+                                   aria-label="{% translate 'AI suggestions' %}"
                                    hx-get="{% url 'suggestions:cached' trip.pk %}"
                                    hx-target="#search-results-panel"
                                    hx-swap="innerHTML" />
@@ -62,13 +64,13 @@
                                     {% if has_custom_stages %}
                                         <select name="stage_destination"
                                                 class="select select-sm select-bordered mb-2 w-full">
-                                            <option value="">{% trans '— all stages —' %}</option>
+                                            <option value="">{% translate '— all stages —' %}</option>
                                             {% for stage in stages %}<option value="{{ stage.destination }}">{{ stage.destination }}</option>{% endfor %}
                                         </select>
                                     {% endif %}
                                     <input type="text"
                                            name="notes"
-                                           placeholder="{% trans 'Notes for this trip (optional)…' %}"
+                                           placeholder="{% translate 'Notes for this trip (optional)…' %}"
                                            autocomplete="off"
                                            class="input input-sm input-bordered mb-2 w-full" />
                                     {% include "suggestions/ai-kind-filter.html" %}
@@ -93,7 +95,7 @@
     <div class="card card-border bg-base-100 shadow">
         <div class="card-body p-4 sm:p-6">
             <div class="flex items-center gap-2">
-                <h2 class="text-xl font-medium sm:text-2xl">{% trans 'Trip events' %}</h2>
+                <h2 class="text-xl font-medium sm:text-2xl">{% translate 'Trip events' %}</h2>
                 <span id="save-spinner"
                       class="loading loading-spinner loading-xs htmx-indicator"></span>
             </div>
@@ -101,6 +103,7 @@
         </div>
     </div>
 {% endblock content %}
+
 {% block script %}
     <script id="map-initial-data" type="application/json">{{ map_items_json|safe }}</script>
     <script id="stage-coords-data" type="application/json">{{ stage_coords_json|safe }}</script>

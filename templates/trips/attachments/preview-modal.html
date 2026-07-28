@@ -7,12 +7,12 @@
                href="{% url 'trips:attachment-stream' attachment.pk %}"
                download="{{ attachment.original_name }}">
                 <i class="ph-bold ph-download-simple" aria-hidden="true"></i>
-                <span class="hidden sm:inline">{% trans "Download" %}</span>
+                <span class="hidden sm:inline">{% translate "Download" %}</span>
             </a>
             <button type="button"
                     class="btn btn-sm btn-circle btn-ghost"
                     x-on:click="openModal = false"
-                    aria-label="{% trans 'Close' %}">✕</button>
+                    aria-label="{% translate 'Close' %}">✕</button>
         </div>
     </div>
     <div class="p-4 md:p-5">

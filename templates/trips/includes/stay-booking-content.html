@@ -6,7 +6,7 @@
           hx-trigger="change">
         {% csrf_token %}
         <input type="hidden" name="destination" value="{{ destination }}">
-        <p class="text-base-content/70 mb-2 text-sm font-medium">{% trans "Who is travelling?" %}</p>
+        <p class="text-base-content/70 mb-2 text-sm font-medium">{% translate "Who is travelling?" %}</p>
         <div class="mb-3 space-y-1.5">
             <label class="flex cursor-pointer items-center justify-between gap-2 text-sm">
                 <span class="flex items-center gap-2">
@@ -14,9 +14,9 @@
                            name="includes_author"
                            class="checkbox checkbox-sm"
                            {% if includes_author %}checked{% endif %}>
-                    {% trans "Me" %}
+                    {% translate "Me" %}
                 </span>
-                <span class="text-base-content/50 text-xs">{% trans "adult" %}</span>
+                <span class="text-base-content/50 text-xs">{% translate "adult" %}</span>
             </label>
             {% for collab in collaborations %}
                 <label class="flex cursor-pointer items-center justify-between gap-2 text-sm">
@@ -30,16 +30,16 @@
                     </span>
                     {% if collab.is_child %}
                         <span class="text-base-content/50 flex items-center gap-1 text-xs">
-                            <i class="ph-bold ph-baby"></i>{{ collab.age }} {% trans "yrs" %}
+                            <i class="ph-bold ph-baby"></i>{{ collab.age }} {% translate "yrs" %}
                         </span>
                     {% else %}
-                        <span class="text-base-content/50 text-xs">{% trans "adult" %}</span>
+                        <span class="text-base-content/50 text-xs">{% translate "adult" %}</span>
                     {% endif %}
                 </label>
             {% endfor %}
         </div>
         <label class="block">
-            <span class="text-base-content/70 mb-1 block text-sm font-medium">{% trans "Booking provider" %}</span>
+            <span class="text-base-content/70 mb-1 block text-sm font-medium">{% translate "Booking provider" %}</span>
             <select name="provider" class="select select-bordered select-sm w-full">
                 {% for value, label in provider_choices %}
                     <option value="{{ value }}"
@@ -48,20 +48,20 @@
             </select>
             <span class="text-base-content/50 mt-1 flex items-start gap-1 text-xs">
                 <i class="ph-bold ph-info mt-0.5"></i>
-                {% trans "If the selected provider has no options for this destination, Stay22 routes you to an available one." %}
+                {% translate "If the selected provider has no options for this destination, Stay22 routes you to an available one." %}
             </span>
         </label>
     </form>
     <div class="border-base-300 mt-3 border-t pt-3">
         <p class="text-base-content/70 mb-2 text-sm">
-            <i class="ph-bold ph-user me-1"></i>{{ booking.adults }} {% trans "adults" %}
-            {% if booking.children %}· <i class="ph-bold ph-baby mx-1"></i>{{ booking.children }} {% trans "children" %}{% endif %}
+            <i class="ph-bold ph-user me-1"></i>{{ booking.adults }} {% translate "adults" %}
+            {% if booking.children %}· <i class="ph-bold ph-baby mx-1"></i>{{ booking.children }} {% translate "children" %}{% endif %}
         </p>
         <a href="{% url 'trips:stay-booking-redirect' trip.pk %}?destination={{ destination|urlencode }}"
            target="_blank"
            rel="noopener noreferrer"
            class="btn btn-primary w-full">
-            {% trans "Search on Stay22" %}<i class="ph-bold ph-arrow-square-out"></i>
+            {% translate "Search on Stay22" %}<i class="ph-bold ph-arrow-square-out"></i>
         </a>
     </div>
 </div>

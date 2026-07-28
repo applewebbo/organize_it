@@ -1,4 +1,4 @@
-{% load trip_tags i18n %}
+{% load i18n trip_tags %}
 {% if show_weather %}
     {% if day.trip.status == 2 or day.trip.status == 3 %}
         <div class="mb-4">{% weather_widget day %}</div>
@@ -39,7 +39,7 @@
 {% empty %}
     <li class="text-base-content/50 col-span-full py-6 text-center">
         <i class="ph-bold ph-calendar-blank i-lg" aria-hidden="true"></i>
-        <p class="mt-2 text-sm">{% trans 'Nothing to do here.' %}</p>
+        <p class="mt-2 text-sm">{% translate 'Nothing to do here.' %}</p>
     </li>
 {% endfor %}
 </ul>

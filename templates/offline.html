@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="description" content="Organize your next trip" />
         <meta name="keywords" content="django, organize, trip" />
-        <title>Organize It — {% trans "Offline" %}</title>
+        <title>Organize It — {% translate "Offline" %}</title>
         <style>
             html,
             body {
@@ -44,9 +44,9 @@
     </head>
     <body>
         <img src="{% static 'img/logo.png' %}" alt="Organize It" />
-        <h1>{% trans "You are offline" %}</h1>
+        <h1>{% translate "You are offline" %}</h1>
         <p>
-            {% trans "Trips you have already opened stay available. Check your connection and reload to see the latest changes." %}
+            {% translate "Trips you have already opened stay available. Check your connection and reload to see the latest changes." %}
         </p>
     </body>
 </html>

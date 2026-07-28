@@ -7,13 +7,13 @@
                 <i class="ph-bold ph-warning i-sm"></i>
                 <span>
                     {% if type_warning == "stay_mismatch" %}
-                        {% trans "Location found, but this doesn't look like an accommodation." %}
+                        {% translate "Location found, but this doesn't look like an accommodation." %}
                     {% elif type_warning == "meal_mismatch" %}
-                        {% trans "Location found, but this doesn't look like a restaurant or café." %}
+                        {% translate "Location found, but this doesn't look like a restaurant or café." %}
                     {% elif type_warning == "experience_lodging" %}
-                        {% trans "Location found, but this looks like an accommodation." %}
+                        {% translate "Location found, but this looks like an accommodation." %}
                     {% elif type_warning == "experience_food" %}
-                        {% trans "Location found, but this looks like a restaurant or café." %}
+                        {% translate "Location found, but this looks like a restaurant or café." %}
                     {% endif %}
                 </span>
             </div>
@@ -21,7 +21,7 @@
             <div role="alert"
                  class="alert alert-success alert-soft mt-3 flex items-center gap-2 rounded-lg p-2 text-sm">
                 <i class="ph-bold ph-check-circle i-sm"></i>
-                <span>{% trans "Location found! Fields have been pre-filled." %}</span>
+                <span>{% translate "Location found! Fields have been pre-filled." %}</span>
             </div>
         {% endif %}
     </div>
@@ -29,6 +29,6 @@
     <div role="alert"
          class="alert alert-error alert-soft mt-3 flex items-center gap-2 rounded-lg p-2 text-sm">
         <i class="ph-bold ph-warning i-sm"></i>
-        <span>{% trans "Oops! Location not recognised, fill in the details manually." %}</span>
+        <span>{% translate "Oops! Location not recognised, fill in the details manually." %}</span>
     </div>
 {% endif %}

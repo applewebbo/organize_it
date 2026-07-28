@@ -1,11 +1,11 @@
 {% load i18n %}
 <div class="modal-content" id="expense-settings-modal">
     <div class="border-base-300 flex items-center justify-between rounded-t border-b p-4 md:px-5 md:py-2.5">
-        <h3 class="text-xl font-semibold">{% trans "Expense settings" %}</h3>
+        <h3 class="text-xl font-semibold">{% translate "Expense settings" %}</h3>
         <button type="button"
                 class="btn btn-sm btn-circle btn-ghost"
                 x-on:click="openModal = false"
-                aria-label="{% trans 'Close' %}">✕</button>
+                aria-label="{% translate 'Close' %}">✕</button>
     </div>
     <div class="p-4 md:p-5">
         <form id="expense-settings-form"
@@ -16,7 +16,7 @@
             {% csrf_token %}
             <input type="hidden" name="expenses_enabled" value="on">
             <label for="{{ settings_form.expense_currency.id_for_label }}"
-                   class="mb-1 block text-sm font-medium">{% trans "Trip currency" %}</label>
+                   class="mb-1 block text-sm font-medium">{% translate "Trip currency" %}</label>
             {{ settings_form.expense_currency }}
         </form>
         {% partialdef config inline %}
@@ -24,13 +24,13 @@
                 {% if trip.expenses_enabled %}
                     <div class="alert alert-info alert-soft mb-4" role="alert">
                         <i class="ph-bold ph-info i-md"></i>
-                        <span>{% trans "Add everyone in the 'Participants' section first — the people added there appear below. Group couples and assign children to a parent." %}</span>
+                        <span>{% translate "Add everyone in the 'Participants' section first — the people added there appear below. Group couples and assign children to a parent." %}</span>
                     </div>
                     <div class="grid gap-4 sm:grid-cols-2">
                         <div class="border-base-300 rounded-box border border-dashed p-3"
                              data-assign-url="{% url 'trips:family-unit-assign' trip.pk %}"
                              data-unit-id="">
-                            <p class="text-base-content/60 mb-2 text-xs font-semibold tracking-wide uppercase">{% trans "Unassigned" %}</p>
+                            <p class="text-base-content/60 mb-2 text-xs font-semibold tracking-wide uppercase">{% translate "Unassigned" %}</p>
                             <div class="family-unit-drop flex min-h-10 flex-wrap gap-2">
                                 {% for participant in unassigned %}
                                     {% include "trips/includes/_participant-chip.html" %}
@@ -48,7 +48,7 @@
                                             hx-post="{% url 'trips:family-unit-delete' unit.pk %}"
                                             hx-target="#expense-config"
                                             hx-swap="outerHTML"
-                                            aria-label="{% trans 'Delete family unit' %}">
+                                            aria-label="{% translate 'Delete family unit' %}">
                                         <i class="ph-bold ph-trash"></i>
                                     </button>
                                 </div>
@@ -66,24 +66,24 @@
                           hx-swap="outerHTML">
                         {% csrf_token %}
                         <div>
-                            <label for="id_unit_name" class="mb-1 block text-xs font-medium">{% trans "Family name" %}</label>
+                            <label for="id_unit_name" class="mb-1 block text-xs font-medium">{% translate "Family name" %}</label>
                             <input type="text"
                                    id="id_unit_name"
                                    name="name"
                                    class="input input-bordered input-sm"
-                                   placeholder="{% trans 'e.g. Rossi' %}">
+                                   placeholder="{% translate 'e.g. Rossi' %}">
                         </div>
                         <button type="submit" class="btn btn-outline btn-sm gap-1">
-                            <i class="ph-bold ph-plus"></i>{% trans "Add family" %}
+                            <i class="ph-bold ph-plus"></i>{% translate "Add family" %}
                         </button>
                     </form>
                 {% endif %}
             </div>
-        {% endpartialdef %}
+        {% endpartialdef config %}
         <div class="border-base-300 mt-6 flex justify-end border-t pt-4">
             <button type="submit"
                     form="expense-settings-form"
-                    class="btn btn-primary btn-sm">{% trans "Save settings" %}</button>
+                    class="btn btn-primary btn-sm">{% translate "Save settings" %}</button>
         </div>
     </div>
 </div>

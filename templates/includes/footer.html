@@ -1,4 +1,4 @@
-{% load static i18n %}
+{% load i18n static %}
 {% get_current_language as LANGUAGE_CODE %}
 <footer class="bg-base-200 border-base-300 mt-6 border-t md:mt-10">
     <div class="container mx-auto px-4 py-10">
@@ -7,39 +7,39 @@
                 <a href="{% url 'trips:home' %}" class="flex items-center">
                     <span class="text-base-content text-xl font-semibold">Organizeit!</span>
                 </a>
-                <p class="text-base-content/70 max-w-xs text-sm">{% trans 'Organize your next trip, on your own or with others.' %}</p>
+                <p class="text-base-content/70 max-w-xs text-sm">{% translate 'Organize your next trip, on your own or with others.' %}</p>
                 <p class="text-base-content/60 text-sm">
                     <i class="ph-bold ph-stack" aria-hidden="true"></i>
-                    {% trans 'Built with Django, HTMX & TailwindCSS.' %}
+                    {% translate 'Built with Django, HTMX & TailwindCSS.' %}
                 </p>
                 <p class="text-base-content/50 mt-1 text-xs">
-                    {% trans '© 2026 WEBBOgrafico' %}&nbsp;-&nbsp;<a href="https://github.com/applewebbo/organize_it/releases"
+                    {% translate '© 2026 WEBBOgrafico' %}&nbsp;-&nbsp;<a href="https://github.com/applewebbo/organize_it/releases"
    target="_blank"
    rel="noopener noreferrer"
    class="link link-hover inline-flex items-center gap-1"><i class="ph-bold ph-tag" aria-hidden="true"></i>v{{ APP_VERSION }}</a>
                 </p>
             </aside>
-            <nav aria-label="{% trans 'Footer menu' %}" class="flex flex-col gap-3">
-                <h6 class="text-base-content/80 text-sm font-semibold tracking-wide uppercase">{% trans 'Menu' %}</h6>
+            <nav aria-label="{% translate 'Footer menu' %}" class="flex flex-col gap-3">
+                <h6 class="text-base-content/80 text-sm font-semibold tracking-wide uppercase">{% translate 'Menu' %}</h6>
                 <ul class="grid grid-cols-1 gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
                     <li>
                         <a href="{% url 'trips:home' %}"
                            class="link link-hover text-base-content/80 inline-flex items-center gap-2">
-                            <i class="ph-bold ph-house text-base-content/50" aria-hidden="true"></i>{% trans 'Home' %}
+                            <i class="ph-bold ph-house text-base-content/50" aria-hidden="true"></i>{% translate 'Home' %}
                         </a>
                     </li>
                     <li>
                         <a href="{% url 'trips:trip-list' %}"
                            class="link link-hover text-base-content/80 inline-flex items-center gap-2">
                             <i class="ph-bold ph-suitcase-rolling text-base-content/50"
-                               aria-hidden="true"></i>{% trans 'Trips' %}
+                               aria-hidden="true"></i>{% translate 'Trips' %}
                         </a>
                     </li>
                     {% if user.is_authenticated %}
                         <li>
                             <a href="{% url 'accounts:profile' %}"
                                class="link link-hover text-base-content/80 inline-flex items-center gap-2">
-                                <i class="ph-bold ph-gear text-base-content/50" aria-hidden="true"></i>{% trans 'Settings' %}
+                                <i class="ph-bold ph-gear text-base-content/50" aria-hidden="true"></i>{% translate 'Settings' %}
                             </a>
                         </li>
                         <li>
@@ -47,7 +47,7 @@
                                 {% csrf_token %}
                                 <button type="submit"
                                         class="link link-hover text-base-content/80 inline-flex items-center gap-2">
-                                    <i class="ph-bold ph-sign-out text-base-content/50" aria-hidden="true"></i>{% trans 'Logout' %}
+                                    <i class="ph-bold ph-sign-out text-base-content/50" aria-hidden="true"></i>{% translate 'Logout' %}
                                 </button>
                             </form>
                         </li>
@@ -55,13 +55,13 @@
                         <li>
                             <a href="{% url 'account_login' %}"
                                class="link link-hover text-base-content/80 inline-flex items-center gap-2">
-                                <i class="ph-bold ph-sign-in text-base-content/50" aria-hidden="true"></i>{% trans 'Login' %}
+                                <i class="ph-bold ph-sign-in text-base-content/50" aria-hidden="true"></i>{% translate 'Login' %}
                             </a>
                         </li>
                         <li>
                             <a href="{% url 'account_signup' %}"
                                class="link link-hover text-base-content/80 inline-flex items-center gap-2">
-                                <i class="ph-bold ph-user-plus text-base-content/50" aria-hidden="true"></i>{% trans 'Sign Up' %}
+                                <i class="ph-bold ph-user-plus text-base-content/50" aria-hidden="true"></i>{% translate 'Sign Up' %}
                             </a>
                         </li>
                     {% endif %}
@@ -70,7 +70,7 @@
                            target="_blank"
                            rel="noopener noreferrer"
                            class="link link-hover text-base-content/80 inline-flex items-center gap-2">
-                            <i class="ph-bold ph-book-open text-base-content/50" aria-hidden="true"></i>{% trans 'Documentation' %}
+                            <i class="ph-bold ph-book-open text-base-content/50" aria-hidden="true"></i>{% translate 'Documentation' %}
                         </a>
                     </li>
                     <li>
@@ -78,7 +78,7 @@
                            target="_blank"
                            rel="noopener noreferrer"
                            class="link link-hover text-base-content/80 inline-flex items-center gap-2">
-                            <i class="ph-bold ph-code text-base-content/50" aria-hidden="true"></i>{% trans 'Source code' %}
+                            <i class="ph-bold ph-code text-base-content/50" aria-hidden="true"></i>{% translate 'Source code' %}
                         </a>
                     </li>
                 </ul>

@@ -6,13 +6,13 @@
                 hx-get="{% url 'trips:trip-destinations' trip.pk %}"
                 hx-target="#dialog"
                 hx-swap="innerHTML"
-                aria-label="{% trans 'Back' %}">
+                aria-label="{% translate 'Back' %}">
             <i class="ph-bold ph-arrow-left i-sm"></i>
         </button>
-        <h3 class="flex-1 text-lg font-semibold">{% trans "New Stage" %}</h3>
+        <h3 class="flex-1 text-lg font-semibold">{% translate "New Stage" %}</h3>
         <button class="btn btn-sm btn-ghost btn-circle"
                 @click="$dispatch('hide-modal')"
-                aria-label="{% trans 'Close' %}">
+                aria-label="{% translate 'Close' %}">
             <i class="ph-bold ph-x i-md"></i>
         </button>
     </div>
@@ -23,7 +23,7 @@
         <input type="hidden" name="destination_latitude" :value="destinationLat">
         <input type="hidden" name="destination_longitude" :value="destinationLon">
         <div class="mb-1">
-            <label class="mb-1 block text-sm font-medium">{% trans "Destination" %}</label>
+            <label class="mb-1 block text-sm font-medium">{% translate "Destination" %}</label>
             <div class="relative">
                 <input type="text"
                        name="destination"
@@ -47,11 +47,11 @@
             <p x-show="citySelected"
                class="text-success mt-1 flex items-center gap-1 text-xs">
                 <i class="ph-bold ph-check-circle i-xs"></i>
-                {% trans "City confirmed" %}
+                {% translate "City confirmed" %}
             </p>
         </div>
         <div class="mb-4">
-            <label class="mb-2 block text-sm font-medium">{% trans "Select days" %}</label>
+            <label class="mb-2 block text-sm font-medium">{% translate "Select days" %}</label>
             <div class="flex max-h-64 flex-col gap-2 overflow-y-auto">
                 {% for day in days %}
                     <label class="flex items-center gap-3 p-2 rounded-md cursor-pointer {% if day.pk in custom_day_pks %}opacity-40 cursor-not-allowed{% else %}hover:bg-base-200{% endif %}">
@@ -61,7 +61,7 @@
                                class="checkbox checkbox-sm checkbox-primary"
                                {% if day.pk in custom_day_pks %}disabled{% endif %}>
                         <span class="flex-1 text-sm">
-                            <span class="font-medium">{% trans "Day" %} {{ day.number }}</span>
+                            <span class="font-medium">{% translate "Day" %} {{ day.number }}</span>
                             <span class="text-base-content/60 ml-2">{{ day.date|date:"D, d M" }}</span>
                         </span>
                         {% if day.pk in custom_day_pks %}<span class="text-base-content/40 text-xs">{{ day.destination }}</span>{% endif %}
@@ -71,7 +71,7 @@
         </div>
         <button type="submit" class="btn btn-sm btn-primary w-full">
             <i class="ph-bold ph-check i-sm"></i>
-            {% trans "Create stage" %}
+            {% translate "Create stage" %}
         </button>
     </form>
 </div>

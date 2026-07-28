@@ -21,13 +21,13 @@
             {% endfor %}
         </ul>
         <p class="mx-2 my-1 flex items-center justify-end gap-1 px-3 text-xs text-slate-400 italic">
-            <i class="ph-bold ph-info i-xs"></i>{% trans 'Station data from CSV database' %}
+            <i class="ph-bold ph-info i-xs"></i>{% translate 'Station data from CSV database' %}
         </p>
     </div>
 {% else %}
     <div class="-mt-1 mb-4">
         <p class="mx-2 mb-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-red-500">
-            {% trans 'No station found. Try searching by name or country.' %}
+            {% translate 'No station found. Try searching by name or country.' %}
         </p>
     </div>
 {% endif %}

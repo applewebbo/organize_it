@@ -1,7 +1,7 @@
 {% load crispy_forms_tags i18n %}
 <h3 id="stay-title"
     class="text-xl font-semibold text-gray-900 dark:text-white"
-    hx-swap-oob="true">{% trans 'Edit Stay' %}:&nbsp;{{ stay.name }}</h3>
+    hx-swap-oob="true">{% translate 'Edit Stay' %}:&nbsp;{{ stay.name }}</h3>
 <form hx-post="{{ request.path }}"
       hx-target="#dialog"
       hx-disabled-elt="#form-submit"
@@ -15,7 +15,7 @@
     <div class="flex items-center justify-end p-4">
         <button type="button"
                 x-on:click="openModal = false"
-                class="btn btn-error btn-soft ms-2">{% trans 'Cancel' %}</button>
-        <button id="form-submit" class="btn btn-primary btn-soft ms-2" type="submit">{% trans 'Save' %}</button>
+                class="btn btn-error btn-soft ms-2">{% translate 'Cancel' %}</button>
+        <button id="form-submit" class="btn btn-primary btn-soft ms-2" type="submit">{% translate 'Save' %}</button>
     </div>
 </form>

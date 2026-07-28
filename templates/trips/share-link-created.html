@@ -1,20 +1,20 @@
 {% load i18n %}
 <div id="share-modal-content">
     <div class="border-base-300 flex items-center justify-between rounded-t border-b p-4 md:px-5 md:py-2.5">
-        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% trans "Share trip" %}</h3>
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% translate "Share trip" %}</h3>
         <button type="button"
                 class="btn btn-ghost btn-circle btn-sm"
                 x-on:click="openModal = false">
             <i class="ph-bold ph-x text-xl"></i>
-            <span class="sr-only">{% trans "Close modal" %}</span>
+            <span class="sr-only">{% translate "Close modal" %}</span>
         </button>
     </div>
     <div class="p-4 md:p-6">
         <div class="alert alert-success alert-soft mb-4">
             <i class="ph-bold ph-check-circle i-md"></i>
-            <span>{% trans "Share link created!" %}</span>
+            <span>{% translate "Share link created!" %}</span>
         </div>
-        <label class="label font-medium">{% trans "Share this link" %}</label>
+        <label class="label font-medium">{% translate "Share this link" %}</label>
         <div x-data="{ copied: false }" class="mt-1 flex gap-2">
             <input id="share-link-url"
                    type="text"
@@ -29,10 +29,10 @@
         </div>
         {% if link.expires_at %}
             <p class="text-base-content/60 mt-1 text-xs">
-                {% blocktrans with date=link.expires_at|date:"SHORT_DATE_FORMAT" %}Expires on {{ date }}{% endblocktrans %}
+                {% blocktranslate with date=link.expires_at|date:"SHORT_DATE_FORMAT" %}Expires on {{ date }}{% endblocktranslate %}
             </p>
         {% else %}
-            <p class="text-base-content/60 mt-1 text-xs">{% trans "Never expires" %}</p>
+            <p class="text-base-content/60 mt-1 text-xs">{% translate "Never expires" %}</p>
         {% endif %}
         <div class="mt-4 flex justify-end">
             <button class="btn btn-ghost btn-sm"
@@ -40,7 +40,7 @@
                     hx-target="#share-modal-content"
                     hx-swap="outerHTML">
                 <i class="ph-bold ph-plus"></i>
-                {% trans "Create another" %}
+                {% translate "Create another" %}
             </button>
         </div>
     </div>

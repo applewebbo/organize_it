@@ -10,12 +10,12 @@
     {% if transfer_duration %}
         <div class="flex items-center gap-4 text-xs opacity-80">
             <div class="flex items-center gap-1.5"
-                 title="{% trans 'Estimated driving time' %}">
+                 title="{% translate 'Estimated driving time' %}">
                 <i class="ph-bold ph-car shrink-0" aria-hidden="true"></i>
                 <span>~{{ transfer_duration|format_minutes }}</span>
             </div>
             <div class="flex items-center gap-1.5"
-                 title="{% trans 'Estimated driving distance' %}">
+                 title="{% translate 'Estimated driving distance' %}">
                 <i class="ph-bold ph-map-pin-line shrink-0" aria-hidden="true"></i>
                 <span>~{{ transfer_distance }} km</span>
             </div>

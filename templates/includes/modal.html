@@ -1,7 +1,9 @@
+{# djlint:off H037 #}
 <div x-data="{ openModal: false }"
      x-cloak
      @open-modal.window="openModal = true; document.getElementById('dialog').innerHTML = '<div class=\'flex justify-center items-center h-64\'><span class=\'loading loading-spinner loading-lg text-primary\'></span></div>';"
      @hide-modal.window="openModal = false; setTimeout(() => document.getElementById('dialog').innerHTML = '', 300);">
+    {# djlint:on #}
     <div x-show="openModal"
          x-on:keydown.escape.prevent.stop="openModal = false"
          role="dialog"

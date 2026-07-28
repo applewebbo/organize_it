@@ -1,12 +1,12 @@
-{% load i18n crispy_forms_tags %}
+{% load crispy_forms_tags i18n %}
 <div id="share-modal-content">
     <div class="border-base-300 flex items-center justify-between rounded-t border-b p-4 md:px-5 md:py-2.5">
-        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% trans "Share trip" %}</h3>
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% translate "Share trip" %}</h3>
         <button type="button"
                 class="btn btn-ghost btn-circle btn-sm"
                 x-on:click="openModal = false">
             <i class="ph-bold ph-x text-xl"></i>
-            <span class="sr-only">{% trans "Close modal" %}</span>
+            <span class="sr-only">{% translate "Close modal" %}</span>
         </button>
     </div>
     <div class="p-4 md:p-6">
@@ -24,7 +24,7 @@
                        readonly>
                 <button class="btn btn-xs btn-soft shrink-0"
                         :class="copied ? 'btn-success' :"
-                        :title="copied ? '{% trans "Copied!" %}' : '{% trans "Copy link" %}'"
+                        :title="copied ? '{% translate "Copied!" %}' : '{% translate "Copy link" %}'"
                         @click="navigator.clipboard.writeText($el.previousElementSibling.value); copied = true; setTimeout(() => copied = false, 2000)">
                     <i class="ph-bold" :class="copied ? 'ph-check' : 'ph-copy'"></i>
                 </button>
@@ -32,7 +32,7 @@
         {% endif %}
         {% if links %}
             <div class="mb-4">
-                <h4 class="text-base-content/70 mb-2 text-sm font-semibold">{% trans "Active links" %}</h4>
+                <h4 class="text-base-content/70 mb-2 text-sm font-semibold">{% translate "Active links" %}</h4>
                 <ul class="flex flex-col gap-2">
                     {% for link in links %}
                         <li class="border-base-300 flex items-center justify-between gap-2 rounded-lg border p-2">
@@ -40,7 +40,7 @@
                                 {{ link.display_label }}
                                 {% if link.expires_at %}
                                     <span class="text-base-content/40 ml-1 text-xs">
-                                        ({% blocktrans with date=link.expires_at|date:"SHORT_DATE_FORMAT" %}exp. {{ date }}{% endblocktrans %})
+                                        ({% blocktranslate with date=link.expires_at|date:"SHORT_DATE_FORMAT" %}exp. {{ date }}{% endblocktranslate %})
                                     </span>
                                 {% endif %}
                             </span>
@@ -48,12 +48,12 @@
                                 <button x-data="{ copied: false }"
                                         class="btn btn-xs btn-success btn-soft"
                                         :class="copied ? 'btn-success' :"
-                                        :title="copied ? '{% trans "Copied!" %}' : '{% trans "Copy link" %}'"
+                                        :title="copied ? '{% translate "Copied!" %}' : '{% translate "Copy link" %}'"
                                         @click="navigator.clipboard.writeText('{{ request.scheme }}://{{ request.get_host }}{{ link.get_absolute_url }}'); copied = true; setTimeout(() => copied = false, 2000)">
                                     <i class="ph-bold" :class="copied ? 'ph-check' : 'ph-copy'"></i>
                                 </button>
                                 <button class="btn btn-xs btn-error btn-soft"
-                                        title="{% trans 'Revoke' %}"
+                                        title="{% translate 'Revoke' %}"
                                         hx-post="{% url 'trips:share-link-revoke' link.id %}"
                                         hx-target="#share-modal-content"
                                         hx-swap="outerHTML">
@@ -67,7 +67,7 @@
             <div x-data="{ open: false }" class="border-base-300 border-t pt-4">
                 <button type="button"
                         class="btn btn-sm btn-neutral btn-soft w-full"
-                        @click="open = !open">{% trans "Generate new link" %}</button>
+                        @click="open = !open">{% translate "Generate new link" %}</button>
                 <div x-show="open" x-transition class="mt-3">
                     <form hx-post="{% url 'trips:share-link-create' trip.id %}"
                           hx-target="#share-modal-content"
@@ -77,7 +77,7 @@
                         <div class="mt-4 flex justify-end gap-2">
                             <button type="submit" class="btn btn-primary btn-sm">
                                 <i class="ph-bold ph-link-simple"></i>
-                                {% trans "Generate link" %}
+                                {% translate "Generate link" %}
                             </button>
                         </div>
                     </form>
@@ -92,7 +92,7 @@
                 <div class="mt-4 flex justify-end gap-2">
                     <button type="submit" class="btn btn-primary btn-sm">
                         <i class="ph-bold ph-link-simple"></i>
-                        {% trans "Generate link" %}
+                        {% translate "Generate link" %}
                     </button>
                 </div>
             </form>

@@ -4,13 +4,13 @@
     <div class="border-base-300 flex items-center justify-between rounded-t border-b p-4 md:px-5 md:py-2.5">
         <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
             {% if transport_type == 1 %}
-                {% trans "Edit Flight Transfer" %}
+                {% translate "Edit Flight Transfer" %}
             {% elif transport_type == 2 %}
-                {% trans "Edit Train Transfer" %}
+                {% translate "Edit Train Transfer" %}
             {% elif transport_type == 3 %}
-                {% trans "Edit Car Transfer" %}
+                {% translate "Edit Car Transfer" %}
             {% else %}
-                {% trans "Edit Transfer" %}
+                {% translate "Edit Transfer" %}
             {% endif %}
             ({{ direction|title }})
         </h3>
@@ -24,7 +24,7 @@
                  viewBox="0 0 14 14">
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
             </svg>
-            <span class="sr-only">{% trans "Close modal" %}</span>
+            <span class="sr-only">{% translate "Close modal" %}</span>
         </button>
     </div>
     <!-- Form content (no progress indicator, no wizard wrapper) -->

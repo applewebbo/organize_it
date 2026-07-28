@@ -4,8 +4,8 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>{% trans "Today on your trip" %}</title>
-        <meta name="description" content="{% trans 'Today on your trip' %}">
+        <title>{% translate "Today on your trip" %}</title>
+        <meta name="description" content="{% translate 'Today on your trip' %}">
         <meta name="keywords" content="trip, daily, digest">
     </head>
     <body style="margin:0;padding:0;background-color:#ffffff;">
@@ -46,9 +46,9 @@
                                            border:1px solid #eeeeee;
                                            background-color:#fafafa;
                                            font-size:14px">
-                                    <p style="margin:0 0 6px 0;font-weight:bold;font-size:15px;">☀️ {% trans "Weather" %}</p>
-                                    {% trans "Max:" %} {{ day.weather_data.temperature_max|floatformat:"0" }}°C •
-                                    ❄️ {% trans "Min:" %} {{ day.weather_data.temperature_min|floatformat:"0" }}°C
+                                    <p style="margin:0 0 6px 0;font-weight:bold;font-size:15px;">☀️ {% translate "Weather" %}</p>
+                                    {% translate "Max:" %} {{ day.weather_data.temperature_max|floatformat:"0" }}°C •
+                                    ❄️ {% translate "Min:" %} {{ day.weather_data.temperature_min|floatformat:"0" }}°C
                                 </td>
                             </tr>
                             <tr>
@@ -61,7 +61,7 @@
                                            border:1px solid #eeeeee;
                                            background-color:#fafafa;
                                            font-size:14px">
-                                    <p style="margin:0 0 6px 0;font-weight:bold;font-size:15px;">✈️ {% trans "Transfers" %}</p>
+                                    <p style="margin:0 0 6px 0;font-weight:bold;font-size:15px;">✈️ {% translate "Transfers" %}</p>
                                     {% for t in main_transfers %}
                                         <p style="margin:4px 0 0 0;">
                                             <strong>{{ t.get_direction_display }}</strong> ({{ t.get_type_display }}):
@@ -81,9 +81,9 @@
                                            border:1px solid #eeeeee;
                                            background-color:#fafafa;
                                            font-size:14px">
-                                    <p style="margin:0 0 6px 0;font-weight:bold;font-size:15px;">🏨 {% trans "Accommodation" %}</p>
+                                    <p style="margin:0 0 6px 0;font-weight:bold;font-size:15px;">🏨 {% translate "Accommodation" %}</p>
                                     <p style="margin:4px 0 0 0;">
-                                        <strong>{% trans "Stay:" %}</strong>
+                                        <strong>{% translate "Stay:" %}</strong>
                                         {% if stay.website %}
                                             <a href="{{ stay.website }}">{{ stay.name }}</a>
                                         {% else %}
@@ -97,10 +97,10 @@
                                         {% if stay.phone_number %}({{ stay.phone_number }}){% endif %}
                                     </p>
                                     <p style="margin:4px 0 0 0; font-size: 13px; color: #666;">
-                                        <strong>{% trans "Check-in:" %}</strong> {{ stay_start_date|date:"SHORT_DATE_FORMAT" }}
+                                        <strong>{% translate "Check-in:" %}</strong> {{ stay_start_date|date:"SHORT_DATE_FORMAT" }}
                                         {% if stay.check_in %}{{ stay.check_in|time:"H:i" }}{% endif %}
                                         &nbsp;|&nbsp;
-                                        <strong>{% trans "Check-out:" %}</strong> {{ stay_end_date|date:"SHORT_DATE_FORMAT" }}
+                                        <strong>{% translate "Check-out:" %}</strong> {{ stay_end_date|date:"SHORT_DATE_FORMAT" }}
                                         {% if stay.check_out %}{{ stay.check_out|time:"H:i" }}{% endif %}
                                     </p>
                                 </td>
@@ -114,7 +114,7 @@
                                        border:1px solid #eeeeee;
                                        background-color:#fafafa;
                                        font-size:14px">
-                                <p style="margin:0 0 6px 0;font-weight:bold;font-size:15px;">📅 {% trans "Events" %}</p>
+                                <p style="margin:0 0 6px 0;font-weight:bold;font-size:15px;">📅 {% translate "Events" %}</p>
                                 {% if events %}
                                     {% for event in events %}
                                         <p style="margin:4px 0 0 0;">
@@ -137,7 +137,7 @@
                                         </p>
                                     {% endfor %}
                                 {% else %}
-                                    <p style="margin:0;">{% trans "No events scheduled for today." %}</p>
+                                    <p style="margin:0;">{% translate "No events scheduled for today." %}</p>
                                 {% endif %}
                             </td>
                         </tr>
@@ -150,12 +150,12 @@
                                           color:#ffffff;
                                           font-weight:bold;
                                           font-family:Arial,Helvetica,sans-serif;
-                                          font-size:14px">{% trans "Open the trip" %}</a>
+                                          font-size:14px">{% translate "Open the trip" %}</a>
                             </td>
                         </tr>
                         <tr>
                             <td style="padding:32px 0 0 0;font-size:12px;color:#888888;">
-                                {% trans "You received this email because you have an active trip and the daily digest enabled in your profile." %}
+                                {% translate "You received this email because you have an active trip and the daily digest enabled in your profile." %}
                             </td>
                         </tr>
                     </table>
