@@ -62,6 +62,15 @@ repos:
     files: ^templates/.*\.html$
     exclude: ^templates/tailwind/field\.html$
 
+- repo: local
+  hooks:
+  - id: check-phosphor-icons
+    name: Phosphor icon presence gate
+    language: system
+    entry: just check_phosphor
+    files: ^(templates/.*\.html|static/icons/phosphor/bold/style\.css)$
+    pass_filenames: false
+
 - repo: https://github.com/astral-sh/ruff-pre-commit
   rev: v0.16.0
   hooks:
