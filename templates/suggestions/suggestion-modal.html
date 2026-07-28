@@ -5,7 +5,7 @@
         <button type="button"
                 @click="$dispatch('hide-modal')"
                 class="btn btn-sm btn-circle btn-ghost"
-                aria-label="{% translate 'Close' %}">✕</button>
+                aria-label="{% translate 'Close' %}"><i class="ph-bold ph-x i-md"></i></button>
     </div>
     <form hx-post="{% url 'suggestions:generate' trip.pk %}"
           hx-target="#ai-modal-results"

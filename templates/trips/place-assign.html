@@ -6,15 +6,9 @@
     <div class="flex items-center justify-between rounded-t border-b p-4 md:p-5 dark:border-gray-600">
         <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Choose a day for {{ place.name }}</h3>
         <button type="button"
-                class="ms-auto inline-flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white"
+                class="btn btn-sm btn-ghost btn-circle"
                 x-on:click="openModal = false">
-            <svg class="h-3 w-3"
-                 aria-hidden="true"
-                 xmlns="http://www.w3.org/2000/svg"
-                 fill="none"
-                 viewBox="0 0 14 14">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-            </svg>
+            <i class="ph-bold ph-x i-md"></i>
             <span class="sr-only">Close modal</span>
         </button>
     </div>
