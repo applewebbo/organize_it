@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-27 12:09+0200\n"
+"POT-Creation-Date: 2026-07-28 10:12+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1815,8 +1815,6 @@ msgid "Paid"
 msgstr "Paid"
 
 #: templates/trips/expenses-modal.html:54
-#: templates/trips/includes/trip-header-card.html:114
-#: templates/trips/trip-list.html:84
 msgid "Share"
 msgstr ""
 
@@ -2269,7 +2267,7 @@ msgstr ""
 msgid "No departure transfer added yet."
 msgstr ""
 
-#: templates/trips/includes/map-offline-placeholder.html:8
+#: templates/trips/includes/map-offline-placeholder.html:10
 msgid "Map not available offline"
 msgstr ""
 
@@ -2473,6 +2471,12 @@ msgstr "Stages"
 #: templates/trips/includes/trip-header-card.html:91
 msgid "Add events"
 msgstr "Add events"
+
+#: templates/trips/includes/trip-header-card.html:114
+#: templates/trips/trip-list.html:84
+msgctxt "trip action"
+msgid "Share"
+msgstr ""
 
 #: templates/trips/includes/trip-header-card.html:178
 msgid "Start Date:"

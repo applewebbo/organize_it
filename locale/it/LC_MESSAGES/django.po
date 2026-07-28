@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-27 12:09+0200\n"
+"POT-Creation-Date: 2026-07-28 10:12+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1933,8 +1933,6 @@ msgid "Paid"
 msgstr "Pagato"
 
 #: templates/trips/expenses-modal.html:54
-#: templates/trips/includes/trip-header-card.html:114
-#: templates/trips/trip-list.html:84
 msgid "Share"
 msgstr "Quota"
 
@@ -2391,7 +2389,7 @@ msgstr "Ritorno"
 msgid "No departure transfer added yet."
 msgstr "Nessun trasferimento di ritorno aggiunto."
 
-#: templates/trips/includes/map-offline-placeholder.html:8
+#: templates/trips/includes/map-offline-placeholder.html:10
 msgid "Map not available offline"
 msgstr "Mappa non disponibile offline"
 
@@ -2597,6 +2595,12 @@ msgstr "Tappe"
 #: templates/trips/includes/trip-header-card.html:91
 msgid "Add events"
 msgstr "Aggiungi eventi"
+
+#: templates/trips/includes/trip-header-card.html:114
+#: templates/trips/trip-list.html:84
+msgctxt "trip action"
+msgid "Share"
+msgstr "Condividi"
 
 #: templates/trips/includes/trip-header-card.html:178
 msgid "Start Date:"

@@ -81,7 +81,7 @@
                                                 hx-swap="innerHTML"
                                                 @click="$dispatch('open-modal'); document.activeElement.blur()">
                                             <i class="ph-bold ph-share-network" aria-hidden="true"></i>
-                                            <span>{% trans 'Share' %}</span>
+                                            <span>{% translate 'Share' context 'trip action' %}</span>
                                         </button>
                                         <a href="{% url 'trips:trip-detail' trip.id %}"
                                            class="btn btn-sm btn-primary btn-soft">
