@@ -10,6 +10,9 @@ from pytest_django.asserts import assertTemplateUsed
 
 from tests.test import TestCase
 from tests.trips.factories import (
+    ExpenseFactory,
+    ExpenseParticipantFactory,
+    ExpenseShareFactory,
     ExperienceFactory,
     LinkFactory,
     MainTransferFactory,
@@ -17,7 +20,7 @@ from tests.trips.factories import (
     StayFactory,
     TripFactory,
 )
-from trips.models import Trip, TripCollaboration
+from trips.models import Expense, Trip, TripCollaboration
 from trips.views.trips import build_pdf_export_context
 
 pytestmark = pytest.mark.django_db
@@ -125,6 +128,21 @@ class TestTripDeleteView(TestCase):
         message = list(get_messages(response.wsgi_request))[0].message
         assert message == f"<strong>{trip.title}</strong> deleted successfully"
         assert Trip.objects.filter(author=user).count() == 0
+
+    def test_delete_trip_with_expenses(self):
+        """A trip carrying expenses deletes without ProtectedError (#410)."""
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        participant = ExpenseParticipantFactory(trip=trip)
+        expense = ExpenseFactory(trip=trip, payer=participant)
+        ExpenseShareFactory(expense=expense, participant=participant)
+
+        with self.login(user):
+            response = self.delete("trips:trip-delete", pk=trip.pk)
+
+        self.response_204(response)
+        assert Trip.objects.filter(pk=trip.pk).count() == 0
+        assert Expense.objects.filter(pk=expense.pk).count() == 0
 
 
 class TestTripUpdateView(TestCase):

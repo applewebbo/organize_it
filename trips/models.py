@@ -108,6 +108,14 @@ class Trip(models.Model):
 
         super().save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        # Expenses PROTECT their payer ExpenseParticipant, so the default cascade
+        # raises ProtectedError while collecting the trip's participants. Remove
+        # the expenses first (this also clears their shares) so a trip carrying
+        # expenses can be deleted.
+        self.expenses.all().delete()
+        return super().delete(*args, **kwargs)
+
     @property
     def get_image_url(self):
         """Get image URL for template use"""
