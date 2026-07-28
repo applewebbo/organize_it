@@ -1,6 +1,8 @@
 {% load i18n %}
-{# Shown in place of a map when the PWA is offline (map tiles are cross-origin
-   and cannot be cached). Relies on the Alpine "connection" store. #}
+{% comment %}
+Shown in place of a map when the PWA is offline (map tiles are cross-origin
+and cannot be cached). Relies on the Alpine "connection" store.
+{% endcomment %}
 <div x-show="!$store.connection.online"
      x-cloak
      class="map-container bg-base-200 text-base-content/60 flex min-h-48 flex-col items-center justify-center gap-2 p-6 text-center">
