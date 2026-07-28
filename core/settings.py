@@ -370,6 +370,12 @@ GOOGLE_PLACES_API_KEY = env("GOOGLE_PLACES_API_KEY", default="")
 UNSPLASH_ACCESS_KEY = env("UNSPLASH_ACCESS_KEY", default="")
 STAY22_AID = env("STAY22_AID", default="")
 
+# Telegram alerts for failed scheduled tasks (shared Coolify chat, hence the
+# project-label prefix). No-op when token/chat id are empty.
+TELEGRAM_BOT_TOKEN = env("TELEGRAM_BOT_TOKEN", default="")
+TELEGRAM_CHAT_ID = env("TELEGRAM_CHAT_ID", default="")
+TELEGRAM_PROJECT_LABEL = env("TELEGRAM_PROJECT_LABEL", default="organizeit")
+
 # Fernet key used to encrypt BYOK AI credentials at rest (suggestions app)
 FIELD_ENCRYPTION_KEY = env("FIELD_ENCRYPTION_KEY", default="")
 
