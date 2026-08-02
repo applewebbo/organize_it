@@ -94,44 +94,12 @@
                             </div>
                         {% endfor %}
                         <div class="col-span-full flex flex-col items-center gap-2 self-center">
-                            <button class="btn btn-lg btn-primary btn-dash py-8 md:py-12"
-                                    id="trip-add"
-                                    x-data
-                                    hx-get="{% url 'trips:trip-create' %}"
-                                    hx-target="#dialog"
-                                    hx-swap="innerHTML"
-                                    @click="$dispatch('open-modal')">
-                                <i class="ph-bold ph-plus-circle" aria-hidden="true"></i>
-                                {% translate 'Create a new trip' %}
-                            </button>
-                            {% if wizard_available %}
-                                <a href="{% url 'trips:wizard-start' %}"
-                                   class="btn btn-outline btn-primary btn-sm">
-                                    <i class="ph-bold ph-magic-wand" aria-hidden="true"></i>
-                                    {% translate 'Guided setup' %}
-                                </a>
-                            {% endif %}
+                            {% include "trips/includes/create-trip-cta.html" %}
                         </div>
                     </div>
                 {% else %}
                     <div class="flex flex-col items-center justify-center gap-2 py-20">
-                        <button class="btn btn-lg btn-primary btn-dash py-8 md:py-12"
-                                id="trip-add"
-                                x-data
-                                hx-get="{% url 'trips:trip-create' %}"
-                                hx-target="#dialog"
-                                hx-swap="innerHTML"
-                                @click="$dispatch('open-modal')">
-                            <i class="ph-bold ph-plus-circle" aria-hidden="true"></i>
-                            {% translate 'Create a new trip' %}
-                        </button>
-                        {% if wizard_available %}
-                            <a href="{% url 'trips:wizard-start' %}"
-                               class="btn btn-outline btn-primary btn-sm">
-                                <i class="ph-bold ph-magic-wand" aria-hidden="true"></i>
-                                {% translate 'Guided setup' %}
-                            </a>
-                        {% endif %}
+                        {% include "trips/includes/create-trip-cta.html" %}
                     </div>
                 {% endif %}
             </section>

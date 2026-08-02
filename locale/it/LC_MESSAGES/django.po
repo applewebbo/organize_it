@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-02 20:49+0200\n"
+"POT-Creation-Date: 2026-08-02 21:03+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -919,7 +919,7 @@ msgstr "Altri Viaggi"
 #: templates/trips/includes/trip-header-card.html:106
 #: templates/trips/main-transfer-connection-modal.html:37
 #: templates/trips/stay-detail.html:84 templates/trips/trip-list.html:90
-#: templates/trips/trip-list.html:182
+#: templates/trips/trip-list.html:150
 msgid "Edit"
 msgstr "Modifica"
 
@@ -1787,7 +1787,7 @@ msgstr "Arricchisci"
 #: templates/trips/includes/note.html:12
 #: templates/trips/main-transfer-connection-modal.html:44
 #: templates/trips/stay-detail.html:92 templates/trips/stay-note-modify.html:26
-#: templates/trips/trip-list.html:76 templates/trips/trip-list.html:232
+#: templates/trips/trip-list.html:76 templates/trips/trip-list.html:200
 msgid "Delete"
 msgstr "Elimina"
 
@@ -2239,6 +2239,19 @@ msgstr "Seleziona giorni"
 #: templates/trips/includes/create-stage-modal.html:74
 msgid "Create stage"
 msgstr "Crea tappa"
+
+#: templates/trips/includes/create-trip-cta.html:10
+#: templates/trips/includes/create-trip-cta.html:41
+msgid "Create a new trip"
+msgstr "Crea un nuovo viaggio"
+
+#: templates/trips/includes/create-trip-cta.html:21
+msgid "Standard setup"
+msgstr "Procedura standard"
+
+#: templates/trips/includes/create-trip-cta.html:27
+msgid "Guided setup"
+msgstr "Procedura guidata"
 
 #: templates/trips/includes/day-destination-card.html:20
 msgid "Destination for day"
@@ -3014,7 +3027,7 @@ msgstr "Ignora"
 msgid "This trip is archived and cannot be modified."
 msgstr "Questo viaggio è stato archiviato e non può essere modificato."
 
-#: templates/trips/trip-detail.html:35 templates/trips/trip-list.html:228
+#: templates/trips/trip-detail.html:35 templates/trips/trip-list.html:196
 msgid "Unarchive"
 msgstr "Riapri"
 
@@ -3034,23 +3047,15 @@ msgstr "Previsioni meteo"
 msgid "Archive"
 msgstr "Archivia"
 
-#: templates/trips/trip-list.html:105 templates/trips/trip-list.html:126
-msgid "Create a new trip"
-msgstr "Crea un nuovo viaggio"
-
-#: templates/trips/trip-list.html:111 templates/trips/trip-list.html:132
-msgid "Guided setup"
-msgstr "Procedura guidata"
-
-#: templates/trips/trip-list.html:144
+#: templates/trips/trip-list.html:112
 msgid "Shared with me"
 msgstr "Condivise con me"
 
-#: templates/trips/trip-list.html:196
+#: templates/trips/trip-list.html:164
 msgid "Archived Trips"
 msgstr "Viaggi Archiviati"
 
-#: templates/trips/trip-list.html:235
+#: templates/trips/trip-list.html:203
 msgid "View"
 msgstr "Vedi"
 

@@ -1,0 +1,43 @@
+{% load i18n %}
+{% if wizard_available %}
+    <div class="dropdown dropdown-center" x-data>
+        <div tabindex="0"
+             role="button"
+             id="trip-add"
+             class="btn btn-lg btn-primary btn-dash py-8 md:py-12"
+             aria-haspopup="menu">
+            <i class="ph-bold ph-plus-circle" aria-hidden="true"></i>
+            {% translate 'Create a new trip' %}
+            <i class="ph-bold ph-caret-down i-sm" aria-hidden="true"></i>
+        </div>
+        <ul tabindex="0"
+            class="dropdown-content menu bg-base-100 rounded-box border-base-300 z-20 mt-2 w-64 border p-2 shadow">
+            <li>
+                <a hx-get="{% url 'trips:trip-create' %}"
+                   hx-target="#dialog"
+                   hx-swap="innerHTML"
+                   @click="$dispatch('open-modal'); document.activeElement.blur()">
+                    <i class="ph-bold ph-note-pencil i-sm" aria-hidden="true"></i>
+                    {% translate 'Standard setup' %}
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'trips:wizard-start' %}">
+                    <i class="ph-bold ph-magic-wand i-sm" aria-hidden="true"></i>
+                    {% translate 'Guided setup' %}
+                </a>
+            </li>
+        </ul>
+    </div>
+{% else %}
+    <button class="btn btn-lg btn-primary btn-dash py-8 md:py-12"
+            id="trip-add"
+            x-data
+            hx-get="{% url 'trips:trip-create' %}"
+            hx-target="#dialog"
+            hx-swap="innerHTML"
+            @click="$dispatch('open-modal')">
+        <i class="ph-bold ph-plus-circle" aria-hidden="true"></i>
+        {% translate 'Create a new trip' %}
+    </button>
+{% endif %}
