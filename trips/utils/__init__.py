@@ -30,6 +30,7 @@ from trips.utils.queries import (
     get_trips,
 )
 from trips.utils.stages import (
+    apply_stage,
     get_trip_stages,
     group_days_by_destination,
     group_unpaired_events_by_stage,
@@ -66,6 +67,7 @@ __all__ = [
     "get_trip_for_editor_or_404",
     "get_trip_for_owner_or_404",
     "get_trip_or_404",
+    "apply_stage",
     "get_trip_stages",
     "get_trips",
     "group_days_by_destination",

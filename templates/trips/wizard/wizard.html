@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block page_title %}
+    {% translate "Create a trip" %}
+{% endblock page_title %}
+
+{% block content %}
+    <section class="mx-auto my-8 max-w-3xl px-4"
+             x-data="{ leaving: false }"
+             x-init="window.addEventListener('beforeunload', (e) => { if (!leaving) { e.preventDefault(); e.returnValue = ''; } }); document.body.addEventListener('wizardCompleted', () => { leaving = true; }); $el.addEventListener('click', (e) => { if (e.target.closest('[data-wizard-exit]')) { leaving = true; } });">
+        <h1 class="mb-6 text-center text-2xl font-bold">{% translate "Create a trip" %}</h1>
+        <div id="wizard-body">
+            {% include "trips/wizard/basics-step.html" %}
+        </div>
+    </section>
+{% endblock content %}

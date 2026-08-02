@@ -1,0 +1,17 @@
+{% load i18n %}
+<div class="mx-auto max-w-2xl">
+    {% include "trips/wizard/steps-indicator.html" with step=2 %}
+    <div class="card bg-base-100 border-base-300 mt-6 border shadow-sm">
+        <div class="card-body">
+            <h2 class="card-title">{% translate "AI day planning" %}</h2>
+            <p class="text-base-content/70 text-sm">
+                {% blocktranslate with title=trip.title %}Draft <strong>{{ title }}</strong> created. AI day planning will be available here.{% endblocktranslate %}
+            </p>
+            <div class="mt-6 flex items-center justify-end">
+                <a href="{% url 'trips:trip-detail' trip.pk %}"
+                   data-wizard-exit
+                   class="btn btn-primary">{% translate "Go to trip" %}</a>
+            </div>
+        </div>
+    </div>
+</div>

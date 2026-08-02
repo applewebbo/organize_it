@@ -25,6 +25,7 @@ from trips.forms.trip import (
     ShareLinkCreateForm,
     TripForm,
 )
+from trips.forms.wizard import WizardBasicsForm
 
 __all__ = [
     "AddNoteToStayForm",
@@ -49,5 +50,6 @@ __all__ = [
     "StayForm",
     "TrainMainTransferForm",
     "TripForm",
+    "WizardBasicsForm",
     "urlfields_assume_https",
 ]

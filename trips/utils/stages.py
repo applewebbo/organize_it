@@ -1,3 +1,37 @@
+def apply_stage(trip, day_pks, destination, latitude=None, longitude=None):
+    """Assign ``destination`` (and optional coords) to the given trip days and
+    recalculate the transfers arriving at the first day of this stage and at the
+    first day of the following stage. Shared by the destinations modal and the
+    creation wizard. No-op when destination or day_pks is empty.
+    """
+    from django_q.tasks import async_task
+
+    from trips.models import Day
+
+    if not destination or not day_pks:
+        return
+    update_fields = {"destination": destination}
+    if latitude is not None and longitude is not None:
+        update_fields["destination_latitude"] = latitude
+        update_fields["destination_longitude"] = longitude
+    Day.objects.filter(pk__in=day_pks, trip=trip).update(**update_fields)
+    affected_numbers = list(
+        Day.objects.filter(pk__in=day_pks, trip=trip).values_list("number", flat=True)
+    )
+    if affected_numbers:
+        min_number = min(affected_numbers)
+        max_number = max(affected_numbers)
+        first_of_stage_pk = (
+            Day.objects.filter(trip=trip, number=min_number)
+            .values_list("pk", flat=True)
+            .first()
+        )
+        async_task("trips.tasks.calculate_day_transfer", first_of_stage_pk)
+        first_of_next = Day.objects.filter(trip=trip, number=max_number + 1).first()
+        if first_of_next:
+            async_task("trips.tasks.calculate_day_transfer", first_of_next.pk)
+
+
 def get_trip_stages(trip):
     """
     Return destination stages for a trip.

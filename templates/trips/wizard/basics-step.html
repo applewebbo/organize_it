@@ -1,0 +1,30 @@
+{% load i18n %}
+<div class="mx-auto max-w-2xl">
+    {% include "trips/wizard/steps-indicator.html" with step=1 %}
+    <div class="card bg-base-100 border-base-300 mt-6 border shadow-sm">
+        <div class="card-body">
+            <h2 class="card-title">{% translate "Trip basics" %}</h2>
+            <p class="text-base-content/70 text-sm">
+                {% translate "Set the dates and the stages of your trip. The nights across stages must match the trip duration." %}
+            </p>
+            <form hx-post="{% url 'trips:wizard-basics' %}"
+                  hx-target="#wizard-body"
+                  hx-swap="innerHTML"
+                  method="post"
+                  enctype="multipart/form-data"
+                  class="mt-4">
+                {% csrf_token %}
+                {{ form }}
+                <div class="mt-6 flex items-center justify-between">
+                    <a href="{% url 'trips:home' %}"
+                       data-wizard-exit
+                       class="btn btn-outline btn-error dark:btn-soft">{% translate "Cancel" %}</a>
+                    <button type="submit" class="btn btn-primary">
+                        {% translate "Next" %}
+                        <i class="ph-bold ph-arrow-right i-sm"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

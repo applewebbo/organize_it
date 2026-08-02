@@ -1,0 +1,113 @@
+{% load i18n %}
+<div x-data="wizardStages()" class="grid gap-4">
+    {% if form.non_field_errors %}
+        <div class="alert alert-error alert-soft alert-sm">
+            <i class="ph-bold ph-warning i-sm"></i>
+            <span>{{ form.non_field_errors|join:" " }}</span>
+        </div>
+    {% endif %}
+    <label class="floating-label">
+        <span>{% translate "Title" %}</span>
+        <input type="text"
+               name="title"
+               value="{{ form.title.value|default:'' }}"
+               placeholder="{% translate 'Title' %}"
+               class="input input-bordered w-full"
+               required>
+    </label>
+    {% if form.title.errors %}<p class="text-error text-sm">{{ form.title.errors|join:" " }}</p>{% endif %}
+    <div class="grid gap-4 sm:grid-cols-2">
+        <label class="floating-label">
+            <span>{% translate "Start date" %}</span>
+            <input type="date"
+                   name="start_date"
+                   x-model="startDate"
+                   value="{{ form.start_date.value|default:'' }}"
+                   class="input input-bordered w-full"
+                   required>
+        </label>
+        <label class="floating-label">
+            <span>{% translate "End date" %}</span>
+            <input type="date"
+                   name="end_date"
+                   x-model="endDate"
+                   value="{{ form.end_date.value|default:'' }}"
+                   class="input input-bordered w-full"
+                   required>
+        </label>
+    </div>
+    {% if form.end_date.errors %}<p class="text-error text-sm">{{ form.end_date.errors|join:" " }}</p>{% endif %}
+    <div class="grid gap-3">
+        <div class="flex items-center justify-between">
+            <h4 class="font-semibold">{% translate "Stages" %}</h4>
+            <span class="text-sm"
+                  :class="nightsMatch ? 'text-success' : 'text-error'"
+                  x-text="nightsSummary"></span>
+        </div>
+        <template x-for="(stage, index) in stages" :key="index">
+            <div class="join w-full">
+                <input type="text"
+                       class="input input-bordered join-item w-full"
+                       :placeholder="index === 0 ? '{% translate "Main destination" %}' : '{% translate "Destination" %}'"
+                       x-model="stage.destination">
+                <input type="number"
+                       min="1"
+                       class="input input-bordered join-item w-24"
+                       :placeholder="'{% translate "Nights" %}'"
+                       x-model.number="stage.nights">
+                <button type="button"
+                        class="btn btn-outline btn-error join-item"
+                        x-show="stages.length > 1"
+                        x-on:click="removeStage(index)">
+                    <i class="ph-bold ph-trash i-sm"></i>
+                </button>
+            </div>
+        </template>
+        <button type="button"
+                class="btn btn-outline btn-sm w-fit"
+                x-on:click="addStage()">
+            <i class="ph-bold ph-plus i-sm"></i>
+            {% translate "Add stage" %}
+        </button>
+        {% if form.stages.errors %}<p class="text-error text-sm">{{ form.stages.errors|join:" " }}</p>{% endif %}
+    </div>
+    <input type="hidden" name="stages" :value="JSON.stringify(stages)">
+    <input type="hidden"
+           name="selected_photo_id"
+           value="{{ form.selected_photo_id.value|default:'' }}">
+</div>
+<script>
+    function wizardStages() {
+        const initial = {{ form.stages.value|default:"null" }};
+        return {
+            startDate: '{{ form.start_date.value|default:"" }}',
+            endDate: '{{ form.end_date.value|default:"" }}',
+            stages: Array.isArray(initial) && initial.length
+                ? initial
+                : [{ destination: '', nights: 1 }],
+            addStage() {
+                this.stages.push({ destination: '', nights: 1 });
+            },
+            removeStage(index) {
+                this.stages.splice(index, 1);
+            },
+            get totalNights() {
+                return this.stages.reduce((sum, s) => sum + (parseInt(s.nights) || 0), 0);
+            },
+            get duration() {
+                if (!this.startDate || !this.endDate) return null;
+                const start = new Date(this.startDate);
+                const end = new Date(this.endDate);
+                const diff = Math.round((end - start) / 86400000);
+                return diff > 0 ? diff : null;
+            },
+            get nightsMatch() {
+                return this.duration !== null && this.totalNights === this.duration;
+            },
+            get nightsSummary() {
+                if (this.duration === null) return this.totalNights + ' {% translate "nights" %}';
+                return this.totalNights + ' / ' + this.duration + ' {% translate "nights" %}';
+            },
+        };
+    }
+</script>

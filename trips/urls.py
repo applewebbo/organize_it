@@ -16,6 +16,8 @@ urlpatterns = [
 
 htmx_urlpatterns = [
     path("trips/create", views.trip_create, name="trip-create"),
+    path("trips/wizard/", views.wizard_start, name="wizard-start"),
+    path("trips/wizard/basics/", views.wizard_basics, name="wizard-basics"),
     path("trips/<int:pk>/delete", views.trip_delete, name="trip-delete"),
     path("trips/<int:pk>/update", views.trip_update, name="trip-update"),
     path("trips/<int:pk>/archive", views.trip_archive, name="trip-archive"),

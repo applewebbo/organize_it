@@ -21,6 +21,7 @@ from trips.models import Day, Event, MainTransfer, Stay, Trip
 from trips.services import GooglePlacesClient, GooglePlacesError
 from trips.utils import (
     accessible_trips_qs,
+    apply_stage,
     build_categorized_event,
     create_trip_map,
     editable_trips_qs,
@@ -303,43 +304,20 @@ def create_stage(request, trip_pk):
     }
 
     if request.method == "POST":
-        from django_q.tasks import async_task
-
         destination = request.POST.get("destination", "").strip()
         dest_lat = request.POST.get("destination_latitude", "").strip()
         dest_lon = request.POST.get("destination_longitude", "").strip()
         selected_pks = {int(pk) for pk in request.POST.getlist("days")}
         if destination and selected_pks:
             valid_pks = selected_pks - custom_day_pks
-            update_fields = {"destination": destination}
+            latitude = longitude = None
             if dest_lat and dest_lon:
                 try:
-                    update_fields["destination_latitude"] = float(dest_lat)
-                    update_fields["destination_longitude"] = float(dest_lon)
+                    latitude = float(dest_lat)
+                    longitude = float(dest_lon)
                 except ValueError:
-                    pass
-            Day.objects.filter(pk__in=valid_pks, trip=trip).update(**update_fields)
-            affected_numbers = list(
-                Day.objects.filter(pk__in=valid_pks, trip=trip).values_list(
-                    "number", flat=True
-                )
-            )
-            if affected_numbers:
-                min_number = min(affected_numbers)
-                max_number = max(affected_numbers)
-                # Recalculate transfer arriving at the first day of the new stage
-                first_of_stage_pk = (
-                    Day.objects.filter(trip=trip, number=min_number)
-                    .values_list("pk", flat=True)
-                    .first()
-                )
-                async_task("trips.tasks.calculate_day_transfer", first_of_stage_pk)
-                # Recalculate transfer arriving at the first day of the stage after this one
-                first_of_next = Day.objects.filter(
-                    trip=trip, number=max_number + 1
-                ).first()
-                if first_of_next:
-                    async_task("trips.tasks.calculate_day_transfer", first_of_next.pk)
+                    latitude = longitude = None
+            apply_stage(trip, valid_pks, destination, latitude, longitude)
         stages = get_trip_stages(trip)
         return TemplateResponse(
             request,

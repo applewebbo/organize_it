@@ -72,6 +72,25 @@ class TestWizardGating(TestCase):
         assert has_own_ai_key(creds.user) is False
 
 
+class TestWizardEntryPoint(TestCase):
+    def test_trip_list_shows_wizard_link_with_key(self):
+        user = self.make_user("u@example.com")
+        AICredentialsFactory(user=user)
+        TripFactory(author=user)
+        with self.login(user):
+            response = self.get("trips:trip-list")
+        assert response.context["wizard_available"] is True
+        self.assertContains(response, "trips/wizard/")
+
+    def test_trip_list_hides_wizard_link_without_key(self):
+        user = self.make_user("u@example.com")
+        TripFactory(author=user)
+        with self.login(user):
+            response = self.get("trips:trip-list")
+        assert response.context["wizard_available"] is False
+        self.assertNotContains(response, "trips/wizard/")
+
+
 class TestCleanupAbandonedWizardTrips(TestCase):
     def test_deletes_old_draft(self):
         user = self.make_user("u@example.com")

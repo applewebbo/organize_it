@@ -18,7 +18,7 @@ from django_q.tasks import async_task
 from weasyprint import HTML
 
 from accounts.models import Profile, get_profile
-from suggestions.services import should_show_shared_key_notice
+from suggestions.services import has_own_ai_key, should_show_shared_key_notice
 from trips.forms import TripForm
 from trips.models import (
     Day,
@@ -53,6 +53,7 @@ def home(request):
         try:
             context = get_trips(request.user)
             context["show_guide"] = request.session.get("show_guide", False)
+            context["wizard_available"] = has_own_ai_key(request.user)
         except Profile.DoesNotExist:
             pass
     return TemplateResponse(request, "trips/index.html", context)
@@ -109,6 +110,7 @@ def trip_list(request):
         "active_trips": active_trips,
         "archived_trips": archived_trips,
         "shared_trips": shared_trips,
+        "wizard_available": has_own_ai_key(request.user),
     }
     return TemplateResponse(request, template, context)
 

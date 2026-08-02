@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Required so the TemplatesSetting form renderer can find built-in widget templates
+    "django.forms",
     # THIRD_PARTY
     "allauth",
     "allauth.account",
@@ -123,6 +125,10 @@ TEMPLATES = [
         },
     },
 ]
+
+# Resolve Form/Field ``template_name`` against the project TEMPLATES engine so
+# forms can ship their own presentation templates from BASE_DIR/templates.
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 WSGI_APPLICATION = "core.wsgi.application"
 

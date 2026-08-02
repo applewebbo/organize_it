@@ -1,0 +1,6 @@
+{% load i18n %}
+<ul class="steps w-full">
+    <li class="step {% if step >= 1 %}step-primary{% endif %}">{% translate "Basics" %}</li>
+    <li class="step {% if step >= 2 %}step-primary{% endif %}">{% translate "AI planning" %}</li>
+    <li class="step {% if step >= 3 %}step-primary{% endif %}">{% translate "Stays" %}</li>
+</ul>
