@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-02 13:34+0200\n"
+"POT-Creation-Date: 2026-08-02 20:49+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1281,7 +1281,7 @@ msgstr "File"
 #: templates/trips/stay-create.html:42
 #: templates/trips/stay-enrich-preview.html:47
 #: templates/trips/stay-modify.html:18
-#: templates/trips/wizard/basics-step.html:21
+#: templates/trips/wizard/basics-step.html:20
 msgid "Cancel"
 msgstr "Annulla"
 
@@ -3115,9 +3115,11 @@ msgstr "Pianificazione AI dei giorni"
 msgid ""
 "Draft <strong>%(title)s</strong> created. AI day planning will be available "
 "here."
-msgstr "Bozza <strong>%(title)s</strong> creata. La pianificazione AI dei giorni sarà disponibile qui."
+msgstr ""
+"Bozza <strong>%(title)s</strong> creata. La pianificazione AI dei giorni "
+"sarà disponibile qui."
 
-#: templates/trips/wizard/ai-step.html:13
+#: templates/trips/wizard/ai-step.html:12
 msgid "Go to trip"
 msgstr "Vai al viaggio"
 
@@ -3129,9 +3131,11 @@ msgstr "Dati del viaggio"
 msgid ""
 "Set the dates and the stages of your trip. The nights across stages must "
 "match the trip duration."
-msgstr "Imposta le date e le tappe del tuo viaggio. Le notti delle tappe devono corrispondere alla durata del viaggio."
+msgstr ""
+"Imposta le date e le tappe del tuo viaggio. Le notti delle tappe devono "
+"corrispondere alla durata del viaggio."
 
-#: templates/trips/wizard/basics-step.html:23
+#: templates/trips/wizard/basics-step.html:22
 msgid "Next"
 msgstr "Avanti"
 
@@ -3143,9 +3147,30 @@ msgstr "Dati base"
 msgid "AI planning"
 msgstr "Pianificazione AI"
 
-#: templates/trips/wizard/wizard.html:4 templates/trips/wizard/wizard.html:10
+#: templates/trips/wizard/wizard.html:4 templates/trips/wizard/wizard.html:12
 msgid "Create a trip"
 msgstr "Crea un viaggio"
+
+#: templates/trips/wizard/wizard.html:33
+msgid "Leave the setup?"
+msgstr "Uscire dalla procedura?"
+
+#: templates/trips/wizard/wizard.html:37
+msgid "You haven't saved anything yet: leaving will discard your entries."
+msgstr "Non hai ancora salvato nulla: uscendo perderai i dati inseriti."
+
+#: templates/trips/wizard/wizard.html:40
+msgid "Your draft is saved. You can resume it later from the home page."
+msgstr "La bozza è salvata. Potrai riprenderla in seguito dalla home."
+
+#: templates/trips/wizard/wizard.html:44
+msgctxt "wizard exit"
+msgid "Stay"
+msgstr "Rimani"
+
+#: templates/trips/wizard/wizard.html:45
+msgid "Leave"
+msgstr "Esci"
 
 #: trips/forms/event.py:25
 msgid "Start time"
@@ -3472,19 +3497,19 @@ msgstr "Aggiungi almeno una tappa."
 msgid "Each stage needs a destination."
 msgstr "Ogni tappa richiede una destinazione."
 
-#: trips/forms/wizard.py:47
+#: trips/forms/wizard.py:48
 msgid "Each stage needs a number of nights."
 msgstr "Ogni tappa richiede un numero di notti."
 
-#: trips/forms/wizard.py:49
+#: trips/forms/wizard.py:51
 msgid "Each stage needs at least one night."
 msgstr "Ogni tappa richiede almeno una notte."
 
-#: trips/forms/wizard.py:70
+#: trips/forms/wizard.py:72
 msgid "End date must be after the start date."
 msgstr "La data di fine deve essere successiva alla data di inizio."
 
-#: trips/forms/wizard.py:76
+#: trips/forms/wizard.py:78
 msgid "The nights across stages must match the trip duration."
 msgstr "Le notti delle tappe devono corrispondere alla durata del viaggio."
 

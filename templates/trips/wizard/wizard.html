@@ -6,11 +6,85 @@
 
 {% block content %}
     <section class="mx-auto my-8 max-w-3xl px-4"
-             x-data="{ leaving: false }"
-             x-init="window.addEventListener('beforeunload', (e) => { if (!leaving) { e.preventDefault(); e.returnValue = ''; } }); document.body.addEventListener('wizardCompleted', () => { leaving = true; }); $el.addEventListener('click', (e) => { if (e.target.closest('[data-wizard-exit]')) { leaving = true; } });">
+             x-data="wizardExitGuard()"
+             x-init="init()"
+             @wizard-draft-created.window="draftSaved = true">
         <h1 class="mb-6 text-center text-2xl font-bold">{% translate "Create a trip" %}</h1>
         <div id="wizard-body">
             {% include "trips/wizard/basics-step.html" %}
         </div>
+        <!-- Styled exit confirmation modal (replaces the native beforeunload dialog) -->
+        <div x-cloak
+             x-show="showModal"
+             role="dialog"
+             aria-modal="true"
+             class="fixed inset-0 z-50 overflow-y-auto">
+            <div x-show="showModal"
+                 x-transition.opacity
+                 class="fixed inset-0 bg-black/50"
+                 @click="cancel()"></div>
+            <div class="relative flex min-h-screen items-center justify-center p-4">
+                <div x-show="showModal"
+                     x-transition
+                     x-trap.noscroll="showModal"
+                     @keydown.escape.window="cancel()"
+                     class="relative w-full max-w-md rounded-lg bg-white shadow dark:bg-slate-600">
+                    <div class="border-base-300 border-b p-4 md:px-5 md:py-2.5">
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% translate "Leave the setup?" %}</h3>
+                    </div>
+                    <div class="p-4 md:p-5">
+                        <p x-show="!draftSaved" class="text-base-content/70 text-sm">
+                            {% translate "You haven't saved anything yet: leaving will discard your entries." %}
+                        </p>
+                        <p x-show="draftSaved" class="text-base-content/70 text-sm">
+                            {% translate "Your draft is saved. You can resume it later from the home page." %}
+                        </p>
+                    </div>
+                    <div class="flex items-center justify-end gap-2 p-4 md:p-5">
+                        <button type="button" class="btn btn-outline" @click="cancel()">{% translate "Stay" context "wizard exit" %}</button>
+                        <button type="button" class="btn btn-error" @click="confirm()">{% translate "Leave" %}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 {% endblock content %}
+
+{% block script %}
+    <script>
+        function wizardExitGuard() {
+            return {
+                showModal: false,
+                draftSaved: false,
+                pendingHref: null,
+                init() {
+                    document.addEventListener('click', (e) => this.onClick(e), true);
+                },
+                onClick(e) {
+                    if (this.showModal || e.defaultPrevented) return;
+                    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                    const link = e.target.closest('a[href]');
+                    if (!link || link.target === '_blank' || link.hasAttribute('download')) return;
+                    const href = link.getAttribute('href');
+                    if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+                    // Skip HTMX-driven links (in-page swaps, no navigation away)
+                    if (link.hasAttribute('hx-get') || link.hasAttribute('hx-post') ||
+                        link.hasAttribute('hx-put') || link.hasAttribute('hx-delete') ||
+                        link.hasAttribute('hx-patch')) return;
+                    // Skip links that stay on the current wizard page
+                    if (link.href === window.location.href) return;
+                    e.preventDefault();
+                    this.pendingHref = link.href;
+                    this.showModal = true;
+                },
+                cancel() {
+                    this.showModal = false;
+                    this.pendingHref = null;
+                },
+                confirm() {
+                    if (this.pendingHref) window.location.href = this.pendingHref;
+                },
+            };
+        }
+    </script>
+{% endblock script %}

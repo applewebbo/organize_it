@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-02 13:34+0200\n"
+"POT-Creation-Date: 2026-08-02 20:49+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1198,7 +1198,7 @@ msgstr ""
 #: templates/trips/stay-create.html:42
 #: templates/trips/stay-enrich-preview.html:47
 #: templates/trips/stay-modify.html:18
-#: templates/trips/wizard/basics-step.html:21
+#: templates/trips/wizard/basics-step.html:20
 msgid "Cancel"
 msgstr ""
 
@@ -2981,7 +2981,7 @@ msgid ""
 "here."
 msgstr ""
 
-#: templates/trips/wizard/ai-step.html:13
+#: templates/trips/wizard/ai-step.html:12
 msgid "Go to trip"
 msgstr ""
 
@@ -2995,7 +2995,7 @@ msgid ""
 "match the trip duration."
 msgstr ""
 
-#: templates/trips/wizard/basics-step.html:23
+#: templates/trips/wizard/basics-step.html:22
 msgid "Next"
 msgstr ""
 
@@ -3007,8 +3007,29 @@ msgstr ""
 msgid "AI planning"
 msgstr ""
 
-#: templates/trips/wizard/wizard.html:4 templates/trips/wizard/wizard.html:10
+#: templates/trips/wizard/wizard.html:4 templates/trips/wizard/wizard.html:12
 msgid "Create a trip"
+msgstr ""
+
+#: templates/trips/wizard/wizard.html:33
+msgid "Leave the setup?"
+msgstr ""
+
+#: templates/trips/wizard/wizard.html:37
+msgid "You haven't saved anything yet: leaving will discard your entries."
+msgstr ""
+
+#: templates/trips/wizard/wizard.html:40
+msgid "Your draft is saved. You can resume it later from the home page."
+msgstr ""
+
+#: templates/trips/wizard/wizard.html:44
+msgctxt "wizard exit"
+msgid "Stay"
+msgstr ""
+
+#: templates/trips/wizard/wizard.html:45
+msgid "Leave"
 msgstr ""
 
 #: trips/forms/event.py:25
@@ -3331,19 +3352,19 @@ msgstr ""
 msgid "Each stage needs a destination."
 msgstr ""
 
-#: trips/forms/wizard.py:47
+#: trips/forms/wizard.py:48
 msgid "Each stage needs a number of nights."
 msgstr ""
 
-#: trips/forms/wizard.py:49
+#: trips/forms/wizard.py:51
 msgid "Each stage needs at least one night."
 msgstr ""
 
-#: trips/forms/wizard.py:70
+#: trips/forms/wizard.py:72
 msgid "End date must be after the start date."
 msgstr ""
 
-#: trips/forms/wizard.py:76
+#: trips/forms/wizard.py:78
 msgid "The nights across stages must match the trip duration."
 msgstr ""
 

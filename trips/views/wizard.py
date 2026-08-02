@@ -63,7 +63,10 @@ def wizard_basics(request):
     _assign_stages_to_days(trip, stages)
 
     context = {"trip": trip, "step": WIZARD_STEP_AI}
-    return TemplateResponse(request, "trips/wizard/ai-step.html", context)
+    response = TemplateResponse(request, "trips/wizard/ai-step.html", context)
+    # Tell the exit guard a recoverable draft now exists (message wording changes).
+    response["HX-Trigger"] = "wizard-draft-created"
+    return response
 
 
 def _assign_stages_to_days(trip, stages):

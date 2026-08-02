@@ -172,6 +172,7 @@ class TestWizardBasicsView(TestCase):
         with self.login(user):
             response = self.post("trips:wizard-basics", data=self._post_data())
         assert response.status_code == 200
+        assert response["HX-Trigger"] == "wizard-draft-created"
         trip = Trip.objects.get(author=user)
         assert trip.wizard_completed is False
         assert trip.wizard_started_at is not None
