@@ -333,6 +333,18 @@ def resolve_credentials(user, trip: Trip) -> AICredentials | None:
     return None
 
 
+def has_own_ai_key(user) -> bool:
+    """Whether ``user`` has configured their own non-empty AI key.
+
+    Used to gate the creation wizard entry point: it is offered only to users
+    who can actually run the AI planning step with their own credentials. The
+    key is encrypted at rest, so emptiness is checked in Python (mirroring
+    ``resolve_credentials``) rather than via an ORM lookup.
+    """
+    own = AICredentials.objects.filter(user=user).first()
+    return own is not None and bool(own.api_key_encrypted)
+
+
 def should_show_shared_key_notice(user, trip: Trip) -> bool:
     """Whether to show the shared-key notice to ``user`` on ``trip``.
 

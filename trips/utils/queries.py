@@ -66,10 +66,19 @@ def get_trips(user):
     else:
         unpaired_events = None
 
-    # Base queryset: owned + collaborated trips excluding archived
+    # Abandoned wizard draft (author's own, not yet completed), surfaced so the
+    # home page can offer to resume or discard it.
+    wizard_draft = (
+        Trip.objects.filter(author=user, wizard_completed=False)
+        .order_by("-wizard_started_at")
+        .first()
+    )
+
+    # Base queryset: owned + collaborated trips excluding archived and drafts
     base_qs = (
         Trip.objects.filter(Q(author=user) | Q(collaborators=user))
         .exclude(status=Trip.Status.ARCHIVED)
+        .filter(wizard_completed=True)
         .distinct()
     )
     if fav_trip:
@@ -173,4 +182,5 @@ def get_trips(user):
         "to_home_destination": (last_day.destination or featured_trip.destination)
         if last_day and not departure_transfer
         else None,
+        "wizard_draft": wizard_draft,
     }

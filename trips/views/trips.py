@@ -78,15 +78,15 @@ def trip_list(request):
 
     # Build base querysets
     active_trips = (
-        Trip.objects.filter(author=request.user)
+        Trip.objects.filter(author=request.user, wizard_completed=True)
         .exclude(status=5)
         .prefetch_related("days")
     )
     archived_trips = Trip.objects.filter(
-        author=request.user, status=5
+        author=request.user, status=5, wizard_completed=True
     ).prefetch_related("days")
     shared_trips = (
-        Trip.objects.filter(collaborators=request.user)
+        Trip.objects.filter(collaborators=request.user, wizard_completed=True)
         .exclude(status=5)
         .select_related("author__profile")
         .prefetch_related("days")

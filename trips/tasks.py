@@ -289,6 +289,28 @@ def cleanup_old_sessions():
         raise
 
 
+def cleanup_abandoned_wizard_trips():
+    """
+    Delete creation-wizard drafts abandoned for more than 24 hours.
+
+    A draft is a Trip with ``wizard_completed=False``; ``wizard_started_at``
+    timestamps when the wizard began. Instances are deleted one by one so the
+    Trip.delete() override (which clears linked expenses) runs.
+
+    Returns:
+        int: Number of abandoned draft trips deleted
+    """
+    cutoff = timezone.now() - timedelta(hours=24)
+    stale = Trip.objects.filter(wizard_completed=False, wizard_started_at__lt=cutoff)
+    deleted = 0
+    for trip in stale:
+        trip.delete()
+        deleted += 1
+    if deleted:
+        logger.info(f"Deleted {deleted} abandoned wizard draft trips")
+    return deleted
+
+
 def backup_database():
     """
     Backup database using django-dbbackup.

@@ -74,6 +74,12 @@ class Trip(models.Model):
     expense_currency = models.CharField(
         max_length=3, choices=CURRENCY_CHOICES, default="EUR"
     )
+    # Creation-wizard state. Quick-created trips are complete by default so they
+    # behave exactly as before; the wizard creates drafts (False) and flips this
+    # to True on completion. Drafts are hidden from listings and cleaned up.
+    wizard_completed = models.BooleanField(default=True)
+    wizard_step = models.PositiveSmallIntegerField(default=0)
+    wizard_started_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ("status",)
