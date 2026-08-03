@@ -5,11 +5,23 @@
         <div class="card-body">
             <h2 class="card-title">{% translate "AI day planning" %}</h2>
             <p class="text-base-content/70 text-sm">
-                {% blocktranslate with title=trip.title %}Draft <strong>{{ title }}</strong> created. AI day planning will be available here.{% endblocktranslate %}
+                {% blocktranslate with title=trip.title %}Let AI draft a day-by-day plan for <strong>{{ title }}</strong>. You choose which days to keep.{% endblocktranslate %}
             </p>
+            <div id="wizard-ai-results" class="mt-4">
+                <form hx-post="{% url 'trips:wizard-ai-generate' trip.pk %}"
+                      hx-target="#wizard-ai-results"
+                      hx-swap="innerHTML"
+                      hx-disabled-elt="button[type='submit']">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary w-full">
+                        <i class="ph-bold ph-magic-wand i-sm htmx-hide-on-request"></i>
+                        {% translate "Generate itinerary" %}
+                    </button>
+                </form>
+            </div>
             <div class="mt-6 flex items-center justify-end">
                 <a href="{% url 'trips:trip-detail' trip.pk %}"
-                   class="btn btn-primary">{% translate "Go to trip" %}</a>
+                   class="btn btn-ghost btn-sm">{% translate "Skip this step" %}</a>
             </div>
         </div>
     </div>

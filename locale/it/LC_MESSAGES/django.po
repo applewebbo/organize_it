@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-02 21:03+0200\n"
+"POT-Creation-Date: 2026-08-03 15:09+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1029,6 +1029,7 @@ msgstr ""
 
 #: templates/suggestions/ai-map-actions.html:11
 #: templates/suggestions/suggestion-modal.html:39
+#: templates/trips/wizard/ai-results.html:76
 msgid "Regenerate"
 msgstr "Rigenera"
 
@@ -1057,11 +1058,13 @@ msgstr ""
 
 #: templates/suggestions/map-suggestions-results.html:11
 #: templates/suggestions/plan-day-results.html:7
+#: templates/trips/wizard/ai-results.html:7
 msgid "Check your AI settings"
 msgstr "Controlla le impostazioni AI"
 
 #: templates/suggestions/map-suggestions-results.html:13
 #: templates/suggestions/plan-day-results.html:9
+#: templates/trips/wizard/ai-results.html:9
 msgid "You have reached the AI provider usage limit. Please try again later."
 msgstr ""
 "Hai raggiunto il limite di utilizzo del provider AI. Riprova più tardi."
@@ -1144,6 +1147,7 @@ msgid "Plan day"
 msgstr "Pianifica giornata"
 
 #: templates/suggestions/plan-day-results.html:13
+#: templates/trips/wizard/ai-results.html:13
 msgid "Something went wrong while generating the itinerary. Please try again."
 msgstr ""
 "Qualcosa è andato storto durante la generazione dell'itinerario. Riprova."
@@ -1166,6 +1170,7 @@ msgid "Apply day"
 msgstr "Applica giornata"
 
 #: templates/suggestions/plan-day-results.html:73
+#: templates/trips/wizard/ai-results.html:87
 msgid "No itinerary generated"
 msgstr "Nessun itinerario generato"
 
@@ -3111,6 +3116,63 @@ msgstr "Check-out"
 msgid "Forecast unavailable"
 msgstr "Previsioni non disponibili"
 
+#: templates/trips/wizard/ai-applied.html:7
+msgid "Itinerary added"
+msgstr "Itinerario aggiunto"
+
+#: templates/trips/wizard/ai-applied.html:9
+msgid ""
+"The days you kept were added to your trip. You can refine each day later."
+msgstr ""
+"I giorni che hai tenuto sono stati aggiunti al viaggio. Potrai perfezionare "
+"ogni giorno in seguito."
+
+#: templates/trips/wizard/ai-applied.html:12
+msgid "Go to trip"
+msgstr "Vai al viaggio"
+
+#: templates/trips/wizard/ai-results.html:6
+msgid "AI planning is not configured yet. Add a valid API key to get started."
+msgstr ""
+"La pianificazione AI non è ancora configurata. Aggiungi una chiave API "
+"valida per iniziare."
+
+#: templates/trips/wizard/ai-results.html:11
+msgid ""
+"You have reached the daily AI generation limit. Please try again tomorrow."
+msgstr ""
+"Hai raggiunto il limite giornaliero di generazioni AI. Riprova domani."
+
+#: templates/trips/wizard/ai-results.html:18
+#: templates/trips/wizard/ai-results.html:89
+#: templates/trips/wizard/ai-step.html:24
+msgid "Skip this step"
+msgstr "Salta questo passaggio"
+
+#: templates/trips/wizard/ai-results.html:31
+msgid "Keep the days you like; uncheck any you want to skip."
+msgstr "Tieni i giorni che ti piacciono; deseleziona quelli da saltare."
+
+#: templates/trips/wizard/ai-results.html:42
+#, python-format
+msgid "Day %(n)s"
+msgstr "Giorno %(n)s"
+
+#: templates/trips/wizard/ai-results.html:46
+#, python-format
+msgid "%(counter)s stop"
+msgid_plural "%(counter)s stops"
+msgstr[0] "%(counter)s tappa"
+msgstr[1] "%(counter)s tappe"
+
+#: templates/trips/wizard/ai-results.html:63
+msgid "No stops proposed for this day."
+msgstr "Nessuna tappa proposta per questo giorno."
+
+#: templates/trips/wizard/ai-results.html:80
+msgid "Keep selected days"
+msgstr "Tieni i giorni selezionati"
+
 #: templates/trips/wizard/ai-step.html:6
 msgid "AI day planning"
 msgstr "Pianificazione AI dei giorni"
@@ -3118,15 +3180,15 @@ msgstr "Pianificazione AI dei giorni"
 #: templates/trips/wizard/ai-step.html:8
 #, python-format
 msgid ""
-"Draft <strong>%(title)s</strong> created. AI day planning will be available "
-"here."
+"Let AI draft a day-by-day plan for <strong>%(title)s</strong>. You choose "
+"which days to keep."
 msgstr ""
-"Bozza <strong>%(title)s</strong> creata. La pianificazione AI dei giorni "
-"sarà disponibile qui."
+"Lascia che l'AI proponga un piano giorno per giorno per "
+"<strong>%(title)s</strong>. Scegli tu quali giorni tenere."
 
-#: templates/trips/wizard/ai-step.html:12
-msgid "Go to trip"
-msgstr "Vai al viaggio"
+#: templates/trips/wizard/ai-step.html:18
+msgid "Generate itinerary"
+msgstr "Genera itinerario"
 
 #: templates/trips/wizard/basics-step.html:6
 msgid "Trip basics"
@@ -3888,6 +3950,14 @@ msgstr "Errore API di Unsplash. Per favore riprova più tardi."
 #, python-brace-format
 msgid "No images found for '{query}'"
 msgstr "Nessuna immagine trovata per '{query}'"
+
+#, python-format
+#~ msgid ""
+#~ "Draft <strong>%(title)s</strong> created. AI day planning will be "
+#~ "available here."
+#~ msgstr ""
+#~ "Bozza <strong>%(title)s</strong> creata. La pianificazione AI dei giorni "
+#~ "sarà disponibile qui."
 
 #~ msgid "Smart"
 #~ msgstr "Smart"

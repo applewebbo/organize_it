@@ -142,12 +142,19 @@ from trips.views.trips import (
     validate_dates,
 )
 from trips.views.utils import view_log_file
-from trips.views.wizard import wizard_basics, wizard_start
+from trips.views.wizard import (
+    wizard_ai_confirm,
+    wizard_ai_generate,
+    wizard_basics,
+    wizard_start,
+)
 
 __all__ = [
     # wizard
     "wizard_start",
     "wizard_basics",
+    "wizard_ai_generate",
+    "wizard_ai_confirm",
     # trips
     "home",
     "toggle_guide",

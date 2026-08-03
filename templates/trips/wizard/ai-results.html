@@ -1,0 +1,91 @@
+{% load i18n %}
+{% if error_kind %}
+    <div class="alert alert-warning alert-soft">
+        <div>
+            {% if error_kind == 'config' %}
+                <p>{% translate "AI planning is not configured yet. Add a valid API key to get started." %}</p>
+                <a href="{% url 'accounts:profile' %}" class="link link-primary">{% translate "Check your AI settings" %}</a>
+            {% elif error_kind == 'quota' %}
+                <p>{% translate "You have reached the AI provider usage limit. Please try again later." %}</p>
+            {% elif error_kind == 'rate_limit' %}
+                <p>{% translate "You have reached the daily AI generation limit. Please try again tomorrow." %}</p>
+            {% else %}
+                <p>{% translate "Something went wrong while generating the itinerary. Please try again." %}</p>
+            {% endif %}
+        </div>
+    </div>
+    <a href="{% url 'trips:trip-detail' trip.pk %}"
+       class="btn btn-ghost btn-sm mt-3">{% translate "Skip this step" %}</a>
+{% elif days %}
+    {{ days|json_script:"wizard-ai-days" }}
+    <form hx-post="{% url 'trips:wizard-ai-confirm' trip.pk %}"
+          hx-target="#wizard-ai-results"
+          hx-swap="innerHTML"
+          hx-disabled-elt="button[type='submit']"
+          x-data="{ days: JSON.parse(document.getElementById('wizard-ai-days').textContent).map(d => ({ ...d, include: d.stop_count > 0 })) }">
+        {% csrf_token %}
+        <input type="hidden"
+               name="days"
+               :value="JSON.stringify(days.filter(d => d.include).map(d => ({ date: d.date_iso, stops: d.stops })))" />
+        <p class="text-base-content/70 mb-3 text-sm">
+            {% translate "Keep the days you like; uncheck any you want to skip." %}
+        </p>
+        <ul class="space-y-3">
+            {% for day in days %}
+                <li class="border-base-300 bg-base-100 rounded-lg border p-3">
+                    <label class="flex cursor-pointer items-center gap-2">
+                        <input type="checkbox"
+                               class="checkbox checkbox-sm shrink-0"
+                               x-model="days[{{ forloop.counter0 }}].include"
+                               {% if not day.stop_count %}disabled{% endif %} />
+                        <span class="grow font-semibold">
+                            {% if day.number %}{% blocktranslate with n=day.number %}Day {{ n }}{% endblocktranslate %}{% endif %}
+                            {% if day.destination %}<span class="text-base-content/60 font-normal">· {{ day.destination }}</span>{% endif %}
+                        </span>
+                        <span class="badge badge-sm badge-ghost shrink-0">
+                            {% blocktranslate count counter=day.stop_count %}{{ counter }} stop{% plural %}{{ counter }} stops{% endblocktranslate %}
+                        </span>
+                    </label>
+                    {% if day.stops %}
+                        <ul class="mt-2 space-y-1 ps-6">
+                            {% for stop in day.stops %}
+                                <li class="flex items-center gap-2 text-sm">
+                                    <i class="ph-bold {{ stop.icon }} {{ stop.icon_color }} i-xs shrink-0"
+                                       aria-hidden="true"></i>
+                                    <span class="truncate">{{ stop.name }}</span>
+                                    {% if stop.duration_minutes %}
+                                        <span class="text-base-content/50 shrink-0 text-xs">{{ stop.duration_minutes }}′</span>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-base-content/50 mt-1 ps-6 text-xs">{% translate "No stops proposed for this day." %}</p>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+        <div class="mt-4 flex items-center justify-between gap-2">
+            <button type="button"
+                    class="btn btn-ghost btn-sm"
+                    hx-post="{% url 'trips:wizard-ai-generate' trip.pk %}"
+                    hx-target="#wizard-ai-results"
+                    hx-swap="innerHTML"
+                    hx-vals='{"refresh": "1"}'>
+                <i class="ph-bold ph-arrows-clockwise i-sm htmx-hide-on-request"></i>
+                {% translate "Regenerate" %}
+            </button>
+            <button type="submit" class="btn btn-success btn-sm">
+                <i class="ph-bold ph-check i-sm htmx-hide-on-request"></i>
+                {% translate "Keep selected days" %}
+            </button>
+        </div>
+    </form>
+{% else %}
+    <div class="text-base-content/50 py-8 text-center">
+        <i class="ph-bold ph-sparkle i-lg mb-2"></i>
+        <p>{% translate "No itinerary generated" %}</p>
+        <a href="{% url 'trips:trip-detail' trip.pk %}"
+           class="btn btn-ghost btn-sm mt-3">{% translate "Skip this step" %}</a>
+    </div>
+{% endif %}
