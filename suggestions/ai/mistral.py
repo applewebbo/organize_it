@@ -5,12 +5,14 @@ from mistralai.client import Mistral
 from pydantic import BaseModel
 
 from suggestions.ai.base import AISuggestionError
-from suggestions.prompts import build_day_prompt, build_prompt
+from suggestions.prompts import build_day_prompt, build_prompt, build_trip_prompt
 from suggestions.schemas import (
     DayItinerary,
     Suggestion,
     SuggestionPrefs,
     TripContext,
+    TripItinerary,
+    TripStage,
 )
 
 logger = logging.getLogger(__name__)
@@ -98,5 +100,28 @@ class MistralProvider:
 
         parsed = response.choices[0].message.parsed if response.choices else None
         if not parsed or not parsed.stops:
+            raise AISuggestionError("The AI provider returned no itinerary")
+        return parsed
+
+    def generate_trip(
+        self,
+        context: TripContext,
+        prefs: SuggestionPrefs,
+        stages: list[TripStage],
+    ) -> TripItinerary:
+        prompt = build_trip_prompt(context, prefs, stages)
+        try:
+            response = self._client.chat.parse(
+                model=self._model,
+                messages=[{"role": "user", "content": prompt}],
+                response_format=TripItinerary,
+            )
+        except Exception as exc:  # SDK/network errors -> single error type
+            kind = _error_kind(exc)
+            logger.warning("Mistral trip itinerary failed (kind=%s): %s", kind, exc)
+            raise AISuggestionError(str(exc), kind=kind) from exc
+
+        parsed = response.choices[0].message.parsed if response.choices else None
+        if not parsed or not parsed.days:
             raise AISuggestionError("The AI provider returned no itinerary")
         return parsed

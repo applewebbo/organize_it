@@ -1,6 +1,6 @@
 from datetime import date
 
-from suggestions.schemas import SuggestionPrefs, TripContext
+from suggestions.schemas import SuggestionPrefs, TripContext, TripStage
 from trips.models import Experience, Meal
 
 # Deterministic, locale-free weekday names (avoid strftime("%A"), which depends
@@ -246,6 +246,63 @@ def build_day_prompt(
             "the returned order at a sensible position, using their exact name:"
         )
         lines.extend(f"- {name}" for name in day_stops)
+    lines.append("")
+    lines.append(
+        "For each stop provide a real name and a precise postal address so it can "
+        "be located on a map, plus an 'estimated_duration_minutes' integer with a "
+        "realistic visit or meal duration."
+    )
+    lines.append("Set the integer 'type' field from this legend: " + _TYPE_LEGEND)
+    return "\n".join(lines)
+
+
+def build_trip_prompt(
+    context: TripContext,
+    prefs: SuggestionPrefs,
+    stages: list[TripStage],
+) -> str:
+    """Build the prompt for a whole-trip, day-by-day itinerary.
+
+    Reuses the shared preference and context sections but asks for one ordered
+    itinerary per day across every stage of the trip. Stays are out of scope
+    (handled by the wizard's Stays step): the model plans experiences and meals
+    only.
+    """
+    lines = [
+        _intro(context.language),
+        "",
+        f"Destination: {context.destination}",
+        "Plan a full day-by-day itinerary covering every day of the trip.",
+    ]
+    if stages:
+        lines.append("")
+        lines.append("The trip is organised in these stages:")
+        lines.extend(
+            f"- {stage.destination}: {stage.start_date} to {stage.end_date}"
+            for stage in stages
+        )
+    lines.extend(_preference_lines(context, prefs, include_radius=False))
+    lines.extend(_context_lines(context))
+    lines.append("")
+    lines.append(
+        "For each day return its date, the stage destination it belongs to, and "
+        "an ordered sequence of stops for that day."
+    )
+    lines.append(
+        "Keep each day's stops clustered within its stage destination, in order "
+        "along a sensible route that minimises backtracking, forming a realistic "
+        "day from morning to evening."
+    )
+    lines.append(
+        "Aim for a well-paced day of roughly 4 to 6 stops; do not over-pack it."
+    )
+    lines.append(
+        "Cover each day's meals (breakfast, lunch and dinner as appropriate) with "
+        "restaurants, interleaved with experiences and activities."
+    )
+    lines.append(
+        "Plan experiences and meals only; do NOT propose accommodation or stays."
+    )
     lines.append("")
     lines.append(
         "For each stop provide a real name and a precise postal address so it can "

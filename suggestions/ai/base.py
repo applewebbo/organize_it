@@ -6,6 +6,8 @@ from suggestions.schemas import (
     Suggestion,
     SuggestionPrefs,
     TripContext,
+    TripItinerary,
+    TripStage,
 )
 
 
@@ -45,3 +47,10 @@ class TripSuggestionProvider(Protocol):
         day_date: date,
         day_stops: list[str] | None = None,
     ) -> DayItinerary: ...
+
+    def generate_trip(
+        self,
+        context: TripContext,
+        prefs: SuggestionPrefs,
+        stages: list[TripStage],
+    ) -> TripItinerary: ...

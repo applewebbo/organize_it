@@ -1,11 +1,16 @@
+from datetime import date
+
 import pytest
 from pydantic import ValidationError
 
 from suggestions.schemas import (
     DayItinerary,
+    DayPlan,
     ItineraryStop,
     Suggestion,
     SuggestionKind,
+    TripItinerary,
+    TripStage,
 )
 
 
@@ -78,3 +83,61 @@ class TestDayItinerarySchema:
 
     def test_defaults_to_empty(self):
         assert DayItinerary().stops == []
+
+
+class TestDayPlanSchema:
+    def test_holds_date_destination_and_stops(self):
+        plan = DayPlan(
+            date=date(2026, 6, 2),
+            destination="Firenze",
+            stops=[ItineraryStop(kind="experience", name="Uffizi")],
+        )
+        assert plan.date == date(2026, 6, 2)
+        assert plan.destination == "Firenze"
+        assert [s.name for s in plan.stops] == ["Uffizi"]
+
+    def test_defaults(self):
+        plan = DayPlan(date=date(2026, 6, 2))
+        assert plan.destination == ""
+        assert plan.stops == []
+
+    def test_date_is_required(self):
+        with pytest.raises(ValidationError):
+            DayPlan(destination="Roma")
+
+
+class TestTripItinerarySchema:
+    def test_holds_ordered_days(self):
+        itinerary = TripItinerary(
+            days=[
+                DayPlan(date=date(2026, 6, 1), destination="Roma"),
+                DayPlan(date=date(2026, 6, 2), destination="Firenze"),
+            ]
+        )
+        assert [d.destination for d in itinerary.days] == ["Roma", "Firenze"]
+
+    def test_defaults_to_empty(self):
+        assert TripItinerary().days == []
+
+
+class TestTripStageSchema:
+    def test_holds_destination_dates_and_coords(self):
+        stage = TripStage(
+            destination="Roma",
+            start_date=date(2026, 6, 1),
+            end_date=date(2026, 6, 3),
+            latitude=41.9,
+            longitude=12.5,
+        )
+        assert stage.destination == "Roma"
+        assert stage.start_date == date(2026, 6, 1)
+        assert stage.latitude == 41.9
+
+    def test_coords_default_to_none(self):
+        stage = TripStage(
+            destination="Roma",
+            start_date=date(2026, 6, 1),
+            end_date=date(2026, 6, 3),
+        )
+        assert stage.latitude is None
+        assert stage.longitude is None

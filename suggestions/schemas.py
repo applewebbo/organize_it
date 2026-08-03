@@ -77,6 +77,32 @@ class DayItinerary(BaseModel):
     stops: list[ItineraryStop] = Field(default_factory=list)
 
 
+class DayPlan(BaseModel):
+    """One day of a whole-trip plan: its date, the stage/destination it belongs
+    to, and the ordered stops proposed for it."""
+
+    date: date
+    destination: str = ""
+    stops: list[ItineraryStop] = Field(default_factory=list)
+
+
+class TripItinerary(BaseModel):
+    """A whole-trip plan: an ordered list of per-day itineraries."""
+
+    days: list[DayPlan] = Field(default_factory=list)
+
+
+class TripStage(BaseModel):
+    """A single stage fed to the whole-trip prompt: its destination and the
+    inclusive date range it spans, so the model knows which days go where."""
+
+    destination: str
+    start_date: date
+    end_date: date
+    latitude: float | None = None
+    longitude: float | None = None
+
+
 class TripContext(BaseModel):
     """Context about the trip fed to the prompt."""
 

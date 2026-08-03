@@ -9,15 +9,23 @@ from suggestions.ai.gemini import GeminiProvider
 from suggestions.ai.mistral import MistralProvider, SuggestionList
 from suggestions.schemas import (
     DayItinerary,
+    DayPlan,
     ItineraryStop,
     Suggestion,
     SuggestionPrefs,
     TripContext,
+    TripItinerary,
+    TripStage,
 )
 
 CONTEXT = TripContext(destination="Rome")
 PREFS = SuggestionPrefs()
 DAY = date(2026, 7, 1)
+STAGES = [
+    TripStage(
+        destination="Rome", start_date=date(2026, 7, 1), end_date=date(2026, 7, 2)
+    )
+]
 
 
 class _ApiError(Exception):
@@ -145,6 +153,48 @@ class TestGeminiProvider:
         with pytest.raises(AISuggestionError):
             provider.generate_day(CONTEXT, PREFS, DAY)
 
+    @patch("suggestions.ai.gemini.genai.Client")
+    def test_generate_trip_success(self, mock_client_cls):
+        itinerary = TripItinerary(
+            days=[
+                DayPlan(
+                    date=DAY,
+                    destination="Rome",
+                    stops=[ItineraryStop(kind="experience", name="Forum")],
+                )
+            ]
+        )
+        mock_client = mock_client_cls.return_value
+        mock_client.models.generate_content.return_value = MagicMock(parsed=itinerary)
+
+        provider = GeminiProvider("api-key")
+        result = provider.generate_trip(CONTEXT, PREFS, STAGES)
+
+        assert result is itinerary
+        config = mock_client.models.generate_content.call_args.kwargs["config"]
+        assert config.response_schema is TripItinerary
+
+    @patch("suggestions.ai.gemini.genai.Client")
+    def test_generate_trip_wraps_sdk_errors(self, mock_client_cls):
+        mock_client = mock_client_cls.return_value
+        mock_client.models.generate_content.side_effect = RuntimeError("boom")
+
+        provider = GeminiProvider("api-key")
+        with pytest.raises(AISuggestionError) as exc_info:
+            provider.generate_trip(CONTEXT, PREFS, STAGES)
+        assert exc_info.value.kind == AISuggestionError.GENERIC
+
+    @patch("suggestions.ai.gemini.genai.Client")
+    def test_generate_trip_raises_on_empty(self, mock_client_cls):
+        mock_client = mock_client_cls.return_value
+        mock_client.models.generate_content.return_value = MagicMock(
+            parsed=TripItinerary(days=[])
+        )
+
+        provider = GeminiProvider("api-key")
+        with pytest.raises(AISuggestionError):
+            provider.generate_trip(CONTEXT, PREFS, STAGES)
+
 
 def _mistral_response(suggestions):
     """Build a mock chat.parse response with the given parsed suggestions."""
@@ -260,6 +310,43 @@ class TestMistralProvider:
         provider = MistralProvider("api-key")
         with pytest.raises(AISuggestionError):
             provider.generate_day(CONTEXT, PREFS, DAY)
+
+    @patch("suggestions.ai.mistral.Mistral")
+    def test_generate_trip_success(self, mock_client_cls):
+        itinerary = TripItinerary(days=[DayPlan(date=DAY, destination="Rome")])
+        message = MagicMock(parsed=itinerary)
+        mock_client = mock_client_cls.return_value
+        mock_client.chat.parse.return_value = MagicMock(
+            choices=[MagicMock(message=message)]
+        )
+
+        provider = MistralProvider("api-key")
+        result = provider.generate_trip(CONTEXT, PREFS, STAGES)
+
+        assert result is itinerary
+        kwargs = mock_client.chat.parse.call_args.kwargs
+        assert kwargs["response_format"] is TripItinerary
+
+    @patch("suggestions.ai.mistral.Mistral")
+    def test_generate_trip_wraps_sdk_errors(self, mock_client_cls):
+        mock_client = mock_client_cls.return_value
+        mock_client.chat.parse.side_effect = RuntimeError("boom")
+
+        provider = MistralProvider("api-key")
+        with pytest.raises(AISuggestionError) as exc_info:
+            provider.generate_trip(CONTEXT, PREFS, STAGES)
+        assert exc_info.value.kind == AISuggestionError.GENERIC
+
+    @patch("suggestions.ai.mistral.Mistral")
+    def test_generate_trip_raises_on_empty(self, mock_client_cls):
+        mock_client = mock_client_cls.return_value
+        mock_client.chat.parse.return_value = MagicMock(
+            choices=[MagicMock(message=MagicMock(parsed=None))]
+        )
+
+        provider = MistralProvider("api-key")
+        with pytest.raises(AISuggestionError):
+            provider.generate_trip(CONTEXT, PREFS, STAGES)
 
 
 class TestFactory:

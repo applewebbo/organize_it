@@ -1,7 +1,7 @@
 from datetime import date
 
-from suggestions.prompts import build_day_prompt, build_prompt
-from suggestions.schemas import SuggestionPrefs, TripContext
+from suggestions.prompts import build_day_prompt, build_prompt, build_trip_prompt
+from suggestions.schemas import SuggestionPrefs, TripContext, TripStage
 
 
 class TestBuildPrompt:
@@ -277,3 +277,63 @@ class TestBuildDayPrompt:
         )
         assert "Wednesday" in prompt
         assert "closed" in prompt
+
+
+_STAGES = [
+    TripStage(
+        destination="Roma", start_date=date(2026, 6, 1), end_date=date(2026, 6, 3)
+    ),
+    TripStage(
+        destination="Firenze", start_date=date(2026, 6, 4), end_date=date(2026, 6, 5)
+    ),
+]
+
+
+class TestBuildTripPrompt:
+    def test_asks_for_full_day_by_day_itinerary(self):
+        prompt = build_trip_prompt(
+            TripContext(destination="Roma"), SuggestionPrefs(), _STAGES
+        )
+        assert "day-by-day" in prompt.lower()
+        assert "every day" in prompt.lower()
+
+    def test_lists_each_stage_with_its_date_range(self):
+        prompt = build_trip_prompt(
+            TripContext(destination="Roma"), SuggestionPrefs(), _STAGES
+        )
+        assert "- Roma: 2026-06-01 to 2026-06-03" in prompt
+        assert "- Firenze: 2026-06-04 to 2026-06-05" in prompt
+
+    def test_requests_date_destination_and_ordered_stops_per_day(self):
+        prompt = build_trip_prompt(
+            TripContext(destination="Roma"), SuggestionPrefs(), _STAGES
+        )
+        assert "date" in prompt.lower()
+        assert "ordered sequence of stops" in prompt.lower()
+
+    def test_excludes_stays(self):
+        prompt = build_trip_prompt(
+            TripContext(destination="Roma"), SuggestionPrefs(), _STAGES
+        )
+        assert "do NOT propose accommodation" in prompt
+
+    def test_requests_estimated_duration(self):
+        prompt = build_trip_prompt(
+            TripContext(destination="Roma"), SuggestionPrefs(), _STAGES
+        )
+        assert "estimated_duration_minutes" in prompt
+
+    def test_reuses_shared_preferences_and_context(self):
+        context = TripContext(destination="Roma", existing_places=["Colosseo (Roma)"])
+        prompt = build_trip_prompt(
+            context, SuggestionPrefs(budget="high", interests=["history"]), _STAGES
+        )
+        assert "premium" in prompt
+        assert "history" in prompt
+        assert "- Colosseo (Roma)" in prompt
+
+    def test_omits_stage_list_when_empty(self):
+        prompt = build_trip_prompt(
+            TripContext(destination="Roma"), SuggestionPrefs(), []
+        )
+        assert "organised in these stages" not in prompt
