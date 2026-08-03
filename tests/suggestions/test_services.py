@@ -1,3 +1,4 @@
+from datetime import date
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -7,10 +8,12 @@ from django.test import override_settings
 from suggestions.ai.base import AISuggestionError
 from suggestions.schemas import (
     DayItinerary,
+    DayPlan,
     ItineraryStop,
     Suggestion,
     SuggestionPrefs,
     TripContext,
+    TripItinerary,
 )
 from suggestions.services import (
     _CACHE_TTL,
@@ -18,13 +21,16 @@ from suggestions.services import (
     DAY_STRATEGY_ADD,
     DAY_STRATEGY_DELETE,
     DAY_STRATEGY_UNPAIR,
+    GroundedDay,
     GroundedStop,
     GroundedSuggestion,
     _last_key,
+    _trip_stages,
     build_day_context,
     build_trip_context,
     generate_day_itinerary,
     generate_suggestions,
+    generate_trip_itinerary,
     get_cached_suggestions,
     merge_preferences,
     resolve_credentials,
@@ -39,6 +45,7 @@ from tests.suggestions.factories import (
 from tests.trips.factories import ExperienceFactory, StayFactory, TripFactory
 from trips.models import TripCollaboration
 from trips.services import GooglePlacesError, PlaceResult
+from trips.utils import apply_stage
 
 
 def _add_collaborator(trip, user):
@@ -1058,3 +1065,143 @@ class TestGenerationQuota:
 
         assert exc.value.kind == AISuggestionError.RATE_LIMIT
         provider.generate.assert_not_called()
+
+
+class TestTripStages:
+    def test_groups_consecutive_days_and_averages_coords(self):
+        trip = TripFactory(
+            start_date=date(2026, 6, 1), end_date=date(2026, 6, 5), destination="Roma"
+        )
+        days = list(trip.days.order_by("number"))
+        apply_stage(
+            trip, [d.pk for d in days[3:]], "Firenze", latitude=43.77, longitude=11.25
+        )
+
+        stages = _trip_stages(trip)
+
+        assert [s.destination for s in stages] == ["Roma", "Firenze"]
+        assert stages[0].start_date == date(2026, 6, 1)
+        assert stages[0].end_date == date(2026, 6, 3)
+        assert stages[1].start_date == date(2026, 6, 4)
+        assert stages[1].end_date == date(2026, 6, 5)
+        assert stages[1].latitude == 43.77
+        assert stages[1].longitude == 11.25
+
+    def test_blank_day_destination_falls_back_to_trip(self):
+        trip = TripFactory(
+            start_date=date(2026, 6, 1), end_date=date(2026, 6, 2), destination="Roma"
+        )
+        day = trip.days.first()
+        day.destination = ""
+        day.save(update_fields=["destination"])
+
+        stages = _trip_stages(trip)
+
+        assert stages[0].destination == "Roma"
+
+
+class TestGenerateTripItinerary:
+    def _provider_returning(self, itinerary):
+        provider = MagicMock()
+        provider.generate_trip.return_value = itinerary
+        return provider
+
+    def _trip_with_creds(self, **kwargs):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        kwargs.setdefault("start_date", date(2026, 6, 1))
+        kwargs.setdefault("end_date", date(2026, 6, 2))
+        kwargs.setdefault("destination", "Roma")
+        trip = TripFactory(author=creds.user, **kwargs)
+        return creds, trip
+
+    def test_raises_without_credentials(self):
+        trip = TripFactory()
+        with pytest.raises(AISuggestionError):
+            generate_trip_itinerary(trip.author, trip)
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_grounds_each_day_and_drops_stays(self, mock_get_provider, mock_client):
+        creds, trip = self._trip_with_creds()
+        days = list(trip.days.order_by("number"))
+        itinerary = TripItinerary(
+            days=[
+                DayPlan(
+                    date=days[0].date,
+                    destination="Roma",
+                    stops=[
+                        ItineraryStop(
+                            kind="meal",
+                            name="Trattoria",
+                            type=3,
+                            estimated_duration_minutes=90,
+                        )
+                    ],
+                ),
+                DayPlan(
+                    date=days[1].date,
+                    destination="Roma",
+                    stops=[ItineraryStop(kind="stay", name="Hotel")],
+                ),
+            ]
+        )
+        mock_get_provider.return_value = self._provider_returning(itinerary)
+        mock_client.return_value.search_text.return_value = [PLACE]
+
+        result = generate_trip_itinerary(creds.user, trip)
+
+        assert len(result) == 2
+        assert isinstance(result[0], GroundedDay)
+        assert result[0].date == days[0].date
+        assert result[0].stops[0].place_id == "ChIJ_grounded"
+        assert result[0].stops[0].stop.estimated_duration_minutes == 90
+        # stays are dropped during grounding
+        assert result[1].stops == []
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_blank_destination_uses_trip_coords(self, mock_get_provider, mock_client):
+        creds, trip = self._trip_with_creds()
+        day = trip.days.first()
+        itinerary = TripItinerary(
+            days=[
+                DayPlan(
+                    date=day.date,
+                    destination="",
+                    stops=[ItineraryStop(kind="experience", name="Forum", type=1)],
+                )
+            ]
+        )
+        mock_get_provider.return_value = self._provider_returning(itinerary)
+        mock_client.return_value.search_text.return_value = [PLACE]
+
+        result = generate_trip_itinerary(creds.user, trip)
+
+        assert result[0].destination == ""
+        assert result[0].stops[0].place_id == "ChIJ_grounded"
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_caches_and_force_refresh(self, mock_get_provider, mock_client):
+        creds, trip = self._trip_with_creds()
+        day = trip.days.first()
+        provider = self._provider_returning(
+            TripItinerary(
+                days=[
+                    DayPlan(
+                        date=day.date,
+                        destination="Roma",
+                        stops=[ItineraryStop(kind="meal", name="X", type=3)],
+                    )
+                ]
+            )
+        )
+        mock_get_provider.return_value = provider
+        mock_client.return_value.search_text.return_value = [PLACE]
+
+        generate_trip_itinerary(creds.user, trip)
+        generate_trip_itinerary(creds.user, trip)
+        assert provider.generate_trip.call_count == 1
+
+        generate_trip_itinerary(creds.user, trip, force_refresh=True)
+        assert provider.generate_trip.call_count == 2

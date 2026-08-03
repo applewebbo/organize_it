@@ -1,6 +1,7 @@
 import hashlib
 import json
 from dataclasses import dataclass
+from datetime import date, timedelta
 from math import asin, cos, radians, sin, sqrt
 
 from django.conf import settings
@@ -21,9 +22,24 @@ from suggestions.schemas import (
     SuggestionKind,
     SuggestionPrefs,
     TripContext,
+    TripStage,
 )
 from trips.models import Event, Stay, Trip
 from trips.services import GooglePlacesClient, GooglePlacesError
+from trips.utils import build_categorized_event
+
+# Map an itinerary stop kind to the Event category it materialises as. Stays are
+# absent: a day itinerary never creates accommodation.
+_ACCEPT_CATEGORY = {
+    "experience": Event.Category.EXPERIENCE,
+    "meal": Event.Category.MEAL,
+}
+# Per-kind icon + colour, matching the project's "Add event" dropdown / map pins.
+_KIND_ICON = {
+    "experience": ("ph-map-pin", "text-green-500"),
+    "meal": ("ph-fork-knife", "text-yellow-500"),
+    "stay": ("ph-bed", "text-sky-500"),
+}
 
 # Radius (meters) used to bias Google Places search around the destination.
 _GROUNDING_RADIUS = 50000
@@ -631,3 +647,200 @@ def get_cached_suggestions(user, trip: Trip) -> list[GroundedSuggestion] | None:
     reopened, regardless of the prefs/stage that produced them.
     """
     return cache.get(_last_key(user, trip))
+
+
+def to_stop_card(grounded: GroundedStop) -> dict:
+    """Turn a GroundedStop into the dict the itinerary preview templates render."""
+    stop = grounded.stop
+    kind = stop.kind.value
+    icon, icon_color = _KIND_ICON[kind]
+    return {
+        "kind": kind,
+        "name": stop.name,
+        "description": stop.description,
+        "icon": icon,
+        "icon_color": icon_color,
+        "address": grounded.address,
+        "city": grounded.city,
+        "lat": grounded.latitude,
+        "lng": grounded.longitude,
+        "place_id": grounded.place_id,
+        "duration_minutes": stop.estimated_duration_minutes,
+        "existing_event_id": grounded.existing_event_id,
+    }
+
+
+def create_day_event(user, trip: Trip, day, item: dict, order: int) -> None:
+    """Create an Experience/Meal on ``day`` from a submitted itinerary stop."""
+    name = (item.get("name") or "").strip()
+    category = _ACCEPT_CATEGORY.get(item.get("kind"))
+    if not name or category is None:
+        return
+    obj = build_categorized_event(
+        category,
+        trip=trip,
+        day=day,
+        name=name,
+        address=item.get("address") or "",
+        city=item.get("city") or "",
+        place_id=item.get("place_id") or "",
+        order=order,
+        last_modified_by=user,
+    )
+    lat, lng = item.get("lat"), item.get("lng")
+    if lat is not None and lng is not None:
+        try:
+            obj.latitude = float(lat)
+            obj.longitude = float(lng)
+        except TypeError, ValueError:
+            pass
+    minutes = item.get("duration_minutes")
+    if minutes:
+        obj.estimated_duration = timedelta(minutes=int(minutes))
+    obj.save()
+
+
+def apply_day_itinerary(user, trip: Trip, day, strategy: str, stops: list) -> None:
+    """Apply an accepted day itinerary.
+
+    ``unpair``/``delete`` detach or remove the day's current events first, then
+    every accepted stop is created fresh. ``add`` reorders matched existing
+    events in place, creates the new ones, and appends any existing event the
+    user deselected after the accepted sequence.
+    """
+    existing = list(day.events.all())
+    if strategy == DAY_STRATEGY_UNPAIR:
+        Event.objects.filter(day=day).update(day=None)
+    elif strategy == DAY_STRATEGY_DELETE:
+        Event.objects.filter(day=day).delete()
+
+    consumed = set()
+    order = 0
+    for item in stops:
+        existing_id = item.get("existing_event_id")
+        if existing_id and strategy == DAY_STRATEGY_ADD:
+            Event.objects.filter(pk=existing_id, day=day).update(order=order)
+            consumed.add(existing_id)
+        else:
+            create_day_event(user, trip, day, item, order)
+        order += 1
+
+    if strategy == DAY_STRATEGY_ADD:
+        for event in existing:
+            if event.pk not in consumed:
+                event.order = order
+                event.save(update_fields=["order"])
+                order += 1
+
+
+@dataclass
+class GroundedDay:
+    """A single day of a whole-trip plan, grounded and ready for review: its
+    date, the stage destination it belongs to, and its ordered grounded stops."""
+
+    date: date
+    destination: str
+    stops: list[GroundedStop]
+
+
+def _trip_stages(trip: Trip) -> list[TripStage]:
+    """Derive the ordered stages from the trip's days.
+
+    Consecutive days sharing a destination form one stage carrying its inclusive
+    date range and, when the days are geocoded, an averaged centre used for
+    grounding location bias.
+    """
+    stages: list[TripStage] = []
+    lats: list[float] = []
+    lngs: list[float] = []
+    for day in trip.days.order_by("number"):
+        dest = day.destination or trip.destination
+        if stages and stages[-1].destination == dest:
+            stages[-1].end_date = day.date
+        else:
+            stages.append(
+                TripStage(destination=dest, start_date=day.date, end_date=day.date)
+            )
+            lats, lngs = [], []
+        if day.destination_latitude is not None:
+            lats.append(day.destination_latitude)
+            lngs.append(day.destination_longitude)
+            stages[-1].latitude = sum(lats) / len(lats)
+            stages[-1].longitude = sum(lngs) / len(lngs)
+    return stages
+
+
+def _trip_cache_key(trip: Trip, preferences: SuggestionPrefs, language: str) -> str:
+    payload = json.dumps(
+        {"trip": trip.pk, "lang": language, "prefs": preferences.model_dump()},
+        sort_keys=True,
+        default=str,
+    )
+    digest = hashlib.sha256(payload.encode()).hexdigest()[:16]
+    return f"ai_trip:{trip.pk}:{digest}"
+
+
+def generate_trip_itinerary(
+    user,
+    trip: Trip,
+    overrides: dict | None = None,
+    language: str = "en",
+    force_refresh: bool = False,
+) -> list[GroundedDay]:
+    """Generate and ground a whole-trip, day-by-day itinerary.
+
+    Builds the trip's stages, calls the provider once for the full plan, then
+    grounds each day's stops with a context scoped to that day's stage. Results
+    are cached per trip + preferences and the daily generation caps are enforced
+    on a real provider hit, mirroring ``generate_day_itinerary``. Nothing is
+    mutated here — days are applied only on acceptance.
+    """
+    credentials = resolve_credentials(user, trip)
+    if credentials is None:
+        raise AISuggestionError(
+            "No AI credentials configured", kind=AISuggestionError.CONFIG
+        )
+
+    preferences = merge_preferences(
+        SuggestionPreferences.objects.filter(user=user).first(), overrides
+    )
+    stages = _trip_stages(trip)
+
+    key = _trip_cache_key(trip, preferences, language)
+    if not force_refresh:
+        cached = cache.get(key)
+        if cached is not None:
+            return cached
+
+    _enforce_generation_quota(user, trip)
+
+    provider = get_provider(credentials.provider, credentials.api_key_encrypted)
+    base_context = build_trip_context(trip, language=language)
+    itinerary = provider.generate_trip(base_context, preferences, stages)
+
+    radius = _RADIUS_METERS.get(preferences.search_radius, _GROUNDING_RADIUS)
+    coords = {s.destination: (s.latitude, s.longitude) for s in stages}
+    grounded_days: list[GroundedDay] = []
+    for day_plan in itinerary.days:
+        lat, lng = coords.get(
+            day_plan.destination,
+            (trip.destination_latitude, trip.destination_longitude),
+        )
+        day_context = TripContext(
+            destination=day_plan.destination or trip.destination,
+            latitude=lat,
+            longitude=lng,
+            language=language,
+        )
+        grounded_stops = _ground_itinerary(
+            DayItinerary(stops=day_plan.stops), day_context, [], radius
+        )
+        grounded_days.append(
+            GroundedDay(
+                date=day_plan.date,
+                destination=day_plan.destination,
+                stops=grounded_stops,
+            )
+        )
+    cache.set(key, grounded_days, _CACHE_TTL)
+    return grounded_days

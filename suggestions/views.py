@@ -1,5 +1,4 @@
 import json
-from datetime import timedelta
 
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
@@ -20,13 +19,15 @@ from suggestions.models import (
     SuggestionPreferences,
 )
 from suggestions.services import (
+    _ACCEPT_CATEGORY,
+    _KIND_ICON,
     DAY_STRATEGIES,
     DAY_STRATEGY_ADD,
-    DAY_STRATEGY_DELETE,
-    DAY_STRATEGY_UNPAIR,
+    apply_day_itinerary,
     generate_day_itinerary,
     generate_suggestions,
     get_cached_suggestions,
+    to_stop_card,
 )
 from trips.models import Day, Event, Stay, Trip
 from trips.services import GooglePlacesClient, GooglePlacesError
@@ -40,16 +41,6 @@ _ACCEPT_URL = {
     "experience": "suggestions:accept-experience",
     "meal": "suggestions:accept-meal",
     "stay": "suggestions:accept-stay",
-}
-_ACCEPT_CATEGORY = {
-    "experience": Event.Category.EXPERIENCE,
-    "meal": Event.Category.MEAL,
-}
-# Per-kind icon + colour, matching the project's "Add event" dropdown / map pins.
-_KIND_ICON = {
-    "experience": ("ph-map-pin", "text-green-500"),
-    "meal": ("ph-fork-knife", "text-yellow-500"),
-    "stay": ("ph-bed", "text-sky-500"),
 }
 
 
@@ -345,27 +336,6 @@ def _get_accessible_day(request, pk, day_id):
     return trip, day
 
 
-def _to_stop_card(grounded) -> dict:
-    """Turn a GroundedStop into the dict the day-itinerary preview renders."""
-    stop = grounded.stop
-    kind = stop.kind.value
-    icon, icon_color = _KIND_ICON[kind]
-    return {
-        "kind": kind,
-        "name": stop.name,
-        "description": stop.description,
-        "icon": icon,
-        "icon_color": icon_color,
-        "address": grounded.address,
-        "city": grounded.city,
-        "lat": grounded.latitude,
-        "lng": grounded.longitude,
-        "place_id": grounded.place_id,
-        "duration_minutes": stop.estimated_duration_minutes,
-        "existing_event_id": grounded.existing_event_id,
-    }
-
-
 @login_required
 @require_GET
 def plan_day_modal(request, pk, day_id):
@@ -403,7 +373,7 @@ def generate_day(request, pk, day_id):
         grounded = generate_day_itinerary(
             request.user, trip, day, strategy, overrides, language, force_refresh
         )
-        stops = [_to_stop_card(g) for g in grounded]
+        stops = [to_stop_card(g) for g in grounded]
     except AISuggestionError as exc:
         error_kind = exc.kind
 
@@ -421,69 +391,6 @@ def generate_day(request, pk, day_id):
     )
 
 
-def _create_day_event(user, trip, day, item, order) -> None:
-    """Create an Experience/Meal on ``day`` from a submitted itinerary stop."""
-    name = (item.get("name") or "").strip()
-    category = _ACCEPT_CATEGORY.get(item.get("kind"))
-    if not name or category is None:
-        return
-    obj = build_categorized_event(
-        category,
-        trip=trip,
-        day=day,
-        name=name,
-        address=item.get("address") or "",
-        city=item.get("city") or "",
-        place_id=item.get("place_id") or "",
-        order=order,
-        last_modified_by=user,
-    )
-    lat, lng = item.get("lat"), item.get("lng")
-    if lat is not None and lng is not None:
-        try:
-            obj.latitude = float(lat)
-            obj.longitude = float(lng)
-        except TypeError, ValueError:
-            pass
-    minutes = item.get("duration_minutes")
-    if minutes:
-        obj.estimated_duration = timedelta(minutes=int(minutes))
-    obj.save()
-
-
-def _apply_day_itinerary(user, trip, day, strategy, stops) -> None:
-    """Apply an accepted day itinerary.
-
-    ``unpair``/``delete`` detach or remove the day's current events first, then
-    every accepted stop is created fresh. ``add`` reorders matched existing
-    events in place, creates the new ones, and appends any existing event the
-    user deselected after the accepted sequence.
-    """
-    existing = list(day.events.all())
-    if strategy == DAY_STRATEGY_UNPAIR:
-        Event.objects.filter(day=day).update(day=None)
-    elif strategy == DAY_STRATEGY_DELETE:
-        Event.objects.filter(day=day).delete()
-
-    consumed = set()
-    order = 0
-    for item in stops:
-        existing_id = item.get("existing_event_id")
-        if existing_id and strategy == DAY_STRATEGY_ADD:
-            Event.objects.filter(pk=existing_id, day=day).update(order=order)
-            consumed.add(existing_id)
-        else:
-            _create_day_event(user, trip, day, item, order)
-        order += 1
-
-    if strategy == DAY_STRATEGY_ADD:
-        for event in existing:
-            if event.pk not in consumed:
-                event.order = order
-                event.save(update_fields=["order"])
-                order += 1
-
-
 @login_required
 @require_POST
 def accept_day(request, pk, day_id):
@@ -497,7 +404,7 @@ def accept_day(request, pk, day_id):
     except json.JSONDecodeError:
         stops = []
 
-    _apply_day_itinerary(request.user, trip, day, strategy, stops)
+    apply_day_itinerary(request.user, trip, day, strategy, stops)
 
     return TemplateResponse(
         request,
