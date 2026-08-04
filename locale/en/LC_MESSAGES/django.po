@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-03 15:09+0200\n"
+"POT-Creation-Date: 2026-08-04 07:55+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -956,7 +956,7 @@ msgstr ""
 
 #: templates/suggestions/ai-map-actions.html:11
 #: templates/suggestions/suggestion-modal.html:39
-#: templates/trips/wizard/ai-results.html:76
+#: templates/trips/wizard/ai-results.html:77
 msgid "Regenerate"
 msgstr ""
 
@@ -1087,7 +1087,7 @@ msgid "Apply day"
 msgstr ""
 
 #: templates/suggestions/plan-day-results.html:73
-#: templates/trips/wizard/ai-results.html:87
+#: templates/trips/wizard/ai-results.html:89
 msgid "No itinerary generated"
 msgstr ""
 
@@ -3003,8 +3003,8 @@ msgid ""
 msgstr ""
 
 #: templates/trips/wizard/ai-results.html:18
-#: templates/trips/wizard/ai-results.html:89
-#: templates/trips/wizard/ai-step.html:24
+#: templates/trips/wizard/ai-results.html:91
+#: templates/trips/wizard/ai-step.html:30
 msgid "Skip this step"
 msgstr ""
 
@@ -3028,7 +3028,7 @@ msgstr[1] ""
 msgid "No stops proposed for this day."
 msgstr ""
 
-#: templates/trips/wizard/ai-results.html:80
+#: templates/trips/wizard/ai-results.html:82
 msgid "Keep selected days"
 msgstr ""
 
@@ -3044,6 +3044,10 @@ msgid ""
 msgstr ""
 
 #: templates/trips/wizard/ai-step.html:18
+msgid "Notes for the AI (optional)…"
+msgstr ""
+
+#: templates/trips/wizard/ai-step.html:24
 msgid "Generate itinerary"
 msgstr ""
 

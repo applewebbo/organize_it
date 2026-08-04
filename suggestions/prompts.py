@@ -236,8 +236,9 @@ def build_day_prompt(
         "(e.g. some museums on Mondays)."
     )
     lines.append(
-        "Cover the day's meals (breakfast, lunch and dinner as appropriate) with "
-        "restaurants, interleaved with experiences and activities."
+        "Cover the day's meals with restaurants — at most three meals per day "
+        "(breakfast, lunch and dinner, and only as appropriate) — interleaved "
+        "with experiences and activities."
     )
     if day_stops:
         lines.append("")
@@ -297,8 +298,9 @@ def build_trip_prompt(
         "Aim for a well-paced day of roughly 4 to 6 stops; do not over-pack it."
     )
     lines.append(
-        "Cover each day's meals (breakfast, lunch and dinner as appropriate) with "
-        "restaurants, interleaved with experiences and activities."
+        "Cover each day's meals with restaurants — at most three meals per day "
+        "(breakfast, lunch and dinner, and only as appropriate) — interleaved "
+        "with experiences and activities."
     )
     lines.append(
         "Plan experiences and meals only; do NOT propose accommodation or stays."

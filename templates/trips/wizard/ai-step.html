@@ -13,8 +13,14 @@
                       hx-swap="innerHTML"
                       hx-disabled-elt="button[type='submit']">
                     {% csrf_token %}
+                    <input type="text"
+                           name="notes"
+                           placeholder="{% translate 'Notes for the AI (optional)…' %}"
+                           autocomplete="off"
+                           class="input input-sm input-bordered mb-3 w-full" />
                     <button type="submit" class="btn btn-primary w-full">
                         <i class="ph-bold ph-magic-wand i-sm htmx-hide-on-request"></i>
+                        <span class="loading loading-spinner loading-sm htmx-indicator"></span>
                         {% translate "Generate itinerary" %}
                     </button>
                 </form>

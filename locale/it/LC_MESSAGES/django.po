@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-03 15:09+0200\n"
+"POT-Creation-Date: 2026-08-04 07:55+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1029,7 +1029,7 @@ msgstr ""
 
 #: templates/suggestions/ai-map-actions.html:11
 #: templates/suggestions/suggestion-modal.html:39
-#: templates/trips/wizard/ai-results.html:76
+#: templates/trips/wizard/ai-results.html:77
 msgid "Regenerate"
 msgstr "Rigenera"
 
@@ -1170,7 +1170,7 @@ msgid "Apply day"
 msgstr "Applica giornata"
 
 #: templates/suggestions/plan-day-results.html:73
-#: templates/trips/wizard/ai-results.html:87
+#: templates/trips/wizard/ai-results.html:89
 msgid "No itinerary generated"
 msgstr "Nessun itinerario generato"
 
@@ -3140,12 +3140,11 @@ msgstr ""
 #: templates/trips/wizard/ai-results.html:11
 msgid ""
 "You have reached the daily AI generation limit. Please try again tomorrow."
-msgstr ""
-"Hai raggiunto il limite giornaliero di generazioni AI. Riprova domani."
+msgstr "Hai raggiunto il limite giornaliero di generazioni AI. Riprova domani."
 
 #: templates/trips/wizard/ai-results.html:18
-#: templates/trips/wizard/ai-results.html:89
-#: templates/trips/wizard/ai-step.html:24
+#: templates/trips/wizard/ai-results.html:91
+#: templates/trips/wizard/ai-step.html:30
 msgid "Skip this step"
 msgstr "Salta questo passaggio"
 
@@ -3169,7 +3168,7 @@ msgstr[1] "%(counter)s tappe"
 msgid "No stops proposed for this day."
 msgstr "Nessuna tappa proposta per questo giorno."
 
-#: templates/trips/wizard/ai-results.html:80
+#: templates/trips/wizard/ai-results.html:82
 msgid "Keep selected days"
 msgstr "Tieni i giorni selezionati"
 
@@ -3183,10 +3182,14 @@ msgid ""
 "Let AI draft a day-by-day plan for <strong>%(title)s</strong>. You choose "
 "which days to keep."
 msgstr ""
-"Lascia che l'AI proponga un piano giorno per giorno per "
-"<strong>%(title)s</strong>. Scegli tu quali giorni tenere."
+"Lascia che l'AI proponga un piano giorno per giorno per <strong>%(title)s</"
+"strong>. Scegli tu quali giorni tenere."
 
 #: templates/trips/wizard/ai-step.html:18
+msgid "Notes for the AI (optional)…"
+msgstr "Note per l'AI (facoltativo)…"
+
+#: templates/trips/wizard/ai-step.html:24
 msgid "Generate itinerary"
 msgstr "Genera itinerario"
 

@@ -182,6 +182,12 @@ class TestBuildDayPrompt:
         )
         assert "meal" in prompt.lower()
 
+    def test_caps_meals_at_three(self):
+        prompt = build_day_prompt(
+            TripContext(destination="Rome"), SuggestionPrefs(), date(2026, 7, 1)
+        )
+        assert "at most three meals" in prompt
+
     def test_reuses_shared_preferences(self):
         prompt = build_day_prompt(
             TripContext(destination="Rome"),
@@ -322,6 +328,12 @@ class TestBuildTripPrompt:
             TripContext(destination="Roma"), SuggestionPrefs(), _STAGES
         )
         assert "estimated_duration_minutes" in prompt
+
+    def test_caps_meals_at_three(self):
+        prompt = build_trip_prompt(
+            TripContext(destination="Roma"), SuggestionPrefs(), _STAGES
+        )
+        assert "at most three meals" in prompt
 
     def test_reuses_shared_preferences_and_context(self):
         context = TripContext(destination="Roma", existing_places=["Colosseo (Roma)"])
