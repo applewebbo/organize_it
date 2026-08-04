@@ -1,9 +1,13 @@
 from datetime import date
 from enum import Enum
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from trips.models import Experience, Meal
+
+# Free-text user notes are fed to the LLM prompt; cap their length so a single
+# request cannot smuggle in an oversized payload (abuse / prompt-injection).
+NOTES_MAX_LENGTH = 500
 
 
 class SuggestionKind(str, Enum):
@@ -136,3 +140,9 @@ class SuggestionPrefs(BaseModel):
     result_count: int = 8
     # Empty means "all kinds"; otherwise restrict to these SuggestionKind values.
     kinds: list[str] = Field(default_factory=list)
+
+    @field_validator("notes")
+    @classmethod
+    def _cap_notes(cls, value: str) -> str:
+        """Hard-limit free-text notes fed to the prompt (see NOTES_MAX_LENGTH)."""
+        return value[:NOTES_MAX_LENGTH]

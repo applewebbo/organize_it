@@ -15,6 +15,7 @@
                     {% csrf_token %}
                     <input type="text"
                            name="notes"
+                           maxlength="500"
                            placeholder="{% translate 'Notes for the AI (optional)…' %}"
                            autocomplete="off"
                            class="input input-sm input-bordered mb-3 w-full" />

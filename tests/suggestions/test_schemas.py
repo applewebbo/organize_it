@@ -4,11 +4,13 @@ import pytest
 from pydantic import ValidationError
 
 from suggestions.schemas import (
+    NOTES_MAX_LENGTH,
     DayItinerary,
     DayPlan,
     ItineraryStop,
     Suggestion,
     SuggestionKind,
+    SuggestionPrefs,
     TripItinerary,
     TripStage,
 )
@@ -141,3 +143,13 @@ class TestTripStageSchema:
         )
         assert stage.latitude is None
         assert stage.longitude is None
+
+
+class TestSuggestionPrefsNotes:
+    def test_notes_within_cap_are_kept(self):
+        prefs = SuggestionPrefs(notes="with kids")
+        assert prefs.notes == "with kids"
+
+    def test_notes_are_truncated_to_the_cap(self):
+        prefs = SuggestionPrefs(notes="x" * (NOTES_MAX_LENGTH + 50))
+        assert len(prefs.notes) == NOTES_MAX_LENGTH
