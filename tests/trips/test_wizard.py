@@ -91,6 +91,83 @@ class TestWizardEntryPoint(TestCase):
         self.assertNotContains(response, "trips/wizard/")
 
 
+def _draft(author, **kwargs):
+    return TripFactory(author=author, wizard_completed=False, wizard_step=3, **kwargs)
+
+
+class TestWizardFinish(TestCase):
+    def test_requires_login(self):
+        trip = TripFactory()
+        self.response_302(self.post("trips:wizard-finish", pk=trip.pk))
+
+    def test_requires_ai_key(self):
+        user = self.make_user("nokey@example.com")
+        trip = _draft(user)
+        with self.login(user):
+            response = self.post("trips:wizard-finish", pk=trip.pk)
+        assert response.status_code == 403
+
+    def test_get_not_allowed(self):
+        user = self.make_user("owner@example.com")
+        AICredentialsFactory(user=user)
+        trip = _draft(user)
+        with self.login(user):
+            response = self.get("trips:wizard-finish", pk=trip.pk)
+        assert response.status_code == 405
+
+    def test_other_user_forbidden(self):
+        owner = self.make_user("owner@example.com")
+        AICredentialsFactory(user=owner)
+        other = self.make_user("other@example.com")
+        AICredentialsFactory(user=other)
+        trip = _draft(owner)
+        with self.login(other):
+            self.response_404(self.post("trips:wizard-finish", pk=trip.pk))
+
+    def test_marks_completed_and_redirects_to_trip(self):
+        user = self.make_user("owner@example.com")
+        AICredentialsFactory(user=user)
+        trip = _draft(user)
+        with self.login(user):
+            response = self.post("trips:wizard-finish", pk=trip.pk)
+        self.assertRedirects(
+            response, f"/trips/{trip.pk}", fetch_redirect_response=False
+        )
+        trip.refresh_from_db()
+        assert trip.wizard_completed is True
+
+
+class TestWizardCancel(TestCase):
+    def test_requires_login(self):
+        trip = TripFactory()
+        self.response_302(self.post("trips:wizard-cancel", pk=trip.pk))
+
+    def test_requires_ai_key(self):
+        user = self.make_user("nokey@example.com")
+        trip = _draft(user)
+        with self.login(user):
+            response = self.post("trips:wizard-cancel", pk=trip.pk)
+        assert response.status_code == 403
+
+    def test_other_user_forbidden(self):
+        owner = self.make_user("owner@example.com")
+        AICredentialsFactory(user=owner)
+        other = self.make_user("other@example.com")
+        AICredentialsFactory(user=other)
+        trip = _draft(owner)
+        with self.login(other):
+            self.response_404(self.post("trips:wizard-cancel", pk=trip.pk))
+
+    def test_deletes_draft_and_redirects_home(self):
+        user = self.make_user("owner@example.com")
+        AICredentialsFactory(user=user)
+        trip = _draft(user)
+        with self.login(user):
+            response = self.post("trips:wizard-cancel", pk=trip.pk)
+        self.assertRedirects(response, "/", fetch_redirect_response=False)
+        assert not Trip.objects.filter(pk=trip.pk).exists()
+
+
 class TestCleanupAbandonedWizardTrips(TestCase):
     def test_deletes_old_draft(self):
         user = self.make_user("u@example.com")

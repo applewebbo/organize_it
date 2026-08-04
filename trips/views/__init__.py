@@ -146,6 +146,8 @@ from trips.views.wizard import (
     wizard_ai_confirm,
     wizard_ai_generate,
     wizard_basics,
+    wizard_cancel,
+    wizard_finish,
     wizard_start,
 )
 
@@ -155,6 +157,8 @@ __all__ = [
     "wizard_basics",
     "wizard_ai_generate",
     "wizard_ai_confirm",
+    "wizard_finish",
+    "wizard_cancel",
     # trips
     "home",
     "toggle_guide",

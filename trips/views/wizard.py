@@ -2,7 +2,7 @@ import json
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
@@ -155,6 +155,25 @@ def wizard_ai_confirm(request, pk):
 
     context = {"trip": trip, "step": WIZARD_STEP_STAYS}
     return TemplateResponse(request, "trips/wizard/ai-applied.html", context)
+
+
+@login_required
+@require_http_methods(["POST"])
+def wizard_finish(request, pk):
+    """Mark the wizard draft complete and leave the wizard for the trip."""
+    trip = _get_wizard_trip(request, pk)
+    trip.wizard_completed = True
+    trip.save(update_fields=["wizard_completed"])
+    return redirect("trips:trip-detail", pk=trip.pk)
+
+
+@login_required
+@require_http_methods(["POST"])
+def wizard_cancel(request, pk):
+    """Discard the wizard draft and return home."""
+    trip = _get_wizard_trip(request, pk)
+    trip.delete()
+    return redirect("trips:home")
 
 
 def _assign_stages_to_days(trip, stages):
