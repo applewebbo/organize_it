@@ -19,8 +19,8 @@
 {% elif days %}
     {{ days|json_script:"wizard-ai-days" }}
     <form hx-post="{% url 'trips:wizard-ai-confirm' trip.pk %}"
-          hx-target="#wizard-ai-results"
-          hx-swap="innerHTML"
+          hx-target="#wizard-content"
+          hx-swap="outerHTML"
           hx-disabled-elt="button[type='submit']"
           x-data="{ days: JSON.parse(document.getElementById('wizard-ai-days').textContent).map(d => ({ ...d, include: d.stop_count > 0 })) }">
         {% csrf_token %}
