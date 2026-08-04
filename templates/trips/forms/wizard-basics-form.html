@@ -104,9 +104,14 @@
             get nightsMatch() {
                 return this.duration !== null && this.totalNights === this.duration;
             },
+            nightsLabel(count) {
+                return count === 1 ? '{% translate "night" %}' : '{% translate "nights" %}';
+            },
             get nightsSummary() {
-                if (this.duration === null) return this.totalNights + ' {% translate "nights" %}';
-                return this.totalNights + ' / ' + this.duration + ' {% translate "nights" %}';
+                if (this.duration === null) {
+                    return this.totalNights + ' ' + this.nightsLabel(this.totalNights);
+                }
+                return this.totalNights + ' / ' + this.duration + ' ' + this.nightsLabel(this.duration);
             },
         };
     }

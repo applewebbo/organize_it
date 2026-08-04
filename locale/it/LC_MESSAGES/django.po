@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-04 07:55+0200\n"
+"POT-Creation-Date: 2026-08-04 08:03+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2032,7 +2032,10 @@ msgid "Add stage"
 msgstr "Aggiungi tappa"
 
 #: templates/trips/forms/wizard-basics-form.html:108
-#: templates/trips/forms/wizard-basics-form.html:109
+msgid "night"
+msgstr "notte"
+
+#: templates/trips/forms/wizard-basics-form.html:108
 msgid "nights"
 msgstr "notti"
 
