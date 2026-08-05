@@ -4,7 +4,7 @@ slug: wizard-417-cleanupabandonedwizardtrips-task-scheduling
 title: 'Wizard #417: cleanup_abandoned_wizard_trips task + scheduling'
 labels: []
 created: '2026-08-02T12:11:23.785+02:00'
-updated: '2026-08-02T12:19:07.757+02:00'
+updated: '2026-08-05T16:27:36.909+02:00'
 ---
 
 ## Task Comments
@@ -12,3 +12,4 @@ updated: '2026-08-02T12:19:07.757+02:00'
 | Commented At | Comment |
 | --- | --- |
 | 2026-08-02T12:19:07.757+02:00 | Status changed from ready to done |
+| 2026-08-05T16:27:36.909+02:00 | Status changed from done to complete |
