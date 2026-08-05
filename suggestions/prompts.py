@@ -106,6 +106,25 @@ _DAY_AREA_LINES = {
 }
 
 
+# Meals already covered by the day's accommodation, so the planner does not
+# double up on restaurants the traveller will not use.
+_BOARD_LINES = {
+    "breakfast": (
+        "The accommodation for this day includes breakfast: do NOT propose a "
+        "breakfast meal stop."
+    ),
+    "half_board": (
+        "The accommodation for this day includes half board (breakfast and "
+        "dinner): do NOT propose breakfast or dinner meal stops; only a lunch "
+        "is appropriate."
+    ),
+    "full_board": (
+        "The accommodation for this day includes full board (all meals): do "
+        "NOT propose any meal stops at all."
+    ),
+}
+
+
 def _preference_lines(
     context: TripContext, prefs: SuggestionPrefs, *, include_radius: bool = True
 ) -> list[str]:
@@ -250,6 +269,8 @@ def build_day_prompt(
         "(breakfast, lunch and dinner, and only as appropriate) — interleaved "
         "with experiences and activities."
     )
+    if context.board in _BOARD_LINES:
+        lines.append(_BOARD_LINES[context.board])
     if day_stops:
         lines.append("")
         lines.append(

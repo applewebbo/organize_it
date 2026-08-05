@@ -49,4 +49,10 @@
             {{ stay.cancellation_date }}
         </li>
     {% endif %}
+    {% if stay.board and stay.board != "none" %}
+        <li class="flex items-center gap-2">
+            <i class="ph-bold ph-fork-knife i-md text-base-content/60"></i>
+            {{ stay.get_board_display }}
+        </li>
+    {% endif %}
 </ul>

@@ -230,6 +230,41 @@ class TestBuildDayPrompt:
         assert "- Trattoria Luzzi" in prompt
         assert "exact" in prompt.lower()
 
+    def test_no_board_line_without_included_meals(self):
+        prompt = build_day_prompt(
+            TripContext(destination="Rome", board="none"),
+            SuggestionPrefs(),
+            date(2026, 7, 1),
+        )
+        assert "includes" not in prompt.lower()
+
+    def test_breakfast_board_skips_breakfast(self):
+        prompt = build_day_prompt(
+            TripContext(destination="Rome", board="breakfast"),
+            SuggestionPrefs(),
+            date(2026, 7, 1),
+        )
+        assert "includes breakfast" in prompt.lower()
+        assert "do not propose a breakfast" in prompt.lower()
+
+    def test_half_board_skips_breakfast_and_dinner(self):
+        prompt = build_day_prompt(
+            TripContext(destination="Rome", board="half_board"),
+            SuggestionPrefs(),
+            date(2026, 7, 1),
+        )
+        assert "half board" in prompt.lower()
+        assert "only a lunch" in prompt.lower()
+
+    def test_full_board_skips_all_meals(self):
+        prompt = build_day_prompt(
+            TripContext(destination="Rome", board="full_board"),
+            SuggestionPrefs(),
+            date(2026, 7, 1),
+        )
+        assert "full board" in prompt.lower()
+        assert "do not propose any meal" in prompt.lower()
+
     def test_no_interleave_section_without_day_stops(self):
         prompt = build_day_prompt(
             TripContext(destination="Rome"), SuggestionPrefs(), date(2026, 7, 1)

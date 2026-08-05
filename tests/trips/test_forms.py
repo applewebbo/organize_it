@@ -399,6 +399,28 @@ class TestStayForm:
         assert not form.is_valid()
         assert "phone_number" in form.errors
 
+    @patch("geocoder.mapbox")
+    def test_form_saves_board(self, mock_geocoder, user_factory, trip_factory):
+        """The board type is saved on the stay."""
+        mock_geocoder.return_value.ok = True
+        mock_geocoder.return_value.latlng = [45.4773, 9.1815]
+
+        user = user_factory()
+        trip = trip_factory(author=user)
+        days = trip.days.all()
+
+        data = {
+            "name": "Half Board Hotel",
+            "address": "Via Roma 1, Rome",
+            "board": "half_board",
+            "apply_to_days": [day.pk for day in days],
+        }
+        form = StayForm(trip=trip, data=data)
+
+        assert form.is_valid()
+        stay = form.save()
+        assert stay.board == "half_board"
+
 
 class TestAddNoteToStayForm:
     def test_form_valid(self, user_factory, trip_factory, stay_factory):

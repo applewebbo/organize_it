@@ -682,6 +682,21 @@ class TestBuildDayContext:
         context = build_day_context(trip, trip.days.first())
         assert context.weather == []
 
+    def test_board_taken_from_days_stay(self):
+        trip = TripFactory(destination="Roma")
+        day = trip.days.first()
+        StayFactory(city="Roma", day=day, board="half_board")
+        day.refresh_from_db()
+
+        context = build_day_context(trip, day)
+
+        assert context.board == "half_board"
+
+    def test_no_board_without_stay(self):
+        trip = TripFactory(destination="Roma")
+        context = build_day_context(trip, trip.days.first())
+        assert context.board == ""
+
 
 class TestGenerateDayItinerary:
     def _provider_returning(self, stops):

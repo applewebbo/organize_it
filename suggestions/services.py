@@ -523,6 +523,7 @@ def build_day_context(
         language=language,
         existing_places=_day_existing_places(trip, day, exclude_names),
         weather=_day_weather_lines(day),
+        board=day.stay.board if day.stay else "",
     )
 
 

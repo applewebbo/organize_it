@@ -123,6 +123,9 @@ class TripContext(BaseModel):
     # Compact per-day weather lines for days that already have a forecast,
     # scoped to the selected stage when one is chosen.
     weather: list[str] = Field(default_factory=list)
+    # Board type of the day's stay ("breakfast"/"half_board"/"full_board"),
+    # used by the single-day planner to skip meals already covered by the stay.
+    board: str = ""
 
 
 class SuggestionPrefs(BaseModel):

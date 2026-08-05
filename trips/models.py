@@ -248,7 +248,19 @@ def update_trip_days(sender, instance, **kwargs):
 
 
 class Stay(models.Model):
+    class BoardType(models.TextChoices):
+        NONE = "none", _("No meals included")
+        BREAKFAST = "breakfast", _("Breakfast included")
+        HALF_BOARD = "half_board", _("Half board")
+        FULL_BOARD = "full_board", _("Full board")
+
     name = models.CharField(max_length=100)
+    board = models.CharField(
+        max_length=20,
+        choices=BoardType.choices,
+        default=BoardType.NONE,
+        blank=True,
+    )
     check_in = models.TimeField(null=True, blank=True)
     check_out = models.TimeField(null=True, blank=True)
     cancellation_date = models.DateField(null=True, blank=True)
