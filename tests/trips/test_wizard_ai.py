@@ -176,7 +176,8 @@ class TestWizardAIConfirm(TestCase):
                 data={"days": json.dumps(payload)},
             )
         self.response_200(response)
-        assert "Itinerary added" in response.content.decode()
+        # Applying advances to the Stays step (step 3).
+        assert "Where will you stay?" in response.content.decode()
         assert Event.objects.filter(trip=trip, day=day, name="Forum").exists()
         trip.refresh_from_db()
         assert trip.wizard_step == 3

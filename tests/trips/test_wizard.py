@@ -168,6 +168,28 @@ class TestWizardCancel(TestCase):
         assert not Trip.objects.filter(pk=trip.pk).exists()
 
 
+class TestWizardResumeBanner(TestCase):
+    def test_home_shows_resume_banner_for_draft(self):
+        user = self.make_user("owner@example.com")
+        AICredentialsFactory(user=user)
+        draft = TripFactory(
+            author=user, wizard_completed=False, wizard_step=2, title="Draft Trip"
+        )
+        with self.login(user):
+            response = self.get("trips:home")
+        content = response.content.decode()
+        assert "Draft Trip" in content
+        assert f"/trips/wizard/{draft.pk}/resume/" in content
+
+    def test_home_no_banner_without_draft(self):
+        user = self.make_user("owner@example.com")
+        AICredentialsFactory(user=user)
+        TripFactory(author=user)
+        with self.login(user):
+            response = self.get("trips:home")
+        assert "/resume/" not in response.content.decode()
+
+
 class TestCleanupAbandonedWizardTrips(TestCase):
     def test_deletes_old_draft(self):
         user = self.make_user("u@example.com")

@@ -1,5 +1,23 @@
 {% load i18n static trip_tags %}
 <div class="mx-auto mt-8 max-w-7xl">
+    {% if wizard_draft %}
+        <div class="alert alert-info alert-soft mb-6 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+                <i class="ph-bold ph-magic-wand i-md" aria-hidden="true"></i>
+                <span>
+                    {% blocktranslate with title=wizard_draft.title %}You have an unfinished trip setup: <strong>{{ title }}</strong>.{% endblocktranslate %}
+                </span>
+            </div>
+            <div class="flex items-center gap-2">
+                <form action="{% url 'trips:wizard-cancel' wizard_draft.pk %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-ghost">{% translate "Discard" %}</button>
+                </form>
+                <a href="{% url 'trips:wizard-resume' wizard_draft.pk %}"
+                   class="btn btn-sm btn-primary">{% translate "Resume" %}</a>
+            </div>
+        </div>
+    {% endif %}
     {% if fav_trip or latest_trip %}
         {% with trip=fav_trip|default:latest_trip %}
             <!-- Trip Detail Section -->

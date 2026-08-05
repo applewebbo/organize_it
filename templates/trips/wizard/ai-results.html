@@ -14,7 +14,9 @@
             {% endif %}
         </div>
     </div>
-    <a href="{% url 'trips:trip-detail' trip.pk %}"
+    <a hx-get="{% url 'trips:wizard-stays' trip.pk %}"
+       hx-target="#wizard-content"
+       hx-swap="outerHTML"
        class="btn btn-ghost btn-sm mt-3">{% translate "Skip this step" %}</a>
 {% elif days %}
     {{ days|json_script:"wizard-ai-days" }}
@@ -87,7 +89,9 @@
     <div class="text-base-content/50 py-8 text-center">
         <i class="ph-bold ph-sparkle i-lg mb-2"></i>
         <p>{% translate "No itinerary generated" %}</p>
-        <a href="{% url 'trips:trip-detail' trip.pk %}"
+        <a hx-get="{% url 'trips:wizard-stays' trip.pk %}"
+           hx-target="#wizard-content"
+           hx-swap="outerHTML"
            class="btn btn-ghost btn-sm mt-3">{% translate "Skip this step" %}</a>
     </div>
 {% endif %}

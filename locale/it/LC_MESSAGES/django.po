@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-04 08:03+0200\n"
+"POT-Creation-Date: 2026-08-04 08:52+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -907,11 +907,24 @@ msgstr ""
 msgid "Get started"
 msgstr "Parti da qui"
 
-#: templates/includes/auth-index.html:51
+#: templates/includes/auth-index.html:8
+#, python-format
+msgid "You have an unfinished trip setup: <strong>%(title)s</strong>."
+msgstr "Hai una creazione viaggio non completata: <strong>%(title)s</strong>."
+
+#: templates/includes/auth-index.html:14
+msgid "Discard"
+msgstr "Scarta"
+
+#: templates/includes/auth-index.html:17
+msgid "Resume"
+msgstr "Riprendi"
+
+#: templates/includes/auth-index.html:69
 msgid "Other Trips"
 msgstr "Altri Viaggi"
 
-#: templates/includes/auth-index.html:72 templates/trips/event-detail.html:86
+#: templates/includes/auth-index.html:90 templates/trips/event-detail.html:86
 #: templates/trips/includes/_expense-cost-row.html:11
 #: templates/trips/includes/main-transfers.html:170
 #: templates/trips/includes/main-transfers.html:345
@@ -923,15 +936,15 @@ msgstr "Altri Viaggi"
 msgid "Edit"
 msgstr "Modifica"
 
-#: templates/includes/auth-index.html:86
+#: templates/includes/auth-index.html:104
 msgid "Toggle guide visibility"
 msgstr "Attiva/disattiva la visibilità della guida"
 
-#: templates/includes/auth-index.html:90
+#: templates/includes/auth-index.html:108
 msgid "Hide Guide"
 msgstr "Nascondi guida"
 
-#: templates/includes/auth-index.html:92
+#: templates/includes/auth-index.html:110
 msgid "Show Guide"
 msgstr "Mostra guida"
 
@@ -1029,7 +1042,7 @@ msgstr ""
 
 #: templates/suggestions/ai-map-actions.html:11
 #: templates/suggestions/suggestion-modal.html:39
-#: templates/trips/wizard/ai-results.html:77
+#: templates/trips/wizard/ai-results.html:79
 msgid "Regenerate"
 msgstr "Rigenera"
 
@@ -1170,7 +1183,7 @@ msgid "Apply day"
 msgstr "Applica giornata"
 
 #: templates/suggestions/plan-day-results.html:73
-#: templates/trips/wizard/ai-results.html:89
+#: templates/trips/wizard/ai-results.html:91
 msgid "No itinerary generated"
 msgstr "Nessun itinerario generato"
 
@@ -1984,7 +1997,7 @@ msgstr "Incolla un link Google Maps per precompilare"
 
 #: templates/trips/experience-create.html:32
 #: templates/trips/meal-create.html:32 templates/trips/stay-create.html:32
-#: templates/trips/trip-map.html:42
+#: templates/trips/trip-map.html:42 templates/trips/wizard/stays-step.html:30
 msgid "Search"
 msgstr "Cerca"
 
@@ -3119,21 +3132,6 @@ msgstr "Check-out"
 msgid "Forecast unavailable"
 msgstr "Previsioni non disponibili"
 
-#: templates/trips/wizard/ai-applied.html:7
-msgid "Itinerary added"
-msgstr "Itinerario aggiunto"
-
-#: templates/trips/wizard/ai-applied.html:9
-msgid ""
-"The days you kept were added to your trip. You can refine each day later."
-msgstr ""
-"I giorni che hai tenuto sono stati aggiunti al viaggio. Potrai perfezionare "
-"ogni giorno in seguito."
-
-#: templates/trips/wizard/ai-applied.html:12
-msgid "Go to trip"
-msgstr "Vai al viaggio"
-
 #: templates/trips/wizard/ai-results.html:6
 msgid "AI planning is not configured yet. Add a valid API key to get started."
 msgstr ""
@@ -3145,33 +3143,33 @@ msgid ""
 "You have reached the daily AI generation limit. Please try again tomorrow."
 msgstr "Hai raggiunto il limite giornaliero di generazioni AI. Riprova domani."
 
-#: templates/trips/wizard/ai-results.html:18
-#: templates/trips/wizard/ai-results.html:91
-#: templates/trips/wizard/ai-step.html:30
+#: templates/trips/wizard/ai-results.html:20
+#: templates/trips/wizard/ai-results.html:95
+#: templates/trips/wizard/ai-step.html:33
 msgid "Skip this step"
 msgstr "Salta questo passaggio"
 
-#: templates/trips/wizard/ai-results.html:31
+#: templates/trips/wizard/ai-results.html:33
 msgid "Keep the days you like; uncheck any you want to skip."
 msgstr "Tieni i giorni che ti piacciono; deseleziona quelli da saltare."
 
-#: templates/trips/wizard/ai-results.html:42
+#: templates/trips/wizard/ai-results.html:44
 #, python-format
 msgid "Day %(n)s"
 msgstr "Giorno %(n)s"
 
-#: templates/trips/wizard/ai-results.html:46
+#: templates/trips/wizard/ai-results.html:48
 #, python-format
 msgid "%(counter)s stop"
 msgid_plural "%(counter)s stops"
 msgstr[0] "%(counter)s tappa"
 msgstr[1] "%(counter)s tappe"
 
-#: templates/trips/wizard/ai-results.html:63
+#: templates/trips/wizard/ai-results.html:65
 msgid "No stops proposed for this day."
 msgstr "Nessuna tappa proposta per questo giorno."
 
-#: templates/trips/wizard/ai-results.html:82
+#: templates/trips/wizard/ai-results.html:84
 msgid "Keep selected days"
 msgstr "Tieni i giorni selezionati"
 
@@ -3188,11 +3186,11 @@ msgstr ""
 "Lascia che l'AI proponga un piano giorno per giorno per <strong>%(title)s</"
 "strong>. Scegli tu quali giorni tenere."
 
-#: templates/trips/wizard/ai-step.html:18
+#: templates/trips/wizard/ai-step.html:19
 msgid "Notes for the AI (optional)…"
 msgstr "Note per l'AI (facoltativo)…"
 
-#: templates/trips/wizard/ai-step.html:24
+#: templates/trips/wizard/ai-step.html:25
 msgid "Generate itinerary"
 msgstr "Genera itinerario"
 
@@ -3211,6 +3209,26 @@ msgstr ""
 #: templates/trips/wizard/basics-step.html:22
 msgid "Next"
 msgstr "Avanti"
+
+#: templates/trips/wizard/stays-step.html:6
+msgid "Where will you stay?"
+msgstr "Dove alloggerai?"
+
+#: templates/trips/wizard/stays-step.html:8
+msgid ""
+"Optionally search accommodation for each stage. You can skip this and add "
+"stays later."
+msgstr ""
+"Se vuoi, cerca un alloggio per ogni tappa. Puoi saltare questo passaggio e "
+"aggiungere i soggiorni in seguito."
+
+#: templates/trips/wizard/stays-step.html:37
+msgid "Accommodation search is currently unavailable."
+msgstr "La ricerca degli alloggi non è al momento disponibile."
+
+#: templates/trips/wizard/stays-step.html:46
+msgid "Finish"
+msgstr "Fine"
 
 #: templates/trips/wizard/steps-indicator.html:3
 msgid "Basics"
@@ -3956,6 +3974,18 @@ msgstr "Errore API di Unsplash. Per favore riprova più tardi."
 #, python-brace-format
 msgid "No images found for '{query}'"
 msgstr "Nessuna immagine trovata per '{query}'"
+
+#~ msgid "Itinerary added"
+#~ msgstr "Itinerario aggiunto"
+
+#~ msgid ""
+#~ "The days you kept were added to your trip. You can refine each day later."
+#~ msgstr ""
+#~ "I giorni che hai tenuto sono stati aggiunti al viaggio. Potrai "
+#~ "perfezionare ogni giorno in seguito."
+
+#~ msgid "Go to trip"
+#~ msgstr "Vai al viaggio"
 
 #, python-format
 #~ msgid ""

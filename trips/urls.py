@@ -28,6 +28,8 @@ htmx_urlpatterns = [
         views.wizard_ai_confirm,
         name="wizard-ai-confirm",
     ),
+    path("trips/wizard/<int:pk>/stays/", views.wizard_stays, name="wizard-stays"),
+    path("trips/wizard/<int:pk>/resume/", views.wizard_resume, name="wizard-resume"),
     path("trips/wizard/<int:pk>/finish/", views.wizard_finish, name="wizard-finish"),
     path("trips/wizard/<int:pk>/cancel/", views.wizard_cancel, name="wizard-cancel"),
     path("trips/<int:pk>/delete", views.trip_delete, name="trip-delete"),

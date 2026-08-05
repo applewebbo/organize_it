@@ -1,0 +1,51 @@
+{% load i18n %}
+<div id="wizard-content" class="mx-auto max-w-2xl">
+    {% include "trips/wizard/steps-indicator.html" with step=3 %}
+    <div class="card bg-base-100 border-base-300 mt-6 border shadow-sm">
+        <div class="card-body">
+            <h2 class="card-title">{% translate "Where will you stay?" %}</h2>
+            <p class="text-base-content/70 text-sm">
+                {% translate "Optionally search accommodation for each stage. You can skip this and add stays later." %}
+            </p>
+            {% if stay22_available %}
+                <ul class="mt-4 space-y-3">
+                    {% for stage in stages %}
+                        <li class="border-base-300 bg-base-100 flex items-center justify-between gap-3 rounded-lg border p-3">
+                            <div class="min-w-0">
+                                <p class="flex items-center gap-2 font-semibold">
+                                    <i class="ph-bold ph-bed i-sm text-primary" aria-hidden="true"></i>
+                                    <span class="truncate">{{ stage.destination }}</span>
+                                </p>
+                                {% if stage.days %}
+                                    {% with last=stage.days|last %}
+                                        <p class="text-base-content/60 text-xs">{{ stage.days.0.date }} – {{ last.date }}</p>
+                                    {% endwith %}
+                                {% endif %}
+                            </div>
+                            <a hx-get="{% url 'trips:stay-booking-modal' trip.pk %}?destination={{ stage.destination|urlencode }}"
+                               hx-target="#dialog"
+                               class="btn btn-sm btn-outline shrink-0"
+                               @click="$dispatch('open-modal'); document.activeElement.blur()">
+                                <i class="ph-bold ph-magnifying-glass i-sm" aria-hidden="true"></i>
+                                {% translate "Search" %}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-base-content/50 mt-4 text-sm">
+                    {% translate "Accommodation search is currently unavailable." %}
+                </p>
+            {% endif %}
+            <form action="{% url 'trips:wizard-finish' trip.pk %}"
+                  method="post"
+                  class="mt-6 flex items-center justify-end">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">
+                    <i class="ph-bold ph-check i-sm" aria-hidden="true"></i>
+                    {% translate "Finish" %}
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

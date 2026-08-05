@@ -148,7 +148,9 @@ from trips.views.wizard import (
     wizard_basics,
     wizard_cancel,
     wizard_finish,
+    wizard_resume,
     wizard_start,
+    wizard_stays,
 )
 
 __all__ = [
@@ -157,6 +159,8 @@ __all__ = [
     "wizard_basics",
     "wizard_ai_generate",
     "wizard_ai_confirm",
+    "wizard_stays",
+    "wizard_resume",
     "wizard_finish",
     "wizard_cancel",
     # trips

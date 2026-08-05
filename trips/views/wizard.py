@@ -1,5 +1,6 @@
 import json
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect
@@ -18,7 +19,11 @@ from suggestions.services import (
 )
 from trips.forms import WizardBasicsForm
 from trips.models import Trip
-from trips.utils import apply_stage, process_trip_image
+from trips.utils import apply_stage, get_trip_stages, process_trip_image
+
+WIZARD_BODY_BASICS = "trips/wizard/basics-step.html"
+WIZARD_BODY_AI = "trips/wizard/ai-step.html"
+WIZARD_BODY_STAYS = "trips/wizard/stays-step.html"
 
 WIZARD_STEP_AI = 2
 WIZARD_STEP_STAYS = 3
@@ -35,7 +40,12 @@ def _require_wizard_access(user):
 def wizard_start(request):
     """Render the wizard shell on the Basics step."""
     _require_wizard_access(request.user)
-    context = {"form": WizardBasicsForm(), "step": 1}
+    context = {
+        "form": WizardBasicsForm(),
+        "step": 1,
+        "wizard_body_template": WIZARD_BODY_BASICS,
+        "draft_saved": False,
+    }
     return TemplateResponse(request, "trips/wizard/wizard.html", context)
 
 
@@ -153,8 +163,43 @@ def wizard_ai_confirm(request, pk):
     trip.wizard_step = WIZARD_STEP_STAYS
     trip.save(update_fields=["wizard_step"])
 
-    context = {"trip": trip, "step": WIZARD_STEP_STAYS}
-    return TemplateResponse(request, "trips/wizard/ai-applied.html", context)
+    return TemplateResponse(request, WIZARD_BODY_STAYS, _stays_context(trip))
+
+
+def _stays_context(trip):
+    """Context for the Stays step: the trip's stages plus Stay22 availability."""
+    return {
+        "trip": trip,
+        "step": WIZARD_STEP_STAYS,
+        "stages": get_trip_stages(trip),
+        "stay22_available": bool(settings.STAY22_AID),
+    }
+
+
+@login_required
+@require_http_methods(["GET"])
+def wizard_stays(request, pk):
+    """Render the optional Stays step (per-stage Stay22 booking)."""
+    trip = _get_wizard_trip(request, pk)
+    if trip.wizard_step != WIZARD_STEP_STAYS:
+        trip.wizard_step = WIZARD_STEP_STAYS
+        trip.save(update_fields=["wizard_step"])
+    return TemplateResponse(request, WIZARD_BODY_STAYS, _stays_context(trip))
+
+
+@login_required
+@require_http_methods(["GET"])
+def wizard_resume(request, pk):
+    """Reopen the wizard shell at the draft's stored step from the home banner."""
+    trip = _get_wizard_trip(request, pk)
+    if trip.wizard_step >= WIZARD_STEP_STAYS:
+        context = _stays_context(trip)
+        context["wizard_body_template"] = WIZARD_BODY_STAYS
+    else:
+        context = {"trip": trip, "step": WIZARD_STEP_AI}
+        context["wizard_body_template"] = WIZARD_BODY_AI
+    context["draft_saved"] = True
+    return TemplateResponse(request, "trips/wizard/wizard.html", context)
 
 
 @login_required

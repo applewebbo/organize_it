@@ -27,7 +27,9 @@
                 </form>
             </div>
             <div class="mt-6 flex items-center justify-end">
-                <a href="{% url 'trips:trip-detail' trip.pk %}"
+                <a hx-get="{% url 'trips:wizard-stays' trip.pk %}"
+                   hx-target="#wizard-content"
+                   hx-swap="outerHTML"
                    class="btn btn-ghost btn-sm">{% translate "Skip this step" %}</a>
             </div>
         </div>
