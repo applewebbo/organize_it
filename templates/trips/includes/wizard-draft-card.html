@@ -1,0 +1,26 @@
+{% load i18n %}
+<div class="card card-border bg-base-100 shadow-sm">
+    <div class="card-body gap-1 p-3">
+        <span class="badge badge-xs w-fit gap-1 border-amber-500 text-amber-500">
+            <i class="ph-bold ph-magic-wand" aria-hidden="true"></i>{% translate 'Draft' %}
+        </span>
+        <h3 class="card-title text-sm sm:text-base">{{ wizard_draft.title }}</h3>
+        <div class="text-base-content/70 flex items-center text-xs">
+            <span>
+                {% if wizard_draft.start_date and wizard_draft.end_date %}
+                    {{ wizard_draft.start_date|date:"SHORT_DATE_FORMAT" }}&nbsp;-&nbsp;{{ wizard_draft.end_date|date:"SHORT_DATE_FORMAT" }}
+                {% else %}
+                    - / -
+                {% endif %}
+            </span>
+        </div>
+        <div class="mt-2 flex justify-end gap-2">
+            <form action="{% url 'trips:wizard-cancel' wizard_draft.pk %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-xs btn-ghost">{% translate 'Discard' %}</button>
+            </form>
+            <a href="{% url 'trips:wizard-resume' wizard_draft.pk %}"
+               class="btn btn-xs btn-primary btn-soft">{% translate 'Continue' %}</a>
+        </div>
+    </div>
+</div>

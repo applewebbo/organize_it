@@ -1,23 +1,5 @@
 {% load i18n static trip_tags %}
 <div class="mx-auto mt-8 max-w-7xl">
-    {% if wizard_draft %}
-        <div class="alert alert-info alert-soft mb-6 flex flex-wrap items-center justify-between gap-3">
-            <div class="flex items-center gap-2">
-                <i class="ph-bold ph-magic-wand i-md" aria-hidden="true"></i>
-                <span>
-                    {% blocktranslate with title=wizard_draft.title %}You have an unfinished trip setup: <strong>{{ title }}</strong>.{% endblocktranslate %}
-                </span>
-            </div>
-            <div class="flex items-center gap-2">
-                <form action="{% url 'trips:wizard-cancel' wizard_draft.pk %}" method="post">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-sm btn-ghost">{% translate "Discard" %}</button>
-                </form>
-                <a href="{% url 'trips:wizard-resume' wizard_draft.pk %}"
-                   class="btn btn-sm btn-primary">{% translate "Resume" %}</a>
-            </div>
-        </div>
-    {% endif %}
     {% if fav_trip or latest_trip %}
         {% with trip=fav_trip|default:latest_trip %}
             <!-- Trip Detail Section -->
@@ -64,10 +46,13 @@
             <!-- END Collaborators Section -->
         {% endwith %}
         <!-- Other Trips Section -->
-        {% if other_trips %}
+        {% if other_trips or wizard_draft %}
             <section id="other-trips" class="border-base-300 mt-4 mb-8 border-t pt-8">
                 <h2 class="ms-2 mb-4 text-2xl font-semibold">{% translate 'Other Trips' %}</h2>
                 <div class="grid grid-cols-1 gap-x-4 gap-y-4 md:grid-cols-2 xl:grid-cols-3">
+                    {% if wizard_draft %}
+                        {% include "trips/includes/wizard-draft-card.html" %}
+                    {% endif %}
                     {% for trip in other_trips %}
                         <div class="card card-border bg-base-100 shadow-sm">
                             <div class="card-body gap-1 p-3">
@@ -115,8 +100,18 @@
         <!-- Quick Guide (shown if user toggles it on) -->
         {% if show_guide %}<c-quick-guide />{% endif %}
     {% else %}
-        <!-- Empty State: No trips yet -->
-        <c-empty-state />
+        {% if wizard_draft %}
+            <!-- Only an unfinished wizard draft: surface it so it stays resumable -->
+            <section id="other-trips" class="mb-8">
+                <h2 class="ms-2 mb-4 text-2xl font-semibold">{% translate 'Other Trips' %}</h2>
+                <div class="grid grid-cols-1 gap-x-4 gap-y-4 md:grid-cols-2 xl:grid-cols-3">
+                    {% include "trips/includes/wizard-draft-card.html" %}
+                </div>
+            </section>
+        {% else %}
+            <!-- Empty State: No trips yet -->
+            <c-empty-state />
+        {% endif %}
         <!-- Quick Guide (always shown for users without trips) -->
         <c-quick-guide />
     {% endif %}

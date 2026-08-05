@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-04 08:52+0200\n"
+"POT-Creation-Date: 2026-08-05 08:04+0200\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -907,44 +907,31 @@ msgstr ""
 msgid "Get started"
 msgstr "Parti da qui"
 
-#: templates/includes/auth-index.html:8
-#, python-format
-msgid "You have an unfinished trip setup: <strong>%(title)s</strong>."
-msgstr "Hai una creazione viaggio non completata: <strong>%(title)s</strong>."
-
-#: templates/includes/auth-index.html:14
-msgid "Discard"
-msgstr "Scarta"
-
-#: templates/includes/auth-index.html:17
-msgid "Resume"
-msgstr "Riprendi"
-
-#: templates/includes/auth-index.html:69
+#: templates/includes/auth-index.html:51 templates/includes/auth-index.html:106
 msgid "Other Trips"
 msgstr "Altri Viaggi"
 
-#: templates/includes/auth-index.html:90 templates/trips/event-detail.html:86
+#: templates/includes/auth-index.html:75 templates/trips/event-detail.html:86
 #: templates/trips/includes/_expense-cost-row.html:11
 #: templates/trips/includes/main-transfers.html:170
 #: templates/trips/includes/main-transfers.html:345
 #: templates/trips/includes/note.html:8
 #: templates/trips/includes/trip-header-card.html:106
 #: templates/trips/main-transfer-connection-modal.html:37
-#: templates/trips/stay-detail.html:84 templates/trips/trip-list.html:90
-#: templates/trips/trip-list.html:150
+#: templates/trips/stay-detail.html:84 templates/trips/trip-list.html:136
+#: templates/trips/trip-list.html:196
 msgid "Edit"
 msgstr "Modifica"
 
-#: templates/includes/auth-index.html:104
+#: templates/includes/auth-index.html:89
 msgid "Toggle guide visibility"
 msgstr "Attiva/disattiva la visibilità della guida"
 
-#: templates/includes/auth-index.html:108
+#: templates/includes/auth-index.html:93
 msgid "Hide Guide"
 msgstr "Nascondi guida"
 
-#: templates/includes/auth-index.html:110
+#: templates/includes/auth-index.html:95
 msgid "Show Guide"
 msgstr "Mostra guida"
 
@@ -1805,7 +1792,7 @@ msgstr "Arricchisci"
 #: templates/trips/includes/note.html:12
 #: templates/trips/main-transfer-connection-modal.html:44
 #: templates/trips/stay-detail.html:92 templates/trips/stay-note-modify.html:26
-#: templates/trips/trip-list.html:76 templates/trips/trip-list.html:200
+#: templates/trips/trip-list.html:122 templates/trips/trip-list.html:246
 msgid "Delete"
 msgstr "Elimina"
 
@@ -2671,7 +2658,7 @@ msgid "Add events"
 msgstr "Aggiungi eventi"
 
 #: templates/trips/includes/trip-header-card.html:114
-#: templates/trips/trip-list.html:85
+#: templates/trips/trip-list.html:131
 msgctxt "trip action"
 msgid "Share"
 msgstr "Condividi"
@@ -2687,6 +2674,21 @@ msgstr "Data di fine:"
 #: templates/trips/includes/trip-header-card.html:187
 msgid "Destination:"
 msgstr "Destinazione:"
+
+#: templates/trips/includes/wizard-draft-card.html:5
+#: templates/trips/trip-list.html:39
+msgid "Draft"
+msgstr "Bozza"
+
+#: templates/trips/includes/wizard-draft-card.html:20
+#: templates/trips/trip-list.html:57
+msgid "Discard"
+msgstr "Scarta"
+
+#: templates/trips/includes/wizard-draft-card.html:23
+#: templates/trips/trip-list.html:63
+msgid "Continue"
+msgstr "Continua"
 
 #: templates/trips/link-expired.html:4
 msgid "Link expired"
@@ -3048,7 +3050,7 @@ msgstr "Ignora"
 msgid "This trip is archived and cannot be modified."
 msgstr "Questo viaggio è stato archiviato e non può essere modificato."
 
-#: templates/trips/trip-detail.html:35 templates/trips/trip-list.html:196
+#: templates/trips/trip-detail.html:35 templates/trips/trip-list.html:242
 msgid "Unarchive"
 msgstr "Riapri"
 
@@ -3060,23 +3062,27 @@ msgstr "Lista dei Viaggi"
 msgid "My Trips"
 msgstr "Viaggi Personali"
 
-#: templates/trips/trip-list.html:54
+#: templates/trips/trip-list.html:32 templates/trips/trip-list.html:33
+msgid "AI-generated trip"
+msgstr "Viaggio generato dall'AI"
+
+#: templates/trips/trip-list.html:100
 msgid "Weather forecast"
 msgstr "Previsioni meteo"
 
-#: templates/trips/trip-list.html:70
+#: templates/trips/trip-list.html:116
 msgid "Archive"
 msgstr "Archivia"
 
-#: templates/trips/trip-list.html:112
+#: templates/trips/trip-list.html:158
 msgid "Shared with me"
 msgstr "Condivise con me"
 
-#: templates/trips/trip-list.html:164
+#: templates/trips/trip-list.html:210
 msgid "Archived Trips"
 msgstr "Viaggi Archiviati"
 
-#: templates/trips/trip-list.html:203
+#: templates/trips/trip-list.html:249
 msgid "View"
 msgstr "Vedi"
 
@@ -3929,51 +3935,59 @@ msgstr "Trasferimento eliminata correttamente"
 msgid "Transfer saved successfully!"
 msgstr "Trasferimento salvato con successo!"
 
-#: trips/views/trips.py:271
+#: trips/views/trips.py:278
 #, python-format
 msgid "<strong>%(title)s</strong> added successfully"
 msgstr "<strong>%(title)s</strong> aggiunta correttamente"
 
-#: trips/views/trips.py:294
+#: trips/views/trips.py:301
 #, python-format
 msgid "<strong>%(title)s</strong> deleted successfully"
 msgstr "<strong>%(title)s</strong> eliminata correttamente"
 
-#: trips/views/trips.py:347
+#: trips/views/trips.py:354
 #, python-format
 msgid "<strong>%(title)s</strong> updated successfully"
 msgstr "<strong>%(title)s</strong> modificata correttamente"
 
-#: trips/views/trips.py:373
+#: trips/views/trips.py:380
 #, python-format
 msgid "<strong>%(title)s</strong> archived successfully"
 msgstr "<strong>%(title)s</strong> archiviata correttamente"
 
-#: trips/views/trips.py:388
+#: trips/views/trips.py:395
 #, python-format
 msgid "<strong>%(title)s</strong> unarchived successfully"
 msgstr "<strong>%(title)s</strong> riaperta correttamente"
 
-#: trips/views/trips.py:422
+#: trips/views/trips.py:429
 msgid "Start date must be after today."
 msgstr "La data di inizio deve essere successiva a quella di oggi."
 
-#: trips/views/trips.py:426
+#: trips/views/trips.py:433
 msgid "Start date cannot be after end date."
 msgstr "La data di inizio deve essere successiva a quella di fine."
 
-#: trips/views/trips.py:460
+#: trips/views/trips.py:467
 msgid "Please enter a destination first"
 msgstr "Per favore compila prima il campo destinazione"
 
-#: trips/views/trips.py:470
+#: trips/views/trips.py:477
 msgid "Unsplash API error. Please try again later."
 msgstr "Errore API di Unsplash. Per favore riprova più tardi."
 
-#: trips/views/trips.py:477
+#: trips/views/trips.py:484
 #, python-brace-format
 msgid "No images found for '{query}'"
 msgstr "Nessuna immagine trovata per '{query}'"
+
+#, python-format
+#~ msgid "You have an unfinished trip setup: <strong>%(title)s</strong>."
+#~ msgstr ""
+#~ "Hai una creazione viaggio non completata: <strong>%(title)s</strong>."
+
+#~ msgid "Resume"
+#~ msgstr "Riprendi"
 
 #~ msgid "Itinerary added"
 #~ msgstr "Itinerario aggiunto"

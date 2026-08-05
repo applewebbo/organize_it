@@ -106,10 +106,17 @@ def trip_list(request):
     archived_trips = archived_trips.order_by(order_by)
     shared_trips = shared_trips.order_by(order_by)
 
+    wizard_draft = (
+        Trip.objects.filter(author=request.user, wizard_completed=False)
+        .order_by("-wizard_started_at")
+        .first()
+    )
+
     context = {
         "active_trips": active_trips,
         "archived_trips": archived_trips,
         "shared_trips": shared_trips,
+        "wizard_draft": wizard_draft,
         "wizard_available": has_own_ai_key(request.user),
     }
     return TemplateResponse(request, template, context)

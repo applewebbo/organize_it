@@ -18,8 +18,54 @@
                         <h1 class="inline-block rounded-lg px-4 py-2 text-3xl font-semibold">{% translate 'My Trips' %}</h1>
                     </div>
                 </div>
-                {% if active_trips %}
+                {% if active_trips or wizard_draft %}
                     <div class="mb-12 grid grid-cols-1 gap-x-4 gap-y-8 md:grid-cols-2 xl:grid-cols-3">
+                        {% if wizard_draft %}
+                            <div class="card card-border bg-base-100 overflow-hidden shadow"
+                                 id="wizard-draft-{{ wizard_draft.id }}">
+                                <figure class="relative h-48 w-full">
+                                    <img src="{% static 'img/trip_generic.jpg' %}"
+                                         alt="{{ wizard_draft.title }}"
+                                         class="h-full w-full object-cover"
+                                         loading="lazy">
+                                    <span class="absolute top-3 right-3 flex h-11 w-11 items-center justify-center rounded-full bg-amber-500 p-2 text-white shadow-lg"
+                                          title="{% translate 'AI-generated trip' %}"
+                                          aria-label="{% translate 'AI-generated trip' %}">
+                                        <i class="ph-bold ph-magic-wand text-xl" aria-hidden="true"></i>
+                                    </span>
+                                </figure>
+                                <div class="card-body">
+                                    <span class="badge badge-outline w-fit gap-1 border-amber-500 text-amber-500">
+                                        <i class="ph-bold ph-magic-wand" aria-hidden="true"></i>{% translate 'Draft' %}
+                                    </span>
+                                    <h2 class="card-title">{{ wizard_draft.title }}</h2>
+                                    <div class="flex items-center">
+                                        <span>
+                                            {% if wizard_draft.start_date and wizard_draft.end_date %}
+                                                {{ wizard_draft.start_date|date:"SHORT_DATE_FORMAT" }}&nbsp;-&nbsp;{{ wizard_draft.end_date|date:"SHORT_DATE_FORMAT" }}
+                                            {% else %}
+                                                - / -
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="mt-auto grid grid-cols-2 gap-2">
+                                        <form action="{% url 'trips:wizard-cancel' wizard_draft.id %}"
+                                              method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-ghost w-full">
+                                                <i class="ph-bold ph-trash" aria-hidden="true"></i>
+                                                <span>{% translate 'Discard' %}</span>
+                                            </button>
+                                        </form>
+                                        <a href="{% url 'trips:wizard-resume' wizard_draft.id %}"
+                                           class="btn btn-sm btn-primary btn-soft">
+                                            <i class="ph-bold ph-arrow-right" aria-hidden="true"></i>
+                                            <span>{% translate 'Continue' %}</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
                         {% for trip in active_trips %}
                             <div class="card card-border bg-base-100 overflow-hidden shadow"
                                  id="{{ trip.id }}">

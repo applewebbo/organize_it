@@ -341,6 +341,18 @@ class TestTripListView(TestCase):
         self.response_200(response)
         assert "trips/trip-list.html" not in [t.name for t in response.templates]
 
+    def test_shows_wizard_draft_card(self):
+        user = self.make_user("user")
+        draft = TripFactory(author=user, wizard_completed=False, title="Draft Trip")
+
+        with self.login(user):
+            response = self.get("trips:trip-list")
+
+        assert response.context["wizard_draft"] == draft
+        content = response.content.decode()
+        assert "Draft Trip" in content
+        assert f"/trips/wizard/{draft.pk}/resume/" in content
+
     @time_machine.travel("2026-06-24")
     def test_trip_list_query_count_is_stable_with_more_trips(self):
         """N+1 guard: trips list query count must not grow with the number of trips."""
