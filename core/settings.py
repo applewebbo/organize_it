@@ -552,6 +552,12 @@ elif ENVIRONMENT == "prod":
 
 # TESTING SPECIFIC SETTINGS
 elif ENVIRONMENT == "test":
+    # Force DEBUG off in tests: with DEBUG=True Django keeps every executed query
+    # in connection.queries (per xdist worker), which grows unbounded across the
+    # whole suite and saturates RAM. Set after the `if not DEBUG` security block
+    # (line ~241) so it does not enable SSL redirect / secure cookies.
+    DEBUG = False
+
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",

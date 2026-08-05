@@ -167,15 +167,18 @@ makemessages:
 test *args:
     ENVIRONMENT=test uv run python -m pytest --reuse-db -s -x {{ args }}
 
-# Run fast tests (TEST_WORKERS controls parallelism, default 2 to keep the machine responsive; raise it for faster CI runs)
+# Run fast tests (TEST_WORKERS controls parallelism, default 4; raise it for faster CI runs)
+# taskpolicy -b routes the xdist workers to the efficiency cores (background QoS) so the
+# performance cores stay free and the Mac remains responsive during the run. Default 4 matches
+# the Apple-silicon efficiency-core count so the run stays fast while the P-cores stay idle.
 [group('utility')]
 ftest *args:
-    nice -n 10 env ENVIRONMENT=test uv run pytest -n ${TEST_WORKERS:-2} --reuse-db --dist loadscope --exitfirst {{ args }}
+    taskpolicy -b nice -n 10 env ENVIRONMENT=test uv run pytest -n ${TEST_WORKERS:-4} --reuse-db --dist loadscope --exitfirst {{ args }}
 
 # Run fast tests with coverage report (must reach 100%)
 [group('utility')]
 cov *args:
-    nice -n 10 env ENVIRONMENT=test uv run pytest -n ${TEST_WORKERS:-2} --reuse-db --dist loadscope --exitfirst --cov=. --cov-report html:htmlcov --cov-report term:skip-covered --cov-fail-under 100 {{ args }}
+    taskpolicy -b nice -n 10 env ENVIRONMENT=test uv run pytest -n ${TEST_WORKERS:-4} --reuse-db --dist loadscope --exitfirst --cov=. --cov-report html:htmlcov --cov-report term:skip-covered --cov-fail-under 100 {{ args }}
 
 # Show coverage for a specific test file against a source module (no threshold)
 # Usage: just fcov tests/trips/test_views_map.py trips/views/maps.py
