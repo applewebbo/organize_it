@@ -50,6 +50,18 @@ class TestApplyStage(TestCase):
         day.refresh_from_db()
         assert day.destination == "Roma"
 
+    def test_noop_when_day_pks_dont_belong_to_trip(self):
+        trip = TripFactory(
+            start_date=date(2026, 6, 1), end_date=date(2026, 6, 3), destination="Roma"
+        )
+        other = TripFactory(
+            start_date=date(2026, 7, 1), end_date=date(2026, 7, 3), destination="Milano"
+        )
+        other_day = other.days.first()
+        apply_stage(trip, [other_day.pk], "Firenze")
+        other_day.refresh_from_db()
+        assert other_day.destination == "Milano"
+
 
 class TestWizardBasicsForm(TestCase):
     def _data(self, stages_json, **overrides):
