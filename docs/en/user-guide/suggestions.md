@@ -40,6 +40,41 @@ Select your provider, paste the API key issued by that provider, and click **Sav
 !!! warning "Usage counts against your quota"
     Every generation calls your provider using **your** API key, so it consumes **your** quota (and any associated cost). Results are cached to avoid unnecessary calls.
 
+## Getting a Free API Key
+
+Both supported providers offer a **free tier** that is enough for personal trip planning. You need an account with the provider, but no payment method and no subscription to Organize It.
+
+### Google Gemini
+
+1. Go to [Google AI Studio](https://aistudio.google.com/apikey)
+2. Sign in with a Google account
+3. Click **Create API key**
+4. Choose a project (or let it create one for you)
+5. Copy the key — it starts with `AIza…`
+6. Paste it into **Account Settings → AI suggestions** in Organize It and click **Save**
+
+Organize It uses the `gemini-3.1-flash-lite` model, one of the cheapest in the family and available on the free tier.
+
+### Mistral AI
+
+1. Go to the [Mistral console](https://console.mistral.ai/api-keys/)
+2. Create an account and sign in
+3. Activate the free plan if prompted (it may ask you to verify a phone number)
+4. Open **API Keys** and click **Create new key**
+5. Copy the key immediately — the console shows it **only once**
+6. Paste it into **Account Settings → AI suggestions** in Organize It and click **Save**
+
+Organize It uses the `mistral-small-latest` model.
+
+!!! tip "Which one should I pick?"
+    Either works. Gemini has the quicker signup (no phone verification), Mistral is an EU-based provider if that matters to you. You can switch provider later from the same settings card — just remember to enter the key for the new provider.
+
+!!! warning "Free tiers have rate limits"
+    Free plans cap how many requests you can make per minute and per day, and providers change these limits over time. If a generation fails with a quota or rate-limit message, wait and try again. Check your provider's current terms on the [Gemini pricing page](https://ai.google.dev/pricing) or the [Mistral pricing page](https://mistral.ai/pricing).
+
+!!! danger "Treat the key as a password"
+    Anyone holding your API key can spend your quota. Don't paste it into shared documents or screenshots. If a key leaks, revoke it in the provider's console and create a new one.
+
 ## Suggestion Preferences
 
 The preferences you set once in **Account Settings** are reused for every generation, so you don't have to re-enter them each time.
@@ -160,6 +195,10 @@ No. The feature uses **your own** provider account and key (Bring Your Own Key).
 ### Which providers can I use?
 
 Google **Gemini** and **Mistral AI**.
+
+### Is there a free option?
+
+Yes. Both providers offer a free tier that covers personal trip planning, with no payment method required. See [Getting a Free API Key](#getting-a-free-api-key).
 
 ### Where is my API key stored?
 

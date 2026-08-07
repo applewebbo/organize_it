@@ -47,6 +47,7 @@ nav:
   - Your First Trip: getting-started/first-trip.md
 - User Guide:
   - Trips: user-guide/trips.md
+  - Guided Setup: user-guide/wizard.md
   - Days: user-guide/days.md
   - Stays: user-guide/stays.md
   - Experiences: user-guide/experiences.md

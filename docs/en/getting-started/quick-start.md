@@ -59,7 +59,7 @@ A **Trip** is the main container for your travel plans. Each trip has:
 
 ### Step 2: Create Your First Trip
 
-1. Click **Create New Trip**
+1. Click **Create a new trip**
 2. Fill in the details:
    - Trip name (e.g., "Rome Weekend")
    - Destination (e.g., "Rome, Italy")
@@ -69,6 +69,22 @@ A **Trip** is the main container for your travel plans. Each trip has:
 3. Click **Save**
 
 Days will be automatically created for each date in your trip!
+
+!!! tip "Two ways to create a trip"
+    If you have your own AI API key configured, **Create a new trip** opens a menu with two options:
+
+    - **Standard setup** — the single form described above
+    - **Guided setup** — a three-step wizard that handles multi-stage trips, drafts a day-by-day itinerary with AI and searches accommodation for each stage
+
+    Pick the guided setup for a trip you haven't planned yet. See the [Guided Setup guide](../user-guide/wizard.md).
+
+!!! info "Getting a free AI key"
+    All AI features — including the guided setup — need **your own API key**. Both supported providers have a free tier:
+
+    - **Google Gemini** — create a key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
+    - **Mistral AI** — create a key at [console.mistral.ai/api-keys](https://console.mistral.ai/api-keys/)
+
+    Paste the key into **Account Settings → AI suggestions**. Step-by-step instructions are in the [AI Suggestions guide](../user-guide/suggestions.md#getting-a-free-api-key).
 
 ### Step 3: Add a Stay
 

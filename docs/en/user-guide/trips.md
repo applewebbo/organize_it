@@ -21,12 +21,17 @@ A **Trip** is a container for all your travel planning. Each trip includes:
 
 ### From the Homepage
 
-1. Click **Create New Trip** button
+1. Click **Create a new trip** button
 2. Fill in the trip details
 3. Click **Save**
 
 ![Trip Creation Form](../assets/screenshots/trip-create-form.png)
 *The trip creation form*
+
+!!! tip "Prefer a guided setup?"
+    If you have your own AI API key, **Create a new trip** offers a second option: a
+    [guided setup](wizard.md) that splits the trip into stages, drafts a day-by-day
+    itinerary with AI and searches accommodation for each stage.
 
 ### Trip Details
 

@@ -47,6 +47,7 @@ nav:
   - Il Tuo Primo Viaggio: getting-started/first-trip.md
 - Guida Utente:
   - Viaggi: user-guide/trips.md
+  - Procedura Guidata: user-guide/wizard.md
   - Giorni: user-guide/days.md
   - Alloggi: user-guide/stays.md
   - Esperienze: user-guide/experiences.md

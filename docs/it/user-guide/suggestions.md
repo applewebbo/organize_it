@@ -40,6 +40,41 @@ Seleziona il tuo provider, incolla la chiave API rilasciata da quel provider e c
 !!! warning "L'uso incide sulla tua quota"
     Ogni generazione chiama il provider usando la **tua** chiave API, quindi consuma la **tua** quota (e gli eventuali costi associati). I risultati vengono memorizzati in cache per evitare chiamate inutili.
 
+## Ottenere una Chiave API Gratuita
+
+Entrambi i provider supportati offrono un **piano gratuito** sufficiente per pianificare i propri viaggi. Serve un account presso il provider, ma nessun metodo di pagamento e nessun abbonamento a Organize It.
+
+### Google Gemini
+
+1. Vai su [Google AI Studio](https://aistudio.google.com/apikey)
+2. Accedi con un account Google
+3. Clicca **Create API key**
+4. Scegli un progetto (oppure lascia che ne crei uno)
+5. Copia la chiave — inizia con `AIza…`
+6. Incollala in **Impostazioni Account → Suggerimenti AI** su Organize It e clicca **Salva**
+
+Organize It usa il modello `gemini-3.1-flash-lite`, uno dei più economici della famiglia e disponibile nel piano gratuito.
+
+### Mistral AI
+
+1. Vai sulla [console Mistral](https://console.mistral.ai/api-keys/)
+2. Crea un account e accedi
+3. Attiva il piano gratuito se richiesto (potrebbe essere necessario verificare un numero di telefono)
+4. Apri **API Keys** e clicca **Create new key**
+5. Copia subito la chiave: la console la mostra **una volta sola**
+6. Incollala in **Impostazioni Account → Suggerimenti AI** su Organize It e clicca **Salva**
+
+Organize It usa il modello `mistral-small-latest`.
+
+!!! tip "Quale scegliere?"
+    Vanno bene entrambi. Gemini ha la registrazione più rapida (nessuna verifica telefonica), Mistral è un provider con sede nell'UE, se la cosa ti interessa. Puoi cambiare provider in seguito dalla stessa card delle impostazioni: ricorda solo di inserire la chiave del nuovo provider.
+
+!!! warning "I piani gratuiti hanno limiti di frequenza"
+    I piani gratuiti limitano il numero di richieste al minuto e al giorno, e i provider modificano questi limiti nel tempo. Se una generazione fallisce con un messaggio di quota o di limite raggiunto, attendi e riprova. Verifica le condizioni aggiornate sulla [pagina dei prezzi di Gemini](https://ai.google.dev/pricing) o sulla [pagina dei prezzi di Mistral](https://mistral.ai/pricing).
+
+!!! danger "Tratta la chiave come una password"
+    Chiunque abbia la tua chiave API può consumare la tua quota. Non incollarla in documenti condivisi o screenshot. Se una chiave viene compromessa, revocala nella console del provider e creane una nuova.
+
 ## Preferenze dei Suggerimenti
 
 Le preferenze impostate una volta nelle **Impostazioni Account** vengono riutilizzate a ogni generazione, così non devi reinserirle ogni volta.
@@ -160,6 +195,10 @@ No. La funzione usa il **tuo** account e la **tua** chiave del provider (Bring Y
 ### Quali provider posso usare?
 
 Google **Gemini** e **Mistral AI**.
+
+### Esiste un'opzione gratuita?
+
+Sì. Entrambi i provider offrono un piano gratuito sufficiente per pianificare i propri viaggi, senza bisogno di un metodo di pagamento. Vedi [Ottenere una Chiave API Gratuita](#ottenere-una-chiave-api-gratuita).
 
 ### Dove viene memorizzata la mia chiave API?
 

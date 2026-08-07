@@ -59,7 +59,7 @@ Gli **Eventi** sono le attività nel tuo itinerario. Ci sono quattro tipi:
 
 ### Passo 2: Crea il Tuo Primo Viaggio
 
-1. Clicca su **Crea Nuovo Viaggio**
+1. Clicca su **Crea un nuovo viaggio**
 2. Compila i dettagli:
    - Nome viaggio (es. "Weekend a Roma")
    - Destinazione (es. "Roma, Italia")
@@ -69,6 +69,22 @@ Gli **Eventi** sono le attività nel tuo itinerario. Ci sono quattro tipi:
 3. Clicca su **Salva**
 
 I giorni verranno creati automaticamente per ogni data del viaggio!
+
+!!! tip "Due modi per creare un viaggio"
+    Se hai configurato una tua chiave API per l'AI, **Crea un nuovo viaggio** apre un menu con due opzioni:
+
+    - **Procedura standard** — il modulo unico descritto sopra
+    - **Procedura guidata** — una procedura in tre passaggi che gestisce i viaggi a più tappe, propone un itinerario giorno per giorno con l'AI e cerca un alloggio per ogni tappa
+
+    Scegli la procedura guidata per un viaggio ancora da organizzare. Vedi la [guida alla Procedura Guidata](../user-guide/wizard.md).
+
+!!! info "Ottenere una chiave AI gratuita"
+    Tutte le funzioni AI — procedura guidata compresa — richiedono **una tua chiave API**. Entrambi i provider supportati hanno un piano gratuito:
+
+    - **Google Gemini** — crea una chiave su [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
+    - **Mistral AI** — crea una chiave su [console.mistral.ai/api-keys](https://console.mistral.ai/api-keys/)
+
+    Incolla la chiave in **Impostazioni Account → Suggerimenti AI**. Le istruzioni passo passo sono nella [guida ai Suggerimenti AI](../user-guide/suggestions.md#ottenere-una-chiave-api-gratuita).
 
 ### Passo 3: Aggiungi un Alloggio
 

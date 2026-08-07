@@ -21,12 +21,17 @@ Un **Viaggio** è un contenitore per tutta la tua pianificazione di viaggio. Ogn
 
 ### Dalla Homepage
 
-1. Clicca il pulsante **Crea Nuovo Viaggio**
+1. Clicca il pulsante **Crea un nuovo viaggio**
 2. Compila i dettagli del viaggio
 3. Clicca **Salva**
 
 ![Form Creazione Viaggio](../assets/screenshots/trip-create-form.png)
 *Il form di creazione viaggio*
+
+!!! tip "Preferisci una procedura guidata?"
+    Se hai una tua chiave API per l'AI, **Crea un nuovo viaggio** propone una seconda
+    opzione: una [procedura guidata](wizard.md) che suddivide il viaggio in tappe,
+    propone un itinerario giorno per giorno con l'AI e cerca un alloggio per ogni tappa.
 
 ### Dettagli del Viaggio
 
