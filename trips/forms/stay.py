@@ -80,7 +80,9 @@ class StayForm(forms.ModelForm):
             "longitude": forms.HiddenInput(),
             "check_in": forms.TimeInput(attrs={"type": "time"}),
             "check_out": forms.TimeInput(attrs={"type": "time"}),
-            "cancellation_date": forms.DateInput(attrs={"type": "date"}),
+            "cancellation_date": forms.DateInput(
+                attrs={"type": "date"}, format="%Y-%m-%d"
+            ),
             "phone_number": forms.TextInput(attrs={"placeholder": _("Phone number")}),
             "notes": forms.Textarea(attrs={"rows": 3}),
         }

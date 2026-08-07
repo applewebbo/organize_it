@@ -2,6 +2,7 @@ from datetime import date, timedelta
 from unittest.mock import patch
 
 import pytest
+from django.utils import translation
 
 from tests.trips.factories import (
     ExperienceFactory,
@@ -420,6 +421,21 @@ class TestStayForm:
         assert form.is_valid()
         stay = form.save()
         assert stay.board == "half_board"
+
+    def test_form_renders_cancellation_date_for_the_date_input(
+        self, user_factory, trip_factory
+    ):
+        """The stored date must reach <input type="date"> in ISO format whatever the
+        active locale, otherwise the browser drops it and saving wipes it (issue #426)."""
+        user = user_factory()
+        trip = trip_factory(author=user)
+        stay = StayFactory(cancellation_date=date(2026, 8, 19))
+
+        with translation.override("it"):
+            form = StayForm(trip=trip, instance=stay)
+            rendered = str(form["cancellation_date"])
+
+        assert 'value="2026-08-19"' in rendered
 
 
 class TestAddNoteToStayForm:
