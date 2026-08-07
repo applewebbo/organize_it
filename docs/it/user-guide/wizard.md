@@ -78,7 +78,10 @@ Facoltativo. L'AI propone un piano per l'intero viaggio in una sola volta e deci
 2. Clicca **Genera itinerario**
 3. Rivedi i giorni proposti
 
-Ogni giorno è una card che mostra il numero del giorno, la sua destinazione, il numero di tappe e l'elenco delle fermate proposte con la durata stimata.
+Ogni giorno è una card che mostra il numero del giorno, la sua destinazione, il numero di tappe e l'elenco delle fermate proposte con la durata stimata. Le fermate hanno un'icona che ne indica il tipo: forchetta e coltello per i pasti, segnaposto per le esperienze.
+
+![Risultati della pianificazione AI](../assets/screenshots/wizard-ai-results.png)
+*Un itinerario generato pronto da rivedere, con il giorno 3 deselezionato per non applicarlo*
 
 ### Tenere e Scartare
 

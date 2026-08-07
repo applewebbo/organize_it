@@ -78,7 +78,10 @@ Optional. The AI drafts a plan for the whole trip in one pass, and you decide da
 2. Click **Generate itinerary**
 3. Review the proposed days
 
-Each day is a card showing the day number, its destination, the number of stops and the list of proposed stops with their estimated duration.
+Each day is a card showing the day number, its destination, the number of stops and the list of proposed stops with their estimated duration. Stops are icon-coded: a fork and knife for meals, a pin for experiences.
+
+![Wizard AI results](../assets/screenshots/wizard-ai-results.png)
+*A generated itinerary ready for review, with day 3 unchecked so it won't be applied*
 
 ### Keeping and Discarding
 
