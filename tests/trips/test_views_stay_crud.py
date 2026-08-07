@@ -152,6 +152,28 @@ class TestStayDetailView(TestCase):
         )  # Should be the day before first stay day
         assert response.context["last_day"] == days[-1]
 
+    def test_shows_board_when_meals_are_included(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        stay = StayFactory(board="half_board")
+        stay.days.set(trip.days.all())
+
+        with self.login(user):
+            response = self.get("trips:stay-detail", pk=stay.pk)
+
+        self.assertContains(response, "Half board")
+
+    def test_hides_board_when_no_meal_is_included(self):
+        user = self.make_user("user")
+        trip = TripFactory(author=user)
+        stay = StayFactory(board="none")
+        stay.days.set(trip.days.all())
+
+        with self.login(user):
+            response = self.get("trips:stay-detail", pk=stay.pk)
+
+        self.assertNotContains(response, "No meals included")
+
 
 class TestStayModifyView(TestCase):
     @patch("geocoder.mapbox")
