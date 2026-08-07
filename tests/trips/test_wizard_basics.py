@@ -222,3 +222,52 @@ class TestWizardBasicsView(TestCase):
         with self.login(user):
             response = self.post("trips:wizard-basics", data=self._post_data())
         assert response.status_code == 403
+
+
+class TestWizardBasicsRehydration(TestCase):
+    """A failed Basics step must re-render everything the user typed (issue #425)."""
+
+    def _invalid_post(self, user):
+        data = {
+            "title": "Grand Tour",
+            "start_date": "2026-06-01",
+            "end_date": "2026-06-08",
+            "stages": _stages_json(
+                {"destination": "", "nights": 5},
+                {"destination": "Firenze", "nights": 2},
+            ),
+        }
+        with self.login(user):
+            return self.post("trips:wizard-basics", data=data)
+
+    def _stages_payload(self, content):
+        marker = '<script id="wizard-stages-data" type="application/json">'
+        start = content.index(marker) + len(marker)
+        return json.loads(content[start : content.index("</script>", start)])
+
+    def test_dates_are_kept(self):
+        user = self.make_user("owner@example.com")
+        AICredentialsFactory(user=user)
+        content = self._invalid_post(user).content.decode()
+        assert 'value="2026-06-01"' in content
+        assert 'value="2026-06-08"' in content
+
+    def test_stages_payload_is_valid_json(self):
+        user = self.make_user("owner@example.com")
+        AICredentialsFactory(user=user)
+        content = self._invalid_post(user).content.decode()
+        assert self._stages_payload(content) == [
+            {"destination": "", "nights": 5},
+            {"destination": "Firenze", "nights": 2},
+        ]
+
+    def test_stages_form_initial_unbound(self):
+        assert WizardBasicsForm().stages_initial == []
+
+    def test_stages_form_initial_with_malformed_json(self):
+        form = WizardBasicsForm({"stages": "not json"})
+        assert form.stages_initial == []
+
+    def test_stages_form_initial_with_non_list_json(self):
+        form = WizardBasicsForm({"stages": '{"destination": "Roma"}'})
+        assert form.stages_initial == []

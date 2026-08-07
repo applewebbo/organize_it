@@ -76,13 +76,14 @@
            name="selected_photo_id"
            value="{{ form.selected_photo_id.value|default:'' }}">
 </div>
+{{ form.stages_initial|json_script:"wizard-stages-data" }}
 <script>
     function wizardStages() {
-        const initial = {{ form.stages.value|default:"null" }};
+        const initial = JSON.parse(document.getElementById('wizard-stages-data').textContent);
         return {
-            startDate: '{{ form.start_date.value|default:"" }}',
-            endDate: '{{ form.end_date.value|default:"" }}',
-            stages: Array.isArray(initial) && initial.length
+            startDate: '{{ form.start_date.value|default:""|escapejs }}',
+            endDate: '{{ form.end_date.value|default:""|escapejs }}',
+            stages: initial.length
                 ? initial
                 : [{ destination: '', nights: 1 }],
             addStage() {

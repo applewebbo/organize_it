@@ -28,6 +28,17 @@ class WizardBasicsForm(forms.Form):
     )
     stages = forms.CharField(widget=forms.HiddenInput())
 
+    @property
+    def stages_initial(self):
+        """Stage rows the client-side repeater hydrates from, so a failed
+        validation re-renders the stages the user typed (issue #425)."""
+        raw = self.data.get("stages") if self.is_bound else self.initial.get("stages")
+        try:
+            parsed = json.loads(raw)
+        except ValueError, TypeError:
+            return []
+        return parsed if isinstance(parsed, list) else []
+
     def clean_stages(self):
         raw = self.cleaned_data["stages"]
         try:
