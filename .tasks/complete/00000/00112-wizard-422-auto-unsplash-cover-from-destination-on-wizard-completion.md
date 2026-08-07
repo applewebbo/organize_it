@@ -1,0 +1,1 @@
+../../all/00000/00112-wizard-422-auto-unsplash-cover-from-destination-on-wizard-completion.md

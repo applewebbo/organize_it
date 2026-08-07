@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
+from django_q.tasks import async_task
 
 from accounts.models import get_profile
 from suggestions.ai.base import AISuggestionError
@@ -208,7 +209,18 @@ def wizard_finish(request, pk):
     """Mark the wizard draft complete and leave the wizard for the trip."""
     trip = _get_wizard_trip(request, pk)
     trip.wizard_completed = True
-    trip.save(update_fields=["wizard_completed"])
+    update_fields = ["wizard_completed"]
+    # No cover yet: pick one from the destination in the background (issue #422).
+    if not trip.image:
+        trip.image_metadata = {
+            "source": "unsplash",
+            "pending": True,
+            "auto_selected": True,
+        }
+        update_fields.append("image_metadata")
+    trip.save(update_fields=update_fields)
+    if "image_metadata" in update_fields:
+        async_task("trips.tasks.auto_select_trip_cover", trip.pk)
     return redirect("trips:trip-detail", pk=trip.pk)
 
 

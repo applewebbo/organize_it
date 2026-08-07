@@ -8,6 +8,7 @@ import pytest
 from tests.trips.factories import ExperienceFactory, StayFactory
 from trips.tasks import (
     _get_day_coords,
+    auto_select_trip_cover,
     calculate_day_transfer,
     download_trip_unsplash_photo,
     fetch_weather_for_active_trips,
@@ -68,6 +69,116 @@ class TestDownloadTripUnsplashPhoto:
         with patch("trips.utils.download_unsplash_photo", return_value=(b"data", {})):
             with patch("trips.utils.process_trip_image", return_value=None):
                 download_trip_unsplash_photo(trip.pk, MOCK_PHOTO_DATA)
+
+
+class TestAutoSelectTripCover:
+    """Wizard trips get an Unsplash cover picked automatically (issue #422)."""
+
+    def _fake_processed_image(self):
+        from io import BytesIO
+
+        from django.core.files.uploadedfile import InMemoryUploadedFile
+
+        return InMemoryUploadedFile(
+            BytesIO(b"processed"), "ImageField", "test.jpg", "image/jpeg", 1024, None
+        )
+
+    def test_attaches_first_photo_and_flags_auto_selection(
+        self, user_factory, trip_factory
+    ):
+        user = user_factory()
+        trip = trip_factory(
+            author=user,
+            destination="Lisbon",
+            image_metadata={"source": "unsplash", "pending": True},
+        )
+
+        with (
+            patch(
+                "trips.utils.search_unsplash_photos", return_value=[MOCK_PHOTO_DATA]
+            ) as mock_search,
+            patch(
+                "trips.utils.download_unsplash_photo",
+                return_value=(
+                    b"img_bytes",
+                    {"source": "unsplash", "photographer": "T"},
+                ),
+            ),
+            patch(
+                "trips.utils.process_trip_image",
+                return_value=self._fake_processed_image(),
+            ),
+        ):
+            auto_select_trip_cover(trip.pk)
+
+        mock_search.assert_called_once_with("Lisbon", per_page=1)
+        trip.refresh_from_db()
+        assert trip.image
+        assert trip.image_metadata["source"] == "unsplash"
+        assert trip.image_metadata["auto_selected"] is True
+        assert "pending" not in trip.image_metadata
+
+    def test_skips_if_trip_not_found(self):
+        auto_select_trip_cover(99999)  # no error
+
+    def test_skips_when_trip_already_has_an_image(self, user_factory, trip_factory):
+        user = user_factory()
+        trip = trip_factory(author=user, image_metadata={"source": "upload"})
+        trip.image.save("cover.jpg", self._fake_processed_image(), save=True)
+
+        with patch("trips.utils.search_unsplash_photos") as mock_search:
+            auto_select_trip_cover(trip.pk)
+
+        mock_search.assert_not_called()
+        trip.refresh_from_db()
+        assert trip.image_metadata == {"source": "upload"}
+
+    def test_clears_pending_when_no_photo_matches(self, user_factory, trip_factory):
+        user = user_factory()
+        trip = trip_factory(
+            author=user, image_metadata={"source": "unsplash", "pending": True}
+        )
+
+        with patch("trips.utils.search_unsplash_photos", return_value=None):
+            auto_select_trip_cover(trip.pk)
+
+        trip.refresh_from_db()
+        assert trip.image_metadata == {}
+        assert not trip.image
+
+    def test_clears_pending_when_download_fails(self, user_factory, trip_factory):
+        user = user_factory()
+        trip = trip_factory(
+            author=user, image_metadata={"source": "unsplash", "pending": True}
+        )
+
+        with (
+            patch("trips.utils.search_unsplash_photos", return_value=[MOCK_PHOTO_DATA]),
+            patch("trips.utils.download_unsplash_photo", return_value=(None, None)),
+        ):
+            auto_select_trip_cover(trip.pk)
+
+        trip.refresh_from_db()
+        assert trip.image_metadata == {}
+
+    def test_clears_pending_when_processing_fails(self, user_factory, trip_factory):
+        user = user_factory()
+        trip = trip_factory(
+            author=user, image_metadata={"source": "unsplash", "pending": True}
+        )
+
+        with (
+            patch("trips.utils.search_unsplash_photos", return_value=[MOCK_PHOTO_DATA]),
+            patch(
+                "trips.utils.download_unsplash_photo",
+                return_value=(b"data", {"source": "unsplash"}),
+            ),
+            patch("trips.utils.process_trip_image", return_value=None),
+        ):
+            auto_select_trip_cover(trip.pk)
+
+        trip.refresh_from_db()
+        assert trip.image_metadata == {}
 
 
 class TestFetchWeatherForActiveTrips:

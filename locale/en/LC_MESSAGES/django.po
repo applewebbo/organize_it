@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-05 16:46+0200\n"
+"POT-Creation-Date: 2026-08-06 12:10+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2111,6 +2111,11 @@ msgstr "No account found."
 #: templates/trips/includes/collab-search-result.html:33
 msgid "Invite by email"
 msgstr "Invite by email"
+
+#: templates/trips/includes/cover-ai-badge.html:3
+#: templates/trips/includes/cover-ai-badge.html:5
+msgid "Cover image selected automatically by AI"
+msgstr ""
 
 #: templates/trips/includes/create-stage-modal.html:12
 msgid "New Stage"

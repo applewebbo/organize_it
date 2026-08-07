@@ -1,6 +1,8 @@
 from datetime import timedelta
+from unittest.mock import patch
 
 import pytest
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils import timezone
 
 from suggestions.services import has_own_ai_key
@@ -91,6 +93,60 @@ class TestWizardEntryPoint(TestCase):
         self.assertNotContains(response, "trips/wizard/")
 
 
+class TestAutoSelectedCoverBadge(TestCase):
+    """The AI badge marks covers picked by the wizard (issue #422)."""
+
+    BADGE = "cover-ai-badge"
+
+    def _trip_with_cover(self, author, metadata):
+        trip = TripFactory(author=author, image_metadata=metadata)
+        trip.image.save(
+            "cover.jpg",
+            SimpleUploadedFile("cover.jpg", b"data", content_type="image/jpeg"),
+            save=True,
+        )
+        return trip
+
+    def test_detail_shows_badge_on_auto_selected_cover(self):
+        user = self.make_user("owner@example.com")
+        trip = self._trip_with_cover(
+            user, {"source": "unsplash", "auto_selected": True, "photographer": "T"}
+        )
+        with self.login(user):
+            response = self.get("trips:trip-detail", pk=trip.pk)
+        self.assertContains(response, self.BADGE)
+
+    def test_detail_hides_badge_on_manually_picked_cover(self):
+        user = self.make_user("owner@example.com")
+        trip = self._trip_with_cover(user, {"source": "unsplash", "photographer": "T"})
+        with self.login(user):
+            response = self.get("trips:trip-detail", pk=trip.pk)
+        self.assertNotContains(response, self.BADGE)
+
+    def test_image_status_fragment_shows_badge_when_ready(self):
+        user = self.make_user("owner@example.com")
+        trip = self._trip_with_cover(
+            user, {"source": "unsplash", "auto_selected": True}
+        )
+        with self.login(user):
+            response = self.get("trips:trip-image-status", pk=trip.pk)
+        self.assertContains(response, self.BADGE)
+
+    def test_image_status_fragment_hides_badge_while_pending(self):
+        user = self.make_user("owner@example.com")
+        trip = TripFactory(
+            author=user,
+            image_metadata={
+                "source": "unsplash",
+                "pending": True,
+                "auto_selected": True,
+            },
+        )
+        with self.login(user):
+            response = self.get("trips:trip-image-status", pk=trip.pk)
+        self.assertNotContains(response, self.BADGE)
+
+
 def _draft(author, **kwargs):
     return TripFactory(author=author, wizard_completed=False, wizard_step=3, **kwargs)
 
@@ -128,13 +184,44 @@ class TestWizardFinish(TestCase):
         user = self.make_user("owner@example.com")
         AICredentialsFactory(user=user)
         trip = _draft(user)
-        with self.login(user):
+        with self.login(user), patch("trips.views.wizard.async_task"):
             response = self.post("trips:wizard-finish", pk=trip.pk)
         self.assertRedirects(
             response, f"/trips/{trip.pk}", fetch_redirect_response=False
         )
         trip.refresh_from_db()
         assert trip.wizard_completed is True
+
+    def test_schedules_auto_cover_when_trip_has_no_image(self):
+        user = self.make_user("owner@example.com")
+        AICredentialsFactory(user=user)
+        trip = _draft(user, destination="Lisbon")
+        with self.login(user), patch("trips.views.wizard.async_task") as mock_task:
+            self.post("trips:wizard-finish", pk=trip.pk)
+
+        mock_task.assert_called_once_with("trips.tasks.auto_select_trip_cover", trip.pk)
+        trip.refresh_from_db()
+        assert trip.image_metadata == {
+            "source": "unsplash",
+            "pending": True,
+            "auto_selected": True,
+        }
+
+    def test_does_not_schedule_auto_cover_when_image_already_uploaded(self):
+        user = self.make_user("owner@example.com")
+        AICredentialsFactory(user=user)
+        trip = _draft(user, image_metadata={"source": "upload"})
+        trip.image.save(
+            "cover.jpg",
+            SimpleUploadedFile("cover.jpg", b"data", content_type="image/jpeg"),
+            save=True,
+        )
+        with self.login(user), patch("trips.views.wizard.async_task") as mock_task:
+            self.post("trips:wizard-finish", pk=trip.pk)
+
+        mock_task.assert_not_called()
+        trip.refresh_from_db()
+        assert trip.image_metadata == {"source": "upload"}
 
 
 class TestWizardCancel(TestCase):

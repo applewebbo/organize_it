@@ -14,4 +14,7 @@
          alt="{{ trip.title }}"
          class="h-full w-full object-cover"
          loading="lazy">
+    {% if trip.image_metadata.auto_selected %}
+        {% include "trips/includes/cover-ai-badge.html" %}
+    {% endif %}
 {% endif %}

@@ -1,4 +1,4 @@
-{% load static %}
+{% load i18n static %}
 {% if trip.image_metadata.pending %}
     <div id="trip-image-{{ trip.pk }}"
          class="bg-base-200 flex h-full w-full items-center justify-center"
@@ -13,6 +13,9 @@
          alt="{{ trip.title }}"
          class="h-full w-full object-cover"
          loading="{{ image_loading|default:'lazy' }}">
+    {% if trip.image_metadata.auto_selected %}
+        {% include "trips/includes/cover-ai-badge.html" %}
+    {% endif %}
 {% else %}
     <img src="{% static image_placeholder|default:'img/trip_generic.jpg' %}"
          alt="{{ trip.title }}"

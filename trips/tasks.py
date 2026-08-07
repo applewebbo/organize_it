@@ -15,30 +15,67 @@ from trips.weather import fetch_weather_for_trip
 logger = logging.getLogger("task")
 
 
-def download_trip_unsplash_photo(trip_pk, photo_data):
-    """Download and attach an Unsplash photo to a trip."""
+def _attach_unsplash_photo(trip, photo_data, extra_metadata=None):
+    """Download an Unsplash photo and store it as the trip cover.
+
+    Returns True when the photo was attached, False on any failure.
+    """
     from trips.utils import download_unsplash_photo, process_trip_image
 
+    image_content, metadata = download_unsplash_photo(photo_data)
+    if not image_content:
+        return False
+
+    processed_image = process_trip_image(image_content)
+    if not processed_image:
+        return False
+
+    photo_id = photo_data.get("id", "unknown")
+    filename = f"trip_{trip.pk}_{photo_id}.jpg"
+    trip.image.save(filename, processed_image, save=False)
+    trip.image_metadata = {**metadata, **(extra_metadata or {})}
+    trip.save(update_fields=["image", "image_metadata"])
+    logger.info("Unsplash photo %s attached to trip %s", photo_id, trip.pk)
+    return True
+
+
+def download_trip_unsplash_photo(trip_pk, photo_data):
+    """Download and attach an Unsplash photo to a trip."""
     try:
         trip = Trip.objects.get(pk=trip_pk)
     except Trip.DoesNotExist:
         logger.warning("download_trip_unsplash_photo: trip %s not found", trip_pk)
         return
 
-    image_content, metadata = download_unsplash_photo(photo_data)
-    if not image_content:
+    _attach_unsplash_photo(trip, photo_data)
+
+
+def auto_select_trip_cover(trip_pk):
+    """Pick an Unsplash cover for a trip from its destination, no user choice.
+
+    Used by the creation wizard (issue #422): the first matching photo wins and
+    the metadata is flagged as auto-selected so the UI can badge it. Any failure
+    clears the pending flag so the placeholder is shown instead of a spinner.
+    """
+    from trips.utils import search_unsplash_photos
+
+    try:
+        trip = Trip.objects.get(pk=trip_pk)
+    except Trip.DoesNotExist:
+        logger.warning("auto_select_trip_cover: trip %s not found", trip_pk)
         return
 
-    processed_image = process_trip_image(image_content)
-    if not processed_image:
+    # Never overwrite an image the user provided during the wizard.
+    if trip.image:
         return
 
-    photo_id = photo_data.get("id", "unknown")
-    filename = f"trip_{trip_pk}_{photo_id}.jpg"
-    trip.image.save(filename, processed_image, save=False)
-    trip.image_metadata = metadata
-    trip.save(update_fields=["image", "image_metadata"])
-    logger.info("Unsplash photo %s attached to trip %s", photo_id, trip_pk)
+    photos = search_unsplash_photos(trip.destination, per_page=1)
+    if not photos or not _attach_unsplash_photo(
+        trip, photos[0], {"auto_selected": True}
+    ):
+        logger.info("auto_select_trip_cover: no cover found for trip %s", trip_pk)
+        trip.image_metadata = {}
+        trip.save(update_fields=["image_metadata"])
 
 
 def populate_trips():

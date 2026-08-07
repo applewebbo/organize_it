@@ -1,0 +1,1 @@
+../../all/00000/00113-wizard-422-ai-badge-on-auto-selected-cover.md
