@@ -46,8 +46,8 @@
             <!-- Messages -->
             <div id="messages" class="z-3">{% include 'includes/messages.html' %}</div>
         </div>
-        <!-- Htmx -->
-        <script src="{% static 'js/htmx.min.js' %}" defer></script>
+        <!-- Htmx (served by django-htmx, includes the debug script in DEBUG mode) -->
+        {% htmx_script %}
         <!-- SortableJS -->
         <script src="{% static 'js/sortable.js' %}" defer></script>
         <!-- Main.js must load before Alpine to register alpine:init listener -->
@@ -56,7 +56,6 @@
         <script src="{% static 'js/alpine-collapse.min.js' %}" defer></script>
         <script src="{% static 'js/alpine-focus.min.js' %}" defer></script>
         <script src="{% static 'js/alpine.min.js' %}" defer></script>
-        {% django_htmx_script %}
         {% block script %}
         {% endblock script %}
     </body>

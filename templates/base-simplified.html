@@ -29,13 +29,12 @@
         </section>
         <!-- Messages -->
         <div id="messages" class="z-3">{% include 'includes/messages.html' %}</div>
-        <!-- Htmx -->
-        <script src="https://unpkg.com/htmx.org@latest"></script>
+        <!-- Htmx (served by django-htmx, includes the debug script in DEBUG mode) -->
+        {% htmx_script %}
+        <!-- Main.js must load before Alpine to register alpine:init listener -->
+        <script src="{% static 'js/main.js' %}" defer></script>
         <!-- Alpine.js -->
-        <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-        <!-- Custom.js -->
-        <script src="{% static 'js/main.js' %}"></script>
-        {% django_htmx_script %}
+        <script src="{% static 'js/alpine.min.js' %}" defer></script>
         {% block script %}
         {% endblock script %}
     </body>

@@ -76,6 +76,40 @@ check_phosphor:
 [group('setup')]
 phosphor: update_phosphor check_phosphor
 
+# Download or update the vendored Alpine.js core + plugins (collapse, focus)
+[group('setup')]
+update_js:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    STATIC_DIR="static/js"
+    VERSION_FILE="static/js/.alpine-version"
+
+    get_latest() { curl -sf "https://registry.npmjs.org/$1/latest" | python3 -c "import sys,json; print(json.load(sys.stdin)['version'])"; }
+
+    ALPINE_LATEST=$(get_latest alpinejs)
+    COLLAPSE_LATEST=$(get_latest @alpinejs/collapse)
+    FOCUS_LATEST=$(get_latest @alpinejs/focus)
+    LATEST="alpine=$ALPINE_LATEST collapse=$COLLAPSE_LATEST focus=$FOCUS_LATEST"
+
+    CURRENT=""
+    if [ -f "$VERSION_FILE" ]; then
+        CURRENT=$(cat "$VERSION_FILE")
+    fi
+
+    if [ "$CURRENT" = "$LATEST" ]; then
+        echo "✓ Alpine.js ($LATEST) already up to date"
+        exit 0
+    fi
+
+    echo "⬇️  Updating Alpine.js: ${CURRENT:-none} → $LATEST"
+
+    curl -sf "https://cdn.jsdelivr.net/npm/alpinejs@${ALPINE_LATEST}/dist/cdn.min.js" -o "$STATIC_DIR/alpine.min.js"
+    curl -sf "https://cdn.jsdelivr.net/npm/@alpinejs/collapse@${COLLAPSE_LATEST}/dist/cdn.min.js" -o "$STATIC_DIR/alpine-collapse.min.js"
+    curl -sf "https://cdn.jsdelivr.net/npm/@alpinejs/focus@${FOCUS_LATEST}/dist/cdn.min.js" -o "$STATIC_DIR/alpine-focus.min.js"
+
+    echo "$LATEST" > "$VERSION_FILE"
+    echo "✓ Alpine.js ($LATEST) installed in $STATIC_DIR"
+
 # Update a specific package
 [group('setup')]
 @update *args:
