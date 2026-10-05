@@ -87,7 +87,12 @@ omit = ['*/node_modules/*', '*/venv/*', '*/migrations/*', '*/tests/*', '*/test_*
 # H025: djLint misparses closing </style>/</script> of embedded blocks whose
 # inner content is indented less than the tag as orphans (9 email/PDF/script
 # templates). djade does not reindent HTML, so ignore it globally.
-ignore = "T002,H006,H025"
+# H043 (new in djLint 1.46): flags every <button> without an explicit type
+# attribute. The codebase has 100+ such buttons (mostly hx-get/Alpine toggles
+# inside forms); auditing each one's intended type is a dedicated task, not a
+# side effect of a dependency bump, so ignore it globally until that audit
+# (tracked separately).
+ignore = "T002,H006,H025,H043"
 profile = "django"
 
 [tool.pytest.ini_options]

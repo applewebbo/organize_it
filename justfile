@@ -13,11 +13,11 @@ default:
 [group('setup')]
 @install:
     uv sync
-# Update dependencies and pre-commit hooks
+# Update dependencies, vendored JS libs and pre-commit hooks
 [group('setup')]
-@update_all: lock
+@update_all: lock update_js
     uv sync --all-extras --upgrade
-    uvx --with pre-commit-uv prek auto-update
+    uvx --with pre-commit-uv prek update
 
 # Download or update self-hosted Phosphor Icons (bold variant)
 [group('setup')]

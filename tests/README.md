@@ -131,6 +131,7 @@ class TestMyView(TestCase):
     - self.response_302(response) - Assert redirect
     - self.response_404(response) - Assert not found
     """
+
     pass
 ```
 
@@ -201,6 +202,7 @@ All factories in `tests/*/factories.py` are automatically available as fixtures:
 # - meal_factory
 # - stay_factory
 # etc.
+
 
 def test_with_factories(user_factory, trip_factory):
     user = user_factory(email="test@example.com")
@@ -375,8 +377,11 @@ name. Factories (`*Factory`) and the shared `tests.test.TestCase` base are exclu
 # Good
 class TestTripCreateView(TestCase): ...
 
+
 # Avoid
 class TripCreateView(TestCase): ...
+
+
 class TripCreateViewTest(TestCase): ...
 ```
 
@@ -386,6 +391,7 @@ class TripCreateViewTest(TestCase): ...
 # Good: Describes what is being tested
 def test_trip_status_changes_to_in_progress_when_start_date_is_today(self):
     pass
+
 
 # Avoid: Vague names
 def test_status(self):
@@ -411,6 +417,7 @@ def test_trip_list(self):
     trip1 = TripFactory(author=user)
     trip2 = TripFactory(author=user)
     # ... test ...
+
 
 # Avoid: Depends on other tests
 class TestTrip(TestCase):
