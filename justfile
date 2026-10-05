@@ -142,10 +142,10 @@ fresh: clean install
 @local:
     uv run python manage.py tailwind runserver
 
-# Run development server + worker with Overmind
+# Run development server + worker with mprocs (now `dekit`, upstream renamed the project)
 [group('development')]
 @serve:
-    mprocs -c mprocs-local.yaml
+    dekit mprocs -c mprocs-local.yaml
 
 # Add dummy trips to the database
 [group('development')]
