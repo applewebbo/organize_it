@@ -48,9 +48,6 @@ def geocode_location(name, city):
     # Rate limit check to avoid hitting Nominatim too fast
     rate_limit_check()
 
-    time.sleep(
-        1
-    )  # Ensure at least 1 second between requests for showing a meaningfiul indicator on the frontend
     url = "https://nominatim.openstreetmap.org/search"
     params = {
         "q": f"{name.strip()}, {city.strip()}",
@@ -156,7 +153,6 @@ def geocode_city(query):
         return cached
 
     rate_limit_check()
-    time.sleep(1)
 
     url = "https://nominatim.openstreetmap.org/search"
     params = {
