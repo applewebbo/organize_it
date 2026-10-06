@@ -13,7 +13,8 @@
                 <h2 class="text-xl font-medium sm:text-2xl">{% translate 'Things to Do' %}</h2>
                 {# Map tab only on desktop (sm+) #}
                 <div role="tablist" class="tabs tabs-border tabs-sm hidden sm:flex">
-                    <button role="tab"
+                    <button type="button"
+                            role="tab"
                             :class="view === 'list' ? 'tab-active' : ''"
                             @click="view = 'list'"
                             hx-get="{% url 'trips:trip-events-list' trip.pk %}"
@@ -23,7 +24,8 @@
                         <i class="ph-bold ph-list i-sm" aria-hidden="true"></i>
                         {% translate 'List' %}
                     </button>
-                    <button role="tab"
+                    <button type="button"
+                            role="tab"
                             :class="view === 'map' ? 'tab-active' : ''"
                             @click="view = 'map'"
                             hx-get="{% url 'trips:trip-events-map' trip.pk %}"

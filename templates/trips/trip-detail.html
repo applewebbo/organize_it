@@ -15,7 +15,8 @@
                 {% blocktranslate %}The trip creator shared their AI key with you: enable AI suggestions in your settings to generate suggestions for this trip using it.{% endblocktranslate %}
             </span>
             <div>
-                <button class="btn btn-sm btn-ghost"
+                <button type="button"
+                        class="btn btn-sm btn-ghost"
                         hx-post="{% url 'suggestions:dismiss-shared-key-notice' trip.id %}"
                         hx-target="#shared-key-notice"
                         hx-swap="delete">{% translate 'Dismiss' %}</button>
@@ -30,7 +31,8 @@
             <i class="ph-bold ph-warning i-md"></i>
             <span>{% translate "This trip is archived and cannot be modified." %}</span>
             <div>
-                <button class="btn btn-sm btn-warning"
+                <button type="button"
+                        class="btn btn-sm btn-warning"
                         hx-get="{% url 'trips:trip-unarchive' trip.id %}"
                         hx-target="">{% translate 'Unarchive' %}</button>
             </div>

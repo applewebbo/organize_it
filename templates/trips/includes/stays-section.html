@@ -41,7 +41,8 @@
                             </ul>
                         </div>
                     {% elif request.user == trip.author %}
-                        <button class="btn btn-xs btn-soft btn-primary sm:btn-sm"
+                        <button type="button"
+                                class="btn btn-xs btn-soft btn-primary sm:btn-sm"
                                 x-data
                                 hx-get="{% url 'trips:add-stay-for-trip' trip.pk %}"
                                 hx-target="#dialog"
@@ -52,7 +53,8 @@
                             <span class="hidden sm:inline">{% translate 'Add stay' %}</span>
                         </button>
                     {% elif stay22_on %}
-                        <button class="btn btn-xs btn-soft btn-primary sm:btn-sm"
+                        <button type="button"
+                                class="btn btn-xs btn-soft btn-primary sm:btn-sm"
                                 x-data
                                 hx-get="{% url 'trips:stay-booking-modal' trip.pk %}"
                                 hx-target="#dialog"
@@ -139,7 +141,8 @@
                                             <span class="hidden sm:inline">{% translate "Get directions" %}</span>
                                         </a>
                                     {% endif %}
-                                    <button class="btn btn-xs btn-stay-card sm:btn-sm"
+                                    <button type="button"
+                                            class="btn btn-xs btn-stay-card sm:btn-sm"
                                             hx-get="{% url 'trips:attachment-upload-modal' trip.pk 'stay' %}?object_id={{ stay.pk }}"
                                             hx-target="#dialog"
                                             hx-swap="innerHTML"

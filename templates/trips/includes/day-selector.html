@@ -9,7 +9,8 @@
     </h3>
     <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
         {% for day in days %}
-            <button class="border-base-300 hover:bg-base-200 flex flex-col items-start gap-0.5 rounded-lg border p-3 text-left transition-colors"
+            <button type="button"
+                    class="border-base-300 hover:bg-base-200 flex flex-col items-start gap-0.5 rounded-lg border p-3 text-left transition-colors"
                     hx-get="{% if category == 'experience' %}{% url 'trips:add-experience' day.pk %}{% else %}{% url 'trips:add-meal' day.pk %}{% endif %}"
                     hx-target="#dialog"
                     hx-swap="innerHTML">

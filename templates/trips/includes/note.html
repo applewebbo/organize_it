@@ -2,14 +2,18 @@
 <div id="note" class="py-2 sm:col-span-2">
     {{ element.notes }}
     <div class="mt-2 flex justify-end gap-2">
-        <button class="btn btn-sm btn-soft btn-primary"
+        <button type="button"
+                class="btn btn-sm btn-soft btn-primary"
                 hx-post="{% url modify_url element.pk %}"
                 hx-target="#dialog"
                 hx-swap="innerHTML">{% translate 'Edit' %}</button>
-        <button class="btn btn-sm btn-soft btn-error"
+        <button type="button"
+                class="btn btn-sm btn-soft btn-error"
                 hx-post="{% url delete_url element.pk %}"
                 hx-target="#dialog"
                 hx-swap="innerHTML">{% translate 'Delete' %}</button>
-        <button class="btn btn-sm btn-soft" x-on:click="openModal = false">{% translate 'Close' %}</button>
+        <button type="button"
+                class="btn btn-sm btn-soft"
+                x-on:click="openModal = false">{% translate 'Close' %}</button>
     </div>
 </div>

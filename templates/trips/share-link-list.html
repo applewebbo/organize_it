@@ -22,11 +22,13 @@
                             {% endif %}
                         </td>
                         <td class="flex gap-2">
-                            <button class="btn btn-xs btn-ghost"
+                            <button type="button"
+                                    class="btn btn-xs btn-ghost"
                                     onclick="navigator.clipboard.writeText('{{ request.scheme }}://{{ request.get_host }}{{ link.get_absolute_url }}')">
                                 <i class="ph-bold ph-copy"></i>
                             </button>
-                            <button class="btn btn-xs btn-error btn-soft"
+                            <button type="button"
+                                    class="btn btn-xs btn-error btn-soft"
                                     hx-post="{% url 'trips:share-link-revoke' link.id %}"
                                     hx-target="closest tr"
                                     hx-swap="outerHTML">

@@ -20,7 +20,8 @@
             <button id="form-submit"
                     class="btn btn-sm btn-soft btn-primary"
                     type="submit">{% translate 'Save' %}</button>
-            <button class="btn btn-sm btn-soft btn-error"
+            <button type="button"
+                    class="btn btn-sm btn-soft btn-error"
                     hx-post="{% url 'trips:stay-note-delete' stay.pk %}"
                     hx-target="#dialog"
                     hx-swap="innerHTML">{% translate 'Delete' %}</button>

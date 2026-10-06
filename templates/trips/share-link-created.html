@@ -21,7 +21,8 @@
                    class="input input-bordered input-sm flex-1"
                    value="{{ request.scheme }}://{{ request.get_host }}{{ link.get_absolute_url }}"
                    readonly>
-            <button class="btn btn-sm"
+            <button type="button"
+                    class="btn btn-sm"
                     :class="copied ? 'btn-success' : 'btn-primary'"
                     @click="navigator.clipboard.writeText($el.previousElementSibling.value); copied = true; setTimeout(() => copied = false, 2000)">
                 <i class="ph-bold" :class="copied ? 'ph-check' : 'ph-copy'"></i>
@@ -35,7 +36,8 @@
             <p class="text-base-content/60 mt-1 text-xs">{% translate "Never expires" %}</p>
         {% endif %}
         <div class="mt-4 flex justify-end">
-            <button class="btn btn-ghost btn-sm"
+            <button type="button"
+                    class="btn btn-ghost btn-sm"
                     hx-get="{% url 'trips:share-link-create' trip.id %}"
                     hx-target="#share-modal-content"
                     hx-swap="outerHTML">

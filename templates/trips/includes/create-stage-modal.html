@@ -2,7 +2,8 @@
 <div class="p-4 sm:p-6"
      x-data="{ destination: '', destinationLat: '', destinationLon: '', citySelected: false, selectCity(name, lat, lon) { this.destination = name; this.destinationLat = lat; this.destinationLon = lon; this.citySelected = true; htmx.find('#city-results').innerHTML = ''; } }">
     <div class="mb-4 flex items-center gap-2">
-        <button class="btn btn-sm btn-ghost btn-circle"
+        <button type="button"
+                class="btn btn-sm btn-ghost btn-circle"
                 hx-get="{% url 'trips:trip-destinations' trip.pk %}"
                 hx-target="#dialog"
                 hx-swap="innerHTML"
@@ -10,7 +11,8 @@
             <i class="ph-bold ph-arrow-left i-sm"></i>
         </button>
         <h3 class="flex-1 text-lg font-semibold">{% translate "New Stage" %}</h3>
-        <button class="btn btn-sm btn-ghost btn-circle"
+        <button type="button"
+                class="btn btn-sm btn-ghost btn-circle"
                 @click="$dispatch('hide-modal')"
                 aria-label="{% translate 'Close' %}">
             <i class="ph-bold ph-x i-md"></i>

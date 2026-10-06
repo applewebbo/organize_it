@@ -109,19 +109,22 @@
                                         </div>
                                     {% endif %}
                                     <div class="grid grid-cols-2 gap-2">
-                                        <button class="btn btn-sm btn-warning btn-soft"
+                                        <button type="button"
+                                                class="btn btn-sm btn-warning btn-soft"
                                                 hx-get="{% url 'trips:trip-archive' trip.id %}"
                                                 hx-target="">
                                             <i class="ph-bold ph-archive" aria-hidden="true"></i>
                                             <span>{% translate 'Archive' %}</span>
                                         </button>
-                                        <button class="btn btn-sm btn-error btn-soft"
+                                        <button type="button"
+                                                class="btn btn-sm btn-error btn-soft"
                                                 hx-delete="{% url 'trips:trip-delete' trip.id %}"
                                                 hx-confirm="Are you sure you want to delete {{ trip.title }}?">
                                             <i class="ph-bold ph-trash" aria-hidden="true"></i>
                                             <span>{% translate 'Delete' %}</span>
                                         </button>
-                                        <button class="btn btn-sm btn-soft"
+                                        <button type="button"
+                                                class="btn btn-sm btn-soft"
                                                 x-data
                                                 hx-get="{% url 'trips:share-link-create' trip.id %}"
                                                 hx-target="#dialog"
@@ -237,10 +240,12 @@
                                         {% endif %}
                                     </div>
                                     <div class="card-actions justify-end gap-1">
-                                        <button class="btn btn-xs btn-warning btn-soft"
+                                        <button type="button"
+                                                class="btn btn-xs btn-warning btn-soft"
                                                 hx-get="{% url 'trips:trip-unarchive' trip.id %}"
                                                 hx-target="">{% translate 'Unarchive' %}</button>
-                                        <button class="btn btn-xs btn-error btn-soft"
+                                        <button type="button"
+                                                class="btn btn-xs btn-error btn-soft"
                                                 hx-delete="{% url 'trips:trip-delete' trip.id %}"
                                                 hx-confirm="Are you sure you want to delete {{ trip.title }}?">
                                             {% translate 'Delete' %}

@@ -6,7 +6,8 @@
         <h2 class="text-xl font-semibold tracking-tight sm:hidden">{{ trip.title }}</h2>
         <div x-data class="flex gap-1.5 sm:hidden">
             {% if trip.status != 5 and request.user == trip.author %}
-                <button class="btn btn-xs btn-soft btn-primary"
+                <button type="button"
+                        class="btn btn-xs btn-soft btn-primary"
                         hx-get="{% url 'trips:trip-destinations' trip.pk %}"
                         hx-target="#dialog"
                         hx-swap="innerHTML"
@@ -14,7 +15,8 @@
                         aria-label="{% translate 'Manage stages' %}">
                     <i class="ph-bold ph-line-segments i-sm" aria-hidden="true"></i>
                 </button>
-                <button class="btn btn-xs btn-soft"
+                <button type="button"
+                        class="btn btn-xs btn-soft"
                         hx-get="{% url 'trips:trip-update' trip.pk %}"
                         hx-target="#dialog"
                         hx-swap="innerHTML"
@@ -24,7 +26,8 @@
                 </button>
             {% endif %}
             <div class="dropdown dropdown-end">
-                <button tabindex="0"
+                <button type="button"
+                        tabindex="0"
                         class="btn btn-xs btn-soft"
                         aria-label="{% translate 'Share & Export' %}">
                     <i class="ph-bold ph-share-network i-sm" aria-hidden="true"></i>
@@ -33,7 +36,8 @@
                     class="dropdown-content menu bg-base-100 rounded-box z-10 w-48 p-2 shadow">
                     {% if trip.status != 5 and request.user == trip.author %}
                         <li>
-                            <button hx-get="{% url 'trips:share-link-create' trip.pk %}"
+                            <button type="button"
+                                    hx-get="{% url 'trips:share-link-create' trip.pk %}"
                                     hx-target="#dialog"
                                     hx-swap="innerHTML"
                                     @click="$dispatch('open-modal'); document.activeElement.blur()">
@@ -57,7 +61,8 @@
                     </li>
                     {% if request.user == trip.author %}
                         <li>
-                            <button hx-get="{% url 'trips:trip-calendar-settings' trip.pk %}"
+                            <button type="button"
+                                    hx-get="{% url 'trips:trip-calendar-settings' trip.pk %}"
                                     hx-target="#dialog"
                                     hx-swap="innerHTML"
                                     @click="$dispatch('open-modal'); document.activeElement.blur()">
@@ -77,7 +82,8 @@
             {% with collaborations=trip.collaborations.all %}
                 {% if trip.status != 5 %}
                     {% if request.user == trip.author or collaborations %}
-                        <button class="btn btn-md btn-soft btn-primary"
+                        <button type="button"
+                                class="btn btn-md btn-soft btn-primary"
                                 hx-get="{% url 'trips:trip-destinations' trip.pk %}"
                                 hx-target="#dialog"
                                 hx-swap="innerHTML"
@@ -96,7 +102,8 @@
                 {% endif %}
             {% endwith %}
             {% if trip.status != 5 and request.user == trip.author %}
-                <button class="btn btn-md btn-soft"
+                <button type="button"
+                        class="btn btn-md btn-soft"
                         hx-get="{% url 'trips:trip-update' trip.pk %}"
                         hx-target="#dialog"
                         hx-swap="innerHTML"
@@ -107,7 +114,8 @@
                 </button>
             {% endif %}
             <div class="dropdown dropdown-end">
-                <button tabindex="0"
+                <button type="button"
+                        tabindex="0"
                         class="btn btn-md btn-soft"
                         aria-label="{% translate 'Share & Export' %}">
                     <i class="ph-bold ph-share-network i-lg" aria-hidden="true"></i>
@@ -117,7 +125,8 @@
                     class="dropdown-content menu bg-base-100 rounded-box z-10 w-48 p-2 shadow">
                     {% if trip.status != 5 and request.user == trip.author %}
                         <li>
-                            <button hx-get="{% url 'trips:share-link-create' trip.pk %}"
+                            <button type="button"
+                                    hx-get="{% url 'trips:share-link-create' trip.pk %}"
                                     hx-target="#dialog"
                                     hx-swap="innerHTML"
                                     @click="$dispatch('open-modal'); document.activeElement.blur()">
@@ -141,7 +150,8 @@
                     </li>
                     {% if request.user == trip.author %}
                         <li>
-                            <button hx-get="{% url 'trips:trip-calendar-settings' trip.pk %}"
+                            <button type="button"
+                                    hx-get="{% url 'trips:trip-calendar-settings' trip.pk %}"
                                     hx-target="#dialog"
                                     hx-swap="innerHTML"
                                     @click="$dispatch('open-modal'); document.activeElement.blur()">

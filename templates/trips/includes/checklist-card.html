@@ -31,7 +31,8 @@
                     <div class="space-y-0.5">
                         {% for item in items %}
                             {% if not item.completed %}
-                                <button class="hover:bg-base-300 flex w-full items-center gap-2 rounded-lg px-2 py-1 text-left text-sm transition-colors"
+                                <button type="button"
+                                        class="hover:bg-base-300 flex w-full items-center gap-2 rounded-lg px-2 py-1 text-left text-sm transition-colors"
                                         hx-put="{% url 'trips:checklist-item-toggle' item.pk %}"
                                         hx-swap="none">
                                     <i class="ph ph-circle text-base-content/40 shrink-0"></i>
@@ -46,7 +47,8 @@
                     <div class="space-y-0.5">
                         {% for item in items %}
                             {% if item.completed %}
-                                <button class="hover:bg-base-300 flex w-full items-center gap-2 rounded-lg px-2 py-1 text-left text-sm transition-colors"
+                                <button type="button"
+                                        class="hover:bg-base-300 flex w-full items-center gap-2 rounded-lg px-2 py-1 text-left text-sm transition-colors"
                                         hx-put="{% url 'trips:checklist-item-toggle' item.pk %}"
                                         hx-swap="none">
                                     <i class="ph ph-check-circle text-success shrink-0"></i>

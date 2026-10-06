@@ -30,7 +30,8 @@
         </ul>
     </div>
 {% else %}
-    <button class="btn btn-lg btn-primary btn-dash py-8 md:py-12"
+    <button type="button"
+            class="btn btn-lg btn-primary btn-dash py-8 md:py-12"
             id="trip-add"
             x-data
             hx-get="{% url 'trips:trip-create' %}"

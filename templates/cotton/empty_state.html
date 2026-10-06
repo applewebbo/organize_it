@@ -15,7 +15,8 @@
         {% translate "Start planning your perfect trip. Organize stays, experiences, meals and transfers all in one place." %}
     </p>
     <!-- Prominent CTA Button -->
-    <button x-data
+    <button type="button"
+            x-data
             hx-get="{% url 'trips:trip-create' %}?next=list"
             hx-target="#dialog"
             hx-swap="innerHTML"

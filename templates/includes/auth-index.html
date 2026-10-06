@@ -82,7 +82,8 @@
         {% endif %}
         <!-- Toggle Guide Button for users with trips -->
         <div class="mb-2 flex justify-center">
-            <button class="btn btn-sm btn-ghost gap-2"
+            <button type="button"
+                    class="btn btn-sm btn-ghost gap-2"
                     hx-post="{% url 'trips:toggle-guide' %}"
                     hx-swap="none"
                     hx-on::after-request="location.reload()"

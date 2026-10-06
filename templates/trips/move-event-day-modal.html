@@ -11,7 +11,8 @@
 <div class="p-4 md:p-5">
     <div class="flex flex-wrap gap-2">
         {% for day in days %}
-            <button class="btn btn-sm btn-soft"
+            <button type="button"
+                    class="btn btn-sm btn-soft"
                     hx-post="{% url 'trips:move-event-to-day' event.pk day.pk %}"
                     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                     @click="openModal = false">

@@ -18,7 +18,8 @@
                             {% if cat.attachments %}<span class="badge badge-outline badge-sm">{{ cat.attachments|length }}</span>{% endif %}
                         </h3>
                         {% if trip.status != 5 and cat.enabled %}
-                            <button class="btn btn-xs btn-soft btn-primary"
+                            <button type="button"
+                                    class="btn btn-xs btn-soft btn-primary"
                                     x-data
                                     hx-get="{% url 'trips:attachment-upload-modal' trip.pk cat.key %}"
                                     hx-target="#dialog"
@@ -35,7 +36,8 @@
                                 <li class="bg-base-100 flex items-center gap-2 rounded-lg px-2 py-1 text-sm">
                                     <i class="ph {% if att.is_pdf %}ph-file-pdf{% else %}ph-image{% endif %} text-primary shrink-0"
                                        aria-hidden="true"></i>
-                                    <button class="link link-hover flex-1 truncate text-left"
+                                    <button type="button"
+                                            class="link link-hover flex-1 truncate text-left"
                                             x-data
                                             hx-get="{% url 'trips:attachment-preview' att.pk %}"
                                             hx-target="#dialog"
@@ -43,7 +45,8 @@
                                             @click="$dispatch('open-modal'); document.activeElement.blur()">
                                         {{ att.original_name }}
                                     </button>
-                                    <button class="btn btn-xs btn-error btn-soft"
+                                    <button type="button"
+                                            class="btn btn-xs btn-error btn-soft"
                                             hx-delete="{% url 'trips:attachment-delete' att.pk %}"
                                             hx-confirm="{% translate 'Delete this document?' %}"
                                             hx-swap="none"

@@ -10,7 +10,8 @@
                    hx-target="#checklist-list"
                    hx-swap="outerHTML">
             <span class="flex-1 {% if item.completed %}line-through opacity-50{% endif %}">{{ item.text }}</span>
-            <button class="btn btn-ghost btn-xs text-error"
+            <button type="button"
+                    class="btn btn-ghost btn-xs text-error"
                     hx-delete="{% url 'trips:checklist-item-delete' item.pk %}"
                     hx-target="#checklist-list"
                     hx-swap="outerHTML"

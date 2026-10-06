@@ -42,7 +42,8 @@
                             </a>
                             <span class="badge badge-sm badge-success">{{ locations.arrival_transfer.end_time|time:"H:i" }}</span>
                         </div>
-                        <button class="btn btn-xs btn-outline"
+                        <button type="button"
+                                class="btn btn-xs btn-outline"
                                 hx-get="{% url 'trips:edit-main-transfer' pk=locations.arrival_transfer.pk %}"
                                 @click="$dispatch('open-modal'); document.activeElement.blur()"
                                 hx-target="#dialog"
@@ -68,7 +69,8 @@
                                     <span class="badge badge-sm badge-outline badge-error">{{ locations.stay.check_out|time:"H:i" }}</span>
                                 {% endif %}
                             </div>
-                            <button class="btn btn-xs btn-outline relative"
+                            <button type="button"
+                                    class="btn btn-xs btn-outline relative"
                                     hx-get="{% url 'trips:stay-notes' locations.stay.pk %}"
                                     @click="$dispatch('open-modal'); document.activeElement.blur()"
                                     hx-target="#dialog"
@@ -117,7 +119,8 @@
                             </a>
                             <span class="badge badge-sm badge-error">{{ locations.departure_transfer.start_time|time:"H:i" }}</span>
                         </div>
-                        <button class="btn btn-xs btn-outline"
+                        <button type="button"
+                                class="btn btn-xs btn-outline"
                                 hx-get="{% url 'trips:edit-main-transfer' pk=locations.departure_transfer.pk %}"
                                 @click="$dispatch('open-modal'); document.activeElement.blur()"
                                 hx-target="#dialog"

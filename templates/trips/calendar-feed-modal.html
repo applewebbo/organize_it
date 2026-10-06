@@ -24,7 +24,8 @@
                    class="flex-1 border-none bg-transparent text-sm outline-none"
                    value="{{ request.scheme }}://{{ request.get_host }}{% url 'trips:trip-ical' trip.calendar_token %}"
                    readonly>
-            <button x-data="{ copied: false }"
+            <button type="button"
+                    x-data="{ copied: false }"
                     class="btn btn-xs btn-soft shrink-0"
                     :class="copied ? 'btn-success' :"
                     :title="copied ? '{% translate "Copied!" %}' : '{% translate "Copy link" %}'"

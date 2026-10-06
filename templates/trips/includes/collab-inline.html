@@ -10,7 +10,8 @@
             <div class="flex items-center justify-between">
                 <h2 class="text-xl font-medium sm:text-2xl">{% translate "Participants" %}</h2>
                 {% if request.user == trip.author and trip.status != 5 %}
-                    <button class="btn btn-xs btn-soft btn-primary sm:btn-sm"
+                    <button type="button"
+                            class="btn btn-xs btn-soft btn-primary sm:btn-sm"
                             hx-get="{% url 'trips:collaborators-modal' trip.pk %}"
                             hx-target="#dialog"
                             hx-swap="innerHTML"

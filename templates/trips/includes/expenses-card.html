@@ -5,7 +5,8 @@
             <h2 class="card-title text-xl font-semibold">{% translate "Expenses" %}</h2>
             <div class="flex items-center gap-2">
                 {% if trip.expenses_enabled %}
-                    <button class="btn btn-ghost btn-sm gap-1"
+                    <button type="button"
+                            class="btn btn-ghost btn-sm gap-1"
                             hx-get="{% url 'trips:expense-settings' trip.pk %}"
                             hx-target="#dialog"
                             @click="$dispatch('open-modal'); document.activeElement.blur()"
@@ -59,14 +60,16 @@
                 <p class="text-base-content/50 mt-3 text-center text-sm sm:text-left">{% translate "Everyone is settled up." %}</p>
             {% endif %}
             <div class="card-actions mt-4 justify-end">
-                <button class="btn btn-outline btn-sm gap-1"
+                <button type="button"
+                        class="btn btn-outline btn-sm gap-1"
                         hx-get="{% url 'trips:expenses-modal' trip.pk %}"
                         hx-target="#dialog"
                         @click="$dispatch('open-modal'); document.activeElement.blur()">
                     <i class="ph-bold ph-list-magnifying-glass"></i>
                     {% translate "Details" %}
                 </button>
-                <button class="btn btn-primary btn-sm gap-1"
+                <button type="button"
+                        class="btn btn-primary btn-sm gap-1"
                         hx-get="{% url 'trips:expense-create' trip.pk %}"
                         hx-target="#dialog"
                         @click="$dispatch('open-modal'); document.activeElement.blur()">

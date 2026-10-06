@@ -11,7 +11,8 @@
 <div class="p-4 md:p-5">
     <div class="flex flex-wrap gap-2">
         {% for other in other_events %}
-            <button class="btn btn-sm border {{ other|event_border_color }} {{ other|event_bg_color }} {{ other|event_icon_color }} hover:opacity-80"
+            <button type="button"
+                    class="btn btn-sm border {{ other|event_border_color }} {{ other|event_bg_color }} {{ other|event_icon_color }} hover:opacity-80"
                     hx-post="{% url 'trips:swap-event-order' event.pk %}"
                     hx-vals='{"other_event_id": "{{ other.pk }}"}'
                     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'

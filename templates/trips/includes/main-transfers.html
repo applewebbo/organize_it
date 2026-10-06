@@ -82,7 +82,8 @@
                                 {% endif %}
                             </div>
                         {% else %}
-                            <button class="btn btn-xs btn-primary sm:btn-sm"
+                            <button type="button"
+                                    class="btn btn-xs btn-primary sm:btn-sm"
                                     hx-get="{% url 'trips:arrival-transfer-modal' trip.pk %}"
                                     hx-target="#dialog"
                                     hx-swap="innerHTML"
@@ -139,7 +140,8 @@
                                 {% endif %}
                                 <div class="ms-auto flex flex-wrap items-center justify-end gap-1">
                                     {# Note #}
-                                    <button class="btn btn-xs btn-soft"
+                                    <button type="button"
+                                            class="btn btn-xs btn-soft"
                                             x-data
                                             hx-get="{% url 'trips:attachment-upload-modal' trip.pk 'main' %}?object_id={{ arrival_transfer.pk }}"
                                             hx-target="#dialog"
@@ -150,7 +152,8 @@
                                         <span class="hidden sm:inline">{% translate "Add document" %}</span>
                                     </button>
                                     {# Transfer connection #}
-                                    <button class="btn btn-xs btn-soft"
+                                    <button type="button"
+                                            class="btn btn-xs btn-soft"
                                             hx-get="{% url 'trips:main-transfer-connection-modal' arrival_transfer.pk %}"
                                             hx-target="#dialog"
                                             hx-swap="innerHTML"
@@ -160,7 +163,8 @@
                                         <span class="hidden sm:inline">{% translate "Transfer" %}</span>
                                     </button>
                                     {# Edit transfer #}
-                                    <button class="btn btn-xs btn-soft"
+                                    <button type="button"
+                                            class="btn btn-xs btn-soft"
                                             hx-get="{% url 'trips:edit-main-transfer' pk=arrival_transfer.pk %}"
                                             hx-target="#dialog"
                                             hx-swap="innerHTML"
@@ -170,7 +174,8 @@
                                         <span class="hidden sm:inline">{% translate "Edit" %}</span>
                                     </button>
                                     {# Delete transfer #}
-                                    <button class="btn btn-xs btn-error btn-soft"
+                                    <button type="button"
+                                            class="btn btn-xs btn-error btn-soft"
                                             hx-delete="{% url 'trips:delete-main-transfer' pk=arrival_transfer.pk %}"
                                             hx-confirm="{% translate 'Are you sure you want to delete this main transfer?' %}"
                                             title="{% translate 'Delete transfer' %}">
@@ -257,7 +262,8 @@
                                 {% endif %}
                             </div>
                         {% else %}
-                            <button class="btn btn-xs btn-primary sm:btn-sm"
+                            <button type="button"
+                                    class="btn btn-xs btn-primary sm:btn-sm"
                                     hx-get="{% url 'trips:departure-transfer-modal' trip.pk %}"
                                     hx-target="#dialog"
                                     hx-swap="innerHTML"
@@ -314,7 +320,8 @@
                                 {% endif %}
                                 <div class="ms-auto flex flex-wrap items-center justify-end gap-1">
                                     {# Note #}
-                                    <button class="btn btn-xs btn-soft"
+                                    <button type="button"
+                                            class="btn btn-xs btn-soft"
                                             x-data
                                             hx-get="{% url 'trips:attachment-upload-modal' trip.pk 'main' %}?object_id={{ departure_transfer.pk }}"
                                             hx-target="#dialog"
@@ -325,7 +332,8 @@
                                         <span class="hidden sm:inline">{% translate "Add document" %}</span>
                                     </button>
                                     {# Transfer connection #}
-                                    <button class="btn btn-xs btn-soft"
+                                    <button type="button"
+                                            class="btn btn-xs btn-soft"
                                             hx-get="{% url 'trips:main-transfer-connection-modal' departure_transfer.pk %}"
                                             hx-target="#dialog"
                                             hx-swap="innerHTML"
@@ -335,7 +343,8 @@
                                         <span class="hidden sm:inline">{% translate "Transfer" %}</span>
                                     </button>
                                     {# Edit transfer #}
-                                    <button class="btn btn-xs btn-soft"
+                                    <button type="button"
+                                            class="btn btn-xs btn-soft"
                                             hx-get="{% url 'trips:edit-main-transfer' pk=departure_transfer.pk %}"
                                             hx-target="#dialog"
                                             hx-swap="innerHTML"
@@ -345,7 +354,8 @@
                                         <span class="hidden sm:inline">{% translate "Edit" %}</span>
                                     </button>
                                     {# Delete transfer #}
-                                    <button class="btn btn-xs btn-error btn-soft"
+                                    <button type="button"
+                                            class="btn btn-xs btn-error btn-soft"
                                             hx-delete="{% url 'trips:delete-main-transfer' pk=departure_transfer.pk %}"
                                             hx-confirm="{% translate 'Are you sure you want to delete this main transfer?' %}"
                                             title="{% translate 'Delete transfer' %}">
