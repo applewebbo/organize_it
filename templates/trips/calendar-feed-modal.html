@@ -27,7 +27,7 @@
             <button type="button"
                     x-data="{ copied: false }"
                     class="btn btn-xs btn-soft shrink-0"
-                    :class="copied ? 'btn-success' :"
+                    :class="copied ? 'btn-success' : ''"
                     :title="copied ? '{% translate "Copied!" %}' : '{% translate "Copy link" %}'"
                     @click="navigator.clipboard.writeText($el.previousElementSibling.value); copied = true; setTimeout(() => copied = false, 2000)">
                 <i class="ph-bold" :class="copied ? 'ph-check' : 'ph-copy'"></i>
