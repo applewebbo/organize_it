@@ -423,10 +423,16 @@ DBBACKUP_CLEANUP_KEEP_MEDIA = env.int("DBBACKUP_CLEANUP_KEEP_MEDIA", default=10)
 # DEVELOPMENT SPECIFIC SETTINGS
 if ENVIRONMENT == "dev":
     DEBUG = True
-    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-    EMAIL_HOST = env("EMAIL_HOST", default="localhost")
-    EMAIL_PORT = env.int("EMAIL_PORT", default=1025)
-    EMAIL_USE_TLS = False
+    MAILERS = {
+        "default": {
+            "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+            "OPTIONS": {
+                "host": env("EMAIL_HOST", default="localhost"),
+                "port": env.int("EMAIL_PORT", default=1025),
+                "use_tls": False,
+            },
+        },
+    }
     DEFAULT_FROM_EMAIL = env(
         "DEFAULT_FROM_EMAIL",
         default="Organize It <noreply@localhost>",
@@ -498,7 +504,11 @@ elif ENVIRONMENT == "prod":
     CSRF_TRUSTED_ORIGINS = env("CSRF_TRUSTED_ORIGINS").split(",")
 
     # DJANGO_ANYMAIL
-    EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
+    MAILERS = {
+        "default": {
+            "BACKEND": "anymail.backends.mailgun.EmailBackend",
+        },
+    }
     DEFAULT_FROM_EMAIL = env(
         "DEFAULT_FROM_EMAIL",
         default="Organize It <info@mg.webbografico.com>",
@@ -573,7 +583,11 @@ elif ENVIRONMENT == "test":
     # Fixed Fernet key so encrypted-field tests are deterministic
     FIELD_ENCRYPTION_KEY = "X96Gmf2WBHNi4IfGu474va9oI32nCcRONTmK9hLuoSc="
 
-    EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+    MAILERS = {
+        "default": {
+            "BACKEND": "django.core.mail.backends.locmem.EmailBackend",
+        },
+    }
     DEFAULT_FROM_EMAIL = "Organize It <noreply@test.local>"
 
     # DJANGO-Q configuration for testing (synchronous)
