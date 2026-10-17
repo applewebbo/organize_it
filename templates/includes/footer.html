@@ -13,9 +13,7 @@
                     {% translate 'Built with Django, HTMX & TailwindCSS.' %}
                 </p>
                 <p class="text-base-content/50 mt-1 text-xs">
-                    {% translate '© 2026 WEBBOgrafico' %}&nbsp;-&nbsp;<a href="https://github.com/applewebbo/organize_it/releases"
-   target="_blank"
-   rel="noopener noreferrer"
+                    {% translate '© 2026 WEBBOgrafico' %}&nbsp;-&nbsp;<a href="{% url 'trips:releases' %}"
    class="link link-hover inline-flex items-center gap-1"><i class="ph-bold ph-tag" aria-hidden="true"></i>v{{ APP_VERSION }}</a>
                 </p>
             </aside>

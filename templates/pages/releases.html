@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block page_title %}{% translate "What's new" %} — Organize it!{% endblock %}
+
+{% block content %}
+    <main class="mx-auto max-w-screen-md space-y-8 px-2 pt-4 pb-16 sm:px-4 sm:pt-8">
+        <header class="space-y-4">
+            <h1 class="text-3xl font-bold tracking-tight text-balance sm:text-4xl">
+                {% translate "What's new" %}
+            </h1>
+            <p class="text-base-content/70 max-w-prose text-sm leading-relaxed text-pretty">
+                {% translate "A summary of what changed at each release." %}
+                {% blocktranslate with url="https://github.com/applewebbo/organize_it/releases" %}For the full technical changelog, see <a href="{{ url }}" class="link link-primary" target="_blank" rel="noopener">GitHub</a>.{% endblocktranslate %}
+            </p>
+        </header>
+        <ol class="border-base-300 relative ml-2 space-y-10 border-l">
+            {% for release in releases %}
+                <li class="ml-6">
+                    <span class="bg-primary ring-base-100 absolute -left-1.5 mt-2 size-3 rounded-full ring-4"
+                          aria-hidden="true"></span>
+                    <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                        <h2 class="text-xl font-semibold tracking-tight">v{{ release.version }}</h2>
+                        <time class="text-base-content/60 text-sm"
+                              datetime="{{ release.date|date:'Y-m-d' }}">{{ release.date|date:"j F Y" }}</time>
+                    </div>
+                    <ul class="text-base-content/80 mt-3 list-disc space-y-1.5 pl-5 leading-relaxed">
+                        {% for note in release.notes %}<li>{{ note }}</li>{% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
+        </ol>
+        {% if releases.paginator.num_pages > 1 %}
+            <nav class="flex justify-center" aria-label="{% translate 'Releases pagination' %}">
+                <div class="join">
+                    {% if releases.has_previous %}
+                        <a href="{% querystring page=releases.previous_page_number %}"
+                           class="join-item btn btn-sm">«</a>
+                    {% else %}
+                        <span class="join-item btn btn-sm btn-disabled">«</span>
+                    {% endif %}
+                    {% for page_number in releases.paginator.page_range %}
+                        {% if page_number == releases.number %}
+                            <span class="join-item btn btn-sm btn-active">{{ page_number }}</span>
+                        {% else %}
+                            <a href="{% querystring page=page_number %}"
+                               class="join-item btn btn-sm">{{ page_number }}</a>
+                        {% endif %}
+                    {% endfor %}
+                    {% if releases.has_next %}
+                        <a href="{% querystring page=releases.next_page_number %}"
+                           class="join-item btn btn-sm">»</a>
+                    {% else %}
+                        <span class="join-item btn btn-sm btn-disabled">»</span>
+                    {% endif %}
+                </div>
+            </nav>
+        {% endif %}
+    </main>
+{% endblock content %}

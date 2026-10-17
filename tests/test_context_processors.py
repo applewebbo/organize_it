@@ -25,7 +25,7 @@ def test_footer_version_links_to_releases():
     html = render_to_string(
         "includes/footer.html", {"APP_VERSION": settings.APP_VERSION}
     )
-    assert "https://github.com/applewebbo/organize_it/releases" in html
+    assert "/novita/" in html
     assert f"v{settings.APP_VERSION}" in html
 
 

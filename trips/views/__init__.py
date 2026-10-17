@@ -89,6 +89,7 @@ from trips.views.maps import (
     trip_map,
     update_day_destination,
 )
+from trips.views.releases import releases
 from trips.views.stays import (
     add_stay,
     add_stay_for_trip,
@@ -205,6 +206,7 @@ __all__ = [
     "note_delete",
     "enrich_event",
     "confirm_enrich_event",
+    "releases",
     # stays
     "add_stay_for_trip",
     "add_stay",

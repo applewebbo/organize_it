@@ -12,6 +12,7 @@ urlpatterns = [
     path("trips/list", views.trip_list, name="trip-list"),
     path("stays/<int:pk>", views.stay_detail, name="stay-detail"),
     path("log/<str:filename>", views.view_log_file, name="log"),
+    path("novita/", views.releases, name="releases"),
 ]
 
 htmx_urlpatterns = [
