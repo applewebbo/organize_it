@@ -3,6 +3,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth.decorators import login_not_required
 from django.urls import include, path
+from django.views.i18n import set_language
 from pwa import views as pwa_views
 
 from accounts.views import prefilled_password_reset
@@ -10,7 +11,9 @@ from accounts.views import prefilled_password_reset
 # PWA endpoints must stay reachable without authentication (service worker
 # registration, manifest fetch and the offline fallback page).
 urlpatterns = [
-    path("i18n/", include("django.conf.urls.i18n")),
+    # Must stay reachable without authentication: an anonymous visitor needs
+    # to switch language from the navbar before ever logging in.
+    path("i18n/setlang/", login_not_required(set_language), name="set_language"),
     path("admin/", admin.site.urls),
     path(
         "serviceworker.js",
