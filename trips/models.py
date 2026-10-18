@@ -569,7 +569,7 @@ class Day(models.Model):
     @property
     def next_day(self):
         """Get next day using prefetched data"""
-        days = [d for d in self.trip.days.all()]
+        days = [*self.trip.days.all()]
         try:
             current_index = days.index(self)
             return days[current_index + 1] if current_index + 1 < len(days) else None
@@ -579,7 +579,7 @@ class Day(models.Model):
     @property
     def prev_day(self):
         """Get previous day using prefetched data"""
-        days = [d for d in self.trip.days.all()]
+        days = [*self.trip.days.all()]
         try:
             current_index = days.index(self)
             return days[current_index - 1] if current_index > 0 else None

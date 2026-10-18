@@ -10,6 +10,16 @@ from datetime import date
 
 RELEASES: list[dict] = [
     {
+        "version": "2026.12.2",
+        "date": date(2026, 10, 18),
+        "notes": [
+            'Nuova pagina "Novità", raggiungibile dal numero di versione in fondo al sito, per leggere in linguaggio semplice cosa cambia a ogni rilascio.',
+            "Risolto un problema che impediva a chi non ha ancora un account di cambiare la lingua del sito.",
+            "Rimosso un ritardo artificiale che rendeva più lenta la ricerca degli indirizzi.",
+            "Diverse rifiniture tecniche e correzioni minori di interfaccia.",
+        ],
+    },
+    {
         "version": "2026.12.1",
         "date": date(2026, 8, 7),
         "notes": [

@@ -184,7 +184,7 @@ def is_first_day_of_stay(day):
 def is_first_day_of_trip(day):
     """Check if the given day is the first day of its trip using prefetched data"""
     try:
-        days = [d for d in day.trip.days.all()]
+        days = [*day.trip.days.all()]
         first_day = min(days, key=lambda d: d.number) if days else None
         return day == first_day
     except AttributeError:
