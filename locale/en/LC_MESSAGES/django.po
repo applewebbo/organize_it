@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-17 08:25+0200\n"
+"POT-Creation-Date: 2026-11-03 08:33+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1271,7 +1271,7 @@ msgid "Pre-departure Checklist"
 msgstr ""
 
 #: templates/trips/checklist.html:41
-#: templates/trips/includes/checklist-card.html:18 trips/forms/trip.py:349
+#: templates/trips/includes/checklist-card.html:18 trips/forms/trip.py:358
 msgid "Add an item…"
 msgstr ""
 
@@ -2066,7 +2066,7 @@ msgid "Viewer"
 msgstr "Viewer"
 
 #: templates/trips/includes/collab-modal-list.html:32
-#: templates/trips/includes/collab-modal.html:99 trips/forms/trip.py:331
+#: templates/trips/includes/collab-modal.html:99 trips/forms/trip.py:340
 msgid "Child"
 msgstr "Child"
 
@@ -2115,7 +2115,7 @@ msgstr "Adult"
 msgid "Name…"
 msgstr ""
 
-#: templates/trips/includes/collab-modal.html:114 trips/forms/trip.py:332
+#: templates/trips/includes/collab-modal.html:114 trips/forms/trip.py:341
 msgid "Age"
 msgstr "Age"
 
@@ -2256,6 +2256,10 @@ msgstr "Your balance"
 #: templates/trips/includes/stay-preview.html:28
 #: templates/trips/includes/stay-preview.html:39
 msgid "New"
+msgstr ""
+
+#: templates/trips/includes/image-search-results.html:39
+msgid "Click an image to select it for your trip, then save the form"
 msgstr ""
 
 #: templates/trips/includes/main-transfers.html:10
@@ -2832,7 +2836,7 @@ msgstr ""
 msgid "Expires on %(date)s"
 msgstr ""
 
-#: templates/trips/share-link-created.html:36 trips/forms/trip.py:287
+#: templates/trips/share-link-created.html:36 trips/forms/trip.py:296
 msgid "Never expires"
 msgstr ""
 
@@ -2844,7 +2848,7 @@ msgstr ""
 msgid "Active share links"
 msgstr ""
 
-#: templates/trips/share-link-list.html:8 trips/forms/trip.py:293
+#: templates/trips/share-link-list.html:8 trips/forms/trip.py:302
 msgid "Label"
 msgstr ""
 
@@ -3159,7 +3163,7 @@ msgstr ""
 
 #: trips/forms/event.py:46 trips/forms/event.py:47 trips/forms/event.py:96
 #: trips/forms/stay.py:27 trips/forms/stay.py:28 trips/forms/stay.py:76
-#: trips/forms/stay.py:90 trips/forms/trip.py:330
+#: trips/forms/stay.py:90 trips/forms/trip.py:339
 msgid "Name"
 msgstr ""
 
@@ -3373,91 +3377,91 @@ msgstr ""
 msgid "Transport Mode"
 msgstr ""
 
-#: trips/forms/trip.py:73
+#: trips/forms/trip.py:81
 msgid "Select from suggestions for accurate geolocation"
 msgstr ""
 
-#: trips/forms/trip.py:118
+#: trips/forms/trip.py:126
 msgid "Trip Image"
 msgstr ""
 
-#: trips/forms/trip.py:160
+#: trips/forms/trip.py:169
 msgid "Search Unsplash"
 msgstr ""
 
-#: trips/forms/trip.py:170
+#: trips/forms/trip.py:179
 msgid "Upload Image"
 msgstr ""
 
-#: trips/forms/trip.py:178
+#: trips/forms/trip.py:187
 msgid "Please fill in the destination field to search for images"
 msgstr ""
 
-#: trips/forms/trip.py:218
+#: trips/forms/trip.py:227
 msgid "Click to select an image"
 msgstr ""
 
-#: trips/forms/trip.py:237
+#: trips/forms/trip.py:246
 msgid "End date must be after start date"
 msgstr ""
 
-#: trips/forms/trip.py:243
+#: trips/forms/trip.py:252
 msgid "Start date must be after today"
 msgstr ""
 
-#: trips/forms/trip.py:251
+#: trips/forms/trip.py:260
 msgid "Destination not found"
 msgstr ""
 
-#: trips/forms/trip.py:284
+#: trips/forms/trip.py:293
 msgid "7 days"
 msgstr ""
 
-#: trips/forms/trip.py:285
+#: trips/forms/trip.py:294
 msgid "30 days"
 msgstr ""
 
-#: trips/forms/trip.py:286
+#: trips/forms/trip.py:295
 msgid "90 days"
 msgstr ""
 
-#: trips/forms/trip.py:294
+#: trips/forms/trip.py:303
 msgid "Optional label to identify this link"
 msgstr ""
 
-#: trips/forms/trip.py:299
+#: trips/forms/trip.py:308
 msgid "Expires after"
 msgstr ""
 
-#: trips/forms/trip.py:338
+#: trips/forms/trip.py:347
 msgid "Age is required for a child."
 msgstr "Age is required for a child."
 
-#: trips/forms/trip.py:362
+#: trips/forms/trip.py:371
 msgid "Off"
 msgstr ""
 
-#: trips/forms/trip.py:363
+#: trips/forms/trip.py:372
 msgid "1 day before"
 msgstr ""
 
-#: trips/forms/trip.py:364
+#: trips/forms/trip.py:373
 msgid "3 days before"
 msgstr ""
 
-#: trips/forms/trip.py:365
+#: trips/forms/trip.py:374
 msgid "7 days before"
 msgstr ""
 
-#: trips/forms/trip.py:366
+#: trips/forms/trip.py:375
 msgid "14 days before"
 msgstr ""
 
-#: trips/forms/trip.py:367
+#: trips/forms/trip.py:376
 msgid "30 days before"
 msgstr ""
 
-#: trips/forms/trip.py:373
+#: trips/forms/trip.py:382
 msgid "Email reminder"
 msgstr ""
 

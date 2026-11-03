@@ -1,4 +1,4 @@
-{% load static %}
+{% load i18n static %}
 {% if error %}
     <div class="alert alert-error alert-soft">
         <i class="ph-bold ph-warning-circle"></i>
@@ -36,6 +36,6 @@
         {% endfor %}
     </div>
     <p class="text-base-content/60 mt-4 text-center text-xs">
-        Click an image to select it for your trip, then save the form
+        {% translate "Click an image to select it for your trip, then save the form" %}
     </p>
 {% endif %}
