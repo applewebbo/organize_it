@@ -10,13 +10,13 @@ from PIL import Image
 logger = logging.getLogger(__name__)
 
 
-def search_unsplash_photos(query, per_page=3, orientation="landscape"):
+def search_unsplash_photos(query, per_page=5, orientation="landscape"):
     """
     Search Unsplash for photos with caching.
 
     Args:
         query: Search query (typically trip destination)
-        per_page: Number of results (default 3 for UI)
+        per_page: Number of results (default 5 for UI)
         orientation: Photo orientation (default 'landscape')
 
     Returns:

@@ -36,7 +36,7 @@ class TestSearchTripImages:
 
         assert response.status_code == 200
         assert b"photo123" in response.content
-        mock_search.assert_called_once_with("Paris", per_page=3)
+        mock_search.assert_called_once_with("Paris", per_page=5)
 
     @patch("trips.views.trips.search_unsplash_photos")
     def test_search_trip_images_empty_query(self, mock_search, client, user_factory):

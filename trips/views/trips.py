@@ -468,7 +468,7 @@ def search_trip_images(request):
             )
 
         # Search Unsplash
-        photos = search_unsplash_photos(query, per_page=3)
+        photos = search_unsplash_photos(query, per_page=5)
 
         if photos is None:
             return TemplateResponse(
