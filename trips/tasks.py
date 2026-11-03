@@ -15,14 +15,14 @@ from trips.weather import fetch_weather_for_trip
 logger = logging.getLogger("task")
 
 
-def _attach_unsplash_photo(trip, photo_data, extra_metadata=None):
-    """Download an Unsplash photo and store it as the trip cover.
+def _attach_photo(trip, photo_data, download_fn, extra_metadata=None):
+    """Download a photo (any source) and store it as the trip cover.
 
     Returns True when the photo was attached, False on any failure.
     """
-    from trips.utils import download_unsplash_photo, process_trip_image
+    from trips.utils import process_trip_image
 
-    image_content, metadata = download_unsplash_photo(photo_data)
+    image_content, metadata = download_fn(photo_data)
     if not image_content:
         return False
 
@@ -35,8 +35,15 @@ def _attach_unsplash_photo(trip, photo_data, extra_metadata=None):
     trip.image.save(filename, processed_image, save=False)
     trip.image_metadata = {**metadata, **(extra_metadata or {})}
     trip.save(update_fields=["image", "image_metadata"])
-    logger.info("Unsplash photo %s attached to trip %s", photo_id, trip.pk)
+    logger.info("Photo %s attached to trip %s", photo_id, trip.pk)
     return True
+
+
+def _attach_unsplash_photo(trip, photo_data, extra_metadata=None):
+    """Download an Unsplash photo and store it as the trip cover."""
+    from trips.utils import download_unsplash_photo
+
+    return _attach_photo(trip, photo_data, download_unsplash_photo, extra_metadata)
 
 
 def download_trip_unsplash_photo(trip_pk, photo_data):
@@ -48,6 +55,19 @@ def download_trip_unsplash_photo(trip_pk, photo_data):
         return
 
     _attach_unsplash_photo(trip, photo_data)
+
+
+def download_trip_wikimedia_photo(trip_pk, photo_data):
+    """Download and attach a Wikimedia Commons photo to a trip."""
+    from trips.utils import download_wikimedia_photo
+
+    try:
+        trip = Trip.objects.get(pk=trip_pk)
+    except Trip.DoesNotExist:
+        logger.warning("download_trip_wikimedia_photo: trip %s not found", trip_pk)
+        return
+
+    _attach_photo(trip, photo_data, download_wikimedia_photo)
 
 
 def auto_select_trip_cover(trip_pk):

@@ -35,6 +35,9 @@ class TripForm(forms.ModelForm):
     selected_photo_id = forms.CharField(
         required=False, widget=forms.HiddenInput(), initial=""
     )
+    selected_photo_source = forms.CharField(
+        required=False, widget=forms.HiddenInput(), initial="unsplash"
+    )
 
     class Meta:
         model = Trip
@@ -69,7 +72,6 @@ class TripForm(forms.ModelForm):
                 "hx-swap": "innerHTML",
                 "x-on:input.debounce.600ms": (
                     "if ($el.value.trim() && $el.value !== lastSearchQuery) {"
-                    " imageMode = 'search';"
                     " lastSearchQuery = $el.value;"
                     " document.getElementById('search-unsplash-tab')"
                     ".dispatchEvent(new Event('doSearch'));"
@@ -130,76 +132,39 @@ class TripForm(forms.ModelForm):
                 f'<input type="hidden" name="trip_id" value="{trip_id}" id="trip_id">'
             ),
             Field("selected_photo_id"),
-            # Mode Toggle
+            Field("selected_photo_source"),
+            # Single cover-image container: suggested photos (Unsplash +
+            # Wikimedia Commons, auto-searched while typing the destination)
+            # with a manual upload field right below as an alternative.
             HTML(
-                """
-            <div class="sm:col-span-2" x-data="{ showDestinationError: false }">
-                <div role="tablist" class="tabs tabs-border tabs-sm">
-                    <button type="button"
-                            id="search-unsplash-tab"
-                            role="tab"
-                            class="gap-1 tab"
-                            :class="imageMode === 'search' ? 'tab-active' : ''"
-                            @click="
-                                const destValue = document.querySelector('[name=destination]').value;
-                                if (!destValue || destValue.trim() === '') {
-                                    showDestinationError = true;
-                                    document.querySelector('[name=destination]').classList.add('input-error', 'border-error', 'border-2');
-                                    setTimeout(() => {
-                                        showDestinationError = false;
-                                        document.querySelector('[name=destination]').classList.remove('input-error', 'border-error', 'border-2');
-                                    }, 5000);
-                                    return;
-                                }
-                                imageMode = 'search';
-                                if (destValue !== lastSearchQuery) {
-                                    lastSearchQuery = destValue;
-                                    $el.dispatchEvent(new Event('doSearch'));
-                                }
-                            "
-                            hx-post="""
+                '<p class="text-base-content/60 sm:col-span-2 -mt-1 mb-3 text-xs">'
+                + str(
+                    _(
+                        "Pick one of the suggested photos below, or upload your own — whichever you choose becomes the cover."
+                    )
+                )
+                + "</p>"
+            ),
+            # Hidden element wiring the image search request; triggered
+            # automatically while typing the destination (see the
+            # destination field's x-on:input handler above).
+            HTML(
+                '<span id="search-unsplash-tab" class="hidden" hx-post='
                 + f'"{reverse("trips:search-images")}"'
                 + """
-                            hx-trigger="doSearch"
-                            hx-target="#image-results"
-                            hx-indicator="#search-spinner"
-                            hx-include="[name='destination'], [name='trip_id']">
-                        <i class="ph-bold ph-magnifying-glass"></i>
-                        """
-                + str(_("Search Unsplash"))
-                + """
-                    </button>
-                    <button type="button"
-                            role="tab"
-                            class="gap-1 tab"
-                            :class="imageMode === 'upload' ? 'tab-active' : ''"
-                            @click="imageMode = 'upload'">
-                        <i class="ph-bold ph-upload"></i>
-                        """
-                + str(_("Upload Image"))
-                + """
-                    </button>
-                </div>
-                <div x-show="showDestinationError"
-                     x-transition
-                     class="mt-2 text-sm text-error">
-                    """
-                + str(_("Please fill in the destination field to search for images"))
-                + """
-                </div>
-            </div>
-            """
+                      hx-trigger="doSearch"
+                      hx-target="#image-results"
+                      hx-indicator="#search-spinner"
+                      hx-include="[name='destination'], [name='trip_id']"></span>
+                """
             ),
-            # Search results section
             Div(
                 HTML(
                     '<div id="search-spinner" class="loading loading-spinner htmx-indicator"></div>'
                 ),
-                HTML('<div id="image-results" class="mt-4"></div>'),
-                css_class="search-section sm:col-span-2",
-                x_show="imageMode === 'search'",
+                HTML('<div id="image-results"></div>'),
+                css_class="sm:col-span-2",
             ),
-            # Upload section
             Div(
                 HTML(
                     f"""
@@ -231,8 +196,7 @@ class TripForm(forms.ModelForm):
                     </div>
                     """
                 ),
-                css_class="upload-section sm:col-span-2 mt-4",
-                x_show="imageMode === 'upload'",
+                css_class="sm:col-span-2 mt-4",
             ),
         )
 

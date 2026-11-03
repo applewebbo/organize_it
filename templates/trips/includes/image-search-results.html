@@ -4,36 +4,10 @@
         <i class="ph-bold ph-warning-circle"></i>
         <span>{{ error }}</span>
     </div>
-{% elif photos %}
-    <div class="grid grid-cols-5 gap-1.5"
-         x-data="{ selectedId: '' }">
-        {% for photo in photos %}
-            <div class="group relative cursor-pointer overflow-hidden rounded-lg shadow-lg"
-                 @click="selectedId = '{{ photo.id }}'; document.getElementById('id_selected_photo_id').value = '{{ photo.id }}'"
-                 :class="selectedId === '{{ photo.id }}' ? 'ring-4 ring-primary' : ''">
-                <!-- Image -->
-                <img src="{{ photo.urls.small }}"
-                     alt="{{ photo.alt_description }}"
-                     class="h-20 w-full object-cover transition-transform duration-200 group-hover:scale-110">
-                <!-- Overlay with photographer credit -->
-                <div class="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/70 to-transparent p-1.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                    <p class="truncate text-[10px] text-white">
-                        <a href="{{ photo.user.profile }}"
-    target="_blank"
-    class="underline"
-    @click.stop>{{ photo.user.name }}</a>
-                    </p>
-                </div>
-                <!-- Selection indicator -->
-                <div class="absolute top-1 right-1"
-                     :class="selectedId === '{{ photo.id }}' ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'">
-                    <div class="rounded-full p-1"
-                         :class="selectedId === '{{ photo.id }}' ? 'bg-success' : 'bg-primary/80'">
-                        <i class="i-sm ph-bold ph-check text-white"></i>
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
+{% elif unsplash_photos or wikimedia_photos %}
+    <div x-data="{ selectedId: '' }">
+        {% include "trips/includes/image-search-results-row.html" with photos=unsplash_photos label="Unsplash" %}
+        {% include "trips/includes/image-search-results-row.html" with photos=wikimedia_photos label="Wikimedia Commons" %}
     </div>
     <p class="text-base-content/60 mt-4 text-center text-xs">
         {% translate "Click an image to select it for your trip, then save the form" %}

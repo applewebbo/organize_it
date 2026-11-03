@@ -11,6 +11,7 @@ from trips.tasks import (
     auto_select_trip_cover,
     calculate_day_transfer,
     download_trip_unsplash_photo,
+    download_trip_wikimedia_photo,
     fetch_weather_for_active_trips,
 )
 
@@ -25,6 +26,15 @@ MOCK_PHOTO_DATA = {
     "links": {
         "html": "https://unsplash.com/photos/photo123",
         "download_location": "https://api.unsplash.com/download",
+    },
+}
+
+MOCK_WIKIMEDIA_PHOTO_DATA = {
+    "id": "wikimedia_123",
+    "urls": {"regular": "https://upload.wikimedia.org/full.jpg"},
+    "user": {
+        "name": "Jane Doe",
+        "profile": "https://commons.wikimedia.org/wiki/File:x.jpg",
     },
 }
 
@@ -69,6 +79,40 @@ class TestDownloadTripUnsplashPhoto:
         with patch("trips.utils.download_unsplash_photo", return_value=(b"data", {})):
             with patch("trips.utils.process_trip_image", return_value=None):
                 download_trip_unsplash_photo(trip.pk, MOCK_PHOTO_DATA)
+
+
+class TestDownloadTripWikimediaPhoto:
+    def test_attaches_photo_to_trip(self, user_factory, trip_factory):
+        from io import BytesIO
+
+        from django.core.files.uploadedfile import InMemoryUploadedFile
+
+        user = user_factory()
+        trip = trip_factory(author=user)
+        fake_file = InMemoryUploadedFile(
+            BytesIO(b"processed"), "ImageField", "test.jpg", "image/jpeg", 1024, None
+        )
+
+        with patch("trips.utils.download_wikimedia_photo") as mock_dl:
+            with patch("trips.utils.process_trip_image", return_value=fake_file):
+                mock_dl.return_value = (b"img_bytes", {"source": "wikimedia"})
+                download_trip_wikimedia_photo(trip.pk, MOCK_WIKIMEDIA_PHOTO_DATA)
+
+        trip.refresh_from_db()
+        assert trip.image_metadata == {"source": "wikimedia"}
+
+    def test_skips_if_trip_not_found(self):
+        download_trip_wikimedia_photo(99999, MOCK_WIKIMEDIA_PHOTO_DATA)  # no error
+
+    def test_skips_if_download_fails(self, user_factory, trip_factory):
+        user = user_factory()
+        trip = trip_factory(author=user)
+
+        with patch("trips.utils.download_wikimedia_photo", return_value=(None, None)):
+            download_trip_wikimedia_photo(trip.pk, MOCK_WIKIMEDIA_PHOTO_DATA)
+
+        trip.refresh_from_db()
+        assert not trip.image
 
 
 class TestAutoSelectTripCover:

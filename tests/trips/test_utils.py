@@ -21,6 +21,7 @@ from trips.utils import (
     create_day_map,
     create_trip_map,
     download_unsplash_photo,
+    download_wikimedia_photo,
     generate_cache_key,
     geocode_city,
     geocode_location,
@@ -30,6 +31,7 @@ from trips.utils import (
     process_trip_image,
     rate_limit_check,
     search_unsplash_photos,
+    search_wikimedia_photos,
     select_best_result,
 )
 
@@ -942,6 +944,273 @@ class TestUnsplashAPI(TestCase):
         }
 
         content, metadata = download_unsplash_photo(photo_data)
+
+        self.assertIsNone(content)
+        self.assertIsNone(metadata)
+
+    @patch("trips.utils.images.requests.get")
+    def test_search_wikimedia_photos_success(self, mock_get):
+        """Test successful Wikimedia Commons search"""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "query": {
+                "pages": {
+                    "12345": {
+                        "title": "File:Milan Duomo.jpg",
+                        "imageinfo": [
+                            {
+                                "url": "https://upload.wikimedia.org/full.jpg",
+                                "thumburl": "https://upload.wikimedia.org/thumb.jpg",
+                                "descriptionurl": "https://commons.wikimedia.org/wiki/File:Milan_Duomo.jpg",
+                                "mime": "image/jpeg",
+                                "width": 1600,
+                                "height": 1000,
+                                "extmetadata": {
+                                    "Artist": {"value": "<a href='#'>Jane Doe</a>"}
+                                },
+                            }
+                        ],
+                    }
+                }
+            }
+        }
+        mock_get.return_value = mock_response
+
+        photos = search_wikimedia_photos("Milan")
+
+        self.assertEqual(len(photos), 1)
+        self.assertEqual(photos[0]["id"], "wikimedia_12345")
+        self.assertEqual(photos[0]["user"]["name"], "Jane Doe")
+        self.assertEqual(photos[0]["source"], "wikimedia")
+        self.assertEqual(photos[0]["alt_description"], "Milan Duomo")
+        mock_get.assert_called_once()
+
+    @patch("trips.utils.images.requests.get")
+    def test_search_wikimedia_photos_filters_out_panoramic_and_portrait(self, mock_get):
+        """Test that panoramas and portrait crops are excluded, keeping landscapes"""
+
+        def page(page_id, width, height):
+            return {
+                "title": f"File:{page_id}.jpg",
+                "imageinfo": [
+                    {
+                        "url": f"https://upload.wikimedia.org/{page_id}.jpg",
+                        "mime": "image/jpeg",
+                        "width": width,
+                        "height": height,
+                        "extmetadata": {},
+                    }
+                ],
+            }
+
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "query": {
+                "pages": {
+                    "1": page("landscape", 1600, 1000),  # ratio 1.6, kept
+                    "2": page("panorama", 4000, 1000),  # ratio 4.0, excluded
+                    "3": page("portrait", 800, 1200),  # ratio 0.67, excluded
+                }
+            }
+        }
+        mock_get.return_value = mock_response
+
+        photos = search_wikimedia_photos("Milan")
+
+        self.assertEqual(len(photos), 1)
+        self.assertEqual(photos[0]["id"], "wikimedia_1")
+
+    @patch("trips.utils.images.requests.get")
+    def test_search_wikimedia_photos_stops_at_per_page(self, mock_get):
+        """Test that results are capped at per_page even with more matches"""
+
+        def page(page_id):
+            return {
+                "title": f"File:{page_id}.jpg",
+                "imageinfo": [
+                    {
+                        "url": f"https://upload.wikimedia.org/{page_id}.jpg",
+                        "mime": "image/jpeg",
+                        "width": 1600,
+                        "height": 1000,
+                        "extmetadata": {},
+                    }
+                ],
+            }
+
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "query": {"pages": {str(i): page(i) for i in range(5)}}
+        }
+        mock_get.return_value = mock_response
+
+        photos = search_wikimedia_photos("Milan", per_page=2)
+
+        self.assertEqual(len(photos), 2)
+
+    @patch("trips.utils.images.requests.get")
+    def test_search_wikimedia_photos_skips_missing_dimensions(self, mock_get):
+        """Test that results without width/height are skipped"""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "query": {
+                "pages": {
+                    "1": {
+                        "title": "File:NoDimensions.jpg",
+                        "imageinfo": [
+                            {
+                                "url": "https://upload.wikimedia.org/x.jpg",
+                                "mime": "image/jpeg",
+                                "extmetadata": {},
+                            }
+                        ],
+                    }
+                }
+            }
+        }
+        mock_get.return_value = mock_response
+
+        photos = search_wikimedia_photos("Milan")
+
+        self.assertEqual(photos, [])
+
+    @patch("trips.utils.images.requests.get")
+    def test_search_wikimedia_photos_skips_pages_without_imageinfo(self, mock_get):
+        """Test that pages missing imageinfo (e.g. deleted files) are skipped"""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "query": {"pages": {"1": {"title": "File:Deleted.jpg"}}}
+        }
+        mock_get.return_value = mock_response
+
+        photos = search_wikimedia_photos("Milan")
+
+        self.assertEqual(photos, [])
+
+    @patch("trips.utils.images.requests.get")
+    def test_search_wikimedia_photos_skips_non_image_mime(self, mock_get):
+        """Test that non-image results (e.g. PDFs) are filtered out"""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "query": {
+                "pages": {
+                    "1": {
+                        "title": "File:Map.pdf",
+                        "imageinfo": [
+                            {
+                                "url": "https://upload.wikimedia.org/map.pdf",
+                                "mime": "application/pdf",
+                                "extmetadata": {},
+                            }
+                        ],
+                    }
+                }
+            }
+        }
+        mock_get.return_value = mock_response
+
+        photos = search_wikimedia_photos("Milan")
+
+        self.assertEqual(photos, [])
+
+    @patch("trips.utils.images.requests.get")
+    def test_search_wikimedia_photos_cached(self, mock_get):
+        """Test that search results are cached"""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "query": {
+                "pages": {
+                    "1": {
+                        "title": "File:Milan.jpg",
+                        "imageinfo": [
+                            {
+                                "url": "https://upload.wikimedia.org/full.jpg",
+                                "mime": "image/jpeg",
+                                "width": 1600,
+                                "height": 1000,
+                                "extmetadata": {},
+                            }
+                        ],
+                    }
+                }
+            }
+        }
+        mock_get.return_value = mock_response
+
+        search_wikimedia_photos("Milan")
+        self.assertEqual(mock_get.call_count, 1)
+
+        search_wikimedia_photos("Milan")
+        self.assertEqual(mock_get.call_count, 1)
+
+    @patch("trips.utils.images.requests.get")
+    def test_search_wikimedia_photos_timeout(self, mock_get):
+        """Test Wikimedia API timeout handling"""
+        import requests
+
+        mock_get.side_effect = requests.exceptions.Timeout("Timeout")
+
+        photos = search_wikimedia_photos("Milan")
+
+        self.assertIsNone(photos)
+
+    @patch("trips.utils.images.requests.get")
+    def test_search_wikimedia_photos_api_error(self, mock_get):
+        """Test Wikimedia API error handling"""
+        import requests
+
+        mock_get.side_effect = requests.RequestException("API Error")
+
+        photos = search_wikimedia_photos("Milan")
+
+        self.assertIsNone(photos)
+
+    @patch("trips.utils.images.requests.get")
+    def test_download_wikimedia_photo_success(self, mock_get):
+        """Test successful photo download from Wikimedia Commons"""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.content = b"fake_image_data"
+        mock_get.return_value = mock_response
+
+        photo_data = {
+            "id": "wikimedia_12345",
+            "urls": {"regular": "https://upload.wikimedia.org/full.jpg"},
+            "user": {
+                "name": "Jane Doe",
+                "profile": "https://commons.wikimedia.org/wiki/File:Milan_Duomo.jpg",
+            },
+        }
+
+        content, metadata = download_wikimedia_photo(photo_data)
+
+        self.assertEqual(content, b"fake_image_data")
+        self.assertEqual(metadata["source"], "wikimedia")
+        self.assertEqual(metadata["wikimedia_id"], "wikimedia_12345")
+        self.assertEqual(metadata["photographer"], "Jane Doe")
+        mock_get.assert_called_once()
+
+    @patch("trips.utils.images.requests.get")
+    def test_download_wikimedia_photo_error(self, mock_get):
+        """Test download error handling"""
+        import requests
+
+        mock_get.side_effect = requests.RequestException("Download failed")
+
+        photo_data = {
+            "id": "wikimedia_12345",
+            "urls": {"regular": "https://upload.wikimedia.org/full.jpg"},
+            "user": {"name": "Jane Doe", "profile": "https://example.com"},
+        }
+
+        content, metadata = download_wikimedia_photo(photo_data)
 
         self.assertIsNone(content)
         self.assertIsNone(metadata)

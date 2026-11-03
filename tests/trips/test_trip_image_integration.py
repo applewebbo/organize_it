@@ -20,6 +20,12 @@ MOCK_PHOTO = {
     },
 }
 
+MOCK_WIKIMEDIA_PHOTO = {
+    "id": "wikimedia_123",
+    "urls": {"regular": "https://upload.wikimedia.org/full.jpg"},
+    "user": {"name": "Jane Doe", "profile": "https://commons.wikimedia.org/wiki/x"},
+}
+
 
 class TestTripCreateImageHandling:
     """Tests for image handling in trip_create view"""
@@ -93,6 +99,33 @@ class TestTripCreateImageHandling:
 
         assert response.status_code in [200, 204, 302]
         mock_async_task.assert_not_called()
+
+    @patch("trips.views.trips.async_task")
+    @patch("trips.views.trips.search_wikimedia_photos")
+    def test_create_with_wikimedia_fires_async_task(
+        self, mock_search, mock_async_task, client, user_factory
+    ):
+        """Selecting a Wikimedia photo triggers the Wikimedia async task."""
+        user = user_factory()
+        client.force_login(user)
+        mock_search.return_value = [MOCK_WIKIMEDIA_PHOTO]
+
+        response = client.post(
+            reverse("trips:trip-create"),
+            {
+                "title": "Test Trip",
+                "destination": "Paris",
+                "selected_photo_id": "wikimedia_123",
+                "selected_photo_source": "wikimedia",
+            },
+        )
+
+        assert response.status_code in [200, 204, 302]
+        mock_search.assert_called_once_with("Paris", per_page=10)
+        mock_async_task.assert_called_once()
+        args = mock_async_task.call_args[0]
+        assert args[0] == "trips.tasks.download_trip_wikimedia_photo"
+        assert args[2] == MOCK_WIKIMEDIA_PHOTO
 
 
 class TestTripUpdateImageHandling:

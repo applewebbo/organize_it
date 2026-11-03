@@ -1,0 +1,36 @@
+{% if photos %}
+    <div class="mb-3">
+        <p class="text-base-content/50 mb-1 text-[11px] font-medium tracking-wide uppercase">
+            {{ label }}
+        </p>
+        <div class="grid grid-cols-5 gap-1.5">
+            {% for photo in photos %}
+                <div class="group relative cursor-pointer overflow-hidden rounded-lg shadow-lg"
+                     @click="selectedId = '{{ photo.id }}'; document.getElementById('id_selected_photo_id').value = '{{ photo.id }}'; document.getElementById('id_selected_photo_source').value = '{{ photo.source }}'"
+                     :class="selectedId === '{{ photo.id }}' ? 'ring-4 ring-primary' : ''">
+                    <!-- Image -->
+                    <img src="{{ photo.urls.small }}"
+                         alt="{{ photo.alt_description }}"
+                         class="h-20 w-full object-cover transition-transform duration-200 group-hover:scale-110">
+                    <!-- Overlay with photographer credit -->
+                    <div class="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/70 to-transparent p-1.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                        <p class="truncate text-[10px] text-white">
+                            <a href="{{ photo.user.profile }}"
+    target="_blank"
+    class="underline"
+    @click.stop>{{ photo.user.name }}</a>
+                        </p>
+                    </div>
+                    <!-- Selection indicator -->
+                    <div class="absolute top-1 right-1"
+                         :class="selectedId === '{{ photo.id }}' ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'">
+                        <div class="rounded-full p-1"
+                             :class="selectedId === '{{ photo.id }}' ? 'bg-success' : 'bg-primary/80'">
+                            <i class="i-sm ph-bold ph-check text-white"></i>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}

@@ -17,8 +17,10 @@ from trips.utils.geocoding import (
 )
 from trips.utils.images import (
     download_unsplash_photo,
+    download_wikimedia_photo,
     process_trip_image,
     search_unsplash_photos,
+    search_wikimedia_photos,
 )
 from trips.utils.maps import create_day_map, create_trip_map
 from trips.utils.queries import (
@@ -54,6 +56,7 @@ __all__ = [
     "create_day_map",
     "create_trip_map",
     "download_unsplash_photo",
+    "download_wikimedia_photo",
     "editable_trips_qs",
     "fetch_route",
     "generate_cache_key",
@@ -79,5 +82,6 @@ __all__ = [
     "search_airports",
     "search_train_stations",
     "search_unsplash_photos",
+    "search_wikimedia_photos",
     "select_best_result",
 ]

@@ -40,9 +40,30 @@ from trips.utils import (
     group_unpaired_events_by_stage,
     process_trip_image,
     search_unsplash_photos,
+    search_wikimedia_photos,
 )
 
 logger = logging.getLogger(__name__)
+
+
+def _schedule_cover_photo_download(trip, photo_id, photo_source):
+    """Re-fetch the selected cover photo's metadata and schedule its download.
+
+    The selected photo is only an id from the earlier search response, so it
+    needs to be re-fetched from its source (Unsplash or Wikimedia Commons)
+    before handing it to the background download task.
+    """
+    if photo_source == "wikimedia":
+        photos = search_wikimedia_photos(trip.destination, per_page=10)
+        task_name = "trips.tasks.download_trip_wikimedia_photo"
+    else:
+        photos = search_unsplash_photos(trip.destination, per_page=10)
+        task_name = "trips.tasks.download_trip_unsplash_photo"
+
+    if photos:
+        photo_data = next((p for p in photos if p["id"] == photo_id), None)
+        if photo_data:
+            async_task(task_name, trip.pk, photo_data)
 
 
 @login_not_required
@@ -244,26 +265,24 @@ def trip_create(request):
                     trip.image = processed_image
                     trip.image_metadata = {"source": "upload"}
 
-            # Schedule Unsplash download in background (only when no direct upload)
+            # Schedule photo download in background (only when no direct upload)
             selected_photo_id = form.cleaned_data.get("selected_photo_id")
+            selected_photo_source = (
+                form.cleaned_data.get("selected_photo_source") or "unsplash"
+            )
             if selected_photo_id and not request.FILES.get("image"):
                 trip.image = None
-                trip.image_metadata = {"source": "unsplash", "pending": True}
+                trip.image_metadata = {
+                    "source": selected_photo_source,
+                    "pending": True,
+                }
 
             trip.save()
 
             if selected_photo_id and not request.FILES.get("image"):
-                photos = search_unsplash_photos(trip.destination, per_page=10)
-                if photos:
-                    photo_data = next(
-                        (p for p in photos if p["id"] == selected_photo_id), None
-                    )
-                    if photo_data:
-                        async_task(
-                            "trips.tasks.download_trip_unsplash_photo",
-                            trip.pk,
-                            photo_data,
-                        )
+                _schedule_cover_photo_download(
+                    trip, selected_photo_id, selected_photo_source
+                )
             dest_lat = form.cleaned_data.get("destination_latitude")
             dest_lon = form.cleaned_data.get("destination_longitude")
             if dest_lat is not None and dest_lon is not None:
@@ -320,26 +339,24 @@ def trip_update(request, pk):
                     trip.image = processed_image
                     trip.image_metadata = {"source": "upload"}
 
-            # Schedule Unsplash download in background (only when no direct upload)
+            # Schedule photo download in background (only when no direct upload)
             selected_photo_id = form.cleaned_data.get("selected_photo_id")
+            selected_photo_source = (
+                form.cleaned_data.get("selected_photo_source") or "unsplash"
+            )
             if selected_photo_id and not request.FILES.get("image"):
                 trip.image = None
-                trip.image_metadata = {"source": "unsplash", "pending": True}
+                trip.image_metadata = {
+                    "source": selected_photo_source,
+                    "pending": True,
+                }
 
             trip.save()
 
             if selected_photo_id and not request.FILES.get("image"):
-                photos = search_unsplash_photos(trip.destination, per_page=10)
-                if photos:
-                    photo_data = next(
-                        (p for p in photos if p["id"] == selected_photo_id), None
-                    )
-                    if photo_data:
-                        async_task(
-                            "trips.tasks.download_trip_unsplash_photo",
-                            trip.pk,
-                            photo_data,
-                        )
+                _schedule_cover_photo_download(
+                    trip, selected_photo_id, selected_photo_source
+                )
             dest_lat = form.cleaned_data.get("destination_latitude")
             dest_lon = form.cleaned_data.get("destination_longitude")
             if dest_lat is not None and dest_lon is not None:
@@ -455,7 +472,13 @@ def validate_dates(request):
 
 
 def search_trip_images(request):
-    """HTMX endpoint for searching Unsplash images using destination"""
+    """HTMX endpoint for searching cover images using destination.
+
+    Always queries both Unsplash and Wikimedia Commons (fallback source with
+    much broader coverage for lesser-known destinations) and shows them as
+    two separate, source-labeled rows. A source that returns no results is
+    simply omitted rather than shown as an empty row.
+    """
     if request.method == "POST":
         query = request.POST.get("destination", "").strip()
         trip_id = request.POST.get("trip_id")
@@ -467,17 +490,10 @@ def search_trip_images(request):
                 {"error": _("Please enter a destination first")},
             )
 
-        # Search Unsplash
-        photos = search_unsplash_photos(query, per_page=5)
+        unsplash_photos = search_unsplash_photos(query, per_page=5) or []
+        wikimedia_photos = search_wikimedia_photos(query, per_page=5) or []
 
-        if photos is None:
-            return TemplateResponse(
-                request,
-                "trips/includes/image-search-results.html",
-                {"error": _("Unsplash API error. Please try again later.")},
-            )
-
-        if not photos:
+        if not unsplash_photos and not wikimedia_photos:
             return TemplateResponse(
                 request,
                 "trips/includes/image-search-results.html",
@@ -487,7 +503,12 @@ def search_trip_images(request):
         return TemplateResponse(
             request,
             "trips/includes/image-search-results.html",
-            {"photos": photos, "trip_id": trip_id, "query": query},
+            {
+                "unsplash_photos": unsplash_photos,
+                "wikimedia_photos": wikimedia_photos,
+                "trip_id": trip_id,
+                "query": query,
+            },
         )
 
     return HttpResponse(status=405)

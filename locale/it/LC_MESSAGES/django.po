@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-03 08:33+0100\n"
+"POT-Creation-Date: 2026-11-03 16:11+0100\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1361,7 +1361,7 @@ msgid "Pre-departure Checklist"
 msgstr "Checklist pre-partenza"
 
 #: templates/trips/checklist.html:41
-#: templates/trips/includes/checklist-card.html:18 trips/forms/trip.py:358
+#: templates/trips/includes/checklist-card.html:18 trips/forms/trip.py:322
 msgid "Add an item…"
 msgstr "Aggiungi un elemento…"
 
@@ -2188,7 +2188,7 @@ msgid "Viewer"
 msgstr "Osservatore"
 
 #: templates/trips/includes/collab-modal-list.html:32
-#: templates/trips/includes/collab-modal.html:99 trips/forms/trip.py:340
+#: templates/trips/includes/collab-modal.html:99 trips/forms/trip.py:304
 msgid "Child"
 msgstr "Bambino"
 
@@ -2237,7 +2237,7 @@ msgstr "Adulto"
 msgid "Name…"
 msgstr "Nome…"
 
-#: templates/trips/includes/collab-modal.html:114 trips/forms/trip.py:341
+#: templates/trips/includes/collab-modal.html:114 trips/forms/trip.py:305
 msgid "Age"
 msgstr "Età"
 
@@ -2382,9 +2382,11 @@ msgstr "Il tuo saldo"
 msgid "New"
 msgstr "Nuovo"
 
-#: templates/trips/includes/image-search-results.html:39
+#: templates/trips/includes/image-search-results.html:13
 msgid "Click an image to select it for your trip, then save the form"
-msgstr "Clicca su un'immagine per selezionarla per il tuo viaggio, poi salva il modulo"
+msgstr ""
+"Clicca su un'immagine per selezionarla per il tuo viaggio, poi salva il "
+"modulo"
 
 #: templates/trips/includes/main-transfers.html:10
 #: trips/views/attachments.py:122
@@ -2969,7 +2971,7 @@ msgstr "Condividi questo link"
 msgid "Expires on %(date)s"
 msgstr "Scade il %(date)s"
 
-#: templates/trips/share-link-created.html:36 trips/forms/trip.py:296
+#: templates/trips/share-link-created.html:36 trips/forms/trip.py:260
 msgid "Never expires"
 msgstr "Non scade mai"
 
@@ -2981,7 +2983,7 @@ msgstr "Crea un altro"
 msgid "Active share links"
 msgstr "Link di condivisione attivi"
 
-#: templates/trips/share-link-list.html:8 trips/forms/trip.py:302
+#: templates/trips/share-link-list.html:8 trips/forms/trip.py:266
 msgid "Label"
 msgstr "Etichetta"
 
@@ -3309,7 +3311,7 @@ msgstr "Durata"
 
 #: trips/forms/event.py:46 trips/forms/event.py:47 trips/forms/event.py:96
 #: trips/forms/stay.py:27 trips/forms/stay.py:28 trips/forms/stay.py:76
-#: trips/forms/stay.py:90 trips/forms/trip.py:339
+#: trips/forms/stay.py:90 trips/forms/trip.py:303
 msgid "Name"
 msgstr "Nome"
 
@@ -3527,92 +3529,87 @@ msgstr "Indirizzo completo o nome località"
 msgid "Transport Mode"
 msgstr "Mezzo di trasporto"
 
-#: trips/forms/trip.py:81
+#: trips/forms/trip.py:83
 msgid "Select from suggestions for accurate geolocation"
 msgstr "Seleziona dai suggerimenti per una geolocalizzazione accurata"
 
-#: trips/forms/trip.py:126
+#: trips/forms/trip.py:128
 msgid "Trip Image"
 msgstr "Immagine del viaggio"
 
-#: trips/forms/trip.py:169
-msgid "Search Unsplash"
-msgstr "Cerca immagine su unsplash"
-
-#: trips/forms/trip.py:179
-msgid "Upload Image"
-msgstr "Carica immagine"
-
-#: trips/forms/trip.py:187
-msgid "Please fill in the destination field to search for images"
+#: trips/forms/trip.py:143
+msgid ""
+"Pick one of the suggested photos below, or upload your own — whichever you "
+"choose becomes the cover."
 msgstr ""
-"Per favore compila il campo destinazione per usufruire della ricerca immagini"
+"Scegli una delle foto suggerite qui sotto, oppure caricane una tua — "
+"diventerà la copertina del viaggio."
 
-#: trips/forms/trip.py:227
+#: trips/forms/trip.py:192
 msgid "Click to select an image"
 msgstr ""
 
-#: trips/forms/trip.py:246
+#: trips/forms/trip.py:210
 msgid "End date must be after start date"
 msgstr "La data di fine deve essere successiva alla data di inizio"
 
-#: trips/forms/trip.py:252
+#: trips/forms/trip.py:216
 msgid "Start date must be after today"
 msgstr "La data di inizio deve essere successiva a quella di oggi"
 
-#: trips/forms/trip.py:260
+#: trips/forms/trip.py:224
 msgid "Destination not found"
 msgstr "Destinazione non trovata"
 
-#: trips/forms/trip.py:293
+#: trips/forms/trip.py:257
 msgid "7 days"
 msgstr "7 giorni"
 
-#: trips/forms/trip.py:294
+#: trips/forms/trip.py:258
 msgid "30 days"
 msgstr "30 giorni"
 
-#: trips/forms/trip.py:295
+#: trips/forms/trip.py:259
 msgid "90 days"
 msgstr "90 giorni"
 
-#: trips/forms/trip.py:303
+#: trips/forms/trip.py:267
 msgid "Optional label to identify this link"
 msgstr "Etichetta opzionale per identificare il link"
 
-#: trips/forms/trip.py:308
+#: trips/forms/trip.py:272
 msgid "Expires after"
 msgstr "Scade dopo"
 
-#: trips/forms/trip.py:347
+#: trips/forms/trip.py:311
 msgid "Age is required for a child."
 msgstr "L'età è obbligatoria per un bambino."
 
-#: trips/forms/trip.py:371
+#: trips/forms/trip.py:335
 msgid "Off"
 msgstr "Disattivato"
 
-#: trips/forms/trip.py:372
+#: trips/forms/trip.py:336
 msgid "1 day before"
 msgstr "1 giorno prima"
 
-#: trips/forms/trip.py:373
+#: trips/forms/trip.py:337
 msgid "3 days before"
 msgstr "3 giorni prima"
 
-#: trips/forms/trip.py:374
+#: trips/forms/trip.py:338
 msgid "7 days before"
 msgstr "7 giorni prima"
 
-#: trips/forms/trip.py:375
+#: trips/forms/trip.py:339
 msgid "14 days before"
 msgstr "14 giorni prima"
 
-#: trips/forms/trip.py:376
+#: trips/forms/trip.py:340
 msgid "30 days before"
 msgstr "30 giorni prima"
 
-#: trips/forms/trip.py:382
+#: trips/forms/trip.py:346
 msgid "Email reminder"
 msgstr "Promemoria email"
 
@@ -3985,51 +3982,61 @@ msgstr "Trasferimento eliminata correttamente"
 msgid "Transfer saved successfully!"
 msgstr "Trasferimento salvato con successo!"
 
-#: trips/views/trips.py:278
+#: trips/views/trips.py:297
 #, python-format
 msgid "<strong>%(title)s</strong> added successfully"
 msgstr "<strong>%(title)s</strong> aggiunta correttamente"
 
-#: trips/views/trips.py:301
+#: trips/views/trips.py:320
 #, python-format
 msgid "<strong>%(title)s</strong> deleted successfully"
 msgstr "<strong>%(title)s</strong> eliminata correttamente"
 
-#: trips/views/trips.py:354
+#: trips/views/trips.py:371
 #, python-format
 msgid "<strong>%(title)s</strong> updated successfully"
 msgstr "<strong>%(title)s</strong> modificata correttamente"
 
-#: trips/views/trips.py:380
+#: trips/views/trips.py:397
 #, python-format
 msgid "<strong>%(title)s</strong> archived successfully"
 msgstr "<strong>%(title)s</strong> archiviata correttamente"
 
-#: trips/views/trips.py:395
+#: trips/views/trips.py:412
 #, python-format
 msgid "<strong>%(title)s</strong> unarchived successfully"
 msgstr "<strong>%(title)s</strong> riaperta correttamente"
 
-#: trips/views/trips.py:429
+#: trips/views/trips.py:446
 msgid "Start date must be after today."
 msgstr "La data di inizio deve essere successiva a quella di oggi."
 
-#: trips/views/trips.py:433
+#: trips/views/trips.py:450
 msgid "Start date cannot be after end date."
 msgstr "La data di inizio deve essere successiva a quella di fine."
 
-#: trips/views/trips.py:467
+#: trips/views/trips.py:490
 msgid "Please enter a destination first"
 msgstr "Per favore compila prima il campo destinazione"
 
-#: trips/views/trips.py:477
-msgid "Unsplash API error. Please try again later."
-msgstr "Errore API di Unsplash. Per favore riprova più tardi."
-
-#: trips/views/trips.py:484
+#: trips/views/trips.py:500
 #, python-brace-format
 msgid "No images found for '{query}'"
 msgstr "Nessuna immagine trovata per '{query}'"
+
+#~ msgid "Search Unsplash"
+#~ msgstr "Cerca immagine su unsplash"
+
+#~ msgid "Upload Image"
+#~ msgstr "Carica immagine"
+
+#~ msgid "Please fill in the destination field to search for images"
+#~ msgstr ""
+#~ "Per favore compila il campo destinazione per usufruire della ricerca "
+#~ "immagini"
+
+#~ msgid "Unsplash API error. Please try again later."
+#~ msgstr "Errore API di Unsplash. Per favore riprova più tardi."
 
 #, python-format
 #~ msgid "You have an unfinished trip setup: <strong>%(title)s</strong>."

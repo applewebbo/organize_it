@@ -1,5 +1,6 @@
 import hashlib
 import logging
+import re
 from io import BytesIO
 
 import requests
@@ -8,6 +9,15 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from PIL import Image
 
 logger = logging.getLogger(__name__)
+
+WIKIMEDIA_USER_AGENT = "OrganizeIt/1.0 (https://github.com/applewebbo/organize_it)"
+
+# Wikimedia Commons has no orientation filter like Unsplash, so aspect ratio
+# is checked client-side to exclude panoramas and portrait/odd crops.
+WIKIMEDIA_MIN_ASPECT_RATIO = 1.05
+WIKIMEDIA_MAX_ASPECT_RATIO = 2.2
+# Over-fetch since many results get filtered out by aspect ratio.
+WIKIMEDIA_OVERFETCH_FACTOR = 3
 
 
 def search_unsplash_photos(query, per_page=5, orientation="landscape"):
@@ -72,6 +82,7 @@ def search_unsplash_photos(query, per_page=5, orientation="landscape"):
                         "download_location": result["links"]["download_location"],
                     },
                     "alt_description": result.get("alt_description", ""),
+                    "source": "unsplash",
                 }
             )
 
@@ -134,6 +145,140 @@ def download_unsplash_photo(photo_data):
 
     except requests.RequestException as e:
         logger.error(f"Failed to download Unsplash photo: {e}")
+        return None, None
+
+
+def search_wikimedia_photos(query, per_page=5):
+    """
+    Search Wikimedia Commons for photos with caching.
+
+    Used as a fallback source alongside Unsplash: Commons has much broader
+    coverage of lesser-known destinations since it mirrors Wikipedia's
+    geo-tagged photos, and requires no API key.
+
+    Args:
+        query: Search query (typically trip destination)
+        per_page: Number of results (default 5 for UI)
+
+    Returns:
+        List of photo dicts or None on error
+    """
+    cache_data = f"wikimedia_{query}_{per_page}"
+    cache_key = hashlib.md5(cache_data.encode(), usedforsecurity=False).hexdigest()
+
+    cached_result = cache.get(cache_key)
+    if cached_result:
+        logger.info(f"Wikimedia cache hit for query: {query}")
+        return cached_result
+
+    try:
+        response = requests.get(
+            "https://commons.wikimedia.org/w/api.php",
+            params={
+                "action": "query",
+                "format": "json",
+                "generator": "search",
+                "gsrsearch": f"{query} filetype:bitmap",
+                "gsrnamespace": 6,
+                "gsrlimit": per_page * WIKIMEDIA_OVERFETCH_FACTOR,
+                "prop": "imageinfo",
+                "iiprop": "url|extmetadata|mime|size",
+                "iiurlwidth": 400,
+            },
+            headers={"User-Agent": WIKIMEDIA_USER_AGENT},
+            timeout=5,
+        )
+        response.raise_for_status()
+        data = response.json()
+
+        pages = data.get("query", {}).get("pages", {})
+        photos = []
+        for page_id, page in pages.items():
+            if len(photos) >= per_page:
+                break
+
+            imageinfo = page.get("imageinfo")
+            if not imageinfo:
+                continue
+            info = imageinfo[0]
+            if not info.get("mime", "").startswith("image/"):
+                continue
+
+            width, height = info.get("width"), info.get("height")
+            if not width or not height:
+                continue
+            aspect_ratio = width / height
+            if not (
+                WIKIMEDIA_MIN_ASPECT_RATIO <= aspect_ratio <= WIKIMEDIA_MAX_ASPECT_RATIO
+            ):
+                continue
+
+            extmetadata = info.get("extmetadata", {})
+            artist = re.sub(
+                r"<[^>]+>", "", extmetadata.get("Artist", {}).get("value", "")
+            ).strip()
+            title = re.sub(r"^File:", "", page.get("title", "")).rsplit(".", 1)[0]
+
+            photos.append(
+                {
+                    "id": f"wikimedia_{page_id}",
+                    "urls": {
+                        "small": info.get("thumburl", info["url"]),
+                        "regular": info["url"],
+                    },
+                    "user": {
+                        "name": artist or "Wikimedia Commons",
+                        "profile": info.get("descriptionurl", info["url"]),
+                    },
+                    "alt_description": title,
+                    "source": "wikimedia",
+                }
+            )
+
+        cache.set(cache_key, photos, 21600)
+        logger.info(f"Wikimedia search successful: {len(photos)} results for '{query}'")
+        return photos
+
+    except requests.exceptions.Timeout:
+        logger.error("Wikimedia API timeout")
+    except requests.RequestException as e:
+        logger.error(f"Wikimedia API error: {e}")
+
+    return None
+
+
+def download_wikimedia_photo(photo_data):
+    """
+    Download photo from Wikimedia Commons and return file content.
+
+    Args:
+        photo_data: Photo dict from search_wikimedia_photos
+
+    Returns:
+        Tuple of (image_content, metadata_dict) or (None, None)
+    """
+    try:
+        image_url = photo_data["urls"]["regular"]
+        response = requests.get(
+            image_url,
+            headers={"User-Agent": WIKIMEDIA_USER_AGENT},
+            timeout=10,
+        )
+        response.raise_for_status()
+
+        metadata = {
+            "source": "wikimedia",
+            "wikimedia_id": photo_data["id"],
+            "photographer": photo_data["user"]["name"],
+            "photographer_url": photo_data["user"]["profile"],
+            "photo_url": photo_data["user"]["profile"],
+        }
+
+        logger.info(f"Downloaded Wikimedia photo: {photo_data['id']}")
+        return response.content, metadata
+
+    except requests.RequestException as e:
+        logger.error(f"Failed to download Wikimedia photo: {e}")
         return None, None
 
 
