@@ -67,6 +67,14 @@ class TripForm(forms.ModelForm):
                 "hx-trigger": "input changed delay:600ms",
                 "hx-target": "#city-results-trip",
                 "hx-swap": "innerHTML",
+                "x-on:input.debounce.600ms": (
+                    "if ($el.value.trim() && $el.value !== lastSearchQuery) {"
+                    " imageMode = 'search';"
+                    " lastSearchQuery = $el.value;"
+                    " document.getElementById('search-unsplash-tab')"
+                    ".dispatchEvent(new Event('doSearch'));"
+                    " }"
+                ),
             }
         )
         self.fields["destination"].help_text = _(
@@ -128,6 +136,7 @@ class TripForm(forms.ModelForm):
             <div class="sm:col-span-2" x-data="{ showDestinationError: false }">
                 <div role="tablist" class="tabs tabs-border tabs-sm">
                     <button type="button"
+                            id="search-unsplash-tab"
                             role="tab"
                             class="gap-1 tab"
                             :class="imageMode === 'search' ? 'tab-active' : ''"

@@ -116,6 +116,16 @@ class TestTripForm:
         assert TripForm(data=data).is_valid()
         assert mock_geocoder.call_args.kwargs["types"] == "place"
 
+    def test_destination_widget_autosuggests_images_on_input(self):
+        """Typing a destination should also trigger the image search,
+        debounced, without requiring a manual click on the search tab."""
+        form = TripForm()
+        attrs = form.fields["destination"].widget.attrs
+
+        assert attrs["x-on:input.debounce.600ms"]
+        assert "search-unsplash-tab" in attrs["x-on:input.debounce.600ms"]
+        assert "doSearch" in attrs["x-on:input.debounce.600ms"]
+
 
 class TestLinkForm:
     def test_form(self):
