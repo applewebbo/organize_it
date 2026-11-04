@@ -124,6 +124,15 @@ select ~ .pointer-events-none {
   background-color: rgb(71 85 105); /* slate-600 */
 }
 
+.trip-card-overlay {
+  background-color: rgba(255, 255, 255, 0.9);
+  color: rgb(31 41 55); /* gray-800 */
+}
+[data-theme="dark"] .trip-card-overlay {
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #fff;
+}
+
 /* ── Trip Map Pins ── */
 .map-pin {
   display: flex;

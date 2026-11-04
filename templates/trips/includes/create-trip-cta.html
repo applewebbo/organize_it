@@ -3,8 +3,8 @@
     <div class="dropdown dropdown-center" x-data>
         <div tabindex="0"
              role="button"
-             id="trip-add"
-             class="btn btn-lg btn-primary btn-dash py-8 md:py-12"
+             id="trip-add{{ id_suffix }}"
+             class="btn btn-primary {% if compact %}btn-sm{% else %}btn-lg btn-dash py-8 md:py-12{% endif %}"
              aria-haspopup="menu">
             <i class="ph-bold ph-plus-circle" aria-hidden="true"></i>
             {% translate 'Create a new trip' %}
@@ -31,8 +31,8 @@
     </div>
 {% else %}
     <button type="button"
-            class="btn btn-lg btn-primary btn-dash py-8 md:py-12"
-            id="trip-add"
+            class="btn btn-primary {% if compact %}btn-sm{% else %}btn-lg btn-dash py-8 md:py-12{% endif %}"
+            id="trip-add{{ id_suffix }}"
             x-data
             hx-get="{% url 'trips:trip-create' %}"
             hx-target="#dialog"

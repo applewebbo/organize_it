@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-03 16:11+0100\n"
+"POT-Creation-Date: 2026-11-04 06:30+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -527,6 +527,7 @@ msgstr ""
 #: templates/trips/partials/main-transfer-train.html:111
 #: templates/trips/stay-create.html:39 templates/trips/stay-modify.html:19
 #: templates/trips/stay-note-modify.html:22 templates/trips/stay-notes.html:30
+#: templates/trips/trip-create.html:36
 msgid "Save"
 msgstr ""
 
@@ -847,8 +848,8 @@ msgstr ""
 #: templates/trips/includes/note.html:9
 #: templates/trips/includes/trip-header-card.html:113
 #: templates/trips/main-transfer-connection-modal.html:38
-#: templates/trips/stay-detail.html:89 templates/trips/trip-list.html:139
-#: templates/trips/trip-list.html:199
+#: templates/trips/stay-detail.html:89 templates/trips/trip-list.html:125
+#: templates/trips/trip-list.html:214
 msgid "Edit"
 msgstr ""
 
@@ -1221,7 +1222,7 @@ msgstr ""
 #: templates/trips/partials/main-transfer-type.html:63
 #: templates/trips/stay-create.html:42
 #: templates/trips/stay-enrich-preview.html:47
-#: templates/trips/stay-modify.html:18
+#: templates/trips/stay-modify.html:18 templates/trips/trip-create.html:35
 #: templates/trips/wizard/basics-step.html:20
 msgid "Cancel"
 msgstr ""
@@ -1696,7 +1697,9 @@ msgstr ""
 #: templates/trips/includes/note.html:14
 #: templates/trips/main-transfer-connection-modal.html:46
 #: templates/trips/stay-detail.html:97 templates/trips/stay-note-modify.html:27
-#: templates/trips/trip-list.html:124 templates/trips/trip-list.html:251
+#: templates/trips/trip-list.html:151 templates/trips/trip-list.html:152
+#: templates/trips/trip-list.html:281 templates/trips/trip-list.html:282
+#: templates/trips/trip-list.html:284
 msgid "Delete"
 msgstr ""
 
@@ -2562,7 +2565,7 @@ msgid "Add events"
 msgstr "Add events"
 
 #: templates/trips/includes/trip-header-card.html:122
-#: templates/trips/trip-list.html:134
+#: templates/trips/trip-list.html:133 templates/trips/trip-list.html:134
 msgctxt "trip action"
 msgid "Share"
 msgstr ""
@@ -2580,17 +2583,17 @@ msgid "Destination:"
 msgstr ""
 
 #: templates/trips/includes/wizard-draft-card.html:5
-#: templates/trips/trip-list.html:39
+#: templates/trips/trip-list.html:47
 msgid "Draft"
 msgstr ""
 
 #: templates/trips/includes/wizard-draft-card.html:20
-#: templates/trips/trip-list.html:57
+#: templates/trips/trip-list.html:65
 msgid "Discard"
 msgstr ""
 
 #: templates/trips/includes/wizard-draft-card.html:23
-#: templates/trips/trip-list.html:63
+#: templates/trips/trip-list.html:71
 msgid "Continue"
 msgstr ""
 
@@ -2942,7 +2945,8 @@ msgstr ""
 msgid "This trip is archived and cannot be modified."
 msgstr ""
 
-#: templates/trips/trip-detail.html:37 templates/trips/trip-list.html:246
+#: templates/trips/trip-detail.html:37 templates/trips/trip-list.html:272
+#: templates/trips/trip-list.html:273 templates/trips/trip-list.html:275
 msgid "Unarchive"
 msgstr ""
 
@@ -2950,33 +2954,42 @@ msgstr ""
 msgid "Trips List"
 msgstr ""
 
-#: templates/trips/trip-list.html:18
+#: templates/trips/trip-list.html:19
 msgid "My Trips"
 msgstr ""
 
-#: templates/trips/trip-list.html:32 templates/trips/trip-list.html:33
+#: templates/trips/trip-list.html:40 templates/trips/trip-list.html:41
 msgid "AI-generated trip"
 msgstr ""
 
-#: templates/trips/trip-list.html:100
+#: templates/trips/trip-list.html:110
 msgid "Weather forecast"
 msgstr "Weather forecast"
 
-#: templates/trips/trip-list.html:117
+#: templates/trips/trip-list.html:142
+msgid "Are you sure you want to archive this trip?"
+msgstr "Are you sure you want to archive this trip?"
+
+#: templates/trips/trip-list.html:143 templates/trips/trip-list.html:144
 msgid "Archive"
 msgstr ""
 
-#: templates/trips/trip-list.html:161
+#: templates/trips/trip-list.html:172
 msgid "Shared with me"
 msgstr "Shared with me"
 
-#: templates/trips/trip-list.html:213
+#: templates/trips/trip-list.html:229
 msgid "Archived Trips"
 msgstr ""
 
-#: templates/trips/trip-list.html:254
+#: templates/trips/trip-list.html:262 templates/trips/trip-list.html:263
+#: templates/trips/trip-list.html:265
 msgid "View"
 msgstr ""
+
+#: templates/trips/trip-list.html:271
+msgid "Are you sure you want to unarchive this trip?"
+msgstr "Are you sure you want to unarchive this trip?"
 
 #: templates/trips/trip-map.html:21
 msgid "Back to events"

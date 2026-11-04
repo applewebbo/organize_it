@@ -3,7 +3,7 @@
         <p class="text-base-content/50 mb-1 text-[11px] font-medium tracking-wide uppercase">
             {{ label }}
         </p>
-        <div class="grid grid-cols-5 gap-1.5">
+        <div class="grid grid-cols-3 gap-1.5 sm:grid-cols-5">
             {% for photo in photos %}
                 <div class="group relative cursor-pointer overflow-hidden rounded-lg shadow-lg"
                      @click="selectedId = '{{ photo.id }}'; document.getElementById('id_selected_photo_id').value = '{{ photo.id }}'; document.getElementById('id_selected_photo_source').value = '{{ photo.source }}'"

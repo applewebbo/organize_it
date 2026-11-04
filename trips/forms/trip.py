@@ -189,7 +189,7 @@ class TripForm(forms.ModelForm):
                                class="flex gap-2 justify-center items-center w-full h-12 rounded-lg border-2 border-dashed cursor-pointer border-base-300 hover:border-primary hover:bg-base-200">
                             <i class="ph-bold ph-upload-simple text-base-content/50"></i>
                             <span class="text-sm text-base-content/60"
-                                  x-text="fileName || '{_("Click to select an image")}'"
+                                  x-text="fileName || '{str(_("Click to select an image")).replace("'", "\\'")}'"
                             ></span>
                         </label>
                         <input type="file" name="image" accept="image/*" class="hidden" id="id_image" @change="onFileChange($event)">

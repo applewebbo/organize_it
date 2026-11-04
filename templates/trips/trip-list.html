@@ -13,12 +13,20 @@
                      hx-trigger="tripSaved from:body"
                      hx-get="{% url 'trips:trip-list' %}"
                      hx-target="#trips">
-                <div class="card bg-base-100 mb-12 shadow">
-                    <div class="card-body items-center text-center md:text-start">
-                        <h1 class="inline-block rounded-lg px-4 py-2 text-3xl font-semibold">{% translate 'My Trips' %}</h1>
+                <div class="card bg-base-100 mb-6 shadow">
+                    <div class="card-body relative items-center py-3 text-center md:items-start md:py-6 md:text-start">
+                        <h1 class="inline-block rounded-lg px-4 py-1 text-xl font-semibold sm:py-2 sm:text-2xl md:text-3xl">
+                            {% translate 'My Trips' %}
+                        </h1>
+                        <div class="absolute top-1/2 right-4 hidden -translate-y-1/2 sm:block">
+                            {% include "trips/includes/create-trip-cta.html" with compact=True id_suffix="-header" %}
+                        </div>
                     </div>
                 </div>
                 {% if active_trips or wizard_draft %}
+                    <div class="mb-6 flex justify-center sm:hidden">
+                        {% include "trips/includes/create-trip-cta.html" %}
+                    </div>
                     <div class="mb-12 grid grid-cols-1 gap-x-4 gap-y-8 md:grid-cols-2 xl:grid-cols-3">
                         {% if wizard_draft %}
                             <div class="card card-border bg-base-100 overflow-hidden shadow"
@@ -74,26 +82,28 @@
                                     <figure class="relative h-48 w-full">
                                         {% include "trips/includes/trip-image.html" with trip=trip image_loading="lazy" %}
                                         {% if trip.needs_attribution and not trip.image_metadata.pending %}
-                                            <div class="absolute right-1 bottom-1 rounded bg-black/50 px-2 py-1 text-xs text-white">
+                                            <div class="absolute top-1 right-1 rounded bg-black/50 px-2 py-1 text-xs text-white">
                                                 {{ trip.get_attribution_text }}
                                             </div>
                                         {% endif %}
+                                        <span class="badge badge-secondary badge-sm rounded-box absolute top-2 left-2">
+                                            {{ trip.get_status_display }}
+                                        </span>
+                                        <div class="trip-card-overlay absolute bottom-2 left-2 flex max-w-[calc(100%-1rem)] items-center gap-4 rounded-lg px-3 py-2">
+                                            <h2 class="card-title max-w-[65%] min-w-0 truncate text-sm font-semibold">
+                                                {{ trip.title }}
+                                            </h2>
+                                            <span class="shrink-0 text-xs whitespace-nowrap opacity-80">
+                                                {% if trip.start_date and trip.end_date %}
+                                                    {{ trip.start_date|date:"SHORT_DATE_FORMAT" }}&nbsp;-&nbsp;{{ trip.end_date|date:"SHORT_DATE_FORMAT" }}
+                                                {% else %}
+                                                    - / -
+                                                {% endif %}
+                                            </span>
+                                        </div>
                                     </figure>
                                 </a>
                                 <div class="card-body">
-                                    <span class="badge badge-outline badge-secondary">{{ trip.get_status_display }}</span>
-                                    <h2 class="card-title">
-                                        <a href="{% url 'trips:trip-detail' trip.id %}">{{ trip.title }}</a>
-                                    </h2>
-                                    <div x-data class="flex items-center">
-                                        <span>
-                                            {% if trip.start_date and trip.end_date %}
-                                                {{ trip.start_date|date:"SHORT_DATE_FORMAT" }}&nbsp;-&nbsp;{{ trip.end_date|date:"SHORT_DATE_FORMAT" }}
-                                            {% else %}
-                                                - / -
-                                            {% endif %}
-                                        </span>
-                                    </div>
                                     {% if trip.status == 2 or trip.status == 3 %}
                                         {% trip_day_one_weather trip as day_weather %}
                                         <div class="flex items-center gap-2 text-sm">
@@ -108,43 +118,44 @@
                                             {% endif %}
                                         </div>
                                     {% endif %}
-                                    <div class="grid grid-cols-2 gap-2">
-                                        <button type="button"
-                                                class="btn btn-sm btn-warning btn-soft"
-                                                hx-get="{% url 'trips:trip-archive' trip.id %}"
-                                                hx-target="">
-                                            <i class="ph-bold ph-archive" aria-hidden="true"></i>
-                                            <span>{% translate 'Archive' %}</span>
-                                        </button>
-                                        <button type="button"
-                                                class="btn btn-sm btn-error btn-soft"
-                                                hx-delete="{% url 'trips:trip-delete' trip.id %}"
-                                                hx-confirm="Are you sure you want to delete {{ trip.title }}?">
-                                            <i class="ph-bold ph-trash" aria-hidden="true"></i>
-                                            <span>{% translate 'Delete' %}</span>
-                                        </button>
+                                    <div class="grid grid-cols-[2fr_1fr_1fr_1fr] gap-2">
+                                        <a href="{% url 'trips:trip-detail' trip.id %}"
+                                           class="btn btn-sm btn-primary btn-soft">
+                                            <i class="ph-bold ph-pencil-line" aria-hidden="true"></i>
+                                            <span>{% translate 'Edit' %}</span>
+                                        </a>
                                         <button type="button"
                                                 class="btn btn-sm btn-soft"
                                                 x-data
                                                 hx-get="{% url 'trips:share-link-create' trip.id %}"
                                                 hx-target="#dialog"
                                                 hx-swap="innerHTML"
+                                                title="{% translate 'Share' context 'trip action' %}"
+                                                aria-label="{% translate 'Share' context 'trip action' %}"
                                                 @click="$dispatch('open-modal'); document.activeElement.blur()">
-                                            <i class="ph-bold ph-share-network" aria-hidden="true"></i>
-                                            <span>{% translate 'Share' context 'trip action' %}</span>
+                                            <i class="ph-bold ph-export" aria-hidden="true"></i>
                                         </button>
-                                        <a href="{% url 'trips:trip-detail' trip.id %}"
-                                           class="btn btn-sm btn-primary btn-soft">
-                                            <i class="ph-bold ph-pencil-line" aria-hidden="true"></i>
-                                            <span>{% translate 'Edit' %}</span>
-                                        </a>
+                                        <button type="button"
+                                                class="btn btn-sm btn-warning btn-soft"
+                                                hx-get="{% url 'trips:trip-archive' trip.id %}"
+                                                hx-target=""
+                                                hx-confirm="{% translate 'Are you sure you want to archive this trip?' %}"
+                                                title="{% translate 'Archive' %}"
+                                                aria-label="{% translate 'Archive' %}">
+                                            <i class="ph-bold ph-archive" aria-hidden="true"></i>
+                                        </button>
+                                        <button type="button"
+                                                class="btn btn-sm btn-error btn-soft"
+                                                hx-delete="{% url 'trips:trip-delete' trip.id %}"
+                                                hx-confirm="Are you sure you want to delete {{ trip.title }}?"
+                                                title="{% translate 'Delete' %}"
+                                                aria-label="{% translate 'Delete' %}">
+                                            <i class="ph-bold ph-trash" aria-hidden="true"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         {% endfor %}
-                        <div class="col-span-full flex flex-col items-center gap-2 self-center">
-                            {% include "trips/includes/create-trip-cta.html" %}
-                        </div>
                     </div>
                 {% else %}
                     <div class="flex flex-col items-center justify-center gap-2 py-20">
@@ -170,28 +181,32 @@
                                     <figure class="relative h-48 w-full">
                                         {% include "trips/includes/trip-image.html" with trip=trip image_loading="lazy" %}
                                         {% if trip.needs_attribution and not trip.image_metadata.pending %}
-                                            <div class="absolute right-1 bottom-1 rounded bg-black/50 px-2 py-1 text-xs text-white">
+                                            <div class="absolute top-1 right-1 rounded bg-black/50 px-2 py-1 text-xs text-white">
                                                 {{ trip.get_attribution_text }}
                                             </div>
                                         {% endif %}
+                                        <span class="badge badge-secondary badge-sm rounded-box absolute top-2 left-2">
+                                            {{ trip.get_status_display }}
+                                        </span>
+                                        <div class="trip-card-overlay absolute bottom-2 left-2 flex max-w-[calc(100%-1rem)] items-center gap-4 rounded-lg px-3 py-2">
+                                            <h2 class="card-title max-w-[65%] min-w-0 truncate text-sm font-semibold">
+                                                {{ trip.title }}
+                                            </h2>
+                                            <span class="shrink-0 text-xs whitespace-nowrap opacity-80">
+                                                {% if trip.start_date and trip.end_date %}
+                                                    {{ trip.start_date|date:"SHORT_DATE_FORMAT" }}&nbsp;-&nbsp;{{ trip.end_date|date:"SHORT_DATE_FORMAT" }}
+                                                {% else %}
+                                                    - / -
+                                                {% endif %}
+                                            </span>
+                                        </div>
                                     </figure>
                                 </a>
                                 <div class="card-body">
-                                    <span class="badge badge-outline badge-secondary">{{ trip.get_status_display }}</span>
-                                    <h2 class="card-title">
-                                        <a href="{% url 'trips:trip-detail' trip.id %}">{{ trip.title }}</a>
-                                    </h2>
                                     <span class="text-base-content bg-info/20 flex items-center gap-1.5 self-start rounded-full py-0.5 pr-2 pl-1.5 text-xs">
                                         <i class="ph-bold ph-user-circle"></i>
                                         {{ trip.author.profile.first_name|default:trip.author.email }}
                                     </span>
-                                    <div class="text-base-content/70 text-sm">
-                                        {% if trip.start_date and trip.end_date %}
-                                            {{ trip.start_date|date:"SHORT_DATE_FORMAT" }}&nbsp;-&nbsp;{{ trip.end_date|date:"SHORT_DATE_FORMAT" }}
-                                        {% else %}
-                                            - / -
-                                        {% endif %}
-                                    </div>
                                     <div class="card-actions justify-end">
                                         <a href="{% url 'trips:trip-detail' trip.id %}"
                                            class="btn btn-sm btn-primary btn-soft">
@@ -209,8 +224,10 @@
             {% if archived_trips %}
                 <section class="mx-auto my-5 max-w-7xl">
                     <div class="card bg-base-100 mb-6 shadow">
-                        <div class="card-body items-center text-center md:text-start">
-                            <h2 class="inline-block rounded-lg px-4 py-2 text-2xl font-semibold">{% translate 'Archived Trips' %}</h2>
+                        <div class="card-body items-center py-3 text-center md:items-start md:py-6 md:text-start">
+                            <h2 class="inline-block rounded-lg px-4 py-1 text-xl font-semibold sm:py-2 sm:text-2xl md:text-3xl">
+                                {% translate 'Archived Trips' %}
+                            </h2>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -240,18 +257,32 @@
                                         {% endif %}
                                     </div>
                                     <div class="card-actions justify-end gap-1">
+                                        <a href="{% url 'trips:trip-detail' trip.id %}"
+                                           class="btn btn-xs btn-primary btn-soft"
+                                           title="{% translate 'View' %}"
+                                           aria-label="{% translate 'View' %}">
+                                            <i class="ph-bold ph-eye" aria-hidden="true"></i>
+                                            <span class="hidden sm:inline">{% translate 'View' %}</span>
+                                        </a>
                                         <button type="button"
                                                 class="btn btn-xs btn-warning btn-soft"
                                                 hx-get="{% url 'trips:trip-unarchive' trip.id %}"
-                                                hx-target="">{% translate 'Unarchive' %}</button>
+                                                hx-target=""
+                                                hx-confirm="{% translate 'Are you sure you want to unarchive this trip?' %}"
+                                                title="{% translate 'Unarchive' %}"
+                                                aria-label="{% translate 'Unarchive' %}">
+                                            <i class="ph-bold ph-arrow-counter-clockwise" aria-hidden="true"></i>
+                                            <span class="hidden sm:inline">{% translate 'Unarchive' %}</span>
+                                        </button>
                                         <button type="button"
                                                 class="btn btn-xs btn-error btn-soft"
                                                 hx-delete="{% url 'trips:trip-delete' trip.id %}"
-                                                hx-confirm="Are you sure you want to delete {{ trip.title }}?">
-                                            {% translate 'Delete' %}
+                                                hx-confirm="Are you sure you want to delete {{ trip.title }}?"
+                                                title="{% translate 'Delete' %}"
+                                                aria-label="{% translate 'Delete' %}">
+                                            <i class="ph-bold ph-trash" aria-hidden="true"></i>
+                                            <span class="hidden sm:inline">{% translate 'Delete' %}</span>
                                         </button>
-                                        <a href="{% url 'trips:trip-detail' trip.id %}"
-                                           class="btn btn-xs btn-primary btn-soft">{% translate 'View' %}</a>
                                     </div>
                                 </div>
                             </div>
