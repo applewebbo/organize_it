@@ -1,3 +1,11 @@
+/* Disable iOS/mobile Safari's automatic text-size "boosting": it inflates
+   small/italic text in narrow columns (e.g. form help text) past the
+   font-size/line-height actually set in CSS, regardless of design intent. */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 [x-cloak] { display: none !important; }
 
 /* Map view drops the card's bottom padding (kept as a class so rustywind does
@@ -29,6 +37,21 @@ select ~ .pointer-events-none {
 .htmx-request .htmx-indicator,
 .htmx-request.htmx-indicator  {
   display: inline-block;
+}
+
+/* The cover-image skeleton placeholder (trips/forms/trip.py) lives inside
+   the trip <form>. The generic ".htmx-request .htmx-indicator" rule above
+   matches any descendant indicator whenever an ANCESTOR has an in-flight
+   htmx request — including the form's own Save submit — so without this,
+   the skeleton flashes open over the already-loaded photos for an instant
+   right before the dialog closes. ID selectors outrank the generic class
+   rules above regardless of source order, so this reacts only to the
+   indicator's own targeted request (#search-unsplash-tab's hx-indicator). */
+#search-spinner.htmx-indicator {
+  display: none;
+}
+#search-spinner.htmx-indicator.htmx-request {
+  display: block;
 }
 
 .i-xs {

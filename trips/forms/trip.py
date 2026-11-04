@@ -133,21 +133,10 @@ class TripForm(forms.ModelForm):
             ),
             Field("selected_photo_id"),
             Field("selected_photo_source"),
-            # Single cover-image container: suggested photos (Unsplash +
-            # Wikimedia Commons, auto-searched while typing the destination)
-            # with a manual upload field right below as an alternative.
-            HTML(
-                '<p class="text-base-content/60 sm:col-span-2 -mt-1 mb-3 text-xs">'
-                + str(
-                    _(
-                        "Pick one of the suggested photos below, or upload your own — whichever you choose becomes the cover."
-                    )
-                )
-                + "</p>"
-            ),
             # Hidden element wiring the image search request; triggered
             # automatically while typing the destination (see the
-            # destination field's x-on:input handler above).
+            # destination field's x-on:input handler above) and when the
+            # current cover is clicked to be replaced.
             HTML(
                 '<span id="search-unsplash-tab" class="hidden" hx-post='
                 + f'"{reverse("trips:search-images")}"'
@@ -158,45 +147,133 @@ class TripForm(forms.ModelForm):
                       hx-include="[name='destination'], [name='trip_id']"></span>
                 """
             ),
-            Div(
-                HTML(
-                    '<div id="search-spinner" class="loading loading-spinner htmx-indicator"></div>'
-                ),
-                HTML('<div id="image-results"></div>'),
-                css_class="sm:col-span-2",
-            ),
+            # Single cover-image container: when a cover is already set it
+            # shows as a clickable preview (hover overlay / caption invite
+            # replacing it); clicking it — or starting from scratch when no
+            # cover exists yet — reveals the suggested-photos picker
+            # (Unsplash + Wikimedia Commons) plus the manual upload field.
             Div(
                 HTML(
                     f"""
                     <div x-data="{{
+                        originalImageUrl: '{current_image_url}',
                         previewUrl: '{current_image_url}',
-                        fileName: '',
+                        uploadPreviewUrl: '',
+                        showPicker: {"false" if current_image_url else "true"},
+                        triggerSearch() {{
+                            const dest = document.querySelector('[name=destination]');
+                            if (dest && dest.value.trim()) {{
+                                document.getElementById('search-unsplash-tab').dispatchEvent(new Event('doSearch'));
+                            }}
+                        }},
+                        openPicker() {{
+                            this.showPicker = true;
+                            this.triggerSearch();
+                        }},
+                        cancelPicker() {{
+                            this.showPicker = false;
+                            this.uploadPreviewUrl = '';
+                            document.getElementById('id_selected_photo_id').value = '';
+                            document.getElementById('id_selected_photo_source').value = 'unsplash';
+                            const fileInput = document.getElementById('id_image');
+                            if (fileInput) fileInput.value = '';
+                        }},
                         onFileChange(e) {{
                             const file = e.target.files[0];
                             if (!file) return;
-                            this.fileName = file.name;
                             const reader = new FileReader();
-                            reader.onload = (ev) => {{ this.previewUrl = ev.target.result; }};
+                            reader.onload = (ev) => {{ this.uploadPreviewUrl = ev.target.result; }};
                             reader.readAsDataURL(file);
                         }}
-                    }}" class="flex flex-col gap-2">
-                        <template x-if="previewUrl">
-                            <img :src="previewUrl"
-                                 class="object-cover w-full h-32 rounded-lg border border-base-300"
-                                 alt="preview">
-                        </template>
-                        <label for="id_image"
-                               class="flex gap-2 justify-center items-center w-full h-12 rounded-lg border-2 border-dashed cursor-pointer border-base-300 hover:border-primary hover:bg-base-200">
-                            <i class="ph-bold ph-upload-simple text-base-content/50"></i>
-                            <span class="text-sm text-base-content/60"
-                                  x-text="fileName || '{str(_("Click to select an image")).replace("'", "\\'")}'"
-                            ></span>
-                        </label>
-                        <input type="file" name="image" accept="image/*" class="hidden" id="id_image" @change="onFileChange($event)">
+                    }}"
+                         x-init="if (showPicker) triggerSearch()">
+                        <!-- Current cover: click to replace -->
+                        <div x-show="!showPicker && previewUrl" x-cloak class="flex flex-col gap-1">
+                            <button type="button"
+                                    @click="openPicker()"
+                                    class="group relative block w-full overflow-hidden rounded-lg border border-base-300">
+                                <img :src="previewUrl"
+                                     class="h-32 w-full object-cover transition-transform duration-200 group-hover:scale-105"
+                                     alt="{str(_("Trip cover"))}">
+                                <div class="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all duration-200 group-hover:bg-black/50 group-hover:opacity-100">
+                                    <span class="flex items-center gap-1.5 text-sm font-medium text-white">
+                                        <i class="ph-bold ph-pencil-simple" aria-hidden="true"></i>
+                                        {str(_("Change image"))}
+                                    </span>
+                                </div>
+                            </button>
+                            <p class="text-base-content/60 text-sm leading-snug text-center italic">{
+                        str(_("Tap the photo to replace it"))
+                    }</p>
+                        </div>
+                        <!-- Picker: suggested photos + manual upload (replaces the current cover view entirely).
+                             bg-base-200 (no border) sets it apart as the section Cancel closes. -->
+                        <div x-show="showPicker" x-cloak class="bg-base-200 flex flex-col gap-3 rounded-lg p-3">
+                            <div class="flex items-center justify-between gap-2">
+                                <p class="text-base-content/60 text-sm leading-snug italic">{
+                        str(
+                            _(
+                                "Pick one of the suggested photos below, or upload your own — whichever you choose becomes the cover."
+                            )
+                        )
+                    }</p>
+                                <button type="button"
+                                        x-show="originalImageUrl"
+                                        x-cloak
+                                        @click="cancelPicker()"
+                                        class="btn btn-xs btn-soft btn-error shrink-0 gap-1">
+                                    <i class="ph-bold ph-x" aria-hidden="true"></i>
+                                    {str(_("Cancel"))}
+                                </button>
+                            </div>
+                            <!-- Skeleton placeholder matching the real results grid
+                                 (same row/grid-cell shape), so the layout doesn't
+                                 jump once Unsplash + Wikimedia photos swap in. -->
+                            <div id="search-spinner" class="htmx-indicator w-full">
+                                <div class="mb-3">
+                                    <div class="skeleton mb-1 h-3 w-20"></div>
+                                    <div class="grid grid-cols-3 gap-1.5 sm:grid-cols-5">
+                                        <div class="skeleton h-20 w-full rounded-lg"></div>
+                                        <div class="skeleton h-20 w-full rounded-lg"></div>
+                                        <div class="skeleton h-20 w-full rounded-lg"></div>
+                                        <div class="skeleton hidden h-20 w-full rounded-lg sm:block"></div>
+                                        <div class="skeleton hidden h-20 w-full rounded-lg sm:block"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="skeleton mb-1 h-3 w-28"></div>
+                                    <div class="grid grid-cols-3 gap-1.5 sm:grid-cols-5">
+                                        <div class="skeleton h-20 w-full rounded-lg"></div>
+                                        <div class="skeleton h-20 w-full rounded-lg"></div>
+                                        <div class="skeleton h-20 w-full rounded-lg"></div>
+                                        <div class="skeleton hidden h-20 w-full rounded-lg sm:block"></div>
+                                        <div class="skeleton hidden h-20 w-full rounded-lg sm:block"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="image-results"></div>
+                            <div class="flex flex-col gap-2">
+                                <template x-if="uploadPreviewUrl">
+                                    <img :src="uploadPreviewUrl"
+                                         class="object-cover w-full h-32 rounded-lg border border-base-300"
+                                         alt="preview">
+                                </template>
+                                <label for="id_image"
+                                       class="text-base-content/60 text-xs leading-snug">{
+                        str(_("Or upload your own"))
+                    }</label>
+                                <input type="file"
+                                       name="image"
+                                       accept="image/*"
+                                       id="id_image"
+                                       class="file-input w-full"
+                                       @change="onFileChange($event)">
+                            </div>
+                        </div>
                     </div>
                     """
                 ),
-                css_class="sm:col-span-2 mt-4",
+                css_class="sm:col-span-2 mt-1",
             ),
         )
 
