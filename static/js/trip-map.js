@@ -316,10 +316,10 @@
   /* ── HTMX wiring ─────────────────────────────────────────────────── */
   document.addEventListener("DOMContentLoaded", initMap);
 
-  document.body.addEventListener("htmx:afterSwap", (event) => {
-    const id = event.detail.target?.id;
-    if (id === "search-results-panel") rebuildSearchLayer();
-    if (id === "events-panel") {
+  document.body.addEventListener("htmx:after:swap", (event) => {
+    const target = event.detail.ctx.target;
+    if (target === "#search-results-panel") rebuildSearchLayer();
+    if (target === "#events-panel") {
       // After adding an event, update the JSON and rebuild
       // (the JSON is embedded server-side; a full page reload would refresh it,
       //  but for HTMX swap we rebuild from the existing JSON)

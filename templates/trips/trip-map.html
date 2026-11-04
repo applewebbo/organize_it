@@ -59,7 +59,7 @@
                                       hx-target="#search-results-panel"
                                       hx-swap="innerHTML"
                                       hx-indicator="#ai-spinner"
-                                      hx-disabled-elt="button[type='submit']">
+                                      hx-disable="button[type='submit']">
                                     {% csrf_token %}
                                     {% if has_custom_stages %}
                                         <select name="stage_destination"

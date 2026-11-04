@@ -27,7 +27,7 @@
         <!-- Phosphor Icons (self-hosted) -->
         <link rel="stylesheet" href="{% static 'icons/phosphor/bold/style.css' %}" />
     </head>
-    <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="body-pattern">
+    <body hx-headers:inherited='{"X-CSRFToken": "{{ csrf_token }}"}' class="body-pattern">
         <section>
             {% include 'includes/navbar.html' %}
         </section>
@@ -45,7 +45,7 @@
             <div id="messages" class="z-3">{% include 'includes/messages.html' %}</div>
         </div>
         <!-- Htmx (served by django-htmx, includes the debug script in DEBUG mode) -->
-        {% htmx_script %}
+        {% htmx_script version=4 %}
         <!-- SortableJS -->
         <script src="{% static 'js/sortable.js' %}" defer></script>
         <!-- Main.js must load before Alpine to register alpine:init listener -->

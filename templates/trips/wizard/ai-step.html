@@ -11,7 +11,7 @@
                 <form hx-post="{% url 'trips:wizard-ai-generate' trip.pk %}"
                       hx-target="#wizard-ai-results"
                       hx-swap="innerHTML"
-                      hx-disabled-elt="button[type='submit']">
+                      hx-disable="button[type='submit']">
                     {% csrf_token %}
                     <input type="text"
                            name="notes"

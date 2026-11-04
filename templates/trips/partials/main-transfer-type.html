@@ -12,7 +12,7 @@
                 hx-get="{% url 'trips:main-transfer-step' trip.pk %}?step={% if direction %}{{ direction }}{% else %}{% if for_departure %}departure{% else %}arrival{% endif %}{% endif %}&transport_type=plane{% if direction %}&direction={{ direction }}{% endif %}"
                 hx-target="#{% if direction %}{{ direction }}-transfer-content{% else %}main-transfer-content{% endif %}"
                 hx-swap="innerHTML"
-                @htmx:after-settle="currentStep = 'form'">
+                @htmx:after:settle="currentStep = 'form'">
             <i class="ph-bold ph-airplane-takeoff text-primary text-4xl"></i>
             <span class="font-semibold">{% translate "Plane" %}</span>
         </button>
@@ -24,7 +24,7 @@
                 hx-get="{% url 'trips:main-transfer-step' trip.pk %}?step={% if direction %}{{ direction }}{% else %}{% if for_departure %}departure{% else %}arrival{% endif %}{% endif %}&transport_type=train{% if direction %}&direction={{ direction }}{% endif %}"
                 hx-target="#{% if direction %}{{ direction }}-transfer-content{% else %}main-transfer-content{% endif %}"
                 hx-swap="innerHTML"
-                @htmx:after-settle="currentStep = 'form'">
+                @htmx:after:settle="currentStep = 'form'">
             <i class="ph-bold ph-train text-primary text-4xl"></i>
             <span class="font-semibold">{% translate "Train" %}</span>
         </button>
@@ -36,7 +36,7 @@
                 hx-get="{% url 'trips:main-transfer-step' trip.pk %}?step={% if direction %}{{ direction }}{% else %}{% if for_departure %}departure{% else %}arrival{% endif %}{% endif %}&transport_type=car{% if direction %}&direction={{ direction }}{% endif %}"
                 hx-target="#{% if direction %}{{ direction }}-transfer-content{% else %}main-transfer-content{% endif %}"
                 hx-swap="innerHTML"
-                @htmx:after-settle="currentStep = 'form'">
+                @htmx:after:settle="currentStep = 'form'">
             <i class="ph-bold ph-car text-primary text-4xl"></i>
             <span class="font-semibold">{% translate "Car" %}</span>
         </button>
@@ -48,7 +48,7 @@
                 hx-get="{% url 'trips:main-transfer-step' trip.pk %}?step={% if direction %}{{ direction }}{% else %}{% if for_departure %}departure{% else %}arrival{% endif %}{% endif %}&transport_type=other{% if direction %}&direction={{ direction }}{% endif %}"
                 hx-target="#{% if direction %}{{ direction }}-transfer-content{% else %}main-transfer-content{% endif %}"
                 hx-swap="innerHTML"
-                @htmx:after-settle="currentStep = 'form'">
+                @htmx:after:settle="currentStep = 'form'">
             <span class="text-primary flex items-center gap-1">
                 <i class="ph-bold ph-boat text-3xl"></i>
                 <span class="text-xl font-bold">/</span>

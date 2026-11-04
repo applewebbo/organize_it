@@ -15,7 +15,7 @@
         <div class="bg-base-200 mb-3 flex gap-1 rounded-lg p-1">
             <button type="button"
                     class="flex-1 rounded-md py-1.5 text-base transition-colors"
-                    :class="mode === 'editor' ? 'bg-base-100 text-base-content' : 'text-base-content/60 hover:text-base-content' shadow"
+                    :class="mode === 'editor' ? 'bg-base-100 text-base-content shadow' : 'text-base-content/60 hover:text-base-content'"
                     @click="mode = 'editor'"
                     title="{% translate 'Editor' %}"
                     aria-label="{% translate 'Editor' %}">
@@ -23,7 +23,7 @@
             </button>
             <button type="button"
                     class="flex-1 rounded-md py-1.5 text-base transition-colors"
-                    :class="mode === 'viewer' ? 'bg-base-100 text-base-content' : 'text-base-content/60 hover:text-base-content' shadow"
+                    :class="mode === 'viewer' ? 'bg-base-100 text-base-content shadow' : 'text-base-content/60 hover:text-base-content'"
                     @click="mode = 'viewer'"
                     title="{% translate 'Viewer' %}"
                     aria-label="{% translate 'Viewer' %}">
@@ -31,7 +31,7 @@
             </button>
             <button type="button"
                     class="flex-1 rounded-md py-1.5 text-base transition-colors"
-                    :class="mode === 'named' ? 'bg-base-100 text-base-content' : 'text-base-content/60 hover:text-base-content' shadow"
+                    :class="mode === 'named' ? 'bg-base-100 text-base-content shadow' : 'text-base-content/60 hover:text-base-content'"
                     @click="mode = 'named'"
                     title="{% translate 'Name only' %}"
                     aria-label="{% translate 'Name only' %}">
@@ -61,7 +61,7 @@
             <form hx-post="{% url 'trips:add-viewer-by-email' trip.pk %}"
                   hx-target="#collab-modal-list"
                   hx-swap="outerHTML"
-                  @htmx:after-request="if(event.detail.successful) { $el.reset() }">
+                  @htmx:after:request="if(event.detail.ctx.response.status < 400) { $el.reset() }">
                 {% csrf_token %}
                 <div class="mb-2 flex items-center gap-2">
                     <input type="email"
@@ -82,7 +82,7 @@
             <form hx-post="{% url 'trips:add-named-participant' trip.pk %}"
                   hx-target="#collab-modal-list"
                   hx-swap="outerHTML"
-                  @htmx:after-request="if(event.detail.successful) { $el.reset(); isChild = false }">
+                  @htmx:after:request="if(event.detail.ctx.response.status < 400) { $el.reset(); isChild = false }">
                 {% csrf_token %}
                 <!-- Adult / child selector -->
                 <div class="bg-base-200 mb-2 flex gap-1 rounded-lg p-1">

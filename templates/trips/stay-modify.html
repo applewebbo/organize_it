@@ -4,7 +4,7 @@
     hx-swap-oob="true">{% translate 'Edit Stay' %}:&nbsp;{{ stay.name }}</h3>
 <form hx-post="{{ request.path }}"
       hx-target="#dialog"
-      hx-disabled-elt="#form-submit"
+      hx-disable="#form-submit"
       class="modal-content"
       method="post"
       x-data="autocompleteForm()">

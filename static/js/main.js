@@ -1,22 +1,21 @@
+// Keep htmx 2's default: don't swap error responses (4xx/5xx), only skip
+// 204/304 by default in htmx 4 — this runs before any hx-trigger="load"
+// element fires, since this script is deferred right after htmx itself.
+htmx.config.noSwap = [204, 304, "4xx", "5xx"];
+
 // Close the modal after successfully submitting the form
-htmx.on("htmx:beforeSwap", (e) => {
+htmx.on("htmx:before:swap", (e) => {
   // Empty response targeting #dialog => hide the modal
-  if (e.detail.target.id == "dialog" && !e.detail.xhr.response) {
+  if (e.detail.ctx.target === "#dialog" && !e.detail.ctx.text) {
     window.dispatchEvent(new Event('hide-modal'))
-    e.detail.shouldSwap = false
+    e.preventDefault()
   }
 })
 
 // Re-initialize Alpine.js after HTMX swaps (OOB and normal)
-htmx.on("htmx:oobAfterSwap", (e) => {
-  if (window.Alpine && e.detail.target) {
-    Alpine.initTree(e.detail.target)
-  }
-})
-
-htmx.on("htmx:afterSwap", (e) => {
-  if (window.Alpine && e.detail.target) {
-    Alpine.initTree(e.detail.target)
+htmx.on("htmx:after:swap", () => {
+  if (window.Alpine) {
+    Alpine.initTree(document.body)
   }
 })
 
@@ -281,7 +280,7 @@ function initSortableLists() {
 }
 
 initSortableLists();
-document.addEventListener("htmx:afterSettle", () => initSortableLists());
+document.addEventListener("htmx:after:settle", () => initSortableLists());
 
 // SortableJS drag & drop for expense family units (sm+ only)
 function initFamilyUnitSortables() {
@@ -321,7 +320,7 @@ function initFamilyUnitSortables() {
 }
 
 initFamilyUnitSortables();
-document.addEventListener("htmx:afterSettle", () => initFamilyUnitSortables());
+document.addEventListener("htmx:after:settle", () => initFamilyUnitSortables());
 
 function swapButton(eventId, swapUrl, label) {
     return { open: false };

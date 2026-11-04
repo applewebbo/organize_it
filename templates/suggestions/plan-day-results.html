@@ -19,7 +19,7 @@
     <form hx-post="{% url 'suggestions:accept-day' trip.pk day.pk %}"
           hx-target="#plan-day-results"
           hx-swap="innerHTML"
-          hx-disabled-elt="button[type='submit']"
+          hx-disable="button[type='submit']"
           x-data="{ stops: JSON.parse(document.getElementById('plan-day-stops').textContent).map(s => ({ ...s, include: true })) }">
         {% csrf_token %}
         <input type="hidden" name="strategy" value="{{ strategy }}" />

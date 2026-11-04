@@ -14,7 +14,7 @@
           hx-target="#plan-day-results"
           hx-swap="innerHTML"
           hx-indicator="#plan-day-spinner"
-          hx-disabled-elt="button[type='submit']">
+          hx-disable="button[type='submit']">
         {% csrf_token %}
         {% if has_events %}
             <fieldset class="border-base-300 mb-3 rounded-lg border p-3">

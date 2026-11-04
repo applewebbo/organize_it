@@ -3,7 +3,7 @@
     <form {# djlint:off #}{% if is_edit_modal %} hx-post="{% url 'trips:edit-main-transfer' form.instance.pk %}" {% else %} hx-post="{% url 'trips:save-main-transfer' trip.pk %}?transport_type=car&direction={{ direction }}" hx-target="#{% if direction %}{{ direction }}-transfer-content{% else %}main-transfer-content{% endif %}
           "
     {% endif %}{# djlint:on #}
-          hx-disabled-elt="#form-submit"
+          hx-disable="#form-submit"
           method="post">
         <div class="grid gap-x-1 p-4 sm:grid-cols-4 sm:gap-x-2 md:p-5">
             {% csrf_token %}
@@ -102,7 +102,7 @@
                         hx-get="{% url 'trips:main-transfer-step' trip.pk %}?step=type&transport_type=car{% if direction %}&direction={{ direction }}{% endif %}"
                         hx-target="#{% if direction %}{{ direction }}-transfer-content{% else %}main-transfer-content{% endif %}"
                         hx-swap="innerHTML"
-                        @htmx:after-settle="currentStep = 'type'">
+                        @htmx:after:settle="currentStep = 'type'">
                     <i class="ph-bold ph-arrow-left"></i>
                     {% translate "Back" %}
                 </button>

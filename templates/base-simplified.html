@@ -21,7 +21,7 @@
         <!-- Custom CSS -->
         <link rel="stylesheet" href="{% static 'css/custom.css' %}">
     </head>
-    <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+    <body hx-headers:inherited='{"X-CSRFToken": "{{ csrf_token }}"}'
           class="bg-secondary-subtle">
         <section class="body-pattern h-screen">
             {% block content %}
@@ -30,7 +30,7 @@
         <!-- Messages -->
         <div id="messages" class="z-3">{% include 'includes/messages.html' %}</div>
         <!-- Htmx (served by django-htmx, includes the debug script in DEBUG mode) -->
-        {% htmx_script %}
+        {% htmx_script version=4 %}
         <!-- Main.js must load before Alpine to register alpine:init listener -->
         <script src="{% static 'js/main.js' %}" defer></script>
         <!-- Alpine.js -->

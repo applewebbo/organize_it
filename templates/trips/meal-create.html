@@ -1,7 +1,7 @@
 {% load crispy_forms_tags i18n %}
 <form hx-post="{{ request.path }}"
       hx-target="#dialog"
-      hx-disabled-elt="#form-submit"
+      hx-disable="#form-submit"
       class="modal-content"
       method="post"
       x-data="autocompleteForm()">

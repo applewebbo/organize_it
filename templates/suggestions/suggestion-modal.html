@@ -11,7 +11,7 @@
           hx-target="#ai-modal-results"
           hx-swap="innerHTML"
           hx-indicator="#ai-modal-spinner"
-          hx-disabled-elt="button[type='submit']">
+          hx-disable="button[type='submit']">
         {% csrf_token %}
         <input type="hidden" name="context" value="modal">
         {% if has_custom_stages %}

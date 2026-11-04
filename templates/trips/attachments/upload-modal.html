@@ -2,7 +2,7 @@
 <form hx-post="{% url 'trips:attachment-upload' trip.pk category %}"
       hx-encoding="multipart/form-data"
       hx-swap="none"
-      hx-on::after-request="if(event.detail.successful){ this.closest('[x-data]').dispatchEvent(new CustomEvent('hide-modal',{bubbles:true})); }"
+      hx-on::after:request="if(event.detail.ctx.response.status < 400){ this.closest('[x-data]').dispatchEvent(new CustomEvent('hide-modal',{bubbles:true})); }"
       class="modal-content"
       method="post"
       enctype="multipart/form-data">

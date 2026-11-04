@@ -32,7 +32,7 @@
                 <form hx-post="{% url 'trips:checklist-item-add' trip.pk %}"
                       hx-target="#checklist-list"
                       hx-swap="outerHTML"
-                      hx-on::after-request="this.reset()">
+                      hx-on::after:request="this.reset()">
                     {% csrf_token %}
                     <div class="flex gap-2">
                         <input type="text"

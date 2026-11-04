@@ -86,7 +86,7 @@
                     class="btn btn-sm btn-ghost gap-2"
                     hx-post="{% url 'trips:toggle-guide' %}"
                     hx-swap="none"
-                    hx-on::after-request="location.reload()"
+                    hx-on::after:request="location.reload()"
                     aria-label="{% translate 'Toggle guide visibility' %}">
                 <i class="ph-bold ph-question i-md" aria-hidden="true"></i>
                 <span>

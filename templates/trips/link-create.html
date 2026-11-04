@@ -1,7 +1,7 @@
 {% load crispy_forms_tags %}
 <form hx-post="{{ request.path }}"
       hx-target="#dialog"
-      hx-disabled-elt="#form-submit"
+      hx-disable="#form-submit"
       class="modal-content"
       method="post">
     <div class="flex items-center justify-between rounded-t border-b p-4 md:p-5 dark:border-gray-600">
