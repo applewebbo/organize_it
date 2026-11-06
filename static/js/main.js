@@ -1,3 +1,40 @@
+// Shared by includes/theme-switcher.html (mobile navbar) and
+// includes/sidebar-theme-toggle.html (sidebar, md+): both call
+// x-data="themeSwitcher(...)" directly, so this must stay a plain global
+// function rather than an Alpine.data() registration.
+function themeSwitcher(useSystemTheme) {
+  return {
+    useSystemTheme: useSystemTheme,
+    isDark: false,
+
+    init() {
+      this.isDark = this.getInitialTheme() === "dark";
+      this.applyTheme();
+    },
+
+    getInitialTheme() {
+      if (this.useSystemTheme) {
+        return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme) {
+        return savedTheme;
+      }
+      return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    },
+
+    toggleTheme() {
+      this.applyTheme();
+    },
+
+    applyTheme() {
+      const theme = this.isDark ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", theme);
+      localStorage.setItem("theme", theme);
+    },
+  };
+}
+
 // Keep htmx 2's default: don't swap error responses (4xx/5xx), only skip
 // 204/304 by default in htmx 4 — this runs before any hx-trigger="load"
 // element fires, since this script is deferred right after htmx itself.
@@ -337,6 +374,14 @@ document.addEventListener("alpine:init", () => {
         },
     });
     Alpine.data("swapButton", swapButton);
+    // Vertical sidebar (md+), collapsed state persisted across reloads.
+    Alpine.data("sidebar", () => ({
+        collapsed: localStorage.getItem("sidebar-collapsed") === "true",
+        toggle() {
+            this.collapsed = !this.collapsed;
+            localStorage.setItem("sidebar-collapsed", this.collapsed);
+        },
+    }));
     Alpine.data("autocompleteForm", () => ({
         geocodeTimer: null,
         addressFilled: false,

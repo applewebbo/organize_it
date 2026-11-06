@@ -1,0 +1,9 @@
+{% load i18n %}
+<label class="btn btn-ghost btn-sm swap swap-rotate tooltip tooltip-right"
+       x-data="themeSwitcher({{ use_system_theme|yesno:'true,false' }})"
+       data-tip="{% translate 'Toggle theme' %}"
+       aria-label="{% translate 'Toggle theme' %}">
+    <input type="checkbox" class="theme-controller" x-model="isDark" @change="toggleTheme()" />
+    <i class="ph-bold ph-sun swap-off i-sm" aria-hidden="true"></i>
+    <i class="ph-bold ph-moon swap-on i-sm" aria-hidden="true"></i>
+</label>

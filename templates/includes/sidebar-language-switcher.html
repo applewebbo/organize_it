@@ -1,0 +1,13 @@
+{% load i18n %}
+{% get_current_language as current_language %}
+<button type="button"
+        class="btn btn-ghost btn-sm tooltip tooltip-right font-normal"
+        hx-post="{% url 'set_language' %}"
+        hx-vals='{"language": "{% if current_language == "en" %}it{% else %}en{% endif %}"}'
+        hx-swap="none"
+        hx-headers:append='{"HX-Request": "true"}'
+        hx-on::after:request="window.location.reload()"
+        data-tip="{% translate 'Switch language' %}"
+        aria-label="{% translate 'Switch language' %}">
+    {{ current_language|upper }}
+</button>

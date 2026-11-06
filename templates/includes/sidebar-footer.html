@@ -1,0 +1,38 @@
+{% load i18n %}
+<div class="border-base-200 flex flex-col gap-2 border-t p-2">
+    <div class="flex items-center justify-center gap-2" :class="collapsed ? 'flex-col' : ''">
+        <button type="button"
+                @click="toggle()"
+                class="btn btn-ghost btn-sm"
+                :class="collapsed ? 'tooltip tooltip-right' : ''"
+                data-tip="{% translate 'Expand sidebar' %}"
+                :aria-label="collapsed ? '{% translate "Expand sidebar" %}' : '{% translate "Collapse sidebar" %}'">
+            <i class="ph-bold ph-arrow-line-right i-sm shrink-0" x-show="collapsed" aria-hidden="true"></i>
+            <i class="ph-bold ph-arrow-line-left i-sm shrink-0" x-show="!collapsed" aria-hidden="true"></i>
+        </button>
+        {% if not user.is_authenticated or not use_system_theme %}
+            {% include 'includes/sidebar-theme-toggle.html' %}
+        {% endif %}
+        {% include 'includes/sidebar-language-switcher.html' %}
+    </div>
+    {% if user.is_authenticated %}
+        <form action="{% url 'account_logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit"
+                    class="btn btn-sm btn-primary btn-soft w-full font-normal"
+                    :class="collapsed ? 'tooltip tooltip-right' : ''"
+                    data-tip="{% translate 'Logout' %}">
+                <i class="ph-bold ph-sign-out i-sm shrink-0" aria-hidden="true"></i>
+                <span x-show="!collapsed" x-cloak>{% translate 'Logout' %}</span>
+            </button>
+        </form>
+    {% else %}
+        <a href="{% url 'account_login' %}"
+           class="btn btn-sm btn-primary btn-soft w-full font-normal"
+           :class="collapsed ? 'tooltip tooltip-right' : ''"
+           data-tip="{% translate 'Login' %}">
+            <i class="ph-bold ph-sign-in i-sm shrink-0" aria-hidden="true"></i>
+            <span x-show="!collapsed" x-cloak>{% translate 'Login' %}</span>
+        </a>
+    {% endif %}
+</div>

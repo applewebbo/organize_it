@@ -8,6 +8,17 @@
     <link rel="stylesheet" href="{% static 'css/leaflet.css' %}" />
 {% endblock extra_head %}
 
+{% block sidebar_actions %}
+    <a href="{% url 'trips:trip-detail' trip.pk %}"
+       class="btn btn-sm btn-ghost justify-start font-normal"
+       :class="collapsed ? 'tooltip tooltip-right' : ''"
+       data-tip="{% translate 'Events' %}"
+       aria-label="{% translate 'Back to events' %}">
+        <i class="ph-bold ph-rows i-md shrink-0" aria-hidden="true"></i>
+        <span x-show="!collapsed" x-cloak>{% translate 'Events' %}</span>
+    </a>
+{% endblock sidebar_actions %}
+
 {% block content %}
     {# ── Mini-header ── #}
     <div class="card card-border bg-base-100 mb-4 overflow-hidden shadow">
@@ -15,7 +26,7 @@
             <div class="flex min-w-0 grow items-center gap-2">
                 <h1 class="truncate text-2xl font-semibold tracking-tight">{{ trip.title }}</h1>
             </div>
-            <div class="flex shrink-0 gap-2">
+            <div class="flex shrink-0 gap-2 md:hidden">
                 <a href="{% url 'trips:trip-detail' trip.pk %}"
                    class="btn btn-md btn-soft btn-primary gap-1.5"
                    aria-label="{% translate 'Back to events' %}">

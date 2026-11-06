@@ -28,22 +28,37 @@
         <link rel="stylesheet" href="{% static 'icons/phosphor/bold/style.css' %}" />
     </head>
     <body hx-headers:inherited='{"X-CSRFToken": "{{ csrf_token }}"}' class="body-pattern">
-        <section>
+        <!-- Navbar: below md only, replaced by the sidebar from md up -->
+        <section class="md:hidden">
             {% include 'includes/navbar.html' %}
         </section>
-        <div>
-            <div class="mx-auto max-w-7xl p-2 pt-4 sm:p-4 md:pt-8">
-                {% block content %}
-                {% endblock content %}
+        <div class="md:flex">
+            <!-- Sidebar: md and up only -->
+            <aside class="bg-base-100/70 border-base-300 rounded-box sticky top-4 z-20 mb-4 ml-4 hidden h-[calc(100vh-2rem)] shrink-0 flex-col self-start border shadow backdrop-blur-sm transition-[width] duration-200 md:flex"
+                   x-data="sidebar()"
+                   :class="collapsed ? 'w-16' : 'w-56'">
+                {% include 'includes/sidebar-nav.html' %}
+                <div class="flex flex-col gap-3 px-2">
+                    {% block sidebar_actions %}
+                    {% endblock sidebar_actions %}
+                </div>
+                <div class="flex-1"></div>
+                {% include 'includes/sidebar-footer.html' %}
+            </aside>
+            <div class="flex min-w-0 flex-1 flex-col">
+                <div class="mx-auto w-full max-w-7xl p-2 pt-4 sm:p-4 md:pt-4 2xl:max-w-[1600px]">
+                    {% block content %}
+                    {% endblock content %}
+                </div>
+                <section>
+                    {% include 'includes/footer.html' %}
+                </section>
             </div>
-            <section>
-                {% include 'includes/footer.html' %}
-            </section>
-            <!-- Modal -->
-            {% include 'includes/modal.html' %}
-            <!-- Messages -->
-            <div id="messages" class="z-3">{% include 'includes/messages.html' %}</div>
         </div>
+        <!-- Modal -->
+        {% include 'includes/modal.html' %}
+        <!-- Messages -->
+        <div id="messages" class="z-3">{% include 'includes/messages.html' %}</div>
         <!-- Htmx (served by django-htmx, includes the debug script in DEBUG mode) -->
         {% htmx_script version=4 %}
         <!-- SortableJS -->

@@ -1,0 +1,40 @@
+{% load i18n static %}
+<a href="{% url 'trips:home' %}"
+   class="flex h-30 flex-col items-center justify-center gap-2 px-2 text-center">
+    <img src="{% static 'img/logo.png' %}"
+         class="shrink-0"
+         :class="collapsed ? 'size-8' : 'size-14'"
+         alt="Logo">
+    <span x-show="!collapsed" x-cloak class="font-kalam text-lg whitespace-nowrap">ORGANIZEit!</span>
+</a>
+<ul class="menu menu-vertical sidebar-menu mb-2 w-full flex-nowrap gap-2 px-2">
+    <li>
+        <a href="{% url 'trips:home' %}"
+           :class="collapsed ? 'tooltip tooltip-right' : ''"
+           data-tip="{% translate 'Home' %}"
+           {% if request.resolver_match.url_name == 'home' %}aria-current="page"{% endif %}>
+            <i class="ph-bold ph-house i-md shrink-0" aria-hidden="true"></i>
+            <span x-show="!collapsed" x-cloak>{% translate 'Home' %}</span>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'trips:trip-list' %}"
+           :class="collapsed ? 'tooltip tooltip-right' : ''"
+           data-tip="{% translate 'Trips' %}"
+           {% if request.resolver_match.namespace == 'trips' and request.resolver_match.url_name != 'home' %}aria-current="page"{% endif %}>
+            <i class="ph-bold ph-suitcase-rolling i-md shrink-0" aria-hidden="true"></i>
+            <span x-show="!collapsed" x-cloak>{% translate 'Trips' %}</span>
+        </a>
+    </li>
+    {% if user.is_authenticated %}
+        <li>
+            <a href="{% url 'accounts:profile' %}"
+               :class="collapsed ? 'tooltip tooltip-right' : ''"
+               data-tip="{% translate 'Settings' %}"
+               {% if request.resolver_match.namespace == 'accounts' %}aria-current="page"{% endif %}>
+                <i class="ph-bold ph-gear i-md shrink-0" aria-hidden="true"></i>
+                <span x-show="!collapsed" x-cloak>{% translate 'Settings' %}</span>
+            </a>
+        </li>
+    {% endif %}
+</ul>

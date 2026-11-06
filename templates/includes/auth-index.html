@@ -1,5 +1,5 @@
 {% load i18n static trip_tags %}
-<div class="mx-auto mt-8 max-w-7xl">
+<div class="mx-auto mt-8 max-w-7xl md:mt-0">
     {% if fav_trip or latest_trip %}
         {% with trip=fav_trip|default:latest_trip %}
             <!-- Trip Detail Section -->
