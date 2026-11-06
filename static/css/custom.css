@@ -32,6 +32,32 @@ html {
   font-weight: 700;
 }
 
+/* Trip hero card (templates/trips/includes/trip-header-card.html): below md
+   (classic navbar) it's untouched — a plain block stack in source order
+   (title, image, details). From md up (sidebar screens) it becomes a
+   two-column layout: a square image on the left, title+details stacked on
+   the right, so the card is roughly half the vertical space of the old
+   full-width image. A custom class (not Tailwind arbitrary grid-area
+   utilities) because rustywind/djLint mangle complex bracketed values. */
+@media (min-width: 768px) {
+  .trip-hero-grid {
+    display: grid;
+    grid-template-columns: 14rem 1fr;
+  }
+  .trip-hero-image {
+    grid-row: 1 / span 2;
+    grid-column: 1;
+  }
+  .trip-hero-title {
+    grid-row: 1;
+    grid-column: 2;
+  }
+  .trip-hero-details {
+    grid-row: 2;
+    grid-column: 2;
+  }
+}
+
 /* Sidebar nav menu (templates/includes/sidebar-nav.html): daisyUI's default
    menu-active color is --color-neutral (near-black), too harsh for a
    persistent sidebar. Scoped to this one menu so other .menu usages

@@ -8,7 +8,7 @@
     <div class="card card-border bg-base-100 shadow">
         <div class="card-body p-4 sm:p-6">
             <h2 class="text-xl font-medium sm:text-2xl">{% translate "How to Get There" %}</h2>
-            <div class="mt-2 grid grid-cols-1 gap-4 sm:mt-3 md:grid-cols-2">
+            <div class="mt-2 grid grid-cols-1 gap-4 sm:mt-3">
                 <!-- Arrival Transfer -->
                 <div class="bg-base-200 relative overflow-hidden rounded-lg p-4" x-data>
                     {% if arrival_transfer %}
@@ -83,7 +83,7 @@
                             </div>
                         {% else %}
                             <button type="button"
-                                    class="btn btn-xs btn-primary sm:btn-sm"
+                                    class="btn btn-xs btn-primary btn-soft sm:btn-sm"
                                     hx-get="{% url 'trips:arrival-transfer-modal' trip.pk %}"
                                     hx-target="#dialog"
                                     hx-swap="innerHTML"
@@ -263,7 +263,7 @@
                             </div>
                         {% else %}
                             <button type="button"
-                                    class="btn btn-xs btn-primary sm:btn-sm"
+                                    class="btn btn-xs btn-primary btn-soft sm:btn-sm"
                                     hx-get="{% url 'trips:departure-transfer-modal' trip.pk %}"
                                     hx-target="#dialog"
                                     hx-swap="innerHTML"

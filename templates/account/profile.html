@@ -9,7 +9,7 @@
         <div class="mb-12 text-center">
             <h1 class="mb-2 text-3xl font-semibold">{% translate "Personal Settings" %}</h1>
         </div>
-        <div class="card card-border bg-base-100 mx-auto max-w-2xl shadow">
+        <div class="card card-border bg-base-100 mx-auto max-w-2xl shadow md:max-w-3xl lg:max-w-4xl">
             <form method="post" class="card-body">
                 {% csrf_token %}
                 <h2 class="mb-4 text-center text-xl font-semibold sm:text-left">{% translate "Personal Information" %}</h2>
@@ -153,7 +153,7 @@
                 </div>
             </form>
         </div>
-        <div class="mx-auto mt-8 max-w-2xl"
+        <div class="mx-auto mt-8 max-w-2xl md:max-w-3xl lg:max-w-4xl"
              hx-get="{% url 'suggestions:settings' %}"
              hx-trigger="load"
              hx-swap="outerHTML">

@@ -137,45 +137,42 @@
         {% include "trips/includes/trip-header-card.html" %}
     </section>
     <!-- END Trip Header with Image Section -->
-    <!-- Main Transfers Section -->
-    {% if trip.status != 5 %}
-        {% include 'trips/includes/main-transfers.html' %}
-    {% endif %}
-    <!-- END Main Transfers Section -->
-    <!-- Stays Section -->
-    {% include 'trips/includes/stays-section.html' %}
-    <!-- END Stays Section -->
+    <!-- Transfers + Stays -->
+    <div class="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 [&>section]:mb-0">
+        {% if trip.status != 5 %}
+            {% include 'trips/includes/main-transfers.html' %}
+        {% endif %}
+        {% include 'trips/includes/stays-section.html' %}
+    </div>
+    <!-- END Transfers + Stays -->
     {% partialdef days inline %}
         {% include 'trips/includes/events-section.html' %}
     {% endpartialdef days %}
-    <!-- Checklist Section -->
-    <div id="checklist-card-container"
-         class="mb-8"
-         hx-get="{% url 'trips:checklist-card' trip.pk %}"
-         hx-trigger="load, checklistModified from:body"
-         hx-swap="innerHTML"></div>
-    <!-- END Checklist Section -->
-    <!-- Documents Section -->
-    <div id="attachments-card-container"
-         class="mb-8"
-         hx-get="{% url 'trips:attachments-card' trip.pk %}"
-         hx-trigger="load, attachmentsModified from:body"
-         hx-swap="innerHTML"></div>
-    <!-- END Documents Section -->
-    <!-- Expenses Section -->
-    <div id="expenses-card-container"
-         class="mb-8"
-         hx-get="{% url 'trips:expenses-card' trip.pk %}"
-         hx-trigger="load, expensesModified from:body"
-         hx-swap="innerHTML"></div>
-    <!-- END Expenses Section -->
-    <!-- Collaborators Section -->
-    {% with collaborations=trip.collaborations.all %}
-        {% if request.user == trip.author or collaborations %}
-            {% include "trips/includes/collab-inline.html" with collaborations=collaborations %}
-        {% endif %}
-    {% endwith %}
-    <!-- END Collaborators Section -->
+    <!-- Checklist + Documents -->
+    <div class="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div id="checklist-card-container"
+             hx-get="{% url 'trips:checklist-card' trip.pk %}"
+             hx-trigger="load, checklistModified from:body"
+             hx-swap="innerHTML"></div>
+        <div id="attachments-card-container"
+             hx-get="{% url 'trips:attachments-card' trip.pk %}"
+             hx-trigger="load, attachmentsModified from:body"
+             hx-swap="innerHTML"></div>
+    </div>
+    <!-- END Checklist + Documents -->
+    <!-- Expenses + Collaborators -->
+    <div class="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 [&>section]:mb-0">
+        <div id="expenses-card-container"
+             hx-get="{% url 'trips:expenses-card' trip.pk %}"
+             hx-trigger="load, expensesModified from:body"
+             hx-swap="innerHTML"></div>
+        {% with collaborations=trip.collaborations.all %}
+            {% if request.user == trip.author or collaborations %}
+                {% include "trips/includes/collab-inline.html" with collaborations=collaborations %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    <!-- END Expenses + Collaborators -->
 {% endblock content %}
 
 {% block script %}

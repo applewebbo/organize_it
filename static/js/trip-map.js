@@ -102,13 +102,19 @@
 
     map = L.map("trip-map", { center: DEFAULT_CENTER, zoom: DEFAULT_ZOOM });
 
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-      maxZoom: 19,
-      subdomains: "abcd",
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
-        '&copy; <a href="https://carto.com/attributions">CARTO</a>',
-    }).addTo(map);
+    // CARTO's unauthenticated basemaps.cartocdn.com tiles now return a
+    // watermarked "API KEY REQUIRED" placeholder instead of real map tiles
+    // (still HTTP 200, so it fails silently) — switched to Esri's free,
+    // no-key-required light-gray basemap. Esri tiles use {z}/{y}/{x} order,
+    // not the usual {z}/{x}/{y}.
+    L.tileLayer(
+      "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+      {
+        maxZoom: 19,
+        attribution:
+          '&copy; <a href="https://www.esri.com">Esri</a> &mdash; Esri, DeLorme, NAVTEQ',
+      },
+    ).addTo(map);
 
     searchLayer = L.featureGroup().addTo(map);
     eventsLayer = L.featureGroup().addTo(map);

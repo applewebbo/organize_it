@@ -50,9 +50,8 @@ def create_trip_map(days_with_events, unassigned_events):
         location=center, zoom_start=12, tiles=None, width="100%", height="500px"
     )
     folium.TileLayer(
-        tiles="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-        attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> '
-        '&copy; <a href="https://carto.com/attributions">CARTO</a>',
+        tiles="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+        attr='&copy; <a href="https://www.esri.com">Esri</a> &mdash; Esri, DeLorme, NAVTEQ',
         name="Mappa",
         control=False,
     ).add_to(m)
@@ -265,9 +264,8 @@ def create_day_map(events_with_location, stay, next_day_stay, day=None):
 
     # Create a map
     m = folium.Map(
-        tiles="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-        attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains="abcd",
+        tiles="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+        attr='&copy; <a href="https://www.esri.com">Esri</a> &mdash; Esri, DeLorme, NAVTEQ',
         width="100%",
         height="100%",
     )

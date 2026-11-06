@@ -1,7 +1,7 @@
 {% load i18n static trip_tags %}
-<div class="card card-border bg-base-100 overflow-hidden shadow">
+<div class="card card-border bg-base-100 trip-hero-grid overflow-hidden shadow">
     <!-- Top Bar: Title, Actions -->
-    <div class="border-base-300 flex items-center justify-between gap-2 border-b p-3 sm:gap-y-3 sm:p-6">
+    <div class="trip-hero-title border-base-300 flex items-center justify-between gap-2 border-b p-3 sm:gap-y-3 sm:p-6 md:border-b-0">
         <!-- Mobile: Title and Buttons (sidebar takes over from md up) -->
         <h2 class="text-xl font-semibold tracking-tight sm:hidden">{{ trip.title }}</h2>
         <div x-data class="flex gap-1.5 md:hidden">
@@ -75,27 +75,28 @@
             </div>
         </div>
         <!-- Desktop: Title only (actions live in the sidebar from md up) -->
-        <div class="hidden sm:flex sm:grow sm:items-center sm:gap-2">
+        <div class="hidden sm:flex sm:grow sm:items-center sm:justify-between sm:gap-2">
             <h2 class="text-3xl font-semibold tracking-tight">{{ trip.title }}</h2>
+            <span class="badge badge-secondary badge-sm md:badge-lg">{{ trip.get_status_display }}</span>
         </div>
     </div>
     <!-- Center: Trip Image -->
-    <figure class="relative h-48 w-full md:h-80">
+    <figure class="trip-hero-image relative h-48 w-full md:h-full">
         {% include "trips/includes/trip-image.html" with trip=trip image_loading="eager" image_placeholder="img/trip_generic_detail.jpg" %}
         {% if trip.needs_attribution and not trip.image_metadata.pending %}
             <div class="absolute bottom-3 left-3 rounded bg-black/50 px-2 py-1 text-xs text-white">
                 {{ trip.get_attribution_text }}
             </div>
         {% endif %}
-        <!-- Status Badge on Image -->
-        <div class="absolute top-3 right-3">
-            <span class="badge badge-secondary badge-sm md:badge-lg">{{ trip.get_status_display }}</span>
+        <!-- Status Badge on Image: mobile only, desktop shows it on the title bar -->
+        <div class="absolute top-3 right-3 sm:hidden">
+            <span class="badge badge-secondary badge-sm">{{ trip.get_status_display }}</span>
         </div>
     </figure>
     <!-- Bottom Bar: Trip Details -->
-    <div class="p-3 sm:p-6">
+    <div class="trip-hero-details p-3 sm:p-6">
         <div id="trip-details" class="mb-3 text-sm md:text-base">
-            <div class="flex flex-col gap-y-2 md:flex-row md:gap-x-4 md:gap-y-0 lg:gap-x-6">
+            <div class="flex flex-col gap-y-2">
                 <!-- Dates Row -->
                 <div class="flex items-center gap-1.5">
                     <i class="ph-bold ph-calendar-blank text-base-content/60 sm:hidden"

@@ -68,7 +68,7 @@
                 {% endif %}
             </div>
             {% if stays %}
-                <ul class="mt-2 grid grid-cols-1 gap-3 sm:mt-3 md:grid-cols-2">
+                <ul class="mt-2 grid grid-cols-1 gap-3 sm:mt-3">
                     {% for stay in stays %}
                         <li class="relative flex flex-col overflow-hidden rounded-lg border border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-100/30"
                             x-data>
@@ -130,7 +130,7 @@
                                 </div>
                             </div>
                             {% if trip.status != 5 %}
-                                <div class="mt-auto flex justify-end gap-2 px-4 py-2">
+                                <div class="mt-auto flex flex-wrap justify-end gap-2 px-4 py-2">
                                     {% if stay.google_maps_directions_url %}
                                         <a class="btn btn-xs btn-stay-card sm:btn-sm"
                                            href="{{ stay.google_maps_directions_url }}"

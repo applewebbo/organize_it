@@ -6,50 +6,47 @@
             <section id="details" class="mb-8">
                 {% include "trips/includes/trip-header-card.html" %}
             </section>
-            <!-- Main Transfers Section -->
-            {% if trip.status != 5 %}
-                {% include 'trips/includes/main-transfers.html' %}
-            {% endif %}
-            <!-- END Main Transfers Section -->
-            <!-- Stays Section -->
-            {% include 'trips/includes/stays-section.html' %}
-            <!-- END Stays Section -->
+            <!-- Transfers + Stays -->
+            <div class="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 [&>section]:mb-0">
+                {% if trip.status != 5 %}
+                    {% include 'trips/includes/main-transfers.html' %}
+                {% endif %}
+                {% include 'trips/includes/stays-section.html' %}
+            </div>
+            <!-- END Transfers + Stays -->
             <!-- Events Section -->
             {% include 'trips/includes/events-section.html' %}
-            <!-- Checklist Section -->
-            <div id="checklist-card-container"
-                 class="mb-8"
-                 hx-get="{% url 'trips:checklist-card' trip.pk %}"
-                 hx-trigger="load, checklistModified from:body"
-                 hx-swap="innerHTML"></div>
-            <!-- END Checklist Section -->
-            <!-- Documents Section -->
-            <div id="attachments-card-container"
-                 class="mb-8"
-                 hx-get="{% url 'trips:attachments-card' trip.pk %}"
-                 hx-trigger="load, attachmentsModified from:body"
-                 hx-swap="innerHTML"></div>
-            <!-- END Documents Section -->
-            <!-- Expenses Section -->
-            <div id="expenses-card-container"
-                 class="mb-8"
-                 hx-get="{% url 'trips:expenses-card' trip.pk %}"
-                 hx-trigger="load, expensesModified from:body"
-                 hx-swap="innerHTML"></div>
-            <!-- END Expenses Section -->
-            <!-- Collaborators Section -->
-            {% with collaborations=trip.collaborations.all %}
-                {% if request.user == trip.author or collaborations %}
-                    {% include "trips/includes/collab-inline.html" with collaborations=collaborations %}
-                {% endif %}
-            {% endwith %}
-            <!-- END Collaborators Section -->
+            <!-- Checklist + Documents -->
+            <div class="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div id="checklist-card-container"
+                     hx-get="{% url 'trips:checklist-card' trip.pk %}"
+                     hx-trigger="load, checklistModified from:body"
+                     hx-swap="innerHTML"></div>
+                <div id="attachments-card-container"
+                     hx-get="{% url 'trips:attachments-card' trip.pk %}"
+                     hx-trigger="load, attachmentsModified from:body"
+                     hx-swap="innerHTML"></div>
+            </div>
+            <!-- END Checklist + Documents -->
+            <!-- Expenses + Collaborators -->
+            <div class="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 [&>section]:mb-0">
+                <div id="expenses-card-container"
+                     hx-get="{% url 'trips:expenses-card' trip.pk %}"
+                     hx-trigger="load, expensesModified from:body"
+                     hx-swap="innerHTML"></div>
+                {% with collaborations=trip.collaborations.all %}
+                    {% if request.user == trip.author or collaborations %}
+                        {% include "trips/includes/collab-inline.html" with collaborations=collaborations %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+            <!-- END Expenses + Collaborators -->
         {% endwith %}
         <!-- Other Trips Section -->
         {% if other_trips or wizard_draft %}
             <section id="other-trips" class="border-base-300 mt-4 mb-8 border-t pt-8">
                 <h2 class="ms-2 mb-4 text-2xl font-semibold">{% translate 'Other Trips' %}</h2>
-                <div class="grid grid-cols-1 gap-x-4 gap-y-4 md:grid-cols-2 xl:grid-cols-3">
+                <div class="grid grid-cols-1 gap-x-4 gap-y-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                     {% if wizard_draft %}
                         {% include "trips/includes/wizard-draft-card.html" %}
                     {% endif %}
@@ -105,7 +102,7 @@
             <!-- Only an unfinished wizard draft: surface it so it stays resumable -->
             <section id="other-trips" class="mb-8">
                 <h2 class="ms-2 mb-4 text-2xl font-semibold">{% translate 'Other Trips' %}</h2>
-                <div class="grid grid-cols-1 gap-x-4 gap-y-4 md:grid-cols-2 xl:grid-cols-3">
+                <div class="grid grid-cols-1 gap-x-4 gap-y-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                     {% include "trips/includes/wizard-draft-card.html" %}
                 </div>
             </section>
