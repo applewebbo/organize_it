@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-06 15:30+0100\n"
+"POT-Creation-Date: 2026-11-07 12:41+0100\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -70,7 +70,7 @@ msgstr "Email riepilogo giornaliero"
 msgid "Favourite trip"
 msgstr "Viaggio preferito"
 
-#: accounts/forms.py:84 templates/account/profile.html:41
+#: accounts/forms.py:84 templates/account/profile.html:49
 #: trips/forms/transfer.py:473 trips/forms/transfer.py:485
 msgid "Full address (street, city, country)"
 msgstr "Indirizzo completo (via, città, paese)"
@@ -162,7 +162,7 @@ msgstr ""
 "Ricevi ogni giorno un'email con il riepilogo del programma durante il "
 "viaggio."
 
-#: accounts/models.py:161 templates/suggestions/settings.html:24
+#: accounts/models.py:161 templates/suggestions/settings.html:23
 msgid "Enable AI suggestions"
 msgstr "Attiva i suggerimenti AI"
 
@@ -516,23 +516,27 @@ msgstr "cambia password"
 msgid "Your password is now changed."
 msgstr "La tua password è stata cambiata."
 
-#: templates/account/profile.html:4 templates/account/profile.html:10
+#: templates/account/profile.html:4 templates/account/profile.html:12
 msgid "Personal Settings"
 msgstr "Impostazioni"
 
-#: templates/account/profile.html:15
+#: templates/account/profile.html:23
 msgid "Personal Information"
 msgstr "Informazioni Personali"
 
-#: templates/account/profile.html:64
+#: templates/account/profile.html:74 templates/suggestions/settings.html:70
+msgid "Preferences"
+msgstr "Preferenze"
+
+#: templates/account/profile.html:75
 msgid "Travel Preferences"
 msgstr "Preferenze di viaggio"
 
-#: templates/account/profile.html:83
+#: templates/account/profile.html:94
 msgid "Display Preferences"
 msgstr "Preferenze di visualizzazione"
 
-#: templates/account/profile.html:152 templates/suggestions/settings.html:134
+#: templates/account/profile.html:165 templates/suggestions/settings.html:133
 #: templates/trips/event-notes.html:30 templates/trips/expense-create.html:29
 #: templates/trips/expense-modify.html:31
 #: templates/trips/experience-create-unpaired.html:35
@@ -909,15 +913,16 @@ msgstr ""
 msgid "Get started"
 msgstr "Parti da qui"
 
-#: templates/includes/auth-index.html:51 templates/includes/auth-index.html:107
+#: templates/includes/auth-index.html:48 templates/includes/auth-index.html:104
 msgid "Other Trips"
 msgstr "Altri Viaggi"
 
-#: templates/includes/auth-index.html:75 templates/trips/event-detail.html:86
+#: templates/includes/auth-index.html:72 templates/trips/event-detail.html:86
 #: templates/trips/includes/_expense-cost-row.html:12
 #: templates/trips/includes/main-transfers.html:174
 #: templates/trips/includes/main-transfers.html:354
-#: templates/trips/includes/note.html:9
+#: templates/trips/includes/note.html:9 templates/trips/index.html:41
+#: templates/trips/index.html:48
 #: templates/trips/main-transfer-connection-modal.html:38
 #: templates/trips/stay-detail.html:89 templates/trips/trip-detail.html:38
 #: templates/trips/trip-detail.html:45 templates/trips/trip-list.html:172
@@ -925,15 +930,15 @@ msgstr "Altri Viaggi"
 msgid "Edit"
 msgstr "Modifica"
 
-#: templates/includes/auth-index.html:90
+#: templates/includes/auth-index.html:87
 msgid "Toggle guide visibility"
 msgstr "Attiva/disattiva la visibilità della guida"
 
-#: templates/includes/auth-index.html:94
+#: templates/includes/auth-index.html:91
 msgid "Hide Guide"
 msgstr "Nascondi guida"
 
-#: templates/includes/auth-index.html:96
+#: templates/includes/auth-index.html:93
 msgid "Show Guide"
 msgstr "Mostra guida"
 
@@ -1222,28 +1227,24 @@ msgstr "Applica giornata"
 msgid "No itinerary generated"
 msgstr "Nessun itinerario generato"
 
-#: templates/suggestions/settings.html:11
+#: templates/suggestions/settings.html:10
 #: templates/suggestions/suggestion-modal.html:4
 #: templates/trips/includes/events-section.html:93
 #: templates/trips/trip-map.html:64
 msgid "AI suggestions"
 msgstr "Suggerimenti AI"
 
-#: templates/suggestions/settings.html:14
+#: templates/suggestions/settings.html:13
 msgid "AI settings saved successfully"
 msgstr "Impostazioni AI salvate correttamente"
 
-#: templates/suggestions/settings.html:43
+#: templates/suggestions/settings.html:42
 msgid "A key is already configured."
 msgstr "Una chiave è già configurata."
 
-#: templates/suggestions/settings.html:58
+#: templates/suggestions/settings.html:57
 msgid "Who's travelling"
 msgstr "Chi viaggia"
-
-#: templates/suggestions/settings.html:71
-msgid "Preferences"
-msgstr "Preferenze"
 
 #: templates/suggestions/suggestion-added.html:5
 msgid "Added to your trip"
@@ -1575,6 +1576,7 @@ msgid "Check-out:"
 msgstr "Check-out:"
 
 #: templates/trips/email/daily_digest_body.html:117
+#: templates/trips/index.html:29 templates/trips/index.html:32
 #: templates/trips/trip-detail.html:26 templates/trips/trip-detail.html:29
 #: templates/trips/trip-map.html:15 templates/trips/trip-map.html:18
 #: templates/trips/trip-map.html:34 templates/trips/trip-pdf.html:225
@@ -2060,6 +2062,7 @@ msgid "End date"
 msgstr "Data di fine"
 
 #: templates/trips/forms/wizard-basics-form.html:42
+#: templates/trips/index.html:17 templates/trips/index.html:24
 #: templates/trips/trip-detail.html:14 templates/trips/trip-detail.html:21
 msgid "Stages"
 msgstr "Tappe"
@@ -2306,8 +2309,6 @@ msgstr "Crea tappa"
 
 #: templates/trips/includes/create-trip-cta.html:10
 #: templates/trips/includes/create-trip-cta.html:42
-#: templates/trips/trip-list.html:14 templates/trips/trip-list.html:17
-#: templates/trips/trip-list.html:42 templates/trips/trip-list.html:49
 msgid "Create a new trip"
 msgstr "Crea un nuovo viaggio"
 
@@ -2685,49 +2686,50 @@ msgid "Confirm delete"
 msgstr "Conferma eliminazione"
 
 #: templates/trips/includes/trip-header-card.html:15
-#: templates/trips/trip-detail.html:19
+#: templates/trips/index.html:22 templates/trips/trip-detail.html:19
 msgid "Manage stages"
 msgstr "Gestisci tappe"
 
 #: templates/trips/includes/trip-header-card.html:24
-#: templates/trips/trip-detail.html:43
+#: templates/trips/index.html:46 templates/trips/trip-detail.html:43
 msgid "Edit trip"
 msgstr "Modifica viaggio"
 
 #: templates/trips/includes/trip-header-card.html:32
+#: templates/trips/index.html:56 templates/trips/index.html:57
 #: templates/trips/trip-detail.html:53 templates/trips/trip-detail.html:54
 msgid "Share & Export"
 msgstr "Condividi ed esporta"
 
 #: templates/trips/includes/trip-header-card.html:45
-#: templates/trips/trip-detail.html:68
+#: templates/trips/index.html:71 templates/trips/trip-detail.html:68
 msgid "Link"
 msgstr "Link"
 
 #: templates/trips/includes/trip-header-card.html:52
-#: templates/trips/trip-detail.html:75
+#: templates/trips/index.html:78 templates/trips/trip-detail.html:75
 msgid "PDF"
 msgstr ""
 
 #: templates/trips/includes/trip-header-card.html:59
-#: templates/trips/trip-detail.html:81
+#: templates/trips/index.html:84 templates/trips/trip-detail.html:81
 msgid "Calendar"
 msgstr "Calendario"
 
 #: templates/trips/includes/trip-header-card.html:70
-#: templates/trips/trip-detail.html:92
+#: templates/trips/index.html:95 templates/trips/trip-detail.html:92
 msgid "Calendar link"
 msgstr "Link calendario"
 
-#: templates/trips/includes/trip-header-card.html:103
+#: templates/trips/includes/trip-header-card.html:104
 msgid "Start Date:"
 msgstr "Data di inizio:"
 
-#: templates/trips/includes/trip-header-card.html:106
+#: templates/trips/includes/trip-header-card.html:107
 msgid "End Date:"
 msgstr "Data di fine:"
 
-#: templates/trips/includes/trip-header-card.html:112
+#: templates/trips/includes/trip-header-card.html:113
 msgid "Destination:"
 msgstr "Destinazione:"
 
@@ -2745,6 +2747,16 @@ msgstr "Scarta"
 #: templates/trips/trip-list.html:118
 msgid "Continue"
 msgstr "Continua"
+
+#: templates/trips/index.html:30 templates/trips/trip-detail.html:27
+msgid "Add events"
+msgstr "Aggiungi eventi"
+
+#: templates/trips/index.html:59 templates/trips/trip-detail.html:56
+#: templates/trips/trip-list.html:180 templates/trips/trip-list.html:181
+msgctxt "trip action"
+msgid "Share"
+msgstr "Condividi"
 
 #: templates/trips/link-expired.html:4
 msgid "Link expired"
@@ -3089,16 +3101,6 @@ msgstr ""
 "Modificare le date potrebbe rimuovere alcuni giorni. Gli eventi nei giorni "
 "rimossi diventeranno non assegnati e potranno essere riassegnati in seguito."
 
-#: templates/trips/trip-detail.html:27
-msgid "Add events"
-msgstr "Aggiungi eventi"
-
-#: templates/trips/trip-detail.html:56 templates/trips/trip-list.html:180
-#: templates/trips/trip-list.html:181
-msgctxt "trip action"
-msgid "Share"
-msgstr "Condividi"
-
 #: templates/trips/trip-detail.html:108
 msgid ""
 "The trip creator shared their AI key with you: enable AI suggestions in your "
@@ -3124,6 +3126,11 @@ msgstr "Riapri"
 #: templates/trips/trip-list.html:4
 msgid "Trips List"
 msgstr "Lista dei Viaggi"
+
+#: templates/trips/trip-list.html:14 templates/trips/trip-list.html:17
+#: templates/trips/trip-list.html:42 templates/trips/trip-list.html:49
+msgid "Create new"
+msgstr "Crea Nuovo"
 
 #: templates/trips/trip-list.html:66
 msgid "My Trips"

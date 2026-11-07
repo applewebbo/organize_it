@@ -6,15 +6,15 @@
 
 {% block sidebar_actions %}
     {% if wizard_available %}
-        <div class="dropdown dropdown-right" x-data>
+        <div class="dropdown dropdown-right mt-4" x-data>
             <div tabindex="0"
                  role="button"
-                 class="btn btn-sm btn-primary w-full justify-start"
+                 class="btn btn-sm btn-primary btn-soft w-full justify-start"
                  :class="collapsed ? 'tooltip tooltip-right' : ''"
-                 data-tip="{% translate 'Create a new trip' %}"
+                 data-tip="{% translate 'Create new' %}"
                  aria-haspopup="menu">
                 <i class="ph-bold ph-plus-circle i-md shrink-0" aria-hidden="true"></i>
-                <span x-show="!collapsed" x-cloak>{% translate 'Create a new trip' %}</span>
+                <span x-show="!collapsed" x-cloak>{% translate 'Create new' %}</span>
             </div>
             <ul tabindex="0"
                 class="dropdown-content menu bg-base-100 rounded-box border-base-300 z-20 w-64 border p-2 shadow">
@@ -37,16 +37,16 @@
         </div>
     {% else %}
         <button type="button"
-                class="btn btn-sm btn-primary w-full justify-start"
+                class="btn btn-sm btn-primary btn-soft mt-4 w-full justify-start"
                 :class="collapsed ? 'tooltip tooltip-right' : ''"
-                data-tip="{% translate 'Create a new trip' %}"
+                data-tip="{% translate 'Create new' %}"
                 x-data
                 hx-get="{% url 'trips:trip-create' %}"
                 hx-target="#dialog"
                 hx-swap="innerHTML"
                 @click="$dispatch('open-modal')">
             <i class="ph-bold ph-plus-circle i-md shrink-0" aria-hidden="true"></i>
-            <span x-show="!collapsed" x-cloak>{% translate 'Create a new trip' %}</span>
+            <span x-show="!collapsed" x-cloak>{% translate 'Create new' %}</span>
         </button>
     {% endif %}
 {% endblock sidebar_actions %}
@@ -55,13 +55,13 @@
     {% partialdef trip-list inline %}
         <div id="trips">
             <!-- Active Trips Section -->
-            <section class="mx-auto my-5 max-w-7xl 2xl:max-w-[1600px]"
+            <section class="mx-auto mb-5 max-w-7xl 2xl:max-w-[1600px]"
                      hx-swap="outerHTML"
                      hx-trigger="tripSaved from:body"
                      hx-get="{% url 'trips:trip-list' %}"
                      hx-target="#trips">
                 <div class="card bg-base-100 mb-6 shadow">
-                    <div class="card-body relative items-center py-3 text-center md:items-start md:py-6 md:text-start">
+                    <div class="card-body relative items-center py-2 text-center md:items-start md:py-4 md:text-start">
                         <h1 class="inline-block rounded-lg px-4 py-1 text-xl font-semibold sm:py-2 sm:text-2xl md:text-3xl">
                             {% translate 'My Trips' %}
                         </h1>
@@ -271,7 +271,7 @@
             {% if archived_trips %}
                 <section class="mx-auto my-5 max-w-7xl 2xl:max-w-[1600px]">
                     <div class="card bg-base-100 mb-6 shadow">
-                        <div class="card-body items-center py-3 text-center md:items-start md:py-6 md:text-start">
+                        <div class="card-body items-center py-2 text-center md:items-start md:py-4 md:text-start">
                             <h2 class="inline-block rounded-lg px-4 py-1 text-xl font-semibold sm:py-2 sm:text-2xl md:text-3xl">
                                 {% translate 'Archived Trips' %}
                             </h2>

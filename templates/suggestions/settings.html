@@ -1,6 +1,5 @@
 {% load i18n %}
-<div id="ai-settings"
-     class="card card-border bg-base-100 mx-auto mt-8 max-w-2xl shadow md:max-w-3xl lg:max-w-4xl">
+<div id="ai-settings" class="card card-border bg-base-100 shadow md:order-4">
     <form method="post"
           class="card-body"
           x-data="{ enabled: {{ ai_enabled|yesno:'true,false' }} }"
@@ -8,7 +7,7 @@
           hx-target="#ai-settings"
           hx-swap="outerHTML">
         {% csrf_token %}
-        <h2 class="mb-4 text-center text-xl font-semibold sm:text-left">{% translate "AI suggestions" %}</h2>
+        <h2 class="card-title text-xl font-semibold">{% translate "AI suggestions" %}</h2>
         {% if saved %}
             <div class="alert alert-success alert-soft mb-4">
                 <span>{% translate "AI settings saved successfully" %}</span>
