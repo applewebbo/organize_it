@@ -64,7 +64,7 @@ document.body.addEventListener("showMessage", (e) => {
   let toastContainer = document.querySelector(".toast.toast-top.toast-center")
   if (!toastContainer) {
     toastContainer = document.createElement("div")
-    toastContainer.className = "toast toast-top toast-center"
+    toastContainer.className = "toast toast-top toast-center md:toast-end"
     document.getElementById("messages")?.appendChild(toastContainer) || document.body.appendChild(toastContainer)
   }
 
@@ -74,21 +74,22 @@ document.body.addEventListener("showMessage", (e) => {
   alertDiv.setAttribute("x-data", "{ show: true }")
   alertDiv.setAttribute("x-show", "show")
   alertDiv.setAttribute("x-cloak", "")
+  alertDiv.className = "alert bg-base-200 border-base-300 border shadow-sm"
 
-  const alertClass = type === "success" ? "alert-success" : type === "error" ? "alert-error" : "alert-info"
-  alertDiv.className = `alert alert-soft ${alertClass}`
+  const badgeClass = type === "success" ? "bg-success" : type === "error" ? "bg-error" : type === "warning" ? "bg-warning" : "bg-info"
+  const iconClass = type === "success" ? "ph-check" : type === "error" ? "ph-x" : type === "warning" ? "ph-warning" : "ph-info"
 
   alertDiv.innerHTML = `
-    <i class="ph-bold ph-info i-md"></i>
-    <span class="sr-only">Info</span>
-    <div class="flex gap-6 items-center text-sm font-medium">
+    <span class="${badgeClass} flex h-6 w-6 shrink-0 items-center justify-center rounded-full" aria-hidden="true">
+      <i class="${iconClass} ph-bold i-sm text-white"></i>
+    </span>
+    <div class="flex gap-4 items-center text-sm font-medium">
       ${message}
       <button type="button"
-              class="btn btn-xs btn-outline"
+              class="btn btn-ghost btn-circle btn-xs"
               @click="show = false"
               aria-label="Close">
-        <span class="sr-only">Close</span>
-        Close
+        <i class="ph-bold ph-x i-xs"></i>
       </button>
     </div>
   `

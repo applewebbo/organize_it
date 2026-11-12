@@ -1,23 +1,24 @@
 {% load i18n %}
-<div class="toast toast-top toast-center">
+<div class="toast toast-top toast-center md:toast-end">
     {% if messages %}
         {% for message in messages %}
             <div role="alert"
-                 class="alert alert-soft {% if message.tags == 'info' %} alert-info {% elif message.tags == 'success' %} alert-success {% elif message.tags == 'error' %} alert-error {% elif message.tags == 'warning' %} alert-warning {% elif message.tags == 'debug' %}{% endif %} "
+                 class="alert bg-base-200 border-base-300 border shadow-sm"
                  x-cloak
                  x-data="{ show: true }"
                  x-show="show"
                  x-init="setTimeout(() => show = false, 4000)">
-                <i class="ph-bold ph-info i-md"></i>
-                <span class="sr-only">Info</span>
-                <div class="flex items-center gap-6 text-sm font-medium">
+                <span class="{% if message.tags == 'success' %}bg-success{% elif message.tags == 'error' %}bg-error{% elif message.tags == 'warning' %}bg-warning{% else %}bg-info{% endif %} flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
+                      aria-hidden="true">
+                    <i class="{% if message.tags == 'success' %}ph-check{% elif message.tags == 'error' %}ph-x{% elif message.tags == 'warning' %}ph-warning{% else %}ph-info{% endif %} ph-bold i-sm text-white"></i>
+                </span>
+                <div class="flex items-center gap-4 text-sm font-medium">
                     {{ message|safe }}
                     <button type="button"
-                            class="btn btn-xs btn-outline"
+                            class="btn btn-ghost btn-circle btn-xs"
                             @click="show = !show"
-                            aria-label="Close">
-                        <span class="sr-only">Close</span>
-                        {% translate 'Close' %}
+                            aria-label="{% translate 'Close' %}">
+                        <i class="ph-bold ph-x i-xs"></i>
                     </button>
                 </div>
             </div>
