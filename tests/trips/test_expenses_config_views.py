@@ -1,6 +1,7 @@
 import json
 
 import pytest
+from django.contrib.messages import get_messages
 from django.urls import reverse
 
 from trips.models import ExpenseParticipant, FamilyUnit
@@ -32,11 +33,13 @@ class TestExpenseSettings:
         response = client.post(
             url, {"expenses_enabled": "on", "expense_currency": "GBP"}
         )
-        assert response.status_code == 204
+        assert response.status_code == 200
+        assert response.headers["HX-Reswap"] == "none"
         triggers = json.loads(response.headers["HX-Trigger"])
         assert "expensesModified" in triggers
         assert "hide-modal" in triggers
-        assert triggers["showMessage"]["type"] == "success"
+        messages = list(get_messages(response.wsgi_request))
+        assert any("Expense settings saved" in str(message) for message in messages)
         trip.refresh_from_db()
         assert trip.expenses_enabled is True
         assert trip.expense_currency == "GBP"

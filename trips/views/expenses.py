@@ -1,5 +1,6 @@
 import json
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
@@ -69,19 +70,15 @@ def expense_settings(request, trip_pk):
         if form.is_valid():
             form.save()
             # Close the modal, refresh the summary card and confirm the save.
-            return HttpResponse(
-                status=204,
+            messages.add_message(request, messages.SUCCESS, _("Expense settings saved"))
+            return TemplateResponse(
+                request,
+                "includes/messages-oob.html",
                 headers={
+                    "HX-Reswap": "none",
                     "HX-Trigger": json.dumps(
-                        {
-                            "expensesModified": {},
-                            "hide-modal": {},
-                            "showMessage": {
-                                "type": "success",
-                                "message": str(_("Expense settings saved")),
-                            },
-                        }
-                    )
+                        {"expensesModified": {}, "hide-modal": {}}
+                    ),
                 },
             )
     else:

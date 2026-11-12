@@ -56,58 +56,6 @@ htmx.on("htmx:after:swap", () => {
   }
 })
 
-// Show success/error messages from HTMX triggers
-document.body.addEventListener("showMessage", (e) => {
-  const { type, message } = e.detail
-
-  // Get or create toast container (matching includes/messages.html style)
-  let toastContainer = document.querySelector(".toast.toast-top.toast-center")
-  if (!toastContainer) {
-    toastContainer = document.createElement("div")
-    toastContainer.className = "toast toast-top toast-center md:toast-end"
-    document.getElementById("messages")?.appendChild(toastContainer) || document.body.appendChild(toastContainer)
-  }
-
-  // Create alert element matching includes/messages.html structure
-  const alertDiv = document.createElement("div")
-  alertDiv.setAttribute("role", "alert")
-  alertDiv.setAttribute("x-data", "{ show: true }")
-  alertDiv.setAttribute("x-show", "show")
-  alertDiv.setAttribute("x-cloak", "")
-  alertDiv.className = "alert bg-base-200 border-base-300 border shadow-sm"
-
-  const badgeClass = type === "success" ? "bg-success" : type === "error" ? "bg-error" : type === "warning" ? "bg-warning" : "bg-info"
-  const iconClass = type === "success" ? "ph-check" : type === "error" ? "ph-x" : type === "warning" ? "ph-warning" : "ph-info"
-
-  alertDiv.innerHTML = `
-    <span class="${badgeClass} flex h-6 w-6 shrink-0 items-center justify-center rounded-full" aria-hidden="true">
-      <i class="${iconClass} ph-bold i-sm text-white"></i>
-    </span>
-    <div class="flex gap-4 items-center text-sm font-medium">
-      ${message}
-      <button type="button"
-              class="btn btn-ghost btn-circle btn-xs"
-              @click="show = false"
-              aria-label="Close">
-        <i class="ph-bold ph-x i-xs"></i>
-      </button>
-    </div>
-  `
-
-  toastContainer.appendChild(alertDiv)
-
-  // Initialize Alpine on the new element
-  if (window.Alpine) {
-    Alpine.initTree(alertDiv)
-  }
-
-  // Auto-remove after 4 seconds (matching the template)
-  setTimeout(() => {
-    alertDiv.remove()
-  }, 4000)
-})
-
-
 // LeafletJs Map
 function createMap(bounds) {
   let map = L.map('map').fitBounds(bounds);

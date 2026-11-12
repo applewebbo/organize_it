@@ -71,20 +71,15 @@ def edit_main_transfer(request, pk):
         )
         if form.is_valid():
             form.save()
-            message = str(_("Main transfer updated successfully"))
-            return HttpResponse(
-                status=204,
+            messages.add_message(
+                request, messages.SUCCESS, _("Main transfer updated successfully")
+            )
+            return TemplateResponse(
+                request,
+                "includes/messages-oob.html",
                 headers={
-                    "HX-Trigger": json.dumps(
-                        {
-                            "tripModified": {},
-                            "hide-modal": {},
-                            "showMessage": {
-                                "type": "success",
-                                "message": message,
-                            },
-                        }
-                    )
+                    "HX-Reswap": "none",
+                    "HX-Trigger": json.dumps({"tripModified": {}, "hide-modal": {}}),
                 },
             )
         # If form is invalid, fall through to return form with errors
@@ -823,20 +818,15 @@ def save_main_transfer(request, trip_id):
         transfer.save()
 
         # Always close modal and refresh trip
-        message = str(_("Transfer saved successfully!"))
-        return HttpResponse(
-            status=204,
+        messages.add_message(
+            request, messages.SUCCESS, _("Transfer saved successfully!")
+        )
+        return TemplateResponse(
+            request,
+            "includes/messages-oob.html",
             headers={
-                "HX-Trigger": json.dumps(
-                    {
-                        "tripModified": {},
-                        "hide-modal": {},
-                        "showMessage": {
-                            "type": "success",
-                            "message": message,
-                        },
-                    }
-                )
+                "HX-Reswap": "none",
+                "HX-Trigger": json.dumps({"tripModified": {}, "hide-modal": {}}),
             },
         )
 

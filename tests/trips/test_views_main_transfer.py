@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+from django.contrib.messages import get_messages
 from django.urls import reverse
 from pytest_django.asserts import assertTemplateUsed
 
@@ -59,7 +60,13 @@ class TestMainTransferViews(TestCase):
         with self.login(user):
             response = self.client.post(url, data)
 
-            assert response.status_code == 204
+            assert response.status_code == 200
+            assert response.headers["HX-Reswap"] == "none"
+            messages = list(get_messages(response.wsgi_request))
+            assert any(
+                "Main transfer updated successfully" in str(message)
+                for message in messages
+            )
             transfer.refresh_from_db()
             assert transfer.origin_name == "Florence Central Station"
             assert str(transfer.start_time) == "14:00:00"
@@ -361,8 +368,13 @@ class TestMainTransferViews(TestCase):
             )
 
             # Should create transfer and close modal
-            assert response.status_code == 204
+            assert response.status_code == 200
+            assert response.headers["HX-Reswap"] == "none"
             assert "HX-Trigger" in response.headers
+            messages = list(get_messages(response.wsgi_request))
+            assert any(
+                "Transfer saved successfully!" in str(message) for message in messages
+            )
             # Verify arrival was created
             assert MainTransfer.objects.filter(
                 trip=trip, direction=MainTransfer.Direction.ARRIVAL
@@ -397,8 +409,13 @@ class TestMainTransferViews(TestCase):
                 url, data, QUERY_STRING="transport_type=plane&direction=departure"
             )
 
-            assert response.status_code == 204
+            assert response.status_code == 200
+            assert response.headers["HX-Reswap"] == "none"
             assert "HX-Trigger" in response.headers
+            messages = list(get_messages(response.wsgi_request))
+            assert any(
+                "Transfer saved successfully!" in str(message) for message in messages
+            )
 
     def test_save_main_transfer_invalid_method(self):
         """Test save main transfer with GET returns 405"""
