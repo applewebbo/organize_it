@@ -57,6 +57,11 @@ htmx_urlpatterns = [
         views.add_stay_for_trip,
         name="add-stay-for-trip",
     ),
+    path(
+        "trips/<int:trip_id>/stays-section",
+        views.stays_section,
+        name="stays-section",
+    ),
     path("stays/<int:pk>/modify", views.stay_modify, name="stay-modify"),
     path("stays/<int:pk>/delete", views.stay_delete, name="stay-delete"),
     path("stays/<int:stay_id>/enrich/", views.enrich_stay, name="enrich-stay"),

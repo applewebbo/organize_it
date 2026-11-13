@@ -27,9 +27,12 @@
             {% endif %}
             {# Pre-fill notification #}
             {% if prefilled_from_arrival %}
-                <div class="alert alert-info mb-4 sm:col-span-4">
-                    <i class="ph ph-info"></i>
-                    <span>{% translate "Fields pre-filled from arrival journey. You can modify them if needed." %}</span>
+                <div class="bg-base-200 text-base-content/80 mb-4 flex items-center gap-4 rounded-lg px-4 py-3 text-sm sm:col-span-4">
+                    <span class="bg-info flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
+                          aria-hidden="true">
+                        <i class="ph-bold ph-info i-sm text-white"></i>
+                    </span>
+                    <span>{% translate "Fields pre-filled from arrival journey. The arrival time will also be pre-filled from the estimated driving duration once you set a departure time. You can modify everything if needed." %}</span>
                 </div>
             {% endif %}
             <div class="mb-4 sm:col-span-4">
@@ -51,9 +54,10 @@
                 {% if quick_fill_locations %}
                     <div class="mt-1 flex flex-wrap gap-2">
                         {% for loc in quick_fill_locations %}
+                            {# Arrival locations fill where we're arriving TO; departure locations fill where we're leaving FROM. #}
                             <button type="button"
-                                    class="btn btn-sm btn-outline {% if loc.type == 'stay' %}btn-neutral{% elif loc.type == 'meal' %}btn-warning{% elif loc.type == 'experience' %}btn-success{% else %}btn-neutral{% endif %}"
-                                    @click="document.getElementById('id_destination_address').value = '{{ loc.address|escapejs }}'; $nextTick(() => $dispatch('car-estimate-requested'))">
+                                    class="btn btn-sm btn-soft {% if loc.type == 'stay' %}btn-neutral{% elif loc.type == 'meal' %}btn-warning{% elif loc.type == 'experience' %}btn-success{% else %}btn-neutral{% endif %}"
+                                    @click="document.getElementById('id_{% if direction == 'departure' %}origin_address{% else %}destination_address{% endif %}').value = '{{ loc.address|escapejs }}'; $nextTick(() => $dispatch('car-estimate-requested'))">
                                 <i class="ph-bold {% if loc.type == 'stay' %}ph-bed{% elif loc.type == 'meal' %}ph-fork-knife{% else %}ph-images{% endif %}"></i>
                                 {{ loc.label }}
                                 <i class="ph-bold ph-plus"></i>
@@ -82,6 +86,48 @@
             <!-- Notes -->
             <div class="sm:col-span-4">{{ form.notes|as_crispy_field }}</div>
         </div>
+        <script>
+            (function () {
+                const form = document.currentScript.closest("form");
+                if (!form) return;
+                const startInput = form.querySelector("#id_start_time");
+                const endInput = form.querySelector("#id_end_time");
+                const durationEl = form.querySelector("#duration-estimate");
+                if (!startInput || !endInput || !durationEl) return;
+
+                function getDurationMinutes() {
+                    const el = durationEl.querySelector("[data-duration-minutes]");
+                    const raw = el && el.dataset.durationMinutes;
+                    return raw ? parseInt(raw, 10) : null;
+                }
+
+                function flashAutofill(el) {
+                    el.classList.add("transition-colors", "duration-700", "border-primary", "ring-2", "ring-primary/30");
+                    setTimeout(() => {
+                        el.classList.remove("border-primary", "ring-2", "ring-primary/30");
+                    }, 1200);
+                }
+
+                function autofillEndTime() {
+                    if (!startInput.value) return;
+                    const minutes = getDurationMinutes();
+                    if (minutes == null) return;
+                    // Round the estimated duration up to the next quarter
+                    // hour (52min -> 1h): a precise-to-the-minute ETA reads
+                    // as false precision for a driving estimate.
+                    const roundedMinutes = Math.ceil(minutes / 15) * 15;
+                    const [h, m] = startInput.value.split(":").map(Number);
+                    const total = (h * 60 + m + roundedMinutes) % (24 * 60);
+                    const nh = String(Math.floor(total / 60)).padStart(2, "0");
+                    const nm = String(total % 60).padStart(2, "0");
+                    endInput.value = `${nh}:${nm}`;
+                    flashAutofill(endInput);
+                }
+
+                startInput.addEventListener("change", autofillEndTime);
+                durationEl.addEventListener("htmx:afterSwap", autofillEndTime);
+            })();
+        </script>
         <!-- Footer with navigation -->
         {% if is_edit_modal %}
             <!-- Edit modal footer: simple Cancel + Save -->

@@ -105,6 +105,7 @@ from trips.views.stays import (
     stay_note_delete,
     stay_note_modify,
     stay_notes,
+    stays_section,
 )
 from trips.views.transfers import (
     arrival_transfer_modal,
@@ -222,6 +223,7 @@ __all__ = [
     "stay_booking_modal",
     "stay_booking_save",
     "stay_booking_redirect",
+    "stays_section",
     # transfers
     "edit_main_transfer",
     "delete_main_transfer",

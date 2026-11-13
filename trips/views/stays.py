@@ -4,6 +4,7 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.contrib import messages
+from django.db.models import Max, Min
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
@@ -23,6 +24,19 @@ from trips.utils import (
 from trips.views.days import _day_city
 
 logger = logging.getLogger(__name__)
+
+
+def stays_section(request, trip_id):
+    """HTMX endpoint: returns the stays section for the trip detail page."""
+    trip = get_trip_or_404(trip_id, request.user)
+    stays = (
+        Stay.objects.filter(days__trip=trip)
+        .annotate(first_day_date=Min("days__date"), last_day_date=Max("days__date"))
+        .distinct()
+        .order_by("first_day_date")
+    )
+    context = {"trip": trip, "stays": stays}
+    return TemplateResponse(request, "trips/includes/stays-section.html", context)
 
 
 def add_stay_for_trip(request, trip_pk):

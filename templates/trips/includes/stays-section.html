@@ -2,7 +2,7 @@
 {% stay22_enabled as stay22_on %}
 <section id="stays-section"
          class="mb-4"
-         hx-get="{% url 'trips:trip-detail' trip.pk %}"
+         hx-get="{% url 'trips:stays-section' trip.pk %}"
          hx-target="#stays-section"
          hx-swap="outerHTML"
          hx-trigger="tripModified from:body">

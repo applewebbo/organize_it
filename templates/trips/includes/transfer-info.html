@@ -1,13 +1,14 @@
 {% load i18n trip_tags %}
 <div id="transfer-info-{{ day_pk }}"
-     class="text-base-content/80 bg-info/10 border-info/20 mx-auto mb-4 flex w-full max-w-sm flex-col items-center gap-1.5 rounded-xl border px-4 py-3 text-sm"
+     class="text-base-content/80 bg-info/10 border-info/20 flex w-full flex-wrap items-center justify-center gap-x-3 gap-y-1 rounded-xl border px-4 py-3 text-sm"
      {% if not transfer_duration %} hx-get="{% url 'trips:transfer-info' day_pk %}" hx-trigger="every 4s" hx-target="#transfer-info-{{ day_pk }}" hx-swap="outerHTML" {% endif %}>
     <div class="flex items-center gap-2 font-medium">
-        <span class="truncate text-center">{{ from_dest }}</span>
+        <span class="truncate">{{ from_dest }}</span>
         <i class="ph-bold ph-arrow-right text-info shrink-0" aria-hidden="true"></i>
-        <span class="truncate text-center">{{ next_destination }}</span>
+        <span class="truncate">{{ next_destination }}</span>
     </div>
     {% if transfer_duration %}
+        <span class="bg-info/30 hidden h-4 w-px sm:inline-block" aria-hidden="true"></span>
         <div class="flex items-center gap-4 text-xs opacity-80">
             <div class="flex items-center gap-1.5"
                  title="{% translate 'Estimated driving time' %}">
@@ -21,6 +22,6 @@
             </div>
         </div>
     {% else %}
-        <span class="loading loading-spinner loading-xs mt-1"></span>
+        <span class="loading loading-spinner loading-xs"></span>
     {% endif %}
 </div>

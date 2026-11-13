@@ -372,6 +372,21 @@ def weather_summary(trip):
 
 
 @register.simple_tag
+def show_day_weather(day, show_weather):
+    """Whether to render a weather indicator for a day row.
+
+    Hidden for past days: Open-Meteo only forecasts from today onward, so a
+    past day with no weather_data means "no forecast ever existed", not "data
+    missing" — showing an n/d icon there would be misleading.
+    """
+    if not show_weather or day.trip.status not in (2, 3):
+        return False
+    if not day.date or day.date < timezone.localdate():
+        return False
+    return True
+
+
+@register.simple_tag
 def trip_current_day_weather(trip):
     """Return weather_data for the current/next day of a trip (for list badge)."""
     # Past days never have a forecast (Open-Meteo only covers today onward), so

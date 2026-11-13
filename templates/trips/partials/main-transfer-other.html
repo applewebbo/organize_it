@@ -27,8 +27,11 @@
             {% endif %}
             {# Pre-fill notification #}
             {% if prefilled_from_arrival %}
-                <div class="alert alert-info mb-4 sm:col-span-4">
-                    <i class="ph ph-info"></i>
+                <div class="bg-base-200 text-base-content/80 mb-4 flex items-center gap-4 rounded-lg px-4 py-3 text-sm sm:col-span-4">
+                    <span class="bg-info flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
+                          aria-hidden="true">
+                        <i class="ph-bold ph-info i-sm text-white"></i>
+                    </span>
                     <span>{% translate "Fields pre-filled from arrival journey. You can modify them if needed." %}</span>
                 </div>
             {% endif %}

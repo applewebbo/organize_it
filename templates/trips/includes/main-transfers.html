@@ -115,6 +115,9 @@
                             </p>
                             <p>
                                 <strong>{% translate "Arrival:" %}</strong> {{ arrival_transfer.end_time }}
+                                {% if arrival_transfer.end_time and arrival_transfer.type == 3 %}
+                                    <span class="text-base-content/50">({% translate "estimated" %})</span>
+                                {% endif %}
                             </p>
                         </div>
                         {# Connection to first event/stay #}
@@ -295,6 +298,9 @@
                             </p>
                             <p>
                                 <strong>{% translate "Arrival:" %}</strong> {{ departure_transfer.end_time }}
+                                {% if departure_transfer.end_time and departure_transfer.type == 3 %}
+                                    <span class="text-base-content/50">({% translate "estimated" %})</span>
+                                {% endif %}
                             </p>
                         </div>
                         {# Connection from last event/stay #}

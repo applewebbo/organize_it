@@ -1,27 +1,44 @@
 {% load i18n trip_tags %}
 <div id="day-{{ day.pk }}"
-     class="sm:bg-base-200 sm:dark:bg-base-300/20 sm:rounded-lg sm:p-3"
+     class="sm:bg-base-200 sm:dark:bg-base-300/20 sm:rounded-lg sm:px-3 sm:py-4"
      hx-get="{% url 'trips:day-detail' day.pk %}"
      hx-trigger="dayModified{{ day.pk }} from:body"
      hx-target="#day-{{ day.pk }}"
      hx-swap="outerHTML">
     <div class="flex items-start justify-between">
-        <div class="flex flex-col gap-1.5">
-            <div class="flex flex-wrap items-center gap-2">
-                <h3 class="text-base font-semibold">
-                    {% if day.date %}
-                        {{ day.date|date:"j F" }} <span class="text-base-content/50 ms-0.5 font-normal">{% translate 'Day' %} {{ day.number }}</span>
-                    {% else %}
-                        {% translate 'Day' %} {{ day.number }}
-                    {% endif %}
-                </h3>
-                {% if day.trip.is_multi_destination %}
-                    <span class="text-base-content/50 text-sm font-medium uppercase">
-                        —
-                        {% with dest=day.destination|default:day.trip.destination %}{{ dest }}{% endwith %}
-                    </span>
+        <div class="flex flex-wrap items-center gap-2">
+            <h3 class="text-base font-semibold">
+                {% if day.date %}
+                    {{ day.date|date:"j F" }} <span class="text-base-content/50 ms-0.5 font-normal">{% translate 'Day' %} {{ day.number }}</span>
+                {% else %}
+                    {% translate 'Day' %} {{ day.number }}
                 {% endif %}
-            </div>
+            </h3>
+            {% show_day_weather day show_weather as render_day_weather %}
+            {% if day.trip.is_multi_destination or render_day_weather %}
+                <span class="bg-base-300 text-base-content/70 dark:bg-base-200/50 inline-flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium uppercase">
+                    {% if day.trip.is_multi_destination %}
+                        {% with dest=day.destination|default:day.trip.destination %}{{ dest }}{% endwith %}
+                    {% endif %}
+                    {% if render_day_weather %}
+                        {% if day.weather_data %}
+                            <span class="inline-flex items-center gap-1 normal-case">
+                                <i class="ph-bold {{ day.weather_data.weather_icon }}" aria-hidden="true"></i>
+                                {{ day.weather_data.temperature_max|floatformat:0 }}°
+                            </span>
+                            <span class="inline-flex items-center gap-1 normal-case">
+                                <i class="ph-bold ph-wind" aria-hidden="true"></i>
+                                {{ day.weather_data.wind_speed_max|floatformat:0 }}&nbsp;km/h
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center gap-1 normal-case">
+                                <i class="ph-bold ph-cloud-slash" aria-hidden="true"></i>
+                                {% translate "n/d" %}
+                            </span>
+                        {% endif %}
+                    {% endif %}
+                </span>
+            {% endif %}
             {% if day.stay %}
                 {% if day.trip.status != 5 %}
                     <button type="button"
@@ -30,11 +47,11 @@
                             hx-target="#dialog"
                             hx-swap="innerHTML"
                             @click="$dispatch('open-modal'); document.activeElement.blur()"
-                            class="bg-base-300 text-base-content/70 dark:bg-base-200/50 hover:bg-base-300/70 inline-flex w-fit max-w-full cursor-pointer items-center gap-1.5 rounded-md px-2.5 py-1 text-left text-xs font-medium">
+                            class="bg-base-300 text-base-content/70 dark:bg-base-200/50 hover:bg-base-300/70 inline-flex w-fit max-w-full cursor-pointer items-center gap-1.5 rounded-md px-2.5 py-1.5 text-left text-xs font-medium">
                         <i class="ph-bold ph-bed i-sm shrink-0"></i><span class="line-clamp-2 break-words">{{ day.stay.name }}</span>
                     </button>
                 {% else %}
-                    <span class="bg-base-300 text-base-content/70 dark:bg-base-200/50 inline-flex w-fit max-w-full items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium">
+                    <span class="bg-base-300 text-base-content/70 dark:bg-base-200/50 inline-flex w-fit max-w-full items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium">
                         <i class="ph-bold ph-bed i-sm shrink-0"></i><span class="line-clamp-2 break-words">{{ day.stay.name }}</span>
                     </span>
                 {% endif %}
@@ -59,7 +76,7 @@
         </div>
     </div>
     <div id="day-info-{{ day.pk }}"
-         class="mt-3"
+         class="mt-4"
          {% if show_map and not map %}hx-get="{% url 'trips:day-detail' day.pk %}" hx-trigger="load[navigator.onLine], online from:window" hx-target="#day-{{ day.pk }}" hx-swap="outerHTML"{% endif %}>
         {% if show_map %}
             {% if map %}
