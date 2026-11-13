@@ -606,7 +606,7 @@ class TestWeatherTags:
         # No weather data → nothing rendered
         assert "ph-" not in result
 
-    def test_trip_day_one_weather_with_data(self, trip_factory, user_factory):
+    def test_trip_current_day_weather_with_data(self, trip_factory, user_factory):
         from django.template import Context, Template
 
         user = user_factory()
@@ -615,12 +615,38 @@ class TestWeatherTags:
         day.weather_data = {"weather_icon": "ph-sun", "temperature_max": 20.0}
         day.save()
         t = Template(
-            "{% load trip_tags %}{% trip_day_one_weather trip as w %}{{ w.weather_icon }}"
+            "{% load trip_tags %}{% trip_current_day_weather trip as w %}{{ w.weather_icon }}"
         )
         result = t.render(Context({"trip": trip}))
         assert "ph-sun" in result
 
-    def test_trip_day_one_weather_no_days(self, user_factory):
+    def test_trip_current_day_weather_skips_past_days(self, trip_factory, user_factory):
+        import datetime
+
+        from django.template import Context, Template
+        from django.utils import timezone
+
+        user = user_factory()
+        trip = trip_factory(author=user)
+        days = list(trip.days.order_by("number"))
+        past_day, today_day = days[0], days[1]
+        past_day.date = timezone.localdate() - datetime.timedelta(days=1)
+        past_day.weather_data = {"weather_icon": "ph-sun", "temperature_max": 20.0}
+        past_day.save()
+        today_day.date = timezone.localdate()
+        today_day.weather_data = {
+            "weather_icon": "ph-cloud-rain",
+            "temperature_max": 15.0,
+        }
+        today_day.save()
+        t = Template(
+            "{% load trip_tags %}{% trip_current_day_weather trip as w %}{{ w.weather_icon }}"
+        )
+        result = t.render(Context({"trip": trip}))
+        assert "ph-cloud-rain" in result
+        assert "ph-sun" not in result
+
+    def test_trip_current_day_weather_no_days(self, user_factory):
         from django.template import Context, Template
 
         from trips.models import Trip
@@ -633,7 +659,9 @@ class TestWeatherTags:
             start_date=None,
             end_date=None,
         )
-        t = Template("{% load trip_tags %}{% trip_day_one_weather trip as w %}{{ w }}")
+        t = Template(
+            "{% load trip_tags %}{% trip_current_day_weather trip as w %}{{ w }}"
+        )
         result = t.render(Context({"trip": trip}))
         assert result.strip() == "None"
 

@@ -361,7 +361,7 @@ class TestTripListView(TestCase):
             user = self.make_user(username)
             owner = self.make_user(f"{username}_owner")
             for _ in range(n):
-                # Own in-progress trip triggers the trip_day_one_weather tag
+                # Own in-progress trip triggers the trip_current_day_weather tag
                 TripFactory(
                     author=user,
                     start_date=date(2026, 6, 23),

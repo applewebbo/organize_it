@@ -3,6 +3,7 @@ import re
 from django import template
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils import timezone
 from django.utils.html import format_html, format_html_join
 
 from trips.data.phone_prefixes import ITALIAN_PREFIXES
@@ -371,11 +372,13 @@ def weather_summary(trip):
 
 
 @register.simple_tag
-def trip_day_one_weather(trip):
-    """Return weather_data for the first day of a trip (for list badge)."""
-    # Day is ordered by "number" by default, so reuse the prefetched days
+def trip_current_day_weather(trip):
+    """Return weather_data for the current/next day of a trip (for list badge)."""
+    # Past days never have a forecast (Open-Meteo only covers today onward), so
+    # skip them and use the first day that is today or in the future.
+    today = timezone.localdate()
     days = list(trip.days.all())
-    first_day = days[0] if days else None
-    if first_day:
-        return first_day.weather_data
+    current_day = next((day for day in days if day.date >= today), None)
+    if current_day:
+        return current_day.weather_data
     return None

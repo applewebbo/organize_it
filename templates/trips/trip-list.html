@@ -125,22 +125,39 @@
                             <div class="card card-border bg-base-100 overflow-hidden shadow"
                                  id="{{ trip.id }}">
                                 <!-- Trip Image Header -->
+                                {% if trip.status == 2 or trip.status == 3 %}
+                                    {% trip_current_day_weather trip as day_weather %}
+                                {% endif %}
                                 <a href="{% url 'trips:trip-detail' trip.id %}">
                                     <figure class="relative h-48 w-full">
                                         {% include "trips/includes/trip-image.html" with trip=trip image_loading="lazy" %}
-                                        {% if trip.needs_attribution and not trip.image_metadata.pending %}
-                                            <div class="absolute top-1 right-1 rounded bg-black/50 px-2 py-1 text-xs text-white">
-                                                {{ trip.get_attribution_text }}
-                                            </div>
-                                        {% endif %}
                                         <span class="badge badge-secondary badge-sm rounded-box absolute top-2 left-2">
                                             {{ trip.get_status_display }}
                                         </span>
-                                        <div class="trip-card-overlay absolute bottom-2 left-2 flex max-w-[calc(100%-1rem)] items-center gap-4 rounded-lg px-3 py-2">
-                                            <h2 class="card-title max-w-[65%] min-w-0 truncate text-sm font-semibold">
+                                        <div class="absolute top-2 right-2 flex flex-col items-end gap-1">
+                                            {% if trip.needs_attribution and not trip.image_metadata.pending %}
+                                                <div class="rounded bg-black/50 px-2 py-1 text-xs text-white">
+                                                    {{ trip.get_attribution_text }}
+                                                </div>
+                                            {% endif %}
+                                            {% if trip.status == 2 or trip.status == 3 %}
+                                                <div class="badge badge-sm rounded-box bg-base-100/90 text-base-content flex gap-1"
+                                                     title="{% translate 'Weather forecast' %}">
+                                                    {% if day_weather %}
+                                                        <i class="ph-bold {{ day_weather.weather_icon }}"></i>
+                                                        {{ day_weather.temperature_max|floatformat:0 }}°
+                                                    {% else %}
+                                                        <i class="ph-bold ph-cloud-slash" aria-hidden="true"></i>
+                                                        <span class="opacity-60">n/d</span>
+                                                    {% endif %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="trip-card-overlay absolute bottom-2 left-2 flex max-w-[calc(100%-1rem)] flex-col items-start gap-0.5 rounded-lg px-3 py-2">
+                                            <h2 class="card-title line-clamp-2 w-full text-base font-semibold break-words">
                                                 {{ trip.title }}
                                             </h2>
-                                            <span class="shrink-0 text-xs whitespace-nowrap opacity-80">
+                                            <span class="text-xs whitespace-nowrap opacity-80">
                                                 {% if trip.start_date and trip.end_date %}
                                                     {{ trip.start_date|date:"SHORT_DATE_FORMAT" }}&nbsp;-&nbsp;{{ trip.end_date|date:"SHORT_DATE_FORMAT" }}
                                                 {% else %}
@@ -151,20 +168,6 @@
                                     </figure>
                                 </a>
                                 <div class="card-body">
-                                    {% if trip.status == 2 or trip.status == 3 %}
-                                        {% trip_day_one_weather trip as day_weather %}
-                                        <div class="flex items-center gap-2 text-sm">
-                                            <span class="text-base-content/60 font-medium">{% translate "Weather forecast" %}:</span>
-                                            {% if day_weather %}
-                                                <span class="flex items-center gap-1">
-                                                    <i class="ph-bold {{ day_weather.weather_icon }}"></i>
-                                                    {{ day_weather.temperature_max|floatformat:0 }}° / {{ day_weather.temperature_min|floatformat:0 }}°
-                                                </span>
-                                            {% else %}
-                                                <span class="text-base-content/40">n/d</span>
-                                            {% endif %}
-                                        </div>
-                                    {% endif %}
                                     <div class="grid grid-cols-[2fr_1fr_1fr_1fr] gap-2">
                                         <a href="{% url 'trips:trip-detail' trip.id %}"
                                            class="btn btn-sm btn-primary btn-soft">
@@ -309,7 +312,7 @@
                                            title="{% translate 'View' %}"
                                            aria-label="{% translate 'View' %}">
                                             <i class="ph-bold ph-eye" aria-hidden="true"></i>
-                                            <span class="hidden sm:inline">{% translate 'View' %}</span>
+                                            <span>{% translate 'View' %}</span>
                                         </a>
                                         <button type="button"
                                                 class="btn btn-xs btn-warning btn-soft"
@@ -319,7 +322,6 @@
                                                 title="{% translate 'Unarchive' %}"
                                                 aria-label="{% translate 'Unarchive' %}">
                                             <i class="ph-bold ph-arrow-counter-clockwise" aria-hidden="true"></i>
-                                            <span class="hidden sm:inline">{% translate 'Unarchive' %}</span>
                                         </button>
                                         <button type="button"
                                                 class="btn btn-xs btn-error btn-soft"
@@ -328,7 +330,6 @@
                                                 title="{% translate 'Delete' %}"
                                                 aria-label="{% translate 'Delete' %}">
                                             <i class="ph-bold ph-trash" aria-hidden="true"></i>
-                                            <span class="hidden sm:inline">{% translate 'Delete' %}</span>
                                         </button>
                                     </div>
                                 </div>

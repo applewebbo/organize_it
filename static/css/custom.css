@@ -206,6 +206,15 @@ select ~ .pointer-events-none {
   background-color: rgb(71 85 105); /* slate-600 */
 }
 
+/* daisyUI's warning token (oklch 82% lightness, yellow hue) is too pale
+   for soft icon-only buttons (trip-list.html archive/unarchive actions)
+   to read against a white card. Override --btn-color with a more vivid
+   orange locally, scoped to soft warning buttons only — solid
+   .btn-warning usage elsewhere is unaffected. */
+.btn-warning.btn-soft {
+  --btn-color: oklch(68% 0.19 50);
+}
+
 .trip-card-overlay {
   background-color: rgba(255, 255, 255, 0.9);
   color: rgb(31 41 55); /* gray-800 */
