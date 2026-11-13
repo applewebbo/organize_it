@@ -65,7 +65,7 @@ def test_footer_shows_project_info():
     html = render_to_string(
         "includes/footer.html", {"APP_VERSION": settings.APP_VERSION}
     )
-    assert "Organizeit!" in html
+    assert "ORGANIZEit!" in html
     assert "Django" in html
 
 

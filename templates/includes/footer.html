@@ -1,25 +1,31 @@
 {% load i18n static %}
 {% get_current_language as LANGUAGE_CODE %}
-<footer class="bg-base-200 border-base-300 mt-6 border-t md:mt-10">
+<footer class="bg-base-200 border-base-300 md:rounded-box mt-6 border-t md:mx-4 md:mt-10 md:mb-4 md:max-w-7xl md:border md:shadow 2xl:mx-auto 2xl:max-w-[1600px]">
     <div class="container mx-auto px-4 py-10">
         <div class="mx-auto grid w-full max-w-4xl grid-cols-1 gap-10 sm:grid-cols-2">
-            <aside class="flex flex-col gap-3">
-                <a href="{% url 'trips:home' %}" class="flex items-center">
-                    <span class="text-base-content text-xl font-semibold">Organizeit!</span>
-                </a>
-                <p class="text-base-content/70 max-w-xs text-sm">{% translate 'Organize your next trip, on your own or with others.' %}</p>
-                <p class="text-base-content/60 text-sm">
-                    <i class="ph-bold ph-stack" aria-hidden="true"></i>
-                    {% translate 'Built with Django, HTMX & TailwindCSS.' %}
-                </p>
-                <p class="text-base-content/50 mt-1 text-xs">
-                    {% translate '© 2026 WEBBOgrafico' %}&nbsp;-&nbsp;<a href="{% url 'trips:releases' %}"
+            <aside class="flex flex-col gap-6">
+                <div class="flex flex-col gap-0.5">
+                    <a href="{% url 'trips:home' %}" class="flex items-center">
+                        <span class="text-base-content/80 font-kalam text-2xl leading-none">ORGANIZEit!</span>
+                    </a>
+                    <p class="text-base-content/70 max-w-xs text-sm">{% translate 'Organize your next trip, on your own or with others.' %}</p>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <p class="text-base-content/60 text-sm">
+                        <i class="ph-bold ph-stack" aria-hidden="true"></i>
+                        {% translate 'Built with Django, HTMX & TailwindCSS.' %}
+                    </p>
+                    <p class="text-base-content/50 text-xs">
+                        {% translate '© 2026 WEBBOgrafico' %}&nbsp;-&nbsp;<a href="{% url 'trips:releases' %}"
    class="link link-hover inline-flex items-center gap-1"><i class="ph-bold ph-tag" aria-hidden="true"></i>v{{ APP_VERSION }}</a>
-                </p>
+                    </p>
+                </div>
             </aside>
             <nav aria-label="{% translate 'Footer menu' %}" class="flex flex-col gap-3">
-                <h6 class="text-base-content/80 text-sm font-semibold tracking-wide uppercase">{% translate 'Menu' %}</h6>
-                <ul class="grid grid-cols-1 gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
+                <h6 class="text-base-content/80 text-sm leading-none font-semibold tracking-wide uppercase">
+                    {% translate 'Menu' %}
+                </h6>
+                <ul class="grid grid-cols-1 gap-x-6 gap-y-2 text-sm sm:grid-cols-2 md:grid-flow-col md:grid-rows-3">
                     <li>
                         <a href="{% url 'trips:home' %}"
                            class="link link-hover text-base-content/80 inline-flex items-center gap-2">
