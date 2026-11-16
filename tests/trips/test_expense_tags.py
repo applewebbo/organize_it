@@ -59,7 +59,7 @@ class TestCostRowInclude:
 
     def test_add_button_when_unlinked(self, trip_factory, meal_factory):
         trip = trip_factory(expenses_enabled=True)
-        assert "Add cost" in self._render(meal_factory(trip=trip), trip)
+        assert "Cost" in self._render(meal_factory(trip=trip), trip)
 
     def test_shows_amount_when_linked(self, trip_factory, meal_factory):
         trip = trip_factory(expenses_enabled=True)

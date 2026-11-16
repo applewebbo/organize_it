@@ -1,9 +1,9 @@
 {% load expense_tags i18n %}
 {% if trip.expenses_enabled %}
     {% linked_expense obj as linked %}
-    <li class="flex items-center gap-2">
-        <i class="ph-bold ph-receipt i-md text-base-content/60 shrink-0"></i>
+    <li class="mt-1 flex items-center gap-2">
         {% if linked %}
+            <i class="ph-bold ph-receipt i-md text-base-content/60 shrink-0"></i>
             <span class="font-medium">{{ linked.amount|money:trip.expense_currency }}</span>
             <button type="button"
                     class="btn btn-ghost btn-xs"
@@ -11,12 +11,13 @@
                     hx-target="#dialog"
                     @click="$dispatch('open-modal'); document.activeElement.blur()">{% translate "Edit" %}</button>
         {% else %}
+            <i class="ph-bold ph-wallet i-md text-base-content/60 shrink-0"></i>
             <button type="button"
-                    class="btn btn-ghost btn-xs gap-1"
+                    class="btn btn-soft btn-xs gap-1"
                     hx-get="{% url 'trips:expense-create' trip.pk %}?ct={{ ct }}&obj={{ obj.pk }}"
                     hx-target="#dialog"
                     @click="$dispatch('open-modal'); document.activeElement.blur()">
-                <i class="ph-bold ph-plus"></i>{% translate "Add cost" %}
+                <i class="ph-bold ph-plus"></i>{% translate "Cost" %}
             </button>
         {% endif %}
     </li>

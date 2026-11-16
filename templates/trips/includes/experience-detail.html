@@ -18,7 +18,7 @@
     {% if event.notes %}
         <li class="mt-1 flex items-start gap-2 leading-normal">
             <i class="ph-bold ph-note i-md text-base-content/60 shrink-0"></i>
-            <span class="min-w-0 text-sm break-words whitespace-pre-line">{{ event.notes }}</span>
+            <span class="min-w-0 break-words whitespace-pre-line">{{ event.notes }}</span>
         </li>
     {% endif %}
     {% include "trips/includes/_expense-cost-row.html" with obj=event trip=event.trip ct="event" %}
