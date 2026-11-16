@@ -3,6 +3,7 @@ import json
 from dataclasses import dataclass
 from datetime import date, timedelta
 from math import asin, cos, radians, sin, sqrt
+from urllib.parse import quote
 
 from django.conf import settings
 from django.core.cache import cache
@@ -12,6 +13,7 @@ from suggestions.ai.base import AISuggestionError
 from suggestions.ai.factory import get_provider
 from suggestions.models import (
     AICredentials,
+    DayPlanStop,
     SharedKeyNoticeDismissal,
     SuggestionPreferences,
 )
@@ -527,24 +529,6 @@ def build_day_context(
     )
 
 
-def _day_cache_key(
-    trip: Trip, day, strategy: str, preferences: SuggestionPrefs, language: str
-) -> str:
-    payload = json.dumps(
-        {
-            "trip": trip.pk,
-            "day": day.pk,
-            "strategy": strategy,
-            "lang": language,
-            "prefs": preferences.model_dump(),
-        },
-        sort_keys=True,
-        default=str,
-    )
-    digest = hashlib.sha256(payload.encode()).hexdigest()[:16]
-    return f"ai_day:{trip.pk}:{day.pk}:{digest}"
-
-
 def _ground_itinerary(
     itinerary: DayItinerary,
     context: TripContext,
@@ -592,6 +576,60 @@ def _ground_itinerary(
     return grounded
 
 
+def persist_day_plan(day, strategy: str, grounded: list[GroundedStop], user) -> None:
+    """Replace the day's persisted draft plan with a fresh one.
+
+    The DB is the single durable store for a day's draft plan — reopening
+    "Plan day" reads these rows back (see generate_day_itinerary), so the
+    draft survives across devices/sessions until Regenerate or acceptance."""
+    DayPlanStop.objects.filter(day=day).delete()
+    DayPlanStop.objects.bulk_create(
+        [
+            DayPlanStop(
+                day=day,
+                strategy=strategy,
+                order=i,
+                kind=g.stop.kind.value,
+                name=g.stop.name,
+                description=g.stop.description,
+                address=g.address,
+                city=g.city,
+                latitude=g.latitude,
+                longitude=g.longitude,
+                place_id=g.place_id,
+                duration_minutes=g.stop.estimated_duration_minutes,
+                existing_event_id=g.existing_event_id,
+                generated_by=user,
+            )
+            for i, g in enumerate(grounded)
+        ]
+    )
+
+
+def _grounded_from_persisted(stop: DayPlanStop) -> GroundedStop:
+    """Reconstruct a GroundedStop from a persisted DayPlanStop row, so
+    to_stop_card() stays the single rendering function for both a freshly
+    generated itinerary and one reloaded from the DB."""
+    return GroundedStop(
+        stop=ItineraryStop(
+            kind=SuggestionKind(stop.kind),
+            name=stop.name,
+            description=stop.description,
+            estimated_duration_minutes=stop.duration_minutes,
+        ),
+        address=stop.address,
+        city=stop.city,
+        latitude=stop.latitude,
+        longitude=stop.longitude,
+        place_id=stop.place_id,
+        existing_event_id=stop.existing_event_id,
+    )
+
+
+def get_persisted_day_plan(day) -> list[DayPlanStop]:
+    return list(day.plan_stops.all())
+
+
 def generate_day_itinerary(
     user,
     trip: Trip,
@@ -604,11 +642,18 @@ def generate_day_itinerary(
     """Generate and ground a single-day itinerary for ``day``.
 
     ``strategy`` decides how existing events are treated (see DAY_STRATEGIES);
-    only "add" feeds them to the model for interleaving. Results are cached per
-    day + strategy + preferences and the daily generation caps are enforced on a
-    real provider hit, mirroring ``generate_suggestions``. Nothing on the day is
-    mutated here — the draft is applied only on acceptance.
+    only "add" feeds them to the model for interleaving. The draft is persisted
+    to the DB (``DayPlanStop``) so reopening "Plan day" without
+    ``force_refresh`` shows the same proposals again at zero cost — no provider
+    call, no quota spent — until Regenerate or acceptance. Nothing on the day
+    is mutated here beyond the draft rows — real events are created only on
+    acceptance.
     """
+    if not force_refresh:
+        persisted = get_persisted_day_plan(day)
+        if persisted:
+            return [_grounded_from_persisted(s) for s in persisted]
+
     credentials = resolve_credentials(user, trip)
     if credentials is None:
         raise AISuggestionError(
@@ -623,12 +668,6 @@ def generate_day_itinerary(
     day_stops = [e.name for e in existing_events] or None
     context = build_day_context(trip, day, language=language, exclude_names=day_stops)
 
-    key = _day_cache_key(trip, day, strategy, preferences, language)
-    if not force_refresh:
-        cached = cache.get(key)
-        if cached is not None:
-            return cached
-
     _enforce_generation_quota(user, trip)
 
     provider = get_provider(credentials.provider, credentials.api_key_encrypted)
@@ -636,7 +675,7 @@ def generate_day_itinerary(
 
     radius = _RADIUS_METERS.get(preferences.search_radius, _GROUNDING_RADIUS)
     grounded = _ground_itinerary(itinerary, context, existing_events, radius)
-    cache.set(key, grounded, _CACHE_TTL)
+    persist_day_plan(day, strategy, grounded, user)
     return grounded
 
 
@@ -668,6 +707,44 @@ def to_stop_card(grounded: GroundedStop) -> dict:
         "place_id": grounded.place_id,
         "duration_minutes": stop.estimated_duration_minutes,
         "existing_event_id": grounded.existing_event_id,
+    }
+
+
+# Plain outbound search-link operator per kind, used by build_stop_preview_links.
+# Zero API cost — these are ordinary URL-encoded search links, not integrations.
+_KIND_OPERATOR = {
+    "meal": ("TheFork", "https://www.thefork.com/search?q={q}"),
+    "stay": ("Booking.com", "https://www.booking.com/searchresults.html?ss={q}"),
+    "experience": ("GetYourGuide", "https://www.getyourguide.com/s/?q={q}"),
+}
+
+
+def build_stop_preview_links(
+    name: str, city: str, address: str, kind: str, place_id: str, language: str = "en"
+) -> dict:
+    """Build the "preview before accepting" external links for a stop: Google
+    Maps/reviews, TripAdvisor, a kind-specific operator, Google Images, and a
+    generic "book" search fallback (the official-website lookup, when known,
+    is handled separately by the caller via the existing on-demand Places
+    details call — this function never makes any network call itself)."""
+    location = city or address
+    q = quote(f"{name} {location}".strip())
+    maps_url = (
+        f"https://www.google.com/maps/place/?q=place_id:{place_id}"
+        if place_id
+        else f"https://www.google.com/maps/search/?api=1&query={q}"
+    )
+    operator_label, operator_tpl = _KIND_OPERATOR.get(
+        kind, _KIND_OPERATOR["experience"]
+    )
+    book_word = "prenota" if language.startswith("it") else "book"
+    return {
+        "maps": maps_url,
+        "tripadvisor": f"https://www.tripadvisor.com/Search?q={q}",
+        "operator_label": operator_label,
+        "operator": operator_tpl.format(q=q),
+        "images": f"https://www.google.com/search?tbm=isch&q={q}",
+        "book_fallback": f"https://www.google.com/search?q={book_word}+{q}",
     }
 
 
@@ -732,6 +809,8 @@ def apply_day_itinerary(user, trip: Trip, day, strategy: str, stops: list) -> No
                 event.order = order
                 event.save(update_fields=["order"])
                 order += 1
+
+    DayPlanStop.objects.filter(day=day).delete()
 
 
 @dataclass

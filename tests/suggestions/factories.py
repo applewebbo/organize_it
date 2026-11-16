@@ -2,6 +2,7 @@ import factory
 
 from suggestions.models import (
     AICredentials,
+    DayPlanStop,
     SharedKeyNoticeDismissal,
     SuggestionPreferences,
 )
@@ -31,3 +32,13 @@ class SuggestionPreferencesFactory(factory.django.DjangoModelFactory):
         model = SuggestionPreferences
 
     user = factory.SubFactory(UserFactory)
+
+
+class DayPlanStopFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = DayPlanStop
+
+    day = factory.LazyAttribute(lambda o: TripFactory().days.first())
+    strategy = "add"
+    kind = "experience"
+    name = factory.Faker("company")

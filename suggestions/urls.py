@@ -26,6 +26,11 @@ urlpatterns = [
         name="accept-day",
     ),
     path(
+        "trip/<int:pk>/day/<int:day_id>/plan/stop/<int:stop_id>/preview/",
+        views.preview_day_stop,
+        name="preview-day-stop",
+    ),
+    path(
         "trip/<int:pk>/accept/experience/",
         views.accept_experience,
         name="accept-experience",

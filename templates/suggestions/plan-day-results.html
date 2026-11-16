@@ -48,6 +48,16 @@
                         <p class="text-base-content/70 line-clamp-2 mt-1 ps-6 text-xs">{{ stop.description }}</p>
                     {% endif %}
                     {% if stop.address %}<p class="text-base-content/50 mt-0.5 ps-6 text-xs">{{ stop.address }}</p>{% endif %}
+                    {% if stop.id %}
+                        <button type="button"
+                                class="btn btn-xs btn-ghost mt-1 ps-6"
+                                hx-get="{% url 'suggestions:preview-day-stop' trip.pk day.pk stop.id %}"
+                                hx-target="#dialog"
+                                hx-swap="innerHTML">
+                            <i class="ph-bold ph-info i-xs"></i>
+                            {% translate "Preview" %}
+                        </button>
+                    {% endif %}
                 </li>
             {% endfor %}
         </ul>

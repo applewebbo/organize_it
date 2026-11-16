@@ -3,9 +3,10 @@ from cryptography.fernet import Fernet
 from django.conf import settings
 from django.db import connection
 
-from suggestions.models import AICredentials, SuggestionPreferences
+from suggestions.models import AICredentials, DayPlanStop, SuggestionPreferences
 from tests.suggestions.factories import (
     AICredentialsFactory,
+    DayPlanStopFactory,
     SharedKeyNoticeDismissalFactory,
     SuggestionPreferencesFactory,
 )
@@ -95,3 +96,36 @@ class TestSuggestionPreferences:
         prefs = SuggestionPreferencesFactory(favored_experience_types=[1, 3])
         prefs.refresh_from_db()
         assert prefs.favored_experience_types == [1, 3]
+
+
+class TestDayPlanStop:
+    def test_str(self):
+        stop = DayPlanStopFactory(name="Museo Egizio")
+        assert "Museo Egizio" in str(stop)
+
+    def test_ordered_by_order_field(self):
+        from tests.trips.factories import TripFactory
+
+        trip = TripFactory()
+        day = trip.days.first()
+        second = DayPlanStopFactory(day=day, order=1)
+        first = DayPlanStopFactory(day=day, order=0)
+        assert list(DayPlanStop.objects.filter(day=day)) == [first, second]
+
+    def test_existing_event_set_null_on_delete(self):
+        from tests.trips.factories import ExperienceFactory
+
+        event = ExperienceFactory()
+        stop = DayPlanStopFactory(day=event.day, existing_event=event)
+        event.delete()
+        stop.refresh_from_db()
+        assert stop.existing_event is None
+
+    def test_deleted_with_day(self):
+        from tests.trips.factories import TripFactory
+
+        trip = TripFactory()
+        day = trip.days.first()
+        DayPlanStopFactory(day=day)
+        day.delete()
+        assert DayPlanStop.objects.count() == 0

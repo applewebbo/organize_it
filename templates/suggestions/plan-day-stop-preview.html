@@ -1,0 +1,76 @@
+{% load i18n %}
+<div class="p-4 sm:p-6">
+    <div class="mb-4 flex items-center justify-between">
+        <h3 class="text-lg font-semibold">{{ stop.name }}</h3>
+        <button type="button"
+                @click="$dispatch('hide-modal')"
+                class="btn btn-sm btn-circle btn-ghost"
+                aria-label="{% translate 'Close' %}"><i class="ph-bold ph-x i-md"></i></button>
+    </div>
+    {% if stop.address %}<p class="text-base-content/50 mb-3 text-xs">{{ stop.address }}</p>{% endif %}
+    <ul class="space-y-2">
+        <li>
+            <a href="{{ links.maps }}"
+               target="_blank"
+               rel="noopener"
+               class="link link-primary flex items-center gap-2 text-sm">
+                <i class="ph-bold ph-map-pin i-sm"></i>
+                {% translate "Google Maps & reviews" %}
+            </a>
+        </li>
+        <li>
+            <a href="{{ links.tripadvisor }}"
+               target="_blank"
+               rel="noopener"
+               class="link link-primary flex items-center gap-2 text-sm">
+                <i class="ph-bold ph-star i-sm"></i>
+                {% translate "TripAdvisor reviews" %}
+            </a>
+        </li>
+        <li>
+            <a href="{{ links.operator }}"
+               target="_blank"
+               rel="noopener"
+               class="link link-primary flex items-center gap-2 text-sm">
+                <i class="ph-bold ph-calendar-check i-sm"></i>
+                {{ links.operator_label }}
+            </a>
+        </li>
+        <li>
+            <a href="{{ links.images }}"
+               target="_blank"
+               rel="noopener"
+               class="link link-primary flex items-center gap-2 text-sm">
+                <i class="ph-bold ph-images i-sm"></i>
+                {% translate "Images" %}
+            </a>
+        </li>
+        <li>
+            {% if website %}
+                <a href="{{ website }}"
+                   target="_blank"
+                   rel="noopener"
+                   class="link link-primary flex items-center gap-2 text-sm">
+                    <i class="ph-bold ph-globe i-sm"></i>
+                    {% translate "Official website" %}
+                </a>
+            {% else %}
+                <a href="{{ links.book_fallback }}"
+                   target="_blank"
+                   rel="noopener"
+                   class="link link-primary flex items-center gap-2 text-sm">
+                    <i class="ph-bold ph-globe i-sm"></i>
+                    {% translate "Search where to book" %}
+                </a>
+            {% endif %}
+        </li>
+    </ul>
+    <button type="button"
+            class="btn btn-sm btn-soft mt-4 w-full"
+            hx-get="{% url 'suggestions:plan-day-modal' trip.pk day.pk %}"
+            hx-target="#dialog"
+            hx-swap="innerHTML">
+        <i class="ph-bold ph-arrow-left i-sm"></i>
+        {% translate "Back to results" %}
+    </button>
+</div>

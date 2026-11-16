@@ -176,3 +176,49 @@ class SuggestionPreferences(models.Model):
 
     def __str__(self) -> str:
         return f"Suggestion preferences for {self.user.email}"
+
+
+class DayPlanStop(models.Model):
+    """A single stop of a day's draft AI itinerary, persisted so the "Plan
+    day" wizard survives reopening (even from another device) without
+    re-calling the AI provider. Rows for a day are replaced wholesale on
+    Regenerate and deleted once the day's plan is applied."""
+
+    day = models.ForeignKey(
+        "trips.Day", on_delete=models.CASCADE, related_name="plan_stops"
+    )
+    strategy = models.CharField(max_length=20)
+    kind = models.CharField(max_length=20)
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    address = models.CharField(max_length=500, blank=True)
+    city = models.CharField(max_length=255, blank=True)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
+    place_id = models.CharField(max_length=255, blank=True)
+    duration_minutes = models.PositiveIntegerField(null=True, blank=True)
+    existing_event = models.ForeignKey(
+        "trips.Event",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
+    order = models.PositiveIntegerField(default=0)
+    generated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("Day plan stop")
+        verbose_name_plural = _("Day plan stops")
+        ordering = ["order"]
+        indexes = [models.Index(fields=["day", "order"])]
+
+    def __str__(self) -> str:
+        return f"{self.name} (day {self.day_id})"

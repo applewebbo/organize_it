@@ -6,6 +6,7 @@ from django.core.cache import cache
 from django.test import override_settings
 
 from suggestions.ai.base import AISuggestionError
+from suggestions.models import DayPlanStop
 from suggestions.schemas import (
     DayItinerary,
     DayPlan,
@@ -27,6 +28,7 @@ from suggestions.services import (
     _last_key,
     _trip_stages,
     build_day_context,
+    build_stop_preview_links,
     build_trip_context,
     generate_day_itinerary,
     generate_suggestions,
@@ -884,6 +886,118 @@ class TestGenerateDayItinerary:
 
         assert exc.value.kind == AISuggestionError.RATE_LIMIT
         provider.generate_day.assert_not_called()
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_persists_draft_to_db(self, mock_get_provider, mock_client):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        day = trip.days.first()
+        mock_get_provider.return_value = self._provider_returning(
+            [ItineraryStop(kind="experience", name="Forum", type=1)]
+        )
+        mock_client.return_value.search_text.return_value = [PLACE]
+
+        generate_day_itinerary(creds.user, trip, day)
+
+        stops = DayPlanStop.objects.filter(day=day)
+        assert stops.count() == 1
+        assert stops.first().name == "Forum"
+        assert stops.first().place_id == "ChIJ_grounded"
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_reopen_reads_persisted_draft_without_provider_call(
+        self, mock_get_provider, mock_client
+    ):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        day = trip.days.first()
+        provider = self._provider_returning(
+            [ItineraryStop(kind="experience", name="Forum", type=1)]
+        )
+        mock_get_provider.return_value = provider
+        mock_client.return_value.search_text.return_value = [PLACE]
+
+        first = generate_day_itinerary(creds.user, trip, day)
+        cache.clear()
+        second = generate_day_itinerary(creds.user, trip, day)
+
+        assert provider.generate_day.call_count == 1
+        assert [r.stop.name for r in second] == [r.stop.name for r in first]
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_force_refresh_replaces_persisted_rows(
+        self, mock_get_provider, mock_client
+    ):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        day = trip.days.first()
+        provider = MagicMock()
+        provider.generate_day.side_effect = [
+            DayItinerary(
+                stops=[ItineraryStop(kind="experience", name="Forum", type=1)]
+            ),
+            DayItinerary(
+                stops=[ItineraryStop(kind="experience", name="Colosseo", type=1)]
+            ),
+        ]
+        mock_get_provider.return_value = provider
+        mock_client.return_value.search_text.return_value = [PLACE]
+
+        generate_day_itinerary(creds.user, trip, day)
+        generate_day_itinerary(creds.user, trip, day, force_refresh=True)
+
+        stops = DayPlanStop.objects.filter(day=day)
+        assert stops.count() == 1
+        assert stops.first().name == "Colosseo"
+
+
+class TestBuildStopPreviewLinks:
+    def test_maps_url_uses_place_id_when_available(self):
+        links = build_stop_preview_links(
+            "Duomo", "Milano", "", "experience", "ChIJ_duomo"
+        )
+        assert (
+            links["maps"] == "https://www.google.com/maps/place/?q=place_id:ChIJ_duomo"
+        )
+
+    def test_maps_url_falls_back_to_search_without_place_id(self):
+        links = build_stop_preview_links("Duomo", "Milano", "", "experience", "")
+        assert "google.com/maps/search" in links["maps"]
+        assert "Duomo" in links["maps"] or "Duomo" in links["maps"].replace("%20", " ")
+
+    def test_operator_per_kind(self):
+        assert (
+            "thefork"
+            in build_stop_preview_links("X", "Roma", "", "meal", "")["operator"].lower()
+        )
+        assert (
+            "booking.com"
+            in build_stop_preview_links("X", "Roma", "", "stay", "")["operator"]
+        )
+        assert (
+            "getyourguide"
+            in build_stop_preview_links("X", "Roma", "", "experience", "")["operator"]
+        )
+
+    def test_unknown_kind_falls_back_to_experience_operator(self):
+        links = build_stop_preview_links("X", "Roma", "", "unknown", "")
+        assert links["operator_label"] == "GetYourGuide"
+
+    def test_book_fallback_word_italian(self):
+        links = build_stop_preview_links("X", "Roma", "", "meal", "", language="it")
+        assert "prenota" in links["book_fallback"]
+
+    def test_book_fallback_word_english(self):
+        links = build_stop_preview_links("X", "Roma", "", "meal", "", language="en")
+        assert "book" in links["book_fallback"]
+
+    def test_tripadvisor_and_images_links_always_present(self):
+        links = build_stop_preview_links("X", "Roma", "", "experience", "")
+        assert "tripadvisor.com/Search" in links["tripadvisor"]
+        assert "tbm=isch" in links["images"]
 
 
 class TestGetCachedSuggestions:

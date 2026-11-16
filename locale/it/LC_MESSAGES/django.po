@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 11:30+0100\n"
+"POT-Creation-Date: 2026-11-16 12:04+0100\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -387,6 +387,14 @@ msgstr "Includi gite fuori porta"
 #: suggestions/models.py:174 suggestions/models.py:175
 msgid "Suggestion preferences"
 msgstr "Preferenze suggerimenti"
+
+#: suggestions/models.py:218
+msgid "Day plan stop"
+msgstr ""
+
+#: suggestions/models.py:219
+msgid "Day plan stops"
+msgstr ""
 
 #: templates/account/email_confirm.html:4
 #: templates/account/email_confirm.html:8
@@ -998,6 +1006,7 @@ msgstr "Codice del progetto"
 
 #: templates/includes/messages.html:20 templates/suggestions/day-applied.html:7
 #: templates/suggestions/plan-day-modal.html:11
+#: templates/suggestions/plan-day-stop-preview.html:8
 #: templates/suggestions/suggestion-modal.html:8
 #: templates/trips/attachments/preview-modal.html:15
 #: templates/trips/attachments/upload-modal.html:15
@@ -1081,6 +1090,7 @@ msgid "Releases pagination"
 msgstr "Paginazione delle release"
 
 #: templates/suggestions/ai-map-actions.html:11
+#: templates/suggestions/plan-day-modal.html:87
 #: templates/suggestions/suggestion-modal.html:39
 #: templates/trips/wizard/ai-results.html:79
 msgid "Regenerate"
@@ -1092,7 +1102,7 @@ msgid "Generate"
 msgstr "Genera"
 
 #: templates/suggestions/ai-map-actions.html:22
-#: templates/suggestions/plan-day-modal.html:70
+#: templates/suggestions/plan-day-modal.html:71
 #: templates/suggestions/suggestion-modal.html:50
 msgid "Generating uses your AI provider quota."
 msgstr "La generazione consuma la quota del tuo provider AI."
@@ -1161,23 +1171,23 @@ msgstr "Nessun suggerimento trovato"
 msgid "Plan the day"
 msgstr "Pianifica la giornata"
 
-#: templates/suggestions/plan-day-modal.html:21
+#: templates/suggestions/plan-day-modal.html:22
 msgid "This day already has events"
 msgstr "Questa giornata ha già degli eventi"
 
-#: templates/suggestions/plan-day-modal.html:29
+#: templates/suggestions/plan-day-modal.html:30
 msgid "Add to existing events"
 msgstr "Aggiungi agli eventi esistenti"
 
-#: templates/suggestions/plan-day-modal.html:37
+#: templates/suggestions/plan-day-modal.html:38
 msgid "Unpair existing events"
 msgstr "Disabbina gli eventi esistenti"
 
-#: templates/suggestions/plan-day-modal.html:45
+#: templates/suggestions/plan-day-modal.html:46
 msgid "Delete existing events"
 msgstr "Elimina gli eventi esistenti"
 
-#: templates/suggestions/plan-day-modal.html:50
+#: templates/suggestions/plan-day-modal.html:51
 msgid ""
 "Existing events will be moved to the unassigned list only when you apply the "
 "plan."
@@ -1185,16 +1195,16 @@ msgstr ""
 "Gli eventi esistenti verranno spostati tra quelli non assegnati solo quando "
 "applichi la giornata."
 
-#: templates/suggestions/plan-day-modal.html:55
+#: templates/suggestions/plan-day-modal.html:56
 msgid "Existing events will be deleted only when you apply the plan."
 msgstr ""
 "Gli eventi esistenti verranno eliminati solo quando applichi la giornata."
 
-#: templates/suggestions/plan-day-modal.html:61
+#: templates/suggestions/plan-day-modal.html:62
 msgid "Notes for this day (optional)…"
 msgstr "Note per questa giornata (facoltativo)…"
 
-#: templates/suggestions/plan-day-modal.html:68
+#: templates/suggestions/plan-day-modal.html:69
 #: templates/trips/includes/day.html:72
 msgid "Plan day"
 msgstr "Pianifica giornata"
@@ -1209,23 +1219,51 @@ msgstr ""
 msgid "existing"
 msgstr "esistente"
 
-#: templates/suggestions/plan-day-results.html:57
+#: templates/suggestions/plan-day-results.html:58
+msgid "Preview"
+msgstr "Anteprima"
+
+#: templates/suggestions/plan-day-results.html:67
 msgid "The day's current events will be deleted."
 msgstr "Gli eventi attuali della giornata verranno eliminati."
 
-#: templates/suggestions/plan-day-results.html:62
+#: templates/suggestions/plan-day-results.html:72
 msgid "The day's current events will be moved to the unassigned list."
 msgstr ""
 "Gli eventi attuali della giornata verranno spostati tra quelli non assegnati."
 
-#: templates/suggestions/plan-day-results.html:67
+#: templates/suggestions/plan-day-results.html:77
 msgid "Apply day"
 msgstr "Applica giornata"
 
-#: templates/suggestions/plan-day-results.html:73
+#: templates/suggestions/plan-day-results.html:83
 #: templates/trips/wizard/ai-results.html:91
 msgid "No itinerary generated"
 msgstr "Nessun itinerario generato"
+
+#: templates/suggestions/plan-day-stop-preview.html:18
+msgid "Google Maps & reviews"
+msgstr "Google Maps e recensioni"
+
+#: templates/suggestions/plan-day-stop-preview.html:27
+msgid "TripAdvisor reviews"
+msgstr "Recensioni TripAdvisor"
+
+#: templates/suggestions/plan-day-stop-preview.html:45
+msgid "Images"
+msgstr "Immagini"
+
+#: templates/suggestions/plan-day-stop-preview.html:55
+msgid "Official website"
+msgstr "Sito ufficiale"
+
+#: templates/suggestions/plan-day-stop-preview.html:63
+msgid "Search where to book"
+msgstr "Cerca dove prenotare"
+
+#: templates/suggestions/plan-day-stop-preview.html:74
+msgid "Back to results"
+msgstr "Torna ai risultati"
 
 #: templates/suggestions/settings.html:10
 #: templates/suggestions/suggestion-modal.html:4
@@ -2092,9 +2130,9 @@ msgstr "notte"
 msgid "nights"
 msgstr "notti"
 
-#: templates/trips/includes/_expense-cost-row.html:19
-msgid "Add cost"
-msgstr "Aggiungi costo"
+#: templates/trips/includes/_expense-cost-row.html:20
+msgid "Cost"
+msgstr "Costo"
 
 #: templates/trips/includes/_participant-chip.html:11
 msgid "Child (share charged to parents)"
@@ -4004,11 +4042,11 @@ msgstr "Dati aggiunti con successo!"
 msgid "Expense settings saved"
 msgstr "Impostazioni spese salvate"
 
-#: trips/views/maps.py:588
+#: trips/views/maps.py:607
 msgid "Event added to trip."
 msgstr "Evento aggiunto al viaggio."
 
-#: trips/views/maps.py:641
+#: trips/views/maps.py:660
 msgid "Stay added to trip."
 msgstr "Soggiorno aggiunto al viaggio."
 
@@ -4107,6 +4145,24 @@ msgstr "Per favore compila prima il campo destinazione"
 #, python-brace-format
 msgid "No images found for '{query}'"
 msgstr "Nessuna immagine trovata per '{query}'"
+
+#, fuzzy
+#~| msgid "AI Suggestions"
+#~ msgid "Suggested"
+#~ msgstr "Suggerimenti AI"
+
+#, fuzzy
+#~| msgid "Dismiss"
+#~ msgid "Dismissed"
+#~ msgstr "Ignora"
+
+#, fuzzy
+#~| msgid "Suggestion preferences"
+#~ msgid "Suggested places"
+#~ msgstr "Preferenze suggerimenti"
+
+#~ msgid "Add cost"
+#~ msgstr "Aggiungi costo"
 
 #~ msgid "Collapse"
 #~ msgstr "Comprimi"

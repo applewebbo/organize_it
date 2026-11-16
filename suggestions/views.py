@@ -15,6 +15,7 @@ from suggestions.forms import (
 )
 from suggestions.models import (
     AICredentials,
+    DayPlanStop,
     SharedKeyNoticeDismissal,
     SuggestionPreferences,
 )
@@ -23,7 +24,9 @@ from suggestions.services import (
     _KIND_ICON,
     DAY_STRATEGIES,
     DAY_STRATEGY_ADD,
+    _grounded_from_persisted,
     apply_day_itinerary,
+    build_stop_preview_links,
     generate_day_itinerary,
     generate_suggestions,
     get_cached_suggestions,
@@ -343,13 +346,27 @@ def plan_day_modal(request, pk, day_id):
 
     When the day already holds events the modal offers the three strategies
     (add / unpair / delete); nothing is generated until the user submits.
+
+    When a draft plan is already persisted for this day (DayPlanStop), it is
+    shown directly instead of the configure screen — no AI call, no cost —
+    until the user explicitly presses Regenerate.
     """
     trip, day = _get_accessible_day(request, pk, day_id)
-    return TemplateResponse(
-        request,
-        "suggestions/plan-day-modal.html",
-        {"trip": trip, "day": day, "has_events": day.events.exists()},
-    )
+    persisted = list(day.plan_stops.all())
+    context = {"trip": trip, "day": day, "has_events": day.events.exists()}
+    if persisted:
+        context.update(
+            {
+                "stops": [
+                    dict(to_stop_card(_grounded_from_persisted(s)), id=s.pk)
+                    for s in persisted
+                ],
+                "strategy": persisted[0].strategy,
+                "error_kind": None,
+                "has_cache": True,
+            }
+        )
+    return TemplateResponse(request, "suggestions/plan-day-modal.html", context)
 
 
 @login_required
@@ -373,7 +390,19 @@ def generate_day(request, pk, day_id):
         grounded = generate_day_itinerary(
             request.user, trip, day, strategy, overrides, language, force_refresh
         )
-        stops = [to_stop_card(g) for g in grounded]
+        # generate_day_itinerary persists these rows in the same order before
+        # returning, so pairing by position attaches each card to its pk.
+        # Lengths can diverge only in tests that mock generate_day_itinerary
+        # directly (no real persistence happens then) — those cards simply get
+        # no id, and the template hides the "Preview" button for them.
+        persisted_ids = list(day.plan_stops.values_list("pk", flat=True))
+        stops = [
+            dict(
+                to_stop_card(g),
+                id=persisted_ids[i] if i < len(persisted_ids) else None,
+            )
+            for i, g in enumerate(grounded)
+        ]
     except AISuggestionError as exc:
         error_kind = exc.kind
 
@@ -411,6 +440,40 @@ def accept_day(request, pk, day_id):
         "suggestions/day-applied.html",
         {"trip": trip, "day": day},
         headers={"HX-Trigger": f"dayModified{day.pk}, unpairedModified"},
+    )
+
+
+@login_required
+@require_GET
+def preview_day_stop(request, pk, day_id, stop_id):
+    """HTMX: full #dialog swap showing external links for a proposed stop
+    before accepting it (Google Maps/reviews, TripAdvisor, a kind-specific
+    operator, Google Images, official website or a "book" search fallback).
+
+    The official-website lookup reuses the existing on-demand Places details
+    call, invoked lazily here only — never during generation — so browsing
+    proposals the user never opens costs nothing extra.
+    """
+    trip, day = _get_accessible_day(request, pk, day_id)
+    stop = get_object_or_404(DayPlanStop, pk=stop_id, day=day)
+    language = get_profile(request.user).language
+    links = build_stop_preview_links(
+        stop.name, stop.city, stop.address, stop.kind, stop.place_id, language
+    )
+    website = None
+    if stop.place_id:
+        try:
+            details = GooglePlacesClient().get_full_place_details(
+                stop.place_id, language_code=language
+            )
+            website = details.website or None
+        except GooglePlacesError:
+            website = None
+
+    return TemplateResponse(
+        request,
+        "suggestions/plan-day-stop-preview.html",
+        {"trip": trip, "day": day, "stop": stop, "links": links, "website": website},
     )
 
 

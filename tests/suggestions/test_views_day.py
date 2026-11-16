@@ -5,8 +5,10 @@ from unittest.mock import patch
 import pytest
 
 from suggestions.ai.base import AISuggestionError
+from suggestions.models import DayPlanStop
 from suggestions.schemas import ItineraryStop
 from suggestions.services import GroundedStop
+from tests.suggestions.factories import DayPlanStopFactory
 from tests.test import TestCase
 from tests.trips.factories import ExperienceFactory, MealFactory, TripFactory
 from trips.models import Event, Experience, Meal
@@ -82,6 +84,31 @@ class TestPlanDayModal(TestCase):
         self.response_200(response)
         assert response.context["has_events"] is True
         assert "This day already has events" in response.content.decode()
+
+    def test_shows_persisted_draft_instead_of_configure_form(self):
+        """Reopening the wizard with a persisted draft skips the configure
+        screen and shows the proposals directly — no AI call needed."""
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        DayPlanStopFactory(day=day, name="Museo Egizio", order=0)
+        with self.login(user):
+            response = self.get("suggestions:plan-day-modal", pk=trip.pk, day_id=day.pk)
+        self.response_200(response)
+        content = response.content.decode()
+        assert "Museo Egizio" in content
+        assert "Generating uses your AI provider quota" not in content
+        assert "Regenerate" in content
+
+    def test_no_persisted_draft_shows_configure_form(self):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        with self.login(user):
+            response = self.get(
+                "suggestions:plan-day-modal", pk=trip.pk, day_id=trip.days.first().pk
+            )
+        self.response_200(response)
+        assert "Generating uses your AI provider quota" in response.content.decode()
 
 
 class TestGenerateDayView(TestCase):
@@ -332,3 +359,130 @@ class TestAcceptDayView(TestCase):
             self._accept(user, trip, day, "add", stops)
         forum = Event.objects.get(trip=trip, name="Forum")
         assert forum.latitude is None
+
+    def test_clears_persisted_draft_after_applying(self):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        DayPlanStopFactory(day=day)
+        self._accept(user, trip, day, "add", [{"kind": "experience", "name": "Forum"}])
+        assert DayPlanStop.objects.filter(day=day).count() == 0
+
+
+class TestPreviewDayStopView(TestCase):
+    def test_requires_login(self):
+        trip = TripFactory()
+        day = trip.days.first()
+        stop = DayPlanStopFactory(day=day)
+        response = self.get(
+            "suggestions:preview-day-stop", pk=trip.pk, day_id=day.pk, stop_id=stop.pk
+        )
+        self.response_302(response)
+
+    def test_other_user_forbidden(self):
+        owner = self.make_user("owner@example.com")
+        other = self.make_user("other@example.com")
+        trip = TripFactory(author=owner)
+        day = trip.days.first()
+        stop = DayPlanStopFactory(day=day)
+        with self.login(other):
+            response = self.get(
+                "suggestions:preview-day-stop",
+                pk=trip.pk,
+                day_id=day.pk,
+                stop_id=stop.pk,
+            )
+        self.response_404(response)
+
+    def test_stop_from_another_day_404(self):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        other_trip = TripFactory(author=user)
+        stop = DayPlanStopFactory(day=other_trip.days.first())
+        with self.login(user):
+            response = self.get(
+                "suggestions:preview-day-stop",
+                pk=trip.pk,
+                day_id=trip.days.first().pk,
+                stop_id=stop.pk,
+            )
+        self.response_404(response)
+
+    def test_renders_links_without_place_id(self):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        stop = DayPlanStopFactory(
+            day=day, name="Trattoria", city="Roma", kind="meal", place_id=""
+        )
+        with self.login(user):
+            response = self.get(
+                "suggestions:preview-day-stop",
+                pk=trip.pk,
+                day_id=day.pk,
+                stop_id=stop.pk,
+            )
+        self.response_200(response)
+        content = response.content.decode()
+        assert "tripadvisor.com/Search" in content
+        assert "thefork.com" in content
+        assert "tbm=isch" in content
+
+    @patch("suggestions.views.GooglePlacesClient")
+    def test_fetches_website_only_when_place_id_present(self, mock_client):
+        from trips.services import PlaceFullDetails
+
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        mock_client.return_value.get_full_place_details.return_value = PlaceFullDetails(
+            place_id="p1", website="https://example.com"
+        )
+        stop = DayPlanStopFactory(day=day, kind="experience", place_id="p1")
+        with self.login(user):
+            response = self.get(
+                "suggestions:preview-day-stop",
+                pk=trip.pk,
+                day_id=day.pk,
+                stop_id=stop.pk,
+            )
+        self.response_200(response)
+        mock_client.return_value.get_full_place_details.assert_called_once()
+        assert "https://example.com" in response.content.decode()
+
+    @patch("suggestions.views.GooglePlacesClient")
+    def test_no_website_fetch_without_place_id(self, mock_client):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        stop = DayPlanStopFactory(day=day, kind="experience", place_id="")
+        with self.login(user):
+            self.get(
+                "suggestions:preview-day-stop",
+                pk=trip.pk,
+                day_id=day.pk,
+                stop_id=stop.pk,
+            )
+        mock_client.return_value.get_full_place_details.assert_not_called()
+
+    @patch("suggestions.views.GooglePlacesClient")
+    def test_website_lookup_error_falls_back_to_no_website(self, mock_client):
+        from trips.services import GooglePlacesError
+
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        mock_client.return_value.get_full_place_details.side_effect = GooglePlacesError(
+            "boom"
+        )
+        stop = DayPlanStopFactory(day=day, kind="experience", place_id="p1")
+        with self.login(user):
+            response = self.get(
+                "suggestions:preview-day-stop",
+                pk=trip.pk,
+                day_id=day.pk,
+                stop_id=stop.pk,
+            )
+        self.response_200(response)
+        assert response.context["website"] is None
+        assert "Search where to book" in response.content.decode()
