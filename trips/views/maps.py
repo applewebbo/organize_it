@@ -206,20 +206,72 @@ def trip_map(request, pk):
     )
 
 
+def _build_day_groups_context(trip, user):
+    """Shared context for rendering trip.days grouped by stage, with the AI
+    "Plan day" affordance — used by both the List and Map tabs of the
+    "Things to do" section so the two stay in sync (day.html needs the same
+    keys regardless of which tab rendered it)."""
+    unpaired_events = trip.all_events.filter(day__isnull=True)
+    day_groups = group_days_by_destination(trip.days.all())
+    profile = get_profile(user)
+    arrival_transfer = trip.main_transfers.filter(
+        direction=MainTransfer.Direction.ARRIVAL
+    ).first()
+    departure_transfer = trip.main_transfers.filter(
+        direction=MainTransfer.Direction.DEPARTURE
+    ).first()
+    first_day = trip.days.order_by("number").first()
+    last_day = trip.days.order_by("number").last()
+    return {
+        "unpaired_events": unpaired_events,
+        "day_groups": day_groups,
+        "show_transfer_info": profile.show_transfer_info,
+        "show_weather": profile.show_weather,
+        "show_map": profile.default_map_view == "map",
+        "ai_suggestions_enabled": profile.ai_suggestions_enabled,
+        "from_home_duration": first_day.transfer_duration_from_prev
+        if first_day and not arrival_transfer
+        else None,
+        "from_home_distance": first_day.transfer_distance_from_prev
+        if first_day and not arrival_transfer
+        else None,
+        "from_home_destination": (first_day.destination or trip.destination)
+        if first_day and not arrival_transfer
+        else None,
+        "to_home_duration": last_day.transfer_to_home_duration
+        if last_day and not departure_transfer
+        else None,
+        "to_home_distance": last_day.transfer_to_home_distance
+        if last_day and not departure_transfer
+        else None,
+        "to_home_destination": (last_day.destination or trip.destination)
+        if last_day and not departure_transfer
+        else None,
+    }
+
+
 def trip_events_map(request, pk):
     """HTMX fragment: embedded Folium map for all trip events (trip-detail toggle)."""
-    trip = get_object_or_404(Trip, pk=pk)
+    trip = get_object_or_404(
+        Trip.objects.prefetch_related(
+            Prefetch(
+                "days__events",
+                queryset=Event.objects.all().order_by("order", "pk"),
+            ),
+            "days__stay",
+        ),
+        pk=pk,
+    )
     if not accessible_trips_qs(request.user).filter(pk=trip.pk).exists():
         raise Http404
     days_with_events, unassigned_events = _build_map_events_context(trip)
     trip_map_html = create_trip_map(days_with_events, unassigned_events)
+    context = _build_day_groups_context(trip, request.user)
+    context.update({"trip": trip, "map": trip_map_html})
     return TemplateResponse(
         request,
         "trips/includes/events-map-fragment.html",
-        {
-            "trip": trip,
-            "map": trip_map_html,
-        },
+        context,
     )
 
 
@@ -237,45 +289,12 @@ def trip_events_list(request, pk):
     )
     if not accessible_trips_qs(request.user).filter(pk=trip.pk).exists():
         raise Http404
-    unpaired_events = trip.all_events.filter(day__isnull=True)
-    day_groups = group_days_by_destination(trip.days.all())
-    profile = get_profile(request.user)
-    arrival_transfer = trip.main_transfers.filter(
-        direction=MainTransfer.Direction.ARRIVAL
-    ).first()
-    departure_transfer = trip.main_transfers.filter(
-        direction=MainTransfer.Direction.DEPARTURE
-    ).first()
-    first_day = trip.days.order_by("number").first()
-    last_day = trip.days.order_by("number").last()
+    context = _build_day_groups_context(trip, request.user)
+    context["trip"] = trip
     return TemplateResponse(
         request,
         "trips/includes/events-list-fragment.html",
-        {
-            "trip": trip,
-            "unpaired_events": unpaired_events,
-            "day_groups": day_groups,
-            "show_transfer_info": profile.show_transfer_info,
-            "show_weather": profile.show_weather,
-            "from_home_duration": first_day.transfer_duration_from_prev
-            if first_day and not arrival_transfer
-            else None,
-            "from_home_distance": first_day.transfer_distance_from_prev
-            if first_day and not arrival_transfer
-            else None,
-            "from_home_destination": (first_day.destination or trip.destination)
-            if first_day and not arrival_transfer
-            else None,
-            "to_home_duration": last_day.transfer_to_home_duration
-            if last_day and not departure_transfer
-            else None,
-            "to_home_distance": last_day.transfer_to_home_distance
-            if last_day and not departure_transfer
-            else None,
-            "to_home_destination": (last_day.destination or trip.destination)
-            if last_day and not departure_transfer
-            else None,
-        },
+        context,
     )
 
 

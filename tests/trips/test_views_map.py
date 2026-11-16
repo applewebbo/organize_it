@@ -771,6 +771,28 @@ class TestTripEventsMapFragment(TestCase):
         response = self.get("trips:trip-events-map", pk=trip.pk)
         self.response_302(response)
 
+    def test_shows_days_grouped_with_events(self):
+        """Regression: the Map tab must list events per day underneath the
+        aggregate map (i.e. include day.html), just like the List tab does."""
+        user = self.make_user("owner@example.com")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        ExperienceFactory(trip=trip, day=day, name="Castello Sforzesco")
+        with self.login(user):
+            response = self.get("trips:trip-events-map", pk=trip.pk)
+        self.response_200(response)
+        assert f'id="day-{day.pk}"' in response.content.decode()
+
+    def test_plan_day_button_shown_when_ai_enabled(self):
+        user = self.make_user("owner@example.com")
+        user.profile.ai_suggestions_enabled = True
+        user.profile.save()
+        trip = TripFactory(author=user)
+        with self.login(user):
+            response = self.get("trips:trip-events-map", pk=trip.pk)
+        self.response_200(response)
+        assert "Plan the day with AI" in response.content.decode()
+
 
 class TestTripEventsListFragment(TestCase):
     def test_owner_gets_list_fragment(self):
@@ -793,6 +815,27 @@ class TestTripEventsListFragment(TestCase):
         trip = TripFactory()
         response = self.get("trips:trip-events-list", pk=trip.pk)
         self.response_302(response)
+
+    def test_plan_day_button_shown_when_ai_enabled(self):
+        """Regression: returning to the List tab from Map must still show
+        the "Plan day" button — trip_events_list must pass
+        ai_suggestions_enabled like trip_detail/day_detail do."""
+        user = self.make_user("owner@example.com")
+        user.profile.ai_suggestions_enabled = True
+        user.profile.save()
+        trip = TripFactory(author=user)
+        with self.login(user):
+            response = self.get("trips:trip-events-list", pk=trip.pk)
+        self.response_200(response)
+        assert "Plan the day with AI" in response.content.decode()
+
+    def test_plan_day_button_hidden_when_ai_disabled(self):
+        user = self.make_user("owner@example.com")
+        trip = TripFactory(author=user)
+        with self.login(user):
+            response = self.get("trips:trip-events-list", pk=trip.pk)
+        self.response_200(response)
+        assert "Plan the day with AI" not in response.content.decode()
 
 
 class TestSelectDayForEvent(TestCase):
