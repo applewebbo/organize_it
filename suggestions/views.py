@@ -416,6 +416,8 @@ def generate_day(request, pk, day_id):
             "strategy": strategy,
             "error_kind": error_kind,
             "has_cache": error_kind is None,
+            "has_events": day.events.exists(),
+            "include_top_oob": True,
         },
     )
 

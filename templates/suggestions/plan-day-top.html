@@ -1,0 +1,43 @@
+{% load i18n %}
+{% if not stops %}
+    <form hx-post="{% url 'suggestions:generate-day' trip.pk day.pk %}"
+          hx-target="#plan-day-results"
+          hx-swap="innerHTML"
+          hx-indicator="#plan-day-spinner"
+          hx-disable="button[type='submit']">
+        {% csrf_token %}
+        <input type="text"
+               name="notes"
+               placeholder="{% translate 'Notes for this day (optional)…' %}"
+               autocomplete="off"
+               class="input input-sm input-bordered mb-2 w-full" />
+        <button type="submit" class="btn btn-sm btn-secondary w-full">
+            <i class="ph-bold ph-sparkle i-sm htmx-hide-on-request"></i>
+            <span id="plan-day-spinner"
+                  class="loading loading-spinner loading-xs htmx-indicator"></span>
+            {% translate 'Plan day' %}
+        </button>
+        <p class="text-base-content/50 mt-1 text-xs">{% translate 'Generating uses your AI provider quota.' %}</p>
+    </form>
+{% else %}
+    <form hx-post="{% url 'suggestions:generate-day' trip.pk day.pk %}"
+          hx-target="#plan-day-results"
+          hx-swap="innerHTML"
+          hx-indicator="#plan-day-spinner"
+          hx-disable="button[type='submit']"
+          class="mb-2">
+        {% csrf_token %}
+        <input type="hidden" name="refresh" value="1" />
+        <input type="text"
+               name="notes"
+               placeholder="{% translate 'Notes for this day (optional)…' %}"
+               autocomplete="off"
+               class="input input-sm input-bordered mb-2 w-full" />
+        <button type="submit" class="btn btn-sm btn-soft btn-secondary w-full">
+            <i class="ph-bold ph-sparkle i-sm htmx-hide-on-request"></i>
+            <span id="plan-day-spinner"
+                  class="loading loading-spinner loading-xs htmx-indicator"></span>
+            {% translate 'Regenerate' %}
+        </button>
+    </form>
+{% endif %}

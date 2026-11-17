@@ -281,8 +281,15 @@ def _ground(
     context: TripContext,
     client: GooglePlacesClient,
     radius: int = _GROUNDING_RADIUS,
+    errors: list[str] | None = None,
 ) -> GroundedSuggestion | None:
-    """Resolve a suggestion to a real place; return None if not found."""
+    """Resolve a suggestion to a real place; return None if not found.
+
+    ``errors``, when given, collects the names of stops that failed because of
+    an actual Places API error (auth, quota, network) rather than a genuine
+    "no match" — letting a caller distinguish "nothing was close enough" from
+    "the API is broken" without changing this function's None-on-failure
+    contract for existing callers."""
     query = " ".join(
         part
         for part in (suggestion.name, suggestion.address or suggestion.city)
@@ -304,6 +311,8 @@ def _ground(
             language_code=context.language,
         )
     except GooglePlacesError:
+        if errors is not None:
+            errors.append(suggestion.name)
         return None
 
     if not results:
@@ -540,10 +549,16 @@ def _ground_itinerary(
     Stops whose name matches an existing day event (the "add" strategy) reuse
     that event's location instead of hitting Google Places, and carry its id so
     acceptance can reorder it. Stays and ungrounded stops are dropped.
+
+    Raises ``AISuggestionError`` when every grounding attempt failed with an
+    actual Places API error (not just "no match") — otherwise a Places outage
+    silently produced an empty itinerary with no error shown to the user.
     """
     by_name = {e.name.strip().casefold(): e for e in existing_events}
     client = GooglePlacesClient()
     grounded: list[GroundedStop] = []
+    errors: list[str] = []
+    attempted = 0
     for stop in itinerary.stops:
         if stop.kind is SuggestionKind.STAY:
             continue
@@ -561,7 +576,8 @@ def _ground_itinerary(
                 )
             )
             continue
-        result = _ground(stop, context, client, radius)
+        attempted += 1
+        result = _ground(stop, context, client, radius, errors=errors)
         if result is not None:
             grounded.append(
                 GroundedStop(
@@ -573,6 +589,11 @@ def _ground_itinerary(
                     place_id=result.place_id,
                 )
             )
+    if not grounded and attempted and len(errors) == attempted:
+        raise AISuggestionError(
+            "Google Places lookup failed for every suggested stop",
+            kind=AISuggestionError.GENERIC,
+        )
     return grounded
 
 
@@ -712,13 +733,10 @@ def to_stop_card(grounded: GroundedStop) -> dict:
 
 # Plain outbound search-link operator per kind, used by build_stop_preview_links.
 # Zero API cost — these are ordinary URL-encoded search links, not integrations.
-_KIND_OPERATOR = {
-    "meal": ("TheFork", "https://www.thefork.com/search?q={q}"),
-    "stay": ("Booking.com", "https://www.booking.com/searchresults.html?ss={q}"),
-    "experience": ("GetYourGuide", "https://www.getyourguide.com/s/?q={q}"),
-}
-
-
+# TheFork has no reliable "search by name" page of its own (a plain
+# thefork.com/search?q= silently falls back to a default city) — a Google
+# site-restricted search is the dependable substitute, verified against the
+# live site. Booking.com and Viator accept a plain free-text query directly.
 def build_stop_preview_links(
     name: str, city: str, address: str, kind: str, place_id: str, language: str = "en"
 ) -> dict:
@@ -726,7 +744,10 @@ def build_stop_preview_links(
     Maps/reviews, TripAdvisor, a kind-specific operator, Google Images, and a
     generic "book" search fallback (the official-website lookup, when known,
     is handled separately by the caller via the existing on-demand Places
-    details call — this function never makes any network call itself)."""
+    details call — this function never makes any network call itself).
+
+    TripAdvisor and Viator are searched on their Italian locale when the
+    user's language is Italian, and on the international default otherwise."""
     location = city or address
     q = quote(f"{name} {location}".strip())
     maps_url = (
@@ -734,15 +755,28 @@ def build_stop_preview_links(
         if place_id
         else f"https://www.google.com/maps/search/?api=1&query={q}"
     )
-    operator_label, operator_tpl = _KIND_OPERATOR.get(
-        kind, _KIND_OPERATOR["experience"]
-    )
-    book_word = "prenota" if language.startswith("it") else "book"
+    is_italian = language.startswith("it")
+    tripadvisor_domain = "tripadvisor.it" if is_italian else "tripadvisor.com"
+    viator_locale = "it-IT/" if is_italian else ""
+
+    if kind == "stay":
+        operator_label = "Booking.com"
+        operator_url = f"https://www.booking.com/searchresults.html?ss={q}"
+    elif kind == "meal":
+        operator_label = "TheFork"
+        operator_url = f"https://www.google.com/search?q=site:thefork.com+{q}"
+    else:
+        operator_label = "Viator"
+        operator_url = (
+            f"https://www.viator.com/{viator_locale}searchResults/all?text={q}"
+        )
+
+    book_word = "prenota" if is_italian else "book"
     return {
         "maps": maps_url,
-        "tripadvisor": f"https://www.tripadvisor.com/Search?q={q}",
+        "tripadvisor": f"https://www.google.com/search?q=site:{tripadvisor_domain}+{q}",
         "operator_label": operator_label,
-        "operator": operator_tpl.format(q=q),
+        "operator": operator_url,
         "images": f"https://www.google.com/search?tbm=isch&q={q}",
         "book_fallback": f"https://www.google.com/search?q={book_word}+{q}",
     }

@@ -7,42 +7,59 @@
                 class="btn btn-sm btn-circle btn-ghost"
                 aria-label="{% translate 'Close' %}"><i class="ph-bold ph-x i-md"></i></button>
     </div>
-    {% if stop.address %}<p class="text-base-content/50 mb-3 text-xs">{{ stop.address }}</p>{% endif %}
-    <ul class="space-y-2">
+    {% if stop.address %}
+        <p class="text-base-content/60 mb-4 flex items-center gap-1.5 text-sm">
+            <i class="ph-bold ph-map-pin-area i-sm shrink-0" aria-hidden="true"></i>
+            {{ stop.address }}
+        </p>
+    {% endif %}
+    <ul class="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
         <li>
             <a href="{{ links.maps }}"
                target="_blank"
                rel="noopener"
-               class="link link-primary flex items-center gap-2 text-sm">
-                <i class="ph-bold ph-map-pin i-sm"></i>
-                {% translate "Google Maps & reviews" %}
+               class="border-base-300 bg-base-100 hover:border-success/40 hover:bg-success/5 flex items-center gap-3 rounded-lg border p-3 transition-colors">
+                <span class="bg-success/10 text-success flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
+                    <i class="ph-bold ph-map-pin i-md"></i>
+                </span>
+                <span class="grow text-sm font-medium">{% translate "Google Maps & reviews" %}</span>
+                <i class="ph-bold ph-arrow-square-out text-base-content/30 i-sm shrink-0"></i>
             </a>
         </li>
         <li>
             <a href="{{ links.tripadvisor }}"
                target="_blank"
                rel="noopener"
-               class="link link-primary flex items-center gap-2 text-sm">
-                <i class="ph-bold ph-star i-sm"></i>
-                {% translate "TripAdvisor reviews" %}
+               class="border-base-300 bg-base-100 hover:border-warning/40 hover:bg-warning/5 flex items-center gap-3 rounded-lg border p-3 transition-colors">
+                <span class="bg-warning/10 text-warning flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
+                    <i class="ph-bold ph-star i-md"></i>
+                </span>
+                <span class="grow text-sm font-medium">{% translate "TripAdvisor reviews" %}</span>
+                <i class="ph-bold ph-arrow-square-out text-base-content/30 i-sm shrink-0"></i>
             </a>
         </li>
         <li>
             <a href="{{ links.operator }}"
                target="_blank"
                rel="noopener"
-               class="link link-primary flex items-center gap-2 text-sm">
-                <i class="ph-bold ph-calendar-check i-sm"></i>
-                {{ links.operator_label }}
+               class="border-base-300 bg-base-100 hover:border-primary/40 hover:bg-primary/5 flex items-center gap-3 rounded-lg border p-3 transition-colors">
+                <span class="bg-primary/10 text-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
+                    <i class="ph-bold ph-calendar-check i-md"></i>
+                </span>
+                <span class="grow text-sm font-medium">{{ links.operator_label }}</span>
+                <i class="ph-bold ph-arrow-square-out text-base-content/30 i-sm shrink-0"></i>
             </a>
         </li>
         <li>
             <a href="{{ links.images }}"
                target="_blank"
                rel="noopener"
-               class="link link-primary flex items-center gap-2 text-sm">
-                <i class="ph-bold ph-images i-sm"></i>
-                {% translate "Images" %}
+               class="border-base-300 bg-base-100 hover:border-secondary/40 hover:bg-secondary/5 flex items-center gap-3 rounded-lg border p-3 transition-colors">
+                <span class="bg-secondary/10 text-secondary flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
+                    <i class="ph-bold ph-images i-md"></i>
+                </span>
+                <span class="grow text-sm font-medium">{% translate "Images" %}</span>
+                <i class="ph-bold ph-arrow-square-out text-base-content/30 i-sm shrink-0"></i>
             </a>
         </li>
         <li>
@@ -50,17 +67,23 @@
                 <a href="{{ website }}"
                    target="_blank"
                    rel="noopener"
-                   class="link link-primary flex items-center gap-2 text-sm">
-                    <i class="ph-bold ph-globe i-sm"></i>
-                    {% translate "Official website" %}
+                   class="border-base-300 bg-base-100 hover:border-info/40 hover:bg-info/5 flex items-center gap-3 rounded-lg border p-3 transition-colors">
+                    <span class="bg-info/10 text-info flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
+                        <i class="ph-bold ph-globe i-md"></i>
+                    </span>
+                    <span class="grow text-sm font-medium">{% translate "Official website" %}</span>
+                    <i class="ph-bold ph-arrow-square-out text-base-content/30 i-sm shrink-0"></i>
                 </a>
             {% else %}
                 <a href="{{ links.book_fallback }}"
                    target="_blank"
                    rel="noopener"
-                   class="link link-primary flex items-center gap-2 text-sm">
-                    <i class="ph-bold ph-globe i-sm"></i>
-                    {% translate "Search where to book" %}
+                   class="border-base-300 bg-base-100 hover:border-info/40 hover:bg-info/5 flex items-center gap-3 rounded-lg border p-3 transition-colors">
+                    <span class="bg-info/10 text-info flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
+                        <i class="ph-bold ph-globe i-md"></i>
+                    </span>
+                    <span class="grow text-sm font-medium">{% translate "Search where to book" %}</span>
+                    <i class="ph-bold ph-arrow-square-out text-base-content/30 i-sm shrink-0"></i>
                 </a>
             {% endif %}
         </li>

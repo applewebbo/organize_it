@@ -69,7 +69,13 @@
                         data-tip="{% translate 'Plan the day with AI' %}"
                         aria-label="{% translate 'Plan the day with AI' %}">
                     <i class="ph-bold ph-sparkle i-sm" aria-hidden="true"></i>
-                    <span class="hidden sm:inline">{% translate 'Plan day' %}</span>
+                    <span class="hidden sm:inline">
+                        {% if day.plan_stops.exists %}
+                            {% translate 'View suggestions' %}
+                        {% else %}
+                            {% translate 'Plan day' %}
+                        {% endif %}
+                    </span>
                 </button>
             {% endif %}
             <c-dropdown :day="day" />

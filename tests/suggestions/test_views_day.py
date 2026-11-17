@@ -74,7 +74,10 @@ class TestPlanDayModal(TestCase):
         assert response.context["has_events"] is False
         assert "This day already has events" not in response.content.decode()
 
-    def test_renders_strategy_choices_with_events(self):
+    def test_configure_form_never_shows_strategy_choice(self):
+        """The strategy choice now lives in the apply step (shown alongside
+        generated proposals), not the configure form — it doesn't matter yet
+        whether the day has events until there's something to apply."""
         user = self.make_user("user@example.com")
         trip = TripFactory(author=user)
         day = trip.days.first()
@@ -83,7 +86,19 @@ class TestPlanDayModal(TestCase):
             response = self.get("suggestions:plan-day-modal", pk=trip.pk, day_id=day.pk)
         self.response_200(response)
         assert response.context["has_events"] is True
-        assert "This day already has events" in response.content.decode()
+        assert "This day already has events" not in response.content.decode()
+
+    def test_persisted_draft_shows_strategy_choice_when_events_exist(self):
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        ExperienceFactory(trip=trip, day=day, name="Colosseo")
+        DayPlanStopFactory(day=day, name="Museo Egizio", order=0)
+        with self.login(user):
+            response = self.get("suggestions:plan-day-modal", pk=trip.pk, day_id=day.pk)
+        content = response.content.decode()
+        assert "This day already has events" in content
+        assert "Overwrite" in content
 
     def test_shows_persisted_draft_instead_of_configure_form(self):
         """Reopening the wizard with a persisted draft skips the configure
@@ -150,6 +165,22 @@ class TestGenerateDayView(TestCase):
         # notes forwarded as override
         assert mock_generate.call_args.args[3] == "add"
         assert mock_generate.call_args.args[4] == {"notes": "with kids"}
+
+    @patch("suggestions.views.generate_day_itinerary")
+    def test_renders_oob_swap_to_regenerate_button(self, mock_generate):
+        """After a successful generation the top-of-modal form must flip to
+        the "Regenerate" button via an out-of-band swap, so the full
+        configure form doesn't linger next to freshly generated stops."""
+        user = self.make_user("user@example.com")
+        trip = TripFactory(author=user)
+        mock_generate.return_value = [_grounded("experience", "Forum")]
+        with self.login(user):
+            response = self.post(
+                "suggestions:generate-day", pk=trip.pk, day_id=trip.days.first().pk
+            )
+        content = response.content.decode()
+        assert 'id="plan-day-top" hx-swap-oob="true"' in content
+        assert "Regenerate" in content or "Rigenera" in content
 
     @patch("suggestions.views.generate_day_itinerary")
     def test_invalid_strategy_defaults_to_add(self, mock_generate):
@@ -424,7 +455,7 @@ class TestPreviewDayStopView(TestCase):
             )
         self.response_200(response)
         content = response.content.decode()
-        assert "tripadvisor.com/Search" in content
+        assert "tripadvisor.it" in content
         assert "thefork.com" in content
         assert "tbm=isch" in content
 

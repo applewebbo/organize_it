@@ -1,4 +1,7 @@
 {% load i18n %}
+{% if include_top_oob %}
+    <div id="plan-day-top" hx-swap-oob="true">{% include 'suggestions/plan-day-top.html' %}</div>
+{% endif %}
 {% if error_kind %}
     <div class="alert alert-warning alert-soft">
         <div>
@@ -22,7 +25,6 @@
           hx-disable="button[type='submit']"
           x-data="{ stops: JSON.parse(document.getElementById('plan-day-stops').textContent).map(s => ({ ...s, include: true })) }">
         {% csrf_token %}
-        <input type="hidden" name="strategy" value="{{ strategy }}" />
         <input type="hidden"
                name="stops"
                :value="JSON.stringify(stops.filter(s => s.include))" />
@@ -41,7 +43,9 @@
                             <span class="text-base-content/50 shrink-0 text-xs">{{ stop.duration_minutes }}′</span>
                         {% endif %}
                         {% if stop.existing_event_id %}
-                            <span class="badge badge-xs badge-ghost shrink-0">{% translate 'existing' %}</span>
+                            <i class="ph-bold ph-calendar-check text-base-content/50 i-sm shrink-0"
+                               title="{% translate 'Already in this day' %}"
+                               aria-label="{% translate 'Already in this day' %}"></i>
                         {% endif %}
                     </label>
                     {% if stop.description %}
@@ -49,28 +53,61 @@
                     {% endif %}
                     {% if stop.address %}<p class="text-base-content/50 mt-0.5 ps-6 text-xs">{{ stop.address }}</p>{% endif %}
                     {% if stop.id %}
-                        <button type="button"
-                                class="btn btn-xs btn-ghost mt-1 ps-6"
-                                hx-get="{% url 'suggestions:preview-day-stop' trip.pk day.pk stop.id %}"
-                                hx-target="#dialog"
-                                hx-swap="innerHTML">
-                            <i class="ph-bold ph-info i-xs"></i>
-                            {% translate "Preview" %}
-                        </button>
+                        <div class="mt-1 flex justify-end">
+                            <button type="button"
+                                    class="btn btn-xs btn-soft btn-info"
+                                    hx-get="{% url 'suggestions:preview-day-stop' trip.pk day.pk stop.id %}"
+                                    hx-target="#dialog"
+                                    hx-swap="innerHTML">
+                                <i class="ph-bold ph-binoculars i-sm text-info"></i>
+                                {% translate "Learn more" %}
+                            </button>
+                        </div>
                     {% endif %}
                 </li>
             {% endfor %}
         </ul>
-        {% if strategy == 'delete' %}
-            <p class="text-warning mt-2 flex items-center gap-1 text-xs">
-                <i class="ph-bold ph-warning i-xs"></i>
-                {% translate "The day's current events will be deleted." %}
-            </p>
-        {% elif strategy == 'unpair' %}
-            <p class="text-base-content/60 mt-2 flex items-center gap-1 text-xs">
-                <i class="ph-bold ph-info i-xs"></i>
-                {% translate "The day's current events will be moved to the unassigned list." %}
-            </p>
+        {% if has_events %}
+            <fieldset class="border-base-300 mt-3 rounded-lg border p-3">
+                <legend class="px-1 text-sm font-medium">{% translate 'This day already has events' %}</legend>
+                <label class="label cursor-pointer justify-start gap-2 py-1">
+                    <input type="radio"
+                           name="strategy"
+                           value="add"
+                           class="radio radio-sm"
+                           x-model="strategy"
+                           checked />
+                    <span class="text-sm">{% translate 'Add' %}</span>
+                </label>
+                <label class="label cursor-pointer justify-start gap-2 py-1">
+                    <input type="radio"
+                           name="strategy"
+                           value="delete"
+                           class="radio radio-sm"
+                           x-model="strategy" />
+                    <span class="text-sm">{% translate 'Overwrite' %}</span>
+                </label>
+                <label class="label cursor-pointer justify-start gap-2 py-1">
+                    <input type="radio"
+                           name="strategy"
+                           value="unpair"
+                           class="radio radio-sm"
+                           x-model="strategy" />
+                    <span class="text-sm">{% translate 'Unpair' %}</span>
+                </label>
+                <p x-show="strategy === 'unpair'"
+                   x-cloak
+                   class="text-base-content/60 mt-1 text-xs">
+                    {% translate "The day's current events will be moved to the unassigned list." %}
+                </p>
+                <p x-show="strategy === 'delete'"
+                   x-cloak
+                   class="text-warning mt-1 text-xs">
+                    {% translate "The day's current events will be deleted." %}
+                </p>
+            </fieldset>
+        {% else %}
+            <input type="hidden" name="strategy" value="add" />
         {% endif %}
         <button type="submit" class="btn btn-sm btn-success mt-3 w-full">
             <i class="ph-bold ph-check i-sm htmx-hide-on-request"></i>

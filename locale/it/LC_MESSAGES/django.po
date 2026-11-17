@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-16 12:04+0100\n"
+"POT-Creation-Date: 2026-11-17 20:42+0100\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1090,7 +1090,7 @@ msgid "Releases pagination"
 msgstr "Paginazione delle release"
 
 #: templates/suggestions/ai-map-actions.html:11
-#: templates/suggestions/plan-day-modal.html:87
+#: templates/suggestions/plan-day-top.html:40
 #: templates/suggestions/suggestion-modal.html:39
 #: templates/trips/wizard/ai-results.html:79
 msgid "Regenerate"
@@ -1102,7 +1102,7 @@ msgid "Generate"
 msgstr "Genera"
 
 #: templates/suggestions/ai-map-actions.html:22
-#: templates/suggestions/plan-day-modal.html:71
+#: templates/suggestions/plan-day-top.html:20
 #: templates/suggestions/suggestion-modal.html:50
 msgid "Generating uses your AI provider quota."
 msgstr "La generazione consuma la quota del tuo provider AI."
@@ -1112,7 +1112,7 @@ msgid "Day itinerary applied"
 msgstr "Itinerario della giornata applicato"
 
 #: templates/suggestions/map-suggestions-results.html:10
-#: templates/suggestions/plan-day-results.html:6
+#: templates/suggestions/plan-day-results.html:9
 msgid ""
 "AI suggestions are not configured yet. Add a valid API key to get started."
 msgstr ""
@@ -1120,20 +1120,20 @@ msgstr ""
 "valida per iniziare."
 
 #: templates/suggestions/map-suggestions-results.html:11
-#: templates/suggestions/plan-day-results.html:7
+#: templates/suggestions/plan-day-results.html:10
 #: templates/trips/wizard/ai-results.html:7
 msgid "Check your AI settings"
 msgstr "Controlla le impostazioni AI"
 
 #: templates/suggestions/map-suggestions-results.html:13
-#: templates/suggestions/plan-day-results.html:9
+#: templates/suggestions/plan-day-results.html:12
 #: templates/trips/wizard/ai-results.html:9
 msgid "You have reached the AI provider usage limit. Please try again later."
 msgstr ""
 "Hai raggiunto il limite di utilizzo del provider AI. Riprova più tardi."
 
 #: templates/suggestions/map-suggestions-results.html:15
-#: templates/suggestions/plan-day-results.html:11
+#: templates/suggestions/plan-day-results.html:14
 msgid ""
 "You have reached the daily AI suggestion limit. Please try again tomorrow."
 msgstr ""
@@ -1171,99 +1171,97 @@ msgstr "Nessun suggerimento trovato"
 msgid "Plan the day"
 msgstr "Pianifica la giornata"
 
-#: templates/suggestions/plan-day-modal.html:22
-msgid "This day already has events"
-msgstr "Questa giornata ha già degli eventi"
-
-#: templates/suggestions/plan-day-modal.html:30
-msgid "Add to existing events"
-msgstr "Aggiungi agli eventi esistenti"
-
-#: templates/suggestions/plan-day-modal.html:38
-msgid "Unpair existing events"
-msgstr "Disabbina gli eventi esistenti"
-
-#: templates/suggestions/plan-day-modal.html:46
-msgid "Delete existing events"
-msgstr "Elimina gli eventi esistenti"
-
-#: templates/suggestions/plan-day-modal.html:51
-msgid ""
-"Existing events will be moved to the unassigned list only when you apply the "
-"plan."
-msgstr ""
-"Gli eventi esistenti verranno spostati tra quelli non assegnati solo quando "
-"applichi la giornata."
-
-#: templates/suggestions/plan-day-modal.html:56
-msgid "Existing events will be deleted only when you apply the plan."
-msgstr ""
-"Gli eventi esistenti verranno eliminati solo quando applichi la giornata."
-
-#: templates/suggestions/plan-day-modal.html:62
-msgid "Notes for this day (optional)…"
-msgstr "Note per questa giornata (facoltativo)…"
-
-#: templates/suggestions/plan-day-modal.html:69
-#: templates/trips/includes/day.html:72
-msgid "Plan day"
-msgstr "Pianifica giornata"
-
-#: templates/suggestions/plan-day-results.html:13
+#: templates/suggestions/plan-day-results.html:16
 #: templates/trips/wizard/ai-results.html:13
 msgid "Something went wrong while generating the itinerary. Please try again."
 msgstr ""
 "Qualcosa è andato storto durante la generazione dell'itinerario. Riprova."
 
-#: templates/suggestions/plan-day-results.html:44
-msgid "existing"
-msgstr "esistente"
+#: templates/suggestions/plan-day-results.html:47
+#: templates/suggestions/plan-day-results.html:48
+msgid "Already in this day"
+msgstr "Già presente in questa giornata"
 
-#: templates/suggestions/plan-day-results.html:58
-msgid "Preview"
-msgstr "Anteprima"
-
-#: templates/suggestions/plan-day-results.html:67
-msgid "The day's current events will be deleted."
-msgstr "Gli eventi attuali della giornata verranno eliminati."
+#: templates/suggestions/plan-day-results.html:63
+msgid "Learn more"
+msgstr "Scopri di più"
 
 #: templates/suggestions/plan-day-results.html:72
+msgid "This day already has events"
+msgstr "Questa giornata ha già degli eventi"
+
+#: templates/suggestions/plan-day-results.html:80
+#: templates/trips/checklist.html:46
+#: templates/trips/includes/checklist-card.html:23
+#: templates/trips/includes/collab-modal.html:73
+#: templates/trips/includes/collab-modal.html:119
+#: templates/trips/includes/collab-search-result.html:17
+#: templates/trips/includes/main-transfers.html:92
+#: templates/trips/includes/main-transfers.html:275
+#: templates/trips/main-transfer-form.html:28
+msgid "Add"
+msgstr "Aggiungi"
+
+#: templates/suggestions/plan-day-results.html:88
+msgid "Overwrite"
+msgstr "Sovrascrivi"
+
+#: templates/suggestions/plan-day-results.html:96
+#: templates/trips/event-modal.html:26
+msgid "Unpair"
+msgstr "Dissocia"
+
+#: templates/suggestions/plan-day-results.html:101
 msgid "The day's current events will be moved to the unassigned list."
 msgstr ""
 "Gli eventi attuali della giornata verranno spostati tra quelli non assegnati."
 
-#: templates/suggestions/plan-day-results.html:77
+#: templates/suggestions/plan-day-results.html:106
+msgid "The day's current events will be deleted."
+msgstr "Gli eventi attuali della giornata verranno eliminati."
+
+#: templates/suggestions/plan-day-results.html:114
 msgid "Apply day"
 msgstr "Applica giornata"
 
-#: templates/suggestions/plan-day-results.html:83
+#: templates/suggestions/plan-day-results.html:120
 #: templates/trips/wizard/ai-results.html:91
 msgid "No itinerary generated"
 msgstr "Nessun itinerario generato"
 
-#: templates/suggestions/plan-day-stop-preview.html:18
+#: templates/suggestions/plan-day-stop-preview.html:25
 msgid "Google Maps & reviews"
 msgstr "Google Maps e recensioni"
 
-#: templates/suggestions/plan-day-stop-preview.html:27
+#: templates/suggestions/plan-day-stop-preview.html:37
 msgid "TripAdvisor reviews"
 msgstr "Recensioni TripAdvisor"
 
-#: templates/suggestions/plan-day-stop-preview.html:45
+#: templates/suggestions/plan-day-stop-preview.html:61
 msgid "Images"
 msgstr "Immagini"
 
-#: templates/suggestions/plan-day-stop-preview.html:55
+#: templates/suggestions/plan-day-stop-preview.html:74
 msgid "Official website"
 msgstr "Sito ufficiale"
 
-#: templates/suggestions/plan-day-stop-preview.html:63
+#: templates/suggestions/plan-day-stop-preview.html:85
 msgid "Search where to book"
 msgstr "Cerca dove prenotare"
 
-#: templates/suggestions/plan-day-stop-preview.html:74
+#: templates/suggestions/plan-day-stop-preview.html:97
 msgid "Back to results"
 msgstr "Torna ai risultati"
+
+#: templates/suggestions/plan-day-top.html:11
+#: templates/suggestions/plan-day-top.html:33
+msgid "Notes for this day (optional)…"
+msgstr "Note per questa giornata (facoltativo)…"
+
+#: templates/suggestions/plan-day-top.html:18
+#: templates/trips/includes/day.html:76
+msgid "Plan day"
+msgstr "Pianifica giornata"
 
 #: templates/suggestions/settings.html:10
 #: templates/suggestions/suggestion-modal.html:4
@@ -1430,17 +1428,6 @@ msgstr "Checklist pre-partenza"
 #: templates/trips/includes/checklist-card.html:18 trips/forms/trip.py:399
 msgid "Add an item…"
 msgstr "Aggiungi un elemento…"
-
-#: templates/trips/checklist.html:46
-#: templates/trips/includes/checklist-card.html:23
-#: templates/trips/includes/collab-modal.html:73
-#: templates/trips/includes/collab-modal.html:119
-#: templates/trips/includes/collab-search-result.html:17
-#: templates/trips/includes/main-transfers.html:92
-#: templates/trips/includes/main-transfers.html:275
-#: templates/trips/main-transfer-form.html:28
-msgid "Add"
-msgstr "Aggiungi"
 
 #: templates/trips/departure-transfer-modal.html:5
 msgid "Add Departure Transfer"
@@ -1922,10 +1909,6 @@ msgstr ""
 "l'evento da questo giorno e riutilizzarlo in seguito assegnandolo a un altro "
 "giorno del viaggio. Se sei sicuro di voler procedere, clicca su Conferma."
 
-#: templates/trips/event-modal.html:26
-msgid "Unpair"
-msgstr "Dissocia"
-
 #: templates/trips/event-notes.html:5
 msgid "Event Notes"
 msgstr "Note relative all’evento"
@@ -2391,6 +2374,10 @@ msgstr ""
 #: templates/trips/includes/day.html:69 templates/trips/includes/day.html:70
 msgid "Plan the day with AI"
 msgstr "Pianifica la giornata con l'AI"
+
+#: templates/trips/includes/day.html:74
+msgid "View suggestions"
+msgstr "Vedi suggerimenti"
 
 #: templates/trips/includes/events-list-fragment.html:13
 #: templates/trips/includes/events-list-fragment.html:56
@@ -4145,6 +4132,32 @@ msgstr "Per favore compila prima il campo destinazione"
 #, python-brace-format
 msgid "No images found for '{query}'"
 msgstr "Nessuna immagine trovata per '{query}'"
+
+#~ msgid "Add to existing events"
+#~ msgstr "Aggiungi agli eventi esistenti"
+
+#~ msgid "Unpair existing events"
+#~ msgstr "Disabbina gli eventi esistenti"
+
+#~ msgid "Delete existing events"
+#~ msgstr "Elimina gli eventi esistenti"
+
+#~ msgid ""
+#~ "Existing events will be moved to the unassigned list only when you apply "
+#~ "the plan."
+#~ msgstr ""
+#~ "Gli eventi esistenti verranno spostati tra quelli non assegnati solo "
+#~ "quando applichi la giornata."
+
+#~ msgid "Existing events will be deleted only when you apply the plan."
+#~ msgstr ""
+#~ "Gli eventi esistenti verranno eliminati solo quando applichi la giornata."
+
+#~ msgid "existing"
+#~ msgstr "esistente"
+
+#~ msgid "Preview"
+#~ msgstr "Anteprima"
 
 #, fuzzy
 #~| msgid "AI Suggestions"

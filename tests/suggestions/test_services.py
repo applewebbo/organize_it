@@ -836,6 +836,67 @@ class TestGenerateDayItinerary:
 
     @patch("suggestions.services.GooglePlacesClient")
     @patch("suggestions.services.get_provider")
+    def test_no_match_for_every_stop_returns_empty_without_error(
+        self, mock_get_provider, mock_client
+    ):
+        """A genuine "nothing nearby matched" (not an API failure) for every
+        stop is a normal outcome — it must not raise."""
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        stops = [
+            ItineraryStop(kind="experience", name="Nowhere", type=1),
+            ItineraryStop(kind="meal", name="Nowhere Either", type=3),
+        ]
+        mock_get_provider.return_value = self._provider_returning(stops)
+        mock_client.return_value.search_text.return_value = []
+
+        results = generate_day_itinerary(creds.user, trip, trip.days.first())
+
+        assert results == []
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_places_api_error_for_every_stop_raises(
+        self, mock_get_provider, mock_client
+    ):
+        """If every grounding call fails with an actual Places API error (not
+        just "no match"), that must surface as an error — not a silently
+        empty itinerary that looks like nothing was generated."""
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        stops = [
+            ItineraryStop(kind="experience", name="Forum", type=1),
+            ItineraryStop(kind="meal", name="Trattoria", type=3),
+        ]
+        mock_get_provider.return_value = self._provider_returning(stops)
+        mock_client.return_value.search_text.side_effect = GooglePlacesError("boom")
+
+        with pytest.raises(AISuggestionError):
+            generate_day_itinerary(creds.user, trip, trip.days.first())
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
+    def test_places_api_error_mixed_with_success_does_not_raise(
+        self, mock_get_provider, mock_client
+    ):
+        creds = AICredentialsFactory(user=TripFactory().author)
+        trip = TripFactory(author=creds.user)
+        stops = [
+            ItineraryStop(kind="experience", name="Forum", type=1),
+            ItineraryStop(kind="meal", name="Trattoria", type=3),
+        ]
+        mock_get_provider.return_value = self._provider_returning(stops)
+        mock_client.return_value.search_text.side_effect = [
+            GooglePlacesError("boom"),
+            [PLACE],
+        ]
+
+        results = generate_day_itinerary(creds.user, trip, trip.days.first())
+
+        assert [r.stop.name for r in results] == ["Trattoria"]
+
+    @patch("suggestions.services.GooglePlacesClient")
+    @patch("suggestions.services.get_provider")
     def test_second_call_uses_cache(self, mock_get_provider, mock_client):
         creds = AICredentialsFactory(user=TripFactory().author)
         trip = TripFactory(author=creds.user)
@@ -978,13 +1039,25 @@ class TestBuildStopPreviewLinks:
             in build_stop_preview_links("X", "Roma", "", "stay", "")["operator"]
         )
         assert (
-            "getyourguide"
+            "viator.com"
             in build_stop_preview_links("X", "Roma", "", "experience", "")["operator"]
         )
 
     def test_unknown_kind_falls_back_to_experience_operator(self):
         links = build_stop_preview_links("X", "Roma", "", "unknown", "")
-        assert links["operator_label"] == "GetYourGuide"
+        assert links["operator_label"] == "Viator"
+
+    def test_viator_uses_italian_locale_for_italian_language(self):
+        links = build_stop_preview_links(
+            "X", "Roma", "", "experience", "", language="it"
+        )
+        assert "viator.com/it-IT/searchResults" in links["operator"]
+
+    def test_viator_uses_default_locale_for_other_languages(self):
+        links = build_stop_preview_links(
+            "X", "Roma", "", "experience", "", language="en"
+        )
+        assert links["operator"].startswith("https://www.viator.com/searchResults")
 
     def test_book_fallback_word_italian(self):
         links = build_stop_preview_links("X", "Roma", "", "meal", "", language="it")
@@ -996,8 +1069,21 @@ class TestBuildStopPreviewLinks:
 
     def test_tripadvisor_and_images_links_always_present(self):
         links = build_stop_preview_links("X", "Roma", "", "experience", "")
-        assert "tripadvisor.com/Search" in links["tripadvisor"]
+        assert "tripadvisor.com" in links["tripadvisor"]
         assert "tbm=isch" in links["images"]
+
+    def test_tripadvisor_uses_italian_domain_for_italian_language(self):
+        links = build_stop_preview_links(
+            "X", "Roma", "", "experience", "", language="it"
+        )
+        assert "tripadvisor.it" in links["tripadvisor"]
+
+    def test_tripadvisor_uses_com_domain_for_other_languages(self):
+        links = build_stop_preview_links(
+            "X", "Roma", "", "experience", "", language="en"
+        )
+        assert "tripadvisor.com" in links["tripadvisor"]
+        assert "tripadvisor.it" not in links["tripadvisor"]
 
 
 class TestGetCachedSuggestions:
