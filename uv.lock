@@ -859,6 +859,18 @@ wheels = [
 
 [[package]]
 dependencies = [
+  { name = "django" }
+]
+name = "django-unfold"
+sdist = { url = "https://files.pythonhosted.org/packages/5e/a6/d5f7f3bcb0c9da5719dbf32d13a5d4877994975dffae4aeaa2bd7b2d823c/django_unfold-0.110.1.tar.gz", hash = "sha256:8274da7e3c92583c7f875b3ac3ceef0ed75346a1a28b03bede667aba3205e286", size = 1172856, upload-time = "2026-11-01T08:39:32.508Z" }
+source = { registry = "https://pypi.org/simple" }
+version = "0.110.1"
+wheels = [
+  { url = "https://files.pythonhosted.org/packages/04/11/66c648c4252ccebbda446b516dcab5fa02328df231b1f5006954ed1af430/django_unfold-0.110.1-py3-none-any.whl", hash = "sha256:92b1bb09e56fcbc8535cef53d19579bd417483fdb8981ceac00de409e8cc5a98", size = 1302025, upload-time = "2026-11-01T08:39:31.147Z" }
+]
+
+[[package]]
+dependencies = [
   { name = "django" },
   { name = "watchfiles" }
 ]
@@ -1708,6 +1720,7 @@ dependencies = [
   { name = "django-redis" },
   { name = "django-storages", extra = ["dropbox"] },
   { name = "django-tailwind-cli" },
+  { name = "django-unfold" },
   { name = "dropbox" },
   { name = "factory-boy" },
   { name = "folium" },
@@ -1780,6 +1793,7 @@ requires-dist = [
   { name = "django-redis", specifier = ">=5.4.0" },
   { name = "django-storages", extras = ["dropbox"], specifier = ">=1.14.6" },
   { name = "django-tailwind-cli", specifier = ">=2.15.0" },
+  { name = "django-unfold", specifier = ">=0.110.1" },
   { name = "dropbox", specifier = ">=12.0.2" },
   { name = "factory-boy", specifier = ">=3.3.1" },
   { name = "folium", specifier = ">=0.17.0" },

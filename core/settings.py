@@ -4,7 +4,10 @@ import warnings
 from pathlib import Path
 
 import environ
+from django.templatetags.static import static
+from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import pgettext_lazy
 
 # Silence a DeprecationWarning raised by google-genai on Python 3.14+ (it relies
 # on a typing internal slated for removal); upstream library issue, not ours.
@@ -41,10 +44,16 @@ DEBUG = env.bool("DEBUG")
 
 ALLOWED_HOSTS: list[str] = env("ALLOWED_HOSTS")
 
+# Path for the Django admin, kept out of the default "admin/" to cut down on
+# automated scanning; not a real access control (ADMIN access is already
+# gated by is_staff/is_superuser).
+ADMIN_URL = env("ADMIN_URL", default="admin/")
+
 
 # Application definition
 
 INSTALLED_APPS = [
+    "unfold",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -125,6 +134,154 @@ TEMPLATES = [
         },
     },
 ]
+
+UNFOLD = {
+    "SITE_TITLE": _("Organize It! Admin"),
+    "SITE_HEADER": _("Organize It!"),
+    "SITE_URL": "/",
+    # Not SITE_LOGO: Unfold replaces the header text entirely with the logo
+    # image when SITE_LOGO is set, dropping SITE_HEADER. SITE_ICON instead
+    # renders alongside the header text.
+    "SITE_ICON": lambda request: static("img/logo.png"),
+    "SHOW_HISTORY": True,
+    "SHOW_VIEW_ON_SITE": True,
+    "COLORS": {
+        "primary": {
+            "50": "oklch(96.72% 0.022 221.81)",
+            "100": "oklch(93.62% 0.043 222.71)",
+            "200": "oklch(87.48% 0.083 224.91)",
+            "300": "oklch(82.18% 0.117 226.54)",
+            "400": "oklch(77.41% 0.143 230.48)",
+            "500": "oklch(73.46% 0.159 236.36)",
+            "600": "oklch(62.37% 0.133 235.63)",
+            "700": "oklch(50.76% 0.107 234.44)",
+            "800": "oklch(38.16% 0.079 233.38)",
+            "900": "oklch(24.71% 0.048 228.26)",
+            "950": "oklch(16.9% 0.031 222.65)",
+        },
+    },
+    "SIDEBAR": {
+        "show_search": True,
+        # Custom grouping instead of Unfold's default per-Django-app list:
+        # allauth.account and allauth.socialaccount are two separate apps
+        # that otherwise render as two near-identical "Account"/"Accounts"
+        # boxes in the sidebar; here their models are merged under one
+        # "Login" group instead.
+        "navigation": [
+            {
+                "title": _("Trips"),
+                "icon": "flight",
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": _("Trips"),
+                        "icon": "luggage",
+                        "link": reverse_lazy("admin:trips_trip_changelist"),
+                    },
+                    {
+                        "title": _("Days"),
+                        "icon": "calendar_today",
+                        "link": reverse_lazy("admin:trips_day_changelist"),
+                    },
+                    {
+                        "title": _("Experiences"),
+                        "icon": "hiking",
+                        "link": reverse_lazy("admin:trips_experience_changelist"),
+                    },
+                    {
+                        "title": _("Meals"),
+                        "icon": "restaurant",
+                        "link": reverse_lazy("admin:trips_meal_changelist"),
+                    },
+                    {
+                        "title": _("Stays"),
+                        "icon": "hotel",
+                        "link": reverse_lazy("admin:trips_stay_changelist"),
+                    },
+                    {
+                        "title": _("Expenses"),
+                        "icon": "payments",
+                        "link": reverse_lazy("admin:trips_expense_changelist"),
+                    },
+                    {
+                        "title": _("Family units"),
+                        "icon": "groups",
+                        "link": reverse_lazy("admin:trips_familyunit_changelist"),
+                    },
+                    {
+                        "title": _("Expense participants"),
+                        "icon": "person",
+                        "link": reverse_lazy(
+                            "admin:trips_expenseparticipant_changelist"
+                        ),
+                    },
+                    {
+                        "title": _("Links"),
+                        "icon": "link",
+                        "link": reverse_lazy("admin:trips_link_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": _("Users"),
+                "icon": "person",
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": _("Users"),
+                        "icon": "person",
+                        "link": reverse_lazy("admin:accounts_customuser_changelist"),
+                    },
+                    {
+                        "title": _("Profiles"),
+                        "icon": "badge",
+                        "link": reverse_lazy("admin:accounts_profile_changelist"),
+                    },
+                ],
+            },
+            {
+                # pgettext_lazy, not gettext_lazy: "Login" already has an
+                # existing translation ("Entra", the verb) elsewhere in the
+                # Django/allauth catalogs; this is a noun (section title) and
+                # needs its own, separately-translatable catalog entry.
+                "title": pgettext_lazy("admin sidebar section", "Login"),
+                "icon": "login",
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": _("Email addresses"),
+                        "icon": "mail",
+                        "link": reverse_lazy("admin:account_emailaddress_changelist"),
+                    },
+                    {
+                        "title": _("Social accounts"),
+                        "icon": "link",
+                        "link": reverse_lazy(
+                            "admin:socialaccount_socialaccount_changelist"
+                        ),
+                    },
+                    {
+                        "title": _("Social applications"),
+                        "icon": "apps",
+                        "link": reverse_lazy(
+                            "admin:socialaccount_socialapp_changelist"
+                        ),
+                    },
+                    {
+                        "title": _("Social application tokens"),
+                        "icon": "key",
+                        "link": reverse_lazy(
+                            "admin:socialaccount_socialtoken_changelist"
+                        ),
+                    },
+                ],
+            },
+        ],
+    },
+    "STYLES": [
+        lambda request: static("css/admin-custom.css"),
+    ],
+}
 
 # Resolve Form/Field ``template_name`` against the project TEMPLATES engine so
 # forms can ship their own presentation templates from BASE_DIR/templates.

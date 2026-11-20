@@ -18,6 +18,7 @@ def test_app_version_context_processor():
     assert context == {
         "APP_VERSION": settings.APP_VERSION,
         "PWA_ENABLED": settings.PWA_ENABLED,
+        "ADMIN_URL": settings.ADMIN_URL,
     }
 
 

@@ -1,0 +1,88 @@
+{% load i18n unfold %}
+
+{% comment %}
+Override of unfold/helpers/app_list.html: the vendor template always starts a
+collapsible group collapsed unless the current page is inside it. We want
+groups expanded by default and to remember the user's open/closed choice
+across reloads (Alpine's persist plugin, already loaded by Unfold for the
+theme switcher), instead of silently re-collapsing every navigation.
+{% endcomment %}
+
+{% if sidebar_navigation %}
+    <div id="nav-sidebar-apps" class="scrollbar-default-hover h-0 grow overflow-auto">
+        {% for group in sidebar_navigation %}
+            {% if group.items %}
+                {% has_nav_item_active group.items as has_active %}
+
+                <div class="hidden mb-1.5 has-[ol]:has-[li]:block" {% if group.collapsible %}x-data="{navigationOpen: $persist({% if has_active %}true{% else %}true{% endif %}).as('navigationOpen-{{ forloop.counter0 }}')}"{% endif %}>
+                    {% if group.separator %}
+                        <hr class="border-base-200 dark:border-base-800 mx-6 my-2 border-t" />
+                    {% endif %}
+
+                    {% if group.title %}
+                        <h2 class="font-semibold flex flex-row group items-center mb-1 mx-3 py-1.5 px-3 select-none text-font-important-light text-sm dark:text-font-important-dark {% if group.collapsible %}cursor-pointer hover:text-primary-600 dark:hover:text-primary-500{% endif %}" {% if group.collapsible %}x-on:click="navigationOpen = !navigationOpen"{% endif %}>
+                            {{ group.title }}
+
+                            {% include "unfold/helpers/app_list_badge.html" with item=group %}
+
+                            {% if group.collapsible %}
+                                <span class="material-symbols-outlined group-hover:text-primary-600 dark:group-hover:text-primary-500 ml-auto transition-transform rtl:mr-auto rtl:ml-0 rtl:-scale-x-100" x-bind:class="{'rotate-90 rtl:-rotate-90': navigationOpen}">
+                                    chevron_right
+                                </span>
+                            {% endif %}
+                        </h2>
+                    {% endif %}
+
+                    <ol class="flex flex-col px-6" {% if group.collapsible %}x-show="navigationOpen"{% endif %}>
+                        {% for item in group.items %}
+                            {% if item.has_permission %}
+                                <li {% if item.items|is_list %}x-data="{'subnavigationOpen': {% if item.items|has_active_item %}true{% else %}false{% endif %} }"{% endif %}>
+                                    <a {% if item.items|is_list and item.items|length > 0 %}x-on:click="subnavigationOpen = !subnavigationOpen"{% else %}href="{% if item.link_callback %}{{ item.link_callback }}{% else %}{{ item.link }}{% endif %}"{% endif %} class="cursor-pointer flex h-[38px] items-center -mx-3 px-3 rounded-default hover:text-primary-600 dark:hover:text-primary-500 {% if item.active %}bg-base-100 font-semibold text-primary-600 dark:bg-white/[.06] dark:text-primary-500 active{% endif %}" {% if item.link_attrs %}{% include "unfold/helpers/attrs.html" with attrs=item.link_attrs %}{% endif %}>
+                                        {% if item.icon_template %}
+                                            {% include item.icon_template with item=item %}
+                                        {% elif item.icon %}
+                                            <span class="material-symbols-outlined md-18 mr-3 w-[18px] rtl:mr-0 rtl:ml-3">
+                                                {{ item.icon }}
+                                            </span>
+                                        {% endif %}
+
+                                        <span>{{ item.title|safe }}</span>
+
+                                        {% include "unfold/helpers/app_list_badge.html" with item=item %}
+
+                                        {% if item.items|is_list and item.items|length > 0 %}
+                                            <span class="material-symbols-outlined group-hover:text-primary-600 dark:group-hover:text-primary-500 ml-auto transition-all select-none rtl:mr-auto rtl:ml-0 rtl:-scale-x-100" x-bind:class="{'rotate-90 rtl:-rotate-90': subnavigationOpen}">
+                                                chevron_right
+                                            </span>
+                                        {% endif %}
+                                    </a>
+
+                                    {% if item.items|is_list %}
+                                        <ul class="border-base-200 dark:border-base-800 my-2 ms-2 flex flex-col gap-0.5 border-s-2" x-show="subnavigationOpen">
+                                            {% for subitem in item.items %}
+                                                {% if subitem.has_permission %}
+                                                    <li class="ms-5">
+                                                        <a href="{% if subitem.link_callback %}{{ subitem.link_callback }}{% else %}{{ subitem.link }}{% endif %}" class="block rounded-default -mx-3 px-3 py-1.5 hover:text-primary-600 dark:hover:text-primary-500 {% if subitem.active %}bg-base-100 font-medium text-primary-600 dark:bg-white/[.06] dark:text-primary-500{% endif %}">
+                                                            {{ subitem.title }}
+                                                        </a>
+                                                    </li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ol>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    {% include "unfold/helpers/app_list_all.html" %}
+{% else %}
+    <p>
+        {% translate "You don’t have permission to view or edit anything." as error_message %}
+        {% include "unfold/helpers/messages/error.html" with error=error_message %}
+    </p>
+{% endif %}

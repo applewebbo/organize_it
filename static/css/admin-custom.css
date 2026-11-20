@@ -1,0 +1,15 @@
+/* Unfold admin overrides: color the sidebar group titles with the project's
+   brand primary color instead of the default neutral gray. The title text
+   sits directly on the <h2> with custom UNFOLD["SIDEBAR"]["navigation"]
+   groups, or on a child <a> with Unfold's default per-app grouping; cover
+   both. The #nav-sidebar-apps ancestor id bumps specificity above Unfold's
+   own `.text-font-important-light` utility class. */
+#nav-sidebar-apps h2,
+#nav-sidebar-apps h2 a {
+  color: var(--color-primary-600);
+}
+
+.dark #nav-sidebar-apps h2,
+.dark #nav-sidebar-apps h2 a {
+  color: var(--color-primary-400);
+}

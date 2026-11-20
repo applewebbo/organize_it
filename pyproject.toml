@@ -64,7 +64,8 @@ dependencies = [
   "pypdf>=6.13.1",
   "google-genai>=2.10.0",
   "mistralai>=2.5.2",
-  "django-pwa>=2.0.1"
+  "django-pwa>=2.0.1",
+  "django-unfold>=0.110.1"
 ]
 description = "Help you organize your trips and travel plans."
 name = "organize_it"
