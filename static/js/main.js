@@ -49,6 +49,17 @@ htmx.on("htmx:before:swap", (e) => {
   }
 })
 
+// An HX-Trigger "hide-modal" event is dispatched on the form that made the
+// request, so it bubbles up to <body> (where e.g. `hx-trigger="X from:body"`
+// listeners reliably catch it) but doesn't reliably keep bubbling all the way
+// to `window`, where Alpine's `@hide-modal.window` listener in
+// includes/modal.html lives. Relay it explicitly so forms that target
+// something other than #dialog (main transfers, expense settings, ...) can
+// still close the modal via a plain HX-Trigger, without this quirk.
+document.body.addEventListener("hide-modal", () => {
+  window.dispatchEvent(new Event("hide-modal"))
+})
+
 // Re-initialize Alpine.js after HTMX swaps (OOB and normal)
 htmx.on("htmx:after:swap", () => {
   if (window.Alpine) {

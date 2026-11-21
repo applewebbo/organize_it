@@ -76,69 +76,67 @@
                                  aria-hidden="true">
                                 <i class="ph-bold ph-bed text-[4rem] text-slate-900 opacity-[0.07]"></i>
                             </div>
-                            <div class="relative flex items-center px-4 py-3">
-                                <div class="hidden shrink-0 rounded-md border-2 border-slate-300 bg-white p-1.5 text-slate-500 sm:block dark:border-slate-700 dark:bg-slate-700 dark:text-slate-300">
-                                    <i class="ph-bold ph-bed align-sub text-xl" aria-hidden="true"></i>
+                            <div class="relative px-4 py-4">
+                                <div class="flex items-center gap-2">
+                                    <div class="hidden shrink-0 rounded-md border-2 border-slate-300 bg-white p-1.5 text-slate-500 sm:block dark:border-slate-700 dark:bg-slate-700 dark:text-slate-300">
+                                        <i class="ph-bold ph-bed align-sub text-xl" aria-hidden="true"></i>
+                                    </div>
+                                    <h3 class="text-base font-semibold text-slate-600 dark:text-slate-200">
+                                        {% if trip.status != 5 %}
+                                            <a hx-get="{% url 'trips:stay-detail' stay.pk %}"
+                                               hx-target="#dialog"
+                                               hx-swap="innerHTML"
+                                               @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                               class="link">{{ stay.name }}</a>
+                                        {% else %}
+                                            {{ stay.name }}
+                                        {% endif %}
+                                    </h3>
                                 </div>
-                                <div class="flex grow flex-col sm:ms-3">
-                                    <div class="flex items-center gap-2">
-                                        <h3 class="text-base font-semibold text-slate-600 dark:text-slate-200">
-                                            {% if trip.status != 5 %}
-                                                <a hx-get="{% url 'trips:stay-detail' stay.pk %}"
-                                                   hx-target="#dialog"
-                                                   hx-swap="innerHTML"
-                                                   @click="$dispatch('open-modal'); document.activeElement.blur()"
-                                                   class="link">{{ stay.name }}</a>
-                                            {% else %}
-                                                {{ stay.name }}
-                                            {% endif %}
-                                        </h3>
-                                    </div>
-                                    <div class="mt-1 flex flex-col gap-y-1 text-sm text-slate-500 dark:text-slate-400">
-                                        {% if stay.city %}
-                                            <span>
-                                                <i class="ph-bold ph-map-pin me-1" aria-hidden="true"></i>{{ stay.city }}
-                                            </span>
-                                        {% endif %}
-                                        {% if stay.first_day_date %}
-                                            <span>
-                                                <i class="ph-bold ph-calendar-blank me-1" aria-hidden="true"></i>
-                                                {{ stay.first_day_date|date:"j M" }}
-                                                {% if stay.last_day_date != stay.first_day_date %}– {{ stay.last_day_date|date:"j M" }}{% endif %}
-                                            </span>
-                                        {% endif %}
-                                        <div class="flex flex-wrap gap-x-4">
-                                            {% if stay.check_in %}
-                                                <span>
-                                                    <i class="ph-bold ph-sign-in text-success me-1" aria-hidden="true"></i>
-                                                    <span class="hidden sm:inline">Check-in:</span> {{ stay.check_in|time:"H:i" }}
-                                                </span>
-                                            {% endif %}
-                                            {% if stay.check_out %}
-                                                <span>
-                                                    <i class="ph-bold ph-sign-out text-error me-1" aria-hidden="true"></i>
-                                                    <span class="hidden sm:inline">Check-out:</span> {{ stay.check_out|time:"H:i" }}
-                                                </span>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    {% if stay.notes %}
-                                        <p class="line-clamp-2 mt-1 flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
-                                            <i class="ph-bold ph-note shrink-0" aria-hidden="true"></i>{{ stay.notes }}
-                                        </p>
+                                <div class="mt-1 flex flex-col gap-y-1 text-sm text-slate-500 dark:text-slate-400">
+                                    {% if stay.city %}
+                                        <span>
+                                            <i class="ph-bold ph-map-pin me-1" aria-hidden="true"></i>{{ stay.city }}
+                                        </span>
                                     {% endif %}
+                                    {% if stay.first_day_date %}
+                                        <span>
+                                            <i class="ph-bold ph-calendar-blank me-1" aria-hidden="true"></i>
+                                            {{ stay.first_day_date|date:"j M" }}
+                                            {% if stay.last_day_date != stay.first_day_date %}– {{ stay.last_day_date|date:"j M" }}{% endif %}
+                                        </span>
+                                    {% endif %}
+                                    <div class="flex flex-wrap gap-x-4">
+                                        {% if stay.check_in %}
+                                            <span>
+                                                <i class="ph-bold ph-sign-in text-success me-1" aria-hidden="true"></i>
+                                                <span class="hidden sm:inline">Check-in:</span> {{ stay.check_in|time:"H:i" }}
+                                            </span>
+                                        {% endif %}
+                                        {% if stay.check_out %}
+                                            <span>
+                                                <i class="ph-bold ph-sign-out text-error me-1" aria-hidden="true"></i>
+                                                <span class="hidden sm:inline">Check-out:</span> {{ stay.check_out|time:"H:i" }}
+                                            </span>
+                                        {% endif %}
+                                    </div>
                                 </div>
+                                {% if stay.notes %}
+                                    <p class="line-clamp-2 mt-1 flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
+                                        <i class="ph-bold ph-note shrink-0" aria-hidden="true"></i>{{ stay.notes }}
+                                    </p>
+                                {% endif %}
                             </div>
                             {% if trip.status != 5 %}
-                                <div class="mt-auto flex flex-wrap justify-end gap-2 px-4 py-2">
+                                <div class="mt-auto flex flex-wrap justify-end gap-2 px-4 py-3">
                                     {% if stay.google_maps_directions_url %}
                                         <a class="btn btn-xs btn-stay-card sm:btn-sm"
                                            href="{{ stay.google_maps_directions_url }}"
                                            target="_blank"
                                            rel="noopener noreferrer"
-                                           title="{% translate 'Get directions' %}">
+                                           title="{% translate 'How to get there' %}">
                                             <i class="ph-bold ph-path i-sm"></i>
-                                            <span class="hidden sm:inline">{% translate "Get directions" %}</span>
+                                            <span class="hidden sm:inline">{% translate "How to get there" %}</span>
                                         </a>
                                     {% endif %}
                                     <button type="button"
@@ -149,7 +147,7 @@
                                             @click="$dispatch('open-modal'); document.activeElement.blur()"
                                             title="{% translate 'Add document' %}">
                                         <i class="ph-bold ph-paperclip i-sm"></i>
-                                        <span class="hidden sm:inline">{% translate "Add document" %}</span>
+                                        <span class="hidden sm:inline">{% translate "Attachment" %}</span>
                                     </button>
                                 </div>
                             {% endif %}

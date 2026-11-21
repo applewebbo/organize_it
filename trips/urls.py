@@ -82,6 +82,11 @@ htmx_urlpatterns = [
     ),
     # MAIN TRANSFERS
     path(
+        "main-transfers/<int:pk>/detail",
+        views.main_transfer_detail,
+        name="main-transfer-detail",
+    ),
+    path(
         "main-transfers/<int:pk>/edit",
         views.edit_main_transfer,
         name="edit-main-transfer",

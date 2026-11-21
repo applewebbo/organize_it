@@ -1,10 +1,12 @@
-{% load crispy_forms_tags %}
+{% load crispy_forms_tags i18n %}
 <h3 id="stay-title"
     class="text-xl font-semibold text-gray-900 dark:text-white"
-    hx-swap-oob="true">Delete Stay:&nbsp;{{ stay.name }}</h3>
+    hx-swap-oob="true">
+    {% blocktranslate with name=stay.name %}Delete Stay: {{ name }}{% endblocktranslate %}
+</h3>
 <div class="p-4 md:p-5">
     <p>
-        You are deleting <strong>{{ stay.name }}</strong>. This is a permanent deletion, are you sure?
+        {% blocktranslate with name=stay.name %}You are deleting <strong>{{ name }}</strong>. This is a permanent deletion, are you sure?{% endblocktranslate %}
     </p>
     {% if other_stays %}
         <div role="alert" class="alert alert-info alert-soft mt-3 flex py-4">
@@ -13,7 +15,7 @@
             </div>
             {% if show_dropdown %}
                 <div class="flex grow items-center">
-                    <label for="new_stay" class="block grow text-sm font-medium">Select stay to reassign days to:</label>
+                    <label for="new_stay" class="block grow text-sm font-medium">{% translate "Select stay to reassign days to:" %}</label>
                     <select name="new_stay"
                             id="new_stay"
                             class="select select-bordered text-base-content w-full"
@@ -23,7 +25,7 @@
                 </div>
             {% else %}
                 <span class="text-sm">
-                    Days will be reassigned to: <strong>{{ other_stays.0.name }}</strong>
+                    {% blocktranslate with name=other_stays.0.name %}Days will be reassigned to: <strong>{{ name }}</strong>{% endblocktranslate %}
                 </span>
             {% endif %}
         </div>
@@ -34,8 +36,8 @@
             type="button"
             hx-post="{% url 'trips:stay-delete' stay.pk %}"
             hx-include="#new_stay"
-            hx-target="#dialog">Confirm</button>
+            hx-target="#dialog">{% translate "Confirm" %}</button>
     <button type="button"
             x-on:click="openModal = false"
-            class="btn btn-sm btn-outline btn-neutral ms-2">Cancel</button>
+            class="btn btn-sm btn-outline btn-neutral ms-2">{% translate "Cancel" %}</button>
 </div>

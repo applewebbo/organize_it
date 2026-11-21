@@ -119,6 +119,7 @@ from trips.views.transfers import (
     flight_status_redirect,
     get_trip_addresses,
     main_transfer_connection_modal,
+    main_transfer_detail,
     main_transfer_step,
     main_transfers_section,
     save_main_transfer,
@@ -225,6 +226,7 @@ __all__ = [
     "stay_booking_redirect",
     "stays_section",
     # transfers
+    "main_transfer_detail",
     "edit_main_transfer",
     "delete_main_transfer",
     "train_status_redirect",

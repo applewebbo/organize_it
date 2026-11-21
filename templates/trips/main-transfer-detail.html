@@ -1,0 +1,70 @@
+{% load i18n %}
+<div>
+    <div class="border-base-300 flex items-center justify-between rounded-t border-b p-4 md:px-5 md:py-2.5">
+        <h3 id="main-transfer-title"
+            class="text-xl font-semibold text-gray-900 dark:text-white">{{ transfer.get_direction_display }}</h3>
+        <button type="button"
+                class="btn btn-ghost btn-circle btn-sm"
+                x-on:click="openModal = false">
+            <i class="ph-bold ph-x i-md"></i>
+            <span class="sr-only">{% translate 'Close modal' %}</span>
+        </button>
+    </div>
+    <div id="main-transfer-details">
+        <div class="grid gap-1 p-4 text-sm md:p-5">
+            <p>
+                <strong>{% translate "Type:" %}</strong> {{ transfer.get_type_display }}
+            </p>
+            <div class="grid grid-cols-2 gap-x-4 gap-y-1">
+                {% if transfer.type == 1 or transfer.type == 2 %}
+                    <p>
+                        <strong>{% translate "From:" %}</strong> {{ transfer.origin_name }}
+                    </p>
+                    <p>
+                        <strong>{% translate "To:" %}</strong> {{ transfer.destination_name }}
+                    </p>
+                {% else %}
+                    <p>
+                        <strong>{% translate "From:" %}</strong> {{ transfer.origin_address }}
+                    </p>
+                    <p>
+                        <strong>{% translate "To:" %}</strong> {{ transfer.destination_address }}
+                    </p>
+                {% endif %}
+                <p>
+                    <strong>{% translate "Departure:" %}</strong> {{ transfer.start_time }}
+                </p>
+                <p>
+                    <strong>{% translate "Arrival:" %}</strong> {{ transfer.end_time }}
+                    {% if transfer.end_time and transfer.type == 3 %}
+                        <span class="text-base-content/50">({% translate "estimated" %})</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2 rounded-b p-4 sm:flex sm:justify-center md:p-5">
+            <button type="button"
+                    class="btn btn-success btn-soft"
+                    hx-get="{% url 'trips:edit-main-transfer' transfer.pk %}"
+                    hx-target="#dialog"
+                    hx-swap="innerHTML">
+                <i class="ph-bold ph-pencil-line"></i>
+                <span>{% translate 'Edit' %}</span>
+            </button>
+            <button type="button"
+                    class="btn btn-error btn-soft"
+                    hx-get="{% url 'trips:delete-main-transfer' transfer.pk %}"
+                    hx-target="#main-transfer-details"
+                    hx-swap="innerHTML">
+                <i class="ph-bold ph-trash"></i>
+                <span>{% translate 'Delete' %}</span>
+            </button>
+            <button type="button"
+                    x-on:click="openModal = false"
+                    class="btn btn-soft btn-neutral">
+                <i class="ph-bold ph-x-circle"></i>
+                <span>{% translate 'Close' %}</span>
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,20 @@
+{% load i18n %}
+<h3 id="main-transfer-title"
+    class="text-xl font-semibold text-gray-900 dark:text-white"
+    hx-swap-oob="true">
+    {% blocktranslate with direction=transfer.get_direction_display %}Delete {{ direction }} Transfer{% endblocktranslate %}
+</h3>
+<div class="p-4 md:p-5">
+    <p>
+        {% blocktranslate with direction=transfer.get_direction_display %}You are deleting the {{ direction }} transfer. This is a permanent deletion, are you sure?{% endblocktranslate %}
+    </p>
+</div>
+<div class="flex items-center justify-end p-4">
+    <button class="btn btn-sm btn-error ms-2"
+            type="button"
+            hx-post="{% url 'trips:delete-main-transfer' transfer.pk %}"
+            hx-target="#dialog">{% translate "Confirm" %}</button>
+    <button type="button"
+            x-on:click="openModal = false"
+            class="btn btn-sm btn-outline btn-neutral ms-2">{% translate "Cancel" %}</button>
+</div>

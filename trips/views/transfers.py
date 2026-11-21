@@ -43,6 +43,15 @@ from trips.utils import (
 logger = logging.getLogger(__name__)
 
 
+def main_transfer_detail(request, pk):
+    """Show main transfer details in a modal, with links to edit/delete."""
+    transfer = get_object_or_404(
+        MainTransfer, pk=pk, trip__in=accessible_trips_qs(request.user)
+    )
+    context = {"transfer": transfer, "trip": transfer.trip}
+    return TemplateResponse(request, "trips/main-transfer-detail.html", context)
+
+
 def edit_main_transfer(request, pk):
     """Edit existing main transfer - opens modal with specific form"""
     transfer = get_object_or_404(
@@ -108,18 +117,22 @@ def edit_main_transfer(request, pk):
 
 
 def delete_main_transfer(request, pk):
-    """Delete main transfer"""
+    """Delete main transfer, confirming first like stay deletion does."""
     transfer = get_object_or_404(
         MainTransfer, pk=pk, trip__in=editable_trips_qs(request.user)
     )
 
-    transfer.delete()
-    messages.add_message(
-        request,
-        messages.SUCCESS,
-        _("Main transfer deleted successfully"),
-    )
-    return HttpResponse(status=204, headers={"HX-Refresh": "true"})
+    if request.method == "POST":
+        transfer.delete()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            _("Main transfer deleted successfully"),
+        )
+        return HttpResponse(status=204, headers={"HX-Refresh": "true"})
+
+    context = {"transfer": transfer}
+    return TemplateResponse(request, "trips/main-transfer-delete.html", context)
 
 
 def train_status_redirect(request, pk):
