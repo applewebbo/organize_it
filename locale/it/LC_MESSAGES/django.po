@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 15:49+0100\n"
+"POT-Creation-Date: 2026-11-26 15:02+0100\n"
 "PO-Revision-Date: 2026-01-27 15:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -18,63 +18,131 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.8\n"
 
-#: accounts/apps.py:10 core/settings.py:226 core/settings.py:231
-msgid "Users"
-msgstr ""
+#: accounts/admin.py:85
+msgid "Block selected users"
+msgstr "Blocca gli utenti selezionati"
 
-#: accounts/forms.py:60 accounts/models.py:78
+#: accounts/admin.py:91
+#, python-format
+msgid "%d user blocked."
+msgid_plural "%d users blocked."
+msgstr[0] "%d utente bloccato."
+msgstr[1] "%d utenti bloccati."
+
+#: accounts/admin.py:99
+msgid "Unblock selected users"
+msgstr "Sblocca gli utenti selezionati"
+
+#: accounts/admin.py:105
+#, python-format
+msgid "%d user unblocked."
+msgid_plural "%d users unblocked."
+msgstr[0] "%d utente sbloccato."
+msgstr[1] "%d utenti sbloccati."
+
+#: accounts/admin.py:113
+msgid "Send notification to selected users"
+msgstr "Invia notifica agli utenti selezionati"
+
+#: accounts/admin.py:120
+msgid "Send email to selected users"
+msgstr "Invia email agli utenti selezionati"
+
+#: accounts/admin.py:136 accounts/admin.py:182
+msgid "No users selected."
+msgstr "Nessun utente selezionato."
+
+#: accounts/admin.py:158
+#, python-format
+msgid "Notification sent to %d user."
+msgid_plural "Notification sent to %d users."
+msgstr[0] "Notifica inviata a %d utente."
+msgstr[1] "Notifica inviata a %d utenti."
+
+#: accounts/admin.py:169 templates/admin/accounts/send_notification.html:8
+msgid "Send notification"
+msgstr "Invia notifica"
+
+#: accounts/admin.py:204
+#, python-format
+msgid "Email sent to %d user."
+msgid_plural "Email sent to %d users."
+msgstr[0] "Email inviata a %d utente."
+msgstr[1] "Email inviata a %d utenti."
+
+#: accounts/admin.py:215 templates/admin/accounts/send_email.html:8
+msgid "Send email"
+msgstr "Invia email"
+
+#: accounts/apps.py:10 core/settings.py:237 core/settings.py:242
+msgid "Users"
+msgstr "Utenti"
+
+#: accounts/forms.py:17 accounts/models.py:198
+msgid "Message"
+msgstr "Messaggio"
+
+#: accounts/forms.py:25
+msgid "Subject"
+msgstr "Oggetto"
+
+#: accounts/forms.py:27
+msgid "Body"
+msgstr "Testo"
+
+#: accounts/forms.py:79 accounts/models.py:78
 msgid "First name"
 msgstr "Nome"
 
-#: accounts/forms.py:61 accounts/models.py:84
+#: accounts/forms.py:80 accounts/models.py:84
 msgid "Last name"
 msgstr "Cognome"
 
-#: accounts/forms.py:62 accounts/models.py:120
+#: accounts/forms.py:81 accounts/models.py:120
 msgid "Home address"
 msgstr "Indirizzo di casa"
 
-#: accounts/forms.py:63 accounts/models.py:90
+#: accounts/forms.py:82 accounts/models.py:90
 msgid "Avatar"
 msgstr "Immagine profilo"
 
-#: accounts/forms.py:64 accounts/models.py:99
+#: accounts/forms.py:83 accounts/models.py:99
 msgid "Preferred currency"
 msgstr "Valuta preferita"
 
-#: accounts/forms.py:65
+#: accounts/forms.py:84
 msgid "Email language"
 msgstr "Lingua email"
 
-#: accounts/forms.py:66
+#: accounts/forms.py:85
 msgid "Default event view"
 msgstr "Vista eventi di default"
 
-#: accounts/forms.py:67
+#: accounts/forms.py:86
 msgid "Sort trips by"
 msgstr "Ordine viaggi"
 
-#: accounts/forms.py:68 accounts/models.py:143
+#: accounts/forms.py:87 accounts/models.py:143
 msgid "Use your device's light/dark system setting."
 msgstr "Usa le impostazioni di sistema per il tema chiaro/scuro."
 
-#: accounts/forms.py:69 accounts/models.py:146
+#: accounts/forms.py:88 accounts/models.py:146
 msgid "Show transfer info"
 msgstr "Mostra info trasferimenti"
 
-#: accounts/forms.py:70 accounts/models.py:151
+#: accounts/forms.py:89 accounts/models.py:151
 msgid "Show weather forecast"
 msgstr "Mostra meteo"
 
-#: accounts/forms.py:71 accounts/models.py:156
+#: accounts/forms.py:90 accounts/models.py:156
 msgid "Daily digest email"
 msgstr "Email riepilogo giornaliero"
 
-#: accounts/forms.py:72
+#: accounts/forms.py:91
 msgid "Favourite trip"
 msgstr "Viaggio preferito"
 
-#: accounts/forms.py:84 templates/account/profile.html:49
+#: accounts/forms.py:103 templates/account/profile.html:77
 #: trips/forms/transfer.py:473 trips/forms/transfer.py:485
 msgid "Full address (street, city, country)"
 msgstr "Indirizzo completo (via, città, paese)"
@@ -95,11 +163,11 @@ msgstr "Superuser deve avere is_superuser=True."
 msgid "email address"
 msgstr "indirizzo email"
 
-#: accounts/models.py:52 core/settings.py:477
+#: accounts/models.py:52 core/settings.py:488
 msgid "Italian"
 msgstr "Italiano"
 
-#: accounts/models.py:53 core/settings.py:478
+#: accounts/models.py:53 core/settings.py:489
 msgid "English"
 msgstr "Inglese"
 
@@ -178,102 +246,115 @@ msgstr ""
 "Quando attivo, le impostazioni dei suggerimenti AI e le funzionalità di "
 "suggerimenti AI nell'app diventano disponibili."
 
-#: accounts/views.py:46
+#: accounts/models.py:199
+msgid "Read"
+msgstr "Letta"
+
+#: accounts/models.py:200
+msgid "Created at"
+msgstr "Creata il"
+
+#: accounts/models.py:211
+msgid "Notification"
+msgstr "Notifica"
+
+#: accounts/models.py:212
+msgid "Notifications"
+msgstr "Notifiche"
+
+#: accounts/views.py:47
 msgid "Settings modified succesfully"
 msgstr "Impostazioni salvate"
 
+#: core/admin_dashboard.py:19 core/settings.py:176
+msgid "Usage Statistics"
+msgstr "Statistiche di utilizzo"
+
 #: core/settings.py:139
 msgid "Organize It! Admin"
-msgstr ""
+msgstr "Organize It! Admin"
 
 #: core/settings.py:140
-#, fuzzy
-#| msgid "Organizer"
 msgid "Organize It!"
-msgstr "Organizzatore"
+msgstr "Organize It!"
 
-#: core/settings.py:172 core/settings.py:177
-#: templates/cotton/quick_guide.html:18 templates/includes/footer.html:39
-#: templates/includes/navbar.html:52 templates/includes/sidebar-nav.html:23
+#: core/settings.py:172
+msgid "Analytics"
+msgstr "Statistiche"
+
+#: core/settings.py:183 core/settings.py:188
+#: templates/admin/stats_dashboard.html:56 templates/cotton/quick_guide.html:18
+#: templates/includes/footer.html:39 templates/includes/navbar.html:52
+#: templates/includes/sidebar-nav.html:23
 #: templates/includes/sidebar-nav.html:26
 msgid "Trips"
 msgstr "Viaggi"
 
-#: core/settings.py:182 templates/cotton/quick_guide.html:32
+#: core/settings.py:193 templates/cotton/quick_guide.html:32
 #: templates/trips/trip-pdf.html:221
 msgid "Days"
 msgstr "Giorni"
 
-#: core/settings.py:187 templates/cotton/quick_guide.html:60
+#: core/settings.py:198 templates/cotton/quick_guide.html:60
 #: templates/suggestions/ai-kind-filter.html:11
 msgid "Experiences"
 msgstr "Esperienze"
 
-#: core/settings.py:192 templates/cotton/quick_guide.html:74
+#: core/settings.py:203 templates/cotton/quick_guide.html:74
 #: templates/suggestions/ai-kind-filter.html:20
 msgid "Meals"
 msgstr "Pasti"
 
-#: core/settings.py:197 templates/cotton/quick_guide.html:46
+#: core/settings.py:208 templates/cotton/quick_guide.html:46
 #: templates/suggestions/ai-kind-filter.html:29
 #: templates/trips/trip-pdf.html:229
 #: templates/trips/wizard/steps-indicator.html:5
 msgid "Stays"
 msgstr "Soggiorni"
 
-#: core/settings.py:202 templates/trips/expenses-modal.html:4
+#: core/settings.py:213 templates/trips/expenses-modal.html:4
 #: templates/trips/expenses-modal.html:21
 #: templates/trips/includes/expenses-card.html:5
 msgid "Expenses"
 msgstr "Spese"
 
-#: core/settings.py:207
-#, fuzzy
-#| msgid "Family unit"
+#: core/settings.py:218
 msgid "Family units"
-msgstr "Nucleo famigliare"
+msgstr "Nuclei famigliari"
 
-#: core/settings.py:212
-#, fuzzy
-#| msgid "Participants"
+#: core/settings.py:223
 msgid "Expense participants"
-msgstr "Chi partecipa"
+msgstr "Partecipanti alle spese"
 
-#: core/settings.py:219 templates/trips/trip-pdf.html:233
+#: core/settings.py:230 templates/trips/trip-pdf.html:233
 #: templates/trips/trip-pdf.html:414
 msgid "Links"
 msgstr "Link"
 
-#: core/settings.py:236
-msgid "Profiles"
-msgstr ""
-
 #: core/settings.py:247
-#, fuzzy
-#| msgid "Login"
+msgid "Profiles"
+msgstr "Profili"
+
+#: core/settings.py:258
 msgctxt "admin sidebar section"
 msgid "Login"
-msgstr "Entra"
+msgstr "Accesso"
 
-#: core/settings.py:252
-#, fuzzy
-#| msgid "email address"
+#: core/settings.py:263
 msgid "Email addresses"
-msgstr "indirizzo email"
+msgstr "Indirizzi email"
 
-#: core/settings.py:257
+#: core/settings.py:268
 msgid "Social accounts"
-msgstr ""
+msgstr "Account social"
 
-#: core/settings.py:264
-#, fuzzy
-#| msgid "Local traditional"
+#: core/settings.py:275
 msgid "Social applications"
-msgstr "Tradizionale locale"
+msgstr "Applicazioni social"
 
-#: core/settings.py:271
+#: core/settings.py:282
 msgid "Social application tokens"
-msgstr ""
+msgstr "Token applicazioni social"
 
 #: suggestions/forms.py:32
 msgid "API key"
@@ -627,23 +708,27 @@ msgstr "La tua password è stata cambiata."
 msgid "Personal Settings"
 msgstr "Impostazioni"
 
-#: templates/account/profile.html:23
+#: templates/account/profile.html:38 templates/trips/trip-detail.html:115
+msgid "Dismiss"
+msgstr "Ignora"
+
+#: templates/account/profile.html:51
 msgid "Personal Information"
 msgstr "Informazioni Personali"
 
-#: templates/account/profile.html:74 templates/suggestions/settings.html:70
+#: templates/account/profile.html:102 templates/suggestions/settings.html:70
 msgid "Preferences"
 msgstr "Preferenze"
 
-#: templates/account/profile.html:75
+#: templates/account/profile.html:103
 msgid "Travel Preferences"
 msgstr "Preferenze di viaggio"
 
-#: templates/account/profile.html:94
+#: templates/account/profile.html:122
 msgid "Display Preferences"
 msgstr "Preferenze di visualizzazione"
 
-#: templates/account/profile.html:165 templates/suggestions/settings.html:133
+#: templates/account/profile.html:193 templates/suggestions/settings.html:133
 #: templates/trips/event-notes.html:30 templates/trips/expense-create.html:29
 #: templates/trips/expense-modify.html:31
 #: templates/trips/experience-create-unpaired.html:35
@@ -708,6 +793,84 @@ msgstr ""
 "esitare a contattarci se non ricevi la email di verifica entro qualche "
 "minuto."
 
+#: templates/admin/accounts/send_email.html:10
+#: templates/admin/accounts/send_notification.html:10
+msgid "Recipients:"
+msgstr "Destinatari:"
+
+#: templates/admin/accounts/send_email.html:49
+#: templates/admin/accounts/send_notification.html:34
+msgid "Send"
+msgstr "Invia"
+
+#: templates/admin/accounts/send_email.html:53
+#: templates/admin/accounts/send_notification.html:38
+#: templates/trips/attachments/upload-modal.html:38
+#: templates/trips/event-enrich-preview.html:63
+#: templates/trips/event-modal.html:23 templates/trips/expense-create.html:28
+#: templates/trips/experience-create-unpaired.html:34
+#: templates/trips/experience-create.html:59
+#: templates/trips/includes/trip-destinations-modal.html:65
+#: templates/trips/main-transfer-connection-create.html:96
+#: templates/trips/main-transfer-connection-edit.html:72
+#: templates/trips/main-transfer-delete.html:19
+#: templates/trips/main-transfer-form.html:23
+#: templates/trips/meal-create-unpaired.html:34
+#: templates/trips/partials/main-transfer-car.html:137
+#: templates/trips/partials/main-transfer-flight.html:80
+#: templates/trips/partials/main-transfer-other.html:66
+#: templates/trips/partials/main-transfer-train.html:95
+#: templates/trips/partials/main-transfer-type.html:63
+#: templates/trips/stay-create.html:42 templates/trips/stay-delete.html:42
+#: templates/trips/stay-enrich-preview.html:47
+#: templates/trips/stay-modify.html:18 templates/trips/trip-create.html:35
+#: templates/trips/wizard/basics-step.html:20 trips/forms/trip.py:226
+msgid "Cancel"
+msgstr "Annulla"
+
+#: templates/admin/stats_dashboard.html:9
+msgid "Total users"
+msgstr "Utenti totali"
+
+#: templates/admin/stats_dashboard.html:13
+msgid "Active users"
+msgstr "Utenti attivi"
+
+#: templates/admin/stats_dashboard.html:17
+msgid "Total trips"
+msgstr "Viaggi totali"
+
+#: templates/admin/stats_dashboard.html:21
+msgid "AI suggestions adoption"
+msgstr "Adozione suggerimenti AI"
+
+#: templates/admin/stats_dashboard.html:24
+msgid "profiles"
+msgstr "profili"
+
+#: templates/admin/stats_dashboard.html:31
+#: templates/admin/stats_dashboard.html:36
+msgid "New users per month"
+msgstr "Nuovi utenti per mese"
+
+#: templates/admin/stats_dashboard.html:35
+msgid "New users"
+msgstr "Nuovi utenti"
+
+#: templates/admin/stats_dashboard.html:41
+#: templates/admin/stats_dashboard.html:46
+msgid "Trips created per month"
+msgstr "Viaggi creati per mese"
+
+#: templates/admin/stats_dashboard.html:45
+msgid "Trips created"
+msgstr "Viaggi creati"
+
+#: templates/admin/stats_dashboard.html:52
+#: templates/admin/stats_dashboard.html:57
+msgid "Trips by status"
+msgstr "Viaggi per stato"
+
 #: templates/cotton/dropdown.html:7 templates/cotton/dropdown.html:10
 #: templates/trips/includes/events-map-fragment.html:12
 #: templates/trips/includes/events-section.html:64
@@ -716,13 +879,13 @@ msgstr "Aggiungi evento"
 
 #: templates/cotton/dropdown.html:20
 #: templates/trips/includes/events-map-fragment.html:22
-#: templates/trips/includes/events-section.html:74 trips/models.py:607
+#: templates/trips/includes/events-section.html:74 trips/models.py:608
 msgid "Experience"
 msgstr "Esperienza"
 
 #: templates/cotton/dropdown.html:29
 #: templates/trips/includes/events-map-fragment.html:31
-#: templates/trips/includes/events-section.html:83 trips/models.py:608
+#: templates/trips/includes/events-section.html:83 trips/models.py:609
 msgid "Meal"
 msgstr "Pasto"
 
@@ -809,7 +972,7 @@ msgstr ""
 "ristoranti, bar, punti di ristoro e qualsiasi altra esperienza culinaria."
 
 #: templates/cotton/quick_guide.html:89 templates/trips/trip-pdf.html:238
-#: trips/models.py:433
+#: trips/models.py:434
 msgid "Main Transfers"
 msgstr "Trasferimenti principali"
 
@@ -1102,6 +1265,11 @@ msgstr "Chiudi"
 #: templates/includes/navbar.html:33
 msgid "Open main menu"
 msgstr "Apri il menu principale"
+
+#: templates/includes/navbar.html:62 templates/includes/sidebar-nav.html:43
+#: templates/includes/sidebar-nav.html:45
+msgid "Admin"
+msgstr "Admin"
 
 #: templates/includes/sidebar-footer.html:8
 #: templates/includes/sidebar-footer.html:9
@@ -1420,29 +1588,6 @@ msgstr "Allega a"
 #: templates/trips/attachments/upload-modal.html:30
 msgid "File"
 msgstr "File"
-
-#: templates/trips/attachments/upload-modal.html:38
-#: templates/trips/event-enrich-preview.html:63
-#: templates/trips/event-modal.html:23 templates/trips/expense-create.html:28
-#: templates/trips/experience-create-unpaired.html:34
-#: templates/trips/experience-create.html:59
-#: templates/trips/includes/trip-destinations-modal.html:65
-#: templates/trips/main-transfer-connection-create.html:96
-#: templates/trips/main-transfer-connection-edit.html:72
-#: templates/trips/main-transfer-delete.html:19
-#: templates/trips/main-transfer-form.html:23
-#: templates/trips/meal-create-unpaired.html:34
-#: templates/trips/partials/main-transfer-car.html:137
-#: templates/trips/partials/main-transfer-flight.html:80
-#: templates/trips/partials/main-transfer-other.html:66
-#: templates/trips/partials/main-transfer-train.html:95
-#: templates/trips/partials/main-transfer-type.html:63
-#: templates/trips/stay-create.html:42 templates/trips/stay-delete.html:42
-#: templates/trips/stay-enrich-preview.html:47
-#: templates/trips/stay-modify.html:18 templates/trips/trip-create.html:35
-#: templates/trips/wizard/basics-step.html:20 trips/forms/trip.py:226
-msgid "Cancel"
-msgstr "Annulla"
 
 #: templates/trips/attachments/upload-modal.html:39
 msgid "Upload"
@@ -1890,7 +2035,7 @@ msgstr ""
 #: templates/trips/move-event-day-modal.html:20
 #: templates/trips/partials/map-events-panel.html:6
 #: templates/trips/shared-trip-detail.html:26 templates/trips/trip-pdf.html:288
-#: trips/forms/stay.py:136 trips/models.py:590
+#: trips/forms/stay.py:136 trips/models.py:591
 msgid "Day"
 msgstr "Giorno"
 
@@ -2519,7 +2664,7 @@ msgid "How to Get There"
 msgstr "Come Arrivare"
 
 #: templates/trips/includes/main-transfers.html:51
-#: templates/trips/includes/main-transfers.html:53 trips/models.py:365
+#: templates/trips/includes/main-transfers.html:53 trips/models.py:366
 msgid "Arrival"
 msgstr "Andata"
 
@@ -2635,7 +2780,7 @@ msgid "No arrival transfer added yet."
 msgstr "Nessun trasferimento di andata aggiunto."
 
 #: templates/trips/includes/main-transfers.html:236
-#: templates/trips/includes/main-transfers.html:238 trips/models.py:366
+#: templates/trips/includes/main-transfers.html:238 trips/models.py:367
 msgid "Departure"
 msgstr "Ritorno"
 
@@ -3087,21 +3232,21 @@ msgstr "Cerca su"
 msgid "Select the type of transport for this transfer."
 msgstr "Seleziona il mezzo di trasporto per questo trasferimento."
 
-#: templates/trips/partials/main-transfer-type.html:17 trips/models.py:359
+#: templates/trips/partials/main-transfer-type.html:17 trips/models.py:360
 msgid "Plane"
 msgstr "Aeroplano"
 
 #: templates/trips/partials/main-transfer-type.html:29
-#: templates/trips/trip-pdf.html:270 trips/models.py:360
+#: templates/trips/trip-pdf.html:270 trips/models.py:361
 msgid "Train"
 msgstr "Treno"
 
-#: templates/trips/partials/main-transfer-type.html:41 trips/models.py:361
+#: templates/trips/partials/main-transfer-type.html:41 trips/models.py:362
 msgid "Car"
 msgstr "Automobile"
 
-#: templates/trips/partials/main-transfer-type.html:57 trips/models.py:362
-#: trips/models.py:853
+#: templates/trips/partials/main-transfer-type.html:57 trips/models.py:363
+#: trips/models.py:854
 msgid "Other"
 msgstr "Altro"
 
@@ -3276,10 +3421,6 @@ msgstr ""
 "Il creatore del viaggio ha condiviso la sua chiave AI con te: attiva i "
 "suggerimenti AI nelle impostazioni per generare suggerimenti per questo "
 "viaggio usandola."
-
-#: templates/trips/trip-detail.html:115
-msgid "Dismiss"
-msgstr "Ignora"
 
 #: templates/trips/trip-detail.html:125
 msgid "This trip is archived and cannot be modified."
@@ -3895,188 +4036,188 @@ msgstr "Completata"
 msgid "Archived"
 msgstr "Archiviata"
 
-#: trips/models.py:252
+#: trips/models.py:253
 msgid "No meals included"
 msgstr "Nessun pasto incluso"
 
-#: trips/models.py:253
+#: trips/models.py:254
 msgid "Breakfast included"
 msgstr "Colazione inclusa"
 
-#: trips/models.py:254
+#: trips/models.py:255
 msgid "Half board"
 msgstr "Mezza pensione"
 
-#: trips/models.py:255
+#: trips/models.py:256
 msgid "Full board"
 msgstr "Pensione completa"
 
-#: trips/models.py:408
+#: trips/models.py:409
 msgid "Departure time"
 msgstr "Orario di partenza"
 
-#: trips/models.py:409
+#: trips/models.py:410
 msgid "Arrival time"
 msgstr "Orario di arrivo"
 
-#: trips/models.py:410
+#: trips/models.py:411
 msgid "Additional notes"
 msgstr "Note aggiuntive"
 
-#: trips/models.py:432
+#: trips/models.py:433
 msgid "Main Transfer"
 msgstr "Trasferimento principale"
 
-#: trips/models.py:711
+#: trips/models.py:712
 msgid "Driving"
 msgstr "Auto"
 
-#: trips/models.py:712
+#: trips/models.py:713
 msgid "Walking"
 msgstr "A piedi"
 
-#: trips/models.py:713
+#: trips/models.py:714
 msgid "Bicycling"
 msgstr "Bicicletta"
 
-#: trips/models.py:714
+#: trips/models.py:715
 msgid "Transit"
 msgstr "Mezzi pubblici"
 
-#: trips/models.py:738
+#: trips/models.py:739
 msgid "Main Transfer Connection"
 msgstr "Trasferimento principale"
 
-#: trips/models.py:739
+#: trips/models.py:740
 msgid "Main Transfer Connections"
 msgstr "Trasferimenti principali"
 
-#: trips/models.py:838
+#: trips/models.py:839
 msgid "Either event or stay must be set for the connection"
 msgstr ""
 "Almeno un evento oppure un soggiorno deve essere selezionato per il "
 "trasferimento"
 
-#: trips/models.py:843
+#: trips/models.py:844
 msgid "Cannot set both event and stay - choose only one destination"
 msgstr ""
 "Non è possibile selezionare contemporaneamente un evento e un soggiorno - "
 "per favore scegli una destinazione sola"
 
-#: trips/models.py:849
+#: trips/models.py:850
 msgid "Museum"
 msgstr "Museo"
 
-#: trips/models.py:850
+#: trips/models.py:851
 msgid "Park"
 msgstr "Parco"
 
-#: trips/models.py:851
+#: trips/models.py:852
 msgid "Walk"
 msgstr "Passeggiata"
 
-#: trips/models.py:852
+#: trips/models.py:853
 msgid "Sport"
 msgstr "Attività sportiva"
 
-#: trips/models.py:868
+#: trips/models.py:869
 msgid "To be defined"
 msgstr "Da definire"
 
-#: trips/models.py:869
+#: trips/models.py:870
 msgid "Breakfast"
 msgstr "Colazione"
 
-#: trips/models.py:870
+#: trips/models.py:871
 msgid "Lunch"
 msgstr "Pranzo"
 
-#: trips/models.py:871
+#: trips/models.py:872
 msgid "Dinner"
 msgstr "Cena"
 
-#: trips/models.py:872
+#: trips/models.py:873
 msgid "Snack"
 msgstr "Spuntino"
 
-#: trips/models.py:889
+#: trips/models.py:890
 msgid "Blue"
 msgstr ""
 
-#: trips/models.py:890
+#: trips/models.py:891
 msgid "Green"
 msgstr ""
 
-#: trips/models.py:891
+#: trips/models.py:892
 msgid "Purple"
 msgstr ""
 
-#: trips/models.py:892
+#: trips/models.py:893
 msgid "Orange"
 msgstr ""
 
-#: trips/models.py:893
+#: trips/models.py:894
 msgid "Pink"
 msgstr ""
 
-#: trips/models.py:894
+#: trips/models.py:895
 msgid "Teal"
 msgstr ""
 
-#: trips/models.py:895
+#: trips/models.py:896
 msgid "Red"
 msgstr ""
 
-#: trips/models.py:896
+#: trips/models.py:897
 msgid "Indigo"
 msgstr ""
 
-#: trips/models.py:1013
+#: trips/models.py:1014
 msgid "View only"
 msgstr "Solo visualizzazione"
 
-#: trips/models.py:1014
+#: trips/models.py:1015
 msgid "Can edit"
 msgstr "Può modificare"
 
-#: trips/models.py:1134
+#: trips/models.py:1135
 msgid "File type not allowed."
 msgstr "Tipo di file non consentito."
 
-#: trips/models.py:1136
+#: trips/models.py:1137
 msgid "File exceeds the 2 MB size limit."
 msgstr "Il file supera il limite di 2 MB."
 
-#: trips/models.py:1145
+#: trips/models.py:1146
 msgid "Attachment limit reached for this item."
 msgstr "Limite di allegati raggiunto per questo elemento."
 
-#: trips/models.py:1170
+#: trips/models.py:1171
 #, python-format
 msgid "Family of %(name)s"
 msgstr "Famiglia di %(name)s"
 
-#: trips/models.py:1171
+#: trips/models.py:1172
 msgid "Family unit"
 msgstr "Nucleo famigliare"
 
-#: trips/models.py:1308
+#: trips/models.py:1309
 msgid "Best Deal (Smart)"
 msgstr "Miglior offerta (Smart)"
 
-#: trips/models.py:1309
+#: trips/models.py:1310
 msgid "Booking.com"
 msgstr "Booking.com"
 
-#: trips/models.py:1310
+#: trips/models.py:1311
 msgid "Expedia"
 msgstr "Expedia"
 
-#: trips/models.py:1311
+#: trips/models.py:1312
 msgid "Hotels.com"
 msgstr ""
 
-#: trips/models.py:1312
+#: trips/models.py:1313
 msgid "Airbnb"
 msgstr ""
 
