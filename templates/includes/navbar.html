@@ -56,6 +56,12 @@
                         <a href="{% url 'accounts:profile' %}"
                            class="font-medium text-gray-500 hover:text-gray-400 sm:py-6 dark:text-gray-400 dark:hover:text-gray-500">{% translate 'Settings' %}</a>
                     </li>
+                    {% if user.is_staff %}
+                        <li>
+                            <a href="{% url 'admin:index' %}"
+                               class="font-medium text-gray-500 hover:text-gray-400 sm:py-6 dark:text-gray-400 dark:hover:text-gray-500">{% translate 'Admin' %}</a>
+                        </li>
+                    {% endif %}
                 {% endif %}
             </ul>
         </div>

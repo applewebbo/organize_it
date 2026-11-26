@@ -10,7 +10,7 @@ from django.views.decorators.http import require_POST
 from trips.services import GooglePlacesClient, GooglePlacesError
 
 from .forms import ProfileUpdateForm
-from .models import Profile
+from .models import Notification, Profile
 
 
 class PrefilledPasswordResetView(PasswordResetView):
@@ -35,6 +35,7 @@ def profile(request):
     context = {
         "user": request.user,
         "profile_form": form,
+        "unread_notifications": request.user.notifications.filter(is_read=False),
     }
     if request.method == "POST":
         form = ProfileUpdateForm(request.POST, instance=profile)
@@ -71,6 +72,15 @@ def autocomplete_home_address(request):
         "account/includes/home-address-results.html",
         {"found": False},
     )
+
+
+@require_POST
+def mark_notification_read(request, pk):
+    """HTMX: mark an unread notification belonging to the current user as read."""
+    notification = get_object_or_404(Notification, pk=pk, recipient=request.user)
+    notification.is_read = True
+    notification.save(update_fields=["is_read"])
+    return HttpResponse(status=204)
 
 
 @require_POST

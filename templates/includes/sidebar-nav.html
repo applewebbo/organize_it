@@ -36,5 +36,15 @@
                 <span x-show="!collapsed" x-cloak>{% translate 'Settings' %}</span>
             </a>
         </li>
+        {% if user.is_staff %}
+            <li>
+                <a href="{% url 'admin:index' %}"
+                   :class="collapsed ? 'tooltip tooltip-right' : ''"
+                   data-tip="{% translate 'Admin' %}">
+                    <i class="ph-bold ph-shield-check i-md shrink-0" aria-hidden="true"></i>
+                    <span x-show="!collapsed" x-cloak>{% translate 'Admin' %}</span>
+                </a>
+            </li>
+        {% endif %}
     {% endif %}
 </ul>

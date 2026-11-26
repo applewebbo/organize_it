@@ -10,6 +10,25 @@ from .models import CustomUser, Profile
 from .widgets import AvatarRadioSelect
 
 
+class AdminNotificationForm(forms.Form):
+    """Admin form to send an in-app notification to selected users."""
+
+    message = forms.CharField(
+        label=_("Message"),
+        widget=forms.Textarea(attrs={"rows": 4}),
+    )
+
+
+class AdminEmailForm(forms.Form):
+    """Admin form to send an email to selected users."""
+
+    subject = forms.CharField(label=_("Subject"), max_length=200)
+    body = forms.CharField(
+        label=_("Body"),
+        widget=forms.Textarea(attrs={"rows": 6}),
+    )
+
+
 class CustomLoginForm(LoginForm):
     """Login form that drops allauth's password reset help_text.
 

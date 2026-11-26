@@ -187,6 +187,34 @@ class Profile(models.Model):
         return str(self.user)
 
 
+class Notification(models.Model):
+    """In-app notification sent by an admin to a user."""
+
+    recipient = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name="notifications",
+    )
+    message = models.TextField(_("Message"))
+    is_read = models.BooleanField(_("Read"), default=False)
+    created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
+    created_by = models.ForeignKey(
+        CustomUser,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="sent_notifications",
+    )
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = _("Notification")
+        verbose_name_plural = _("Notifications")
+
+    def __str__(self):
+        return f"{self.recipient} - {self.message[:40]}"
+
+
 def get_profile(user):
     """Return Profile for user, using cache to avoid repeated DB queries."""
     cache_key = f"profile_{user.pk}"
