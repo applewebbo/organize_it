@@ -80,6 +80,7 @@ class Trip(models.Model):
     wizard_completed = models.BooleanField(default=True)
     wizard_step = models.PositiveSmallIntegerField(default=0)
     wizard_started_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ("status",)

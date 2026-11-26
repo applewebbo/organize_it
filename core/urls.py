@@ -7,6 +7,7 @@ from django.views.i18n import set_language
 from pwa import views as pwa_views
 
 from accounts.views import prefilled_password_reset
+from core.admin_dashboard import AdminStatsDashboardView
 
 # PWA endpoints must stay reachable without authentication (service worker
 # registration, manifest fetch and the offline fallback page).
@@ -14,6 +15,11 @@ urlpatterns = [
     # Must stay reachable without authentication: an anonymous visitor needs
     # to switch language from the navbar before ever logging in.
     path("i18n/setlang/", login_not_required(set_language), name="set_language"),
+    path(
+        f"{settings.ADMIN_URL.rstrip('/')}/stats/",
+        admin.site.admin_view(AdminStatsDashboardView.as_view()),
+        name="admin-stats",
+    ),
     path(settings.ADMIN_URL, admin.site.urls),
     path(
         "serviceworker.js",

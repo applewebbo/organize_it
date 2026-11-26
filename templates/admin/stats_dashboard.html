@@ -1,0 +1,63 @@
+{% extends "unfold/layouts/base.html" %}
+
+{% load i18n static %}
+
+{% block content %}
+    <div class="space-y-6">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="rounded-default border-base-200 dark:border-base-800 dark:bg-base-900 border bg-white p-6 shadow-xs">
+                <p class="text-base-500 dark:text-base-400 text-sm font-medium">{% translate "Total users" %}</p>
+                <p class="text-base-900 dark:text-base-100 mt-2 text-3xl font-semibold">{{ total_users }}</p>
+            </div>
+            <div class="rounded-default border-base-200 dark:border-base-800 dark:bg-base-900 border bg-white p-6 shadow-xs">
+                <p class="text-base-500 dark:text-base-400 text-sm font-medium">{% translate "Active users" %}</p>
+                <p class="text-base-900 dark:text-base-100 mt-2 text-3xl font-semibold">{{ active_users }}</p>
+            </div>
+            <div class="rounded-default border-base-200 dark:border-base-800 dark:bg-base-900 border bg-white p-6 shadow-xs">
+                <p class="text-base-500 dark:text-base-400 text-sm font-medium">{% translate "Total trips" %}</p>
+                <p class="text-base-900 dark:text-base-100 mt-2 text-3xl font-semibold">{{ total_trips }}</p>
+            </div>
+            <div class="rounded-default border-base-200 dark:border-base-800 dark:bg-base-900 border bg-white p-6 shadow-xs">
+                <p class="text-base-500 dark:text-base-400 text-sm font-medium">{% translate "AI suggestions adoption" %}</p>
+                <p class="text-base-900 dark:text-base-100 mt-2 text-3xl font-semibold">{{ ai_adoption_rate }}%</p>
+                <p class="text-base-500 dark:text-base-400 mt-1 text-xs">
+                    {{ ai_enabled_count }} / {{ ai_total_profiles }} {% translate "profiles" %}
+                </p>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <div class="rounded-default border-base-200 dark:border-base-800 dark:bg-base-900 border bg-white p-6 shadow-xs">
+                <h2 class="text-base-900 dark:text-base-100 mb-4 text-base font-semibold">
+                    {% translate "New users per month" %}
+                </h2>
+                <div class="relative h-72">
+                    <canvas id="chart-new-users"
+                            data-label="{% translate 'New users' %}"
+                            aria-label="{% translate 'New users per month' %}"></canvas>
+                </div>
+            </div>
+            <div class="rounded-default border-base-200 dark:border-base-800 dark:bg-base-900 border bg-white p-6 shadow-xs">
+                <h2 class="text-base-900 dark:text-base-100 mb-4 text-base font-semibold">
+                    {% translate "Trips created per month" %}
+                </h2>
+                <div class="relative h-72">
+                    <canvas id="chart-trips-per-month"
+                            data-label="{% translate 'Trips created' %}"
+                            aria-label="{% translate 'Trips created per month' %}"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="rounded-default border-base-200 dark:border-base-800 dark:bg-base-900 border bg-white p-6 shadow-xs">
+            <h2 class="text-base-900 dark:text-base-100 mb-4 text-base font-semibold">
+                {% translate "Trips by status" %}
+            </h2>
+            <div class="relative h-72">
+                <canvas id="chart-trips-by-status"
+                        data-label="{% translate 'Trips' %}"
+                        aria-label="{% translate 'Trips by status' %}"></canvas>
+            </div>
+        </div>
+    </div>
+    {{ chart_data|json_script:"admin-stats-data" }}
+    <script src="{% static 'js/admin-stats.js' %}" defer></script>
+{% endblock content %}

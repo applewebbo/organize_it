@@ -169,6 +169,17 @@ UNFOLD = {
         # "Login" group instead.
         "navigation": [
             {
+                "title": _("Analytics"),
+                "collapsible": False,
+                "items": [
+                    {
+                        "title": _("Usage Statistics"),
+                        "icon": "bar_chart",
+                        "link": reverse_lazy("admin-stats"),
+                    },
+                ],
+            },
+            {
                 "title": _("Trips"),
                 "icon": "flight",
                 "collapsible": True,
