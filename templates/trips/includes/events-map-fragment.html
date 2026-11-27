@@ -2,8 +2,34 @@
 <div>
     {# Add event dropdown — outside the map iframe #}
     {% if trip.status != 5 %}
-        <div class="mb-3 flex items-center gap-2" x-data>
-            <div class="dropdown dropdown-bottom">
+        <div class="mb-3 flex items-center justify-end gap-2" x-data>
+            {% if ai_suggestions_enabled and trip.days.all %}
+                <div class="dropdown dropdown-end">
+                    <div tabindex="0"
+                         role="button"
+                         class="btn btn-xs btn-soft btn-secondary sm:btn-sm gap-1"
+                         aria-haspopup="menu">
+                        <i class="ph-bold ph-sparkle i-sm" aria-hidden="true"></i>
+                        <span class="hidden sm:inline">{% translate 'Plan day' %}</span>
+                    </div>
+                    <ul tabindex="0"
+                        class="dropdown-content menu bg-base-100 rounded-box border-base-300 z-20 max-h-64 w-56 flex-nowrap overflow-y-auto border p-2 shadow">
+                        {% for day in trip.days.all %}
+                            <li>
+                                <a hx-get="{% url 'suggestions:plan-day-modal' trip.pk day.pk %}"
+                                   hx-target="#dialog"
+                                   hx-swap="innerHTML"
+                                   @click="$dispatch('open-modal'); document.activeElement.blur()"
+                                   class="justify-between">
+                                    <span>{% translate 'Day' %} {{ day.number }}</span>
+                                    <span class="text-base-content/60 text-xs">{{ day.date|date:"d M" }}</span>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            <div class="dropdown dropdown-end">
                 <div tabindex="0"
                      role="button"
                      class="btn btn-xs btn-soft btn-primary sm:btn-sm gap-1"
@@ -36,13 +62,210 @@
         </div>
     {% endif %}
     {% if map %}
-        <div x-show="$store.connection.online"
-             data-embed-map
-             class="map-container overflow-hidden rounded-lg">
-            <div class="embed-map-canvas h-[500px] w-full"></div>
-            {{ map|json_script:"trip-events-map-data" }}
+        <div data-embed-map-wrapper>
+            <div x-show="$store.connection.online"
+                 data-embed-map
+                 class="map-container overflow-hidden rounded-lg">
+                <div class="embed-map-canvas h-[500px] w-full"></div>
+                {{ map|json_script:"trip-events-map-data" }}
+            </div>
+            {% include 'trips/includes/map-offline-placeholder.html' %}
+            <div class="mt-6 flex flex-wrap items-center justify-between gap-2">
+                <div class="flex flex-wrap gap-1.5"
+                     role="group"
+                     aria-label="{% translate 'Filter by day' %}"
+                     data-embed-map-day-filters>
+                    <button type="button"
+                            data-day-filter="all"
+                            aria-pressed="true"
+                            class="btn btn-xs btn-primary">
+                        {% translate 'All' %}
+                    </button>
+                    {% for day in map.days %}
+                        {% if day.events %}
+                            <button type="button"
+                                    data-day-filter="{{ day.number }}"
+                                    aria-pressed="false"
+                                    class="btn btn-xs btn-soft">
+                                {% translate 'Day' %} {{ day.number }}
+                            </button>
+                        {% endif %}
+                    {% endfor %}
+                    {% if map.unassigned %}
+                        <button type="button"
+                                data-day-filter="unassigned"
+                                aria-pressed="false"
+                                class="btn btn-xs btn-soft">
+                            {% translate 'Unassigned' %}
+                        </button>
+                    {% endif %}
+                </div>
+                <div class="flex flex-wrap gap-1.5"
+                     role="group"
+                     aria-label="{% translate 'Filter by type' %}"
+                     data-embed-map-type-filters>
+                    <button type="button"
+                            data-type-filter="all"
+                            aria-pressed="true"
+                            class="btn btn-xs btn-primary">
+                        {% translate 'All' %}
+                    </button>
+                    <button type="button"
+                            data-type-filter="stay"
+                            aria-pressed="false"
+                            class="btn btn-xs btn-soft gap-1">
+                        <i class="ph-bold ph-bed i-xs" aria-hidden="true"></i>
+                        {% translate 'Stays' %}
+                    </button>
+                    <button type="button"
+                            data-type-filter="experience"
+                            aria-pressed="false"
+                            class="btn btn-xs btn-soft gap-1">
+                        <i class="ph-bold ph-images i-xs" aria-hidden="true"></i>
+                        {% translate 'Experiences' %}
+                    </button>
+                    <button type="button"
+                            data-type-filter="meal"
+                            aria-pressed="false"
+                            class="btn btn-xs btn-soft gap-1">
+                        <i class="ph-bold ph-fork-knife i-xs" aria-hidden="true"></i>
+                        {% translate 'Meals' %}
+                    </button>
+                </div>
+            </div>
+            <div class="mt-5 space-y-4" data-embed-map-list>
+                {% if map.stays %}
+                    <div data-embed-map-group="stays">
+                        <div class="mb-2 flex items-center gap-1.5">
+                            <span class="text-base-content/70 text-xs font-bold">{% translate 'Stays' %}</span>
+                        </div>
+                        <ul class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                            {% for stay in map.stays %}
+                                <li data-map-item-id="{{ stay.id }}"
+                                    data-map-item-kind="stay"
+                                    role="button"
+                                    tabindex="0"
+                                    class="embed-map-item bg-base-200/70 hover:bg-base-200 flex cursor-pointer items-center gap-2.5 rounded-md px-2.5 py-1.5 transition-colors">
+                                    <i class="ph-bold ph-bed i-sm text-base-content/60 shrink-0"
+                                       aria-hidden="true"></i>
+                                    <div class="min-w-0 grow">
+                                        <p class="truncate text-xs font-medium">{{ stay.name }}</p>
+                                        {% if stay.address %}
+                                            <p class="text-base-content/55 truncate text-[11px] leading-tight">{{ stay.address }}</p>
+                                        {% endif %}
+                                    </div>
+                                    <button type="button"
+                                            hx-get="{% url 'trips:stay-detail' stay.pk %}"
+                                            hx-target="#dialog"
+                                            hx-swap="innerHTML"
+                                            @click.stop="$dispatch('open-modal'); document.activeElement.blur()"
+                                            aria-label="{% translate 'Edit' %} {{ stay.name }}"
+                                            class="btn btn-soft btn-primary btn-xs shrink-0 px-2">
+                                        <i class="ph-bold ph-pencil-simple i-xs" aria-hidden="true"></i>
+                                    </button>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                {% for day in map.days %}
+                    {% if day.events %}
+                        <div data-embed-map-group="day-{{ day.number }}">
+                            <div class="mb-2 flex items-center gap-1.5">
+                                <span class="text-xs font-bold" data-day-color="{{ day.color }}">
+                                    {% translate 'Day' %} {{ day.number }}
+                                </span>
+                                <span class="text-base-content/60 text-[11px]">{{ day.date_display }}</span>
+                            </div>
+                            <ul class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                                {% for ev in day.events %}
+                                    <li data-map-item-id="{{ ev.id }}"
+                                        data-map-item-kind="{{ ev.kind }}"
+                                        role="button"
+                                        tabindex="0"
+                                        class="embed-map-item bg-base-200/70 hover:bg-base-200 flex cursor-pointer items-center gap-2.5 rounded-md px-2.5 py-1.5 transition-colors">
+                                        {% if ev.kind == 'meal' %}
+                                            <i class="ph-bold ph-fork-knife i-sm text-meal-yellow-700 dark:text-meal-yellow-300 shrink-0"
+                                               aria-hidden="true"></i>
+                                        {% else %}
+                                            <i class="ph-bold ph-images i-sm text-exp-green-700 dark:text-exp-green-300 shrink-0"
+                                               aria-hidden="true"></i>
+                                        {% endif %}
+                                        <div class="min-w-0 grow">
+                                            <div class="flex items-baseline justify-between gap-1.5">
+                                                <p class="truncate text-xs font-medium">{{ ev.name }}</p>
+                                                {% if ev.duration %}
+                                                    <span class="text-base-content/50 shrink-0 text-[11px]">{{ ev.duration }}</span>
+                                                {% endif %}
+                                            </div>
+                                            {% if ev.address %}
+                                                <p class="text-base-content/55 truncate text-[11px] leading-tight">{{ ev.address }}</p>
+                                            {% endif %}
+                                        </div>
+                                        <button type="button"
+                                                hx-get="{% url 'trips:event-detail' ev.pk %}"
+                                                hx-target="#dialog"
+                                                hx-swap="innerHTML"
+                                                @click.stop="$dispatch('open-modal'); document.activeElement.blur()"
+                                                aria-label="{% translate 'Edit' %} {{ ev.name }}"
+                                                class="btn btn-soft btn-primary btn-xs shrink-0 px-2">
+                                            <i class="ph-bold ph-pencil-simple i-xs" aria-hidden="true"></i>
+                                        </button>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                {% if map.unassigned %}
+                    <div data-embed-map-group="unassigned">
+                        <div class="mb-2 flex items-center gap-1.5">
+                            <span class="text-base-content/60 text-xs font-bold">{% translate 'Unassigned' %}</span>
+                        </div>
+                        <ul class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                            {% for ev in map.unassigned %}
+                                <li data-map-item-id="{{ ev.id }}"
+                                    data-map-item-kind="{{ ev.kind }}"
+                                    role="button"
+                                    tabindex="0"
+                                    class="embed-map-item bg-base-200/70 hover:bg-base-200 flex cursor-pointer items-center gap-2.5 rounded-md px-2.5 py-1.5 transition-colors">
+                                    {% if ev.kind == 'meal' %}
+                                        <i class="ph-bold ph-fork-knife i-sm text-meal-yellow-700 dark:text-meal-yellow-300 shrink-0"
+                                           aria-hidden="true"></i>
+                                    {% else %}
+                                        <i class="ph-bold ph-images i-sm text-exp-green-700 dark:text-exp-green-300 shrink-0"
+                                           aria-hidden="true"></i>
+                                    {% endif %}
+                                    <div class="min-w-0 grow">
+                                        <div class="flex items-baseline justify-between gap-1.5">
+                                            <p class="truncate text-xs font-medium">{{ ev.name }}</p>
+                                            {% if ev.duration %}
+                                                <span class="text-base-content/50 shrink-0 text-[11px]">{{ ev.duration }}</span>
+                                            {% endif %}
+                                        </div>
+                                        {% if ev.address %}
+                                            <p class="text-base-content/55 truncate text-[11px] leading-tight">{{ ev.address }}</p>
+                                        {% endif %}
+                                    </div>
+                                    <button type="button"
+                                            hx-get="{% url 'trips:event-detail' ev.pk %}"
+                                            hx-target="#dialog"
+                                            hx-swap="innerHTML"
+                                            @click.stop="$dispatch('open-modal'); document.activeElement.blur()"
+                                            aria-label="{% translate 'Edit' %} {{ ev.name }}"
+                                            class="btn btn-soft btn-primary btn-xs shrink-0 px-2">
+                                        <i class="ph-bold ph-pencil-simple i-xs" aria-hidden="true"></i>
+                                    </button>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                <p data-embed-map-empty class="text-base-content/50 hidden py-2 text-center text-xs">
+                    {% translate 'No items in the current map area.' %}
+                </p>
+            </div>
         </div>
-        {% include 'trips/includes/map-offline-placeholder.html' %}
     {% else %}
         <div class="alert alert-soft alert-info py-6 text-center">
             <i class="ph-bold ph-map-trifold i-md" aria-hidden="true"></i>

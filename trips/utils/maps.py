@@ -1,6 +1,8 @@
 from django.db.models import Max, Min
+from django.utils.translation import gettext as _
 
-from trips.models import MainTransfer
+from trips.models import MainTransfer, Meal
+from trips.templatetags.trip_tags import duration_display
 
 DAY_COLORS = [
     "#ef4444",
@@ -15,6 +17,40 @@ DAY_COLORS = [
     "#6366f1",
 ]
 STAY_ICON_COLOR = "#6b7280"
+
+
+def _format_time(value):
+    """Format a time or string value as HH:MM."""
+    if not value:
+        return ""
+    if isinstance(value, str):
+        return value[:5]
+    return value.strftime("%H:%M")
+
+
+def _event_badge(ev):
+    """Return a short category/meal badge label for popup display."""
+    if ev.category == 3:
+        meal = getattr(ev, "meal", None)
+        return str(Meal.Type(meal.type).label) if meal and meal.type else ""
+    return ev.tag.capitalize() if ev.tag else ""
+
+
+def _serialize_event_item(ev):
+    """Serialize an Event (Experience or Meal) for the trip embed map."""
+    return {
+        "id": f"event-{ev.pk}",
+        "pk": ev.pk,
+        "lat": ev.latitude,
+        "lng": ev.longitude,
+        "name": ev.name,
+        "address": ev.address or "",
+        "duration": duration_display(ev.estimated_duration),
+        "start_time": _format_time(ev.start_time),
+        "phone": ev.phone_number or "",
+        "badge": _event_badge(ev),
+        "kind": "meal" if ev.category == 3 else "experience",
+    }
 
 
 def build_trip_map_data(days_with_events, unassigned_events):
@@ -35,9 +71,15 @@ def build_trip_map_data(days_with_events, unassigned_events):
             all_points.append((stay.latitude, stay.longitude))
             stays.append(
                 {
+                    "id": f"stay-{stay.pk}",
+                    "pk": stay.pk,
                     "lat": stay.latitude,
                     "lng": stay.longitude,
                     "name": stay.name,
+                    "address": stay.address or "",
+                    "check_in": _format_time(stay.check_in),
+                    "check_out": _format_time(stay.check_out),
+                    "phone": stay.phone_number or "",
                 }
             )
 
@@ -46,18 +88,13 @@ def build_trip_map_data(days_with_events, unassigned_events):
             if not (ev.latitude and ev.longitude):
                 continue
             all_points.append((ev.latitude, ev.longitude))
-            day_events.append(
-                {
-                    "lat": ev.latitude,
-                    "lng": ev.longitude,
-                    "name": ev.name,
-                    "kind": "meal" if ev.category == 3 else "experience",
-                }
-            )
+            day_events.append(_serialize_event_item(ev))
 
         days.append(
             {
-                "label": f"Giorno {idx} — {day.date.strftime('%d %b')}",
+                "number": idx,
+                "date_display": day.date.strftime("%d %b"),
+                "label": f"{_('Day')} {idx} — {day.date.strftime('%d %b')}",
                 "color": color,
                 "events": day_events,
             }
@@ -67,14 +104,7 @@ def build_trip_map_data(days_with_events, unassigned_events):
         if not (ev.latitude and ev.longitude):
             continue
         all_points.append((ev.latitude, ev.longitude))
-        unassigned.append(
-            {
-                "lat": ev.latitude,
-                "lng": ev.longitude,
-                "name": ev.name,
-                "kind": "meal" if ev.category == 3 else "experience",
-            }
-        )
+        unassigned.append(_serialize_event_item(ev))
 
     if not all_points:
         return None
@@ -84,6 +114,8 @@ def build_trip_map_data(days_with_events, unassigned_events):
         "stays": stays,
         "days": days,
         "unassigned": unassigned,
+        "stay_label": _("Stay"),
+        "unassigned_label": _("Unassigned"),
         "bounds": [
             [min(p[0] for p in all_points), min(p[1] for p in all_points)],
             [max(p[0] for p in all_points), max(p[1] for p in all_points)],

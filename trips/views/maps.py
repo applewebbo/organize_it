@@ -41,7 +41,9 @@ def _build_map_events_context(trip):
             "events",
             queryset=Event.objects.filter(
                 category__in=[Event.Category.EXPERIENCE, Event.Category.MEAL]
-            ).order_by("order", "pk"),
+            )
+            .select_related("meal")
+            .order_by("order", "pk"),
         ),
         "stay",
     ).order_by("date")
@@ -52,7 +54,9 @@ def _build_map_events_context(trip):
         stay = day.stay if hasattr(day, "stay") and day.stay else None
         if events or stay:
             days_with_events.append({"day": day, "events": events, "stay": stay})
-    unassigned_events = trip.all_events.filter(day__isnull=True).order_by("name")
+    unassigned_events = (
+        trip.all_events.filter(day__isnull=True).select_related("meal").order_by("name")
+    )
     return days_with_events, unassigned_events
 
 
@@ -269,7 +273,11 @@ def trip_events_map(request, pk):
     return TemplateResponse(
         request,
         "trips/includes/events-map-fragment.html",
-        {"trip": trip, "map": trip_map_data},
+        {
+            "trip": trip,
+            "map": trip_map_data,
+            "ai_suggestions_enabled": get_profile(request.user).ai_suggestions_enabled,
+        },
     )
 
 

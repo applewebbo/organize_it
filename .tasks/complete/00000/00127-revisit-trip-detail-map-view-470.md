@@ -1,0 +1,1 @@
+../../all/00000/00127-revisit-trip-detail-map-view-470.md

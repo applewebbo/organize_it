@@ -1,14 +1,24 @@
 {% load i18n trip_tags %}
 <div id="events-section"
      class="mb-4 flex flex-col gap-4"
+     x-data="{
+         view: window.innerWidth < 640 ? 'list' : (localStorage.getItem('trip-events-view') || '{% if show_map %}map{% else %}list{% endif %}'),
+         init() {
+             const serverView = '{% if show_map %}map{% else %}list{% endif %}';
+             if (window.innerWidth >= 640 && this.view !== serverView) {
+                 const url = this.view === 'map'
+                     ? '{% url "trips:trip-events-map" trip.pk %}'
+                     : '{% url "trips:trip-events-list" trip.pk %}';
+                 htmx.ajax('GET', url, { target: '#events-section-inner', swap: 'innerHTML' });
+             }
+         }
+     }"
      hx-get="{% url 'trips:trip-detail' trip.pk %}"
      hx-target="#events-section"
      hx-swap="outerHTML"
      hx-trigger="unpairedModified from:body, destinationModified from:body">
     <section class="card card-border bg-base-100 shadow">
-        <div class="card-body p-4 sm:p-6"
-             :class="view === 'map' ? 'events-card-map' : ''"
-             x-data="{ view: window.innerWidth < 640 ? 'list' : ' {% if show_map %} map {% else %} list {% endif %} ' }">
+        <div class="card-body p-4 sm:p-6">
             <div class="flex items-center justify-between">
                 <h2 class="text-xl font-medium sm:text-2xl">{% translate 'Things to Do' %}</h2>
                 {# Map tab only on desktop (sm+) #}
@@ -16,7 +26,7 @@
                     <button type="button"
                             role="tab"
                             :class="view === 'list' ? 'tab-active' : ''"
-                            @click="view = 'list'"
+                            @click="view = 'list'; localStorage.setItem('trip-events-view', 'list')"
                             hx-get="{% url 'trips:trip-events-list' trip.pk %}"
                             hx-target="#events-section-inner"
                             hx-swap="innerHTML"
@@ -27,7 +37,7 @@
                     <button type="button"
                             role="tab"
                             :class="view === 'map' ? 'tab-active' : ''"
-                            @click="view = 'map'"
+                            @click="view = 'map'; localStorage.setItem('trip-events-view', 'map')"
                             hx-get="{% url 'trips:trip-events-map' trip.pk %}"
                             hx-target="#events-section-inner"
                             hx-swap="innerHTML"
@@ -51,7 +61,8 @@
             </p>
         </div>
     </section>
-    <section class="card card-border bg-base-100 shadow">
+    <section class="card card-border bg-base-100 shadow"
+             x-show="view !== 'map'">
         <div class="card-body p-4 sm:p-6">
             <div class="flex items-center justify-between">
                 <h2 class="text-xl font-medium sm:text-2xl">{% translate 'Other Things to Do' %}</h2>
@@ -112,7 +123,7 @@
                                     {% translate 'No stage' %}
                                 {% endif %}
                             </p>
-                            <ul class="flex flex-wrap justify-center gap-3" x-data>
+                            <ul class="flex flex-wrap gap-3" x-data>
                                 {% for event in group.events %}
                                     <c-unpaired-event :event="event" :days="trip.days.all" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}" />
                                 {% endfor %}
@@ -120,7 +131,7 @@
                         </div>
                     {% endfor %}
                 {% else %}
-                    <ul class="mt-4 flex flex-wrap justify-center gap-3" x-data>
+                    <ul class="mt-4 flex flex-wrap gap-3" x-data>
                         {% for event in unpaired_events %}
                             <c-unpaired-event :event="event" :days="trip.days.all" icon="{{ event|event_icon }}" border_color="{{ event|event_border_color }}" bg_color="{{ event|event_bg_color }}" icon_color="{{ event|event_icon_color }}" />
                         {% endfor %}

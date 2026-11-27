@@ -790,6 +790,31 @@ class TestTripEventsMapFragment(TestCase):
         assert 'id="trip-events-map-data"' in html
         assert f'id="day-{day.pk}"' not in html
 
+    def test_renders_filters_compact_list_and_plan_day_dropdown(self):
+        user = self.make_user("owner@example.com")
+        user.profile.ai_suggestions_enabled = True
+        user.profile.save()
+        trip = TripFactory(author=user)
+        day = trip.days.first()
+        exp = ExperienceFactory(
+            trip=trip,
+            day=day,
+            name="Pinacoteca di Brera",
+            latitude=45.4719,
+            longitude=9.1878,
+        )
+        with self.login(user):
+            response = self.get("trips:trip-events-map", pk=trip.pk)
+        self.response_200(response)
+        html = response.content.decode()
+        assert "data-embed-map-day-filters" in html
+        assert "data-embed-map-type-filters" in html
+        assert f'data-map-item-id="event-{exp.pk}"' in html
+        assert (
+            self.reverse("suggestions:plan-day-modal", pk=trip.pk, day_id=day.pk)
+            in html
+        )
+
 
 class TestTripEventsListFragment(TestCase):
     def test_owner_gets_list_fragment(self):

@@ -11,6 +11,7 @@ from tests.accounts.factories import UserFactory
 from tests.test import TestCase
 from tests.trips.factories import (
     EventFactory,
+    ExperienceFactory,
     MainTransferFactory,
     MealFactory,
     StayFactory,
@@ -684,6 +685,45 @@ class TestBuildTripMapData(TestCase):
         assert result is not None
         assert len(result["stays"]) == 1
         assert result["stays"][0]["name"] == "Shared Stay"
+
+    def test_popup_metadata_for_experience_meal_and_stay(self):
+        from datetime import time
+
+        trip = TripFactory(start_date=date(2024, 1, 1), end_date=date(2024, 1, 1))
+        day = trip.days.first()
+        stay = StayFactory(
+            name="Hotel Time",
+            latitude=41.9,
+            longitude=12.5,
+            check_in=time(15, 0),
+            check_out=time(11, 0),
+        )
+        day.stay = stay
+        day.save()
+        exp = ExperienceFactory(
+            name="Museo",
+            day=day,
+            latitude=41.91,
+            longitude=12.51,
+            tag="museum",
+            start_time=time(10, 30),
+        )
+        meal = MealFactory(
+            name="Trattoria",
+            day=day,
+            latitude=41.92,
+            longitude=12.52,
+        )
+        result = build_trip_map_data(
+            [{"day": day, "events": [exp, meal], "stay": stay}],
+            [],
+        )
+        assert result["stays"][0]["check_in"] == "15:00"
+        assert result["stays"][0]["check_out"] == "11:00"
+        events = result["days"][0]["events"]
+        assert events[0]["badge"] == "Museum"
+        assert events[0]["start_time"] == "10:30"
+        assert events[1]["badge"] != ""
 
     def test_event_without_coordinates_skipped(self):
         from trips.models import Meal
