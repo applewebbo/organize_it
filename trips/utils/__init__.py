@@ -22,7 +22,7 @@ from trips.utils.images import (
     search_unsplash_photos,
     search_wikimedia_photos,
 )
-from trips.utils.maps import create_day_map, create_trip_map
+from trips.utils.maps import build_day_map_data, build_trip_map_data
 from trips.utils.queries import (
     accessible_trips_qs,
     editable_trips_qs,
@@ -51,10 +51,10 @@ from trips.utils.transport import (
 __all__ = [
     "accessible_trips_qs",
     "build_categorized_event",
+    "build_day_map_data",
     "build_stay22_url",
+    "build_trip_map_data",
     "convert_google_opening_hours",
-    "create_day_map",
-    "create_trip_map",
     "download_unsplash_photo",
     "download_wikimedia_photo",
     "editable_trips_qs",

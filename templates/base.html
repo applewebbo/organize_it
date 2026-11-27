@@ -11,6 +11,16 @@
                 Organize it!
             {% endblock page_title %}
         </title>
+        <link rel="stylesheet" href="{% static 'css/leaflet.css' %}" />
+        <link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}" />
+        <script type="importmap">
+            {
+                "imports": {
+                    "leaflet": "{% static 'js/leaflet.js' %}",
+                    "leaflet.markercluster": "{% static 'js/leaflet.markercluster.js' %}"
+                }
+            }
+        </script>
         {% block extra_head %}
         {% endblock extra_head %}
         <!-- PWA -->
@@ -69,6 +79,7 @@
         <script src="{% static 'js/alpine-collapse.min.js' %}" defer></script>
         <script src="{% static 'js/alpine-focus.min.js' %}" defer></script>
         <script src="{% static 'js/alpine.min.js' %}" defer></script>
+        <script type="module" src="{% static 'js/embed-map.js' %}"></script>
         {% block script %}
         {% endblock script %}
     </body>

@@ -35,10 +35,13 @@
             </div>
         </div>
     {% endif %}
-    {# Folium map — self-contained iframe, no Leaflet init issues #}
     {% if map %}
         <div x-show="$store.connection.online"
-             class="map-container overflow-hidden rounded-lg">{{ map|safe }}</div>
+             data-embed-map
+             class="map-container overflow-hidden rounded-lg">
+            <div class="embed-map-canvas h-[500px] w-full"></div>
+            {{ map|json_script:"trip-events-map-data" }}
+        </div>
         {% include 'trips/includes/map-offline-placeholder.html' %}
     {% else %}
         <div class="alert alert-soft alert-info py-6 text-center">
@@ -46,21 +49,4 @@
             <span>{% translate 'No events with location to display on the map.' %}</span>
         </div>
     {% endif %}
-    {# Events grouped by day, underneath the aggregate map above — the per-day
-       map is forced off since the map above already covers that need. #}
-    <div class="mt-4 flex flex-col gap-6 sm:gap-4">
-        {% if day_groups %}
-            {% for group in day_groups %}
-                {% for day in group.days %}
-                    {% include 'trips/includes/day.html' with day=day show_map=False %}
-                    {% if not forloop.last %}<hr class="border-base-300 pb-2 sm:hidden">{% endif %}
-                {% endfor %}
-            {% endfor %}
-        {% else %}
-            {% for day in trip.days.all %}
-                {% include 'trips/includes/day.html' with day=day show_map=False %}
-                {% if not forloop.last %}<hr class="border-base-300 pb-2 sm:hidden">{% endif %}
-            {% endfor %}
-        {% endif %}
-    </div>
 </div>

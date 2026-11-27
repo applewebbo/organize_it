@@ -4,10 +4,6 @@
     {{ trip.title }} — {% translate 'Map' %}
 {% endblock page_title %}
 
-{% block extra_head %}
-    <link rel="stylesheet" href="{% static 'css/leaflet.css' %}" />
-{% endblock extra_head %}
-
 {% block sidebar_actions %}
     <a href="{% url 'trips:trip-detail' trip.pk %}"
        class="btn btn-sm btn-ghost justify-start font-normal"
@@ -118,6 +114,5 @@
 {% block script %}
     <script id="map-initial-data" type="application/json">{{ map_items_json|safe }}</script>
     <script id="stage-coords-data" type="application/json">{{ stage_coords_json|safe }}</script>
-    <script src="{% static 'js/leaflet.js' %}"></script>
-    <script src="{% static 'js/trip-map.js' %}"></script>
+    <script type="module" src="{% static 'js/trip-map.js' %}"></script>
 {% endblock script %}

@@ -17,9 +17,9 @@ from tests.trips.factories import (
     TripFactory,
 )
 from trips.utils import (
+    build_day_map_data,
+    build_trip_map_data,
     convert_google_opening_hours,
-    create_day_map,
-    create_trip_map,
     download_unsplash_photo,
     download_wikimedia_photo,
     generate_cache_key,
@@ -553,9 +553,9 @@ class TestCacheKey(TestCase):
         self.assertNotEqual(key1, key3)
 
 
-class TestCreateDayMap(TestCase):
-    def test_create_day_map_with_next_day_stay(self):
-        """Test map creation with a different stay on the next day."""
+class TestBuildDayMapData(TestCase):
+    def test_build_day_map_data_with_next_day_stay(self):
+        """Test map data creation with a different stay on the next day."""
         trip = TripFactory(start_date=date(2024, 1, 1), end_date=date(2024, 1, 2))
         day1, day2 = trip.days.all()
         stay1 = StayFactory(name="Stay 1", latitude=10, longitude=10)
@@ -566,24 +566,24 @@ class TestCreateDayMap(TestCase):
         day2.save()
         meal = MealFactory(name="Dinner", day=day1, latitude=15, longitude=15)
 
-        map_html = create_day_map(day1.events.all(), day1.stay, day2.stay)
-        self.assertIn(meal.name, map_html)
-        self.assertIn(stay1.name, map_html)
-        self.assertIn(
-            f"Nextday:{stay2.name.replace(' ', '')}",
-            map_html.replace("\\n", "").replace(" ", ""),
-        )
+        map_data = build_day_map_data(day1.events.all(), day1.stay, day2.stay)
+        self.assertEqual(map_data["mode"], "day")
+        names = [m["name"] for m in map_data["markers"]]
+        tooltips = [m.get("tooltip", "") for m in map_data["markers"]]
+        self.assertIn(meal.name, names)
+        self.assertIn(stay1.name, names)
+        self.assertIn(f"Next day: {stay2.name}", tooltips)
 
-    def test_create_day_map_no_locations(self):
-        """Test map creation with no locations."""
+    def test_build_day_map_data_no_locations(self):
+        """Test map data creation with no locations."""
         trip = TripFactory()
         day = trip.days.first()
-        map_html = create_day_map(day.events.all(), None, None)
-        self.assertIsNone(map_html)
+        map_data = build_day_map_data(day.events.all(), None, None)
+        self.assertIsNone(map_data)
 
     @patch("trips.models.geocoder.mapbox")
-    def test_create_day_map_with_stay_no_location(self, mock_mapbox):
-        """Test map creation with a stay that has no location."""
+    def test_build_day_map_data_with_stay_no_location(self, mock_mapbox):
+        """Test map data creation with a stay that has no location."""
         mock_g = MagicMock()
         mock_g.latlng = None
         mock_mapbox.return_value = mock_g
@@ -600,26 +600,28 @@ class TestCreateDayMap(TestCase):
 
         event = MealFactory(name="Dinner", day=day, latitude=15, longitude=15)
 
-        map_html = create_day_map(day.events.all(), day.stay, None)
-        self.assertIn(event.name, map_html)
-        self.assertNotIn(stay_no_location.name, map_html)
+        map_data = build_day_map_data(day.events.all(), day.stay, None)
+        names = [m["name"] for m in map_data["markers"]]
+        self.assertIn(event.name, names)
+        self.assertNotIn(stay_no_location.name, names)
 
 
-class TestCreateTripMap(TestCase):
-    def test_returns_html_with_events(self):
+class TestBuildTripMapData(TestCase):
+    def test_returns_data_with_events(self):
         trip = TripFactory(start_date=date(2024, 1, 1), end_date=date(2024, 1, 2))
         day = trip.days.first()
         meal = MealFactory(name="Pizzeria Roma", day=day, latitude=41.9, longitude=12.5)
         days_data = [{"day": day, "events": [meal], "stay": None}]
-        result = create_trip_map(days_data, [])
+        result = build_trip_map_data(days_data, [])
         assert result is not None
-        assert "Pizzeria Roma" in result
+        assert result["mode"] == "trip"
+        assert [e["name"] for e in result["days"][0]["events"]] == ["Pizzeria Roma"]
 
     def test_returns_none_when_no_coordinates(self):
         trip = TripFactory(start_date=date(2024, 1, 1), end_date=date(2024, 1, 1))
         day = trip.days.first()
         days_data = [{"day": day, "events": [], "stay": None}]
-        result = create_trip_map(days_data, [])
+        result = build_trip_map_data(days_data, [])
         assert result is None
 
     def test_includes_stay(self):
@@ -629,9 +631,9 @@ class TestCreateTripMap(TestCase):
         day.stay = stay
         day.save()
         days_data = [{"day": day, "events": [], "stay": stay}]
-        result = create_trip_map(days_data, [])
+        result = build_trip_map_data(days_data, [])
         assert result is not None
-        assert "Hotel Bello" in result
+        assert [s["name"] for s in result["stays"]] == ["Hotel Bello"]
 
     def test_includes_unassigned_events(self):
         from trips.models import Meal
@@ -647,9 +649,9 @@ class TestCreateTripMap(TestCase):
             category=3,
         )
         days_data = [{"day": day, "events": [], "stay": None}]
-        result = create_trip_map(days_data, [unassigned])
+        result = build_trip_map_data(days_data, [unassigned])
         assert result is not None
-        assert "Free Event" in result
+        assert [e["name"] for e in result["unassigned"]] == ["Free Event"]
 
     def test_multiple_days_different_colors(self):
         trip = TripFactory(start_date=date(2024, 1, 1), end_date=date(2024, 1, 2))
@@ -660,9 +662,10 @@ class TestCreateTripMap(TestCase):
             {"day": day1, "events": [e1], "stay": None},
             {"day": day2, "events": [e2], "stay": None},
         ]
-        result = create_trip_map(days_data, [])
-        assert "Giorno1" in result
-        assert "Giorno2" in result
+        result = build_trip_map_data(days_data, [])
+        assert result["days"][0]["events"][0]["name"] == "Giorno1"
+        assert result["days"][1]["events"][0]["name"] == "Giorno2"
+        assert result["days"][0]["color"] != result["days"][1]["color"]
 
     def test_stay_shown_only_once_across_days(self):
         trip = TripFactory(start_date=date(2024, 1, 1), end_date=date(2024, 1, 2))
@@ -677,11 +680,10 @@ class TestCreateTripMap(TestCase):
             {"day": day1, "events": [e1], "stay": stay},
             {"day": day2, "events": [], "stay": stay},
         ]
-        result = create_trip_map(days_data, [])
-        # Map is generated (has stay+events with coords)
+        result = build_trip_map_data(days_data, [])
         assert result is not None
-        # Stay appears at least once (deduplication means not added multiple times as marker)
-        assert "Shared Stay" in result
+        assert len(result["stays"]) == 1
+        assert result["stays"][0]["name"] == "Shared Stay"
 
     def test_event_without_coordinates_skipped(self):
         from trips.models import Meal
@@ -693,10 +695,11 @@ class TestCreateTripMap(TestCase):
             trip=trip, day=day, name="Senza Coord", category=3
         )
         days_data = [{"day": day, "events": [e_with, e_without], "stay": None}]
-        result = create_trip_map(days_data, [])
+        result = build_trip_map_data(days_data, [])
         assert result is not None
-        assert "Con Coord" in result
-        assert "Senza Coord" not in result
+        names = [e["name"] for e in result["days"][0]["events"]]
+        assert "Con Coord" in names
+        assert "Senza Coord" not in names
 
     def test_unassigned_without_coordinates_skipped(self):
         from trips.models import Meal
@@ -708,9 +711,9 @@ class TestCreateTripMap(TestCase):
             trip=trip, day=None, name="Senza Coord", category=3
         )
         days_data = [{"day": day, "events": [e_with], "stay": None}]
-        result = create_trip_map(days_data, [e_without])
+        result = build_trip_map_data(days_data, [e_without])
         assert result is not None
-        assert "Senza Coord" not in result
+        assert result["unassigned"] == []
 
 
 class TestConvertGoogleOpeningHours(TestCase):
@@ -1303,10 +1306,10 @@ class TestImageProcessing(TestCase):
 
     def test_process_trip_image_large_file(self):
         """Test processing large file (>2MB) triggers size warning"""
+        import os
         from io import BytesIO
         from unittest.mock import patch
 
-        import numpy as np
         from django.core.files.uploadedfile import SimpleUploadedFile
         from PIL import Image
 
@@ -1314,8 +1317,7 @@ class TestImageProcessing(TestCase):
         # This ensures the file will be > 2MB
         width, height = 3000, 2500
         # Generate random RGB data
-        random_data = np.random.randint(0, 256, (height, width, 3), dtype=np.uint8)
-        img = Image.fromarray(random_data, "RGB")
+        img = Image.frombytes("RGB", (width, height), os.urandom(width * height * 3))
 
         img_io = BytesIO()
         img.save(img_io, "JPEG", quality=100)
@@ -1536,12 +1538,12 @@ class TestCSVFunctions(TestCase):
 
 
 class TestMapWithMainTransfers(TestCase):
-    """Test create_day_map integration with main transfers"""
+    """Test build_day_map_data integration with main transfers"""
 
-    def test_create_day_map_with_arrival_transfer(self):
+    def test_build_day_map_data_with_arrival_transfer(self):
         """Test map includes arrival transfer on first day"""
         from trips.models import Event, MainTransfer
-        from trips.utils import create_day_map
+        from trips.utils import build_day_map_data
 
         trip = TripFactory()
         day1 = trip.days.first()
@@ -1567,17 +1569,19 @@ class TestMapWithMainTransfers(TestCase):
         )
 
         # Create day map
-        day_map = create_day_map(
+        day_map = build_day_map_data(
             Event.objects.none(), stay=stay, next_day_stay=None, day=day1
         )
 
         self.assertIsNotNone(day_map)
-        # Map should include the arrival transfer destination
+        self.assertTrue(
+            any("Barcelona Airport" in m["name"] for m in day_map["markers"])
+        )
 
-    def test_create_day_map_with_departure_transfer(self):
+    def test_build_day_map_data_with_departure_transfer(self):
         """Test map includes departure transfer on last day"""
         from trips.models import Event, MainTransfer
-        from trips.utils import create_day_map
+        from trips.utils import build_day_map_data
 
         trip = TripFactory(
             start_date=date(2026, 1, 1), end_date=date(2026, 1, 3)
@@ -1609,18 +1613,19 @@ class TestMapWithMainTransfers(TestCase):
         )
 
         # Create day map for last day
-        day_map = create_day_map(
+        day_map = build_day_map_data(
             Event.objects.none(), stay=stay, next_day_stay=None, day=last_day
         )
 
         self.assertIsNotNone(day_map)
-        self.assertIn("Barcelona Station", day_map)
-        # Map should include the departure transfer origin marker
+        self.assertTrue(
+            any("Barcelona Station" in m["name"] for m in day_map["markers"])
+        )
 
-    def test_create_day_map_with_departure_transfer_no_coordinates(self):
+    def test_build_day_map_data_with_departure_transfer_no_coordinates(self):
         """Test map without departure transfer coordinates"""
         from trips.models import Event, MainTransfer
-        from trips.utils import create_day_map
+        from trips.utils import build_day_map_data
 
         trip = TripFactory(
             start_date=date(2026, 1, 1), end_date=date(2026, 1, 3)
@@ -1648,17 +1653,19 @@ class TestMapWithMainTransfers(TestCase):
         )
 
         # Create day map for last day
-        day_map = create_day_map(
+        day_map = build_day_map_data(
             Event.objects.none(), stay=stay, next_day_stay=None, day=last_day
         )
 
         self.assertIsNotNone(day_map)
-        # Map should be created but without departure marker
+        self.assertFalse(
+            any("Barcelona Station" in m["name"] for m in day_map["markers"])
+        )
 
-    def test_create_day_map_with_both_transfers(self):
+    def test_build_day_map_data_with_both_transfers(self):
         """Test map with both arrival and departure transfers"""
         from trips.models import Event, MainTransfer
-        from trips.utils import create_day_map
+        from trips.utils import build_day_map_data
 
         trip = TripFactory()
         day1 = trip.days.first()
@@ -1694,21 +1701,21 @@ class TestMapWithMainTransfers(TestCase):
         )
 
         # Test first day map
-        day1_map = create_day_map(
+        day1_map = build_day_map_data(
             Event.objects.none(), stay=stay1, next_day_stay=None, day=day1
         )
         self.assertIsNotNone(day1_map)
 
         # Test last day map
-        last_day_map = create_day_map(
+        last_day_map = build_day_map_data(
             Event.objects.none(), stay=stay_last, next_day_stay=None, day=last_day
         )
         self.assertIsNotNone(last_day_map)
 
-    def test_create_day_map_with_car_transfer(self):
+    def test_build_day_map_data_with_car_transfer(self):
         """Test map includes car transfer with correct icon"""
         from trips.models import Event, MainTransfer
-        from trips.utils import create_day_map
+        from trips.utils import build_day_map_data
 
         trip = TripFactory()
         day1 = trip.days.first()
@@ -1727,16 +1734,16 @@ class TestMapWithMainTransfers(TestCase):
             end_time="12:00",
         )
 
-        day_map = create_day_map(
+        day_map = build_day_map_data(
             Event.objects.none(), stay=stay, next_day_stay=None, day=day1
         )
         self.assertIsNotNone(day_map)
-        self.assertIn("car", day_map)
+        self.assertIn("car", [m.get("icon") for m in day_map["markers"]])
 
-    def test_create_day_map_with_other_transfer(self):
+    def test_build_day_map_data_with_other_transfer(self):
         """Test map includes other transfer type with correct icon"""
         from trips.models import Event, MainTransfer
-        from trips.utils import create_day_map
+        from trips.utils import build_day_map_data
 
         trip = TripFactory()
         day1 = trip.days.first()
@@ -1755,11 +1762,11 @@ class TestMapWithMainTransfers(TestCase):
             end_time="12:00",
         )
 
-        day_map = create_day_map(
+        day_map = build_day_map_data(
             Event.objects.none(), stay=stay, next_day_stay=None, day=day1
         )
         self.assertIsNotNone(day_map)
-        self.assertIn("person-walking", day_map)
+        self.assertIn("person-walking", [m.get("icon") for m in day_map["markers"]])
 
 
 class TestGetTripStages(TestCase):

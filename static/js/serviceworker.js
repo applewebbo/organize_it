@@ -14,7 +14,7 @@
  * be enabled later without reworking the caching logic.
  */
 
-const CACHE_VERSION = "organize-it-v1";
+const CACHE_VERSION = "organize-it-v2";
 const OFFLINE_URL = "/offline/";
 const PRECACHE_URLS = [OFFLINE_URL];
 

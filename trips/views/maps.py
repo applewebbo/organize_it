@@ -23,7 +23,7 @@ from trips.utils import (
     accessible_trips_qs,
     apply_stage,
     build_categorized_event,
-    create_trip_map,
+    build_trip_map_data,
     editable_trips_qs,
     geocode_city,
     geocode_location,
@@ -251,7 +251,7 @@ def _build_day_groups_context(trip, user):
 
 
 def trip_events_map(request, pk):
-    """HTMX fragment: embedded Folium map for all trip events (trip-detail toggle)."""
+    """HTMX fragment: embedded Leaflet map for all trip events (trip-detail toggle)."""
     trip = get_object_or_404(
         Trip.objects.prefetch_related(
             Prefetch(
@@ -265,13 +265,11 @@ def trip_events_map(request, pk):
     if not accessible_trips_qs(request.user).filter(pk=trip.pk).exists():
         raise Http404
     days_with_events, unassigned_events = _build_map_events_context(trip)
-    trip_map_html = create_trip_map(days_with_events, unassigned_events)
-    context = _build_day_groups_context(trip, request.user)
-    context.update({"trip": trip, "map": trip_map_html})
+    trip_map_data = build_trip_map_data(days_with_events, unassigned_events)
     return TemplateResponse(
         request,
         "trips/includes/events-map-fragment.html",
-        context,
+        {"trip": trip, "map": trip_map_data},
     )
 
 

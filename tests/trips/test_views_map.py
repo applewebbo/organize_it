@@ -771,27 +771,24 @@ class TestTripEventsMapFragment(TestCase):
         response = self.get("trips:trip-events-map", pk=trip.pk)
         self.response_302(response)
 
-    def test_shows_days_grouped_with_events(self):
-        """Regression: the Map tab must list events per day underneath the
-        aggregate map (i.e. include day.html), just like the List tab does."""
+    def test_shows_map_without_day_list(self):
+        """Map tab renders only the aggregate map, replacing the day list."""
         user = self.make_user("owner@example.com")
         trip = TripFactory(author=user)
         day = trip.days.first()
-        ExperienceFactory(trip=trip, day=day, name="Castello Sforzesco")
+        ExperienceFactory(
+            trip=trip,
+            day=day,
+            name="Castello Sforzesco",
+            latitude=45.4705,
+            longitude=9.1793,
+        )
         with self.login(user):
             response = self.get("trips:trip-events-map", pk=trip.pk)
         self.response_200(response)
-        assert f'id="day-{day.pk}"' in response.content.decode()
-
-    def test_plan_day_button_shown_when_ai_enabled(self):
-        user = self.make_user("owner@example.com")
-        user.profile.ai_suggestions_enabled = True
-        user.profile.save()
-        trip = TripFactory(author=user)
-        with self.login(user):
-            response = self.get("trips:trip-events-map", pk=trip.pk)
-        self.response_200(response)
-        assert "Plan the day with AI" in response.content.decode()
+        html = response.content.decode()
+        assert 'id="trip-events-map-data"' in html
+        assert f'id="day-{day.pk}"' not in html
 
 
 class TestTripEventsListFragment(TestCase):

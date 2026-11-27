@@ -53,7 +53,7 @@ class TestMapOfflinePlaceholder(TestCase):
         trip = TripFactory()
         html = render_to_string(
             "trips/includes/events-map-fragment.html",
-            {"trip": trip, "map": "<div>folium</div>"},
+            {"trip": trip, "map": {"mode": "trip"}},
         )
 
         assert PLACEHOLDER_TEXT in html
@@ -72,7 +72,7 @@ class TestMapOfflinePlaceholder(TestCase):
     def test_day_map_content_renders_placeholder_when_map_present(self):
         html = render_to_string(
             "trips/includes/day-map-content.html",
-            {"map": "<div>folium</div>", "locations": {}},
+            {"map": {"mode": "day"}, "locations": {}},
         )
 
         assert PLACEHOLDER_TEXT in html

@@ -17,7 +17,7 @@ from trips.models import (
     Stay,
     TripCollaboration,
 )
-from trips.utils import accessible_trips_qs, create_day_map, editable_trips_qs
+from trips.utils import accessible_trips_qs, build_day_map_data, editable_trips_qs
 
 logger = logging.getLogger(__name__)
 
@@ -108,8 +108,11 @@ def day_detail(request, pk):
             latitude__isnull=False, longitude__isnull=False
         )
 
-        map_obj = create_day_map(events_with_location, stay, next_day_stay, day=day)
-        context["map"] = map_obj
+        map_data = build_day_map_data(
+            events_with_location, stay, next_day_stay, day=day
+        )
+        context["map"] = map_data
+        context["map_data_id"] = f"day-map-data-{day.pk}"
         context["locations"] = locations
 
     # Use wrapper template for HTMX requests to include OOB message swap

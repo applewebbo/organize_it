@@ -3,7 +3,11 @@
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {% if map %}
             <div>
-                <div x-show="$store.connection.online" class="map-container">{{ map|safe }}</div>
+                <div x-show="$store.connection.online" data-embed-map class="map-container">
+                    <div class="embed-map-canvas h-80 w-full rounded-lg lg:h-96"></div>
+                    {% firstof map_data_id "day-map-data" as map_json_id %}
+                    {{ map|json_script:map_json_id }}
+                </div>
                 {% include 'trips/includes/map-offline-placeholder.html' %}
                 {% if show_weather %}
                     {% weather_widget locations.day %}
